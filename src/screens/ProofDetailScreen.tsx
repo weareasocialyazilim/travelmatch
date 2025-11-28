@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
   Dimensions,
+  Image,
+  ScrollView,
   Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
 import { Proof } from '../types';
+import { COLORS } from '../constants/colors';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
+type ProofDetailScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ProofDetail'
+>;
+
+export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
   navigation,
   route,
 }) => {
@@ -31,7 +36,8 @@ export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
     id: proofId,
     type: 'micro-kindness',
     title: 'Coffee for a Stranger',
-    description: 'Today I met an amazing person at Starbucks who was having a tough day. I bought them a coffee and we had a wonderful conversation about travel and kindness. Small gestures can make a big difference! 💙',
+    description:
+      'Today I met an amazing person at Starbucks who was having a tough day. I bought them a coffee and we had a wonderful conversation about travel and kindness. Small gestures can make a big difference! 💙',
     date: '2024-01-15',
     location: 'Starbucks, 5th Avenue, New York',
     amount: 5,
@@ -86,7 +92,10 @@ export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Proof Detail</Text>
@@ -104,7 +113,9 @@ export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={(e) => {
-                const index = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+                const index = Math.round(
+                  e.nativeEvent.contentOffset.x / SCREEN_WIDTH,
+                );
                 setActiveImageIndex(index);
               }}
             >
@@ -137,10 +148,10 @@ export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
             <LinearGradient
               colors={
                 proof.status === 'verified'
-                  ? [COLORS.mint, '#00D084']
+                  ? [COLORS.mint, COLORS.successDark]
                   : proof.status === 'pending'
-                  ? ['#FFB84D', '#FF9500']
-                  : ['#FF6B6B', '#EE5A52']
+                  ? [COLORS.orange, COLORS.orangeDark]
+                  : [COLORS.softRed, COLORS.error]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -172,8 +183,14 @@ export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
         <View style={styles.content}>
           {/* Type Badge */}
           <View style={styles.typeBadge}>
-            <Icon name={getTypeIcon(proof.type)} size={18} color={getTypeColor(proof.type)} />
-            <Text style={[styles.typeText, { color: getTypeColor(proof.type) }]}>
+            <Icon
+              name={getTypeIcon(proof.type)}
+              size={18}
+              color={getTypeColor(proof.type)}
+            />
+            <Text
+              style={[styles.typeText, { color: getTypeColor(proof.type) }]}
+            >
               {proof.type
                 .split('-')
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -237,26 +254,38 @@ export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
               <Text style={styles.sectionTitle}>Verification Timeline</Text>
               <View style={styles.timeline}>
                 <View style={styles.timelineItem}>
-                  <View style={[styles.timelineDot, styles.timelineDotActive]} />
+                  <View
+                    style={[styles.timelineDot, styles.timelineDotActive]}
+                  />
                   <View style={styles.timelineContent}>
                     <Text style={styles.timelineTitle}>Proof Submitted</Text>
-                    <Text style={styles.timelineDate}>Jan 15, 2024 - 10:30 AM</Text>
+                    <Text style={styles.timelineDate}>
+                      Jan 15, 2024 - 10:30 AM
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.timelineLine} />
                 <View style={styles.timelineItem}>
-                  <View style={[styles.timelineDot, styles.timelineDotActive]} />
+                  <View
+                    style={[styles.timelineDot, styles.timelineDotActive]}
+                  />
                   <View style={styles.timelineContent}>
                     <Text style={styles.timelineTitle}>AI Verification</Text>
-                    <Text style={styles.timelineDate}>Jan 15, 2024 - 10:32 AM</Text>
+                    <Text style={styles.timelineDate}>
+                      Jan 15, 2024 - 10:32 AM
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.timelineLine} />
                 <View style={styles.timelineItem}>
-                  <View style={[styles.timelineDot, styles.timelineDotActive]} />
+                  <View
+                    style={[styles.timelineDot, styles.timelineDotActive]}
+                  />
                   <View style={styles.timelineContent}>
                     <Text style={styles.timelineTitle}>Community Verified</Text>
-                    <Text style={styles.timelineDate}>Jan 15, 2024 - 11:00 AM</Text>
+                    <Text style={styles.timelineDate}>
+                      Jan 15, 2024 - 11:00 AM
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -269,191 +298,190 @@ export const ProofDetailScreen: React.FC<{ navigation: any; route: any }> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  shareButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  imageSection: {
-    position: 'relative',
-  },
-  proofImage: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_WIDTH * 0.75,
-  },
-  imageIndicators: {
-    position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  indicator: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-  },
   activeIndicator: {
     backgroundColor: COLORS.white,
     width: 20,
   },
-  statusBadge: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    flexDirection: 'row',
+  backButton: {
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
   },
-  statusText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.white,
+  container: {
+    backgroundColor: COLORS.background,
+    flex: 1,
   },
   content: {
     padding: 20,
   },
-  typeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: COLORS.gray,
-    borderRadius: 16,
-    marginBottom: 12,
-  },
-  typeText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 24,
-  },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flex: 1,
-  },
-  infoText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    flex: 1,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 12,
-  },
   description: {
+    color: COLORS.text,
     fontSize: 15,
     lineHeight: 22,
+  },
+  detailCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    flex: 1,
+    padding: 16,
+  },
+  detailLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    marginTop: 8,
+  },
+  detailValue: {
     color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 4,
   },
   detailsGrid: {
     flexDirection: 'row',
     gap: 12,
     marginBottom: 24,
   },
-  detailCard: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    padding: 16,
-    borderRadius: 12,
+  header: {
     alignItems: 'center',
-    ...VALUES.shadow,
+    borderBottomColor: COLORS.lightGray,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  detailLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 8,
-  },
-  detailValue: {
-    fontSize: 16,
-    fontWeight: '700',
+  headerTitle: {
     color: COLORS.text,
-    marginTop: 4,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  imageIndicators: {
+    bottom: 16,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+  },
+  imageSection: {
+    position: 'relative',
+  },
+  indicator: {
+    backgroundColor: COLORS.whiteTransparentLight,
+    borderRadius: 3,
+    height: 6,
+    width: 6,
+  },
+  infoItem: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 6,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24,
+  },
+  infoText: {
+    color: COLORS.textSecondary,
+    flex: 1,
+    fontSize: 14,
+  },
+  proofImage: {
+    height: SCREEN_WIDTH * 0.75,
+    width: SCREEN_WIDTH,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    color: COLORS.text,
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  shareButton: {
+    alignItems: 'center',
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  statusBadge: {
+    alignItems: 'center',
+    borderRadius: 16,
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    position: 'absolute',
+    right: 16,
+    top: 16,
+  },
+  statusText: {
+    color: COLORS.white,
+    fontSize: 13,
+    fontWeight: '700',
   },
   timeline: {
     marginTop: 8,
-  },
-  timelineItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  timelineDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.lightGray,
-    marginTop: 4,
-  },
-  timelineDotActive: {
-    backgroundColor: COLORS.mint,
-  },
-  timelineLine: {
-    width: 2,
-    height: 24,
-    backgroundColor: COLORS.lightGray,
-    marginLeft: 5,
   },
   timelineContent: {
     flex: 1,
     marginLeft: 12,
   },
+  timelineDate: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+  },
+  timelineDot: {
+    backgroundColor: COLORS.lightGray,
+    borderRadius: 6,
+    height: 12,
+    marginTop: 4,
+    width: 12,
+  },
+  timelineDotActive: {
+    backgroundColor: COLORS.mint,
+  },
+  timelineItem: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+  },
+  timelineLine: {
+    backgroundColor: COLORS.lightGray,
+    height: 24,
+    marginLeft: 5,
+    width: 2,
+  },
   timelineTitle: {
+    color: COLORS.text,
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 4,
   },
-  timelineDate: {
+  title: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 16,
+  },
+  typeBadge: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.gray,
+    borderRadius: 16,
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  typeText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    fontWeight: '600',
   },
 });

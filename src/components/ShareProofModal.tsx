@@ -41,6 +41,7 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
       }
       onClose();
     } catch (error) {
+      // Log the error if the user cancels the share sheet or if another error occurs.
       console.error('Share error:', error);
     }
   };
@@ -99,7 +100,9 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
               style={styles.option}
               onPress={() => handleShare('facebook')}
             >
-              <View style={[styles.optionCircle, { backgroundColor: '#1877F2' }]}>
+              <View
+                style={[styles.optionCircle, { backgroundColor: COLORS.info }]}
+              >
                 <Icon name="facebook" size={32} color={COLORS.white} />
               </View>
               <Text style={styles.optionLabel}>Facebook</Text>
@@ -109,7 +112,12 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
               style={styles.option}
               onPress={() => handleShare('twitter')}
             >
-              <View style={[styles.optionCircle, { backgroundColor: '#1DA1F2' }]}>
+              <View
+                style={[
+                  styles.optionCircle,
+                  { backgroundColor: COLORS.twitter },
+                ]}
+              >
                 <Icon name="twitter" size={32} color={COLORS.white} />
               </View>
               <Text style={styles.optionLabel}>Twitter</Text>
@@ -119,7 +127,12 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
               style={styles.option}
               onPress={() => handleShare('whatsapp')}
             >
-              <View style={[styles.optionCircle, { backgroundColor: '#25D366' }]}>
+              <View
+                style={[
+                  styles.optionCircle,
+                  { backgroundColor: COLORS.whatsapp },
+                ]}
+              >
                 <Icon name="whatsapp" size={32} color={COLORS.white} />
               </View>
               <Text style={styles.optionLabel}>WhatsApp</Text>
@@ -129,7 +142,12 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
               style={styles.option}
               onPress={() => handleShare('native')}
             >
-              <View style={[styles.optionCircle, { backgroundColor: COLORS.textSecondary }]}>
+              <View
+                style={[
+                  styles.optionCircle,
+                  { backgroundColor: COLORS.textSecondary },
+                ]}
+              >
                 <Icon name="share-variant" size={32} color={COLORS.white} />
               </View>
               <Text style={styles.optionLabel}>More</Text>
@@ -148,13 +166,36 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
   backdrop: {
     flex: 1,
+  },
+  closeButton: {
+    padding: LAYOUT.padding / 2,
+  },
+  copyButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.primary + '20',
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  copyButtonText: {
+    color: COLORS.primary,
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
+  },
+  header: {
+    alignItems: 'center',
+    borderBottomColor: COLORS.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: LAYOUT.padding,
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingTop: LAYOUT.padding * 2,
   },
   modal: {
     backgroundColor: COLORS.white,
@@ -162,80 +203,57 @@ const styles = StyleSheet.create({
     borderTopRightRadius: VALUES.borderRadius * 2,
     paddingBottom: LAYOUT.padding * 3,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  option: {
     alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingTop: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
+  optionCircle: {
+    alignItems: 'center',
+    borderRadius: 30,
+    height: 60,
+    justifyContent: 'center',
+    marginBottom: LAYOUT.padding / 2,
+    width: 60,
+  },
+  optionGradient: {
+    alignItems: 'center',
+    borderRadius: 30,
+    height: 60,
+    justifyContent: 'center',
+    marginBottom: LAYOUT.padding / 2,
+    width: 60,
+  },
+  optionLabel: {
     color: COLORS.text,
-  },
-  closeButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  proofInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 2,
-  },
-  proofTitle: {
-    flex: 1,
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding,
   },
   optionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: LAYOUT.padding * 2,
     marginBottom: LAYOUT.padding * 2,
+    paddingHorizontal: LAYOUT.padding * 2,
   },
-  option: {
+  overlay: {
+    backgroundColor: COLORS.modalBackdrop,
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  proofInfo: {
     alignItems: 'center',
-  },
-  optionGradient: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding / 2,
-  },
-  optionCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding / 2,
-  },
-  optionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  copyButton: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary + '20',
-    marginHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 1.5,
-    borderRadius: VALUES.borderRadius,
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 2,
   },
-  copyButtonText: {
+  proofTitle: {
+    color: COLORS.text,
+    flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.primary,
-    marginLeft: LAYOUT.padding / 2,
+    marginLeft: LAYOUT.padding,
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '700',
   },
 });

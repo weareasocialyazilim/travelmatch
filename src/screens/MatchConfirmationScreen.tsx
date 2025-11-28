@@ -1,26 +1,34 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   Animated,
   Dimensions,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Loading } from '../components';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
+import { VALUES } from '../constants/values';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export const MatchConfirmationScreen: React.FC<{ navigation: any; route: any }> = ({
-  navigation,
-  route,
-}) => {
+type MatchConfirmationScreenProps = StackScreenProps<
+  RootStackParamList,
+  'MatchConfirmation'
+>;
+
+export const MatchConfirmationScreen: React.FC<
+  MatchConfirmationScreenProps
+> = ({ navigation, route }) => {
   const [showCelebration, setShowCelebration] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Animations
   const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -67,21 +75,25 @@ export const MatchConfirmationScreen: React.FC<{ navigation: any; route: any }> 
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [fadeAnim, heartAnim, rotateAnim, scaleAnim]);
 
   const handleContinue = () => {
+    setLoading(true);
     // Navigate to Chat with first giver (primary contact)
-    if (selectedGivers.length > 0) {
-      navigation.replace('Chat', { 
-        otherUser: {
-          id: selectedGivers[0].id,
-          name: selectedGivers[0].name,
-          avatar: selectedGivers[0].avatar,
-        }
-      });
-    } else {
-      navigation.navigate('Home');
-    }
+    setTimeout(() => {
+      setLoading(false);
+      if (selectedGivers.length > 0) {
+        navigation.replace('Chat', {
+          otherUser: {
+            id: selectedGivers[0].id,
+            name: selectedGivers[0].name,
+            avatar: selectedGivers[0].avatar,
+          },
+        });
+      } else {
+        navigation.navigate('Home');
+      }
+    }, 1000);
   };
 
   const spin = rotateAnim.interpolate({
@@ -96,6 +108,7 @@ export const MatchConfirmationScreen: React.FC<{ navigation: any; route: any }> 
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <Loading visible={loading} text="Starting Chat..." overlay />
       <LinearGradient
         colors={[COLORS.primary, COLORS.accent, COLORS.secondary]}
         style={styles.gradient}
@@ -125,7 +138,7 @@ export const MatchConfirmationScreen: React.FC<{ navigation: any; route: any }> 
           </Animated.View>
 
           {/* Title */}
-          <Text style={styles.title}>It's a Match!</Text>
+          <Text style={styles.title}>It&apos;s a Match!</Text>
           <Text style={styles.subtitle}>
             Your gesture has been approved by {selectedGivers.length}{' '}
             {selectedGivers.length === 1 ? 'giver' : 'givers'}
@@ -164,11 +177,7 @@ export const MatchConfirmationScreen: React.FC<{ navigation: any; route: any }> 
             <View style={styles.statCard}>
               <Icon name="currency-usd" size={24} color={COLORS.white} />
               <Text style={styles.statValue}>
-                $
-                {selectedGivers.reduce(
-                  (sum: number, giver: any) => sum + giver.amount,
-                  0
-                )}
+                ${selectedGivers.reduce((sum, giver) => sum + giver.amount, 0)}
               </Text>
               <Text style={styles.statLabel}>Total Amount</Text>
             </View>
@@ -247,125 +256,125 @@ export const MatchConfirmationScreen: React.FC<{ navigation: any; route: any }> 
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    alignItems: 'center',
+    bottom: LAYOUT.padding * 4,
+    left: LAYOUT.padding * 2,
+    position: 'absolute',
+    right: LAYOUT.padding * 2,
+  },
+  buttonText: {
+    color: COLORS.primary,
+    fontSize: 18,
+    fontWeight: '700',
+    marginRight: LAYOUT.padding,
+  },
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding * 2,
   },
   content: {
     alignItems: 'center',
     width: '100%',
   },
-  iconContainer: {
-    marginBottom: LAYOUT.padding * 3,
+  continueButton: {
+    marginBottom: LAYOUT.padding * 1.5,
+    width: '100%',
   },
-  title: {
-    fontSize: 42,
-    fontWeight: '800',
-    color: COLORS.white,
-    marginBottom: LAYOUT.padding,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.white,
-    textAlign: 'center',
-    marginBottom: LAYOUT.padding * 3,
-    opacity: 0.9,
-    lineHeight: 26,
+  gradient: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: LAYOUT.padding * 2,
   },
   heartContainer: {
     marginVertical: LAYOUT.padding * 2,
   },
-  messageContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 1.5,
-    borderRadius: VALUES.borderRadius,
+  iconContainer: {
     marginBottom: LAYOUT.padding * 3,
   },
   message: {
+    color: COLORS.white,
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding,
     lineHeight: 20,
+    marginLeft: LAYOUT.padding,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: LAYOUT.padding * 2,
-  },
-  statCard: {
-    flex: 1,
+  messageContainer: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: COLORS.whiteTransparentDark,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 3,
+    paddingHorizontal: LAYOUT.padding * 2,
     paddingVertical: LAYOUT.padding * 1.5,
-    borderRadius: VALUES.borderRadius,
-    marginHorizontal: LAYOUT.padding / 2,
   },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.white,
-    marginTop: LAYOUT.padding / 2,
-    marginBottom: LAYOUT.padding / 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.white,
-    opacity: 0.8,
-  },
-  buttonContainer: {
+  particle: {
     position: 'absolute',
-    bottom: LAYOUT.padding * 4,
-    left: LAYOUT.padding * 2,
-    right: LAYOUT.padding * 2,
-    alignItems: 'center',
   },
-  continueButton: {
+  particlesContainer: {
+    height: '100%',
+    position: 'absolute',
     width: '100%',
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  whiteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.white,
-    paddingVertical: LAYOUT.padding * 2,
-    borderRadius: VALUES.borderRadius,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginRight: LAYOUT.padding,
   },
   skipButton: {
     paddingVertical: LAYOUT.padding,
   },
   skipText: {
+    color: COLORS.white,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.white,
     opacity: 0.8,
   },
-  particlesContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
+  statCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.whiteTransparent,
+    borderRadius: VALUES.borderRadius,
+    flex: 1,
+    marginHorizontal: LAYOUT.padding / 2,
+    paddingVertical: LAYOUT.padding * 1.5,
   },
-  particle: {
-    position: 'absolute',
+  statLabel: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '500',
+    opacity: 0.8,
+  },
+  statValue: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding / 4,
+    marginTop: LAYOUT.padding / 2,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: LAYOUT.padding * 2,
+    width: '100%',
+  },
+  subtitle: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: '600',
+    lineHeight: 26,
+    marginBottom: LAYOUT.padding * 3,
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  title: {
+    color: COLORS.white,
+    fontSize: 42,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding,
+    textAlign: 'center',
+  },
+  whiteButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: LAYOUT.padding * 2,
   },
 });

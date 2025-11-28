@@ -1,27 +1,35 @@
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Loading from '../components/Loading';
 import SocialButton from '../components/SocialButton';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
+import { VALUES } from '../constants/values';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type EmailAuthScreenProps = StackScreenProps<RootStackParamList, 'EmailAuth'>;
+
+export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
+  navigation,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,11 +48,15 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
     }
 
     // Mock authentication - gerçek uygulamada API call yapılacak
-    if (isSignUp) {
-      navigation.navigate('CompleteProfile');
-    } else {
-      navigation.navigate('Home');
-    }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      if (isSignUp) {
+        navigation.navigate('CompleteProfile');
+      } else {
+        navigation.navigate('Home');
+      }
+    }, 1500);
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -53,11 +65,16 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
     navigation.navigate('CompleteProfile');
   };
 
-    const handleContinueWithoutSignup = () => {
-      navigation.replace('Home');
-    };
+  const handleContinueWithoutSignup = () => {
+    navigation.replace('Home');
+  };
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <Loading
+        visible={loading}
+        text={isSignUp ? 'Creating Account...' : 'Signing In...'}
+        overlay
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -67,7 +84,10 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
             <View style={styles.cardInner}>
               {/* Header */}
               <View style={styles.headerRow}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <TouchableOpacity
+                  onPress={() => navigation.goBack()}
+                  style={styles.backButton}
+                >
                   <Icon name="arrow-left" size={22} color={COLORS.text} />
                 </TouchableOpacity>
               </View>
@@ -76,7 +96,9 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                 <View style={styles.iconContainer}>
                   <Icon name="email-outline" size={52} color={COLORS.primary} />
                 </View>
-                <Text style={styles.title}>{isSignUp ? 'Create account' : 'Welcome back'}</Text>
+                <Text style={styles.title}>
+                  {isSignUp ? 'Create account' : 'Welcome back'}
+                </Text>
                 <Text style={styles.subtitleText}>
                   {isSignUp
                     ? 'Sign up with your email to get started'
@@ -84,7 +106,11 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                 </Text>
                 {/* Email Input */}
                 <View style={[styles.inputContainer, styles.inputWithIcon]}>
-                  <Icon name="email-outline" size={20} color={COLORS.textSecondary} />
+                  <Icon
+                    name="email-outline"
+                    size={20}
+                    color={COLORS.textSecondary}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="Email address"
@@ -98,7 +124,11 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                 </View>
                 {/* Password Input */}
                 <View style={[styles.inputContainer, styles.inputWithIcon]}>
-                  <Icon name="lock-outline" size={20} color={COLORS.textSecondary} />
+                  <Icon
+                    name="lock-outline"
+                    size={20}
+                    color={COLORS.textSecondary}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="Password"
@@ -109,7 +139,9 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
                     <Icon
                       name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                       size={20}
@@ -120,7 +152,9 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                 {/* Forgot Password */}
                 {!isSignUp && (
                   <TouchableOpacity style={styles.forgotPassword}>
-                    <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+                    <Text style={styles.forgotPasswordText}>
+                      Forgot password?
+                    </Text>
                   </TouchableOpacity>
                 )}
                 {/* Continue Button */}
@@ -135,13 +169,17 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                     end={{ x: 1, y: 0 }}
                     style={styles.continueGradient}
                   >
-                    <Text style={styles.continueButtonText}>{isSignUp ? 'Sign Up' : 'Sign In'}</Text>
+                    <Text style={styles.continueButtonText}>
+                      {isSignUp ? 'Sign Up' : 'Sign In'}
+                    </Text>
                   </LinearGradient>
                 </TouchableOpacity>
                 {/* Toggle Sign Up/Sign In */}
                 <View style={styles.toggleContainer}>
                   <Text style={styles.toggleText}>
-                    {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                    {isSignUp
+                      ? 'Already have an account?'
+                      : "Don't have an account?"}
                   </Text>
                   <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
                     <Text style={styles.toggleLink}>
@@ -157,9 +195,21 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                 </View>
                 {/* Social Options */}
                 <View style={styles.socialContainerRow}>
-                  <SocialButton provider="google" size="icon" onPress={() => handleSocialLogin('google')} />
-                  <SocialButton provider="apple" size="icon" onPress={() => handleSocialLogin('apple')} />
-                  <SocialButton provider="facebook" size="icon" onPress={() => handleSocialLogin('facebook')} />
+                  <SocialButton
+                    provider="google"
+                    size="icon"
+                    onPress={() => handleSocialLogin('google')}
+                  />
+                  <SocialButton
+                    provider="apple"
+                    size="icon"
+                    onPress={() => handleSocialLogin('apple')}
+                  />
+                  <SocialButton
+                    provider="facebook"
+                    size="icon"
+                    onPress={() => handleSocialLogin('facebook')}
+                  />
                 </View>
                 {/* Terms */}
                 <Text style={styles.terms}>
@@ -179,7 +229,9 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                   >
-                    <Text style={styles.continueWithoutSignupText}>Üye olmadan devam et</Text>
+                    <Text style={styles.continueWithoutSignupText}>
+                      Üye olmadan devam et
+                    </Text>
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
@@ -192,70 +244,100 @@ export const EmailAuthScreen: React.FC<{ navigation: any }> = ({ navigation }) =
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  gradient: {
-    flex: 1,
-  },
-  screenCenter: {
-    flex: 1,
-    justifyContent: 'center',
+  backButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.background,
-    paddingVertical: LAYOUT.padding * 2,
+    borderRadius: 10,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
   },
   cardContainer: {
-    width: '92%',
-    maxWidth: 420,
-    borderRadius: VALUES.borderRadius * 1.6,
     backgroundColor: COLORS.card,
+    borderRadius: VALUES.borderRadius * 1.6,
+    maxWidth: 420,
+    width: '92%',
     ...VALUES.shadow,
     overflow: 'hidden',
   },
   cardInner: {
     padding: LAYOUT.padding * 2,
   },
-  keyboardView: {
+  container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
+  content: {
+    justifyContent: 'center',
+    width: '100%',
+  },
+  continueButton: {
+    borderRadius: VALUES.borderRadius,
+    marginBottom: LAYOUT.spacing.md,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  continueButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  continueGradient: {
+    alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  continueWithoutSignupButton: {
+    borderRadius: VALUES.borderRadius,
+    marginTop: LAYOUT.spacing.lg,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  continueWithoutSignupGradient: {
+    alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 1.3,
+  },
+  continueWithoutSignupText: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  divider: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: LAYOUT.spacing.lg,
+  },
+  dividerLine: {
+    backgroundColor: COLORS.border,
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    marginHorizontal: 12,
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 24,
+  },
+  forgotPasswordText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '600',
   },
   headerRow: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'flex-start',
     marginBottom: LAYOUT.spacing.md,
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-  },
-  content: {
-    width: '100%',
-    justifyContent: 'center',
   },
   iconContainer: {
     alignSelf: 'center',
     marginBottom: LAYOUT.spacing.lg,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
+  input: {
     color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: LAYOUT.spacing.sm,
-  },
-  subtitleText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: LAYOUT.spacing.lg,
+    flex: 1,
+    fontSize: 16,
+    marginLeft: 12,
   },
   inputContainer: {
     marginBottom: 16,
@@ -263,112 +345,59 @@ const styles = StyleSheet.create({
   inputWithIcon: {
     gap: 12,
   },
-  input: {
+  keyboardView: {
     flex: 1,
-    fontSize: 16,
-    color: COLORS.text,
-    marginLeft: 12,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: COLORS.white,
-    fontWeight: '600',
-  },
-  continueButton: {
-    width: '100%',
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-    marginBottom: LAYOUT.spacing.md,
-  },
-  continueGradient: {
-    paddingVertical: LAYOUT.padding * 1.5,
+  screenCenter: {
     alignItems: 'center',
-  },
-  continueButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 32,
-  },
-  toggleText: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
-  },
-  toggleLink: {
-    fontSize: 14,
-    color: COLORS.white,
-    fontWeight: '700',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: LAYOUT.spacing.lg,
-  },
-  dividerLine: {
+    backgroundColor: COLORS.background,
     flex: 1,
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  dividerText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginHorizontal: 12,
-  },
-  socialContainer: {
-    flexDirection: 'row',
     justifyContent: 'center',
-    gap: 16,
-    marginBottom: 24,
+    paddingVertical: LAYOUT.padding * 2,
   },
   socialContainerRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     gap: 16,
+    justifyContent: 'center',
     marginBottom: 24,
   },
-  socialButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-    continueWithoutSignupButton: {
-      marginTop: LAYOUT.spacing.lg,
-      width: '100%',
-      borderRadius: VALUES.borderRadius,
-      overflow: 'hidden',
-    },
-    continueWithoutSignupGradient: {
-      paddingVertical: LAYOUT.padding * 1.3,
-      alignItems: 'center',
-    },
-    continueWithoutSignupText: {
-      color: COLORS.white,
-      fontSize: 15,
-      fontWeight: '700',
-    },
-  terms: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+  subtitleText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    marginBottom: LAYOUT.spacing.lg,
     textAlign: 'center',
+  },
+  terms: {
+    color: COLORS.whiteTransparentLight,
+    fontSize: 12,
     lineHeight: 18,
+    textAlign: 'center',
   },
   termsLink: {
-    fontWeight: '700',
     color: COLORS.white,
+    fontWeight: '700',
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: LAYOUT.spacing.sm,
+    textAlign: 'center',
+  },
+  toggleContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    marginBottom: 32,
+  },
+  toggleLink: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  toggleText: {
+    color: COLORS.whiteTransparent,
+    fontSize: 14,
   },
 });

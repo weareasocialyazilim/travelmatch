@@ -1,5 +1,12 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  View,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
@@ -12,7 +19,7 @@ interface Props {
   label?: string;
   onPress?: () => void;
   size?: 'full' | 'icon';
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }
 
 const iconMap: Record<Provider, string> = {
@@ -23,7 +30,13 @@ const iconMap: Record<Provider, string> = {
   email: 'email',
 };
 
-const SocialButton: React.FC<Props> = ({ provider, label, onPress, size = 'full', style }) => {
+const SocialButton: React.FC<Props> = ({
+  provider,
+  label,
+  onPress,
+  size = 'full',
+  style,
+}) => {
   const iconName = iconMap[provider];
 
   const providerStyles = {
@@ -37,7 +50,7 @@ const SocialButton: React.FC<Props> = ({ provider, label, onPress, size = 'full'
       wrapperBg: COLORS.black,
       iconColor: COLORS.white,
       textColor: COLORS.white,
-      borderColor: 'transparent',
+      borderColor: COLORS.transparent,
     },
     facebook: {
       wrapperBg: COLORS.white,
@@ -49,25 +62,32 @@ const SocialButton: React.FC<Props> = ({ provider, label, onPress, size = 'full'
       wrapperBg: COLORS.primary,
       iconColor: COLORS.white,
       textColor: COLORS.white,
-      borderColor: 'transparent',
+      borderColor: COLORS.transparent,
     },
     email: {
-      wrapperBg: 'transparent',
+      wrapperBg: COLORS.transparent,
       iconColor: COLORS.white,
       textColor: COLORS.white,
-      borderColor: 'rgba(255,255,255,0.18)',
+      borderColor: COLORS.whiteTransparent,
     },
   }[provider];
 
   const iconCircleBg =
     provider === 'apple' || provider === 'google' || provider === 'facebook'
       ? COLORS.white
-      : 'transparent';
+      : COLORS.transparent;
 
   if (size === 'icon') {
     return (
       <TouchableOpacity
-        style={[styles.iconButton, { backgroundColor: providerStyles.wrapperBg, borderColor: providerStyles.borderColor }, style]}
+        style={[
+          styles.iconButton,
+          {
+            backgroundColor: providerStyles.wrapperBg,
+            borderColor: providerStyles.borderColor,
+          },
+          style,
+        ]}
         onPress={onPress}
         activeOpacity={0.8}
         accessible
@@ -83,7 +103,10 @@ const SocialButton: React.FC<Props> = ({ provider, label, onPress, size = 'full'
     <TouchableOpacity
       style={[
         styles.fullButton,
-        { backgroundColor: providerStyles.wrapperBg, borderColor: providerStyles.borderColor },
+        {
+          backgroundColor: providerStyles.wrapperBg,
+          borderColor: providerStyles.borderColor,
+        },
         style,
       ]}
       onPress={onPress}
@@ -92,49 +115,51 @@ const SocialButton: React.FC<Props> = ({ provider, label, onPress, size = 'full'
       accessibilityRole="button"
       accessibilityLabel={label || `Continue with ${provider}`}
     >
-      <View style={[styles.iconWrapper, { backgroundColor: iconCircleBg }]}> 
+      <View style={[styles.iconWrapper, { backgroundColor: iconCircleBg }]}>
         <Icon name={iconName} size={18} color={providerStyles.iconColor} />
       </View>
-      <Text style={[styles.label, { color: providerStyles.textColor }]}>{label}</Text>
+      <Text style={[styles.label, { color: providerStyles.textColor }]}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   fullButton: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: LAYOUT.padding * 1.4,
-    paddingHorizontal: 14,
     borderRadius: VALUES.borderRadius,
     borderWidth: 1,
-    width: '100%',
+    flexDirection: 'row',
     marginBottom: 10,
     minHeight: 56,
+    paddingHorizontal: 14,
+    paddingVertical: LAYOUT.padding * 1.4,
+    width: '100%',
+  },
+  iconButton: {
+    alignItems: 'center',
+    borderRadius: 28,
+    borderWidth: 1,
+    elevation: 2,
+    height: 56,
+    justifyContent: 'center',
+    shadowColor: COLORS.shadowColor,
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    width: 56,
   },
   iconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
     alignItems: 'center',
+    borderRadius: 18,
+    height: 36,
     justifyContent: 'center',
     marginRight: 12,
+    width: 36,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  iconButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    shadowColor: COLORS.shadowColor,
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
   },
 });
 

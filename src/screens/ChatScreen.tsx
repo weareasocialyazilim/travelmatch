@@ -1,24 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   FlatList,
-  TextInput,
-  TouchableOpacity,
+  Image,
   KeyboardAvoidingView,
   Platform,
-  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
-import { Message } from '../types';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, { useEffect, useRef, useState } from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 import { MOCK_MESSAGES } from '../mocks';
+import { Message } from '../types';
+import { LAYOUT } from '../constants/layout';
+import { VALUES } from '../constants/values';
+import { COLORS } from '../constants/colors';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
+type ChatScreenProps = StackScreenProps<RootStackParamList, 'Chat'>;
+
+export const ChatScreen: React.FC<ChatScreenProps> = ({
   navigation,
   route,
 }) => {
@@ -73,7 +78,9 @@ export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
         <View
           style={[
             styles.messageContainer,
-            item.isMine ? styles.myMessageContainer : styles.otherMessageContainer,
+            item.isMine
+              ? styles.myMessageContainer
+              : styles.otherMessageContainer,
           ]}
         >
           <TouchableOpacity
@@ -91,7 +98,7 @@ export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
               style={styles.proofImage}
             />
             <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.7)']}
+              colors={[COLORS.transparent, COLORS.blackTransparent]}
               style={styles.proofOverlay}
             >
               <View style={styles.proofTypeBadge}>
@@ -133,7 +140,9 @@ export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
       <View
         style={[
           styles.messageContainer,
-          item.isMine ? styles.myMessageContainer : styles.otherMessageContainer,
+          item.isMine
+            ? styles.myMessageContainer
+            : styles.otherMessageContainer,
         ]}
       >
         <View
@@ -181,7 +190,9 @@ export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
 
         <TouchableOpacity
           style={styles.userInfo}
-          onPress={() => navigation.navigate('ProfileDetail', { userId: otherUser.id })}
+          onPress={() =>
+            navigation.navigate('ProfileDetail', { userId: otherUser.id })
+          }
           activeOpacity={0.8}
         >
           <Image source={{ uri: otherUser.avatar }} style={styles.avatar} />
@@ -189,7 +200,9 @@ export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
             <Text style={styles.userName}>{otherUser.name}</Text>
             <View style={styles.trustBadge}>
               <Icon name="shield-check" size={12} color={COLORS.white} />
-              <Text style={styles.trustScore}>{otherUser.trustScore}% Trust</Text>
+              <Text style={styles.trustScore}>
+                {otherUser.trustScore}% Trust
+              </Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -221,7 +234,10 @@ export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
         keyboardVerticalOffset={90}
       >
         <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.attachButton} onPress={handleAttachProof}>
+          <TouchableOpacity
+            style={styles.attachButton}
+            onPress={handleAttachProof}
+          >
             <Icon name="plus-circle" size={28} color={COLORS.primary} />
           </TouchableOpacity>
 
@@ -264,197 +280,197 @@ export const ChatScreen: React.FC<{ navigation: any; route: any }> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+  attachButton: {
+    marginRight: LAYOUT.padding / 2,
+    padding: LAYOUT.padding / 2,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    paddingVertical: LAYOUT.padding * 1.5,
+  avatar: {
+    borderColor: COLORS.white,
+    borderRadius: 20,
+    borderWidth: 2,
+    height: 40,
+    width: 40,
   },
   backButton: {
     padding: LAYOUT.padding / 2,
   },
-  userInfo: {
+  container: {
+    backgroundColor: COLORS.background,
     flex: 1,
-    flexDirection: 'row',
+  },
+  header: {
     alignItems: 'center',
-    marginLeft: LAYOUT.padding,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: COLORS.white,
-  },
-  userDetails: {
-    marginLeft: LAYOUT.padding,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginBottom: LAYOUT.padding / 4,
-  },
-  trustBadge: {
     flexDirection: 'row',
-    alignItems: 'center',
+    paddingHorizontal: LAYOUT.padding * 1.5,
+    paddingVertical: LAYOUT.padding * 1.5,
   },
-  trustScore: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding / 4,
+  input: {
+    backgroundColor: COLORS.background,
+    borderRadius: VALUES.borderRadius,
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '400',
+    maxHeight: 100,
+    paddingHorizontal: LAYOUT.padding * 1.5,
+    paddingVertical: LAYOUT.padding,
   },
-  moreButton: {
-    padding: LAYOUT.padding / 2,
+  inputContainer: {
+    alignItems: 'flex-end',
+    backgroundColor: COLORS.white,
+    borderTopColor: COLORS.border,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    paddingHorizontal: LAYOUT.padding * 1.5,
+    paddingVertical: LAYOUT.padding,
   },
-  messagesList: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 2,
+  messageBubble: {
+    borderRadius: VALUES.borderRadius,
+    paddingHorizontal: LAYOUT.padding * 1.5,
+    paddingVertical: LAYOUT.padding,
   },
   messageContainer: {
     marginBottom: LAYOUT.padding * 1.5,
     maxWidth: '80%',
-  },
-  myMessageContainer: {
-    alignSelf: 'flex-end',
-  },
-  otherMessageContainer: {
-    alignSelf: 'flex-start',
-  },
-  messageBubble: {
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    paddingVertical: LAYOUT.padding,
-    borderRadius: VALUES.borderRadius,
-  },
-  myMessage: {
-    backgroundColor: COLORS.primary,
-    borderBottomRightRadius: 4,
-  },
-  otherMessage: {
-    backgroundColor: COLORS.white,
-    borderBottomLeftRadius: 4,
   },
   messageText: {
     fontSize: 15,
     fontWeight: '400',
     lineHeight: 20,
   },
+  messagesList: {
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 2,
+  },
+  moreButton: {
+    padding: LAYOUT.padding / 2,
+  },
+  myMessage: {
+    backgroundColor: COLORS.primary,
+    borderBottomRightRadius: 4,
+  },
+  myMessageContainer: {
+    alignSelf: 'flex-end',
+  },
   myMessageText: {
     color: COLORS.white,
-  },
-  otherMessageText: {
-    color: COLORS.text,
-  },
-  timestamp: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-    marginTop: LAYOUT.padding / 2,
-  },
-  myTimestamp: {
-    textAlign: 'right',
-  },
-  otherTimestamp: {
-    textAlign: 'left',
-  },
-  proofMessage: {
-    width: 250,
-    height: 200,
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-    position: 'relative',
   },
   myProofMessage: {
     // Additional styles if needed
   },
+  myTimestamp: {
+    textAlign: 'right',
+  },
+  otherMessage: {
+    backgroundColor: COLORS.white,
+    borderBottomLeftRadius: 4,
+  },
+  otherMessageContainer: {
+    alignSelf: 'flex-start',
+  },
+  otherMessageText: {
+    color: COLORS.text,
+  },
   otherProofMessage: {
     // Additional styles if needed
   },
+  otherTimestamp: {
+    textAlign: 'left',
+  },
+  proofAction: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  proofActionText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '600',
+    marginRight: LAYOUT.padding / 4,
+  },
   proofImage: {
-    width: '100%',
     height: '100%',
+    width: '100%',
+  },
+  proofMessage: {
+    borderRadius: VALUES.borderRadius,
+    height: 200,
+    overflow: 'hidden',
+    position: 'relative',
+    width: 250,
   },
   proofOverlay: {
-    position: 'absolute',
     bottom: 0,
     left: 0,
-    right: 0,
     padding: LAYOUT.padding,
+    position: 'absolute',
+    right: 0,
   },
-  proofTypeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: LAYOUT.padding / 2,
-    paddingVertical: LAYOUT.padding / 4,
-    borderRadius: VALUES.borderRadius / 4,
+  proofTitle: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
     marginBottom: LAYOUT.padding / 2,
   },
+  proofTypeBadge: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.whiteTransparent,
+    borderRadius: VALUES.borderRadius / 4,
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding / 2,
+    paddingHorizontal: LAYOUT.padding / 2,
+    paddingVertical: LAYOUT.padding / 4,
+  },
   proofTypeText: {
+    color: COLORS.white,
     fontSize: 10,
     fontWeight: '700',
-    color: COLORS.white,
     marginLeft: LAYOUT.padding / 4,
     textTransform: 'uppercase',
   },
-  proofTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginBottom: LAYOUT.padding / 2,
-  },
-  proofAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  proofActionText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.white,
-    marginRight: LAYOUT.padding / 4,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    paddingVertical: LAYOUT.padding,
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  attachButton: {
-    padding: LAYOUT.padding / 2,
-    marginRight: LAYOUT.padding / 2,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    borderRadius: VALUES.borderRadius,
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    paddingVertical: LAYOUT.padding,
-    fontSize: 15,
-    fontWeight: '400',
-    color: COLORS.text,
-    maxHeight: 100,
-  },
   sendButton: {
-    marginLeft: LAYOUT.padding / 2,
     borderRadius: 22,
+    marginLeft: LAYOUT.padding / 2,
     overflow: 'hidden',
   },
   sendButtonDisabled: {
     opacity: 0.5,
   },
   sendButtonGradient: {
-    width: 44,
+    alignItems: 'center',
     height: 44,
     justifyContent: 'center',
+    width: 44,
+  },
+  timestamp: {
+    color: COLORS.textSecondary,
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: LAYOUT.padding / 2,
+  },
+  trustBadge: {
     alignItems: 'center',
+    flexDirection: 'row',
+  },
+  trustScore: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 4,
+  },
+  userDetails: {
+    marginLeft: LAYOUT.padding,
+  },
+  userInfo: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    marginLeft: LAYOUT.padding,
+  },
+  userName: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding / 4,
   },
 });

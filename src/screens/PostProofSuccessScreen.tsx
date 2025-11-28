@@ -1,12 +1,25 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '../constants/colors';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-export const PostProofSuccessScreen: React.FC<{ navigation: any; route: any }> = ({
+type PostProofSuccessScreenProps = StackScreenProps<
+  RootStackParamList,
+  'PostProofSuccess'
+>;
+
+export const PostProofSuccessScreen: React.FC<PostProofSuccessScreenProps> = ({
   navigation,
   route,
 }) => {
@@ -32,7 +45,7 @@ export const PostProofSuccessScreen: React.FC<{ navigation: any; route: any }> =
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, scaleAnim]);
 
   const handleViewProof = () => {
     navigation.navigate('ProofDetail', { proofId });
@@ -49,7 +62,7 @@ export const PostProofSuccessScreen: React.FC<{ navigation: any; route: any }> =
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <LinearGradient
-        colors={['#00D084', '#00B372']}
+        colors={[COLORS.success, COLORS.successDark]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
@@ -73,16 +86,20 @@ export const PostProofSuccessScreen: React.FC<{ navigation: any; route: any }> =
           </Animated.View>
 
           {/* Success Message */}
-          <Animated.View style={[styles.messageContainer, { opacity: fadeAnim }]}>
+          <Animated.View
+            style={[styles.messageContainer, { opacity: fadeAnim }]}
+          >
             <Text style={styles.title}>Proof Uploaded!</Text>
             <Text style={styles.subtitle}>
-              Your proof has been successfully submitted and is now being verified by our AI
-              system.
+              Your proof has been successfully submitted and is now being
+              verified by our AI system.
             </Text>
           </Animated.View>
 
           {/* Status Cards */}
-          <Animated.View style={[styles.statusContainer, { opacity: fadeAnim }]}>
+          <Animated.View
+            style={[styles.statusContainer, { opacity: fadeAnim }]}
+          >
             <View style={styles.statusCard}>
               <Icon name="robot" size={32} color={COLORS.mint} />
               <Text style={styles.statusLabel}>AI Verification</Text>
@@ -104,28 +121,38 @@ export const PostProofSuccessScreen: React.FC<{ navigation: any; route: any }> =
 
           {/* Info Banner */}
           <Animated.View style={[styles.infoBanner, { opacity: fadeAnim }]}>
-            <Icon name="information" size={20} color="#00B372" />
+            <Icon name="information" size={20} color={COLORS.successDark} />
             <Text style={styles.infoText}>
-              You'll be notified once verification is complete. Typically takes 2-5 minutes.
+              You&apos;ll be notified once verification is complete. Typically
+              takes 2-5 minutes.
             </Text>
           </Animated.View>
         </View>
 
         {/* Action Buttons */}
         <Animated.View style={[styles.actionsContainer, { opacity: fadeAnim }]}>
-          <TouchableOpacity style={styles.primaryButton} onPress={handleViewProof}>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={handleViewProof}
+          >
             <Icon name="eye" size={20} color={COLORS.white} />
             <Text style={styles.primaryButtonText}>View Proof</Text>
           </TouchableOpacity>
 
           <View style={styles.secondaryButtons}>
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleShareProof}>
-              <Icon name="share-variant" size={20} color="#00B372" />
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleShareProof}
+            >
+              <Icon name="share-variant" size={20} color={COLORS.successDark} />
               <Text style={styles.secondaryButtonText}>Share as Story</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleDone}>
-              <Icon name="wallet" size={20} color="#00B372" />
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleDone}
+            >
+              <Icon name="wallet" size={20} color={COLORS.successDark} />
               <Text style={styles.secondaryButtonText}>Go to Wallet</Text>
             </TouchableOpacity>
           </View>
@@ -136,17 +163,30 @@ export const PostProofSuccessScreen: React.FC<{ navigation: any; route: any }> =
 };
 
 const styles = StyleSheet.create({
+  actionsContainer: {
+    padding: 24,
+    paddingBottom: 40,
+  },
   container: {
     flex: 1,
+  },
+  content: {
+    alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 60,
   },
   gradient: {
     flex: 1,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
+  iconCircle: {
     alignItems: 'center',
+    backgroundColor: COLORS.whiteTransparentDark,
+    borderRadius: 80,
+    height: 160,
+    justifyContent: 'center',
+    width: 160,
+    zIndex: 3,
   },
   iconContainer: {
     alignItems: 'center',
@@ -154,126 +194,113 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     position: 'relative',
   },
-  iconCircle: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 3,
-  },
   iconRing1: {
+    backgroundColor: COLORS.whiteTransparentDarker,
+    borderRadius: 100,
+    height: 200,
     position: 'absolute',
     width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     zIndex: 2,
   },
   iconRing2: {
+    backgroundColor: COLORS.whiteTransparentDarkest,
+    borderRadius: 120,
+    height: 240,
     position: 'absolute',
     width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     zIndex: 1,
+  },
+  infoBanner: {
+    alignItems: 'center',
+    backgroundColor: COLORS.glassBackground,
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 12,
+    padding: 16,
+  },
+  infoText: {
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
   },
   messageContainer: {
     alignItems: 'center',
     marginBottom: 40,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: COLORS.white,
+  primaryButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
     marginBottom: 12,
-    textAlign: 'center',
+    paddingVertical: 16,
   },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 20,
+  primaryButtonText: {
+    color: COLORS.successDark,
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  secondaryButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.whiteTransparentDark,
+    borderColor: COLORS.whiteTransparentLight,
+    borderRadius: 12,
+    borderWidth: 1,
+    flex: 1,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    paddingVertical: 14,
+  },
+  secondaryButtonText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  secondaryButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  statusCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    flex: 1,
+    padding: 16,
   },
   statusContainer: {
     flexDirection: 'row',
     gap: 12,
     marginBottom: 24,
   },
-  statusCard: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
   statusLabel: {
-    fontSize: 12,
     color: COLORS.textSecondary,
+    fontSize: 12,
     marginTop: 8,
     textAlign: 'center',
   },
   statusValue: {
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
     marginTop: 4,
     textAlign: 'center',
   },
-  infoBanner: {
-    flexDirection: 'row',
-    gap: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
+  subtitle: {
+    color: COLORS.subtitle,
+    fontSize: 16,
+    lineHeight: 24,
+    paddingHorizontal: 20,
+    textAlign: 'center',
   },
-  infoText: {
-    flex: 1,
-    fontSize: 14,
-    color: COLORS.text,
-    lineHeight: 20,
-  },
-  actionsContainer: {
-    padding: 24,
-    paddingBottom: 40,
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: COLORS.white,
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  primaryButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#00B372',
-  },
-  secondaryButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  secondaryButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
+  title: {
     color: COLORS.white,
+    fontSize: 32,
+    fontWeight: '700',
+    marginBottom: 12,
+    textAlign: 'center',
   },
 });
