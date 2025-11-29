@@ -36,12 +36,17 @@ export const ConfirmGiftModal: React.FC<Props> = ({
       <View style={styles.backdrop}>
         <View style={styles.container}>
           <View style={styles.iconContainer}>
-            <MaterialCommunityIcons name="gift-outline" size={48} color="#5BC08A" />
+            <MaterialCommunityIcons
+              name="gift-outline"
+              size={48}
+              color={COLORS.success}
+            />
           </View>
 
           <Text style={styles.title}>Confirm Gift</Text>
           <Text style={styles.message}>
-            Send <Text style={styles.amount}>${amount.toFixed(2)}</Text> to{'\n'}
+            Send <Text style={styles.amount}>${amount.toFixed(2)}</Text> to
+            {'\n'}
             <Text style={styles.recipient}>{recipientName}</Text>?
           </Text>
 
@@ -69,23 +74,57 @@ export const ConfirmGiftModal: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
+  amount: {
+    color: COLORS.success,
+    fontSize: 17,
+    fontWeight: '700',
+  },
   backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.modalBackdrop,
+    flex: 1,
+    justifyContent: 'center',
     padding: 20,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  cancelButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.gray,
+    borderRadius: 999,
+    flex: 1,
+    paddingVertical: 14,
+  },
+  cancelButtonText: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  confirmButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.buttonDark,
+    borderRadius: 999,
+    flex: 1,
+    paddingVertical: 14,
+  },
+  confirmButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
   container: {
+    alignItems: 'center',
     backgroundColor: COLORS.white,
     borderRadius: 24,
+    maxWidth: LAYOUT.size.modalMax,
     padding: 32,
     width: '100%',
-    maxWidth: LAYOUT.size.modalMax,
-    alignItems: 'center',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: COLORS.black,
         shadowOffset: LAYOUT.shadowOffset.xxl,
         shadowOpacity: 0.15,
         shadowRadius: 20,
@@ -96,63 +135,29 @@ const styles = StyleSheet.create({
     }),
   },
   iconContainer: {
-    width: LAYOUT.size.iconSm,
-    height: LAYOUT.size.iconSm,
-    borderRadius: 40,
-    backgroundColor: COLORS.successLight,
     alignItems: 'center',
+    backgroundColor: COLORS.successLight,
+    borderRadius: 40,
+    height: LAYOUT.size.iconSm,
     justifyContent: 'center',
     marginBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 12,
+    width: LAYOUT.size.iconSm,
   },
   message: {
-    fontSize: 16,
     color: COLORS.textSecondary,
-    textAlign: 'center',
+    fontSize: 16,
     lineHeight: 24,
     marginBottom: 32,
-  },
-  amount: {
-    fontWeight: '700',
-    color: COLORS.success,
-    fontSize: 17,
+    textAlign: 'center',
   },
   recipient: {
-    fontWeight: '600',
     color: COLORS.text,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    width: '100%',
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 999,
-    backgroundColor: COLORS.gray,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 16,
     fontWeight: '600',
+  },
+  title: {
     color: COLORS.text,
-  },
-  confirmButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 999,
-    backgroundColor: COLORS.buttonDark,
-    alignItems: 'center',
-  },
-  confirmButtonText: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: '700',
-    color: COLORS.white,
+    marginBottom: 12,
   },
 });

@@ -14,8 +14,8 @@ export const GlassView: React.FC<GlassViewProps> = ({ children, style }) => {
 const styles = StyleSheet.create({
   glassContainer: {
     backgroundColor: COLORS.glassBackground,
-    borderWidth: 1,
     borderColor: COLORS.glassBorder,
+    borderWidth: 1,
     overflow: 'hidden',
   },
 });

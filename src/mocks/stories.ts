@@ -6,7 +6,8 @@ export const MOCK_PROOF_STORY: ProofStory = {
   userId: 'user1',
   type: 'micro-kindness',
   title: 'Coffee for a Stranger',
-  description: 'Today I met an amazing person at Starbucks who was having a tough day. I bought them a coffee and we had a wonderful conversation about travel and kindness. Small gestures can make a big difference!',
+  description:
+    'Today I met an amazing person at Starbucks who was having a tough day. I bought them a coffee and we had a wonderful conversation about travel and kindness. Small gestures can make a big difference!',
   location: {
     lat: 37.7749,
     lng: -122.4194,

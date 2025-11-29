@@ -1,5 +1,5 @@
-import React, {createContext, useContext, useState, ReactNode} from 'react';
-import {User} from '../types/index';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { User } from '../types/index';
 
 interface AuthContextType {
   user: User | null;
@@ -10,7 +10,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
 
   const login = (userData: User) => {
@@ -24,7 +26,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
   const isAuthenticated = user !== null;
 
   return (
-    <AuthContext.Provider value={{user, login, logout, isAuthenticated}}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

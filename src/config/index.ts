@@ -1,5 +1,4 @@
-const API_URL =
-  process.env.API_URL || 'https://api.travelmatch.com';
+const API_URL = process.env.API_URL || 'https://api.travelmatch.com';
 
 const config = {
   apiUrl: API_URL,

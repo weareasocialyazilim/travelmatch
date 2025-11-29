@@ -10,7 +10,7 @@ export const LAYOUT = {
     lg: 16,
     xl: 24,
   },
-  
+
   // Border radius
   borderRadius: {
     sm: 8,
@@ -18,36 +18,36 @@ export const LAYOUT = {
     lg: 16,
     full: 9999,
   },
-  
+
   // Component sizes
   header: {
     titleSize: 34,
     buttonSize: 48,
   },
-  
+
   avatar: {
     size: 32,
     borderRadius: 16,
   },
-  
+
   verifiedBadge: {
     size: 32,
     borderRadius: 16,
   },
-  
+
   // Card
   card: {
     imageAspectRatio: 16 / 9,
     borderRadius: 16,
     padding: 16,
   },
-  
+
   // Filter pill
   filterPill: {
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  
+
   // Bottom nav
   bottomNav: {
     gradientHeight: 96,
@@ -57,14 +57,14 @@ export const LAYOUT = {
     paddingVertical: 16,
     paddingHorizontal: 8,
   },
-  
+
   // List
   list: {
     contentPaddingHorizontal: 16,
     contentPaddingBottom: 120,
     contentPaddingTop: 8,
   },
-  
+
   // Shadow offsets
   shadowOffset: {
     none: { width: 0, height: 0 },
@@ -75,7 +75,7 @@ export const LAYOUT = {
     xxl: { width: 0, height: 10 },
     bottomSheet: { width: 0, height: -3 },
   },
-  
+
   // Sizes for modals and containers
   size: {
     errorButtonMin: 200,

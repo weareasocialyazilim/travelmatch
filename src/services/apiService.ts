@@ -1,4 +1,16 @@
-import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError} from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
+import { Moment, Transaction, User } from '../types';
+
+// Data Transfer Objects (DTOs)
+type CreateMomentDto = Omit<Moment, 'id' | 'createdAt' | 'updatedAt'>;
+type UpdateMomentDto = Partial<CreateMomentDto>;
+type CreateTransactionDto = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>;
+type UpdateProfileDto = Partial<User>;
 
 interface ApiError {
   message: string;
@@ -9,7 +21,7 @@ interface ApiError {
 class ApiService {
   private api: AxiosInstance;
 
-  constructor(baseURL: string = 'https://api.example.com') {
+  constructor(baseURL = 'https://api.example.com') {
     this.api = axios.create({
       baseURL,
       timeout: 10000,
@@ -24,7 +36,7 @@ class ApiService {
   private setupInterceptors() {
     // Request interceptor
     this.api.interceptors.request.use(
-      config => {
+      (config) => {
         // Token eklenebilir
         // const token = await getToken();
         // if (token) {
@@ -32,17 +44,17 @@ class ApiService {
         // }
         return config;
       },
-      error => {
+      (error) => {
         return Promise.reject(error);
       },
     );
 
     // Response interceptor
     this.api.interceptors.response.use(
-      response => response,
+      (response) => response,
       (error: AxiosError) => {
         let message = 'An error occurred';
-        
+
         if (error.code === 'ECONNABORTED') {
           message = 'Request timeout. Please try again.';
         } else if (error.code === 'ERR_NETWORK') {
@@ -69,18 +81,18 @@ class ApiService {
               message = error.message || 'An error occurred';
           }
         }
-        
+
         const apiError: ApiError = {
           message,
           statusCode: error.response?.status,
           details: error.response?.data,
         };
-        
+
         // Hata yönetimi
         if (error.response?.status === 401) {
           // Oturum süresi dolmuş, logout işlemi yapılabilir
         }
-        
+
         return Promise.reject(apiError);
       },
     );
@@ -121,78 +133,68 @@ const apiService = new ApiService();
 export const authService = {
   login: (email: string, password: string) =>
     apiService.post('/auth/login', { email, password }),
-  
-  register: (data: any) =>
-    apiService.post('/auth/register', data),
-  
+
+  register: (data: Partial<User>) => apiService.post('/auth/register', data),
+
   verifyPhone: (phone: string, code: string) =>
     apiService.post('/auth/verify-phone', { phone, code }),
-  
-  refreshToken: () =>
-    apiService.post('/auth/refresh'),
+
+  refreshToken: () => apiService.post('/auth/refresh'),
 };
 
 // Moment endpoints
 export const momentService = {
-  getMoments: (filters?: any) =>
-    apiService.get('/moments', { params: filters }),
-  
-  getMoment: (id: string) =>
-    apiService.get(`/moments/${id}`),
-  
-  createMoment: (data: any) =>
-    apiService.post('/moments', data),
-  
-  updateMoment: (id: string, data: any) =>
-    apiService.put(`/moments/${id}`, data),
-  
-  deleteMoment: (id: string) =>
-    apiService.delete(`/moments/${id}`),
+  getMoments: (filters?: Record<string, unknown>) =>
+    apiService.get<Moment[]>('/moments', { params: filters }),
+
+  getMoment: (id: string) => apiService.get<Moment>(`/moments/${id}`),
+
+  createMoment: (data: CreateMomentDto) =>
+    apiService.post<Moment>('/moments', data),
+
+  updateMoment: (id: string, data: UpdateMomentDto) =>
+    apiService.put<Moment>(`/moments/${id}`, data),
+
+  deleteMoment: (id: string) => apiService.delete(`/moments/${id}`),
 };
 
 // Proof endpoints
 export const proofService = {
-  getProofs: () =>
-    apiService.get('/proofs'),
-  
-  getProof: (id: string) =>
-    apiService.get(`/proofs/${id}`),
-  
+  getProofs: () => apiService.get('/proofs'),
+
+  getProof: (id: string) => apiService.get(`/proofs/${id}`),
+
   uploadProof: (data: FormData) =>
     apiService.post('/proofs', data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  
-  verifyProof: (id: string) =>
-    apiService.post(`/proofs/${id}/verify`),
+
+  verifyProof: (id: string) => apiService.post(`/proofs/${id}/verify`),
 };
 
 // Transaction endpoints
 export const transactionService = {
-  getTransactions: () =>
-    apiService.get('/transactions'),
-  
+  getTransactions: () => apiService.get<Transaction[]>('/transactions'),
+
   getTransaction: (id: string) =>
-    apiService.get(`/transactions/${id}`),
-  
-  createTransaction: (data: any) =>
-    apiService.post('/transactions', data),
-  
+    apiService.get<Transaction>(`/transactions/${id}`),
+
+  createTransaction: (data: CreateTransactionDto) =>
+    apiService.post<Transaction>('/transactions', data),
+
   requestRefund: (id: string, reason: string) =>
     apiService.post(`/transactions/${id}/refund`, { reason }),
 };
 
 // User endpoints
 export const userService = {
-  getProfile: () =>
-    apiService.get('/users/profile'),
-  
-  updateProfile: (data: any) =>
-    apiService.put('/users/profile', data),
-  
-  getUser: (id: string) =>
-    apiService.get(`/users/${id}`),
-  
+  getProfile: () => apiService.get<User>('/users/profile'),
+
+  updateProfile: (data: UpdateProfileDto) =>
+    apiService.put<User>('/users/profile', data),
+
+  getUser: (id: string) => apiService.get<User>(`/users/${id}`),
+
   uploadAvatar: (data: FormData) =>
     apiService.post('/users/avatar', data, {
       headers: { 'Content-Type': 'multipart/form-data' },

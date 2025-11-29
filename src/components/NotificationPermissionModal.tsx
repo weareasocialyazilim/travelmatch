@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -60,8 +60,8 @@ export const NotificationPermissionModal: React.FC<
 
           {/* Description */}
           <Text style={styles.description}>
-            Get notified about new gestures, matches, and important updates to make
-            the most of your kindness journey.
+            Get notified about new gestures, matches, and important updates to
+            make the most of your kindness journey.
           </Text>
 
           {/* Benefits */}
@@ -106,84 +106,84 @@ export const NotificationPermissionModal: React.FC<
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding * 2,
-  },
-  modal: {
+  allowButton: {
+    borderRadius: VALUES.borderRadius,
+    marginBottom: LAYOUT.padding,
+    overflow: 'hidden',
     width: '100%',
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius * 2,
-    padding: LAYOUT.padding * 3,
+  },
+  allowButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  allowGradient: {
     alignItems: 'center',
-    ...VALUES.shadow,
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  benefit: {
+    alignItems: 'center',
+    borderBottomColor: COLORS.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    paddingVertical: LAYOUT.padding,
+  },
+  benefitText: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: LAYOUT.padding,
+  },
+  benefitsContainer: {
+    marginBottom: LAYOUT.padding * 3,
+    width: '100%',
+  },
+  description: {
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
+    marginBottom: LAYOUT.padding * 2,
+    textAlign: 'center',
   },
   iconContainer: {
     marginBottom: LAYOUT.padding * 2,
   },
   iconGradient: {
-    width: 100,
-    height: 100,
+    alignItems: 'center',
     borderRadius: 50,
+    height: 100,
     justifyContent: 'center',
+    width: 100,
+  },
+  modal: {
     alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: LAYOUT.padding * 2,
-  },
-  benefitsContainer: {
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius * 2,
+    padding: LAYOUT.padding * 3,
     width: '100%',
-    marginBottom: LAYOUT.padding * 3,
+    ...VALUES.shadow,
   },
-  benefit: {
-    flexDirection: 'row',
+  overlay: {
     alignItems: 'center',
-    paddingVertical: LAYOUT.padding,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  benefitText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding,
-  },
-  allowButton: {
-    width: '100%',
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-    marginBottom: LAYOUT.padding,
-  },
-  allowGradient: {
-    paddingVertical: LAYOUT.padding * 1.5,
-    alignItems: 'center',
-  },
-  allowButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
+    backgroundColor: COLORS.modalBackdrop,
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: LAYOUT.padding * 2,
   },
   skipButton: {
     paddingVertical: LAYOUT.padding,
   },
   skipButtonText: {
+    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding,
+    textAlign: 'center',
   },
 });

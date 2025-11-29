@@ -39,7 +39,14 @@ export interface Gesture {
   item: GiftItem;
   amountUSD?: number; // UI'da gösterme
   tier: 'low' | 'mid' | 'high';
-  state: 'created' | 'awaiting_approval' | 'in_escrow' | 'proof_pending' | 'verified' | 'refunded' | 'under_review';
+  state:
+    | 'created'
+    | 'awaiting_approval'
+    | 'in_escrow'
+    | 'proof_pending'
+    | 'verified'
+    | 'refunded'
+    | 'under_review';
   expiresAt: string;
   proof?: Proof;
 }

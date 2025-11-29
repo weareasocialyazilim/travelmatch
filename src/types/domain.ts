@@ -121,7 +121,14 @@ export interface MomentData {
 // PROOF TYPES (Doğrulanmış Jest Kanıtı)
 // ============================================================================
 
-export type ProofType = 'photo' | 'receipt' | 'geo' | 'ticket_qr' | 'micro-kindness' | 'verified-experience' | 'community-proof';
+export type ProofType =
+  | 'photo'
+  | 'receipt'
+  | 'geo'
+  | 'ticket_qr'
+  | 'micro-kindness'
+  | 'verified-experience'
+  | 'community-proof';
 export type ProofStatus = 'pending' | 'verified' | 'failed' | 'rejected';
 
 export interface Proof {
@@ -141,9 +148,15 @@ export interface Proof {
   trustScore?: number;
 }
 
+export interface File {
+  uri: string;
+  type: string; // e.g., 'image/jpeg'
+  name: string;
+}
+
 export interface ProofUpload {
   type: 'photo' | 'video' | 'receipt' | 'location';
-  file?: any;
+  file?: File;
   location?: {
     latitude: number;
     longitude: number;
@@ -181,7 +194,14 @@ export interface GiftItem {
   placeId: string;
   placeName: string;
   title: string;
-  type: 'coffee' | 'ticket' | 'dinner' | 'meal' | 'transport' | 'experience' | 'other';
+  type:
+    | 'coffee'
+    | 'ticket'
+    | 'dinner'
+    | 'meal'
+    | 'transport'
+    | 'experience'
+    | 'other';
   icon?: string;
 }
 

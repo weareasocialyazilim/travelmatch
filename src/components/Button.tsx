@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants/colors';
 
 interface ButtonProps {
@@ -18,12 +18,14 @@ const Button: React.FC<ButtonProps> = ({
       style={[styles.button, variant === 'secondary' && styles.secondaryButton]}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={title}>
+      accessibilityLabel={title}
+    >
       <Text
         style={[
           styles.buttonText,
           variant === 'secondary' && styles.secondaryButtonText,
-        ]}>
+        ]}
+      >
         {title}
       </Text>
     </TouchableOpacity>
@@ -32,21 +34,21 @@ const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
+    alignItems: 'center',
     backgroundColor: COLORS.buttonPrimary,
+    borderRadius: 8,
     paddingHorizontal: 30,
     paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: COLORS.buttonPrimary,
   },
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: COLORS.transparent,
+    borderColor: COLORS.buttonPrimary,
+    borderWidth: 1,
   },
   secondaryButtonText: {
     color: COLORS.buttonPrimary,

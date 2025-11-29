@@ -15,6 +15,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 interface SupportOption {
   id: string;
@@ -24,7 +26,9 @@ interface SupportOption {
   action: () => void;
 }
 
-export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type SupportScreenProps = StackScreenProps<RootStackParamList, 'Support'>;
+
+export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +38,9 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   };
 
   const handleWhatsApp = () => {
-    Linking.openURL('https://wa.me/905551234567?text=Hello, I need help with TravelMatch');
+    Linking.openURL(
+      'https://wa.me/905551234567?text=Hello, I need help with TravelMatch',
+    );
   };
 
   const handleLiveChat = () => {
@@ -57,7 +63,7 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
       Alert.alert(
         'Success',
         'Your support request has been submitted. We will get back to you within 24 hours.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: 'OK', onPress: () => navigation.goBack() }],
       );
     }, 1500);
   };
@@ -106,7 +112,11 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Support & Help</Text>
           <View style={styles.placeholder} />
@@ -128,7 +138,7 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
             </View>
             <Text style={styles.heroTitle}>How can we help you?</Text>
             <Text style={styles.heroSubtitle}>
-              We're here to assist you 24/7
+              We&apos;re here to assist you 24/7
             </Text>
           </View>
 
@@ -145,13 +155,17 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                 >
                   <View style={styles.optionIcon}>
                     <MaterialCommunityIcons
-                      name={option.icon as any}
+                      name={
+                        option.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                      }
                       size={28}
                       color={COLORS.primary}
                     />
                   </View>
                   <Text style={styles.optionTitle}>{option.title}</Text>
-                  <Text style={styles.optionDescription}>{option.description}</Text>
+                  <Text style={styles.optionDescription}>
+                    {option.description}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -188,7 +202,10 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
               </View>
 
               <TouchableOpacity
-                style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+                style={[
+                  styles.submitButton,
+                  loading && styles.submitButtonDisabled,
+                ]}
                 onPress={handleSubmit}
                 disabled={loading}
                 activeOpacity={0.8}
@@ -204,7 +221,11 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                   ) : (
                     <>
                       <Text style={styles.submitText}>Submit Request</Text>
-                      <MaterialCommunityIcons name="send" size={20} color="#FFF" />
+                      <MaterialCommunityIcons
+                        name="send"
+                        size={20}
+                        color={COLORS.white}
+                      />
                     </>
                   )}
                 </LinearGradient>
@@ -240,9 +261,14 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
           {/* Response Time Info */}
           <View style={styles.infoCard}>
-            <MaterialCommunityIcons name="clock-outline" size={20} color={COLORS.primary} />
+            <MaterialCommunityIcons
+              name="clock-outline"
+              size={20}
+              color={COLORS.primary}
+            />
             <Text style={styles.infoText}>
-              Average response time: <Text style={styles.infoBold}>2-4 hours</Text>
+              Average response time:{' '}
+              <Text style={styles.infoBold}>2-4 hours</Text>
             </Text>
           </View>
 
@@ -254,112 +280,58 @@ export const SupportScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  gradient: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.card,
     alignItems: 'center',
+    backgroundColor: COLORS.card,
+    borderRadius: 20,
+    height: 40,
     justifyContent: 'center',
+    width: 40,
     ...VALUES.shadow,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
+  bottomPadding: {
+    height: 32,
   },
-  placeholder: {
-    width: 40,
+  charCount: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: 'right',
   },
-  scrollView: {
+  container: {
+    backgroundColor: COLORS.background,
     flex: 1,
   },
-  scrollContent: {
-    paddingHorizontal: LAYOUT.padding,
-  },
-  heroSection: {
+  faqCard: {
     alignItems: 'center',
-    paddingVertical: 32,
-  },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: COLORS.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    ...VALUES.shadow,
-  },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 16,
-  },
-  optionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  optionCard: {
-    width: '48%',
     backgroundColor: COLORS.card,
     borderRadius: VALUES.borderRadius,
-    padding: 16,
+    flexDirection: 'row',
     marginBottom: 16,
-    alignItems: 'center',
+    padding: 16,
     ...VALUES.shadow,
   },
-  optionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: `${COLORS.primary}15`,
+  faqContent: {
+    flex: 1,
+  },
+  faqIcon: {
     alignItems: 'center',
+    backgroundColor: `${COLORS.primary}15`,
+    borderRadius: 24,
+    height: 48,
     justifyContent: 'center',
-    marginBottom: 12,
+    marginRight: 12,
+    width: 48,
   },
-  optionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  optionDescription: {
-    fontSize: 11,
+  faqSubtitle: {
     color: COLORS.textSecondary,
-    textAlign: 'center',
+    fontSize: 12,
+  },
+  faqTitle: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
   },
   formCard: {
     backgroundColor: COLORS.card,
@@ -367,33 +339,134 @@ const styles = StyleSheet.create({
     padding: 20,
     ...VALUES.shadow,
   },
+  gradient: {
+    flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    borderBottomColor: COLORS.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: LAYOUT.padding,
+    paddingVertical: 16,
+  },
+  headerTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  heroSection: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  heroSubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  heroTitle: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    borderRadius: 60,
+    height: 120,
+    justifyContent: 'center',
+    marginBottom: 16,
+    width: 120,
+    ...VALUES.shadow,
+  },
+  infoBold: {
+    color: COLORS.primary,
+    fontWeight: '700',
+  },
+  infoCard: {
+    alignItems: 'center',
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginBottom: 16,
+    padding: 16,
+  },
+  infoText: {
+    color: COLORS.text,
+    fontSize: 14,
+    marginLeft: 12,
+  },
+  input: {
+    backgroundColor: COLORS.background,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 1,
+    color: COLORS.text,
+    fontSize: 14,
+    padding: 12,
+  },
   inputGroup: {
     marginBottom: 20,
   },
   inputLabel: {
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 8,
   },
-  input: {
-    backgroundColor: COLORS.background,
+  optionCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
     borderRadius: VALUES.borderRadius,
-    padding: 12,
-    fontSize: 14,
-    color: COLORS.text,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    marginBottom: 16,
+    padding: 16,
+    width: '48%',
+    ...VALUES.shadow,
   },
-  textArea: {
-    height: 120,
-    paddingTop: 12,
-  },
-  charCount: {
-    fontSize: 12,
+  optionDescription: {
     color: COLORS.textSecondary,
-    textAlign: 'right',
-    marginTop: 4,
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  optionIcon: {
+    alignItems: 'center',
+    backgroundColor: `${COLORS.primary}15`,
+    borderRadius: 28,
+    height: 56,
+    justifyContent: 'center',
+    marginBottom: 12,
+    width: 56,
+  },
+  optionTitle: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  optionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  placeholder: {
+    width: 40,
+  },
+  scrollContent: {
+    paddingHorizontal: LAYOUT.padding,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 16,
   },
   submitButton: {
     borderRadius: VALUES.borderRadius,
@@ -403,66 +476,19 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitGradient: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
     justifyContent: 'center',
     paddingVertical: 16,
-    gap: 8,
   },
   submitText: {
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFF',
   },
-  faqCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.card,
-    borderRadius: VALUES.borderRadius,
-    padding: 16,
-    marginBottom: 16,
-    ...VALUES.shadow,
-  },
-  faqIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: `${COLORS.primary}15`,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  faqContent: {
-    flex: 1,
-  },
-  faqTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  faqSubtitle: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: `${COLORS.primary}10`,
-    borderRadius: VALUES.borderRadius,
-    padding: 16,
-    marginBottom: 16,
-  },
-  infoText: {
-    fontSize: 14,
-    color: COLORS.text,
-    marginLeft: 12,
-  },
-  infoBold: {
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  bottomPadding: {
-    height: 32,
+  textArea: {
+    height: 120,
+    paddingTop: 12,
   },
 });

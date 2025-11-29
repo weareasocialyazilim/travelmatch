@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
@@ -77,70 +70,70 @@ export const ThankYouModal: React.FC<ThankYouModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  closeButton: {
+    width: '100%',
   },
-  modal: {
-    width: '85%',
-    borderRadius: VALUES.borderRadius * 2,
-    overflow: 'hidden',
-    ...VALUES.shadow,
+  closeButtonText: {
+    color: COLORS.primary,
+    fontSize: 16,
+    fontWeight: '700',
   },
   gradient: {
-    padding: LAYOUT.padding * 3,
     alignItems: 'center',
+    padding: LAYOUT.padding * 3,
   },
   iconContainer: {
     marginBottom: LAYOUT.padding * 2,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.white,
-    marginBottom: LAYOUT.padding * 1.5,
-    textAlign: 'center',
-  },
   message: {
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.white,
-    textAlign: 'center',
-    marginBottom: LAYOUT.padding * 2,
     lineHeight: 24,
+    marginBottom: LAYOUT.padding * 2,
     opacity: 0.95,
+    textAlign: 'center',
+  },
+  modal: {
+    borderRadius: VALUES.borderRadius * 2,
+    overflow: 'hidden',
+    width: '85%',
+    ...VALUES.shadow,
   },
   noteCard: {
-    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: COLORS.whiteTransparent,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 3,
     paddingHorizontal: LAYOUT.padding * 1.5,
     paddingVertical: LAYOUT.padding,
-    borderRadius: VALUES.borderRadius,
-    marginBottom: LAYOUT.padding * 3,
   },
   noteText: {
+    color: COLORS.white,
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding,
     lineHeight: 20,
+    marginLeft: LAYOUT.padding,
   },
-  closeButton: {
-    width: '100%',
+  overlay: {
+    alignItems: 'center',
+    backgroundColor: COLORS.modalBackdrop,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  title: {
+    color: COLORS.white,
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding * 1.5,
+    textAlign: 'center',
   },
   whiteButton: {
-    backgroundColor: COLORS.white,
-    paddingVertical: LAYOUT.padding * 1.5,
-    borderRadius: VALUES.borderRadius,
     alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.primary,
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    paddingVertical: LAYOUT.padding * 1.5,
   },
 });

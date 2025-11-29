@@ -12,7 +12,10 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -38,7 +41,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <Text style={styles.emoji}>😔</Text>
             <Text style={styles.title}>Something went wrong</Text>
             <Text style={styles.message}>
-              We're sorry for the inconvenience. Please try again.
+              We&apos;re sorry for the inconvenience. Please try again.
             </Text>
             {__DEV__ && this.state.error && (
               <Text style={styles.errorDetails}>
@@ -62,11 +65,24 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 }
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 12,
+    minWidth: LAYOUT.size.errorButtonMin,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+  },
+  buttonText: {
+    color: COLORS.background,
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
+    flex: 1,
+    justifyContent: 'center',
     padding: 20,
   },
   content: {
@@ -77,39 +93,26 @@ const styles = StyleSheet.create({
     fontSize: 64,
     marginBottom: 16,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 12,
+  errorDetails: {
+    backgroundColor: COLORS.errorBackground,
+    borderRadius: 8,
+    color: COLORS.softRed,
+    fontSize: 12,
+    marginBottom: 24,
+    padding: 12,
     textAlign: 'center',
   },
   message: {
-    fontSize: 16,
     color: COLORS.textSecondary,
-    textAlign: 'center',
+    fontSize: 16,
     marginBottom: 24,
-  },
-  errorDetails: {
-    fontSize: 12,
-    color: COLORS.softRed,
     textAlign: 'center',
-    marginBottom: 24,
-    padding: 12,
-    backgroundColor: '#FFE6E6',
-    borderRadius: 8,
   },
-  button: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 12,
-    minWidth: LAYOUT.size.errorButtonMin,
-  },
-  buttonText: {
-    fontSize: 18,
+  title: {
+    color: COLORS.text,
+    fontSize: 22,
     fontWeight: '700',
-    color: COLORS.background,
+    marginBottom: 12,
     textAlign: 'center',
   },
 });

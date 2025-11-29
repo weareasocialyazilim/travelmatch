@@ -10,13 +10,13 @@ export const STRINGS = {
     CATEGORY_REQUIRED: 'Please select a category',
     AMOUNT_REQUIRED: 'Please enter a valid amount',
   },
-  
+
   // Success messages
   SUCCESS: {
     MOMENT_PUBLISHED: 'Your moment has been published!',
     GIFT_SENT: 'Gift sent successfully!',
   },
-  
+
   // Placeholder texts
   PLACEHOLDERS: {
     MOMENT_TITLE: 'Ex: Coffee at Blue Bottle Oakland',
@@ -24,7 +24,7 @@ export const STRINGS = {
     SEARCH_LOCATION: 'Search for a place...',
     AMOUNT: '0',
   },
-  
+
   // Button texts
   BUTTONS: {
     TRY_AGAIN: 'Try Again',
@@ -34,7 +34,7 @@ export const STRINGS = {
     SELECT_PHOTO: 'Select Photo',
     CHOOSE_LOCATION: 'Choose a location',
   },
-  
+
   // Labels
   LABELS: {
     PERMISSION_NEEDED: 'Permission needed',

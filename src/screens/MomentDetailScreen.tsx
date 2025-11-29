@@ -1,12 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   Image,
   TouchableOpacity,
-  Platform,
   Dimensions,
   Animated,
 } from 'react-native';
@@ -16,7 +14,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { GiftMomentBottomSheet } from '../components/GiftMomentBottomSheet';
 import { GiftSuccessModal } from '../components/GiftSuccessModal';
-import { COLORS, CARD_SHADOW } from '../constants/colors';
+import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -31,21 +29,22 @@ const MomentDetailScreen = () => {
   const [showGiftSheet, setShowGiftSheet] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [giftAmount, setGiftAmount] = useState(0);
-  
+
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const handleScroll = useCallback(
-    Animated.event(
-      [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-      { useNativeDriver: false }
-    ),
-    [scrollY]
+  // TODO: Animasyon davranışı test edilmeden kaldırılmamalı – görsel akışı korumak için mevcut haliyle bırakıldı.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: false,
+    },
   );
 
-  const handleGiftOption = (paymentMethod: 'apple-pay' | 'google-pay' | 'card') => {
+  const handleGiftOption = () => {
     setShowGiftSheet(false);
     setGiftAmount(moment.price);
-    
+
     setTimeout(() => {
       setShowSuccessModal(true);
     }, VALUES.ANIMATION_DURATION);
@@ -78,9 +77,11 @@ const MomentDetailScreen = () => {
   return (
     <View style={styles.container}>
       {/* Animated Hero Image */}
-      <Animated.View style={[styles.heroImageContainer, { height: headerHeight }]}>
-        <Animated.Image 
-          source={{ uri: moment.imageUrl }} 
+      <Animated.View
+        style={[styles.heroImageContainer, { height: headerHeight }]}
+      >
+        <Animated.Image
+          source={{ uri: moment.imageUrl }}
           style={[styles.heroImage, { opacity: imageOpacity }]}
           resizeMode="cover"
         />
@@ -90,141 +91,170 @@ const MomentDetailScreen = () => {
       <View style={styles.headerOverlay}>
         <SafeAreaView edges={['top']}>
           <View style={styles.header}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.backButton}
               onPress={() => navigation.goBack()}
               activeOpacity={0.7}
             >
-              <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={24}
+                color={COLORS.text}
+              />
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.shareButton}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons name="share-variant-outline" size={24} color={COLORS.text} />
+            <TouchableOpacity style={styles.shareButton} activeOpacity={0.7}>
+              <MaterialCommunityIcons
+                name="share-variant-outline"
+                size={24}
+                color={COLORS.text}
+              />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
       </View>
 
-      <Animated.ScrollView 
+      <Animated.ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={handleScroll}
-        contentContainerStyle={{ paddingTop: 400 }}
+        contentContainerStyle={styles.scrollViewContent}
       >
-          {/* Content */}
-          <View style={styles.content}>
-            {/* User Info */}
-            <View style={styles.userSection}>
-              <Image 
-                source={{ uri: moment.user.avatar }} 
-                style={styles.userAvatar}
-              />
-              <View style={styles.userInfo}>
-                <View style={styles.userNameRow}>
-                  <Text style={styles.userName}>{moment.user.name}</Text>
-                  {moment.user.isVerified && (
-                    <MaterialCommunityIcons name="check-decagram" size={16} color={COLORS.mint} />
-                  )}
-                </View>
-              </View>
-              <Text style={styles.userRole}>
-                {moment.user.type === 'traveler' ? '✈️' : '📍'}
-              </Text>
-            </View>
-
-            {/* Title */}
-            <Text style={styles.title}>{moment.title}</Text>
-
-            {/* Meta Info */}
-            <View style={styles.infoRow}>
-              {moment.category && (
-                <View style={styles.categoryPill}>
-                  <Text style={styles.categoryEmoji}>{moment.category.emoji}</Text>
-                  <Text style={styles.categoryName}>{moment.category.label}</Text>
-                </View>
-              )}
-              <Text style={styles.separator}>•</Text>
-              <View style={styles.infoItem}>
-                <MaterialCommunityIcons name="map-marker" size={14} color={COLORS.textSecondary} />
-                <Text style={styles.infoText}>{moment.location.city}</Text>
-              </View>
-              <Text style={styles.separator}>•</Text>
-              <View style={styles.infoItem}>
-                <MaterialCommunityIcons name="clock-outline" size={14} color={COLORS.textSecondary} />
-                <Text style={styles.infoText}>{moment.availability}</Text>
+        {/* Content */}
+        <View style={styles.content}>
+          {/* User Info */}
+          <View style={styles.userSection}>
+            <Image
+              source={{ uri: moment.user.avatar }}
+              style={styles.userAvatar}
+            />
+            <View style={styles.userInfo}>
+              <View style={styles.userNameRow}>
+                <Text style={styles.userName}>{moment.user.name}</Text>
+                {moment.user.isVerified && (
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={16}
+                    color={COLORS.mint}
+                  />
+                )}
               </View>
             </View>
+            <Text style={styles.userRole}>
+              {moment.user.type === 'traveler' ? '✈️' : '📍'}
+            </Text>
+          </View>
 
-            {/* About Section */}
-            {moment.story && (
-              <View style={styles.section}>
-                <Text style={styles.sectionHeader}>About this moment</Text>
-                <Text style={styles.sectionBody}>{moment.story}</Text>
+          {/* Title */}
+          <Text style={styles.title}>{moment.title}</Text>
+
+          {/* Meta Info */}
+          <View style={styles.infoRow}>
+            {moment.category && (
+              <View style={styles.categoryPill}>
+                <Text style={styles.categoryEmoji}>
+                  {moment.category.emoji}
+                </Text>
+                <Text style={styles.categoryName}>{moment.category.label}</Text>
               </View>
             )}
+            <Text style={styles.separator}>•</Text>
+            <View style={styles.infoItem}>
+              <MaterialCommunityIcons
+                name="map-marker"
+                size={14}
+                color={COLORS.textSecondary}
+              />
+              <Text style={styles.infoText}>{moment.location.city}</Text>
+            </View>
+            <Text style={styles.separator}>•</Text>
+            <View style={styles.infoItem}>
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={14}
+                color={COLORS.textSecondary}
+              />
+              <Text style={styles.infoText}>{moment.availability}</Text>
+            </View>
+          </View>
 
-            {/* Location Section */}
+          {/* About Section */}
+          {moment.story && (
             <View style={styles.section}>
-              <Text style={styles.sectionHeader}>Location</Text>
-              <View style={styles.placeCard}>
-                <View style={styles.placeIcon}>
-                  <MaterialCommunityIcons name="map-marker" size={20} color={COLORS.mint} />
-                </View>
-                <View style={styles.placeInfo}>
-                  <Text style={styles.placeName}>{moment.location.name}</Text>
-                  <Text style={styles.placeAddress}>{moment.location.city}, {moment.location.country}</Text>
-                </View>
+              <Text style={styles.sectionHeader}>About this moment</Text>
+              <Text style={styles.sectionBody}>{moment.story}</Text>
+            </View>
+          )}
+
+          {/* Location Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>Location</Text>
+            <View style={styles.placeCard}>
+              <View style={styles.placeIcon}>
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={20}
+                  color={COLORS.mint}
+                />
+              </View>
+              <View style={styles.placeInfo}>
+                <Text style={styles.placeName}>{moment.location.name}</Text>
+                <Text style={styles.placeAddress}>
+                  {moment.location.city}, {moment.location.country}
+                </Text>
               </View>
             </View>
-
-            <View style={{ height: 120 }} />
           </View>
-        </Animated.ScrollView>
 
-        {/* Bottom Action Bar */}
-        <View style={styles.bottomBar}>
-          <TouchableOpacity 
-            style={styles.primaryButton}
-            onPress={() => setShowGiftSheet(true)}
-          >
-            <Text style={styles.buttonText}>Gift this moment</Text>
-            <View style={styles.buttonBadge}>
-              <Text style={styles.badgeText}>${moment.price}</Text>
-            </View>
-          </TouchableOpacity>
+          <View style={styles.bottomSpacer} />
         </View>
+      </Animated.ScrollView>
+
+      {/* Bottom Action Bar */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => setShowGiftSheet(true)}
+        >
+          <Text style={styles.buttonText}>Gift this moment</Text>
+          <View style={styles.buttonBadge}>
+            <Text style={styles.badgeText}>${moment.price}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
 
       {/* Gift Bottom Sheet */}
       <GiftMomentBottomSheet
         visible={showGiftSheet}
-        moment={showGiftSheet ? {
-          id: moment.id,
-          title: moment.title,
-          imageUrl: moment.imageUrl,
-          category: moment.category,
-          user: {
-            name: moment.user.name,
-            avatar: moment.user.avatar,
-            type: moment.user.type,
-            location: moment.user.location,
-            travelDays: moment.user.travelDays,
-            isVerified: moment.user.isVerified,
-          },
-          location: {
-            name: moment.location.name,
-            city: moment.location.city,
-            country: moment.location.country,
-          },
-          story: moment.story,
-          dateRange: moment.dateRange || {
-            start: new Date(),
-            end: new Date()
-          },
-          price: moment.price
-        } : null}
+        moment={
+          showGiftSheet
+            ? {
+                id: moment.id,
+                title: moment.title,
+                imageUrl: moment.imageUrl,
+                category: moment.category,
+                user: {
+                  name: moment.user.name,
+                  avatar: moment.user.avatar,
+                  type: moment.user.type,
+                  location: moment.user.location,
+                  travelDays: moment.user.travelDays,
+                  isVerified: moment.user.isVerified,
+                },
+                location: {
+                  name: moment.location.name,
+                  city: moment.location.city,
+                  country: moment.location.country,
+                },
+                story: moment.story,
+                dateRange: moment.dateRange || {
+                  start: new Date(),
+                  end: new Date(),
+                },
+                price: moment.price,
+              }
+            : null
+        }
         onClose={() => setShowGiftSheet(false)}
         onGift={handleGiftOption}
       />
@@ -245,338 +275,226 @@ const MomentDetailScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  headerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 100,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
-  },
-  shareButton: {
-    width: 40,
-    height: 40,
+    backgroundColor: COLORS.whiteTransparentLight,
+    borderColor: COLORS.whiteTransparentLight,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
   },
-  scrollView: {
+  badgeText: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  bottomBar: {
+    backgroundColor: COLORS.white,
+    borderTopColor: COLORS.border,
+    borderTopWidth: 1,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  bottomSpacer: {
+    height: 120,
+  },
+  buttonBadge: {
+    backgroundColor: COLORS.white,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  buttonText: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  categoryEmoji: {
+    fontSize: 13,
+  },
+  categoryName: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  categoryPill: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  container: {
+    backgroundColor: COLORS.white,
     flex: 1,
-  },
-  heroImageContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    overflow: 'hidden',
-    backgroundColor: COLORS.background,
-  },
-  heroImage: {
-    width: SCREEN_WIDTH,
-    height: '100%',
   },
   content: {
     backgroundColor: COLORS.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -24,
-    paddingTop: 24,
     paddingHorizontal: 20,
+    paddingTop: 24,
   },
-  userSection: {
-    flexDirection: 'row',
+  header: {
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 12,
-  },
-  userAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  userNameRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  headerOverlay: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 100,
+  },
+  heroImage: {
+    height: '100%',
+    width: SCREEN_WIDTH,
+  },
+  heroImageContainer: {
+    backgroundColor: COLORS.background,
+    left: 0,
+    overflow: 'hidden',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  infoItem: {
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  userRole: {
-    fontSize: 16,
-  },
-  userLocation: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  userBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: COLORS.white,
-  },
-  userBadgeText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 16,
-    lineHeight: 34,
+    flexDirection: 'row',
+    gap: 4,
   },
   infoRow: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     marginBottom: 24,
   },
-  categoryPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    gap: 4,
-  },
-  categoryEmoji: {
-    fontSize: 13,
-  },
-  categoryName: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  separator: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    opacity: 0.5,
-  },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
   infoText: {
-    fontSize: 14,
     color: COLORS.textSecondary,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
     fontSize: 14,
+  },
+  placeAddress: {
     color: COLORS.textSecondary,
-  },
-  categoryChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    gap: 6,
-    marginBottom: 16,
-  },
-  categoryIcon: {
-    fontSize: 14,
-  },
-  categoryLabel: {
     fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 12,
-  },
-  sectionBody: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: COLORS.textSecondary,
   },
   placeCard: {
-    flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
     backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    flexDirection: 'row',
     gap: 12,
+    padding: 14,
   },
   placeIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(166, 229, 193, 0.15)',
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.mintTransparent,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
   },
   placeInfo: {
     flex: 1,
   },
   placeName: {
+    color: COLORS.text,
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 2,
   },
-  placeAddress: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  detailsRow: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 16,
-  },
-  detailItem: {
-    flexDirection: 'row',
+  primaryButton: {
     alignItems: 'center',
-    gap: 6,
-  },
-  detailText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: COLORS.white,
-    marginBottom: 24,
-  },
-  categoryText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  storySection: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 12,
-  },
-  storyText: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: COLORS.textSecondary,
-  },
-  locationSection: {
-    marginBottom: 24,
-  },
-  locationCard: {
+    backgroundColor: COLORS.mint,
+    borderRadius: 12,
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
     gap: 12,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
   },
-  locationInfo: {
+  scrollView: {
     flex: 1,
   },
-  locationName: {
+  scrollViewContent: {
+    paddingTop: 400,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionBody: {
+    color: COLORS.textSecondary,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  sectionHeader: {
+    color: COLORS.text,
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  separator: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    opacity: 0.5,
+  },
+  shareButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.whiteTransparentLight,
+    borderColor: COLORS.whiteTransparentLight,
+    borderRadius: 20,
+    borderWidth: 1,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 28,
+    fontWeight: 'bold',
+    lineHeight: 34,
+    marginBottom: 16,
+  },
+  userAvatar: {
+    borderRadius: 24,
+    height: 48,
+    width: 48,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+  },
+  userNameRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
     marginBottom: 4,
   },
-  locationAddress: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  bottomBar: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 20,
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    backgroundColor: COLORS.mint,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-  },
-  buttonText: {
+  userRole: {
     fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.text,
   },
-  buttonBadge: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  badgeText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: COLORS.text,
+  userSection: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
   },
 });
 

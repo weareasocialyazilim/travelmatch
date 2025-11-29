@@ -23,12 +23,12 @@ interface Props {
   onViewApprovals?: () => void;
 }
 
-export const GiftSuccessModal: React.FC<Props> = ({ 
-  visible, 
-  amount, 
+export const GiftSuccessModal: React.FC<Props> = ({
+  visible,
+  amount,
   onClose,
   momentTitle,
-  onViewApprovals 
+  onViewApprovals,
 }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -38,7 +38,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
       translateX: new Animated.Value(0),
       opacity: new Animated.Value(1),
       rotate: new Animated.Value(0),
-    }))
+    })),
   ).current;
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
       confettiAnims.forEach((anim, index) => {
         const angle = (index * 360) / confettiAnims.length;
         const distance = 100 + Math.random() * 50;
-        
+
         Animated.parallel([
           Animated.timing(anim.translateY, {
             toValue: -distance * Math.sin((angle * Math.PI) / 180),
@@ -104,9 +104,15 @@ export const GiftSuccessModal: React.FC<Props> = ({
         anim.rotate.setValue(0);
       });
     }
-  }, [visible]);
+  }, [visible, confettiAnims, fadeAnim, scaleAnim]);
 
-  const confettiColors = [COLORS.coral, COLORS.mint, COLORS.success, '#FFD166', COLORS.white];
+  const confettiColors = [
+    COLORS.coral,
+    COLORS.mint,
+    COLORS.success,
+    COLORS.softOrange,
+    COLORS.white,
+  ];
 
   return (
     <Modal
@@ -125,7 +131,8 @@ export const GiftSuccessModal: React.FC<Props> = ({
                 style={[
                   styles.confetti,
                   {
-                    backgroundColor: confettiColors[index % confettiColors.length],
+                    backgroundColor:
+                      confettiColors[index % confettiColors.length],
                     transform: [
                       { translateX: anim.translateX },
                       { translateY: anim.translateY },
@@ -152,7 +159,11 @@ export const GiftSuccessModal: React.FC<Props> = ({
               },
             ]}
           >
-            <MaterialCommunityIcons name="check-circle" size={80} color="#5BC08A" />
+            <MaterialCommunityIcons
+              name="check-circle"
+              size={80}
+              color={COLORS.success}
+            />
           </Animated.View>
 
           {/* Success message */}
@@ -163,16 +174,24 @@ export const GiftSuccessModal: React.FC<Props> = ({
 
           {amount >= VALUES.ESCROW_DIRECT_MAX && (
             <View style={styles.infoBox}>
-              <MaterialCommunityIcons name="shield-check" size={20} color="#5BC08A" />
+              <MaterialCommunityIcons
+                name="shield-check"
+                size={20}
+                color={COLORS.success}
+              />
               <Text style={styles.infoText}>
-                You'll be notified when proof is uploaded.
+                You&apos;ll be notified when proof is uploaded.
               </Text>
             </View>
           )}
 
           {amount < VALUES.ESCROW_DIRECT_MAX && (
             <View style={styles.infoBox}>
-              <MaterialCommunityIcons name="flash" size={20} color="#5BC08A" />
+              <MaterialCommunityIcons
+                name="flash"
+                size={20}
+                color={COLORS.success}
+              />
               <Text style={styles.infoText}>
                 Payment sent instantly to recipient.
               </Text>
@@ -181,23 +200,31 @@ export const GiftSuccessModal: React.FC<Props> = ({
 
           {/* Action Buttons */}
           {onViewApprovals && momentTitle && (
-            <TouchableOpacity 
-              style={styles.primaryButton} 
-              onPress={onViewApprovals} 
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={onViewApprovals}
               activeOpacity={0.8}
             >
-              <MaterialCommunityIcons name="account-multiple" size={20} color={COLORS.white} />
+              <MaterialCommunityIcons
+                name="account-multiple"
+                size={20}
+                color={COLORS.white}
+              />
               <Text style={styles.primaryButtonText}>View Approvals</Text>
             </TouchableOpacity>
           )}
 
           {/* Return button */}
-          <TouchableOpacity 
-            style={onViewApprovals ? styles.secondaryButton : styles.button} 
-            onPress={onClose} 
+          <TouchableOpacity
+            style={onViewApprovals ? styles.secondaryButton : styles.button}
+            onPress={onClose}
             activeOpacity={0.8}
           >
-            <Text style={onViewApprovals ? styles.secondaryButtonText : styles.buttonText}>
+            <Text
+              style={
+                onViewApprovals ? styles.secondaryButtonText : styles.buttonText
+              }
+            >
               Return Home
             </Text>
           </TouchableOpacity>
@@ -208,23 +235,49 @@ export const GiftSuccessModal: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
+  button: {
     alignItems: 'center',
+    backgroundColor: COLORS.buttonDark,
+    borderRadius: 999,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    width: '100%',
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  confetti: {
+    borderRadius: 4,
+    height: 8,
+    position: 'absolute',
+    width: 8,
+  },
+  confettiContainer: {
+    height: 1,
+    left: '50%',
+    position: 'absolute',
+    top: '50%',
+    width: 1,
+  },
+  container: {
+    alignItems: 'center',
+    backgroundColor: COLORS.blackTransparent,
+    flex: 1,
+    justifyContent: 'center',
     padding: 20,
   },
   content: {
+    alignItems: 'center',
     backgroundColor: COLORS.white,
     borderRadius: 28,
-    padding: 40,
-    alignItems: 'center',
-    width: '100%',
     maxWidth: LAYOUT.size.modalMax,
+    padding: 40,
+    width: '100%',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: COLORS.black,
         shadowOffset: LAYOUT.shadowOffset.xxl,
         shadowOpacity: 0.2,
         shadowRadius: 20,
@@ -234,93 +287,67 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  confettiContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: 1,
-    height: 1,
-  },
-  confetti: {
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
   iconContainer: {
     marginBottom: 24,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 17,
-    color: COLORS.textSecondary,
-    marginBottom: 32,
-    textAlign: 'center',
-  },
   infoBox: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
     backgroundColor: COLORS.successLight,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 32,
-    borderWidth: 1,
     borderColor: COLORS.primary,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 32,
+    padding: 16,
   },
   infoText: {
+    color: COLORS.text,
     flex: 1,
     fontSize: 14,
-    color: COLORS.text,
     lineHeight: 20,
   },
   primaryButton: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
     backgroundColor: COLORS.mint,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
     borderRadius: 999,
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
     marginBottom: 12,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
     width: '100%',
   },
   primaryButtonText: {
+    color: COLORS.white,
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.white,
   },
   secondaryButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 999,
-    backgroundColor: COLORS.gray,
-    width: '100%',
     alignItems: 'center',
+    backgroundColor: COLORS.gray,
+    borderRadius: 999,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    width: '100%',
   },
   secondaryButtonText: {
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: '600',
+  },
+  subtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 17,
+    marginBottom: 32,
+    textAlign: 'center',
+  },
+  title: {
     color: COLORS.text,
-  },
-  button: {
-    backgroundColor: COLORS.buttonDark,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 999,
-    width: '100%',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: COLORS.white,
-    fontSize: 16,
+    fontSize: 28,
     fontWeight: '700',
+    marginBottom: 8,
+    textAlign: 'center',
   },
 });
