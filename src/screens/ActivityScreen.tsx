@@ -10,7 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import BottomNav from '../components/BottomNav';
-import { COLORS, CARD_SHADOW } from '../constants/colors';
+import { COLORS } from '../constants/colors';
+import EmptyState from '../components/EmptyState';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -59,7 +60,7 @@ const ActivityScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabType>('messages');
-  const [userSettings, setUserSettings] = useState<UserSettings>({
+  const [userSettings] = useState<UserSettings>({
     isKYCCompleted: true, // KYC onaylanmış, system mesajı gösterme
   });
 
@@ -81,7 +82,7 @@ const ActivityScreen: React.FC = () => {
         role: 'giver',
         momentTitle: 'Coffee at Soho Café',
         time: '2h ago',
-        isRead: false
+        isRead: false,
       },
       {
         id: '2',
@@ -94,7 +95,7 @@ const ActivityScreen: React.FC = () => {
         role: 'giver',
         momentTitle: 'Street food tour in Kadıköy',
         time: '1d ago',
-        isRead: true
+        isRead: true,
       },
       {
         id: '3',
@@ -107,7 +108,7 @@ const ActivityScreen: React.FC = () => {
         role: 'giver',
         momentTitle: 'Local pastry in Lisbon',
         time: '2d ago',
-        isRead: true
+        isRead: true,
       },
       {
         id: '4',
@@ -116,13 +117,14 @@ const ActivityScreen: React.FC = () => {
         iconColor: COLORS.softRed,
         emoji: '↩︎',
         title: 'Verification failed — refunded',
-        subtitle: "Proof didn't meet requirements. Funds returned to your balance.",
+        subtitle:
+          "Proof didn't meet requirements. Funds returned to your balance.",
         role: 'giver',
         momentTitle: 'Museum ticket in Berlin',
         time: '3d ago',
-        isRead: true
+        isRead: true,
       },
-      
+
       // Gestures
       {
         id: '5',
@@ -135,7 +137,7 @@ const ActivityScreen: React.FC = () => {
         gestureAmount: 5,
         gestureStatus: 'verified',
         time: '3h ago',
-        isRead: true
+        isRead: true,
       },
       {
         id: '6',
@@ -148,7 +150,7 @@ const ActivityScreen: React.FC = () => {
         gestureAmount: 12,
         gestureStatus: 'waiting',
         time: '5h ago',
-        isRead: true
+        isRead: true,
       },
       {
         id: '7',
@@ -161,9 +163,9 @@ const ActivityScreen: React.FC = () => {
         gestureAmount: 8,
         gestureStatus: 'verified',
         time: '1d ago',
-        isRead: true
+        isRead: true,
       },
-      
+
       // Messages
       {
         id: '8',
@@ -173,7 +175,7 @@ const ActivityScreen: React.FC = () => {
         title: 'Chat unlocked with Jessica',
         subtitle: 'Talk about your shared Paris moment.',
         time: '4d ago',
-        isRead: true
+        isRead: true,
       },
       {
         id: '9',
@@ -183,7 +185,7 @@ const ActivityScreen: React.FC = () => {
         title: 'New message from Ahmet',
         subtitle: '"Thank you again for the ferry ride!"',
         time: '1h ago',
-        isRead: false
+        isRead: false,
       },
       {
         id: '10',
@@ -193,9 +195,9 @@ const ActivityScreen: React.FC = () => {
         title: 'New message from Sarah',
         subtitle: '"Are you free this weekend?"',
         time: '30m ago',
-        isRead: false
+        isRead: false,
       },
-      
+
       // System
       {
         id: '11',
@@ -206,8 +208,8 @@ const ActivityScreen: React.FC = () => {
         subtitle: 'Verify your identity to unlock all features.',
         time: 'Nov 7',
         actionText: 'Verify now',
-        isRead: true
-      }
+        isRead: true,
+      },
     ]);
   };
 
@@ -228,14 +230,17 @@ const ActivityScreen: React.FC = () => {
 
   // Calculate unread counts dynamically based on isRead property (optimized with reduce)
   const tabUnreadCounts = useMemo((): TabUnreadCounts => {
-    return activities.reduce((acc, activity) => {
-      if (activity.isRead === false) {
-        if (activity.type === 'messages') acc.messages++;
-        else if (activity.type === 'trust_loop') acc.trust_loop++;
-        else if (activity.type === 'gestures') acc.gestures++;
-      }
-      return acc;
-    }, { messages: 0, trust_loop: 0, gestures: 0 } as TabUnreadCounts);
+    return activities.reduce(
+      (acc, activity) => {
+        if (activity.isRead === false) {
+          if (activity.type === 'messages') acc.messages++;
+          else if (activity.type === 'trust_loop') acc.trust_loop++;
+          else if (activity.type === 'gestures') acc.gestures++;
+        }
+        return acc;
+      },
+      { messages: 0, trust_loop: 0, gestures: 0 } as TabUnreadCounts,
+    );
   }, [activities]);
 
   // Calculate today's highlights from actual activities (last 24 hours)
@@ -243,21 +248,26 @@ const ActivityScreen: React.FC = () => {
     // In a real app, you'd filter by timestamp within last 24h
     // For now, we'll count specific types from recent activities
     const todayActivities = activities; // Filter by today's date in production
-    
-    const proofsVerified = todayActivities.filter(a => 
-      a.type === 'trust_loop' && a.title.includes('Proof verified')
+
+    const proofsVerified = todayActivities.filter(
+      (a) => a.type === 'trust_loop' && a.title.includes('Proof verified'),
     ).length;
-    
-    const chatsUnlocked = todayActivities.filter(a => 
-      (a.type === 'trust_loop' || a.type === 'messages') && a.title.includes('Chat unlocked')
+
+    const chatsUnlocked = todayActivities.filter(
+      (a) =>
+        (a.type === 'trust_loop' || a.type === 'messages') &&
+        a.title.includes('Chat unlocked'),
     ).length;
-    
-    const newGestures = todayActivities.filter(a => 
-      a.type === 'gestures' && a.title.includes('received')
+
+    const newGestures = todayActivities.filter(
+      (a) => a.type === 'gestures' && a.title.includes('received'),
     ).length;
-    
-    const unreadNotifications = tabUnreadCounts.messages + tabUnreadCounts.trust_loop + tabUnreadCounts.gestures;
-    
+
+    const unreadNotifications =
+      tabUnreadCounts.messages +
+      tabUnreadCounts.trust_loop +
+      tabUnreadCounts.gestures;
+
     return {
       proofsVerified,
       chatsUnlocked,
@@ -266,14 +276,14 @@ const ActivityScreen: React.FC = () => {
     };
   }, [activities, tabUnreadCounts]);
 
-  const filteredActivities = useMemo(() => 
-    activities.filter(a => a.type === selectedTab),
-    [activities, selectedTab]
+  const filteredActivities = useMemo(
+    () => activities.filter((a) => a.type === selectedTab),
+    [activities, selectedTab],
   );
-  
-  const systemActivities = useMemo(() => 
-    activities.filter(a => a.type === 'system'),
-    [activities]
+
+  const systemActivities = useMemo(
+    () => activities.filter((a) => a.type === 'system'),
+    [activities],
   );
 
   return (
@@ -290,32 +300,50 @@ const ActivityScreen: React.FC = () => {
         {/* Today's Highlights */}
         <View style={styles.highlightsCard}>
           <View style={styles.highlightsHeader}>
-            <MaterialCommunityIcons name="calendar-today" size={18} color={COLORS.text} />
-            <Text style={styles.highlightsTitle}>Today's highlights</Text>
+            <MaterialCommunityIcons
+              name="calendar-today"
+              size={18}
+              color={COLORS.text}
+            />
+            <Text style={styles.highlightsTitle}>Today&apos;s highlights</Text>
           </View>
           <Text style={styles.highlightsSubtitle}>
-            {todayHighlights.proofsVerified} proof verified · {todayHighlights.chatsUnlocked} chat unlocked · {todayHighlights.newGestures} new gesture
+            {todayHighlights.proofsVerified} proof verified ·{' '}
+            {todayHighlights.chatsUnlocked} chat unlocked ·{' '}
+            {todayHighlights.newGestures} new gesture
           </Text>
         </View>
 
         {/* Tabs */}
         <View style={styles.filtersContainer}>
-          {tabs.map(tab => {
+          {tabs.map((tab) => {
             const unreadCount = tabUnreadCounts[tab.id];
             const isActive = selectedTab === tab.id;
-            
+
             return (
               <TouchableOpacity
                 key={tab.id}
                 style={[styles.filterTab, isActive && styles.filterTabActive]}
                 onPress={() => setSelectedTab(tab.id)}
               >
-                <Text style={[styles.filterTabText, isActive && styles.filterTabTextActive]}>
+                <Text
+                  style={[
+                    styles.filterTabText,
+                    isActive && styles.filterTabTextActive,
+                  ]}
+                >
                   {tab.label}
                 </Text>
                 {unreadCount > 0 && (
-                  <View style={[styles.tabBadge, isActive && styles.tabBadgeActive]}>
-                    <Text style={[styles.tabBadgeText, isActive && styles.tabBadgeTextActive]}>
+                  <View
+                    style={[styles.tabBadge, isActive && styles.tabBadgeActive]}
+                  >
+                    <Text
+                      style={[
+                        styles.tabBadgeText,
+                        isActive && styles.tabBadgeTextActive,
+                      ]}
+                    >
                       {unreadCount}
                     </Text>
                   </View>
@@ -330,7 +358,11 @@ const ActivityScreen: React.FC = () => {
           style={styles.content}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.mint} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.mint}
+            />
           }
         >
           {/* Selected Tab Activities */}
@@ -338,17 +370,19 @@ const ActivityScreen: React.FC = () => {
             {filteredActivities.map((activity, index) => (
               <View key={activity.id}>
                 <ActivityRow activity={activity} />
-                {index < filteredActivities.length - 1 && <View style={styles.divider} />}
+                {index < filteredActivities.length - 1 && (
+                  <View style={styles.divider} />
+                )}
               </View>
             ))}
           </View>
 
           {filteredActivities.length === 0 && (
-            <View style={styles.emptyState}>
-              <MaterialCommunityIcons name="bell-sleep-outline" size={48} color={COLORS.softGray} />
-              <Text style={styles.emptyTitle}>All clear</Text>
-              <Text style={styles.emptyDescription}>No activity yet</Text>
-            </View>
+            <EmptyState
+              icon="bell-sleep-outline"
+              title="All Clear"
+              subtitle="You have no new activity."
+            />
           )}
 
           {/* System Section (only show if KYC not completed and there are system activities) */}
@@ -358,12 +392,14 @@ const ActivityScreen: React.FC = () => {
               {systemActivities.map((activity, index) => (
                 <View key={activity.id}>
                   <SystemRow activity={activity} />
-                  {index < systemActivities.length - 1 && <View style={styles.divider} />}
+                  {index < systemActivities.length - 1 && (
+                    <View style={styles.divider} />
+                  )}
                 </View>
               ))}
             </View>
           )}
-          
+
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </SafeAreaView>
@@ -377,7 +413,12 @@ const ActivityRow = ({ activity }: { activity: ActivityItem }) => {
   const getRoleBadge = (role?: RoleType) => {
     if (!role) return null;
     return (
-      <View style={[styles.rolePill, role === 'giver' ? styles.rolePillGiver : styles.rolePillReceiver]}>
+      <View
+        style={[
+          styles.rolePill,
+          role === 'giver' ? styles.rolePillGiver : styles.rolePillReceiver,
+        ]}
+      >
         <Text style={styles.rolePillText}>
           {role === 'giver' ? 'As Giver' : 'As Receiver'}
         </Text>
@@ -387,7 +428,7 @@ const ActivityRow = ({ activity }: { activity: ActivityItem }) => {
 
   const getGestureStatusBadge = (status?: string) => {
     if (!status) return null;
-    
+
     const badgeConfig = {
       waiting: { label: 'Waiting for proof', color: COLORS.softOrange },
       verified: { label: 'Verified', color: COLORS.mint },
@@ -398,7 +439,9 @@ const ActivityRow = ({ activity }: { activity: ActivityItem }) => {
     if (!config) return null;
 
     return (
-      <View style={[styles.statusBadge, { backgroundColor: config.color + '20' }]}>
+      <View
+        style={[styles.statusBadge, { backgroundColor: config.color + '20' }]}
+      >
         <Text style={[styles.statusBadgeText, { color: config.color }]}>
           {config.label}
         </Text>
@@ -409,26 +452,33 @@ const ActivityRow = ({ activity }: { activity: ActivityItem }) => {
   return (
     <View style={styles.activityRow}>
       <View style={styles.iconDot}>
-        <MaterialCommunityIcons name={activity.icon as IconName} size={20} color={activity.iconColor} />
+        <MaterialCommunityIcons
+          name={activity.icon as IconName}
+          size={20}
+          color={activity.iconColor}
+        />
       </View>
-      
+
       <View style={styles.activityContent}>
         <View style={styles.activityTitleRow}>
           <Text style={styles.activityTitle}>{activity.title}</Text>
-          {activity.emoji && <Text style={styles.activityEmoji}>{activity.emoji}</Text>}
+          {activity.emoji && (
+            <Text style={styles.activityEmoji}>{activity.emoji}</Text>
+          )}
         </View>
-        
+
         {activity.role && activity.momentTitle && (
           <View style={styles.momentRow}>
             {getRoleBadge(activity.role)}
             <Text style={styles.momentTitle}>{activity.momentTitle}</Text>
           </View>
         )}
-        
+
         <Text style={styles.activitySubtitle}>{activity.subtitle}</Text>
-        
-        {activity.gestureStatus && getGestureStatusBadge(activity.gestureStatus)}
-        
+
+        {activity.gestureStatus &&
+          getGestureStatusBadge(activity.gestureStatus)}
+
         {activity.actionText && (
           <TouchableOpacity style={styles.actionLink} onPress={activity.action}>
             <Text style={styles.actionLinkText}>{activity.actionText}</Text>
@@ -444,16 +494,29 @@ const ActivityRow = ({ activity }: { activity: ActivityItem }) => {
 const SystemRow = ({ activity }: { activity: ActivityItem }) => (
   <View style={styles.systemRow}>
     <View style={styles.systemIconDot}>
-      <MaterialCommunityIcons name={activity.icon} size={20} color={activity.iconColor} />
+      <MaterialCommunityIcons
+        name={activity.icon}
+        size={20}
+        color={activity.iconColor}
+      />
     </View>
-    
+
     <View style={styles.systemContent}>
       <Text style={styles.systemTitle}>{activity.title}</Text>
       <Text style={styles.systemSubtitle}>{activity.subtitle}</Text>
       {activity.actionText && (
-        <TouchableOpacity style={styles.systemActionButton} onPress={activity.action}>
-          <Text style={styles.systemActionButtonText}>{activity.actionText}</Text>
-          <MaterialCommunityIcons name="chevron-right" size={16} color={COLORS.mint} />
+        <TouchableOpacity
+          style={styles.systemActionButton}
+          onPress={activity.action}
+        >
+          <Text style={styles.systemActionButtonText}>
+            {activity.actionText}
+          </Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={16}
+            color={COLORS.mint}
+          />
         </TouchableOpacity>
       )}
     </View>
@@ -461,314 +524,271 @@ const SystemRow = ({ activity }: { activity: ActivityItem }) => (
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background
+  actionLink: {
+    marginTop: 8,
   },
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: COLORS.background,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  filterButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  highlightsCard: {
-    marginHorizontal: 20,
-    marginBottom: 12,
-    padding: 16,
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  highlightsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  unreadBadge: {
-    backgroundColor: COLORS.coral,
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    paddingHorizontal: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 'auto',
-  },
-  unreadBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  highlightsTitle: {
-    fontSize: 15,
+  actionLinkText: {
+    color: COLORS.mint,
+    fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
   },
-  highlightsSubtitle: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
+  activityContent: {
+    flex: 1,
   },
-  filtersContainer: {
+  activityEmoji: {
+    fontSize: 14,
+  },
+  activityRow: {
+    alignItems: 'flex-start',
     flexDirection: 'row',
+    gap: 12,
     paddingHorizontal: 20,
     paddingVertical: 12,
-    gap: 8,
+  },
+  activitySubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    lineHeight: 18,
+  },
+  activityTime: {
+    color: COLORS.softGray,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  activityTitle: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  activityTitleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 4,
+  },
+  bottomSpacer: {
+    height: 100,
+  },
+  container: {
+    backgroundColor: COLORS.background,
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+  },
+  divider: {
+    backgroundColor: COLORS.border,
+    height: 1,
+    marginLeft: 68,
+    marginRight: 20,
+  },
+  filterButton: {
+    alignItems: 'center',
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
   },
   filterTab: {
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    flexDirection: 'row',
     gap: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: COLORS.white,
   },
   filterTabActive: {
     backgroundColor: COLORS.mint,
   },
   filterTabText: {
+    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
   },
   filterTabTextActive: {
     color: COLORS.white,
     fontWeight: '600',
   },
-  tabBadge: {
-    backgroundColor: COLORS.coral,
-    borderRadius: 9,
-    minWidth: 18,
-    height: 18,
-    paddingHorizontal: 5,
+  filtersContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  header: {
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: COLORS.background,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
-  tabBadgeActive: {
-    backgroundColor: COLORS.white,
-  },
-  tabBadgeText: {
-    fontSize: 10,
+  headerTitle: {
+    color: COLORS.text,
+    fontSize: 32,
     fontWeight: '700',
-    color: COLORS.white,
   },
-  tabBadgeTextActive: {
-    color: COLORS.mint,
+  highlightsCard: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 12,
+    marginHorizontal: 20,
+    padding: 16,
   },
-  content: {
+  highlightsHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 6,
+  },
+  highlightsSubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  highlightsTitle: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  iconDot: {
+    alignItems: 'center',
+    backgroundColor: COLORS.mintTransparent,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  momentRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 6,
+  },
+  momentTitle: {
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  rolePill: {
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  rolePillGiver: {
+    backgroundColor: COLORS.softOrangeTransparent,
+  },
+  rolePillReceiver: {
+    backgroundColor: COLORS.mintTransparent,
+  },
+  rolePillText: {
+    color: COLORS.text,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  safeArea: {
     flex: 1,
   },
   section: {
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 12,
-    marginHorizontal: 20,
-  },
-  activityRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    gap: 12,
-  },
-  iconDot: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(166, 229, 193, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activityContent: {
-    flex: 1,
-  },
-  activityTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  activityTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  activityEmoji: {
-    fontSize: 14,
-  },
-  momentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  rolePill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  rolePillGiver: {
-    backgroundColor: 'rgba(255, 169, 77, 0.15)',
-  },
-  rolePillReceiver: {
-    backgroundColor: 'rgba(166, 229, 193, 0.15)',
-  },
-  rolePillText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.text,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
-  },
-  momentTitle: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: COLORS.text,
-    flex: 1,
-  },
-  activitySubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
-  },
   statusBadge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
     borderRadius: 12,
     marginTop: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   statusBadgeText: {
     fontSize: 12,
     fontWeight: '600',
   },
-  activityTime: {
-    fontSize: 12,
-    color: COLORS.softGray,
-    marginTop: 2,
+  systemActionButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: 12,
   },
-  actionLink: {
-    marginTop: 8,
-  },
-  actionLinkText: {
+  systemActionButtonText: {
+    color: COLORS.mint,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.mint,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-    marginLeft: 68,
-    marginRight: 20,
-  },
-  systemSection: {
-    marginTop: 32,
-    marginBottom: 16,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  systemSectionTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: COLORS.softGray,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 16,
-    marginHorizontal: 20,
-  },
-  systemRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    gap: 12,
-    backgroundColor: COLORS.white,
-    marginHorizontal: 20,
-    marginBottom: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  systemIconDot: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(184, 180, 175, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   systemContent: {
     flex: 1,
   },
-  systemTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
+  systemIconDot: {
+    alignItems: 'center',
+    backgroundColor: COLORS.softGrayTransparent,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  systemRow: {
+    alignItems: 'flex-start',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 8,
+    marginHorizontal: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  systemSection: {
+    borderTopColor: COLORS.border,
+    borderTopWidth: 1,
+    marginBottom: 16,
+    marginTop: 32,
+    paddingTop: 20,
+  },
+  systemSectionTitle: {
+    color: COLORS.softGray,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginBottom: 16,
+    marginHorizontal: 20,
+    textTransform: 'uppercase',
   },
   systemSubtitle: {
-    fontSize: 14,
     color: COLORS.textSecondary,
+    fontSize: 14,
     lineHeight: 18,
   },
-  systemActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    gap: 4,
-  },
-  systemActionButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.mint,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+  systemTitle: {
     color: COLORS.text,
-    marginTop: 16,
-    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
   },
-  emptyDescription: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
+  tabBadge: {
+    alignItems: 'center',
+    backgroundColor: COLORS.coral,
+    borderRadius: 9,
+    height: 18,
+    justifyContent: 'center',
+    minWidth: 18,
+    paddingHorizontal: 5,
   },
-  bottomSpacer: {
-    height: 100,
+  tabBadgeActive: {
+    backgroundColor: COLORS.white,
+  },
+  tabBadgeText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  tabBadgeTextActive: {
+    color: COLORS.mint,
   },
 });
 

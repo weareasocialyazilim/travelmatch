@@ -18,7 +18,8 @@ export const MOCK_PROOFS: Proof[] = [
       city: 'San Francisco',
       country: 'USA',
     },
-    description: 'Successfully delivered the birthday surprise package to Emily\'s daughter. She was so happy!',
+    description:
+      "Successfully delivered the birthday surprise package to Emily's daughter. She was so happy!",
     verificationStatus: 'verified',
     aiScore: 98,
     communityScore: 96,
@@ -83,7 +84,7 @@ export const MOCK_PROOFS: Proof[] = [
     video: undefined,
     location: {
       lat: 40.7128,
-      lng: -74.0060,
+      lng: -74.006,
       city: 'New York',
       country: 'USA',
     },

@@ -3,9 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   TextInput,
+  TouchableOpacity,
   Image,
   Alert,
 } from 'react-native';
@@ -15,11 +15,15 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import Loading from '../components/Loading';
 
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
+type ProofType = 'micro-kindness' | 'verified-experience' | 'community-proof';
 
 interface ProofUpload {
-  type: 'micro-kindness' | 'verified-experience' | 'community-proof';
+  type: ProofType;
   photos: string[];
   ticket?: string;
   location?: { lat: number; lng: number; name: string };
@@ -35,7 +39,8 @@ const PROOF_TYPES = [
     name: 'Micro Kindness',
     icon: 'hand-heart',
     color: COLORS.primary,
-    description: 'Small acts of kindness like buying coffee or giving directions',
+    description:
+      'Small acts of kindness like buying coffee or giving directions',
   },
   {
     id: 'verified-experience',
@@ -53,7 +58,14 @@ const PROOF_TYPES = [
   },
 ];
 
-export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type ProofUploadScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ProofUpload'
+>;
+
+export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
+  navigation,
+}) => {
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [proof, setProof] = useState<Partial<ProofUpload>>({
     photos: [],
@@ -62,8 +74,8 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
   });
   const [loading, setLoading] = useState(false);
 
-  const handleSelectType = (type: string) => {
-    setProof({ ...proof, type: type as any });
+  const handleSelectType = (type: ProofType) => {
+    setProof({ ...proof, type });
     setCurrentStep('upload');
   };
 
@@ -111,7 +123,7 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
           <TouchableOpacity
             key={type.id}
             style={styles.typeCard}
-            onPress={() => handleSelectType(type.id)}
+            onPress={() => handleSelectType(type.id as ProofType)}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -141,12 +153,15 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
       <View style={styles.uploadSection}>
         <Text style={styles.sectionLabel}>Photos (Required)</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
+          <TouchableOpacity
+            style={styles.addPhotoButton}
+            onPress={handleAddPhoto}
+          >
             <Icon name="camera-plus" size={32} color={COLORS.primary} />
             <Text style={styles.addPhotoText}>Add Photo</Text>
           </TouchableOpacity>
-          {proof.photos?.map((photo, index) => (
-            <View key={index} style={styles.photoPreview}>
+          {proof.photos?.map((photo) => (
+            <View key={photo} style={styles.photoPreview}>
               <Image source={{ uri: photo }} style={styles.photoImage} />
               <TouchableOpacity style={styles.removePhoto}>
                 <Icon name="close-circle" size={24} color={COLORS.error} />
@@ -168,7 +183,10 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
       {/* Location */}
       <View style={styles.uploadSection}>
         <Text style={styles.sectionLabel}>Location</Text>
-        <TouchableOpacity style={styles.uploadButton} onPress={handleSelectLocation}>
+        <TouchableOpacity
+          style={styles.uploadButton}
+          onPress={handleSelectLocation}
+        >
           <Icon name="map-marker" size={24} color={COLORS.primary} />
           <Text style={styles.uploadButtonText}>
             {proof.location ? proof.location.name : 'Add Location'}
@@ -234,7 +252,9 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
               placeholderTextColor={COLORS.textSecondary}
               keyboardType="decimal-pad"
               value={proof.amount?.toString()}
-              onChangeText={(text) => setProof({ ...proof, amount: parseFloat(text) })}
+              onChangeText={(text) =>
+                setProof({ ...proof, amount: parseFloat(text) })
+              }
             />
           </View>
         </View>
@@ -306,15 +326,17 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
 
         <View style={styles.reviewSection}>
           <Text style={styles.reviewLabel}>Photos</Text>
-          <Text style={styles.reviewValue}>{proof.photos?.length || 0} photos</Text>
+          <Text style={styles.reviewValue}>
+            {proof.photos?.length || 0} photos
+          </Text>
         </View>
       </View>
 
       <View style={styles.verificationNote}>
         <Icon name="information" size={20} color={COLORS.info} />
         <Text style={styles.verificationText}>
-          Your proof will be verified using AI and blockchain technology. This process
-          usually takes 2-5 minutes.
+          Your proof will be verified using AI and blockchain technology. This
+          process usually takes 2-5 minutes.
         </Text>
       </View>
 
@@ -329,11 +351,7 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          {loading ? (
-            <Text style={styles.buttonText}>Submitting...</Text>
-          ) : (
-            <Text style={styles.buttonText}>Submit Proof</Text>
-          )}
+          <Text style={styles.buttonText}>Submit Proof</Text>
         </LinearGradient>
       </TouchableOpacity>
     </View>
@@ -341,6 +359,7 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {loading && <Loading mode="overlay" text="Submitting..." />}
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -349,7 +368,12 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
             if (currentStep === 'type') {
               navigation.goBack();
             } else {
-              const steps: ProofStep[] = ['type', 'upload', 'details', 'verify'];
+              const steps: ProofStep[] = [
+                'type',
+                'upload',
+                'details',
+                'verify',
+              ];
               const currentIndex = steps.indexOf(currentStep);
               setCurrentStep(steps[currentIndex - 1]);
             }
@@ -363,7 +387,7 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
 
       {/* Progress Steps */}
       <View style={styles.progressContainer}>
-        {['type', 'upload', 'details', 'verify'].map((step, index) => (
+        {['type', 'upload', 'details', 'verify'].map((step) => (
           <View
             key={step}
             style={[
@@ -390,206 +414,124 @@ export const ProofUploadScreen: React.FC<{ navigation: any }> = ({ navigation })
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 1.5,
-  },
-  backButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding * 2,
-  },
-  progressStep: {
-    flex: 1,
-    height: 4,
-    backgroundColor: COLORS.border,
-    marginHorizontal: LAYOUT.padding / 4,
-    borderRadius: 2,
-  },
   activeProgressStep: {
     backgroundColor: COLORS.primary,
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 4,
-  },
-  stepContainer: {
-    flex: 1,
-  },
-  stepTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-  },
-  stepSubtitle: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    marginBottom: LAYOUT.padding * 3,
-    lineHeight: 24,
-  },
-  typesContainer: {
-    gap: LAYOUT.padding * 1.5,
-  },
-  typeCard: {
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-    ...VALUES.shadow,
-  },
-  typeGradient: {
-    padding: LAYOUT.padding * 2,
-    alignItems: 'center',
-  },
-  typeName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginTop: LAYOUT.padding,
-    marginBottom: LAYOUT.padding / 2,
-  },
-  typeDescription: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.white,
-    textAlign: 'center',
-    opacity: 0.9,
-  },
-  uploadSection: {
-    marginBottom: LAYOUT.padding * 2,
-  },
-  sectionLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-  },
   addPhotoButton: {
-    width: 120,
-    height: 120,
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    height: 120,
+    justifyContent: 'center',
     marginRight: LAYOUT.padding,
+    width: 120,
   },
   addPhotoText: {
+    color: COLORS.primary,
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.primary,
     marginTop: LAYOUT.padding / 2,
   },
-  photoPreview: {
-    width: 120,
-    height: 120,
-    marginRight: LAYOUT.padding,
-    position: 'relative',
-  },
-  photoImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: VALUES.borderRadius,
-  },
-  removePhoto: {
-    position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-  },
-  uploadButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: LAYOUT.padding * 1.5,
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-  },
-  uploadButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding,
-  },
-  inputSection: {
-    marginBottom: LAYOUT.padding * 2,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-  },
-  input: {
-    backgroundColor: COLORS.white,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    fontSize: 16,
-    fontWeight: '500',
-    color: COLORS.text,
-  },
-  textArea: {
-    minHeight: 120,
-    textAlignVertical: 'top',
-  },
   amountInput: {
-    flexDirection: 'row',
     alignItems: 'center',
-  },
-  currency: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginRight: LAYOUT.padding,
+    flexDirection: 'row',
   },
   amountValue: {
     flex: 1,
   },
-  nextButton: {
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-    marginTop: LAYOUT.padding * 2,
-  },
-  submitButton: {
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-    marginTop: LAYOUT.padding * 2,
+  backButton: {
+    padding: LAYOUT.padding / 2,
   },
   buttonGradient: {
-    paddingVertical: LAYOUT.padding * 2,
     alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 2,
   },
   buttonText: {
+    color: COLORS.white,
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.white,
+  },
+  container: {
+    backgroundColor: COLORS.background,
+    flex: 1,
+  },
+  currency: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '700',
+    marginRight: LAYOUT.padding,
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  headerTitle: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  input: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '500',
+    padding: LAYOUT.padding * 1.5,
+  },
+  inputLabel: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: LAYOUT.padding,
+  },
+  inputSection: {
+    marginBottom: LAYOUT.padding * 2,
+  },
+  nextButton: {
+    borderRadius: VALUES.borderRadius,
+    marginTop: LAYOUT.padding * 2,
+    overflow: 'hidden',
+  },
+  photoImage: {
+    borderRadius: VALUES.borderRadius,
+    height: '100%',
+    width: '100%',
+  },
+  photoPreview: {
+    height: 120,
+    marginRight: LAYOUT.padding,
+    position: 'relative',
+    width: 120,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 2,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  progressStep: {
+    backgroundColor: COLORS.border,
+    borderRadius: 2,
+    flex: 1,
+    height: 4,
+    marginHorizontal: LAYOUT.padding / 4,
+  },
+  removePhoto: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    position: 'absolute',
+    right: -8,
+    top: -8,
   },
   reviewCard: {
     backgroundColor: COLORS.white,
@@ -597,33 +539,115 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding * 2,
     ...VALUES.shadow,
   },
+  reviewLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: LAYOUT.padding / 2,
+  },
   reviewSection: {
     marginBottom: LAYOUT.padding * 1.5,
   },
-  reviewLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    marginBottom: LAYOUT.padding / 2,
-  },
   reviewValue: {
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
   },
-  verificationNote: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.info + '20',
-    padding: LAYOUT.padding * 1.5,
+  scrollContent: {
+    paddingBottom: LAYOUT.padding * 4,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  sectionLabel: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: LAYOUT.padding,
+  },
+  stepContainer: {
+    flex: 1,
+  },
+  stepSubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
+    marginBottom: LAYOUT.padding * 3,
+  },
+  stepTitle: {
+    color: COLORS.text,
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding,
+  },
+  submitButton: {
     borderRadius: VALUES.borderRadius,
     marginTop: LAYOUT.padding * 2,
+    overflow: 'hidden',
+  },
+  textArea: {
+    minHeight: 120,
+    textAlignVertical: 'top',
+  },
+  typeCard: {
+    borderRadius: VALUES.borderRadius,
+    overflow: 'hidden',
+    ...VALUES.shadow,
+  },
+  typeDescription: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '400',
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  typeGradient: {
+    alignItems: 'center',
+    padding: LAYOUT.padding * 2,
+  },
+  typeName: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding / 2,
+    marginTop: LAYOUT.padding,
+  },
+  typesContainer: {
+    gap: LAYOUT.padding * 1.5,
+  },
+  uploadButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
+    flexDirection: 'row',
+    padding: LAYOUT.padding * 1.5,
+  },
+  uploadButtonText: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding,
+  },
+  uploadSection: {
+    marginBottom: LAYOUT.padding * 2,
+  },
+  verificationNote: {
+    backgroundColor: COLORS.info + '20',
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginTop: LAYOUT.padding * 2,
+    padding: LAYOUT.padding * 1.5,
   },
   verificationText: {
+    color: COLORS.text,
     flex: 1,
     fontSize: 14,
     fontWeight: '400',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding,
     lineHeight: 20,
+    marginLeft: LAYOUT.padding,
   },
 });

@@ -1,17 +1,12 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
+import { radii } from '../constants/radii';
+import { spacing } from '../constants/spacing';
+import { TYPOGRAPHY } from '../constants/typography';
+import { SHADOWS } from '../constants/shadows';
 
 interface ThankYouModalProps {
   visible: boolean;
@@ -77,70 +72,68 @@ export const ThankYouModal: React.FC<ThankYouModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
-    width: '85%',
-    borderRadius: VALUES.borderRadius * 2,
-    overflow: 'hidden',
-    ...VALUES.shadow,
-  },
-  gradient: {
-    padding: LAYOUT.padding * 3,
-    alignItems: 'center',
-  },
-  iconContainer: {
-    marginBottom: LAYOUT.padding * 2,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.white,
-    marginBottom: LAYOUT.padding * 1.5,
-    textAlign: 'center',
-  },
-  message: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: COLORS.white,
-    textAlign: 'center',
-    marginBottom: LAYOUT.padding * 2,
-    lineHeight: 24,
-    opacity: 0.95,
-  },
-  noteCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    paddingVertical: LAYOUT.padding,
-    borderRadius: VALUES.borderRadius,
-    marginBottom: LAYOUT.padding * 3,
-  },
-  noteText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding,
-    lineHeight: 20,
-  },
   closeButton: {
     width: '100%',
   },
-  whiteButton: {
-    backgroundColor: COLORS.white,
-    paddingVertical: LAYOUT.padding * 1.5,
-    borderRadius: VALUES.borderRadius,
-    alignItems: 'center',
-  },
   closeButtonText: {
+    color: COLORS.primary,
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.primary,
+  },
+  gradient: {
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  iconContainer: {
+    marginBottom: spacing.lg,
+  },
+  message: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.white,
+    lineHeight: 24,
+    marginBottom: spacing.lg,
+    opacity: 0.95,
+    textAlign: 'center',
+  },
+  modal: {
+    borderRadius: radii.xl,
+    overflow: 'hidden',
+    width: '85%',
+    ...SHADOWS.lg,
+  },
+  noteCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.whiteTransparent,
+    borderRadius: radii.md,
+    flexDirection: 'row',
+    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  noteText: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.white,
+    flex: 1,
+    fontWeight: '600',
+    lineHeight: 20,
+    marginLeft: spacing.md,
+  },
+  overlay: {
+    alignItems: 'center',
+    backgroundColor: COLORS.modalBackdrop,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  title: {
+    ...TYPOGRAPHY.h1,
+    color: COLORS.white,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  whiteButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: radii.md,
+    paddingVertical: spacing.md,
   },
 });

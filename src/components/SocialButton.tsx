@@ -1,140 +1,107 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
+import { radii } from '../constants/radii';
+import { spacing } from '../constants/spacing';
 
-type Provider = 'google' | 'apple' | 'facebook' | 'phone' | 'email';
+type Provider = 'google' | 'apple' | 'facebook';
+type Size = 'large' | 'icon';
 
-interface Props {
+interface SocialButtonProps {
   provider: Provider;
-  label?: string;
+  size?: Size;
   onPress?: () => void;
-  size?: 'full' | 'icon';
-  style?: any;
+  style?: ViewStyle;
 }
 
-const iconMap: Record<Provider, string> = {
-  google: 'google',
-  apple: 'apple',
-  facebook: 'facebook',
-  phone: 'phone',
-  email: 'email',
-};
-
-const SocialButton: React.FC<Props> = ({ provider, label, onPress, size = 'full', style }) => {
-  const iconName = iconMap[provider];
-
-  const providerStyles = {
+const SocialButton: React.FC<SocialButtonProps> = ({
+  provider,
+  size = 'large',
+  onPress,
+  style,
+}) => {
+  const providerConfig = {
     google: {
-      wrapperBg: COLORS.white,
-      iconColor: COLORS.error,
-      textColor: COLORS.text,
-      borderColor: COLORS.border,
+      icon: 'google',
+      text: 'Continue with Google',
+      color: COLORS.error,
     },
     apple: {
-      wrapperBg: COLORS.black,
-      iconColor: COLORS.white,
-      textColor: COLORS.white,
-      borderColor: 'transparent',
+      icon: 'apple',
+      text: 'Continue with Apple',
+      color: COLORS.black,
     },
     facebook: {
-      wrapperBg: COLORS.white,
-      iconColor: COLORS.info,
-      textColor: COLORS.text,
-      borderColor: COLORS.border,
+      icon: 'facebook',
+      text: 'Continue with Facebook',
+      color: COLORS.info,
     },
-    phone: {
-      wrapperBg: COLORS.primary,
-      iconColor: COLORS.white,
-      textColor: COLORS.white,
-      borderColor: 'transparent',
-    },
-    email: {
-      wrapperBg: 'transparent',
-      iconColor: COLORS.white,
-      textColor: COLORS.white,
-      borderColor: 'rgba(255,255,255,0.18)',
-    },
-  }[provider];
+  };
 
-  const iconCircleBg =
-    provider === 'apple' || provider === 'google' || provider === 'facebook'
-      ? COLORS.white
-      : 'transparent';
+  const config = providerConfig[provider];
 
   if (size === 'icon') {
     return (
       <TouchableOpacity
-        style={[styles.iconButton, { backgroundColor: providerStyles.wrapperBg, borderColor: providerStyles.borderColor }, style]}
+        style={[styles.iconButton, { backgroundColor: config.color }, style]}
         onPress={onPress}
         activeOpacity={0.8}
-        accessible
         accessibilityRole="button"
-        accessibilityLabel={label || `Continue with ${provider}`}
+        accessibilityLabel={config.text}
       >
-        <Icon name={iconName} size={20} color={providerStyles.iconColor} />
+        <MaterialCommunityIcons
+          name={config.icon}
+          size={24}
+          color={COLORS.white}
+        />
       </TouchableOpacity>
     );
   }
 
   return (
     <TouchableOpacity
-      style={[
-        styles.fullButton,
-        { backgroundColor: providerStyles.wrapperBg, borderColor: providerStyles.borderColor },
-        style,
-      ]}
+      style={[styles.largeButton, style]}
       onPress={onPress}
-      activeOpacity={0.85}
-      accessible
+      activeOpacity={0.8}
       accessibilityRole="button"
-      accessibilityLabel={label || `Continue with ${provider}`}
+      accessibilityLabel={config.text}
     >
-      <View style={[styles.iconWrapper, { backgroundColor: iconCircleBg }]}> 
-        <Icon name={iconName} size={18} color={providerStyles.iconColor} />
-      </View>
-      <Text style={[styles.label, { color: providerStyles.textColor }]}>{label}</Text>
+      <MaterialCommunityIcons
+        name={config.icon}
+        size={22}
+        color={config.color}
+      />
+      <Text style={[styles.largeButtonText, { color: config.color }]}>
+        {config.text}
+      </Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  fullButton: {
-    flexDirection: 'row',
+  iconButton: {
     alignItems: 'center',
-    paddingVertical: LAYOUT.padding * 1.4,
-    paddingHorizontal: 14,
-    borderRadius: VALUES.borderRadius,
-    borderWidth: 1,
-    width: '100%',
-    marginBottom: 10,
-    minHeight: 56,
-  },
-  iconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
+    borderRadius: radii.full,
+    height: 56,
     justifyContent: 'center',
-    marginRight: 12,
+    width: 56,
   },
-  label: {
+  largeButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: radii.full,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: spacing.md,
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    width: '100%',
+  },
+  largeButtonText: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  iconButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    shadowColor: COLORS.shadowColor,
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
   },
 });
 

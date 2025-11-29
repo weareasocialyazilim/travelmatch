@@ -3,28 +3,30 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Image,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
 import { MOCK_PROOF_STORY } from '../mocks';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-export const ProofStoryScreen: React.FC<{ navigation: any; route: any }> = ({
+type ProofStoryScreenProps = StackScreenProps<RootStackParamList, 'ProofStory'>;
+
+export const ProofStoryScreen: React.FC<ProofStoryScreenProps> = ({
   navigation,
-  route,
+  route: _route,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [liked, setLiked] = useState(false);
-  
+
   const story = MOCK_PROOF_STORY; // In real app, fetch from route.params or API
 
   const handleLike = () => {
@@ -61,12 +63,17 @@ export const ProofStoryScreen: React.FC<{ navigation: any; route: any }> = ({
       </View>
 
       <View style={styles.authorContainer}>
-        <Image source={{ uri: story.author.avatar }} style={styles.authorAvatar} />
+        <Image
+          source={{ uri: story.author.avatar }}
+          style={styles.authorAvatar}
+        />
         <View style={styles.authorInfo}>
           <Text style={styles.authorName}>{story.author.name}</Text>
           <View style={styles.trustBadge}>
             <Icon name="shield-check" size={12} color={COLORS.success} />
-            <Text style={styles.trustScore}>{story.author.trustScore}% Trust</Text>
+            <Text style={styles.trustScore}>
+              {story.author.trustScore}% Trust
+            </Text>
           </View>
         </View>
       </View>
@@ -142,10 +149,18 @@ export const ProofStoryScreen: React.FC<{ navigation: any; route: any }> = ({
         activeOpacity={0.8}
       >
         <LinearGradient
-          colors={liked ? [COLORS.error, COLORS.error] : ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.2)']}
+          colors={
+            liked
+              ? [COLORS.error, COLORS.error]
+              : ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.2)']
+          }
           style={styles.actionButtonGradient}
         >
-          <Icon name={liked ? 'heart' : 'heart-outline'} size={28} color={COLORS.white} />
+          <Icon
+            name={liked ? 'heart' : 'heart-outline'}
+            size={28}
+            color={COLORS.white}
+          />
         </LinearGradient>
       </TouchableOpacity>
 
@@ -164,13 +179,11 @@ export const ProofStoryScreen: React.FC<{ navigation: any; route: any }> = ({
 
       <TouchableOpacity
         style={styles.actionButton}
-        onPress={() => navigation.navigate('Chat', { 
-          otherUser: {
-            id: story.author,
-            name: 'Story Author',
-            avatar: 'https://via.placeholder.com/100'
-          }
-        })}
+        onPress={() =>
+          navigation.navigate('Chat', {
+            otherUser: story.author,
+          })
+        }
         activeOpacity={0.8}
       >
         <LinearGradient
@@ -232,25 +245,130 @@ export const ProofStoryScreen: React.FC<{ navigation: any; route: any }> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.text,
+  actionButton: {
+    borderRadius: 30,
+    marginBottom: LAYOUT.padding * 1.5,
+    overflow: 'hidden',
+  },
+  actionButtonGradient: {
+    alignItems: 'center',
+    borderRadius: 30,
+    height: 60,
+    justifyContent: 'center',
+    width: 60,
+  },
+  actions: {
+    alignItems: 'center',
+    bottom: 30,
+    position: 'absolute',
+    right: LAYOUT.padding * 2,
+  },
+  activeProgressBar: {
+    backgroundColor: COLORS.white,
+  },
+  authorAvatar: {
+    borderColor: COLORS.white,
+    borderRadius: 20,
+    borderWidth: 2,
+    height: 40,
+    width: 40,
+  },
+  authorContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  authorInfo: {
+    marginLeft: LAYOUT.padding,
+  },
+  authorName: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding / 4,
   },
   backgroundImage: {
+    height: SCREEN_HEIGHT,
     position: 'absolute',
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+  },
+  closeButton: {
+    alignSelf: 'flex-end',
+    padding: LAYOUT.padding / 2,
+  },
+  container: {
+    backgroundColor: COLORS.text,
+    flex: 1,
+  },
+  content: {
+    bottom: 100,
+    left: 0,
+    paddingBottom: LAYOUT.padding * 2,
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingTop: LAYOUT.padding * 4,
+    position: 'absolute',
+    right: 0,
+  },
+  description: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
+    marginBottom: LAYOUT.padding * 1.5,
+  },
+  header: {
+    left: 0,
+    paddingBottom: LAYOUT.padding * 2,
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingTop: 50,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  metaContainer: {
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 1.5,
+  },
+  metaItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginRight: LAYOUT.padding * 2,
+  },
+  metaText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: LAYOUT.padding / 2,
   },
   overlay: {
+    backgroundColor: COLORS.blackTransparentLight,
+    height: SCREEN_HEIGHT,
     position: 'absolute',
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-    backgroundColor: 'rgba(0,0,0,0.3)',
   },
-  tapZones: {
-    position: 'absolute',
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+  progressBar: {
+    backgroundColor: COLORS.whiteTransparentLight,
+    borderRadius: 1.5,
+    flex: 1,
+    height: 3,
+    marginHorizontal: 2,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 2,
+    marginTop: LAYOUT.padding,
+  },
+  statItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginRight: LAYOUT.padding * 2,
+  },
+  statText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
+  },
+  statsContainer: {
     flexDirection: 'row',
   },
   tapZoneLeft: {
@@ -259,148 +377,43 @@ const styles = StyleSheet.create({
   tapZoneRight: {
     flex: 1,
   },
-  header: {
+  tapZones: {
+    flexDirection: 'row',
+    height: SCREEN_HEIGHT,
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingTop: 50,
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 2,
-  },
-  closeButton: {
-    alignSelf: 'flex-end',
-    padding: LAYOUT.padding / 2,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    marginTop: LAYOUT.padding,
-    marginBottom: LAYOUT.padding * 2,
-  },
-  progressBar: {
-    flex: 1,
-    height: 3,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    marginHorizontal: 2,
-    borderRadius: 1.5,
-  },
-  activeProgressBar: {
-    backgroundColor: COLORS.white,
-  },
-  authorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  authorAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: COLORS.white,
-  },
-  authorInfo: {
-    marginLeft: LAYOUT.padding,
-  },
-  authorName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginBottom: LAYOUT.padding / 4,
-  },
-  trustBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  trustScore: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding / 4,
-  },
-  content: {
-    position: 'absolute',
-    bottom: 100,
-    left: 0,
-    right: 0,
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingTop: LAYOUT.padding * 4,
-    paddingBottom: LAYOUT.padding * 2,
-  },
-  typeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
-    borderRadius: VALUES.borderRadius / 2,
-    marginBottom: LAYOUT.padding,
-  },
-  typeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding / 2,
-    textTransform: 'uppercase',
+    width: SCREEN_WIDTH,
   },
   title: {
+    color: COLORS.white,
     fontSize: 28,
     fontWeight: '800',
-    color: COLORS.white,
     marginBottom: LAYOUT.padding,
   },
-  description: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.white,
-    lineHeight: 24,
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  metaContainer: {
-    flexDirection: 'row',
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  metaItem: {
-    flexDirection: 'row',
+  trustBadge: {
     alignItems: 'center',
-    marginRight: LAYOUT.padding * 2,
+    flexDirection: 'row',
   },
-  metaText: {
-    fontSize: 14,
-    fontWeight: '500',
+  trustScore: {
     color: COLORS.white,
-    marginLeft: LAYOUT.padding / 2,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: LAYOUT.padding * 2,
-  },
-  statText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
+    marginLeft: LAYOUT.padding / 4,
+  },
+  typeBadge: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.whiteTransparentDark,
+    borderRadius: VALUES.borderRadius / 2,
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding,
+    paddingHorizontal: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding / 2,
+  },
+  typeText: {
     color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '700',
     marginLeft: LAYOUT.padding / 2,
-  },
-  actions: {
-    position: 'absolute',
-    bottom: 30,
-    right: LAYOUT.padding * 2,
-    alignItems: 'center',
-  },
-  actionButton: {
-    marginBottom: LAYOUT.padding * 1.5,
-    borderRadius: 30,
-    overflow: 'hidden',
-  },
-  actionButtonGradient: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
+    textTransform: 'uppercase',
   },
 });

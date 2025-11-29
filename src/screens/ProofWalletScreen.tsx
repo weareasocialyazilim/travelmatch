@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,11 +14,20 @@ import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
 import { Proof } from '../types';
 import { MOCK_PROOFS } from '../mocks';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+type ProofWalletScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ProofWallet'
+>;
 
-export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const [selectedTab, setSelectedTab] = useState<'all' | 'verified' | 'pending'>('all');
+export const ProofWalletScreen: React.FC<ProofWalletScreenProps> = ({
+  navigation,
+}) => {
+  const [selectedTab, setSelectedTab] = useState<
+    'all' | 'verified' | 'pending'
+  >('all');
   const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline');
 
   const getTypeIcon = (type: string) => {
@@ -87,7 +95,12 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
         style={[styles.tab, selectedTab === 'all' && styles.activeTab]}
         onPress={() => setSelectedTab('all')}
       >
-        <Text style={[styles.tabText, selectedTab === 'all' && styles.activeTabText]}>
+        <Text
+          style={[
+            styles.tabText,
+            selectedTab === 'all' && styles.activeTabText,
+          ]}
+        >
           All
         </Text>
       </TouchableOpacity>
@@ -95,7 +108,12 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
         style={[styles.tab, selectedTab === 'verified' && styles.activeTab]}
         onPress={() => setSelectedTab('verified')}
       >
-        <Text style={[styles.tabText, selectedTab === 'verified' && styles.activeTabText]}>
+        <Text
+          style={[
+            styles.tabText,
+            selectedTab === 'verified' && styles.activeTabText,
+          ]}
+        >
           Verified
         </Text>
       </TouchableOpacity>
@@ -103,7 +121,12 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
         style={[styles.tab, selectedTab === 'pending' && styles.activeTab]}
         onPress={() => setSelectedTab('pending')}
       >
-        <Text style={[styles.tabText, selectedTab === 'pending' && styles.activeTabText]}>
+        <Text
+          style={[
+            styles.tabText,
+            selectedTab === 'pending' && styles.activeTabText,
+          ]}
+        >
           Pending
         </Text>
       </TouchableOpacity>
@@ -118,13 +141,22 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
       activeOpacity={0.8}
     >
       {/* Type Badge */}
-      <View style={[styles.typeBadge, { backgroundColor: getTypeColor(proof.type) }]}>
+      <View
+        style={[
+          styles.typeBadge,
+          { backgroundColor: getTypeColor(proof.type) },
+        ]}
+      >
         <Icon name={getTypeIcon(proof.type)} size={16} color={COLORS.white} />
       </View>
 
       {/* Status Badge */}
       <View style={[styles.statusBadge, styles[`status${proof.status}`]]}>
-        <Icon name={getStatusIcon(proof.status)} size={14} color={COLORS.white} />
+        <Icon
+          name={getStatusIcon(proof.status)}
+          size={14}
+          color={COLORS.white}
+        />
         <Text style={styles.statusText}>{proof.status}</Text>
       </View>
 
@@ -132,7 +164,8 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
         <View style={styles.proofHeader}>
           <Text style={styles.proofTitle}>{proof.title}</Text>
           <Text style={styles.trustScore}>
-            <Icon name="shield-check" size={14} color={COLORS.success} /> {proof.trustScore}%
+            <Icon name="shield-check" size={14} color={COLORS.success} />{' '}
+            {proof.trustScore}%
           </Text>
         </View>
 
@@ -187,7 +220,9 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
           <Text style={styles.headerTitle}>Proof Wallet</Text>
           <TouchableOpacity
             style={styles.viewModeButton}
-            onPress={() => setViewMode(viewMode === 'timeline' ? 'grid' : 'timeline')}
+            onPress={() =>
+              setViewMode(viewMode === 'timeline' ? 'grid' : 'timeline')
+            }
           >
             <Icon
               name={viewMode === 'timeline' ? 'view-grid' : 'view-list'}
@@ -216,7 +251,11 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
         {/* Empty State */}
         {MOCK_PROOFS.length === 0 && (
           <View style={styles.emptyState}>
-            <Icon name="wallet-outline" size={64} color={COLORS.textSecondary} />
+            <Icon
+              name="wallet-outline"
+              size={64}
+              color={COLORS.textSecondary}
+            />
             <Text style={styles.emptyTitle}>No Proofs Yet</Text>
             <Text style={styles.emptySubtitle}>
               Start your kindness journey by creating your first proof
@@ -259,97 +298,120 @@ export const ProofWalletScreen: React.FC<{ navigation: any }> = ({ navigation })
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingTop: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 3,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding,
-  },
-  backButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: COLORS.white,
-  },
-  viewModeButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.white,
-    opacity: 0.9,
-    textAlign: 'center',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: LAYOUT.padding * 2,
-    marginTop: -LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding * 2,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    alignItems: 'center',
-    marginHorizontal: LAYOUT.padding / 2,
-    ...VALUES.shadow,
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginTop: LAYOUT.padding / 2,
-  },
-  statLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-    marginTop: LAYOUT.padding / 4,
-    textAlign: 'center',
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: LAYOUT.padding,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
   activeTab: {
     borderBottomColor: COLORS.primary,
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
   },
   activeTabText: {
     color: COLORS.primary,
   },
-  scrollView: {
+  amountContainer: {
+    alignItems: 'center',
+    borderTopColor: COLORS.border,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: LAYOUT.padding,
+  },
+  amountLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  amountValue: {
+    color: COLORS.primary,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  backButton: {
+    padding: LAYOUT.padding / 2,
+  },
+  container: {
+    backgroundColor: COLORS.background,
     flex: 1,
   },
-  scrollContent: {
+  createButton: {
+    borderRadius: VALUES.borderRadius,
+    overflow: 'hidden',
+  },
+  createButtonGradient: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: LAYOUT.padding * 3,
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  createButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+    marginLeft: LAYOUT.padding,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 6,
+  },
+  emptySubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '400',
+    marginBottom: LAYOUT.padding * 3,
+    textAlign: 'center',
+  },
+  emptyTitle: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding,
+    marginTop: LAYOUT.padding * 2,
+  },
+  fab: {
+    borderRadius: 28,
+    bottom: LAYOUT.padding * 3,
+    height: 56,
+    overflow: 'hidden',
+    position: 'absolute',
+    right: LAYOUT.padding * 2,
+    width: 56,
+    ...VALUES.shadow,
+  },
+  fabGradient: {
+    alignItems: 'center',
+    height: '100%',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  header: {
+    paddingBottom: LAYOUT.padding * 3,
     paddingHorizontal: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 10,
+    paddingTop: LAYOUT.padding * 2,
+  },
+  headerSubtitle: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '500',
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  headerTitle: {
+    color: COLORS.white,
+    fontSize: 24,
+    fontWeight: '800',
+  },
+  headerTop: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: LAYOUT.padding,
+  },
+  metaItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginRight: LAYOUT.padding * 1.5,
+  },
+  metaText: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '500',
+    marginLeft: LAYOUT.padding / 2,
   },
   proofCard: {
     backgroundColor: COLORS.white,
@@ -358,162 +420,130 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...VALUES.shadow,
   },
-  typeBadge: {
-    position: 'absolute',
-    top: LAYOUT.padding,
-    left: LAYOUT.padding,
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
-    borderRadius: VALUES.borderRadius / 2,
-    zIndex: 1,
-  },
-  statusBadge: {
-    position: 'absolute',
-    top: LAYOUT.padding,
-    right: LAYOUT.padding,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
-    borderRadius: VALUES.borderRadius / 2,
-    zIndex: 1,
-  },
-  statusverified: {
-    backgroundColor: COLORS.success,
-  },
-  statuspending: {
-    backgroundColor: COLORS.warning,
-  },
-  statusrejected: {
-    backgroundColor: COLORS.error,
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding / 4,
-    textTransform: 'uppercase',
-  },
   proofContent: {
     padding: LAYOUT.padding * 1.5,
     paddingTop: LAYOUT.padding * 3,
   },
-  proofHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding,
-  },
-  proofTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-    flex: 1,
-  },
-  trustScore: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.success,
-  },
   proofDescription: {
+    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '400',
-    color: COLORS.textSecondary,
     lineHeight: 20,
+    marginBottom: LAYOUT.padding,
+  },
+  proofHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: LAYOUT.padding,
   },
   proofMeta: {
     flexDirection: 'row',
     marginBottom: LAYOUT.padding,
   },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: LAYOUT.padding * 1.5,
-  },
-  metaText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-    marginLeft: LAYOUT.padding / 2,
-  },
-  amountContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: LAYOUT.padding,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  amountLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-  },
-  amountValue: {
+  proofTitle: {
+    color: COLORS.text,
+    flex: 1,
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.primary,
   },
   receiverContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     marginTop: LAYOUT.padding,
   },
   receiverText: {
+    color: COLORS.text,
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text,
     marginLeft: LAYOUT.padding / 2,
   },
-  emptyState: {
+  scrollContent: {
+    paddingBottom: LAYOUT.padding * 10,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  statCard: {
     alignItems: 'center',
-    paddingVertical: LAYOUT.padding * 6,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginTop: LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: LAYOUT.padding * 3,
-  },
-  createButton: {
+    backgroundColor: COLORS.white,
     borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-  },
-  createButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: LAYOUT.padding * 1.5,
-    paddingHorizontal: LAYOUT.padding * 3,
-  },
-  createButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: LAYOUT.padding * 3,
-    right: LAYOUT.padding * 2,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    overflow: 'hidden',
+    flex: 1,
+    marginHorizontal: LAYOUT.padding / 2,
+    padding: LAYOUT.padding * 1.5,
     ...VALUES.shadow,
   },
-  fabGradient: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
+  statLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: LAYOUT.padding / 4,
+    textAlign: 'center',
+  },
+  statValue: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '800',
+    marginTop: LAYOUT.padding / 2,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: LAYOUT.padding * 2,
+    marginTop: -LAYOUT.padding * 2,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  statusBadge: {
     alignItems: 'center',
+    borderRadius: VALUES.borderRadius / 2,
+    flexDirection: 'row',
+    paddingHorizontal: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding / 2,
+    position: 'absolute',
+    right: LAYOUT.padding,
+    top: LAYOUT.padding,
+    zIndex: 1,
+  },
+  statusText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: '700',
+    marginLeft: LAYOUT.padding / 4,
+    textTransform: 'uppercase',
+  },
+  tab: {
+    alignItems: 'center',
+    borderBottomColor: COLORS.transparent,
+    borderBottomWidth: 2,
+    flex: 1,
+    paddingVertical: LAYOUT.padding,
+  },
+  tabText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 1.5,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  trustScore: {
+    color: COLORS.success,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  typeBadge: {
+    borderRadius: VALUES.borderRadius / 2,
+    left: LAYOUT.padding,
+    paddingHorizontal: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding / 2,
+    position: 'absolute',
+    top: LAYOUT.padding,
+    zIndex: 1,
+  },
+  viewModeButton: {
+    padding: LAYOUT.padding / 2,
   },
 });

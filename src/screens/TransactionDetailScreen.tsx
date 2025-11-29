@@ -13,13 +13,18 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
-import { Transaction } from '../types';
 import { MOCK_TRANSACTION } from '../mocks';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> = ({
-  navigation,
-  route,
-}) => {
+type TransactionDetailScreenProps = StackScreenProps<
+  RootStackParamList,
+  'TransactionDetail'
+>;
+
+export const TransactionDetailScreen: React.FC<
+  TransactionDetailScreenProps
+> = ({ navigation, route: _route }) => {
   const transaction = MOCK_TRANSACTION; // In real app, fetch from route.params or API
 
   const getStatusColor = (status: string) => {
@@ -113,7 +118,9 @@ export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> 
           </View>
 
           <Text style={styles.amountLabel}>Amount</Text>
-          <Text style={styles.amountValue}>${transaction.amount.toFixed(2)}</Text>
+          <Text style={styles.amountValue}>
+            ${transaction.amount.toFixed(2)}
+          </Text>
           <Text style={styles.transactionTitle}>{transaction.title}</Text>
         </View>
 
@@ -132,7 +139,9 @@ export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> 
                   source={{ uri: transaction.giver.avatar }}
                   style={styles.participantAvatar}
                 />
-                <Text style={styles.participantName}>{transaction.giver.name}</Text>
+                <Text style={styles.participantName}>
+                  {transaction.giver.name}
+                </Text>
               </View>
             </View>
           )}
@@ -163,17 +172,23 @@ export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> 
           <View style={styles.detailsCard}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Transaction ID</Text>
-              <Text style={styles.detailValue}>{transaction.transactionId}</Text>
+              <Text style={styles.detailValue}>
+                {transaction.transactionId}
+              </Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Date & Time</Text>
-              <Text style={styles.detailValue}>{formatDate(transaction.date)}</Text>
+              <Text style={styles.detailValue}>
+                {formatDate(transaction.date)}
+              </Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Payment Method</Text>
-              <Text style={styles.detailValue}>{transaction.paymentMethod}</Text>
+              <Text style={styles.detailValue}>
+                {transaction.paymentMethod}
+              </Text>
             </View>
 
             <View style={styles.detailRow}>
@@ -202,7 +217,9 @@ export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> 
             <TouchableOpacity
               style={styles.proofCard}
               onPress={() =>
-                navigation.navigate('ProofDetail', { proofId: transaction.proofId })
+                navigation.navigate('ProofDetail', {
+                  proofId: transaction.proofId,
+                })
               }
               activeOpacity={0.8}
             >
@@ -213,7 +230,11 @@ export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> 
                   See the verified proof for this transaction
                 </Text>
               </View>
-              <Icon name="chevron-right" size={24} color={COLORS.textSecondary} />
+              <Icon
+                name="chevron-right"
+                size={24}
+                color={COLORS.textSecondary}
+              />
             </TouchableOpacity>
           </View>
         )}
@@ -237,12 +258,20 @@ export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> 
           {transaction.status === 'completed' && (
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={() => navigation.navigate('RefundRequest', { transactionId: transaction.id })}
+              onPress={() =>
+                navigation.navigate('RefundRequest', {
+                  transactionId: transaction.id,
+                })
+              }
               activeOpacity={0.8}
             >
               <Icon name="undo-variant" size={24} color={COLORS.warning} />
               <Text style={styles.actionButtonText}>Request Refund</Text>
-              <Icon name="chevron-right" size={20} color={COLORS.textSecondary} />
+              <Icon
+                name="chevron-right"
+                size={20}
+                color={COLORS.textSecondary}
+              />
             </TouchableOpacity>
           )}
 
@@ -281,118 +310,73 @@ export const TransactionDetailScreen: React.FC<{ navigation: any; route: any }> 
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
+  actionButton: {
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 2,
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding,
+    padding: LAYOUT.padding * 1.5,
+    ...VALUES.shadow,
+  },
+  actionButtonText: {
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding,
+  },
+  amountCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    marginBottom: LAYOUT.padding * 2,
+    marginTop: LAYOUT.padding * 2,
+    padding: LAYOUT.padding * 3,
+    ...VALUES.shadow,
+  },
+  amountLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: LAYOUT.padding / 2,
+  },
+  amountValue: {
+    color: COLORS.text,
+    fontSize: 48,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding,
   },
   backButton: {
     padding: LAYOUT.padding / 2,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.white,
-  },
-  shareButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  scrollView: {
+  container: {
+    backgroundColor: COLORS.background,
     flex: 1,
   },
-  scrollContent: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 4,
+  descriptionValue: {
+    textAlign: 'left',
   },
-  amountCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 3,
-    alignItems: 'center',
-    marginTop: LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding * 2,
-    ...VALUES.shadow,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
-    borderRadius: VALUES.borderRadius / 2,
-    marginBottom: LAYOUT.padding * 2,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginLeft: LAYOUT.padding / 2,
-  },
-  amountLabel: {
+  detailLabel: {
+    color: COLORS.textSecondary,
+    flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
-    marginBottom: LAYOUT.padding / 2,
   },
-  amountValue: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-  },
-  transactionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
-    textAlign: 'center',
-  },
-  section: {
-    marginBottom: LAYOUT.padding * 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  participantCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    marginBottom: LAYOUT.padding,
-    ...VALUES.shadow,
-  },
-  participantLabel: {
+  detailRow: {
+    alignItems: 'flex-start',
+    borderBottomColor: COLORS.border,
+    borderBottomWidth: 1,
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding,
+    justifyContent: 'space-between',
+    paddingVertical: LAYOUT.padding,
   },
-  participantLabelText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    marginLeft: LAYOUT.padding / 2,
-    textTransform: 'uppercase',
-  },
-  participantInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  participantAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: LAYOUT.padding,
-  },
-  participantName: {
-    fontSize: 16,
-    fontWeight: '600',
+  detailValue: {
     color: COLORS.text,
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'right',
   },
   detailsCard: {
     backgroundColor: COLORS.white,
@@ -400,35 +384,91 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding * 1.5,
     ...VALUES.shadow,
   },
-  detailRow: {
+  header: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingVertical: LAYOUT.padding,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 2,
   },
-  detailLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+  headerTitle: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  helpButton: {
+    backgroundColor: COLORS.info,
+    borderRadius: VALUES.borderRadius / 2,
+    paddingHorizontal: LAYOUT.padding * 1.5,
+    paddingVertical: LAYOUT.padding / 2,
+  },
+  helpButtonText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  helpCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.info + '20',
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginTop: LAYOUT.padding,
+    padding: LAYOUT.padding * 1.5,
+  },
+  helpContent: {
+    flex: 1,
+    marginLeft: LAYOUT.padding,
+  },
+  helpText: {
     color: COLORS.textSecondary,
-    flex: 1,
+    fontSize: 12,
+    fontWeight: '400',
   },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
+  helpTitle: {
     color: COLORS.text,
-    flex: 1,
-    textAlign: 'right',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding / 4,
   },
-  descriptionValue: {
-    textAlign: 'left',
+  participantAvatar: {
+    borderRadius: 20,
+    height: 40,
+    marginRight: LAYOUT.padding,
+    width: 40,
+  },
+  participantCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    marginBottom: LAYOUT.padding,
+    padding: LAYOUT.padding * 1.5,
+    ...VALUES.shadow,
+  },
+  participantInfo: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  participantLabel: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding,
+  },
+  participantLabelText: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
+    textTransform: 'uppercase',
+  },
+  participantName: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
   },
   proofCard: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.white,
     borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
     padding: LAYOUT.padding * 1.5,
     ...VALUES.shadow,
   },
@@ -436,65 +476,54 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: LAYOUT.padding,
   },
-  proofTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding / 4,
-  },
   proofSubtitle: {
+    color: COLORS.textSecondary,
     fontSize: 12,
     fontWeight: '400',
-    color: COLORS.textSecondary,
   },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    marginBottom: LAYOUT.padding,
-    ...VALUES.shadow,
-  },
-  actionButtonText: {
-    flex: 1,
+  proofTitle: {
+    color: COLORS.text,
     fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding,
-  },
-  helpCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.info + '20',
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    marginTop: LAYOUT.padding,
-  },
-  helpContent: {
-    flex: 1,
-    marginLeft: LAYOUT.padding,
-  },
-  helpTitle: {
-    fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
     marginBottom: LAYOUT.padding / 4,
   },
-  helpText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
+  scrollContent: {
+    paddingBottom: LAYOUT.padding * 4,
+    paddingHorizontal: LAYOUT.padding * 2,
   },
-  helpButton: {
-    backgroundColor: COLORS.info,
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    paddingVertical: LAYOUT.padding / 2,
+  scrollView: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: LAYOUT.padding * 2,
+  },
+  sectionTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding * 1.5,
+  },
+  shareButton: {
+    padding: LAYOUT.padding / 2,
+  },
+  statusBadge: {
+    alignItems: 'center',
     borderRadius: VALUES.borderRadius / 2,
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 2,
+    paddingHorizontal: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding / 2,
   },
-  helpButtonText: {
+  statusText: {
+    color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
-    color: COLORS.white,
+    marginLeft: LAYOUT.padding / 2,
+  },
+  transactionTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
-import { GiverSlot } from '../types';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { MOCK_SLOTS } from '../mocks';
+import { LAYOUT } from '../constants/layout';
+import { VALUES } from '../constants/values';
+import { COLORS } from '../constants/colors';
+import Loading from '../components/Loading';
 
-export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }> = ({
-  navigation,
-  route,
-}) => {
+export const ReceiverApprovalScreenV2: React.FC<{
+  navigation: {
+    navigate: (route: string, params: { [key: string]: unknown }) => void;
+    goBack: () => void;
+  };
+  route: { params: { momentTitle: string; totalAmount: number } };
+}> = ({ navigation, route }) => {
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -42,16 +46,16 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      
+
       const approvedGivers = MOCK_SLOTS.filter((slot) =>
-        selectedSlots.includes(slot.id)
+        selectedSlots.includes(slot.id),
       ).map((slot) => ({
         id: slot.giver.id,
         name: slot.giver.name,
         avatar: slot.giver.avatar,
         amount: slot.amount,
       }));
-      
+
       navigation.navigate('MatchConfirmation', {
         selectedGivers: approvedGivers,
       });
@@ -63,11 +67,12 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
   };
 
   const selectedTotalAmount = MOCK_SLOTS.filter((slot) =>
-    selectedSlots.includes(slot.id)
+    selectedSlots.includes(slot.id),
   ).reduce((sum, slot) => sum + slot.amount, 0);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {loading && <Loading mode="overlay" text="Processing..." />}
       {/* Header */}
       <LinearGradient
         colors={[COLORS.primary, COLORS.accent]}
@@ -123,8 +128,8 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
       <View style={styles.infoCard}>
         <Icon name="information" size={20} color={COLORS.info} />
         <Text style={styles.infoText}>
-          Select one or more givers to approve. You can choose multiple givers to
-          split the cost or select the one that best fits your needs.
+          Select one or more givers to approve. You can choose multiple givers
+          to split the cost or select the one that best fits your needs.
         </Text>
       </View>
 
@@ -167,7 +172,11 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
                   <View style={styles.giverDetails}>
                     <Text style={styles.giverName}>{slot.giver.name}</Text>
                     <View style={styles.trustBadge}>
-                      <Icon name="shield-check" size={14} color={COLORS.success} />
+                      <Icon
+                        name="shield-check"
+                        size={14}
+                        color={COLORS.success}
+                      />
                       <Text style={styles.trustScore}>
                         {slot.giver.trustScore}% Trust
                       </Text>
@@ -183,7 +192,11 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
 
                 {/* Message */}
                 <View style={styles.messageContainer}>
-                  <Icon name="message-text" size={16} color={COLORS.textSecondary} />
+                  <Icon
+                    name="message-text"
+                    size={16}
+                    color={COLORS.textSecondary}
+                  />
                   <Text style={styles.messageText}>{slot.message}</Text>
                 </View>
 
@@ -194,7 +207,9 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
                 <TouchableOpacity
                   style={styles.profileButton}
                   onPress={() =>
-                    navigation.navigate('ProfileDetail', { userId: slot.giver.id })
+                    navigation.navigate('ProfileDetail', {
+                      userId: slot.giver.id,
+                    })
                   }
                 >
                   <Text style={styles.profileButtonText}>View Profile</Text>
@@ -242,16 +257,13 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-            {loading ? (
-              <Text style={styles.approveButtonText}>Processing...</Text>
-            ) : (
-              <>
-                <Icon name="check" size={20} color={COLORS.white} />
-                <Text style={styles.approveButtonText}>
-                  Approve {selectedSlots.length > 0 && `(${selectedSlots.length})`}
-                </Text>
-              </>
-            )}
+            <>
+              <Icon name="check" size={20} color={COLORS.white} />
+              <Text style={styles.approveButtonText}>
+                Approve{' '}
+                {selectedSlots.length > 0 && `(${selectedSlots.length})`}
+              </Text>
+            </>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -260,298 +272,296 @@ export const ReceiverApprovalScreenV2: React.FC<{ navigation: any; route: any }>
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingTop: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 3,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding,
-  },
-  backButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.white,
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.white,
-    opacity: 0.9,
-    textAlign: 'center',
-  },
-  summaryCard: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: LAYOUT.padding * 2,
-    marginTop: -LAYOUT.padding * 2,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    ...VALUES.shadow,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  summaryItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  summaryLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-    marginBottom: LAYOUT.padding / 2,
-  },
-  summaryValue: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.text,
-  },
-  selectedValue: {
-    color: COLORS.primary,
-  },
-  summaryDivider: {
-    width: 1,
-    backgroundColor: COLORS.border,
-    marginHorizontal: LAYOUT.padding,
-  },
-  successBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.success + '20',
-    paddingVertical: LAYOUT.padding,
-    borderRadius: VALUES.borderRadius / 2,
-    marginTop: LAYOUT.padding,
-  },
-  successText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.success,
-    marginLeft: LAYOUT.padding / 2,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.info + '20',
-    marginHorizontal: LAYOUT.padding * 2,
-    marginTop: LAYOUT.padding * 2,
-    padding: LAYOUT.padding * 1.5,
-    borderRadius: VALUES.borderRadius,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding,
-    lineHeight: 20,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingTop: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 4,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  slotCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    marginBottom: LAYOUT.padding * 1.5,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    position: 'relative',
-    ...VALUES.shadow,
-  },
-  slotCardSelected: {
-    borderColor: COLORS.success,
-    backgroundColor: COLORS.success + '10',
-  },
-  positionBadge: {
-    position: 'absolute',
-    top: LAYOUT.padding,
-    right: LAYOUT.padding,
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
-    borderRadius: VALUES.borderRadius / 2,
-  },
-  positionText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  selectedBadge: {
-    position: 'absolute',
-    top: LAYOUT.padding,
-    left: LAYOUT.padding,
-    zIndex: 1,
-  },
-  slotContent: {
-    marginTop: LAYOUT.padding / 2,
-  },
-  giverInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  giverAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-  },
-  giverDetails: {
-    flex: 1,
-    marginLeft: LAYOUT.padding,
-  },
-  giverName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding / 2,
-  },
-  trustBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  trustScore: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.success,
-    marginLeft: LAYOUT.padding / 2,
-  },
   amountContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: LAYOUT.padding,
-    borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding,
   },
   amountLabel: {
+    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
   },
   amountValue: {
+    color: COLORS.primary,
     fontSize: 24,
     fontWeight: '800',
-    color: COLORS.primary,
-  },
-  messageContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: LAYOUT.padding,
-  },
-  messageText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding / 2,
-    lineHeight: 20,
-  },
-  timestamp: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-    marginBottom: LAYOUT.padding,
-  },
-  profileButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: LAYOUT.padding,
-    borderTopWidth: 1,
-    borderColor: COLORS.border,
-  },
-  profileButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.primary,
-    marginRight: LAYOUT.padding / 2,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: LAYOUT.padding * 6,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginTop: LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-  bottomActions: {
-    flexDirection: 'row',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 1.5,
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  rejectButton: {
-    flex: 1,
-    paddingVertical: LAYOUT.padding * 1.5,
-    borderWidth: 2,
-    borderColor: COLORS.error,
-    borderRadius: VALUES.borderRadius,
-    alignItems: 'center',
-    marginRight: LAYOUT.padding,
-  },
-  rejectButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.error,
   },
   approveButton: {
-    flex: 2,
     borderRadius: VALUES.borderRadius,
+    flex: 2,
     overflow: 'hidden',
   },
   approveButtonDisabled: {
     opacity: 0.5,
   },
   approveButtonGradient: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'center',
     paddingVertical: LAYOUT.padding * 1.5,
   },
   approveButtonText: {
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '700',
+    marginLeft: LAYOUT.padding / 2,
+  },
+  backButton: {
+    padding: LAYOUT.padding / 2,
+  },
+  bottomActions: {
+    backgroundColor: COLORS.white,
+    borderTopColor: COLORS.border,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  container: {
+    backgroundColor: COLORS.background,
+    flex: 1,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 6,
+  },
+  emptySubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '400',
+    textAlign: 'center',
+  },
+  emptyTitle: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding,
+    marginTop: LAYOUT.padding * 2,
+  },
+  giverAvatar: {
+    borderColor: COLORS.border,
+    borderRadius: 30,
+    borderWidth: 2,
+    height: 60,
+    width: 60,
+  },
+  giverDetails: {
+    flex: 1,
+    marginLeft: LAYOUT.padding,
+  },
+  giverInfo: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 1.5,
+  },
+  giverName: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding / 2,
+  },
+  header: {
+    paddingBottom: LAYOUT.padding * 3,
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingTop: LAYOUT.padding * 2,
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  headerSubtitle: {
     color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  headerTitle: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  headerTop: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: LAYOUT.padding,
+  },
+  infoCard: {
+    backgroundColor: COLORS.info + '20',
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginHorizontal: LAYOUT.padding * 2,
+    marginTop: LAYOUT.padding * 2,
+    padding: LAYOUT.padding * 1.5,
+  },
+  infoText: {
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    marginLeft: LAYOUT.padding,
+  },
+  messageContainer: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding,
+  },
+  messageText: {
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    marginLeft: LAYOUT.padding / 2,
+  },
+  positionBadge: {
+    backgroundColor: COLORS.primary,
+    borderRadius: VALUES.borderRadius / 2,
+    paddingHorizontal: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding / 2,
+    position: 'absolute',
+    right: LAYOUT.padding,
+    top: LAYOUT.padding,
+  },
+  positionText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  profileButton: {
+    alignItems: 'center',
+    borderColor: COLORS.border,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: LAYOUT.padding,
+  },
+  profileButtonText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '600',
+    marginRight: LAYOUT.padding / 2,
+  },
+  rejectButton: {
+    alignItems: 'center',
+    borderColor: COLORS.error,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
+    flex: 1,
+    marginRight: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  rejectButtonText: {
+    color: COLORS.error,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  scrollContent: {
+    paddingBottom: LAYOUT.padding * 4,
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingTop: LAYOUT.padding * 2,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  sectionTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding * 1.5,
+  },
+  selectedBadge: {
+    left: LAYOUT.padding,
+    position: 'absolute',
+    top: LAYOUT.padding,
+    zIndex: 1,
+  },
+  selectedValue: {
+    color: COLORS.primary,
+  },
+  slotCard: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
+    marginBottom: LAYOUT.padding * 1.5,
+    padding: LAYOUT.padding * 1.5,
+    position: 'relative',
+  },
+  slotCardSelected: {
+    backgroundColor: COLORS.success + '10',
+    borderColor: COLORS.success,
+  },
+  slotContent: {
+    marginTop: LAYOUT.padding / 2,
+  },
+  successBanner: {
+    alignItems: 'center',
+    backgroundColor: COLORS.success + '20',
+    borderRadius: VALUES.borderRadius / 2,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding,
+  },
+  successText: {
+    color: COLORS.success,
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
+  },
+  summaryCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    marginHorizontal: LAYOUT.padding * 2,
+    marginTop: -LAYOUT.padding * 2,
+    padding: LAYOUT.padding * 1.5,
+  },
+  summaryDivider: {
+    backgroundColor: COLORS.border,
+    marginHorizontal: LAYOUT.padding,
+    width: 1,
+  },
+  summaryItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  summaryLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: LAYOUT.padding / 2,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  summaryValue: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  timestamp: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: LAYOUT.padding,
+  },
+  trustBadge: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  trustScore: {
+    color: COLORS.success,
+    fontSize: 14,
+    fontWeight: '600',
     marginLeft: LAYOUT.padding / 2,
   },
 });

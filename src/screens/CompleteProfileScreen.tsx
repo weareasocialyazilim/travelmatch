@@ -1,20 +1,23 @@
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
+  Alert,
+  Image,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Image,
-  Alert,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS, CARD_SHADOW } from '../constants/colors';
-import { VALUES } from '../constants/values';
+import { CARD_SHADOW, COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
+import { VALUES } from '../constants/values';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import Loading from '../components/Loading';
 
 const INTERESTS = [
   { id: '1', name: 'Travel', icon: 'airplane' },
@@ -29,12 +32,19 @@ const INTERESTS = [
   { id: '10', name: 'Volunteering', icon: 'hand-heart' },
 ];
 
-export const CompleteProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type CompleteProfileScreenProps = StackScreenProps<
+  RootStackParamList,
+  'CompleteProfile'
+>;
+
+export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
+  navigation,
+}) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatar] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSelectAvatar = () => {
@@ -78,7 +88,11 @@ export const CompleteProfileScreen: React.FC<{ navigation: any }> = ({ navigatio
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      {loading && <Loading mode="overlay" text="Creating Profile..." />}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.cardContainer}>
           <LinearGradient
             colors={[COLORS.primary, COLORS.accent, COLORS.secondary]}
@@ -105,7 +119,11 @@ export const CompleteProfileScreen: React.FC<{ navigation: any }> = ({ navigatio
                   <Image source={{ uri: avatar }} style={styles.avatar} />
                 ) : (
                   <View style={styles.avatarPlaceholder}>
-                    <Icon name="camera-plus" size={32} color={COLORS.textSecondary} />
+                    <Icon
+                      name="camera-plus"
+                      size={32}
+                      color={COLORS.textSecondary}
+                    />
                   </View>
                 )}
               </TouchableOpacity>
@@ -165,7 +183,8 @@ export const CompleteProfileScreen: React.FC<{ navigation: any }> = ({ navigatio
             <View style={styles.interestsSection}>
               <Text style={styles.sectionTitle}>Select Your Interests *</Text>
               <Text style={styles.sectionSubtitle}>
-                Choose up to 5 interests (Selected: {selectedInterests.length}/5)
+                Choose up to 5 interests (Selected: {selectedInterests.length}
+                /5)
               </Text>
               <View style={styles.interestsGrid}>
                 {INTERESTS.map((interest) => {
@@ -212,11 +231,7 @@ export const CompleteProfileScreen: React.FC<{ navigation: any }> = ({ navigatio
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                {loading ? (
-                  <Text style={styles.buttonText}>Creating Profile...</Text>
-                ) : (
-                  <Text style={styles.buttonText}>Complete Profile</Text>
-                )}
+                <Text style={styles.buttonText}>Complete Profile</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -235,182 +250,179 @@ export const CompleteProfileScreen: React.FC<{ navigation: any }> = ({ navigatio
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+  avatar: {
+    height: '100%',
+    width: '100%',
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 4,
-  },
-    cardContainer: {
-      width: '100%',
-      maxWidth: 420,
-      alignSelf: 'center',
-      borderRadius: VALUES.borderRadius * 2,
-      overflow: 'hidden',
-      ...CARD_SHADOW,
-      marginVertical: LAYOUT.padding * 2,
-    },
-    cardGradient: {
-      padding: LAYOUT.padding * 2,
-      borderRadius: VALUES.borderRadius * 2,
-    },
-  header: {
-    alignItems: 'center',
-    marginTop: LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding * 3,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.text,
+  avatarContainer: {
+    borderRadius: 60,
+    height: 120,
     marginBottom: LAYOUT.padding,
+    overflow: 'hidden',
+    width: 120,
   },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
+  avatarLabel: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  avatarPlaceholder: {
+    alignItems: 'center',
+    backgroundColor: COLORS.border,
+    height: '100%',
+    justifyContent: 'center',
+    width: '100%',
   },
   avatarSection: {
     alignItems: 'center',
     marginBottom: LAYOUT.padding * 3,
   },
-  avatarContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    overflow: 'hidden',
-    marginBottom: LAYOUT.padding,
-  },
-  avatar: {
-    width: '100%',
-    height: '100%',
-  },
-  avatarPlaceholder: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: COLORS.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
-  inputSection: {
-    marginBottom: LAYOUT.padding * 2,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    borderRadius: VALUES.borderRadius,
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    backgroundColor: COLORS.white,
+  bioInput: {
+    minHeight: 100,
+    paddingVertical: 0,
+    textAlignVertical: 'top',
   },
   bioWrapper: {
     alignItems: 'flex-start',
     paddingVertical: LAYOUT.padding,
   },
+  buttonGradient: {
+    alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 2,
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  cardContainer: {
+    alignSelf: 'center',
+    borderRadius: VALUES.borderRadius * 2,
+    maxWidth: 420,
+    overflow: 'hidden',
+    width: '100%',
+    ...CARD_SHADOW,
+    marginVertical: LAYOUT.padding * 2,
+  },
+  cardGradient: {
+    borderRadius: VALUES.borderRadius * 2,
+    padding: LAYOUT.padding * 2,
+  },
+  charCount: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '400',
+    marginTop: LAYOUT.padding / 2,
+    textAlign: 'right',
+  },
+  completeButton: {
+    borderRadius: VALUES.borderRadius,
+    marginBottom: LAYOUT.padding * 1.5,
+    overflow: 'hidden',
+  },
+  container: {
+    backgroundColor: COLORS.background,
+    flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: LAYOUT.padding * 3,
+    marginTop: LAYOUT.padding * 2,
+  },
   input: {
+    color: COLORS.text,
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
-    paddingVertical: LAYOUT.padding * 1.5,
     marginLeft: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding * 1.5,
   },
-  bioInput: {
-    minHeight: 100,
-    textAlignVertical: 'top',
-    paddingVertical: 0,
-  },
-  charCount: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    textAlign: 'right',
-    marginTop: LAYOUT.padding / 2,
-  },
-  interestsSection: {
-    marginBottom: LAYOUT.padding * 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+  inputLabel: {
     color: COLORS.text,
-    marginBottom: LAYOUT.padding / 2,
-  },
-  sectionSubtitle: {
     fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    marginBottom: LAYOUT.padding * 1.5,
+    fontWeight: '600',
+    marginBottom: LAYOUT.padding,
   },
-  interestsGrid: {
+  inputSection: {
+    marginBottom: LAYOUT.padding * 2,
+  },
+  inputWrapper: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -LAYOUT.padding / 2,
+    paddingHorizontal: LAYOUT.padding * 1.5,
   },
   interestChip: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: LAYOUT.padding,
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    borderRadius: VALUES.borderRadius,
     backgroundColor: COLORS.white,
-    borderWidth: 2,
     borderColor: COLORS.primary,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
+    flexDirection: 'row',
     margin: LAYOUT.padding / 2,
+    paddingHorizontal: LAYOUT.padding * 1.5,
+    paddingVertical: LAYOUT.padding,
   },
   interestChipSelected: {
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
   },
   interestText: {
+    color: COLORS.primary,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.primary,
     marginLeft: LAYOUT.padding / 2,
   },
   interestTextSelected: {
     color: COLORS.white,
   },
-  completeButton: {
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
+  interestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -LAYOUT.padding / 2,
+  },
+  interestsSection: {
+    marginBottom: LAYOUT.padding * 3,
+  },
+  scrollContent: {
+    paddingBottom: LAYOUT.padding * 4,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  sectionSubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '400',
     marginBottom: LAYOUT.padding * 1.5,
   },
-  buttonGradient: {
-    paddingVertical: LAYOUT.padding * 2,
-    alignItems: 'center',
-  },
-  buttonText: {
+  sectionTitle: {
+    color: COLORS.text,
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.white,
+    marginBottom: LAYOUT.padding / 2,
   },
   skipButton: {
     alignItems: 'center',
     paddingVertical: LAYOUT.padding,
   },
   skipText: {
+    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '600',
+  },
+  subtitle: {
     color: COLORS.textSecondary,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
+    textAlign: 'center',
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding,
   },
 });

@@ -25,9 +25,11 @@ export const MOCK_MOMENTS: Moment[] = [
     distance: '2.5 km',
     availability: 'Available now',
     price: 50,
-    imageUrl: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400',
+    imageUrl:
+      'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400',
     giftCount: 3,
-    story: 'Looking for someone to help celebrate my daughter\'s 10th birthday with a special surprise gift.',
+    story:
+      "Looking for someone to help celebrate my daughter's 10th birthday with a special surprise gift.",
   },
   {
     id: '2',
@@ -53,9 +55,11 @@ export const MOCK_MOMENTS: Moment[] = [
     distance: '5.0 km',
     availability: 'Today 3-5 PM',
     price: 75,
-    imageUrl: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400',
+    imageUrl:
+      'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400',
     giftCount: 5,
-    story: 'Need help delivering a local specialty to my friend visiting from Japan.',
+    story:
+      'Need help delivering a local specialty to my friend visiting from Japan.',
   },
   {
     id: '3',
@@ -80,7 +84,8 @@ export const MOCK_MOMENTS: Moment[] = [
     distance: '1.2 km',
     availability: 'Urgent - ASAP',
     price: 30,
-    imageUrl: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400',
+    imageUrl:
+      'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400',
     giftCount: 1,
     story: 'Urgently need someone to pick up prescription from pharmacy.',
   },
@@ -103,13 +108,14 @@ export const MOCK_MOMENTS: Moment[] = [
       country: 'USA',
       coordinates: {
         lat: 40.7128,
-        lng: -74.0060,
+        lng: -74.006,
       },
     },
     distance: '3.8 km',
     availability: 'Tomorrow 10 AM',
     price: 25,
-    imageUrl: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400',
+    imageUrl:
+      'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400',
     giftCount: 2,
     story: 'Looking to meet fellow travelers over coffee and share stories.',
   },

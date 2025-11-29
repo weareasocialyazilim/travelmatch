@@ -1,6 +1,6 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 // Existing Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -45,8 +45,9 @@ import { FAQScreen } from '../screens/FAQScreen';
 
 // Profile
 import { ProfileDetailScreen } from '../screens/ProfileDetailScreen';
+import SocialLoginScreen from '../screens/SocialLoginScreen';
 
-import { Moment } from '../types';
+import { Moment, User, SelectedGiver } from '../types';
 
 export type RootStackParamList = {
   // Onboarding & Auth
@@ -56,7 +57,7 @@ export type RootStackParamList = {
   PhoneAuth: undefined;
   EmailAuth: undefined;
   CompleteProfile: undefined;
-  
+
   // Main App
   Home: undefined;
   Social: undefined;
@@ -65,26 +66,26 @@ export type RootStackParamList = {
   Activity: undefined;
   Profile: undefined;
   ProfileDetail: { userId: string };
-  
+
   // Proof System
   ProofWallet: undefined;
   ProofUpload: undefined;
   ProofStory: { proofId: string };
   ProofDetail: { proofId: string };
   PostProofSuccess: { proofId: string };
-  
+
   // Approval & Matching
   ReceiverApprovalV2: { momentTitle: string; totalAmount: number };
-  MatchConfirmation: { selectedGivers: any[] };
-  
+  MatchConfirmation: { selectedGivers: SelectedGiver[] };
+
   // Communication
-  Chat: { otherUser: any };
-  
+  Chat: { otherUser: User };
+
   // Transactions
   TransactionDetail: { transactionId: string };
   RefundPolicy: undefined;
   RefundRequest: { transactionId: string };
-  
+
   // Settings
   Subscription: undefined;
   Support: undefined;
@@ -124,11 +125,14 @@ const AppNavigator = () => {
         {/* Onboarding & Auth */}
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="SocialLogin" component={require('../screens/SocialLoginScreen').default} />
+        <Stack.Screen name="SocialLogin" component={SocialLoginScreen} />
         <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
         <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
-        <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
-        
+        <Stack.Screen
+          name="CompleteProfile"
+          component={CompleteProfileScreen}
+        />
+
         {/* Main App */}
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Social" component={SocialScreen} />
@@ -137,26 +141,38 @@ const AppNavigator = () => {
         <Stack.Screen name="Activity" component={ActivityScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="ProfileDetail" component={ProfileDetailScreen} />
-        
+
         {/* Proof System */}
         <Stack.Screen name="ProofWallet" component={ProofWalletScreen} />
         <Stack.Screen name="ProofUpload" component={ProofUploadScreen} />
         <Stack.Screen name="ProofStory" component={ProofStoryScreen} />
         <Stack.Screen name="ProofDetail" component={ProofDetailScreen} />
-        <Stack.Screen name="PostProofSuccess" component={PostProofSuccessScreen} />
-        
+        <Stack.Screen
+          name="PostProofSuccess"
+          component={PostProofSuccessScreen}
+        />
+
         {/* Approval & Matching */}
-        <Stack.Screen name="ReceiverApprovalV2" component={ReceiverApprovalScreenV2} />
-        <Stack.Screen name="MatchConfirmation" component={MatchConfirmationScreen} />
-        
+        <Stack.Screen
+          name="ReceiverApprovalV2"
+          component={ReceiverApprovalScreenV2}
+        />
+        <Stack.Screen
+          name="MatchConfirmation"
+          component={MatchConfirmationScreen}
+        />
+
         {/* Communication */}
         <Stack.Screen name="Chat" component={ChatScreen} />
-        
+
         {/* Transactions */}
-        <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} />
+        <Stack.Screen
+          name="TransactionDetail"
+          component={TransactionDetailScreen}
+        />
         <Stack.Screen name="RefundPolicy" component={RefundPolicyScreen} />
         <Stack.Screen name="RefundRequest" component={RefundRequestScreen} />
-        
+
         {/* Settings */}
         <Stack.Screen name="Subscription" component={SubscriptionScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />

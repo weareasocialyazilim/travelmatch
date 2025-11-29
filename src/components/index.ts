@@ -1,7 +1,6 @@
 export { default as Button } from './Button';
 export { default as Loading } from './Loading';
 export { ErrorBoundary } from './ErrorBoundary';
-export { GlassView } from './GlassView';
 export { FilterPill } from './FilterPill';
 export { default as MomentCard } from './MomentCard';
 export { GiftMomentBottomSheet } from './GiftMomentBottomSheet';

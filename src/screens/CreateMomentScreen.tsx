@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -43,7 +43,7 @@ const CATEGORIES: Category[] = [
 
 const CreateMomentScreen: React.FC = () => {
   const navigation = useNavigation();
-  
+
   // Form state
   const [photo, setPhoto] = useState<string>('');
   const [title, setTitle] = useState('');
@@ -53,29 +53,16 @@ const CreateMomentScreen: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [amount, setAmount] = useState('');
   const [story, setStory] = useState('');
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
-
-  // Memoized handlers
-  const handleCategorySelect = useCallback((categoryId: string) => {
-    setSelectedCategory(categoryId);
-  }, []);
-
-  const handleDateChange = useCallback((_event: unknown, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setSelectedDate(selectedDate);
-    }
-  }, []);
-
-  const toggleCard = useCallback((cardId: string) => {
-    setExpandedCard(prev => prev === cardId ? null : cardId);
-  }, []);
 
   const pickImage = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert(STRINGS.LABELS.PERMISSION_NEEDED, STRINGS.ERRORS.PHOTO_PERMISSION);
+        Alert.alert(
+          STRINGS.LABELS.PERMISSION_NEEDED,
+          STRINGS.ERRORS.PHOTO_PERMISSION,
+        );
         return;
       }
 
@@ -97,7 +84,7 @@ const CreateMomentScreen: React.FC = () => {
 
   const escrowInfo = useMemo(() => {
     const amountNum = parseFloat(amount) || 0;
-    
+
     if (amountNum <= VALUES.ESCROW_DIRECT_MAX) {
       return {
         icon: 'flash' as const,
@@ -123,7 +110,12 @@ const CreateMomentScreen: React.FC = () => {
   }, [amount]);
 
   const isFormValid = useMemo(() => {
-    return !!(title.trim() && selectedCategory && amount && parseFloat(amount) > 0);
+    return !!(
+      title.trim() &&
+      selectedCategory &&
+      amount &&
+      parseFloat(amount) > 0
+    );
   }, [title, selectedCategory, amount]);
 
   const handlePublish = () => {
@@ -141,7 +133,7 @@ const CreateMomentScreen: React.FC = () => {
     }
 
     Alert.alert('Success!', 'Your moment has been published', [
-      { text: 'OK', onPress: () => navigation.goBack() }
+      { text: 'OK', onPress: () => navigation.goBack() },
     ]);
   };
 
@@ -153,21 +145,28 @@ const CreateMomentScreen: React.FC = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-            <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.headerButton}
+          >
+            <MaterialCommunityIcons
+              name="close"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Share a Moment</Text>
           <View style={styles.headerButton} />
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
           {/* Hero Photo Section */}
-          <TouchableOpacity 
-            style={styles.photoSection} 
+          <TouchableOpacity
+            style={styles.photoSection}
             onPress={pickImage}
             activeOpacity={0.9}
           >
@@ -175,15 +174,27 @@ const CreateMomentScreen: React.FC = () => {
               <>
                 <Image source={{ uri: photo }} style={styles.heroImage} />
                 <View style={styles.photoOverlay}>
-                  <MaterialCommunityIcons name="camera" size={32} color="rgba(255,255,255,0.8)" />
+                  <MaterialCommunityIcons
+                    name="camera"
+                    size={32}
+                    color={COLORS.white}
+                  />
                   <Text style={styles.photoOverlayText}>Change Photo</Text>
                 </View>
               </>
             ) : (
               <View style={styles.photoPlaceholder}>
-                <MaterialCommunityIcons name="camera-plus" size={64} color={COLORS.textTertiary} />
-                <Text style={styles.photoPlaceholderText}>Add a photo that tells your story</Text>
-                <Text style={styles.photoPlaceholderSubtext}>Tap to choose from gallery</Text>
+                <MaterialCommunityIcons
+                  name="camera-plus"
+                  size={64}
+                  color={COLORS.textTertiary}
+                />
+                <Text style={styles.photoPlaceholderText}>
+                  Add a photo that tells your story
+                </Text>
+                <Text style={styles.photoPlaceholderSubtext}>
+                  Tap to choose from gallery
+                </Text>
               </View>
             )}
           </TouchableOpacity>
@@ -199,14 +210,16 @@ const CreateMomentScreen: React.FC = () => {
               maxLength={VALUES.TITLE_MAX_LENGTH}
               multiline
             />
-            <Text style={styles.titleCounter}>{title.length}/{VALUES.TITLE_MAX_LENGTH}</Text>
+            <Text style={styles.titleCounter}>
+              {title.length}/{VALUES.TITLE_MAX_LENGTH}
+            </Text>
           </View>
 
           {/* Category Chips - Horizontal Scroll */}
           <View style={styles.categorySection}>
             <Text style={styles.sectionLabel}>Category</Text>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.categoryScroll}
             >
@@ -215,20 +228,28 @@ const CreateMomentScreen: React.FC = () => {
                   key={category.id}
                   style={[
                     styles.categoryChip,
-                    selectedCategory === category.id && styles.categoryChipSelected
+                    selectedCategory === category.id &&
+                      styles.categoryChipSelected,
                   ]}
                   onPress={() => setSelectedCategory(category.id)}
                   activeOpacity={0.7}
                 >
-                  <MaterialCommunityIcons 
-                    name={category.icon} 
-                    size={20} 
-                    color={selectedCategory === category.id ? COLORS.text : COLORS.textSecondary} 
+                  <MaterialCommunityIcons
+                    name={category.icon}
+                    size={20}
+                    color={
+                      selectedCategory === category.id
+                        ? COLORS.text
+                        : COLORS.textSecondary
+                    }
                   />
-                  <Text style={[
-                    styles.categoryChipText,
-                    selectedCategory === category.id && styles.categoryChipTextSelected
-                  ]}>
+                  <Text
+                    style={[
+                      styles.categoryChipText,
+                      selectedCategory === category.id &&
+                        styles.categoryChipTextSelected,
+                    ]}
+                  >
                     {category.label}
                   </Text>
                 </TouchableOpacity>
@@ -239,7 +260,7 @@ const CreateMomentScreen: React.FC = () => {
           {/* Details Cards */}
           <View style={styles.detailsSection}>
             {/* Location Card */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.detailCard}
               onPress={() => {
                 setPlace({ name: 'Café Kitsuné', address: 'Paris, France' });
@@ -248,44 +269,64 @@ const CreateMomentScreen: React.FC = () => {
             >
               <View style={styles.detailCardHeader}>
                 <View style={styles.detailCardIcon}>
-                  <MaterialCommunityIcons name="map-marker" size={20} color={COLORS.primary} />
+                  <MaterialCommunityIcons
+                    name="map-marker"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.detailCardContent}>
                   <Text style={styles.detailCardLabel}>Location</Text>
                   {place ? (
                     <View>
                       <Text style={styles.detailCardValue}>{place.name}</Text>
-                      <Text style={styles.detailCardSubvalue}>{place.address}</Text>
+                      <Text style={styles.detailCardSubvalue}>
+                        {place.address}
+                      </Text>
                     </View>
                   ) : (
-                    <Text style={styles.detailCardPlaceholder}>Choose a real place</Text>
+                    <Text style={styles.detailCardPlaceholder}>
+                      Choose a real place
+                    </Text>
                   )}
                 </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textTertiary} />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.textTertiary}
+                />
               </View>
             </TouchableOpacity>
 
             {/* Date Card */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.detailCard}
               onPress={() => setShowDatePicker(true)}
               activeOpacity={0.8}
             >
               <View style={styles.detailCardHeader}>
                 <View style={styles.detailCardIcon}>
-                  <MaterialCommunityIcons name="calendar" size={20} color={COLORS.primary} />
+                  <MaterialCommunityIcons
+                    name="calendar"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.detailCardContent}>
                   <Text style={styles.detailCardLabel}>When</Text>
                   <Text style={styles.detailCardValue}>
-                    {selectedDate.toLocaleDateString('en-US', { 
+                    {selectedDate.toLocaleDateString('en-US', {
                       weekday: 'short',
-                      month: 'short', 
-                      day: 'numeric' 
+                      month: 'short',
+                      day: 'numeric',
                     })}
                   </Text>
                 </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textTertiary} />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.textTertiary}
+                />
               </View>
             </TouchableOpacity>
 
@@ -293,7 +334,11 @@ const CreateMomentScreen: React.FC = () => {
             <View style={styles.detailCard}>
               <View style={styles.detailCardHeader}>
                 <View style={styles.detailCardIcon}>
-                  <MaterialCommunityIcons name="currency-usd" size={20} color={COLORS.primary} />
+                  <MaterialCommunityIcons
+                    name="currency-usd"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.detailCardContent}>
                   <Text style={styles.detailCardLabel}>Amount</Text>
@@ -311,20 +356,29 @@ const CreateMomentScreen: React.FC = () => {
                   </View>
                 </View>
               </View>
-              
+
               {/* Escrow Info */}
               {amount && parseFloat(amount) > 0 && (
-                <View style={[styles.escrowInfo, { borderColor: escrowInfo.color + '20' }]}>
-                  <MaterialCommunityIcons 
-                    name={escrowInfo.icon} 
-                    size={18} 
-                    color={escrowInfo.color} 
+                <View
+                  style={[
+                    styles.escrowInfo,
+                    { borderColor: escrowInfo.color + '20' },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name={escrowInfo.icon}
+                    size={18}
+                    color={escrowInfo.color}
                   />
                   <View style={styles.escrowTextContainer}>
-                    <Text style={[styles.escrowTitle, { color: escrowInfo.color }]}>
+                    <Text
+                      style={[styles.escrowTitle, { color: escrowInfo.color }]}
+                    >
                       {escrowInfo.title}
                     </Text>
-                    <Text style={styles.escrowDescription}>{escrowInfo.description}</Text>
+                    <Text style={styles.escrowDescription}>
+                      {escrowInfo.description}
+                    </Text>
                   </View>
                 </View>
               )}
@@ -334,7 +388,8 @@ const CreateMomentScreen: React.FC = () => {
           {/* Story Section - Optional */}
           <View style={styles.storySection}>
             <Text style={styles.sectionLabel}>
-              Why this matters <Text style={styles.optionalLabel}>(optional)</Text>
+              Why this matters{' '}
+              <Text style={styles.optionalLabel}>(optional)</Text>
             </Text>
             <TextInput
               style={styles.storyInput}
@@ -347,7 +402,9 @@ const CreateMomentScreen: React.FC = () => {
               maxLength={VALUES.STORY_MAX_LENGTH}
               textAlignVertical="top"
             />
-            <Text style={styles.storyCounter}>{story.length}/{VALUES.STORY_MAX_LENGTH}</Text>
+            <Text style={styles.storyCounter}>
+              {story.length}/{VALUES.STORY_MAX_LENGTH}
+            </Text>
           </View>
 
           {/* Live Preview */}
@@ -358,8 +415,11 @@ const CreateMomentScreen: React.FC = () => {
                 {/* Preview Image */}
                 {photo && (
                   <View style={styles.previewImageContainer}>
-                    <Image source={{ uri: photo }} style={styles.previewImage} />
-                
+                    <Image
+                      source={{ uri: photo }}
+                      style={styles.previewImage}
+                    />
+
                     {/* User Badge */}
                     <View style={styles.userBadge}>
                       <View style={styles.userAvatar}>
@@ -384,40 +444,66 @@ const CreateMomentScreen: React.FC = () => {
                     </Text>
                   )}
                   {place && (
-                    <Text style={styles.previewLocation}>
-                      {place.name}
-                    </Text>
+                    <Text style={styles.previewLocation}>{place.name}</Text>
                   )}
 
                   <View style={styles.previewDetails}>
                     {place && (
                       <View style={styles.previewDetailItem}>
-                        <MaterialCommunityIcons name="map-marker" size={16} color={COLORS.textSecondary} />
-                        <Text style={styles.previewDetailText}>{place.name}</Text>
+                        <MaterialCommunityIcons
+                          name="map-marker"
+                          size={16}
+                          color={COLORS.textSecondary}
+                        />
+                        <Text style={styles.previewDetailText}>
+                          {place.name}
+                        </Text>
                       </View>
                     )}
                     <View style={styles.previewDetailItem}>
-                      <MaterialCommunityIcons name="clock-outline" size={16} color={COLORS.textSecondary} />
+                      <MaterialCommunityIcons
+                        name="clock-outline"
+                        size={16}
+                        color={COLORS.textSecondary}
+                      />
                       <Text style={styles.previewDetailText}>
-                        {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {selectedDate.toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
                       </Text>
                     </View>
                     {amount && (
                       <View style={styles.previewDetailItem}>
-                        <MaterialCommunityIcons name="currency-usd" size={16} color={COLORS.textSecondary} />
-                        <Text style={[styles.previewDetailText, styles.previewPrice]}>
+                        <MaterialCommunityIcons
+                          name="currency-usd"
+                          size={16}
+                          color={COLORS.textSecondary}
+                        />
+                        <Text
+                          style={[
+                            styles.previewDetailText,
+                            styles.previewPrice,
+                          ]}
+                        >
                           {amount}
                         </Text>
                       </View>
                     )}
                   </View>
 
-                {parseFloat(amount) >= VALUES.ESCROW_OPTIONAL_MAX && (
-                  <View style={styles.previewProofBadge}>
-                    <MaterialCommunityIcons name="shield-check" size={14} color="#5BC08A" />
-                    <Text style={styles.previewProofText}>ProofLoop Protected</Text>
-                  </View>
-                )}
+                  {parseFloat(amount) >= VALUES.ESCROW_OPTIONAL_MAX && (
+                    <View style={styles.previewProofBadge}>
+                      <MaterialCommunityIcons
+                        name="shield-check"
+                        size={14}
+                        color={COLORS.success}
+                      />
+                      <Text style={styles.previewProofText}>
+                        ProofLoop Protected
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </View>
@@ -447,16 +533,20 @@ const CreateMomentScreen: React.FC = () => {
               Enter amount to see payment terms
             </Text>
           )}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
               styles.publishButton,
-              !isFormValid && styles.publishButtonDisabled
+              !isFormValid && styles.publishButtonDisabled,
             ]}
             onPress={handlePublish}
             activeOpacity={0.8}
             disabled={!isFormValid}
           >
-            <MaterialCommunityIcons name="check" size={20} color={COLORS.text} />
+            <MaterialCommunityIcons
+              name="check"
+              size={20}
+              color={COLORS.text}
+            />
             <Text style={styles.publishButtonText}>Publish Moment</Text>
           </TouchableOpacity>
         </View>
@@ -480,139 +570,140 @@ const CreateMomentScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: COLORS.background,
+    flex: 1,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderBottomColor: COLORS.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.white,
   },
   headerButton: {
-    width: 40,
-    height: 40,
     alignItems: 'center',
+    height: 40,
     justifyContent: 'center',
+    width: 40,
   },
   headerTitle: {
+    color: COLORS.text,
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
+  },
+  // eslint-disable-next-line react-native/sort-styles
+  scrollContent: {
+    paddingBottom: 20,
   },
   scrollView: {
     flex: 1,
   },
-  scrollContent: {
-    paddingBottom: 20,
-  },
 
   // Photo Section
   photoSection: {
-    width: '100%',
     aspectRatio: 16 / 9,
     backgroundColor: COLORS.white,
+    width: '100%',
   },
   heroImage: {
-    width: '100%',
     height: '100%',
+    width: '100%',
   },
   photoOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: COLORS.blackTransparent,
     gap: 8,
+    justifyContent: 'center',
   },
   photoOverlayText: {
+    color: COLORS.white,
     fontSize: 15,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   photoPlaceholder: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
     gap: 12,
+    justifyContent: 'center',
     paddingHorizontal: 40,
   },
   photoPlaceholderText: {
+    color: COLORS.text,
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
     textAlign: 'center',
   },
   photoPlaceholderSubtext: {
-    fontSize: 13,
     color: COLORS.textSecondary,
+    fontSize: 13,
     textAlign: 'center',
   },
 
   // Title Section
   titleSection: {
-    padding: 20,
     backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
+    borderBottomWidth: 1,
+    padding: 20,
   },
   titleInput: {
+    color: COLORS.text,
     fontSize: 20,
     fontWeight: '600',
-    color: COLORS.text,
     minHeight: 60,
   },
   titleCounter: {
-    fontSize: 12,
     color: COLORS.textTertiary,
-    textAlign: 'right',
+    fontSize: 12,
     marginTop: 8,
+    textAlign: 'right',
   },
 
   // Category Section
   categorySection: {
-    paddingVertical: 16,
     backgroundColor: COLORS.background,
+    paddingVertical: 16,
   },
   sectionLabel: {
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.textSecondary,
-    paddingHorizontal: 20,
-    marginBottom: 12,
-    textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginBottom: 12,
+    paddingHorizontal: 20,
+    textTransform: 'uppercase',
   },
   categoryScroll: {
-    paddingHorizontal: 20,
     gap: 8,
+    paddingHorizontal: 20,
   },
   categoryChip: {
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: LAYOUT.borderRadius.full,
+    borderWidth: 1.5,
+    flexDirection: 'row',
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: LAYOUT.borderRadius.full,
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
   },
   categoryChipSelected: {
     backgroundColor: COLORS.filterPillActive,
     borderColor: COLORS.primary,
   },
   categoryChipText: {
+    color: COLORS.textSecondary,
     fontSize: 15,
     fontWeight: '500',
-    color: COLORS.textSecondary,
   },
   categoryChipTextSelected: {
-    fontWeight: '600',
     color: COLORS.text,
+    fontWeight: '600',
   },
 
   // Details Section
@@ -628,66 +719,66 @@ const styles = StyleSheet.create({
     ...CARD_SHADOW,
   },
   detailCardHeader: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     gap: 12,
   },
   detailCardIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.filterPillActive,
     alignItems: 'center',
+    backgroundColor: COLORS.filterPillActive,
+    borderRadius: 20,
+    height: 40,
     justifyContent: 'center',
+    width: 40,
   },
   detailCardContent: {
     flex: 1,
   },
   detailCardLabel: {
-    fontSize: 13,
     color: COLORS.textSecondary,
+    fontSize: 13,
     marginBottom: 4,
   },
   detailCardValue: {
+    color: COLORS.text,
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
   },
   detailCardSubvalue: {
-    fontSize: 13,
     color: COLORS.textSecondary,
+    fontSize: 13,
     marginTop: 2,
   },
   detailCardPlaceholder: {
-    fontSize: 15,
     color: COLORS.textTertiary,
+    fontSize: 15,
   },
   amountInputContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
   },
   currencySymbol: {
+    color: COLORS.text,
     fontSize: 24,
     fontWeight: '600',
-    color: COLORS.text,
     marginRight: 4,
   },
   amountInput: {
-    fontSize: 24,
-    fontWeight: '600',
     color: COLORS.text,
     flex: 1,
+    fontSize: 24,
+    fontWeight: '600',
     padding: 0,
   },
   escrowInfo: {
-    flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 10,
-    marginTop: 16,
-    padding: 12,
     backgroundColor: COLORS.background,
     borderRadius: LAYOUT.borderRadius.sm,
     borderWidth: 1,
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 16,
+    padding: 12,
   },
   escrowTextContainer: {
     flex: 1,
@@ -698,8 +789,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   escrowDescription: {
-    fontSize: 12,
     color: COLORS.textSecondary,
+    fontSize: 12,
     lineHeight: 16,
   },
 
@@ -709,24 +800,24 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   optionalLabel: {
-    fontWeight: '400',
     color: COLORS.textTertiary,
+    fontWeight: '400',
   },
   storyInput: {
     backgroundColor: COLORS.white,
     borderRadius: LAYOUT.borderRadius.md,
-    padding: 16,
-    fontSize: 15,
     color: COLORS.text,
-    minHeight: 100,
+    fontSize: 15,
     marginTop: 12,
+    minHeight: 100,
+    padding: 16,
     ...CARD_SHADOW,
   },
   storyCounter: {
-    fontSize: 12,
     color: COLORS.textTertiary,
-    textAlign: 'right',
+    fontSize: 12,
     marginTop: 8,
+    textAlign: 'right',
   },
 
   // Preview Section
@@ -735,9 +826,9 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   previewLabel: {
+    color: COLORS.textSecondary,
     fontSize: 11,
     fontWeight: '700',
-    color: COLORS.textSecondary,
     letterSpacing: 1.2,
     marginBottom: 12,
   },
@@ -748,78 +839,71 @@ const styles = StyleSheet.create({
     ...CARD_SHADOW,
   },
   previewImageContainer: {
-    width: '100%',
     aspectRatio: 16 / 9,
     position: 'relative',
+    width: '100%',
   },
   previewImage: {
-    width: '100%',
     height: '100%',
-  },
-  previewImagePlaceholder: {
     width: '100%',
-    height: '100%',
-    backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   userBadge: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: LAYOUT.borderRadius.full,
+    flexDirection: 'row',
     gap: 8,
+    left: 12,
+    paddingLeft: 6,
     paddingRight: 12,
     paddingVertical: 6,
-    paddingLeft: 6,
-    borderRadius: LAYOUT.borderRadius.full,
-    backgroundColor: COLORS.cardBackground,
+    position: 'absolute',
+    top: 12,
     ...CARD_SHADOW,
   },
   userAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: COLORS.primary,
     alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    height: 32,
     justifyContent: 'center',
+    width: 32,
   },
   userAvatarText: {
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
   },
   userInfo: {
     gap: 2,
   },
   userName: {
+    color: COLORS.text,
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
   },
   userRole: {
-    fontSize: 11,
     color: COLORS.textSecondary,
+    fontSize: 11,
   },
   previewContent: {
     padding: 16,
   },
   previewTitle: {
+    color: COLORS.text,
     fontSize: 20,
     fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 8,
     lineHeight: 26,
+    marginBottom: 8,
   },
   previewLocation: {
-    fontSize: 15,
     color: COLORS.textSecondary,
+    fontSize: 15,
     marginBottom: 12,
   },
   previewStory: {
-    fontSize: 15,
     color: COLORS.text,
+    fontSize: 15,
     lineHeight: 22,
     marginBottom: 12,
   },
@@ -829,64 +913,64 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   previewDetailItem: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     gap: 4,
   },
   previewDetailText: {
-    fontSize: 13,
     color: COLORS.textSecondary,
+    fontSize: 13,
   },
   previewPrice: {
-    fontWeight: '600',
     color: COLORS.text,
+    fontWeight: '600',
   },
   previewProofBadge: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    alignSelf: 'flex-start',
     backgroundColor: COLORS.successLight,
     borderRadius: LAYOUT.borderRadius.sm,
-    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
   previewProofText: {
+    color: COLORS.success,
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.success,
   },
 
   // Publish Section
   publishSection: {
-    padding: 20,
     backgroundColor: COLORS.white,
-    borderTopWidth: 1,
     borderTopColor: COLORS.border,
+    borderTopWidth: 1,
     gap: 12,
+    padding: 20,
   },
   publishHint: {
-    fontSize: 12,
     color: COLORS.textSecondary,
+    fontSize: 12,
     textAlign: 'center',
   },
   publishButton: {
+    alignItems: 'center',
     backgroundColor: COLORS.primary,
     borderRadius: LAYOUT.borderRadius.full,
-    paddingVertical: 16,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     gap: 8,
+    justifyContent: 'center',
+    paddingVertical: 16,
   },
   publishButtonDisabled: {
     backgroundColor: COLORS.border,
   },
   publishButtonText: {
+    color: COLORS.text,
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
   },
 
   bottomSpacing: {

@@ -12,6 +12,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 interface Plan {
   id: string;
@@ -91,9 +93,18 @@ const PLANS: Plan[] = [
   },
 ];
 
-export const SubscriptionScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type SubscriptionScreenProps = StackScreenProps<
+  RootStackParamList,
+  'Subscription'
+>;
+
+export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
+  navigation,
+}) => {
   const [selectedPlan, setSelectedPlan] = useState<string>('pro');
-  const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
+  const [billingInterval, setBillingInterval] = useState<'month' | 'year'>(
+    'month',
+  );
 
   const handleSubscribe = (planId: string) => {
     // Implement subscription logic
@@ -262,218 +273,218 @@ export const SubscriptionScreen: React.FC<{ navigation: any }> = ({ navigation }
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 2,
-  },
-  backButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.white,
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  billingToggle: {
-    flexDirection: 'row',
-    marginHorizontal: LAYOUT.padding * 2,
-    marginVertical: LAYOUT.padding * 2,
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding / 2,
-    ...VALUES.shadow,
-  },
-  toggleButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: LAYOUT.padding,
-    borderRadius: VALUES.borderRadius / 2,
-  },
   activeToggle: {
     backgroundColor: COLORS.primary,
-  },
-  toggleText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
   },
   activeToggleText: {
     color: COLORS.white,
   },
-  savingsBadge: {
-    backgroundColor: COLORS.success,
-    paddingHorizontal: LAYOUT.padding / 2,
-    paddingVertical: LAYOUT.padding / 4,
-    borderRadius: VALUES.borderRadius / 4,
-    marginLeft: LAYOUT.padding / 2,
+  backButton: {
+    padding: LAYOUT.padding / 2,
   },
-  savingsText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingBottom: LAYOUT.padding * 4,
-  },
-  planCard: {
+  billingToggle: {
     backgroundColor: COLORS.white,
     borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 2,
-    marginBottom: LAYOUT.padding * 2,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    position: 'relative',
+    flexDirection: 'row',
+    marginHorizontal: LAYOUT.padding * 2,
+    marginVertical: LAYOUT.padding * 2,
+    padding: LAYOUT.padding / 2,
     ...VALUES.shadow,
   },
-  selectedPlan: {
-    borderColor: COLORS.primary,
-  },
-  popularBadge: {
-    position: 'absolute',
-    top: -10,
-    right: LAYOUT.padding * 2,
-    backgroundColor: COLORS.accent,
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
-    borderRadius: VALUES.borderRadius / 2,
-  },
-  popularText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: COLORS.white,
-  },
-  planIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  planName: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: LAYOUT.padding / 2,
+  container: {
+    backgroundColor: COLORS.background,
+    flex: 1,
   },
   currency: {
+    color: COLORS.text,
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
     marginRight: LAYOUT.padding / 4,
   },
-  price: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: COLORS.text,
+  faqButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: LAYOUT.padding * 1.5,
   },
-  interval: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-    alignSelf: 'flex-end',
-    marginBottom: LAYOUT.padding / 2,
-  },
-  savings: {
+  faqText: {
+    color: COLORS.primary,
     fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.success,
-    marginBottom: LAYOUT.padding * 1.5,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
+  },
+  featureRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding,
+  },
+  featureText: {
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: LAYOUT.padding,
   },
   featuresContainer: {
     marginBottom: LAYOUT.padding * 2,
   },
-  featureRow: {
-    flexDirection: 'row',
+  freeButton: {
+    backgroundColor: COLORS.border,
+  },
+  freeButtonInner: {
     alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  freeButtonText: {
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 2,
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  headerTitle: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  infoCard: {
+    backgroundColor: COLORS.info + '20',
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding * 2,
+    padding: LAYOUT.padding * 1.5,
+  },
+  infoContent: {
+    flex: 1,
+    marginLeft: LAYOUT.padding,
+  },
+  infoText: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 18,
+  },
+  infoTitle: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding / 4,
+  },
+  interval: {
+    alignSelf: 'flex-end',
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: LAYOUT.padding / 2,
+  },
+  planCard: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
+    marginBottom: LAYOUT.padding * 2,
+    padding: LAYOUT.padding * 2,
+    position: 'relative',
+    ...VALUES.shadow,
+  },
+  planIcon: {
+    alignItems: 'center',
+    borderRadius: 32,
+    height: 64,
+    justifyContent: 'center',
+    marginBottom: LAYOUT.padding * 1.5,
+    width: 64,
+  },
+  planName: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '800',
     marginBottom: LAYOUT.padding,
   },
-  featureText: {
-    fontSize: 14,
-    fontWeight: '500',
+  popularBadge: {
+    backgroundColor: COLORS.accent,
+    borderRadius: VALUES.borderRadius / 2,
+    paddingHorizontal: LAYOUT.padding,
+    paddingVertical: LAYOUT.padding / 2,
+    position: 'absolute',
+    right: LAYOUT.padding * 2,
+    top: -10,
+  },
+  popularText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  price: {
     color: COLORS.text,
-    marginLeft: LAYOUT.padding,
+    fontSize: 48,
+    fontWeight: '800',
+  },
+  priceContainer: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    marginBottom: LAYOUT.padding / 2,
+  },
+  savings: {
+    color: COLORS.success,
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: LAYOUT.padding * 1.5,
+  },
+  savingsBadge: {
+    backgroundColor: COLORS.success,
+    borderRadius: VALUES.borderRadius / 4,
+    marginLeft: LAYOUT.padding / 2,
+    paddingHorizontal: LAYOUT.padding / 2,
+    paddingVertical: LAYOUT.padding / 4,
+  },
+  savingsText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  scrollContent: {
+    paddingBottom: LAYOUT.padding * 4,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  scrollView: {
     flex: 1,
+  },
+  selectedPlan: {
+    borderColor: COLORS.primary,
   },
   subscribeButton: {
     borderRadius: VALUES.borderRadius,
     overflow: 'hidden',
   },
   subscribeGradient: {
-    paddingVertical: LAYOUT.padding * 1.5,
     alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 1.5,
   },
   subscribeText: {
-    fontSize: 16,
-    fontWeight: '700',
     color: COLORS.white,
-  },
-  freeButton: {
-    backgroundColor: COLORS.border,
-  },
-  freeButtonInner: {
-    paddingVertical: LAYOUT.padding * 1.5,
-    alignItems: 'center',
-  },
-  freeButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.textSecondary,
   },
-  infoCard: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.info + '20',
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    marginBottom: LAYOUT.padding * 2,
-  },
-  infoContent: {
-    flex: 1,
-    marginLeft: LAYOUT.padding,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding / 4,
-  },
-  infoText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    lineHeight: 18,
-  },
-  faqButton: {
-    flexDirection: 'row',
+  toggleButton: {
     alignItems: 'center',
+    borderRadius: VALUES.borderRadius / 2,
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: LAYOUT.padding * 1.5,
+    paddingVertical: LAYOUT.padding,
   },
-  faqText: {
+  toggleText: {
+    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.primary,
-    marginLeft: LAYOUT.padding / 2,
   },
 });
