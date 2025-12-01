@@ -1,29 +1,41 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants/colors';
+import { radii } from '../constants/radii';
+import { spacing } from '../constants/spacing';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary';
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
   title,
   onPress,
   variant = 'primary',
+  disabled = false,
 }) => {
   return (
     <TouchableOpacity
-      style={[styles.button, variant === 'secondary' && styles.secondaryButton]}
+      style={[
+        styles.button,
+        variant === 'secondary' && styles.secondaryButton,
+        disabled && styles.disabledButton,
+      ]}
       onPress={onPress}
+      disabled={disabled}
       accessibilityRole="button"
-      accessibilityLabel={title}>
+      accessibilityLabel={title}
+    >
       <Text
         style={[
           styles.buttonText,
           variant === 'secondary' && styles.secondaryButtonText,
-        ]}>
+          disabled && styles.disabledButtonText,
+        ]}
+      >
         {title}
       </Text>
     </TouchableOpacity>
@@ -32,24 +44,32 @@ const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: COLORS.buttonPrimary,
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 8,
     alignItems: 'center',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: COLORS.buttonPrimary,
+    backgroundColor: COLORS.buttonPrimary,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
   },
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
   },
+  secondaryButton: {
+    backgroundColor: COLORS.transparent,
+    borderColor: COLORS.buttonPrimary,
+    borderWidth: 1,
+  },
   secondaryButtonText: {
     color: COLORS.buttonPrimary,
+  },
+  // eslint-disable-next-line react-native/sort-styles
+  disabledButton: {
+    backgroundColor: COLORS.disabled,
+    borderColor: COLORS.disabled,
+  },
+  disabledButtonText: {
+    color: COLORS.white,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,10 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
+import { radii } from '../constants/radii';
+import { spacing } from '../constants/spacing';
+import { TYPOGRAPHY } from '../constants/typography';
+import { SHADOWS } from '../constants/shadows';
 
 interface NotificationPermissionModalProps {
   visible: boolean;
@@ -60,8 +62,8 @@ export const NotificationPermissionModal: React.FC<
 
           {/* Description */}
           <Text style={styles.description}>
-            Get notified about new gestures, matches, and important updates to make
-            the most of your kindness journey.
+            Get notified about new gestures, matches, and important updates to
+            make the most of your kindness journey.
           </Text>
 
           {/* Benefits */}
@@ -106,84 +108,79 @@ export const NotificationPermissionModal: React.FC<
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: LAYOUT.padding * 2,
-  },
-  modal: {
-    width: '100%',
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius * 2,
-    padding: LAYOUT.padding * 3,
-    alignItems: 'center',
-    ...VALUES.shadow,
-  },
-  iconContainer: {
-    marginBottom: LAYOUT.padding * 2,
-  },
-  iconGradient: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginBottom: LAYOUT.padding,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: LAYOUT.padding * 2,
-  },
-  benefitsContainer: {
-    width: '100%',
-    marginBottom: LAYOUT.padding * 3,
-  },
-  benefit: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: LAYOUT.padding,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  benefitText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.text,
-    marginLeft: LAYOUT.padding,
-  },
   allowButton: {
-    width: '100%',
-    borderRadius: VALUES.borderRadius,
+    borderRadius: radii.md,
+    marginBottom: spacing.md,
     overflow: 'hidden',
-    marginBottom: LAYOUT.padding,
-  },
-  allowGradient: {
-    paddingVertical: LAYOUT.padding * 1.5,
-    alignItems: 'center',
+    width: '100%',
   },
   allowButtonText: {
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+  },
+  allowGradient: {
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+  },
+  benefit: {
+    alignItems: 'center',
+    borderBottomColor: COLORS.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    paddingVertical: spacing.md,
+  },
+  benefitText: {
+    ...TYPOGRAPHY.body,
+    marginLeft: spacing.md,
+  },
+  benefitsContainer: {
+    marginBottom: spacing.xl,
+    width: '100%',
+  },
+  description: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.textSecondary,
+    lineHeight: 24,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  },
+  iconContainer: {
+    marginBottom: spacing.lg,
+  },
+  iconGradient: {
+    alignItems: 'center',
+    borderRadius: 50,
+    height: 100,
+    justifyContent: 'center',
+    width: 100,
+  },
+  modal: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: radii.xl,
+    padding: spacing.xl,
+    width: '100%',
+    ...SHADOWS.lg,
+  },
+  overlay: {
+    alignItems: 'center',
+    backgroundColor: COLORS.modalBackdrop,
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
   },
   skipButton: {
-    paddingVertical: LAYOUT.padding,
+    paddingVertical: spacing.sm,
   },
   skipButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...TYPOGRAPHY.bodySmall,
     color: COLORS.textSecondary,
+    fontWeight: '600',
+  },
+  title: {
+    ...TYPOGRAPHY.h1,
+    marginBottom: spacing.md,
+    textAlign: 'center',
   },
 });

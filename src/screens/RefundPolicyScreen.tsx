@@ -1,20 +1,37 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type RefundPolicyScreenProps = StackScreenProps<
+  RootStackParamList,
+  'RefundPolicy'
+>;
+
+export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
+  navigation,
+}) => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Refund Policy</Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -23,8 +40,8 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
           <Icon name="cash-refund" size={64} color={COLORS.mint} />
           <Text style={styles.heroTitle}>14-Day Money-Back Guarantee</Text>
           <Text style={styles.heroSubtitle}>
-            We're committed to your satisfaction. If you're not happy with your experience, we'll
-            make it right.
+            We&apos;re committed to your satisfaction. If you&apos;re not happy
+            with your experience, we&apos;ll make it right.
           </Text>
         </View>
 
@@ -35,8 +52,9 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
             <Text style={styles.sectionTitle}>Our Commitment</Text>
           </View>
           <Text style={styles.paragraph}>
-            TravelMatch stands behind every gesture made on our platform. We offer a comprehensive
-            14-day money-back guarantee to ensure trust and satisfaction for all users.
+            TravelMatch stands behind every gesture made on our platform. We
+            offer a comprehensive 14-day money-back guarantee to ensure trust
+            and satisfaction for all users.
           </Text>
         </View>
 
@@ -47,30 +65,54 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
           </View>
           <View style={styles.bulletList}>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.bulletText}>
                 Gesture not delivered within agreed timeframe
               </Text>
             </View>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.bulletText}>
                 Proof of gesture not provided within 14 days
               </Text>
             </View>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
-              <Text style={styles.bulletText}>Gesture significantly differs from description</Text>
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
+              <Text style={styles.bulletText}>
+                Gesture significantly differs from description
+              </Text>
             </View>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.bulletText}>
                 Verified issues with gesture quality or authenticity
               </Text>
             </View>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
-              <Text style={styles.bulletText}>Technical payment errors or duplicates</Text>
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
+              <Text style={styles.bulletText}>
+                Technical payment errors or duplicates
+              </Text>
             </View>
           </View>
         </View>
@@ -82,21 +124,41 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
           </View>
           <View style={styles.bulletList}>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
-              <Text style={styles.bulletText}>Change of mind after gesture is delivered</Text>
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
+              <Text style={styles.bulletText}>
+                Change of mind after gesture is delivered
+              </Text>
             </View>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.bulletText}>
                 Refund requests made after 14-day window
               </Text>
             </View>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
-              <Text style={styles.bulletText}>Verified gestures with valid proof submitted</Text>
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
+              <Text style={styles.bulletText}>
+                Verified gestures with valid proof submitted
+              </Text>
             </View>
             <View style={styles.bulletItem}>
-              <Icon name="circle-small" size={24} color={COLORS.textSecondary} />
+              <Icon
+                name="circle-small"
+                size={24}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.bulletText}>
                 User violations of TravelMatch terms of service
               </Text>
@@ -106,7 +168,7 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Icon name="clock-outline" size={24} color={COLORS.purple} />
+            <Icon name="clock-outline" size={24} color={COLORS.primary} />
             <Text style={styles.sectionTitle}>Refund Process</Text>
           </View>
           <View style={styles.steps}>
@@ -117,7 +179,7 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
               <View style={styles.stepContent}>
                 <Text style={styles.stepTitle}>Submit Request</Text>
                 <Text style={styles.stepDescription}>
-                  Go to transaction details and tap "Request Refund"
+                  Go to transaction details and tap &quot;Request Refund&quot;
                 </Text>
               </View>
             </View>
@@ -141,7 +203,7 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
               <View style={styles.stepContent}>
                 <Text style={styles.stepTitle}>Decision Notice</Text>
                 <Text style={styles.stepDescription}>
-                  You'll receive email notification of our decision
+                  You&apos;ll receive email notification of our decision
                 </Text>
               </View>
             </View>
@@ -166,11 +228,11 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
             <Text style={styles.sectionTitle}>Important Notes</Text>
           </View>
           <Text style={styles.paragraph}>
-            • Refunds are issued to the original payment method{'\n'}
-            • Processing times may vary by payment provider{'\n'}
-            • Partial refunds may be offered for partial delivery{'\n'}
-            • All refund decisions are final and at TravelMatch's discretion{'\n'}
-            • Contact support@travelmatch.com for assistance
+            • Refunds are issued to the original payment method{'\n'}•
+            Processing times may vary by payment provider{'\n'}• Partial refunds
+            may be offered for partial delivery{'\n'}• All refund decisions are
+            final and at TravelMatch&apos;s discretion{'\n'}• Contact
+            support@travelmatch.com for assistance
           </Text>
         </View>
 
@@ -179,7 +241,8 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
           <Icon name="headset" size={32} color={COLORS.mint} />
           <Text style={styles.contactTitle}>Need Help?</Text>
           <Text style={styles.contactText}>
-            Our support team is here to help you with any refund questions or concerns.
+            Our support team is here to help you with any refund questions or
+            concerns.
           </Text>
           <TouchableOpacity style={styles.contactButton}>
             <Icon name="message-text" size={20} color={COLORS.white} />
@@ -187,160 +250,166 @@ export const RefundPolicyScreen: React.FC<{ navigation: any }> = ({ navigation }
           </TouchableOpacity>
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-  },
   backButton: {
-    width: 40,
+    alignItems: 'center',
     height: 40,
-    alignItems: 'center',
     justifyContent: 'center',
+    width: 40,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
+  bottomSpacer: {
+    height: 40,
   },
-  content: {
-    flex: 1,
-  },
-  hero: {
-    alignItems: 'center',
-    padding: 32,
-    backgroundColor: COLORS.white,
-    marginBottom: 16,
-  },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginTop: 16,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  heroSubtitle: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  section: {
-    padding: 20,
-    backgroundColor: COLORS.white,
-    marginBottom: 16,
-  },
-  sectionHeader: {
+  bulletItem: {
+    alignItems: 'flex-start',
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  paragraph: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: COLORS.text,
   },
   bulletList: {
     gap: 12,
   },
-  bulletItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
   bulletText: {
+    color: COLORS.text,
     flex: 1,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.text,
   },
-  steps: {
-    gap: 20,
+  contactButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.mint,
+    borderRadius: 24,
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  contactButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  contactSection: {
+    alignItems: 'center',
+    backgroundColor: COLORS.gray,
+    borderRadius: 16,
+    marginHorizontal: 16,
+    padding: 32,
+  },
+  contactText: {
+    color: COLORS.textSecondary,
+    fontSize: 15,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  contactTitle: {
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  container: {
+    backgroundColor: COLORS.background,
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    borderBottomColor: COLORS.lightGray,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  headerTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  hero: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    marginBottom: 16,
+    padding: 32,
+  },
+  heroSubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  heroTitle: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 8,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  paragraph: {
+    color: COLORS.text,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  section: {
+    backgroundColor: COLORS.white,
+    marginBottom: 16,
+    padding: 20,
+  },
+  sectionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  stepContent: {
+    flex: 1,
+  },
+  stepDescription: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
   },
   stepItem: {
     flexDirection: 'row',
     gap: 16,
   },
   stepNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: COLORS.mint,
     alignItems: 'center',
+    backgroundColor: COLORS.mint,
+    borderRadius: 16,
+    height: 32,
     justifyContent: 'center',
+    width: 32,
   },
   stepNumberText: {
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
-  },
-  stepContent: {
-    flex: 1,
   },
   stepTitle: {
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 4,
   },
-  stepDescription: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-  },
-  contactSection: {
-    alignItems: 'center',
-    padding: 32,
-    backgroundColor: COLORS.gray,
-    marginHorizontal: 16,
-    borderRadius: 16,
-  },
-  contactTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  contactText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  contactButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: COLORS.mint,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
-  contactButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
+  steps: {
+    gap: 20,
   },
 });

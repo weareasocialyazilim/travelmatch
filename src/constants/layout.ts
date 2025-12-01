@@ -1,70 +1,73 @@
+import { spacing } from './spacing';
+import { radii } from './radii';
+
 export const LAYOUT = {
   // Convenience padding (legacy keys used across codebase)
-  padding: 16,
+  padding: spacing.md,
   // Keep existing spacing object for newer code
   // Spacing
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
+    xs: spacing.xs,
+    sm: spacing.sm,
+    md: spacing.md,
+    lg: spacing.lg,
+    xl: spacing.xl,
   },
-  
+
   // Border radius
   borderRadius: {
-    sm: 8,
-    md: 12,
-    lg: 16,
-    full: 9999,
+    sm: radii.sm,
+    md: radii.md,
+    lg: radii.lg,
+    full: radii.full,
   },
-  
+
   // Component sizes
   header: {
     titleSize: 34,
     buttonSize: 48,
   },
-  
+
   avatar: {
     size: 32,
-    borderRadius: 16,
+    borderRadius: radii.xl,
   },
-  
+
   verifiedBadge: {
     size: 32,
-    borderRadius: 16,
+    borderRadius: radii.xl,
   },
-  
+
   // Card
   card: {
     imageAspectRatio: 16 / 9,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: radii.xl,
+    padding: spacing.md,
   },
-  
+
   // Filter pill
   filterPill: {
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingVertical: 10,
   },
-  
+
   // Bottom nav
   bottomNav: {
     gradientHeight: 96,
-    marginHorizontal: 16,
-    marginBottomIOS: 8,
-    marginBottomAndroid: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 8,
+    marginHorizontal: spacing.md,
+    marginBottomIOS: spacing.sm,
+    marginBottomAndroid: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
   },
-  
+
   // List
   list: {
-    contentPaddingHorizontal: 16,
+    contentPaddingHorizontal: spacing.md,
     contentPaddingBottom: 120,
-    contentPaddingTop: 8,
+    contentPaddingTop: spacing.sm,
   },
-  
+
   // Shadow offsets
   shadowOffset: {
     none: { width: 0, height: 0 },
@@ -75,7 +78,7 @@ export const LAYOUT = {
     xxl: { width: 0, height: 10 },
     bottomSheet: { width: 0, height: -3 },
   },
-  
+
   // Sizes for modals and containers
   size: {
     errorButtonMin: 200,

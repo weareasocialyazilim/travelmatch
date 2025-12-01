@@ -70,7 +70,7 @@ export const MOCK_USERS: User[] = [
     bio: 'Coffee lover and storyteller. Enjoy meeting new people!',
     location: {
       lat: 40.7128,
-      lng: -74.0060,
+      lng: -74.006,
       city: 'New York',
       country: 'USA',
     },

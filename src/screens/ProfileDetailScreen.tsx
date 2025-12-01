@@ -13,23 +13,32 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
+type ProfileDetailScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ProfileDetail'
+>;
+
+export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
   navigation,
   route,
 }) => {
   const { userId } = route.params;
-  const [activeTab, setActiveTab] = useState<'gestures' | 'moments' | 'proofs'>('gestures');
+  const [activeTab, setActiveTab] = useState<'gestures' | 'moments' | 'proofs'>(
+    'gestures',
+  );
 
   // Mock user data - gerçek uygulamada API'den gelecek
   const user = {
     id: userId,
     name: 'Sarah Johnson',
     username: '@sarahtravels',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+    avatar:
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     bio: 'Spreading kindness one gesture at a time ✨ Traveler • Coffee Lover • Kind Human',
     location: 'New York, USA',
     memberSince: 'Jan 2024',
@@ -75,7 +84,7 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
   const getTierColor = (tier: string) => {
     switch (tier) {
       case 'vip':
-        return '#FFD700';
+        return COLORS.gold;
       case 'pro':
         return COLORS.purple;
       case 'starter':
@@ -103,7 +112,10 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
@@ -130,9 +142,16 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
           <Text style={styles.username}>{user.username}</Text>
 
           {/* Membership Badge */}
-          <View style={[styles.membershipBadge, { backgroundColor: getTierColor(user.membershipTier) }]}>
+          <View
+            style={[
+              styles.membershipBadge,
+              { backgroundColor: getTierColor(user.membershipTier) },
+            ]}
+          >
             <Icon name="crown" size={16} color={COLORS.white} />
-            <Text style={styles.membershipText}>{getTierLabel(user.membershipTier)}</Text>
+            <Text style={styles.membershipText}>
+              {getTierLabel(user.membershipTier)}
+            </Text>
           </View>
 
           {/* Bio */}
@@ -161,7 +180,7 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
             <LinearGradient
-              colors={[COLORS.mint, '#00D084']}
+              colors={[COLORS.mint, COLORS.successDark]}
               style={styles.statGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -173,7 +192,12 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
           </View>
 
           <View style={styles.statCard}>
-            <View style={[styles.statBox, { backgroundColor: COLORS.coral + '15' }]}>
+            <View
+              style={[
+                styles.statBox,
+                { backgroundColor: COLORS.coralTransparent },
+              ]}
+            >
               <Icon name="gift" size={28} color={COLORS.coral} />
               <Text style={[styles.statValue, { color: COLORS.coral }]}>
                 {user.stats.gesturesGiven}
@@ -183,7 +207,12 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
           </View>
 
           <View style={styles.statCard}>
-            <View style={[styles.statBox, { backgroundColor: COLORS.purple + '15' }]}>
+            <View
+              style={[
+                styles.statBox,
+                { backgroundColor: COLORS.purpleTransparent },
+              ]}
+            >
               <Icon name="hand-heart" size={28} color={COLORS.purple} />
               <Text style={[styles.statValue, { color: COLORS.purple }]}>
                 {user.stats.gesturesReceived}
@@ -193,7 +222,12 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
           </View>
 
           <View style={styles.statCard}>
-            <View style={[styles.statBox, { backgroundColor: COLORS.mint + '15' }]}>
+            <View
+              style={[
+                styles.statBox,
+                { backgroundColor: COLORS.mintTransparentLight },
+              ]}
+            >
               <Icon name="check-circle" size={28} color={COLORS.mint} />
               <Text style={[styles.statValue, { color: COLORS.mint }]}>
                 {user.stats.proofsVerified}
@@ -212,9 +246,16 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
             <Icon
               name="gift-outline"
               size={20}
-              color={activeTab === 'gestures' ? COLORS.mint : COLORS.textSecondary}
+              color={
+                activeTab === 'gestures' ? COLORS.mint : COLORS.textSecondary
+              }
             />
-            <Text style={[styles.tabText, activeTab === 'gestures' && styles.activeTabText]}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'gestures' && styles.activeTabText,
+              ]}
+            >
               Gestures
             </Text>
           </TouchableOpacity>
@@ -226,9 +267,16 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
             <Icon
               name="calendar-star"
               size={20}
-              color={activeTab === 'moments' ? COLORS.mint : COLORS.textSecondary}
+              color={
+                activeTab === 'moments' ? COLORS.mint : COLORS.textSecondary
+              }
             />
-            <Text style={[styles.tabText, activeTab === 'moments' && styles.activeTabText]}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'moments' && styles.activeTabText,
+              ]}
+            >
               Moments
             </Text>
           </TouchableOpacity>
@@ -240,9 +288,16 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
             <Icon
               name="check-decagram"
               size={20}
-              color={activeTab === 'proofs' ? COLORS.mint : COLORS.textSecondary}
+              color={
+                activeTab === 'proofs' ? COLORS.mint : COLORS.textSecondary
+              }
             />
-            <Text style={[styles.tabText, activeTab === 'proofs' && styles.activeTabText]}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'proofs' && styles.activeTabText,
+              ]}
+            >
               Proofs
             </Text>
           </TouchableOpacity>
@@ -259,14 +314,18 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
                       styles.gestureIcon,
                       {
                         backgroundColor:
-                          gesture.type === 'given' ? COLORS.coral + '15' : COLORS.mint + '15',
+                          gesture.type === 'given'
+                            ? COLORS.coralTransparent
+                            : COLORS.mintTransparentLight,
                       },
                     ]}
                   >
                     <Icon
                       name={gesture.icon}
                       size={24}
-                      color={gesture.type === 'given' ? COLORS.coral : COLORS.mint}
+                      color={
+                        gesture.type === 'given' ? COLORS.coral : COLORS.mint
+                      }
                     />
                   </View>
                   <View style={styles.gestureInfo}>
@@ -277,7 +336,12 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
                     <Text
                       style={[
                         styles.amountText,
-                        { color: gesture.type === 'given' ? COLORS.coral : COLORS.mint },
+                        {
+                          color:
+                            gesture.type === 'given'
+                              ? COLORS.coral
+                              : COLORS.mint,
+                        },
                       ]}
                     >
                       {gesture.type === 'given' ? '-' : '+'}${gesture.amount}
@@ -309,7 +373,11 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
 
       {/* Bottom Actions */}
       <View style={styles.bottomActions}>
-        <TouchableOpacity style={styles.chatButton} onPress={handleChat} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.chatButton}
+          onPress={handleChat}
+          activeOpacity={0.8}
+        >
           <Icon name="message-text" size={20} color={COLORS.white} />
           <Text style={styles.chatButtonText}>Send Message</Text>
         </TouchableOpacity>
@@ -319,105 +387,142 @@ export const ProfileDetailScreen: React.FC<{ navigation: any; route: any }> = ({
 };
 
 const styles = StyleSheet.create({
+  activeTab: {
+    borderBottomColor: COLORS.mint,
+  },
+  activeTabText: {
+    color: COLORS.mint,
+  },
+  amountText: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  avatar: {
+    borderColor: COLORS.white,
+    borderRadius: 50,
+    borderWidth: 3,
+    height: 100,
+    width: 100,
+  },
+  avatarContainer: {
+    marginBottom: 16,
+    position: 'relative',
+  },
+  backButton: {
+    alignItems: 'center',
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  bio: {
+    color: COLORS.text,
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  bottomActions: {
+    backgroundColor: COLORS.white,
+    borderTopColor: COLORS.lightGray,
+    borderTopWidth: 1,
+    padding: 16,
+    paddingBottom: 32,
+  },
+  chatButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.mint,
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  chatButtonText: {
+    color: COLORS.white,
+    fontSize: 17,
+    fontWeight: '700',
+  },
   container: {
-    flex: 1,
     backgroundColor: COLORS.background,
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    marginTop: 16,
+  },
+  gestureAmount: {
+    alignItems: 'flex-end',
+  },
+  gestureCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    flexDirection: 'row',
+    padding: 16,
+    ...VALUES.shadow,
+  },
+  gestureDate: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+  },
+  gestureIcon: {
+    alignItems: 'center',
+    borderRadius: 24,
+    height: 48,
+    justifyContent: 'center',
+    width: 48,
+  },
+  gestureInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  gestureTitle: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  gestureType: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+  },
+  gesturesList: {
+    gap: 12,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderBottomColor: COLORS.lightGray,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-    backgroundColor: COLORS.white,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   headerTitle: {
+    color: COLORS.text,
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
   },
-  moreButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileHeader: {
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: COLORS.white,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: COLORS.white,
-  },
-  verifiedBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  username: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    marginBottom: 12,
-  },
-  membershipBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  interestTag: {
+    backgroundColor: COLORS.gray,
+    borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
-    marginBottom: 16,
   },
-  membershipText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  bio: {
-    fontSize: 15,
+  interestText: {
     color: COLORS.text,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 16,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 16,
-  },
-  locationText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  separator: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
+    fontSize: 13,
+    fontWeight: '500',
   },
   interestsContainer: {
     flexDirection: 'row',
@@ -425,150 +530,113 @@ const styles = StyleSheet.create({
     gap: 8,
     justifyContent: 'center',
   },
-  interestTag: {
-    backgroundColor: COLORS.gray,
+  locationRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 16,
+  },
+  locationText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  membershipBadge: {
+    alignItems: 'center',
+    borderRadius: 16,
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
   },
-  interestText: {
+  membershipText: {
+    color: COLORS.white,
     fontSize: 13,
-    color: COLORS.text,
-    fontWeight: '500',
+    fontWeight: '700',
   },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 16,
-    gap: 12,
+  moreButton: {
+    alignItems: 'center',
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  name: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  profileHeader: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    padding: 24,
+  },
+  separator: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  statBox: {
+    alignItems: 'center',
+    borderRadius: 16,
+    padding: 20,
   },
   statCard: {
     width: (SCREEN_WIDTH - 44) / 2,
   },
   statGradient: {
-    padding: 20,
-    borderRadius: 16,
     alignItems: 'center',
-  },
-  statBox: {
-    padding: 20,
     borderRadius: 16,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginTop: 8,
+    padding: 20,
   },
   statLabel: {
-    fontSize: 13,
     color: COLORS.white,
+    fontSize: 13,
     marginTop: 4,
     opacity: 0.9,
   },
-  tabs: {
+  statValue: {
+    color: COLORS.white,
+    fontSize: 28,
+    fontWeight: '700',
+    marginTop: 8,
+  },
+  statsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    padding: 16,
+  },
+  tab: {
+    alignItems: 'center',
+    borderBottomColor: COLORS.transparent,
+    borderBottomWidth: 2,
+    flex: 1,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    paddingVertical: 12,
+  },
+  tabText: {
+    color: COLORS.textSecondary,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  tabs: {
     backgroundColor: COLORS.white,
+    flexDirection: 'row',
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  tab: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  activeTab: {
-    borderBottomColor: COLORS.mint,
-  },
-  tabText: {
-    fontSize: 15,
-    fontWeight: '600',
+  username: {
     color: COLORS.textSecondary,
+    fontSize: 15,
+    marginBottom: 12,
   },
-  activeTabText: {
-    color: COLORS.mint,
-  },
-  content: {
-    padding: 16,
-  },
-  gesturesList: {
-    gap: 12,
-  },
-  gestureCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+  verifiedBadge: {
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    ...VALUES.shadow,
-  },
-  gestureIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gestureInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  gestureTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  gestureDate: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  gestureAmount: {
-    alignItems: 'flex-end',
-  },
-  amountText: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  gestureType: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    marginTop: 16,
-  },
-  bottomActions: {
-    padding: 16,
-    paddingBottom: 32,
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.lightGray,
-  },
-  chatButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: COLORS.mint,
-    paddingVertical: 16,
-    borderRadius: 12,
-  },
-  chatButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.white,
+    bottom: 0,
+    position: 'absolute',
+    right: 0,
   },
 });
