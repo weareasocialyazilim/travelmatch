@@ -1,54 +1,63 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-import { radii } from '../constants/radii';
-import { spacing } from '../constants/spacing';
 
-type Provider = 'google' | 'apple' | 'facebook';
+type Provider = 'google' | 'apple' | 'facebook' | 'phone' | 'email';
 type Size = 'large' | 'icon';
 
-interface SocialButtonProps {
+export interface SocialButtonProps {
   provider: Provider;
   size?: Size;
   onPress?: () => void;
   style?: ViewStyle;
+  label?: string;
 }
+
+type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const SocialButton: React.FC<SocialButtonProps> = ({
   provider,
   size = 'large',
   onPress,
   style,
+  label,
 }) => {
-  const providerConfig = {
+  const providerConfig: Record<Provider, { icon: IconName; text: string }> = {
     google: {
       icon: 'google',
       text: 'Continue with Google',
-      color: COLORS.error,
     },
     apple: {
       icon: 'apple',
       text: 'Continue with Apple',
-      color: COLORS.black,
     },
     facebook: {
       icon: 'facebook',
       text: 'Continue with Facebook',
-      color: COLORS.info,
+    },
+    phone: {
+      icon: 'phone',
+      text: 'Continue with Phone',
+    },
+    email: {
+      icon: 'email',
+      text: 'Continue with Email',
     },
   };
 
   const config = providerConfig[provider];
+  const displayText = label || config.text;
 
   if (size === 'icon') {
     return (
       <TouchableOpacity
-        style={[styles.iconButton, { backgroundColor: config.color }, style]}
+        style={[styles.iconButton, style]}
         onPress={onPress}
         activeOpacity={0.8}
         accessibilityRole="button"
-        accessibilityLabel={config.text}
+        accessibilityLabel={displayText}
       >
         <MaterialCommunityIcons
           name={config.icon}
@@ -65,16 +74,14 @@ const SocialButton: React.FC<SocialButtonProps> = ({
       onPress={onPress}
       activeOpacity={0.8}
       accessibilityRole="button"
-      accessibilityLabel={config.text}
+      accessibilityLabel={displayText}
     >
       <MaterialCommunityIcons
         name={config.icon}
-        size={22}
-        color={config.color}
+        size={24}
+        color={COLORS.white}
       />
-      <Text style={[styles.largeButtonText, { color: config.color }]}>
-        {config.text}
-      </Text>
+      <Text style={styles.largeButtonText}>{displayText}</Text>
     </TouchableOpacity>
   );
 };
@@ -82,26 +89,26 @@ const SocialButton: React.FC<SocialButtonProps> = ({
 const styles = StyleSheet.create({
   iconButton: {
     alignItems: 'center',
-    borderRadius: radii.full,
-    height: 56,
     justifyContent: 'center',
     width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.buttonDark,
   },
   largeButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
-    borderRadius: radii.full,
-    borderWidth: 1,
     flexDirection: 'row',
-    gap: spacing.md,
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.md,
-    width: '100%',
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.buttonDark,
+    paddingHorizontal: 20,
+    gap: 12,
   },
   largeButtonText: {
     fontSize: 16,
     fontWeight: '600',
+    color: COLORS.white,
   },
 });
 

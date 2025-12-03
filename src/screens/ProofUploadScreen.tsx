@@ -8,17 +8,22 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActionSheetIOS,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import Loading from '../components/Loading';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import { LoadingState } from '../components/LoadingState';
 
+type IconName = React.ComponentProps<typeof Icon>['name'];
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
 type ProofType = 'micro-kindness' | 'verified-experience' | 'community-proof';
 
@@ -33,7 +38,13 @@ interface ProofUpload {
   receiver?: string;
 }
 
-const PROOF_TYPES = [
+const PROOF_TYPES: {
+  id: string;
+  name: string;
+  icon: IconName;
+  color: string;
+  description: string;
+}[] = [
   {
     id: 'micro-kindness',
     name: 'Micro Kindness',
@@ -79,27 +90,163 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
     setCurrentStep('upload');
   };
 
-  const handleAddPhoto = () => {
-    Alert.alert('Add Photo', 'Image picker implementation needed');
-    // Implement image picker
+  const handleAddPhoto = async () => {
+    const showPicker = async (useCamera: boolean) => {
+      // Request permissions
+      if (useCamera) {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Required', 'Camera permission is needed to take photos');
+          return;
+        }
+      } else {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Required', 'Gallery permission is needed to select photos');
+          return;
+        }
+      }
+
+      const result = useCamera 
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+          });
+
+      if (!result.canceled && result.assets[0]) {
+        setProof({ ...proof, photos: [...(proof.photos || []), result.assets[0].uri] });
+      }
+    };
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Take Photo', 'Choose from Gallery'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) showPicker(true);
+          if (buttonIndex === 2) showPicker(false);
+        }
+      );
+    } else {
+      Alert.alert('Add Photo', 'Select proof photo', [
+        { text: 'Take Photo', onPress: () => showPicker(true) },
+        { text: 'Choose from Gallery', onPress: () => showPicker(false) },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
   };
 
-  const handleAddTicket = () => {
-    Alert.alert('Add Ticket', 'Document picker implementation needed');
-    // Implement document picker
+  const handleAddTicket = async () => {
+    // TODO: Implement expo-document-picker
+    // const result = await DocumentPicker.getDocumentAsync({
+    //   type: ['image/*', 'application/pdf'],
+    // });
+    // if (result.type === 'success') {
+    //   setProof({ ...proof, documents: [...proof.documents, result.uri] });
+    // }
+    Alert.alert('Add Ticket/Receipt', 'Select receipt or ticket document', [
+      { text: 'Choose File', onPress: () => console.log('Open document picker') },
+      { text: 'Cancel', style: 'cancel' }
+    ]);
   };
 
-  const handleSelectLocation = () => {
-    Alert.alert('Select Location', 'Map picker implementation needed');
-    // Navigate to location picker
+  const handleSelectLocation = async () => {
+    const getCurrentLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Location permission is needed');
+        return;
+      }
+
+      try {
+        const location = await Location.getCurrentPositionAsync({});
+        const [address] = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+        
+        const locationName = address 
+          ? `${address.street || ''} ${address.city || ''}, ${address.country || ''}`.trim()
+          : 'Current Location';
+
+        setProof({
+          ...proof,
+          location: {
+            lat: location.coords.latitude,
+            lng: location.coords.longitude,
+            name: locationName,
+          },
+        });
+        
+        Alert.alert('Location Set', locationName);
+      } catch (error) {
+        Alert.alert('Error', 'Could not get current location');
+      }
+    };
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Use Current Location', 'Enter Manually'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) getCurrentLocation();
+          if (buttonIndex === 2) {
+            Alert.prompt(
+              'Enter Location',
+              'Type the location name',
+              (text) => {
+                if (text) {
+                  setProof({
+                    ...proof,
+                    location: { lat: 0, lng: 0, name: text },
+                  });
+                }
+              }
+            );
+          }
+        }
+      );
+    } else {
+      Alert.alert('Select Location', 'Choose location option', [
+        { text: 'Use Current Location', onPress: getCurrentLocation },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
   };
 
   const handleNext = () => {
     if (currentStep === 'upload') {
+      if (!proof.photos || proof.photos.length === 0) {
+        Alert.alert('Photo Required', 'Please add at least one photo as proof');
+        return;
+      }
       setCurrentStep('details');
     } else if (currentStep === 'details') {
+      if (!proof.title || proof.title.trim() === '') {
+        Alert.alert('Title Required', 'Please add a title for your proof');
+        return;
+      }
       setCurrentStep('verify');
     }
+  };
+
+  const handleRemovePhoto = (photoUri: string) => {
+    setProof({
+      ...proof,
+      photos: (proof.photos || []).filter((p) => p !== photoUri),
+    });
   };
 
   const handleSubmit = async () => {
@@ -107,7 +254,7 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      navigation.navigate('PostProofSuccess', { proofId: '123' });
+      navigation.navigate('Success', { type: 'proof_uploaded' });
     }, 2000);
   };
 
@@ -163,7 +310,10 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
           {proof.photos?.map((photo) => (
             <View key={photo} style={styles.photoPreview}>
               <Image source={{ uri: photo }} style={styles.photoImage} />
-              <TouchableOpacity style={styles.removePhoto}>
+              <TouchableOpacity 
+                style={styles.removePhoto}
+                onPress={() => handleRemovePhoto(photo)}
+              >
                 <Icon name="close-circle" size={24} color={COLORS.error} />
               </TouchableOpacity>
             </View>
@@ -359,7 +509,7 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {loading && <Loading mode="overlay" text="Submitting..." />}
+      {loading && <LoadingState type="overlay" message="Submitting..." />}
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -378,11 +528,18 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
               setCurrentStep(steps[currentIndex - 1]);
             }
           }}
+          activeOpacity={0.7}
         >
           <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Proof</Text>
-        <View style={styles.headerSpacer} />
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+        >
+          <Icon name="close" size={24} color={COLORS.textSecondary} />
+        </TouchableOpacity>
       </View>
 
       {/* Progress Steps */}
@@ -649,5 +806,8 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 20,
     marginLeft: LAYOUT.padding,
+  },
+  closeButton: {
+    padding: 8,
   },
 });

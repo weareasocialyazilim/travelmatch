@@ -7,16 +7,16 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 type ProfileDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -28,84 +28,154 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
   route,
 }) => {
   const { userId } = route.params;
-  const [activeTab, setActiveTab] = useState<'gestures' | 'moments' | 'proofs'>(
-    'gestures',
-  );
+  const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
+  const [showReportSheet, setShowReportSheet] = useState(false);
 
-  // Mock user data - gerçek uygulamada API'den gelecek
-  const user = {
-    id: userId,
-    name: 'Sarah Johnson',
-    username: '@sarahtravels',
-    avatar:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-    bio: 'Spreading kindness one gesture at a time ✨ Traveler • Coffee Lover • Kind Human',
-    location: 'New York, USA',
-    memberSince: 'Jan 2024',
-    membershipTier: 'pro',
-    isVerified: true,
-    stats: {
-      trustScore: 95,
-      gesturesGiven: 47,
-      gesturesReceived: 32,
-      momentsCreated: 18,
-      proofsVerified: 41,
-    },
-    interests: ['Travel', 'Coffee', 'Photography', 'Local Culture', 'Food'],
-  };
-
-  const recentGestures = [
-    {
-      id: '1',
-      type: 'given',
-      title: 'Coffee for a Stranger',
-      amount: 5,
-      date: '2 days ago',
-      icon: 'coffee',
-    },
-    {
-      id: '2',
-      type: 'received',
-      title: 'Museum Ticket',
-      amount: 15,
-      date: '5 days ago',
-      icon: 'ticket',
-    },
-    {
-      id: '3',
-      type: 'given',
-      title: 'Local Meal',
-      amount: 12,
-      date: '1 week ago',
-      icon: 'food',
-    },
-  ];
-
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'vip':
-        return COLORS.gold;
-      case 'pro':
-        return COLORS.purple;
-      case 'starter':
-        return COLORS.coral;
-      default:
-        return COLORS.textSecondary;
+  // Mock user data based on userId - Only PUBLIC info shown
+  const getUserData = (id: string) => {
+    if (id === 'user-jessica') {
+      return {
+        id,
+        name: 'Jessica Chen',
+        role: 'Traveler',
+        location: 'Paris, France',
+        avatar: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400',
+        headerImage: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
+        isVerified: true,
+        proofScore: 9.5,
+        successfulExchanges: 12,
+        isFastResponder: true,
+      };
     }
+    // Default user (Alexandra)
+    return {
+      id,
+      name: 'Alexandra Adams',
+      role: 'Traveler',
+      location: 'San Francisco, CA',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+      headerImage: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+      isVerified: true,
+      proofScore: 9.8,
+      successfulExchanges: 18,
+      isFastResponder: true,
+    };
   };
 
-  const getTierLabel = (tier: string) => {
-    return tier.charAt(0).toUpperCase() + tier.slice(1);
-  };
+  const user = getUserData(userId);
 
-  const handleChat = () => {
-    navigation.navigate('Chat', {
-      otherUser: {
+  // Mock moments data (simplified for profile view, not full Moment type)
+  interface ProfileMoment {
+    id: string;
+    title: string;
+    location: string;
+    price: string;
+    image: string;
+    status: string;
+    creator: {
+      id: string;
+      name: string;
+      avatar: string;
+      proofScore: number;
+    };
+  }
+
+  const userMoments: ProfileMoment[] = [
+    {
+      id: 'moment-1',
+      title: 'Sunset at the Beach',
+      location: 'Malibu, California',
+      price: '$25',
+      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400',
+      status: 'active',
+      creator: {
         id: user.id,
         name: user.name,
         avatar: user.avatar,
+        proofScore: user.proofScore,
       },
+    },
+    {
+      id: 'moment-2',
+      title: 'Morning Coffee Ritual',
+      location: 'Paris, France',
+      price: '$15',
+      image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
+      status: 'active',
+      creator: {
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        proofScore: user.proofScore,
+      },
+    },
+  ];
+
+  const pastMoments: ProfileMoment[] = [
+    {
+      id: 'moment-3',
+      title: 'Mountain Hike Adventure',
+      location: 'Swiss Alps',
+      price: '$40',
+      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400',
+      status: 'completed',
+      creator: {
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        proofScore: user.proofScore,
+      },
+    },
+  ];
+
+  const handleMomentPress = (moment: ProfileMoment) => {
+    // Navigate to MomentDetail with full moment data
+    navigation.navigate('MomentDetail', { 
+      moment: {
+        id: moment.id,
+        title: moment.title,
+        story: moment.title, // Use title as story for simplified data
+        imageUrl: moment.image,
+        price: parseInt(moment.price.replace('$', '')) || 0,
+        availability: 'Available',
+        location: {
+          name: moment.location,
+          city: moment.location.split(', ')[0],
+          country: moment.location.split(', ')[1] || '',
+        },
+        user: {
+          id: moment.creator.id,
+          name: moment.creator.name,
+          avatar: moment.creator.avatar,
+        },
+        status: moment.status as 'active' | 'pending' | 'completed',
+      }
     });
+  };
+
+  const handleGift = () => {
+    // Navigate to gift flow
+  };
+
+  const handleReportAction = (action: string, reason?: string, details?: string) => {
+    if (action === 'report') {
+      Alert.alert(
+        'Report Submitted',
+        `Thank you for reporting. We'll review this profile.\n\nReason: ${reason}${details ? `\nDetails: ${details}` : ''}`,
+        [{ text: 'OK' }]
+      );
+    } else if (action === 'block') {
+      Alert.alert(
+        'User Blocked',
+        `You have blocked ${user.name}. You won't see their content anymore.`,
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]
+      );
+    }
   };
 
   return (
@@ -116,527 +186,503 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity style={styles.moreButton}>
-          <Icon name="dots-vertical" size={24} color={COLORS.text} />
+        <TouchableOpacity 
+          style={styles.moreButton}
+          onPress={() => setShowReportSheet(true)}
+        >
+          <MaterialCommunityIcons
+            name="dots-vertical"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header Image */}
+        <View style={styles.headerImageContainer}>
+          <Image
+            source={{ uri: user.headerImage }}
+            style={styles.headerImage}
+            resizeMode="cover"
+          />
+        </View>
+
         {/* Profile Header */}
         <View style={styles.profileHeader}>
-          {/* Avatar */}
-          <View style={styles.avatarContainer}>
-            <Image source={{ uri: user.avatar }} style={styles.avatar} />
-            {user.isVerified && (
-              <View style={styles.verifiedBadge}>
-                <Icon name="check-decagram" size={24} color={COLORS.mint} />
-              </View>
-            )}
-          </View>
-
-          {/* User Info */}
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.username}>{user.username}</Text>
-
-          {/* Membership Badge */}
-          <View
-            style={[
-              styles.membershipBadge,
-              { backgroundColor: getTierColor(user.membershipTier) },
-            ]}
-          >
-            <Icon name="crown" size={16} color={COLORS.white} />
-            <Text style={styles.membershipText}>
-              {getTierLabel(user.membershipTier)}
+          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          <View style={styles.profileInfo}>
+            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.role}>
+              {user.role} • {user.isVerified ? 'Verified' : 'Not Verified'} •{' '}
+              {user.location}
             </Text>
           </View>
+          <TouchableOpacity style={styles.proofScoreBadge}>
+            <Text style={styles.proofScoreText}>
+              ProofScore: {user.proofScore}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-          {/* Bio */}
-          <Text style={styles.bio}>{user.bio}</Text>
-
-          {/* Location */}
-          <View style={styles.locationRow}>
-            <Icon name="map-marker" size={16} color={COLORS.textSecondary} />
-            <Text style={styles.locationText}>{user.location}</Text>
-            <Text style={styles.separator}>•</Text>
-            <Icon name="calendar" size={16} color={COLORS.textSecondary} />
-            <Text style={styles.locationText}>Joined {user.memberSince}</Text>
+        {/* Public Badges - Only non-private info */}
+        <View style={styles.badgesContainer}>
+          <View style={styles.badge}>
+            <MaterialCommunityIcons name="handshake" size={16} color={COLORS.primary} />
+            <Text style={styles.badgeText}>{user.successfulExchanges} successful exchanges</Text>
           </View>
+          {user.isFastResponder && (
+            <View style={styles.badge}>
+              <MaterialCommunityIcons name="lightning-bolt" size={16} color={COLORS.warning} />
+              <Text style={styles.badgeText}>Fast responder</Text>
+            </View>
+          )}
+        </View>
 
-          {/* Interests */}
-          <View style={styles.interestsContainer}>
-            {user.interests.map((interest, index) => (
-              <View key={index} style={styles.interestTag}>
-                <Text style={styles.interestText}>{interest}</Text>
-              </View>
+        {/* Segmented Buttons */}
+        <View style={styles.segmentedControl}>
+          <TouchableOpacity
+            style={[
+              styles.segmentButton,
+              activeTab === 'active' && styles.segmentButtonActive,
+            ]}
+            onPress={() => setActiveTab('active')}
+          >
+            <Text
+              style={[
+                styles.segmentButtonText,
+                activeTab === 'active' && styles.segmentButtonTextActive,
+              ]}
+            >
+              Active moments
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.segmentButton,
+              activeTab === 'past' && styles.segmentButtonActive,
+            ]}
+            onPress={() => setActiveTab('past')}
+          >
+            <Text
+              style={[
+                styles.segmentButtonText,
+                activeTab === 'past' && styles.segmentButtonTextActive,
+              ]}
+            >
+              Past
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Active Moments */}
+        {activeTab === 'active' && userMoments.length > 0 && (
+          <View style={styles.momentsGrid}>
+            {userMoments.map((moment) => (
+              <TouchableOpacity
+                key={moment.id}
+                style={styles.momentCard}
+                onPress={() => handleMomentPress(moment)}
+              >
+                <Image
+                  source={{ uri: moment.image }}
+                  style={styles.momentImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.momentOverlay}>
+                  <Text style={styles.momentTitle} numberOfLines={1}>
+                    {moment.title}
+                  </Text>
+                  <Text style={styles.momentLocation} numberOfLines={1}>
+                    {moment.location}
+                  </Text>
+                  <Text style={styles.momentPrice}>{moment.price}</Text>
+                </View>
+              </TouchableOpacity>
             ))}
           </View>
-        </View>
+        )}
 
-        {/* Stats Grid */}
-        <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <LinearGradient
-              colors={[COLORS.mint, COLORS.successDark]}
-              style={styles.statGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <Icon name="shield-star" size={32} color={COLORS.white} />
-              <Text style={styles.statValue}>{user.stats.trustScore}</Text>
-              <Text style={styles.statLabel}>Trust Score</Text>
-            </LinearGradient>
-          </View>
-
-          <View style={styles.statCard}>
-            <View
-              style={[
-                styles.statBox,
-                { backgroundColor: COLORS.coralTransparent },
-              ]}
-            >
-              <Icon name="gift" size={28} color={COLORS.coral} />
-              <Text style={[styles.statValue, { color: COLORS.coral }]}>
-                {user.stats.gesturesGiven}
+        {/* Empty State for Active */}
+        {activeTab === 'active' && userMoments.length === 0 && (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIconContainer}>
+              <MaterialCommunityIcons
+                name="compass-outline"
+                size={32}
+                color={COLORS.textSecondary}
+              />
+            </View>
+            <View style={styles.emptyTextContainer}>
+              <Text style={styles.emptyTitle}>No active moments yet</Text>
+              <Text style={styles.emptySubtitle}>
+                Check back soon to support {user.name.split(' ')[0]}&apos;s next
+                adventure!
               </Text>
-              <Text style={styles.statLabel}>Given</Text>
             </View>
           </View>
+        )}
 
-          <View style={styles.statCard}>
-            <View
-              style={[
-                styles.statBox,
-                { backgroundColor: COLORS.purpleTransparent },
-              ]}
-            >
-              <Icon name="hand-heart" size={28} color={COLORS.purple} />
-              <Text style={[styles.statValue, { color: COLORS.purple }]}>
-                {user.stats.gesturesReceived}
-              </Text>
-              <Text style={styles.statLabel}>Received</Text>
-            </View>
-          </View>
-
-          <View style={styles.statCard}>
-            <View
-              style={[
-                styles.statBox,
-                { backgroundColor: COLORS.mintTransparentLight },
-              ]}
-            >
-              <Icon name="check-circle" size={28} color={COLORS.mint} />
-              <Text style={[styles.statValue, { color: COLORS.mint }]}>
-                {user.stats.proofsVerified}
-              </Text>
-              <Text style={styles.statLabel}>Verified</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Tabs */}
-        <View style={styles.tabs}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'gestures' && styles.activeTab]}
-            onPress={() => setActiveTab('gestures')}
-          >
-            <Icon
-              name="gift-outline"
-              size={20}
-              color={
-                activeTab === 'gestures' ? COLORS.mint : COLORS.textSecondary
-              }
-            />
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === 'gestures' && styles.activeTabText,
-              ]}
-            >
-              Gestures
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'moments' && styles.activeTab]}
-            onPress={() => setActiveTab('moments')}
-          >
-            <Icon
-              name="calendar-star"
-              size={20}
-              color={
-                activeTab === 'moments' ? COLORS.mint : COLORS.textSecondary
-              }
-            />
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === 'moments' && styles.activeTabText,
-              ]}
-            >
-              Moments
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'proofs' && styles.activeTab]}
-            onPress={() => setActiveTab('proofs')}
-          >
-            <Icon
-              name="check-decagram"
-              size={20}
-              color={
-                activeTab === 'proofs' ? COLORS.mint : COLORS.textSecondary
-              }
-            />
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === 'proofs' && styles.activeTabText,
-              ]}
-            >
-              Proofs
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Content */}
-        <View style={styles.content}>
-          {activeTab === 'gestures' && (
-            <View style={styles.gesturesList}>
-              {recentGestures.map((gesture) => (
-                <View key={gesture.id} style={styles.gestureCard}>
-                  <View
-                    style={[
-                      styles.gestureIcon,
-                      {
-                        backgroundColor:
-                          gesture.type === 'given'
-                            ? COLORS.coralTransparent
-                            : COLORS.mintTransparentLight,
-                      },
-                    ]}
-                  >
-                    <Icon
-                      name={gesture.icon}
-                      size={24}
-                      color={
-                        gesture.type === 'given' ? COLORS.coral : COLORS.mint
-                      }
-                    />
-                  </View>
-                  <View style={styles.gestureInfo}>
-                    <Text style={styles.gestureTitle}>{gesture.title}</Text>
-                    <Text style={styles.gestureDate}>{gesture.date}</Text>
-                  </View>
-                  <View style={styles.gestureAmount}>
-                    <Text
-                      style={[
-                        styles.amountText,
-                        {
-                          color:
-                            gesture.type === 'given'
-                              ? COLORS.coral
-                              : COLORS.mint,
-                        },
-                      ]}
-                    >
-                      {gesture.type === 'given' ? '-' : '+'}${gesture.amount}
-                    </Text>
-                    <Text style={styles.gestureType}>
-                      {gesture.type === 'given' ? 'Given' : 'Received'}
-                    </Text>
+        {/* Past Moments */}
+        {activeTab === 'past' && pastMoments.length > 0 && (
+          <View style={styles.momentsGrid}>
+            {pastMoments.map((moment) => (
+              <TouchableOpacity
+                key={moment.id}
+                style={styles.momentCard}
+                onPress={() => handleMomentPress(moment)}
+              >
+                <Image
+                  source={{ uri: moment.image }}
+                  style={styles.momentImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.momentOverlay}>
+                  <Text style={styles.momentTitle} numberOfLines={1}>
+                    {moment.title}
+                  </Text>
+                  <Text style={styles.momentLocation} numberOfLines={1}>
+                    {moment.location}
+                  </Text>
+                  <View style={styles.completedBadge}>
+                    <Text style={styles.completedText}>Completed</Text>
                   </View>
                 </View>
-              ))}
-            </View>
-          )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
-          {activeTab === 'moments' && (
-            <View style={styles.emptyState}>
-              <Icon name="calendar-star" size={64} color={COLORS.lightGray} />
-              <Text style={styles.emptyText}>No moments yet</Text>
+        {/* Empty State for Past */}
+        {activeTab === 'past' && pastMoments.length === 0 && (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIconContainer}>
+              <MaterialCommunityIcons
+                name="history"
+                size={32}
+                color={COLORS.textSecondary}
+              />
             </View>
-          )}
+            <View style={styles.emptyTextContainer}>
+              <Text style={styles.emptyTitle}>No past moments</Text>
+              <Text style={styles.emptySubtitle}>
+                Completed moments will appear here
+              </Text>
+            </View>
+          </View>
+        )}
 
-          {activeTab === 'proofs' && (
-            <View style={styles.emptyState}>
-              <Icon name="check-decagram" size={64} color={COLORS.lightGray} />
-              <Text style={styles.emptyText}>No proofs to display</Text>
-            </View>
-          )}
-        </View>
+        {/* Bottom padding for sticky bar */}
+        <View style={styles.bottomPadding} />
       </ScrollView>
 
-      {/* Bottom Actions */}
-      <View style={styles.bottomActions}>
-        <TouchableOpacity
-          style={styles.chatButton}
-          onPress={handleChat}
-          activeOpacity={0.8}
-        >
-          <Icon name="message-text" size={20} color={COLORS.white} />
-          <Text style={styles.chatButtonText}>Send Message</Text>
+      {/* Sticky Bottom Bar */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity style={styles.giftButton} onPress={handleGift}>
+          <Text style={styles.giftButtonText}>Gift this user</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Report/Block Bottom Sheet */}
+      <ReportBlockBottomSheet
+        visible={showReportSheet}
+        onClose={() => setShowReportSheet(false)}
+        onSubmit={handleReportAction}
+        targetType="user"
+      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  activeTab: {
-    borderBottomColor: COLORS.mint,
-  },
-  activeTabText: {
-    color: COLORS.mint,
-  },
-  amountText: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  avatar: {
-    borderColor: COLORS.white,
-    borderRadius: 50,
-    borderWidth: 3,
-    height: 100,
-    width: 100,
-  },
-  avatarContainer: {
-    marginBottom: 16,
-    position: 'relative',
-  },
   backButton: {
     alignItems: 'center',
     height: 40,
     justifyContent: 'center',
     width: 40,
   },
-  bio: {
-    color: COLORS.text,
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  bottomActions: {
-    backgroundColor: COLORS.white,
-    borderTopColor: COLORS.lightGray,
-    borderTopWidth: 1,
-    padding: 16,
-    paddingBottom: 32,
-  },
-  chatButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.mint,
-    borderRadius: 12,
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    paddingVertical: 16,
-  },
-  chatButtonText: {
-    color: COLORS.white,
-    fontSize: 17,
-    fontWeight: '700',
-  },
   container: {
     backgroundColor: COLORS.background,
     flex: 1,
   },
-  content: {
-    padding: 16,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    color: COLORS.textSecondary,
-    fontSize: 16,
-    marginTop: 16,
-  },
-  gestureAmount: {
-    alignItems: 'flex-end',
-  },
-  gestureCard: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    flexDirection: 'row',
-    padding: 16,
-    ...VALUES.shadow,
-  },
-  gestureDate: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-  },
-  gestureIcon: {
-    alignItems: 'center',
-    borderRadius: 24,
-    height: 48,
-    justifyContent: 'center',
-    width: 48,
-  },
-  gestureInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  gestureTitle: {
-    color: COLORS.text,
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  gestureType: {
-    color: COLORS.textSecondary,
-    fontSize: 12,
-  },
-  gesturesList: {
-    gap: 12,
-  },
   header: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderBottomColor: COLORS.lightGray,
-    borderBottomWidth: 1,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
+    backgroundColor: COLORS.background,
   },
   headerTitle: {
-    color: COLORS.text,
+    flex: 1,
     fontSize: 18,
     fontWeight: '700',
-  },
-  interestTag: {
-    backgroundColor: COLORS.gray,
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  interestText: {
     color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  interestsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    justifyContent: 'center',
-  },
-  locationRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 6,
-    marginBottom: 16,
-  },
-  locationText: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-  },
-  membershipBadge: {
-    alignItems: 'center',
-    borderRadius: 16,
-    flexDirection: 'row',
-    gap: 6,
-    marginBottom: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  membershipText: {
-    color: COLORS.white,
-    fontSize: 13,
-    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: -0.15,
   },
   moreButton: {
+    width: 48,
+    height: 48,
     alignItems: 'center',
-    height: 40,
     justifyContent: 'center',
-    width: 40,
+    borderRadius: 24,
   },
-  name: {
-    color: COLORS.text,
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 4,
+  scrollView: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingBottom: 100,
+  },
+  headerImageContainer: {
+    width: '100%',
+    height: 218,
+  },
+  headerImage: {
+    width: '100%',
+    height: '100%',
   },
   profileHeader: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    padding: 24,
+    marginTop: -64,
+    paddingHorizontal: 16,
   },
-  separator: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
+  avatar: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    borderWidth: 4,
+    borderColor: COLORS.background,
   },
-  statBox: {
+  profileInfo: {
     alignItems: 'center',
-    borderRadius: 16,
-    padding: 20,
+    marginTop: 16,
   },
-  statCard: {
-    width: (SCREEN_WIDTH - 44) / 2,
-  },
-  statGradient: {
-    alignItems: 'center',
-    borderRadius: 16,
-    padding: 20,
-  },
-  statLabel: {
-    color: COLORS.white,
-    fontSize: 13,
-    marginTop: 4,
-    opacity: 0.9,
-  },
-  statValue: {
-    color: COLORS.white,
-    fontSize: 28,
+  name: {
+    fontSize: 22,
     fontWeight: '700',
-    marginTop: 8,
+    color: COLORS.text,
+    marginBottom: 4,
+    letterSpacing: -0.15,
   },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    padding: 16,
-  },
-  tab: {
-    alignItems: 'center',
-    borderBottomColor: COLORS.transparent,
-    borderBottomWidth: 2,
-    flex: 1,
-    flexDirection: 'row',
-    gap: 6,
-    justifyContent: 'center',
-    paddingVertical: 12,
-  },
-  tabText: {
+  role: {
+    fontSize: 16,
     color: COLORS.textSecondary,
-    fontSize: 15,
-    fontWeight: '600',
   },
-  tabs: {
-    backgroundColor: COLORS.white,
+  proofScoreBadge: {
+    marginTop: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: COLORS.mintTransparent,
+    borderRadius: 9999,
+  },
+  proofScoreText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.text,
+    letterSpacing: 0.15,
+  },
+  statsContainer: {
     flexDirection: 'row',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingVertical: 12,
+    gap: 12,
   },
-  username: {
-    color: COLORS.textSecondary,
-    fontSize: 15,
-    marginBottom: 12,
-  },
-  verifiedBadge: {
-    backgroundColor: COLORS.white,
+  statCard: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     borderRadius: 12,
-    bottom: 0,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    marginVertical: 12,
+    padding: 4,
+    backgroundColor: COLORS.border,
+    borderRadius: 9999,
+    height: 40,
+  },
+  segmentButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 9999,
+    paddingHorizontal: 8,
+  },
+  segmentButtonActive: {
+    backgroundColor: COLORS.background,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  segmentButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+  },
+  segmentButtonTextActive: {
+    color: COLORS.text,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 16,
+  },
+  emptyIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyTextContainer: {
+    alignItems: 'center',
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  momentsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 12,
+    gap: 8,
+  },
+  momentCard: {
+    width: '48%',
+    aspectRatio: 0.75,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  momentImage: {
+    width: '100%',
+    height: '100%',
+  },
+  momentOverlay: {
     position: 'absolute',
+    bottom: 0,
+    left: 0,
     right: 0,
+    padding: 12,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  momentTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.white,
+    marginBottom: 2,
+  },
+  momentLocation: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: 4,
+  },
+  momentPrice: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
+  completedBadge: {
+    backgroundColor: COLORS.success,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  completedText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+  bottomPadding: {
+    height: 20,
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: COLORS.background,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    gap: 12,
+  },
+  giftButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 9999,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  giftButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  badgesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    marginTop: 12,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: COLORS.background,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 9999,
+  },
+  badgeText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.text,
   },
 });

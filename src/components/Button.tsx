@@ -1,46 +1,76 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
+import { hapticPatterns } from '../utils/haptics';
+import { usePressScale } from '../utils/animations';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'outline';
   disabled?: boolean;
+  style?: object;
+  enableHaptic?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  title,
-  onPress,
-  variant = 'primary',
-  disabled = false,
-}) => {
-  return (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        variant === 'secondary' && styles.secondaryButton,
-        disabled && styles.disabledButton,
-      ]}
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityLabel={title}
-    >
-      <Text
+const Button: React.FC<ButtonProps> = memo(
+  ({
+    title,
+    onPress,
+    variant = 'primary',
+    disabled = false,
+    style,
+    enableHaptic = true,
+  }) => {
+    const { animatedStyle, onPressIn, onPressOut } = usePressScale();
+
+    const handlePress = () => {
+      if (enableHaptic && !disabled) {
+        if (variant === 'primary') {
+          hapticPatterns.primaryAction();
+        } else {
+          hapticPatterns.buttonPress();
+        }
+      }
+      onPress();
+    };
+
+    return (
+      <TouchableOpacity
         style={[
-          styles.buttonText,
-          variant === 'secondary' && styles.secondaryButtonText,
-          disabled && styles.disabledButtonText,
+          styles.button,
+          variant === 'secondary' && styles.secondaryButton,
+          variant === 'outline' && styles.outlineButton,
+          disabled && styles.disabledButton,
+          style,
         ]}
+        onPress={handlePress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        disabled={disabled}
+        activeOpacity={1}
+        accessibilityRole="button"
+        accessibilityLabel={title}
       >
-        {title}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+        <Animated.View style={animatedStyle}>
+          <Text
+            style={[
+              styles.buttonText,
+              variant === 'secondary' && styles.secondaryButtonText,
+              variant === 'outline' && styles.outlineButtonText,
+              disabled && styles.disabledButtonText,
+            ]}
+          >
+            {title}
+          </Text>
+        </Animated.View>
+      </TouchableOpacity>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   button: {
@@ -63,6 +93,14 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: COLORS.buttonPrimary,
   },
+  outlineButton: {
+    backgroundColor: COLORS.transparent,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+  },
+  outlineButtonText: {
+    color: COLORS.text,
+  },
   // eslint-disable-next-line react-native/sort-styles
   disabledButton: {
     backgroundColor: COLORS.disabled,
@@ -72,5 +110,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
 });
+
+Button.displayName = 'Button';
 
 export default Button;

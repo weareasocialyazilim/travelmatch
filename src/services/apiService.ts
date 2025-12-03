@@ -1,36 +1,67 @@
-import { Moment } from '../types';
+/**
+ * API Service
+ * Merkezi API fonksiyonları
+ *
+ * Artık api.ts'deki gelişmiş error handling ve interceptor'lar kullanılıyor
+ */
 
-// Mock API functions (replace with your actual API calls)
+import { api } from '../utils/api';
+import type { Moment } from '../types';
 
+/**
+ * Moments API
+ */
 export const getMoments = async (): Promise<Moment[]> => {
   try {
-    // In a real app, you would fetch this from your API
-    // const response = await api.get('/moments');
-    // return response.data;
-
-    // For now, returning mock data after a short delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([]); // No moments initially
-      }, 1000);
-    });
+    const data = await api.get<Moment[]>('/moments');
+    return data;
   } catch (error) {
+    // Error handling api.ts'de yapılıyor
     console.error('Failed to fetch moments:', error);
-    throw new Error('Could not retrieve moments. Please try again later.');
+    throw error;
   }
 };
 
 export const getMomentById = async (id: string): Promise<Moment | null> => {
   try {
-    // const response = await api.get(`/moments/${id}`);
-    // return response.data;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null); // No moment initially
-      }, 500);
-    });
+    const data = await api.get<Moment>(`/moments/${id}`);
+    return data;
   } catch (error) {
     console.error(`Failed to fetch moment ${id}:`, error);
-    throw new Error('Could not retrieve the moment. Please try again later.');
+    throw error;
+  }
+};
+
+export const createMoment = async (
+  moment: Partial<Moment>,
+): Promise<Moment> => {
+  try {
+    const data = await api.post<Moment>('/moments', moment);
+    return data;
+  } catch (error) {
+    console.error('Failed to create moment:', error);
+    throw error;
+  }
+};
+
+export const updateMoment = async (
+  id: string,
+  moment: Partial<Moment>,
+): Promise<Moment> => {
+  try {
+    const data = await api.put<Moment>(`/moments/${id}`, moment);
+    return data;
+  } catch (error) {
+    console.error(`Failed to update moment ${id}:`, error);
+    throw error;
+  }
+};
+
+export const deleteMoment = async (id: string): Promise<void> => {
+  try {
+    await api.delete(`/moments/${id}`);
+  } catch (error) {
+    console.error(`Failed to delete moment ${id}:`, error);
+    throw error;
   }
 };

@@ -1,13 +1,20 @@
-import React, { Component, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
+import { logger } from '../utils/logger';
+import * as Sentry from '../config/sentry';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
+  fallback?: (error: Error, resetError: () => void) => ReactNode;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  level?: 'app' | 'navigation' | 'screen' | 'component';
 }
 
 interface ErrorBoundaryState {
@@ -29,7 +36,40 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error('ErrorBoundary caught error:', error, errorInfo);
+    const { onError, level = 'component' } = this.props;
+
+    // Log error
+    logger.error(`[${level.toUpperCase()} Error Boundary]`, error);
+
+    if (__DEV__) {
+      logger.debug('Error Stack', { stack: error.stack });
+      logger.debug('Component Stack', {
+        componentStack: errorInfo.componentStack,
+      });
+    }
+
+    // Send to Sentry
+    try {
+      Sentry.addBreadcrumb('Error Boundary', 'error', 'error', {
+        level,
+        componentStack: errorInfo.componentStack,
+      });
+      Sentry.captureException(error, {
+        contexts: {
+          errorBoundary: {
+            level,
+            componentStack: errorInfo.componentStack,
+          },
+        },
+      });
+    } catch (sentryError) {
+      logger.error('Failed to report to Sentry', sentryError as Error);
+    }
+
+    // Custom error handler
+    if (onError) {
+      onError(error, errorInfo);
+    }
   }
 
   handleReset = (): void => {
@@ -37,19 +77,36 @@ export class ErrorBoundary extends Component<
   };
 
   render(): ReactNode {
-    if (this.state.hasError) {
+    const { hasError, error } = this.state;
+    const { children: _children, fallback, level = 'component' } = this.props;
+
+    if (hasError && error) {
+      // Use custom fallback if provided
+      if (fallback) {
+        return fallback(error, this.handleReset);
+      }
+
+      // Default fallback UI with icon
       return (
         <View style={styles.container}>
           <View style={styles.content}>
-            <Text style={styles.emoji}>😔</Text>
-            <Text style={styles.title}>Something went wrong</Text>
-            <Text style={styles.message}>
-              We&apos;re sorry for the inconvenience. Please try again.
+            <MaterialCommunityIcons
+              name="alert-circle-outline"
+              size={64}
+              color={COLORS.error}
+            />
+            <Text style={styles.title}>
+              {level === 'app'
+                ? 'Oops! Something went wrong'
+                : 'Error occurred'}
             </Text>
-            {__DEV__ && this.state.error && (
-              <Text style={styles.errorDetails}>
-                {this.state.error.toString()}
-              </Text>
+            <Text style={styles.message}>
+              {level === 'app'
+                ? "We're sorry for the inconvenience. Please restart the app."
+                : 'Please try again or go back.'}
+            </Text>
+            {__DEV__ && error && (
+              <Text style={styles.errorDetails}>{error.toString()}</Text>
             )}
             <TouchableOpacity
               style={styles.button}
@@ -92,10 +149,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     maxWidth: LAYOUT.size.errorMessageMax,
   },
-  emoji: {
-    fontSize: 64,
-    marginBottom: spacing.md,
-  },
   errorDetails: {
     backgroundColor: COLORS.errorBackground,
     borderRadius: radii.md,
@@ -117,3 +170,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+/**
+ * Convenience wrappers for different error boundary levels
+ */
+export const AppErrorBoundary: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => <ErrorBoundary level="app">{children}</ErrorBoundary>;
+
+export const NavigationErrorBoundary: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => <ErrorBoundary level="navigation">{children}</ErrorBoundary>;
+
+export const ScreenErrorBoundary: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => <ErrorBoundary level="screen">{children}</ErrorBoundary>;
+
+export const ComponentErrorBoundary: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => <ErrorBoundary level="component">{children}</ErrorBoundary>;

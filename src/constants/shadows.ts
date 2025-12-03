@@ -1,6 +1,15 @@
+import type { ViewStyle } from 'react-native';
 import { COLORS } from './colors';
+type ShadowStyle = Pick<
+  ViewStyle,
+  | 'shadowColor'
+  | 'shadowOffset'
+  | 'shadowOpacity'
+  | 'shadowRadius'
+  | 'elevation'
+>;
 
-export const SHADOWS = {
+export const SHADOWS: Record<'sm' | 'md' | 'lg', ShadowStyle> = {
   sm: {
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 1 },

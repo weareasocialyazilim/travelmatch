@@ -10,16 +10,20 @@ import {
   Platform,
   Alert,
   KeyboardAvoidingView,
+  ActionSheetIOS,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import { COLORS, CARD_SHADOW } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { STRINGS } from '../constants/strings';
 import { LAYOUT } from '../constants/layout';
 import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 interface Category {
   id: string;
@@ -42,7 +46,7 @@ const CATEGORIES: Category[] = [
 ];
 
 const CreateMomentScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   // Form state
   const [photo, setPhoto] = useState<string>('');
@@ -55,30 +59,108 @@ const CreateMomentScreen: React.FC = () => {
   const [story, setStory] = useState('');
 
   const pickImage = async () => {
-    try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          STRINGS.LABELS.PERMISSION_NEEDED,
-          STRINGS.ERRORS.PHOTO_PERMISSION,
-        );
-        return;
-      }
+    const showPicker = async (useCamera: boolean) => {
+      try {
+        if (useCamera) {
+          const { status } = await ImagePicker.requestCameraPermissionsAsync();
+          if (status !== 'granted') {
+            Alert.alert(STRINGS.LABELS.PERMISSION_NEEDED, 'Camera permission is required');
+            return;
+          }
+        } else {
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            Alert.alert(STRINGS.LABELS.PERMISSION_NEEDED, STRINGS.ERRORS.PHOTO_PERMISSION);
+            return;
+          }
+        }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [16, 9],
-        quality: 0.8,
-      });
+        const result = useCamera
+          ? await ImagePicker.launchCameraAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              aspect: [16, 9],
+              quality: 0.8,
+            })
+          : await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              aspect: [16, 9],
+              quality: 0.8,
+            });
 
-      if (!result.canceled) {
-        setPhoto(result.assets[0].uri);
+        if (!result.canceled && result.assets[0]) {
+          setPhoto(result.assets[0].uri);
+        }
+      } catch (error) {
+        console.error('Error selecting photo:', error);
+        Alert.alert('Error', STRINGS.ERRORS.PHOTO_SELECT);
       }
-    } catch (error) {
-      console.error('Error selecting photo:', error);
-      Alert.alert('Error', STRINGS.ERRORS.PHOTO_SELECT);
+    };
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Take Photo', 'Choose from Gallery'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) showPicker(true);
+          if (buttonIndex === 2) showPicker(false);
+        }
+      );
+    } else {
+      Alert.alert('Add Photo', 'Choose an option', [
+        { text: 'Take Photo', onPress: () => showPicker(true) },
+        { text: 'Choose from Gallery', onPress: () => showPicker(false) },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  };
+
+  const pickLocation = async () => {
+    const getCurrentLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Required', 'Location permission is needed');
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({});
+        const [address] = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+        if (address) {
+          setPlace({
+            name: address.name || address.street || 'Current Location',
+            address: `${address.city || ''}, ${address.country || ''}`.trim(),
+          });
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Could not get current location');
+      }
+    };
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Use Current Location', 'Search Place'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) getCurrentLocation();
+          if (buttonIndex === 2) navigation.navigate('SelectPlace');
+        }
+      );
+    } else {
+      Alert.alert('Select Location', 'Choose an option', [
+        { text: 'Use Current Location', onPress: getCurrentLocation },
+        { text: 'Search Place', onPress: () => navigation.navigate('SelectPlace') },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
     }
   };
 
@@ -262,9 +344,7 @@ const CreateMomentScreen: React.FC = () => {
             {/* Location Card */}
             <TouchableOpacity
               style={styles.detailCard}
-              onPress={() => {
-                setPlace({ name: 'Café Kitsuné', address: 'Paris, France' });
-              }}
+              onPress={pickLocation}
               activeOpacity={0.8}
             >
               <View style={styles.detailCardHeader}>
@@ -359,11 +439,26 @@ const CreateMomentScreen: React.FC = () => {
 
               {/* Escrow Info */}
               {amount && parseFloat(amount) > 0 && (
-                <View
+                <TouchableOpacity
                   style={[
                     styles.escrowInfo,
                     { borderColor: escrowInfo.color + '20' },
                   ]}
+                  onPress={() => {
+                    Alert.alert(
+                      '💰 Gift Protection Levels',
+                      'TravelMatch protects both givers and receivers:\n\n' +
+                      '✅ $0-30: Direct Payment\n' +
+                      'Money goes directly to the creator. No proof needed.\n\n' +
+                      '⚡ $30-100: Optional Escrow\n' +
+                      'You can choose to protect your gift. If protected, money is held until proof is uploaded.\n\n' +
+                      '🔒 $100+: Escrow Protected\n' +
+                      'Money is held in escrow. The creator must upload proof to receive funds.\n\n' +
+                      'This ensures authentic travel experiences and protects your gifts.',
+                      [{ text: 'Got it', style: 'default' }]
+                    );
+                  }}
+                  activeOpacity={0.7}
                 >
                   <MaterialCommunityIcons
                     name={escrowInfo.icon}
@@ -380,7 +475,12 @@ const CreateMomentScreen: React.FC = () => {
                       {escrowInfo.description}
                     </Text>
                   </View>
-                </View>
+                  <MaterialCommunityIcons
+                    name="information-outline"
+                    size={16}
+                    color={COLORS.textTertiary}
+                  />
+                </TouchableOpacity>
               )}
             </View>
           </View>

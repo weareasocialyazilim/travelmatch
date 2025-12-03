@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,12 @@ import {
   Modal,
   Platform,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
@@ -29,15 +35,33 @@ export const ConfirmGiftModal: React.FC<Props> = ({
   onCancel,
   onConfirm,
 }) => {
+  const scale = useSharedValue(0.8);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (visible) {
+      scale.value = withSpring(1, { damping: 15, stiffness: 150 });
+      opacity.value = withTiming(1, { duration: 200 });
+    } else {
+      scale.value = withTiming(0.8, { duration: 150 });
+      opacity.value = withTiming(0, { duration: 150 });
+    }
+  }, [visible]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onCancel}
     >
       <View style={styles.backdrop}>
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, animatedStyle]}>
           <View style={styles.iconContainer}>
             <MaterialCommunityIcons
               name="gift-outline"
@@ -70,7 +94,7 @@ export const ConfirmGiftModal: React.FC<Props> = ({
               <Text style={styles.confirmButtonText}>Confirm</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -96,7 +120,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray,
+    backgroundColor: COLORS.gray[100],
     borderRadius: radii.full,
     flex: 1,
     paddingVertical: spacing.md,

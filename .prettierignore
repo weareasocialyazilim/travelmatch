@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+build/
+coverage/
+*.config.js
+*.lock
+package-lock.json
+yarn.lock

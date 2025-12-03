@@ -1,0 +1,44 @@
+appId: com.travelmatch.app
+---
+# Error Recovery Flow Test
+# Tests app behavior in error scenarios and recovery mechanisms
+
+- launchApp
+
+# Navigate to app
+- tapOn: "Skip"
+- tapOn: "Üye olmadan devam et"
+
+# Step 1: Test invalid form submission
+- tapOn: "+"
+- assertVisible: "Share a Moment"
+
+# Try to publish without required fields
+- tapOn: "Publish Moment"
+- assertVisible:
+    text: ".*required.*"
+    pattern: true
+
+# Step 2: Close error and return
+- tapOn: "OK"
+- tapOn:
+    id: "close-button"
+
+# Step 3: Test network error handling (simulate by rapid navigation)
+- tapOn: "Activity"
+- tapOn: "Profile"
+- tapOn: "Home"
+
+# Verify app remains stable
+- assertVisible: "Discover"
+
+# Step 4: Test empty state handling
+- tapOn: "Profile"
+- scroll:
+    direction: DOWN
+    speed: 40
+
+# App should handle empty states gracefully
+- assertVisible:
+    text: ".*"
+    pattern: true

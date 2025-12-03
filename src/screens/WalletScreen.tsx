@@ -1,0 +1,456 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import BottomNav from '../components/BottomNav';
+import { COLORS } from '../constants/colors';
+
+type FilterType = 'all' | 'incoming' | 'outgoing';
+
+interface Transaction {
+  id: string;
+  type: 'gift_received' | 'withdrawal' | 'gift_sent';
+  title: string;
+  subtitle: string;
+  amount: number;
+  isPositive: boolean;
+  hasProofLoop?: boolean;
+  status?: string;
+}
+
+const WalletScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+
+  const balance = {
+    available: 1250.0,
+    escrow: 300.0,
+  };
+
+  const transactions: Transaction[] = [
+    {
+      id: '1',
+      type: 'gift_received',
+      title: 'Gift for Parisian Croissant',
+      subtitle: 'From Sarah • Pending Proof',
+      amount: 10.0,
+      isPositive: true,
+      hasProofLoop: true,
+      status: 'pending',
+    },
+    {
+      id: '2',
+      type: 'withdrawal',
+      title: 'Withdrawal to Bank',
+      subtitle: 'Completed',
+      amount: 50.0,
+      isPositive: false,
+    },
+    {
+      id: '3',
+      type: 'gift_received',
+      title: 'Gift received - Galata coffee',
+      subtitle: 'From Marco • Approved',
+      amount: 5.0,
+      isPositive: true,
+    },
+  ];
+
+  const handleWithdraw = () => {
+    navigation.navigate('Withdraw');
+  };
+
+  const handleViewDetails = () => {
+    navigation.navigate('TransactionHistory');
+  };
+
+  const getTransactionIcon = (type: Transaction['type']) => {
+    switch (type) {
+      case 'gift_received':
+        return 'gift';
+      case 'withdrawal':
+        return 'arrow-top-right';
+      case 'gift_sent':
+        return 'gift-open';
+      default:
+        return 'cash';
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Wallet</Text>
+        <TouchableOpacity style={styles.headerButton}>
+          <MaterialCommunityIcons
+            name="shield-check"
+            size={24}
+            color={COLORS.text}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Balance Card */}
+        <View style={styles.balanceCard}>
+          <View style={styles.balanceInfo}>
+            <Text style={styles.balanceLabel}>Available Balance</Text>
+            <Text style={styles.balanceAmount}>
+              ${balance.available.toFixed(2)}
+            </Text>
+            <Text style={styles.escrowText}>
+              ${balance.escrow.toFixed(2)} in Escrow (waiting for proof)
+            </Text>
+          </View>
+          <View style={styles.balanceActions}>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={handleWithdraw}
+            >
+              <Text style={styles.primaryButtonText}>Withdraw</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleViewDetails}
+            >
+              <Text style={styles.secondaryButtonText}>View Details</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Segmented Filter */}
+        <View style={styles.filterContainer}>
+          <View style={styles.segmentedControl}>
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                selectedFilter === 'all' && styles.filterButtonActive,
+              ]}
+              onPress={() => setSelectedFilter('all')}
+            >
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  selectedFilter === 'all' && styles.filterButtonTextActive,
+                ]}
+              >
+                All
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                selectedFilter === 'incoming' && styles.filterButtonActive,
+              ]}
+              onPress={() => setSelectedFilter('incoming')}
+            >
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  selectedFilter === 'incoming' &&
+                    styles.filterButtonTextActive,
+                ]}
+              >
+                Incoming
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                selectedFilter === 'outgoing' && styles.filterButtonActive,
+              ]}
+              onPress={() => setSelectedFilter('outgoing')}
+            >
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  selectedFilter === 'outgoing' &&
+                    styles.filterButtonTextActive,
+                ]}
+              >
+                Outgoing
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Section Header */}
+        <Text style={styles.sectionTitle}>Transactions</Text>
+
+        {/* Transaction List */}
+        {transactions.map((transaction) => (
+          <TouchableOpacity
+            key={transaction.id}
+            style={styles.transactionItem}
+            onPress={() =>
+              navigation.navigate('TransactionDetail', {
+                transactionId: transaction.id,
+              })
+            }
+          >
+            <View style={styles.transactionLeft}>
+              <View style={styles.transactionIcon}>
+                <MaterialCommunityIcons
+                  name={getTransactionIcon(transaction.type)}
+                  size={20}
+                  color={COLORS.text}
+                />
+              </View>
+              <View style={styles.transactionInfo}>
+                <Text style={styles.transactionTitle}>{transaction.title}</Text>
+                <Text style={styles.transactionSubtitle}>
+                  {transaction.subtitle}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.transactionRight}>
+              <Text
+                style={[
+                  styles.transactionAmount,
+                  transaction.isPositive && styles.transactionAmountPositive,
+                ]}
+              >
+                {transaction.isPositive ? '+' : '-'}$
+                {transaction.amount.toFixed(2)}
+              </Text>
+              {transaction.hasProofLoop && (
+                <View style={styles.proofLoopBadge}>
+                  <Text style={styles.proofLoopText}>ProofLoop</Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+
+      {/* Bottom Navigation */}
+      <BottomNav activeTab="Profile" />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.text,
+    flex: 1,
+    textAlign: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 16,
+  },
+  balanceCard: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 24,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  balanceInfo: {
+    marginBottom: 24,
+  },
+  balanceLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 8,
+  },
+  balanceAmount: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  escrowText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  balanceActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  primaryButton: {
+    flex: 1,
+    height: 48,
+    backgroundColor: COLORS.primary,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  secondaryButton: {
+    flex: 1,
+    height: 48,
+    backgroundColor: COLORS.mintBackground,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  secondaryButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  filterContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.mintBackground,
+    borderRadius: 20,
+    padding: 4,
+    gap: 4,
+  },
+  filterButton: {
+    flex: 1,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+  },
+  filterButtonActive: {
+    backgroundColor: COLORS.white,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+  },
+  filterButtonTextActive: {
+    color: COLORS.text,
+    fontWeight: '600',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.text,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    gap: 16,
+  },
+  transactionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    flex: 1,
+  },
+  transactionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.mintBackground,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  transactionInfo: {
+    flex: 1,
+  },
+  transactionTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  transactionSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  transactionRight: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  transactionAmount: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.text,
+  },
+  transactionAmountPositive: {
+    color: COLORS.success,
+  },
+  proofLoopBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: COLORS.amberBright,
+    borderRadius: 10,
+  },
+  proofLoopText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.amberBright,
+  },
+  bottomSpacer: {
+    height: 32,
+  },
+});
+
+export default WalletScreen;

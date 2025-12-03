@@ -1,0 +1,44 @@
+appId: com.travelmatch.app
+---
+# Offline/Online Transition Flow Test
+# Tests app behavior when network connectivity changes
+
+- launchApp
+
+# Navigate to app
+- tapOn: "Skip"
+- tapOn: "Üye olmadan devam et"
+- assertVisible: "Discover"
+
+# Step 1: Verify initial online state
+- scroll:
+    direction: DOWN
+    speed: 50
+
+# Pull to refresh (tests network calls)
+- scroll:
+    direction: DOWN
+    start: 50%, 20%
+    end: 50%, 80%
+    speed: 100
+
+# Step 2: Navigate through different screens
+- tapOn: "Social"
+- assertVisible: "Explore"
+
+- tapOn: "Activity"
+- assertVisible: "Activity"
+
+# Step 3: Test Profile screen offline
+- tapOn: "Profile"
+- assertVisible: "Profile"
+- scroll:
+    direction: DOWN
+
+# Step 4: Return to home
+- tapOn: "Home"
+- assertVisible: "Discover"
+
+# App should handle network transitions gracefully
+# Note: Actual network toggling requires device control
+# This tests the UI remains stable with cached data

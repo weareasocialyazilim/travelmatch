@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS, CARD_SHADOW } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import Loading from '../components/Loading';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import { LoadingState } from '../components/LoadingState';
 
 type PhoneAuthScreenProps = StackScreenProps<RootStackParamList, 'PhoneAuth'>;
 
@@ -53,7 +53,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      navigation.replace('Home'); // Navigate to home on success
+      navigation.replace('Discover'); // Navigate to discover on success
     }, 1000);
   };
 
@@ -136,7 +136,9 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
         {otp.map((digit, index) => (
           <TextInput
             key={index}
-            ref={(ref) => (otpInputs.current[index] = ref)}
+            ref={(ref) => {
+              otpInputs.current[index] = ref;
+            }}
             style={styles.otpInput}
             value={digit}
             onChangeText={(value) => handleOtpChange(value, index)}
@@ -183,9 +185,9 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {loading && (
-        <Loading
-          mode="overlay"
-          text={step === 'phone' ? 'Sending...' : 'Verifying...'}
+        <LoadingState
+          type="overlay"
+          message={step === 'phone' ? 'Sending...' : 'Verifying...'}
         />
       )}
       <KeyboardAvoidingView
@@ -209,7 +211,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
                 {/* Üye olmadan devam et butonu */}
                 <TouchableOpacity
                   style={styles.continueWithoutSignupButton}
-                  onPress={() => navigation.replace('Home')}
+                  onPress={() => navigation.replace('Discover')}
                   activeOpacity={0.85}
                 >
                   <LinearGradient

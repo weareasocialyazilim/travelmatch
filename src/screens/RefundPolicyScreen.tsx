@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type RefundPolicyScreenProps = StackScreenProps<
   RootStackParamList,
@@ -119,7 +119,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Icon name="close-circle" size={24} color={COLORS.gray} />
+            <Icon name="close-circle" size={24} color={COLORS.gray[400]} />
             <Text style={styles.sectionTitle}>Not Eligible for Refund</Text>
           </View>
           <View style={styles.bulletList}>
@@ -244,7 +244,10 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
             Our support team is here to help you with any refund questions or
             concerns.
           </Text>
-          <TouchableOpacity style={styles.contactButton}>
+          <TouchableOpacity 
+            style={styles.contactButton}
+            onPress={() => navigation.navigate('Support')}
+          >
             <Icon name="message-text" size={20} color={COLORS.white} />
             <Text style={styles.contactButtonText}>Contact Support</Text>
           </TouchableOpacity>
@@ -295,7 +298,7 @@ const styles = StyleSheet.create({
   },
   contactSection: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray,
+    backgroundColor: COLORS.gray[100],
     borderRadius: 16,
     marginHorizontal: 16,
     padding: 32,

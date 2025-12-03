@@ -31,7 +31,10 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
+.env.development
+.env.production
 
 # typescript
 *.tsbuildinfo
@@ -42,3 +45,7 @@ yarn-error.*
 
 # Log files
 *.log
+
+# Maestro E2E test results
+.maestro/results/
+.maestro/.maestro/

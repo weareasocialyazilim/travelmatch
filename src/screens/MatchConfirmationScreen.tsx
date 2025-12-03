@@ -9,14 +9,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import type { RouteProp, NavigationProp } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import { COLORS } from '../constants/colors';
 import { spacing } from '../constants/spacing';
 import { radii } from '../constants/radii';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SHADOWS } from '../constants/shadows';
-import Loading from '../components/Loading';
+import { LoadingState } from '../components/LoadingState';
 
 type MatchConfirmationScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -24,7 +25,7 @@ type MatchConfirmationScreenRouteProp = RouteProp<
 >;
 
 const MatchConfirmationScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<MatchConfirmationScreenRouteProp>();
   const { selectedGivers } = route.params;
   const [loading, setLoading] = useState(false);
@@ -33,13 +34,13 @@ const MatchConfirmationScreen: React.FC = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      navigation.navigate('Home');
+      navigation.navigate('Discover');
     }, 1500);
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {loading && <Loading text="Confirming..." mode="overlay" />}
+      {loading && <LoadingState type="overlay" message="Confirming..." />}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <MaterialCommunityIcons

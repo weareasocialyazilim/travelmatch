@@ -1,3 +1,6 @@
+/**
+ * Format Helpers
+ */
 export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('tr-TR', {
     year: 'numeric',
@@ -13,8 +16,11 @@ export const formatTime = (date: Date): string => {
   });
 };
 
-export const formatCurrency = (amount: number): string => {
-  return `$${amount.toFixed(2)}`;
+export const formatCurrency = (amount: number, currency = 'USD'): string => {
+  return new Intl.NumberFormat('tr-TR', {
+    style: 'currency',
+    currency,
+  }).format(amount);
 };
 
 export const truncateText = (text: string, maxLength: number): string => {
@@ -22,6 +28,9 @@ export const truncateText = (text: string, maxLength: number): string => {
   return text.substring(0, maxLength) + '...';
 };
 
+/**
+ * Validation Helpers
+ */
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);

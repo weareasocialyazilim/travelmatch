@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ConfirmGiftModal } from './ConfirmGiftModal';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
-import { MomentData } from '../types';
+import type { MomentData } from '../types';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.85;
@@ -83,14 +83,6 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
     }),
   ).current;
 
-  useEffect(() => {
-    if (visible && moment) {
-      openSheet();
-    } else if (!visible) {
-      closeSheet();
-    }
-  }, [visible, moment, openSheet, closeSheet]);
-
   const openSheet = useCallback(() => {
     Animated.parallel([
       Animated.spring(translateY, {
@@ -125,6 +117,14 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
       onClose();
     });
   }, [backdropOpacity, onClose, translateY]);
+
+  useEffect(() => {
+    if (visible && moment) {
+      openSheet();
+    } else if (!visible) {
+      closeSheet();
+    }
+  }, [visible, moment, openSheet, closeSheet]);
 
   if (!moment) return null;
 
@@ -209,10 +209,12 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                   color={COLORS.textSecondary}
                 />
                 <Text style={styles.previewMetaText}>
-                  {formatDateRange(
-                    moment.dateRange.start,
-                    moment.dateRange.end,
-                  )}
+                  {moment.dateRange
+                    ? formatDateRange(
+                        moment.dateRange.start,
+                        moment.dateRange.end,
+                      )
+                    : 'Available now'}
                 </Text>
               </View>
             </View>
@@ -404,8 +406,174 @@ const styles = StyleSheet.create({
   backdropTouch: {
     flex: 1,
   },
+  sheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: SHEET_HEIGHT,
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  handleContainer: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  handle: {
+    width: 36,
+    height: 4,
+    backgroundColor: COLORS.lightGray,
+    borderRadius: 2,
+  },
   content: {
     flex: 1,
+    paddingHorizontal: 20,
+  },
+  previewSection: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  previewImageContainer: {
+    position: 'relative',
+  },
+  previewImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+  },
+  previewBadge: {
+    position: 'absolute',
+    bottom: 4,
+    left: 4,
+    right: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 4,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+  },
+  previewBadgeText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  previewInfo: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  previewTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 6,
+  },
+  previewMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  previewMetaText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginLeft: 4,
+  },
+  directPayNotice: {
+    backgroundColor: COLORS.successLight,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  protectionNotice: {
+    backgroundColor: COLORS.mintTransparentLight,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  protectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  protectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginLeft: 8,
+  },
+  protectionText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 18,
+  },
+  paymentInfo: {
+    backgroundColor: COLORS.gray[100],
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  paymentRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  paymentLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  paymentValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  paymentDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 8,
+  },
+  paymentTotal: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  paymentMethodSection: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 12,
+  },
+  paymentMethods: {
+    gap: 10,
+  },
+  paymentMethodButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.gray[100],
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: COLORS.transparent,
+  },
+  paymentMethodSelected: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.mintTransparentLight,
+  },
+  paymentMethodText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginLeft: 12,
+  },
+  paymentMethodTextSelected: {
+    color: COLORS.text,
+  },
+  ctaSection: {
+    paddingVertical: 20,
   },
   ctaButton: {
     alignItems: 'center',

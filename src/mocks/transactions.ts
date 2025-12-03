@@ -1,4 +1,4 @@
-import { Transaction } from '../types/domain';
+import type { Transaction } from '../types/domain';
 
 export const MOCK_TRANSACTIONS: Transaction[] = [
   {

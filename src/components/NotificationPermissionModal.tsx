@@ -8,7 +8,8 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { logger } from '@/utils/logger';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
@@ -28,10 +29,10 @@ export const NotificationPermissionModal: React.FC<
     // Request notification permissions
     if (Platform.OS === 'ios') {
       // iOS permission request
-      console.log('Requesting iOS notifications');
+      logger.info('Requesting iOS notifications');
     } else {
       // Android permission request
-      console.log('Requesting Android notifications');
+      logger.info('Requesting Android notifications');
     }
     onAllow();
   };

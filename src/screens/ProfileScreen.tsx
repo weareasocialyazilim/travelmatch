@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,546 +6,265 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
+  FlatList,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import BottomNav from '../components/BottomNav';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const AVATAR_SIZE = 90;
+const MOMENT_CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
+
+// Mock moments data
+const MOCK_MOMENTS = [
+  { id: '1', title: 'Coffee Tour', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400', price: 25, isActive: true },
+  { id: '2', title: 'Street Food Walk', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400', price: 40, isActive: true },
+  { id: '3', title: 'Art Gallery Visit', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400', price: 30, isActive: true },
+  { id: '4', title: 'Jazz Night', image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400', price: 35, isActive: false },
+  { id: '5', title: 'Wine Tasting', image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400', price: 55, isActive: false },
+];
 
 const ProfileScreen: React.FC = () => {
-  const [trustLevel] = useState<'Sprout' | 'Growing' | 'Blooming'>('Blooming');
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
 
+  // Mock user data
   const userData = {
-    name: 'Emma Chen',
-    avatar:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-    type: 'Traveler' as const,
-    city: 'San Francisco',
-    bio: 'Coffee enthusiast, street food explorer. Discovering hidden gems around the world.',
-    memberSince: 'January 2024',
-    verifiedGestures: 28,
-    completedMoments: 12,
-    activeMoments: 2,
-    verifiedMoments: 10,
-    draftMoments: 0,
-    // Money IN - What you received
-    availableBalance: 70.0,
-    totalReceived: 70.0,
-    // Money OUT - What you gave
-    totalGiven: 40.0,
-    // Escrow - Only for proof-required moments (>$VALUES.ESCROW_DIRECT_MAX)
-    escrowIncoming: 45.0, // Coming to you (pending proof) - örn: $45 değerinde 1 moment proof bekliyor
-    escrowOutgoing: 35.0, // Sent by you (pending proof from recipient) - örn: $35 değerinde 1 moment gönderdin, proof bekleniyor
-    connectedAccounts: {
-      instagram: '@emmachen',
-      x: null, // Not connected
-    },
+    name: 'Sophia Carter',
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+    isVerified: true,
+    location: 'San Francisco, CA',
+    trustScore: 92,
+    momentsCount: 28,
+    exchangesCount: 156,
+    responseRate: 98,
+    activeMoments: 5,
+    completedMoments: 23,
+    walletBalance: 1250.00,
+    giftsCount: 12,
+    savedCount: 8,
   };
 
-  // Escrow hesaplamasını güvenli yap - NaN hatalarını önler
-  const totalEscrow = useMemo(() => {
-    const incoming =
-      typeof userData.escrowIncoming === 'number' ? userData.escrowIncoming : 0;
-    const outgoing =
-      typeof userData.escrowOutgoing === 'number' ? userData.escrowOutgoing : 0;
-    return incoming + outgoing;
-  }, [userData.escrowIncoming, userData.escrowOutgoing]);
+  // Navigation handlers
+  const handleEditProfile = () => navigation.navigate('EditProfile');
+  const handleMyMoments = () => navigation.navigate('MyMoments');
+  const handleTrustGarden = () => navigation.navigate('TrustGardenDetail');
+  const handleSettings = () => navigation.navigate('AppSettings');
+  const handleWallet = () => navigation.navigate('Wallet');
+  const handleMyGifts = () => navigation.navigate('MyGifts');
+  const handleSaved = () => navigation.navigate('SavedMoments');
 
-  const handleLogout = () => {
-    Alert.alert('Sign out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign out',
-        style: 'destructive',
-        onPress: () => {
-          // Handle logout - placeholder for future implementation
-        },
-      },
-    ]);
-  };
+  const activeMoments = MOCK_MOMENTS.filter(m => m.isActive);
+  const pastMoments = MOCK_MOMENTS.filter(m => !m.isActive);
+  const displayedMoments = activeTab === 'active' ? activeMoments : pastMoments;
+
+  const renderMomentCard = ({ item }: { item: typeof MOCK_MOMENTS[0] }) => (
+    <TouchableOpacity 
+      style={styles.momentCard} 
+      activeOpacity={0.8}
+      onPress={() => navigation.navigate('MomentDetail', { 
+        moment: { 
+          id: item.id, 
+          title: item.title, 
+          imageUrl: item.image, 
+          price: item.price 
+        } as any 
+      })}
+    >
+      <Image source={{ uri: item.image }} style={styles.momentImage} />
+      <View style={styles.momentInfo}>
+        <Text style={styles.momentTitle} numberOfLines={1}>{item.title}</Text>
+        <Text style={styles.momentPrice}>${item.price}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={styles.container} edges={['top']}>
-        {/* Header with Settings */}
+        {/* Header */}
         <View style={styles.header}>
+          <View style={styles.headerSpacer} />
           <Text style={styles.headerTitle}>Profile</Text>
-          <TouchableOpacity style={styles.settingsButton}>
-            <MaterialCommunityIcons
-              name="cog-outline"
-              size={24}
-              color={COLORS.text}
-            />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity 
+              style={styles.headerButton} 
+              onPress={handleEditProfile}
+            >
+              <MaterialCommunityIcons name="pencil-outline" size={22} color={COLORS.text} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.headerButton} 
+              onPress={handleSettings}
+            >
+              <MaterialCommunityIcons name="cog-outline" size={22} color={COLORS.text} />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* 1) Header Section - Ultra-clear & personality first */}
-          <View style={styles.profileHeader}>
-            <View style={styles.avatarContainer}>
-              <Image source={{ uri: userData.avatar }} style={styles.avatar} />
-              <View style={styles.verifiedBadge}>
-                <MaterialCommunityIcons
-                  name="check"
-                  size={14}
-                  color={COLORS.white}
-                />
-              </View>
-            </View>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Profile Info Section */}
+          <View style={styles.profileSection}>
+            {/* Avatar */}
+            <TouchableOpacity 
+              style={styles.avatarWrapper} 
+              onPress={handleEditProfile}
+              activeOpacity={0.9}
+            >
+              <Image source={{ uri: userData.avatarUrl }} style={styles.avatar} />
+              {userData.isVerified && (
+                <View style={styles.verifiedBadge}>
+                  <MaterialCommunityIcons name="check-decagram" size={22} color={COLORS.mint} />
+                </View>
+              )}
+            </TouchableOpacity>
 
+            {/* Name & Location */}
             <Text style={styles.userName}>{userData.name}</Text>
-
-            <View style={styles.userMeta}>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>✈️ {userData.type}</Text>
-              </View>
-              <Text style={styles.cityText}>{userData.city}</Text>
+            <View style={styles.locationRow}>
+              <MaterialCommunityIcons name="map-marker" size={16} color={COLORS.textSecondary} />
+              <Text style={styles.locationText}>{userData.location}</Text>
             </View>
 
-            <Text style={styles.bio}>{userData.bio}</Text>
-          </View>
-
-          {/* 2) Trust Garden - Emotional Proof */}
-          <View style={styles.trustCard}>
-            <View style={styles.trustIconContainer}>
-              <MaterialCommunityIcons
-                name={
-                  trustLevel === 'Blooming'
-                    ? 'flower'
-                    : trustLevel === 'Growing'
-                    ? 'leaf'
-                    : 'seed'
-                }
-                size={24}
-                color={COLORS.mint}
-              />
-            </View>
-
-            <Text style={styles.trustTitle}>Trust Garden</Text>
-            <Text style={styles.trustLevel}>{trustLevel}</Text>
-
-            <Text style={styles.trustSummary}>
-              {userData.verifiedGestures} Verified Gestures ·{' '}
-              {userData.completedMoments} Completed Moments
-            </Text>
-          </View>
-
-          {/* 3) My Moments */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>MY MOMENTS</Text>
-
-            <TouchableOpacity style={styles.momentTile}>
-              <View style={styles.momentIcon}>
-                <MaterialCommunityIcons
-                  name="lightning-bolt"
-                  size={20}
-                  color={COLORS.coral}
-                />
-              </View>
-              <View style={styles.momentContent}>
-                <Text style={styles.momentLabel}>Active Moments</Text>
-                <Text style={styles.momentDescription}>
-                  Visible to supporters right now
-                </Text>
-              </View>
-              <Text style={styles.momentCount}>{userData.activeMoments}</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
+            {/* ProofScore Badge */}
+            <TouchableOpacity style={styles.proofScoreBadge} onPress={handleTrustGarden}>
+              <MaterialCommunityIcons name="shield-check" size={16} color={COLORS.mint} />
+              <Text style={styles.proofScoreText}>
+                ProofScore {userData.trustScore}%
+              </Text>
+              <MaterialCommunityIcons name="chevron-right" size={16} color={COLORS.mint} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.momentTile}>
-              <View style={styles.momentIcon}>
-                <MaterialCommunityIcons
-                  name="check-circle"
-                  size={20}
-                  color={COLORS.mint}
-                />
-              </View>
-              <View style={styles.momentContent}>
-                <Text style={styles.momentLabel}>Verified Moments</Text>
-                <Text style={styles.momentDescription}>
-                  Successfully completed with proof
-                </Text>
-              </View>
-              <Text style={styles.momentCount}>{userData.verifiedMoments}</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-
-            {userData.draftMoments > 0 && (
-              <TouchableOpacity style={styles.momentTile}>
-                <View style={styles.momentIcon}>
-                  <MaterialCommunityIcons
-                    name="file-document-outline"
-                    size={20}
-                    color={COLORS.softGray}
-                  />
-                </View>
-                <View style={styles.momentContent}>
-                  <Text style={styles.momentLabel}>Drafts</Text>
-                  <Text style={styles.momentDescription}>
-                    Saved but not published yet
-                  </Text>
-                </View>
-                <Text style={styles.momentCount}>{userData.draftMoments}</Text>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={20}
-                  color={COLORS.softGray}
-                />
+            {/* Stats Row */}
+            <View style={styles.statsRow}>
+              <TouchableOpacity style={styles.statItem} onPress={handleMyMoments}>
+                <Text style={styles.statNumber}>{userData.momentsCount}</Text>
+                <Text style={styles.statLabel}>Moments</Text>
               </TouchableOpacity>
-            )}
-          </View>
-
-          {/* 4) Wallet & Payments - Modern Card Design */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>WALLET & PAYMENTS</Text>
-
-            {/* Balance Card - Hero */}
-            <View style={styles.balanceHeroCard}>
-              <View style={styles.balanceContent}>
-                <Text style={styles.balanceLabel}>Available Balance</Text>
-                <Text style={styles.balanceAmount}>
-                  ${userData.availableBalance.toFixed(2)}
-                </Text>
-              </View>
-              <TouchableOpacity style={styles.withdrawButton}>
-                <Text style={styles.withdrawButtonText}>Withdraw</Text>
-                <MaterialCommunityIcons
-                  name="arrow-right"
-                  size={16}
-                  color={COLORS.white}
-                />
+              <View style={styles.statDivider} />
+              <TouchableOpacity style={styles.statItem} onPress={handleMyGifts}>
+                <Text style={styles.statNumber}>{userData.exchangesCount}</Text>
+                <Text style={styles.statLabel}>Exchanges</Text>
               </TouchableOpacity>
-            </View>
-
-            {/* Money Flow Cards - 2 Column Grid */}
-            <View style={styles.moneyFlowGrid}>
-              {/* Received Card */}
-              <View style={styles.moneyFlowCard}>
-                <View style={[styles.moneyFlowIcon, styles.moneyFlowIconGreen]}>
-                  <MaterialCommunityIcons
-                    name="arrow-down"
-                    size={16}
-                    color={COLORS.success}
-                  />
-                </View>
-                <Text style={styles.moneyFlowLabel}>Received</Text>
-                <Text style={styles.moneyFlowAmount}>
-                  ${userData.totalReceived.toFixed(2)}
-                </Text>
-              </View>
-
-              {/* Given Card */}
-              <View style={styles.moneyFlowCard}>
-                <View style={[styles.moneyFlowIcon, styles.moneyFlowIconRed]}>
-                  <MaterialCommunityIcons
-                    name="arrow-up"
-                    size={16}
-                    color={COLORS.coral}
-                  />
-                </View>
-                <Text style={styles.moneyFlowLabel}>Given</Text>
-                <Text style={styles.moneyFlowAmount}>
-                  ${userData.totalGiven.toFixed(2)}
-                </Text>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>{userData.responseRate}%</Text>
+                <Text style={styles.statLabel}>Response</Text>
               </View>
             </View>
-
-            {/* Escrow Card - If there's money in escrow and total > $VALUES.ESCROW_DIRECT_MAX */}
-            {totalEscrow > VALUES.ESCROW_DIRECT_MAX && (
-              <View style={styles.escrowCard}>
-                <View style={styles.escrowHeader}>
-                  <View style={styles.escrowIconContainer}>
-                    <MaterialCommunityIcons
-                      name="shield-lock"
-                      size={18}
-                      color={COLORS.softOrange}
-                    />
-                  </View>
-                  <View style={styles.escrowHeaderText}>
-                    <Text style={styles.escrowTitle}>In Escrow</Text>
-                    <Text style={styles.escrowSubtitle}>
-                      Pending verification
-                    </Text>
-                  </View>
-                  <Text style={styles.escrowTotal}>
-                    ${totalEscrow.toFixed(2)}
-                  </Text>
-                </View>
-
-                {userData.escrowIncoming > 0 && (
-                  <View style={styles.escrowDetail}>
-                    <View
-                      style={[
-                        styles.escrowDetailDot,
-                        { backgroundColor: COLORS.mint },
-                      ]}
-                    />
-                    <Text style={styles.escrowDetailLabel}>Incoming</Text>
-                    <Text style={styles.escrowDetailValue}>
-                      ${userData.escrowIncoming.toFixed(2)}
-                    </Text>
-                  </View>
-                )}
-
-                {userData.escrowOutgoing > 0 && (
-                  <View style={styles.escrowDetail}>
-                    <View
-                      style={[
-                        styles.escrowDetailDot,
-                        { backgroundColor: COLORS.coral },
-                      ]}
-                    />
-                    <Text style={styles.escrowDetailLabel}>Outgoing</Text>
-                    <Text style={styles.escrowDetailValue}>
-                      ${userData.escrowOutgoing.toFixed(2)}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
-
-            {/* Payment Settings */}
-            <TouchableOpacity style={styles.listItem}>
-              <MaterialCommunityIcons
-                name="credit-card-outline"
-                size={20}
-                color={COLORS.text}
-              />
-              <Text style={styles.listItemLabel}>Payment Methods</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.listItem}>
-              <MaterialCommunityIcons
-                name="bank-outline"
-                size={20}
-                color={COLORS.text}
-              />
-              <Text style={styles.listItemLabel}>Payout Settings</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
           </View>
 
-          {/* 5) Security - Premium & Logical */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>SECURITY</Text>
-
-            <TouchableOpacity style={styles.listItem}>
-              <MaterialCommunityIcons
-                name="shield-check-outline"
-                size={20}
-                color={COLORS.mint}
-              />
-              <View style={styles.listItemContent}>
-                <Text style={styles.listItemLabel}>KYC Verification</Text>
-                <Text style={styles.listItemDescription}>
-                  Your identity is secured.
-                </Text>
+          {/* Wallet Card */}
+          <TouchableOpacity style={styles.walletCard} onPress={handleWallet}>
+            <View style={styles.walletLeft}>
+              <View style={styles.walletIconWrapper}>
+                <MaterialCommunityIcons name="wallet" size={24} color={COLORS.mint} />
               </View>
-              <View style={styles.verifiedTag}>
-                <Text style={styles.verifiedTagText}>Verified</Text>
+              <View>
+                <Text style={styles.walletLabel}>Wallet</Text>
+                <Text style={styles.walletBalance}>${userData.walletBalance.toFixed(2)}</Text>
               </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.listItem}>
-              <MaterialCommunityIcons
-                name="shield-lock-outline"
-                size={20}
-                color={COLORS.text}
-              />
-              <View style={styles.listItemContent}>
-                <Text style={styles.listItemLabel}>
-                  Two-Factor Authentication
-                </Text>
-                <Text style={styles.listItemDescription}>
-                  Protect your account with an extra layer.
-                </Text>
-              </View>
-              <Text style={styles.listItemValue}>On</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* 6) Connected Accounts - Social Proof */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>CONNECTED ACCOUNTS</Text>
-
-            <TouchableOpacity style={styles.socialItem}>
-              <View style={styles.socialIconContainer}>
-                <MaterialCommunityIcons
-                  name="instagram"
-                  size={20}
-                  color={COLORS.instagram}
-                />
-              </View>
-              <View style={styles.listItemContent}>
-                <Text style={styles.listItemLabel}>Instagram</Text>
-                {userData.connectedAccounts.instagram ? (
-                  <Text style={styles.listItemDescription}>
-                    {userData.connectedAccounts.instagram}
-                  </Text>
-                ) : (
-                  <Text style={styles.listItemDescription}>
-                    Connect your account
-                  </Text>
-                )}
-              </View>
-              {userData.connectedAccounts.instagram ? (
-                <View style={styles.connectedTag}>
-                  <Text style={styles.connectedTagText}>Connected</Text>
-                </View>
-              ) : (
-                <Text style={styles.connectText}>Connect</Text>
-              )}
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.socialItem}>
-              <View style={styles.socialIconContainer}>
-                <Text style={styles.xLogo}>𝕏</Text>
-              </View>
-              <View style={styles.listItemContent}>
-                <Text style={styles.listItemLabel}>X (Twitter)</Text>
-                {userData.connectedAccounts.x ? (
-                  <Text style={styles.listItemDescription}>
-                    {userData.connectedAccounts.x}
-                  </Text>
-                ) : (
-                  <Text style={styles.listItemDescription}>
-                    Connect your account
-                  </Text>
-                )}
-              </View>
-              {userData.connectedAccounts.x ? (
-                <View style={styles.connectedTag}>
-                  <Text style={styles.connectedTagText}>Connected</Text>
-                </View>
-              ) : (
-                <Text style={styles.connectText}>Connect</Text>
-              )}
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* 7) Settings - Minimal & Essential */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>SETTINGS</Text>
-
-            <TouchableOpacity style={styles.listItem}>
-              <MaterialCommunityIcons
-                name="bell-outline"
-                size={20}
-                color={COLORS.text}
-              />
-              <View style={styles.listItemContent}>
-                <Text style={styles.listItemLabel}>Notifications</Text>
-                <Text style={styles.listItemDescription}>
-                  Edit alerts & reminders
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.listItem}>
-              <MaterialCommunityIcons
-                name="eye-off-outline"
-                size={20}
-                color={COLORS.text}
-              />
-              <View style={styles.listItemContent}>
-                <Text style={styles.listItemLabel}>Privacy</Text>
-                <Text style={styles.listItemDescription}>
-                  Control visibility & data
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.listItem}>
-              <MaterialCommunityIcons
-                name="translate"
-                size={20}
-                color={COLORS.text}
-              />
-              <View style={styles.listItemContent}>
-                <Text style={styles.listItemLabel}>Language</Text>
-              </View>
-              <Text style={styles.listItemValue}>English</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* 7) Logout + Member Since */}
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <MaterialCommunityIcons
-              name="logout"
-              size={20}
-              color={COLORS.coral}
-            />
-            <Text style={styles.logoutText}>Sign Out</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
           </TouchableOpacity>
 
-          <Text style={styles.memberSince}>
-            Member since {userData.memberSince}
-          </Text>
+          {/* Quick Links */}
+          <View style={styles.quickLinks}>
+            <TouchableOpacity style={styles.quickLink} onPress={handleMyGifts}>
+              <View style={styles.quickLinkLeft}>
+                <MaterialCommunityIcons name="gift-outline" size={22} color={COLORS.softOrange} />
+                <Text style={styles.quickLinkText}>My Gifts</Text>
+              </View>
+              <View style={styles.quickLinkRight}>
+                <Text style={styles.quickLinkCount}>{userData.giftsCount}</Text>
+                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textSecondary} />
+              </View>
+            </TouchableOpacity>
+            <View style={styles.quickLinkDivider} />
+            <TouchableOpacity style={styles.quickLink} onPress={handleSaved}>
+              <View style={styles.quickLinkLeft}>
+                <MaterialCommunityIcons name="bookmark-outline" size={22} color={COLORS.coral} />
+                <Text style={styles.quickLinkText}>Saved</Text>
+              </View>
+              <View style={styles.quickLinkRight}>
+                <Text style={styles.quickLinkCount}>{userData.savedCount}</Text>
+                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textSecondary} />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* Moments Tabs */}
+          <View style={styles.tabsContainer}>
+            <TouchableOpacity 
+              style={[styles.tab, activeTab === 'active' && styles.tabActive]}
+              onPress={() => setActiveTab('active')}
+            >
+              <MaterialCommunityIcons 
+                name="map-marker-star" 
+                size={18} 
+                color={activeTab === 'active' ? COLORS.mint : COLORS.textSecondary} 
+              />
+              <Text style={[styles.tabText, activeTab === 'active' && styles.tabTextActive]}>
+                Active ({userData.activeMoments})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.tab, activeTab === 'past' && styles.tabActive]}
+              onPress={() => setActiveTab('past')}
+            >
+              <MaterialCommunityIcons 
+                name="history" 
+                size={18} 
+                color={activeTab === 'past' ? COLORS.mint : COLORS.textSecondary} 
+              />
+              <Text style={[styles.tabText, activeTab === 'past' && styles.tabTextActive]}>
+                Past ({userData.completedMoments})
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Moments Grid */}
+          <View style={styles.momentsGrid}>
+            {displayedMoments.length > 0 ? (
+              <FlatList
+                data={displayedMoments}
+                renderItem={renderMomentCard}
+                keyExtractor={item => item.id}
+                numColumns={2}
+                scrollEnabled={false}
+                columnWrapperStyle={styles.momentRow}
+                contentContainerStyle={styles.momentsContent}
+              />
+            ) : (
+              <View style={styles.emptyState}>
+                <MaterialCommunityIcons 
+                  name={activeTab === 'active' ? 'map-marker-plus' : 'history'} 
+                  size={48} 
+                  color={COLORS.softGray} 
+                />
+                <Text style={styles.emptyText}>
+                  {activeTab === 'active' 
+                    ? 'No active moments yet' 
+                    : 'No past moments'
+                  }
+                </Text>
+                {activeTab === 'active' && (
+                  <TouchableOpacity style={styles.createButton}>
+                    <Text style={styles.createButtonText}>Create Moment</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
 
           <View style={styles.bottomSpacer} />
         </ScrollView>
@@ -557,442 +276,325 @@ const ProfileScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  avatar: {
-    borderRadius: 40,
-    height: 80,
-    width: 80,
-  },
-  avatarContainer: {
-    marginBottom: 12,
-    position: 'relative',
-  },
-  badge: {
-    backgroundColor: COLORS.mint,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  badgeText: {
-    color: COLORS.text,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  balanceAmount: {
-    color: COLORS.text,
-    fontSize: 32,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  balanceContent: {
+  wrapper: {
     flex: 1,
-  },
-  balanceHeroCard: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.mint,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    elevation: 2,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-    padding: 14,
-    shadowColor: COLORS.mint,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  balanceLabel: {
-    color: COLORS.textSecondary,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-  },
-  bio: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'center',
-  },
-  bottomSpacer: {
-    height: 100,
-  },
-  cityText: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-  },
-  connectText: {
-    color: COLORS.coral,
-    fontSize: 14,
-    fontWeight: '600',
-    marginRight: 4,
-  },
-  connectedTag: {
-    backgroundColor: COLORS.mintTransparentDark,
-    borderRadius: 8,
-    marginRight: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  connectedTagText: {
-    color: COLORS.mint,
-    fontSize: 12,
-    fontWeight: '600',
+    backgroundColor: COLORS.background,
   },
   container: {
     flex: 1,
   },
-  divider: {
-    backgroundColor: COLORS.border,
-    height: 1,
-    marginLeft: 32,
-  },
-  escrowCard: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginBottom: 12,
-    padding: 14,
-  },
-  escrowDetail: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 8,
-    paddingVertical: 6,
-  },
-  escrowDetailDot: {
-    borderRadius: 3,
-    height: 6,
-    marginRight: 10,
-    width: 6,
-  },
-  escrowDetailLabel: {
-    color: COLORS.textSecondary,
-    flex: 1,
-    fontSize: 13,
-  },
-  escrowDetailValue: {
-    color: COLORS.text,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  escrowHeader: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  escrowHeaderText: {
-    flex: 1,
-  },
-  escrowIconContainer: {
-    alignItems: 'center',
-    backgroundColor: COLORS.softOrangeTransparent,
-    borderRadius: 16,
-    height: 32,
-    justifyContent: 'center',
-    marginRight: 10,
-    width: 32,
-  },
-  escrowSubtitle: {
-    color: COLORS.textSecondary,
-    fontSize: 12,
-  },
-  escrowTitle: {
-    color: COLORS.text,
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  escrowTotal: {
-    color: COLORS.text,
-    fontSize: 18,
-    fontWeight: '700',
-  },
   header: {
-    alignItems: 'center',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: COLORS.background,
+  },
+  headerSpacer: {
+    width: 80,
   },
   headerTitle: {
-    color: COLORS.text,
-    fontSize: 32,
-    fontWeight: '700',
-  },
-  listItem: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 12,
-    paddingVertical: 12,
-  },
-  listItemContent: {
-    flex: 1,
-  },
-  listItemDescription: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  listItemLabel: {
-    color: COLORS.text,
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  listItemValue: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    marginRight: 4,
-  },
-  logoutButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.coralTransparentLight,
-    borderRadius: 12,
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    marginBottom: 16,
-    marginHorizontal: 20,
-    paddingVertical: 14,
-  },
-  logoutText: {
-    color: COLORS.coral,
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '600',
+    color: COLORS.text,
   },
-  memberSince: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-    marginBottom: 24,
-    textAlign: 'center',
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
-  momentContent: {
+  headerButton: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scrollView: {
     flex: 1,
   },
-  momentCount: {
-    color: COLORS.text,
-    fontSize: 20,
-    fontWeight: '700',
-    marginRight: 8,
-  },
-  momentDescription: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  momentIcon: {
-    alignItems: 'center',
-    backgroundColor: COLORS.mintTransparent,
+
+  // Profile Section
+  profileSection: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: 16,
     borderRadius: 20,
-    height: 40,
-    justifyContent: 'center',
-    marginRight: 12,
-    width: 40,
-  },
-  momentLabel: {
-    color: COLORS.text,
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  momentTile: {
+    padding: 24,
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    elevation: 1,
-    flexDirection: 'row',
-    marginBottom: 8,
-    padding: 16,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 3,
-  },
-  moneyFlowAmount: {
-    color: COLORS.text,
-    fontSize: 24,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  moneyFlowCard: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    elevation: 1,
-    flex: 1,
-    padding: 12,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 3,
-  },
-  moneyFlowGrid: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 12,
-  },
-  moneyFlowIcon: {
-    alignItems: 'center',
-    borderRadius: 16,
-    height: 32,
-    justifyContent: 'center',
-    marginBottom: 8,
-    width: 32,
-  },
-  moneyFlowIconGreen: {
-    backgroundColor: COLORS.mintTransparentLight,
-  },
-  moneyFlowIconRed: {
-    backgroundColor: COLORS.coralTransparent,
-  },
-  moneyFlowLabel: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  profileHeader: {
-    alignItems: 'center',
-    paddingBottom: 24,
-    paddingHorizontal: 20,
-  },
-  section: {
-    marginBottom: 32,
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    color: COLORS.textSecondary,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    marginBottom: 12,
-    textTransform: 'uppercase',
-  },
-  settingsButton: {
-    alignItems: 'center',
-    height: 40,
-    justifyContent: 'center',
-    width: 40,
-  },
-  socialIconContainer: {
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderRadius: 16,
-    height: 32,
-    justifyContent: 'center',
-    width: 32,
-  },
-  socialItem: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 12,
-    paddingVertical: 12,
-  },
-  trustCard: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    elevation: 2,
-    marginBottom: 24,
-    marginHorizontal: 20,
-    padding: 20,
-    shadowColor: COLORS.black,
-    shadowOffset: LAYOUT.shadowOffset.sm,
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowRadius: 12,
+    elevation: 3,
   },
-  trustIconContainer: {
-    alignItems: 'center',
-    backgroundColor: COLORS.mintTransparent,
-    borderRadius: 24,
-    height: 48,
-    justifyContent: 'center',
-    marginBottom: 12,
-    width: 48,
+  avatarWrapper: {
+    position: 'relative',
+    marginBottom: 16,
   },
-  trustLevel: {
-    color: COLORS.text,
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  trustSummary: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: 'center',
-  },
-  trustTitle: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  userMeta: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 8,
-  },
-  userName: {
-    color: COLORS.text,
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
+  avatar: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
+    borderWidth: 3,
+    borderColor: COLORS.white,
   },
   verifiedBadge: {
-    alignItems: 'center',
-    backgroundColor: COLORS.mint,
-    borderColor: COLORS.background,
-    borderRadius: 12,
-    borderWidth: 2,
-    bottom: 0,
-    height: 24,
-    justifyContent: 'center',
     position: 'absolute',
+    bottom: 0,
     right: 0,
-    width: 24,
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 2,
   },
-  verifiedTag: {
-    backgroundColor: COLORS.mintTransparentDark,
-    borderRadius: 8,
-    marginRight: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  userName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
   },
-  verifiedTagText: {
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 16,
+  },
+  locationText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  proofScoreBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: COLORS.mintTransparent,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  proofScoreText: {
+    fontSize: 14,
+    fontWeight: '600',
     color: COLORS.mint,
+  },
+
+  // Stats Row
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  statLabel: {
     fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: COLORS.border,
+  },
+
+  // Wallet Card
+  walletCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.white,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  walletLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  walletIconWrapper: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.mintTransparent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  walletLabel: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginBottom: 2,
+  },
+  walletBalance: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+
+  // Quick Links
+  quickLinks: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: 16,
+    marginTop: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  quickLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  quickLinkLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  quickLinkText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: COLORS.text,
+  },
+  quickLinkRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  quickLinkCount: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  quickLinkDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginLeft: 50,
+  },
+
+  // Tabs
+  tabsContainer: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    marginTop: 20,
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  tabActive: {
+    backgroundColor: COLORS.white,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+  },
+  tabTextActive: {
+    color: COLORS.mint,
     fontWeight: '600',
   },
-  withdrawButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.mint,
-    borderRadius: 10,
-    flexDirection: 'row',
-    gap: 6,
-    justifyContent: 'center',
+
+  // Moments Grid
+  momentsGrid: {
     paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  momentsContent: {
+    gap: 12,
+  },
+  momentRow: {
+    gap: 12,
+  },
+  momentCard: {
+    width: MOMENT_CARD_WIDTH,
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  momentImage: {
+    width: '100%',
+    height: 120,
+  },
+  momentInfo: {
+    padding: 12,
+  },
+  momentTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  momentPrice: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.mint,
+  },
+
+  // Empty State
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  createButton: {
+    paddingHorizontal: 20,
     paddingVertical: 10,
+    backgroundColor: COLORS.mint,
+    borderRadius: 20,
   },
-  withdrawButtonText: {
+  createButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
     color: COLORS.white,
-    fontSize: 13,
-    fontWeight: '700',
   },
-  wrapper: {
-    backgroundColor: COLORS.background,
-    flex: 1,
-  },
-  xLogo: {
-    color: COLORS.black,
-    fontSize: 18,
-    fontWeight: '700',
+
+  bottomSpacer: {
+    height: 100,
   },
 });
 

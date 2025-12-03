@@ -8,12 +8,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS } from '../constants/colors';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { COLORS } from '@/constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+
+type IconName = React.ComponentProps<typeof Icon>['name'];
 
 interface Plan {
   id: string;
@@ -23,7 +25,7 @@ interface Plan {
   features: string[];
   popular?: boolean;
   color: string;
-  icon: string;
+  icon: IconName;
 }
 
 const PLANS: Plan[] = [
@@ -108,7 +110,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const handleSubscribe = (planId: string) => {
     // Implement subscription logic
-    console.log('Subscribe to:', planId);
+    console.log('Subscribe to plan', { planId });
   };
 
   const renderPlanCard = (plan: Plan) => {

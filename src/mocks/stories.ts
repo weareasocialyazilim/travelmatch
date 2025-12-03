@@ -1,4 +1,4 @@
-import { ProofStory } from '../types/domain';
+import type { ProofStory } from '../types/domain';
 
 export const MOCK_PROOF_STORY: ProofStory = {
   id: '1',

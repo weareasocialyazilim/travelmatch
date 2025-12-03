@@ -15,6 +15,8 @@ import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SHADOWS } from '../constants/shadows';
 
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
 interface ShareProofModalProps {
   visible: boolean;
   onClose: () => void;
@@ -22,7 +24,7 @@ interface ShareProofModalProps {
   proofUrl: string;
 }
 
-const socialPlatforms = [
+const socialPlatforms: { name: string; icon: IconName; color: string }[] = [
   { name: 'Instagram', icon: 'instagram', color: COLORS.instagram },
   { name: 'Facebook', icon: 'facebook', color: COLORS.info },
   { name: 'Twitter', icon: 'twitter', color: COLORS.twitter },
@@ -38,11 +40,20 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    // In a real app, you would use Clipboard API
-    console.log('Copied to clipboard:', proofUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+  const handleCopy = async () => {
+    try {
+      if (Platform.OS === 'web') {
+        await navigator.clipboard.writeText(proofUrl);
+      } else {
+        // For React Native, you would use @react-native-clipboard/clipboard
+        // For now, just simulate the copy
+        console.log('Copied to clipboard:', proofUrl);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
   };
 
   return (
@@ -134,7 +145,7 @@ const styles = StyleSheet.create({
   },
   linkContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray,
+    backgroundColor: COLORS.gray[100],
     borderRadius: radii.md,
     flexDirection: 'row',
     marginBottom: spacing.xl,

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-import { Moment } from '../types';
+import type { Moment } from '../types';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SHADOWS } from '../constants/shadows';
+import { useHaptics } from '../hooks/useHaptics';
+import { usePressScale } from '../utils/animations';
+import Animated from 'react-native-reanimated';
 
 interface MomentCardProps {
   moment: Moment;
@@ -14,103 +17,130 @@ interface MomentCardProps {
   onGiftPress: (moment: Moment) => void;
 }
 
-const MomentCard: React.FC<MomentCardProps> = ({
-  moment,
-  onPress,
-  onGiftPress,
-}) => {
-  return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={onPress}
-      activeOpacity={0.95}
-    >
-      <View style={styles.cardImageContainer}>
-        <Image
-          source={{ uri: moment.imageUrl }}
-          style={styles.cardImage}
-          resizeMode="cover"
-        />
+const MomentCard: React.FC<MomentCardProps> = memo(
+  ({ moment, onPress, onGiftPress }) => {
+    const { impact } = useHaptics();
+    const {
+      animatedStyle: cardScale,
+      onPressIn: onCardPressIn,
+      onPressOut: onCardPressOut,
+    } = usePressScale();
 
-        <View style={styles.userBadge}>
-          <Image
-            source={{ uri: moment.user.avatar }}
-            style={styles.userAvatar}
-          />
-          <View style={styles.userInfo}>
-            <View style={styles.userNameRow}>
-              <Text style={styles.userName} numberOfLines={1}>
-                {moment.user.name}
-              </Text>
-              {moment.user.isVerified && (
-                <MaterialCommunityIcons
-                  name="check-decagram"
-                  size={14}
-                  color={COLORS.primary}
-                  style={styles.verifiedIcon}
-                />
-              )}
+    // Memoize gift button handler to prevent recreating on every render
+    const handleGiftPress = useCallback(
+      (e: unknown) => {
+        if (e && typeof e === 'object' && 'stopPropagation' in e) {
+          (e as { stopPropagation: () => void }).stopPropagation();
+        }
+        impact('medium');
+        onGiftPress(moment);
+      },
+      [moment, onGiftPress, impact],
+    );
+
+    const handleMaybeLater = useCallback(
+      (e: unknown) => {
+        if (e && typeof e === 'object' && 'stopPropagation' in e) {
+          (e as { stopPropagation: () => void }).stopPropagation();
+        }
+        impact('light');
+      },
+      [impact],
+    );
+
+    const handleCardPress = useCallback(() => {
+      impact('light');
+      onPress();
+    }, [onPress, impact]);
+
+    return (
+      <TouchableOpacity
+        onPress={handleCardPress}
+        onPressIn={onCardPressIn}
+        onPressOut={onCardPressOut}
+        activeOpacity={1}
+      >
+        <Animated.View style={[styles.card, cardScale]}>
+          <View style={styles.cardImageContainer}>
+            <Image
+              source={{ uri: moment.imageUrl }}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+
+            <View style={styles.userBadge}>
+              <Image
+                source={{ uri: moment.user.avatar }}
+                style={styles.userAvatar}
+              />
+              <View style={styles.userInfo}>
+                <Text style={styles.userName} numberOfLines={1}>
+                  {moment.user.name}
+                  {moment.user.isVerified && (
+                    <Text style={styles.verifiedBadge}> ✓</Text>
+                  )}
+                </Text>
+                <Text style={styles.userRole} numberOfLines={1}>
+                  {moment.user.role}
+                </Text>
+              </View>
             </View>
-            <Text style={styles.userRole}>{moment.user.role}</Text>
           </View>
-        </View>
-      </View>
 
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle} numberOfLines={2}>
-          {moment.title}
-        </Text>
-        <Text style={styles.cardLocation}>{moment.location.city}</Text>
-
-        <View style={styles.cardDetails}>
-          <View style={styles.detailItem}>
-            <MaterialCommunityIcons
-              name="map-marker"
-              size={16}
-              color={COLORS.textSecondary}
-            />
-            <Text style={styles.detailText} numberOfLines={1}>
-              {moment.location.name}
+          <View style={styles.cardContent}>
+            <Text style={styles.cardTitle} numberOfLines={2}>
+              {moment.title}
             </Text>
-          </View>
-          <View style={styles.detailItem}>
-            <MaterialCommunityIcons
-              name="clock-outline"
-              size={16}
-              color={COLORS.textSecondary}
-            />
-            <Text style={styles.detailText} numberOfLines={1}>
-              {moment.availability}
-            </Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Text style={styles.priceText}>${moment.price}</Text>
-          </View>
-        </View>
+            <Text style={styles.cardLocation}>{moment.location.city}</Text>
 
-        <View style={styles.cardActions}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            activeOpacity={0.8}
-            onPress={(e) => {
-              e.stopPropagation();
-              onGiftPress(moment);
-            }}
-          >
-            <Text style={styles.primaryButtonText}>Gift this moment</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            activeOpacity={0.8}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text style={styles.secondaryButtonText}>Maybe later</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-};
+            <View style={styles.cardDetails}>
+              <View style={styles.detailItem}>
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={16}
+                  color={COLORS.textSecondary}
+                />
+                <Text style={styles.detailText} numberOfLines={1}>
+                  {moment.location.name}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <MaterialCommunityIcons
+                  name="clock-outline"
+                  size={16}
+                  color={COLORS.textSecondary}
+                />
+                <Text style={styles.detailText} numberOfLines={1}>
+                  {moment.availability}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.priceText}>${moment.price}</Text>
+              </View>
+            </View>
+
+            <View style={styles.cardActions}>
+              <TouchableOpacity
+                style={styles.primaryButton}
+                activeOpacity={0.8}
+                onPress={handleGiftPress}
+              >
+                <Text style={styles.primaryButtonText}>Gift this moment</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                activeOpacity={0.8}
+                onPress={handleMaybeLater}
+              >
+                <Text style={styles.secondaryButtonText}>Maybe later</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   card: {
@@ -191,42 +221,48 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   userAvatar: {
+    borderColor: COLORS.white,
     borderRadius: radii.full,
-    height: 48,
-    width: 48,
+    borderWidth: 2,
+    height: 36,
+    width: 36,
   },
   userBadge: {
     alignItems: 'center',
-    backgroundColor: COLORS.whiteTransparent,
-    borderRadius: radii.full,
-    bottom: spacing.md,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 18,
+    bottom: spacing.sm,
     flexDirection: 'row',
-    left: spacing.md,
-    padding: spacing.xs,
+    left: spacing.sm,
+    paddingRight: 12,
+    paddingLeft: 6,
+    paddingVertical: 6,
     position: 'absolute',
+    alignSelf: 'flex-start',
   },
   userInfo: {
-    flex: 1,
-    marginLeft: spacing.sm,
-    marginRight: spacing.md,
+    marginLeft: spacing.xs,
   },
   userName: {
     ...TYPOGRAPHY.body,
-    color: COLORS.text,
-    flexShrink: 1,
-    fontWeight: 'bold',
+    color: COLORS.white,
+    fontSize: 13,
+    fontWeight: '700',
   },
-  userNameRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
+  verifiedBadge: {
+    color: COLORS.mint,
+    fontSize: 14,
+    fontWeight: '900',
+    marginLeft: 3,
   },
   userRole: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
-  },
-  verifiedIcon: {
-    marginLeft: spacing.xs,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 11,
+    marginTop: 1,
   },
 });
+
+MomentCard.displayName = 'MomentCard';
 
 export default MomentCard;

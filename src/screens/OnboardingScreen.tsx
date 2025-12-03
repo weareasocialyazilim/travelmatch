@@ -1,287 +1,273 @@
-import { StackScreenProps } from '@react-navigation/stack';
+import type { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
 import React, { useRef, useState } from 'react';
+import type { ImageSourcePropType } from 'react-native';
 import {
   Dimensions,
   FlatList,
   Image,
-  ImageSourcePropType,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '../constants/colors';
-import { LAYOUT } from '../constants/layout';
-import { VALUES } from '../constants/values';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { HORIZONTAL_LIST_CONFIG } from '../utils/listOptimization';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import { useAnalytics } from '../hooks/useAnalytics';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
+  Dimensions.get('window');
 
 interface OnboardingPage {
   id: string;
   title: string;
-  subtitle: string;
   description: string;
   image: ImageSourcePropType;
-  gradient: string[];
 }
 
 const ONBOARDING_PAGES: OnboardingPage[] = [
   {
     id: '1',
-    title: 'Give from the Heart',
-    subtitle: 'Turn Kindness into Verified Proof',
+    title: 'Welcome to TravelMatch',
     description:
-      'Every moment of generosity deserves to be recognized. Create, verify, and share your kindness journey.',
+      'Connect and support travelers on their unique journeys through verified, heartfelt gifts.',
     image: require('../../assets/icon.png'),
-    gradient: [COLORS.primary, COLORS.accent],
   },
   {
     id: '2',
-    title: 'Build Trust',
-    subtitle: 'Your Kindness Wallet',
+    title: 'Share Your Journey',
     description:
-      'Every verified gesture becomes part of your Trust Garden. Watch your impact grow with each act of kindness.',
+      'Create moments from your travels and receive gifts from supporters around the world.',
     image: require('../../assets/icon.png'),
-    gradient: [COLORS.accent, COLORS.secondary],
   },
   {
     id: '3',
-    title: 'Connect Globally',
-    subtitle: 'Join the Proof Economy',
+    title: 'Build Trust Together',
     description:
-      'Share meaningful moments with travelers worldwide. Your verified experiences inspire others to give.',
+      'Every verified moment strengthens our community. Your proof of experience matters.',
     image: require('../../assets/icon.png'),
-    gradient: [COLORS.secondary, COLORS.mint],
+  },
+  {
+    id: '4',
+    title: 'Start Your Adventure',
+    description:
+      'Join thousands of travelers connecting through meaningful gifts and authentic experiences.',
+    image: require('../../assets/icon.png'),
   },
 ];
 
+import { useOnboarding } from '../hooks/useOnboarding';
+import { useNavigation } from '@react-navigation/native';
+
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 
-export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
-  navigation,
+export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
+  navigation: navProp,
 }) => {
+  const defaultNavigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const navigation = navProp || defaultNavigation;
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const analytics = useAnalytics();
+  const { completeOnboarding } = useOnboarding();
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < ONBOARDING_PAGES.length - 1) {
       const nextIndex = currentIndex + 1;
       flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
       setCurrentIndex(nextIndex);
     } else {
+      analytics.trackEvent('onboarding_completed', {
+        screen: 'onboarding',
+        total_screens: ONBOARDING_PAGES.length,
+      });
+      await completeOnboarding();
       navigation.replace('Welcome');
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    analytics.trackEvent('onboarding_skipped', {
+      screen: 'onboarding',
+      current_screen: currentIndex + 1,
+      total_screens: ONBOARDING_PAGES.length,
+      skip_percentage: ((currentIndex + 1) / ONBOARDING_PAGES.length) * 100,
+    });
+    await completeOnboarding();
     navigation.replace('Welcome');
   };
 
   const renderPage = ({ item }: { item: OnboardingPage }) => (
     <View style={styles.pageContainer}>
-      <LinearGradient
-        colors={item.gradient}
-        style={styles.gradientBackground}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.imageContainer}>
-          <Image
-            source={item.image}
-            style={styles.image}
-            resizeMode="contain"
-          />
-        </View>
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.subtitle}>{item.subtitle}</Text>
-          <Text style={styles.description}>{item.description}</Text>
-        </View>
-      </LinearGradient>
+      <View style={styles.imageSection}>
+        <Image source={item.image} style={styles.image} resizeMode="contain" />
+      </View>
+      <View style={styles.textSection}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <FlatList
-        ref={flatListRef}
-        data={ONBOARDING_PAGES}
-        renderItem={renderPage}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        bounces={false}
-        keyExtractor={(item) => item.id}
-        onMomentumScrollEnd={(event) => {
-          const index = Math.round(
-            event.nativeEvent.contentOffset.x / SCREEN_WIDTH,
-          );
-          setCurrentIndex(index);
-        }}
-        scrollEnabled={true}
-      />
-
-      {/* Pagination Dots */}
-      <View style={styles.paginationContainer}>
-        {ONBOARDING_PAGES.map((_, index) => (
-          <View
-            key={index}
-            style={[styles.dot, index === currentIndex && styles.activeDot]}
-          />
-        ))}
+      <View style={styles.contentWrapper}>
+        <FlatList<OnboardingPage>
+          ref={flatListRef}
+          data={ONBOARDING_PAGES}
+          renderItem={renderPage}
+          horizontal
+          pagingEnabled
+          bounces={false}
+          keyExtractor={(item) => item.id}
+          onMomentumScrollEnd={(event) => {
+            const index = Math.round(
+              event.nativeEvent.contentOffset.x / SCREEN_WIDTH,
+            );
+            setCurrentIndex(index);
+          }}
+          scrollEnabled={true}
+          style={styles.flatList}
+          {...HORIZONTAL_LIST_CONFIG}
+          showsHorizontalScrollIndicator={false}
+        />
       </View>
 
-      {/* Bottom Actions */}
-      <View style={styles.actionsContainer}>
-        {currentIndex < ONBOARDING_PAGES.length - 1 ? (
-          <>
-            <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-              <Text style={styles.skipText}>Skip</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
-              <LinearGradient
-                colors={[COLORS.primary, COLORS.accent]}
-                style={styles.nextButtonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Text style={styles.nextText}>Next</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <TouchableOpacity
-            onPress={handleNext}
-            style={styles.getStartedButton}
-          >
-            <LinearGradient
-              colors={[COLORS.primary, COLORS.accent]}
-              style={styles.getStartedGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.getStartedText}>Get Started</Text>
-            </LinearGradient>
+      {/* Bottom Controls Section */}
+      <View style={styles.bottomSection}>
+        {/* Pagination Dots */}
+        <View style={styles.paginationContainer}>
+          {ONBOARDING_PAGES.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                index === currentIndex && styles.activeDot,
+                index !== currentIndex && styles.inactiveDot,
+              ]}
+            />
+          ))}
+        </View>
+
+        {/* Next Button */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
+            <Text style={styles.nextText}>Next</Text>
           </TouchableOpacity>
-        )}
+        </View>
+
+        {/* Skip Link */}
+        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+          <Text style={styles.skipText}>Skip</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  actionsContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom: LAYOUT.padding * 2,
-    paddingHorizontal: LAYOUT.padding * 2,
-  },
-  activeDot: {
-    backgroundColor: COLORS.primary,
-    width: 24,
-  },
   container: {
+    flex: 1,
     backgroundColor: COLORS.background,
+  },
+  contentWrapper: {
     flex: 1,
   },
-  contentContainer: {
-    paddingBottom: LAYOUT.padding * 4,
-  },
-  description: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 24,
-    opacity: 0.8,
-    textAlign: 'center',
-  },
-  dot: {
-    backgroundColor: COLORS.border,
-    borderRadius: 4,
-    height: 8,
-    marginHorizontal: 4,
-    width: 8,
-  },
-  getStartedButton: {
-    borderRadius: VALUES.borderRadius,
+  flatList: {
     flex: 1,
-    overflow: 'hidden',
-  },
-  getStartedGradient: {
-    alignItems: 'center',
-    borderRadius: VALUES.borderRadius,
-    paddingVertical: LAYOUT.padding * 2,
-  },
-  getStartedText: {
-    color: COLORS.white,
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  gradientBackground: {
-    flex: 1,
-    justifyContent: 'space-between',
-    paddingHorizontal: LAYOUT.padding * 2,
-  },
-  image: {
-    height: SCREEN_HEIGHT * 0.4,
-    width: SCREEN_WIDTH * 0.7,
-  },
-  imageContainer: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: LAYOUT.padding * 3,
-  },
-  nextButton: {
-    borderRadius: VALUES.borderRadius,
-    overflow: 'hidden',
-  },
-  nextButtonGradient: {
-    borderRadius: VALUES.borderRadius,
-    paddingHorizontal: LAYOUT.padding * 4,
-    paddingVertical: LAYOUT.padding * 1.5,
-  },
-  nextText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '700',
   },
   pageContainer: {
-    height: SCREEN_HEIGHT - 200,
     width: SCREEN_WIDTH,
-  },
-  paginationContainer: {
+    flex: 1,
     alignItems: 'center',
-    flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: LAYOUT.padding * 2,
+    paddingHorizontal: 16,
   },
-  skipButton: {
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding,
+  imageSection: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  skipText: {
-    color: COLORS.textSecondary,
-    fontSize: 16,
-    fontWeight: '600',
+  image: {
+    width: SCREEN_WIDTH * 0.8,
+    height: SCREEN_WIDTH * 0.8,
   },
-  subtitle: {
-    color: COLORS.white,
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: LAYOUT.padding,
-    opacity: 0.9,
-    textAlign: 'center',
+  textSection: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 40,
   },
   title: {
-    color: COLORS.white,
     fontSize: 32,
-    fontWeight: '800',
-    marginBottom: LAYOUT.padding,
+    fontWeight: '700',
+    color: COLORS.text,
     textAlign: 'center',
+    paddingTop: 24,
+    paddingBottom: 12,
+    letterSpacing: -0.5,
+  },
+  description: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    paddingBottom: 12,
+    paddingTop: 4,
+  },
+  bottomSection: {
+    backgroundColor: COLORS.background,
+    paddingBottom: 24,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  dot: {
+    height: 8,
+    borderRadius: 9999,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    width: 8,
+    backgroundColor: COLORS.primary,
+  },
+  inactiveDot: {
+    width: 8,
+    backgroundColor: COLORS.primary,
+    opacity: 0.2,
+  },
+  buttonContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  nextButton: {
+    height: 48,
+    backgroundColor: COLORS.primary,
+    borderRadius: 9999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  nextText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    letterSpacing: 0.15,
+  },
+  skipButton: {
+    alignItems: 'center',
+    paddingTop: 8,
+  },
+  skipText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
   },
 });

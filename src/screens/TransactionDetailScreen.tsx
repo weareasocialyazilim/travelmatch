@@ -9,13 +9,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
 import { MOCK_TRANSACTION } from '../mocks';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type TransactionDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -173,14 +173,14 @@ export const TransactionDetailScreen: React.FC<
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Transaction ID</Text>
               <Text style={styles.detailValue}>
-                {transaction.transactionId}
+                {transaction.transactionId || transaction.id}
               </Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Date & Time</Text>
               <Text style={styles.detailValue}>
-                {formatDate(transaction.date)}
+                {formatDate(transaction.date || transaction.createdAt)}
               </Text>
             </View>
 
@@ -218,7 +218,7 @@ export const TransactionDetailScreen: React.FC<
               style={styles.proofCard}
               onPress={() =>
                 navigation.navigate('ProofDetail', {
-                  proofId: transaction.proofId,
+                  proofId: transaction.proofId!,
                 })
               }
               activeOpacity={0.8}

@@ -9,12 +9,14 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
-const REFUND_REASONS = [
+type IconName = React.ComponentProps<typeof Icon>['name'];
+
+const REFUND_REASONS: { id: string; label: string; icon: IconName }[] = [
   {
     id: 'not_delivered',
     label: 'Gesture not delivered',

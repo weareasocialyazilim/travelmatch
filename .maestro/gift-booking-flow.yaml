@@ -1,0 +1,55 @@
+appId: com.travelmatch.app
+---
+# Test: Gift Booking Flow
+# Description: Verifies complete gift/booking flow from discovery to payment
+
+- launchApp
+- tapOn: "Home"
+
+# Discover and select a moment
+- assertVisible: "Discover moments"
+- scroll
+- tapOn: "Coffee with a local" # First moment in feed
+
+# View moment details
+- assertVisible: "Moment Details"
+- assertVisible: "Gift this moment"
+- assertVisible: "Price"
+
+# Initiate gift
+- tapOn: "Gift this moment"
+
+# Select recipient (or self)
+- assertVisible: "Who is this for?"
+- tapOn: "Myself"
+# OR
+# - tapOn: "Someone else"
+# - inputText: "friend@example.com"
+
+# Review and confirm
+- assertVisible: "Review Gift"
+- assertVisible: "Total"
+- tapOn: "Continue to Payment"
+
+# Add payment method
+- assertVisible: "Payment Method"
+- tapOn: "Add Card"
+- tapOn: "Card Number"
+- inputText: "4242424242424242"
+- tapOn: "Expiry"
+- inputText: "12/25"
+- tapOn: "CVV"
+- inputText: "123"
+- tapOn: "Save Card"
+
+# Complete payment
+- tapOn: "Pay Now"
+
+# Verify success
+- assertVisible: "Gift Sent!"
+- assertVisible: "Your gift is on its way"
+
+# Check proof wallet
+- tapOn: "View in Wallet"
+- assertVisible: "Proof Wallet"
+- assertVisible: "Pending"

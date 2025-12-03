@@ -16,6 +16,11 @@ export const TYPOGRAPHY = {
     fontWeight: '600' as const,
     color: COLORS.text,
   },
+  h4: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: COLORS.text,
+  },
   body: {
     fontSize: 15,
     fontWeight: '400' as const,
@@ -30,5 +35,14 @@ export const TYPOGRAPHY = {
     fontSize: 12,
     fontWeight: '400' as const,
     color: COLORS.textTertiary,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+    color: COLORS.text,
+  },
+  button: {
+    fontSize: 16,
+    fontWeight: '600' as const,
   },
 } as const;

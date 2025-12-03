@@ -1,10 +1,13 @@
 import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import PropTypes from 'prop-types';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
+import { useHaptics } from '../hooks/useHaptics';
+import { usePressScale } from '../utils/animations';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -22,26 +25,44 @@ interface FilterPillProps {
 
 export const FilterPill: React.FC<FilterPillProps> = React.memo(
   ({ filter, isSelected, onPress }) => {
+    const { impact } = useHaptics();
+    const { animatedStyle, onPressIn, onPressOut } = usePressScale();
+
+    const handlePress = () => {
+      impact('light');
+      onPress(filter.id);
+    };
+
     return (
       <TouchableOpacity
-        style={[styles.filterPill, isSelected && styles.filterPillActive]}
-        onPress={() => onPress(filter.id)}
+        onPress={handlePress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        activeOpacity={1}
         accessibilityRole="button"
         accessibilityLabel={filter.label}
         accessibilityState={{ selected: isSelected }}
       >
-        {filter.icon && (
-          <MaterialCommunityIcons
-            name={filter.icon as IconName}
-            size={16}
-            color={isSelected ? COLORS.text : COLORS.textSecondary}
-          />
-        )}
-        <Text
-          style={[styles.filterText, isSelected && styles.filterTextActive]}
+        <Animated.View
+          style={[
+            styles.filterPill,
+            isSelected && styles.filterPillActive,
+            animatedStyle,
+          ]}
         >
-          {filter.label}
-        </Text>
+          {filter.icon && (
+            <MaterialCommunityIcons
+              name={filter.icon as IconName}
+              size={16}
+              color={isSelected ? COLORS.text : COLORS.textSecondary}
+            />
+          )}
+          <Text
+            style={[styles.filterText, isSelected && styles.filterTextActive]}
+          >
+            {filter.label}
+          </Text>
+        </Animated.View>
       </TouchableOpacity>
     );
   },

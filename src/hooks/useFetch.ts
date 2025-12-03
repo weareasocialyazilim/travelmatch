@@ -1,19 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
+import { AppError, getErrorMessage } from '../utils/errors';
 
 interface UseFetchResult<T> {
   data: T | null;
   loading: boolean;
-  error: Error | null;
+  error: AppError | null;
   refetch: () => void;
 }
 
-export function useFetch<T>(url: string): UseFetchResult<T> {
+interface UseFetchOptions<T = unknown> {
+  skip?: boolean;
+  onSuccess?: (data: T) => void;
+  onError?: (error: AppError) => void;
+}
+
+export function useFetch<T>(
+  url: string,
+  options: UseFetchOptions = {},
+): UseFetchResult<T> {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(!options.skip);
+  const [error, setError] = useState<AppError | null>(null);
 
   const fetchData = useCallback(
     async (abortController?: AbortController) => {
+      if (options.skip) return;
+
       try {
         setLoading(true);
         setError(null);
@@ -23,21 +35,31 @@ export function useFetch<T>(url: string): UseFetchResult<T> {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage =
+            errorData.message || `HTTP error! status: ${response.status}`;
+
+          const apiError = new AppError(errorMessage);
+          throw apiError;
         }
 
         const jsonData = await response.json();
         setData(jsonData);
+        options.onSuccess?.(jsonData);
       } catch (err) {
         // Ignore abort errors, which are expected when a component unmounts during a fetch.
         if ((err as Error).name !== 'AbortError') {
-          setError(err instanceof Error ? err : new Error('An error occurred'));
+          const appError =
+            err instanceof AppError ? err : new AppError(getErrorMessage(err));
+
+          setError(appError);
+          options.onError?.(appError);
         }
       } finally {
         setLoading(false);
       }
     },
-    [url],
+    [url, options],
   );
 
   useEffect(() => {

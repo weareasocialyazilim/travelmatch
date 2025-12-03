@@ -1,0 +1,37 @@
+appId: com.travelmatch.app
+---
+# Test: Proof Upload and Verification Flow
+# Description: Verifies that users can upload proof and request verification
+
+- launchApp
+- tapOn: "Profile"
+- tapOn: "Proof Wallet"
+
+# Select pending moment
+- assertVisible: "Pending"
+- tapOn: "Coffee with a local" # First pending item
+
+# Upload proof
+- assertVisible: "Upload Proof"
+- tapOn: "Add Photo"
+- tapOn: "Camera Roll"
+
+# Add proof details
+- tapOn: "Add Description"
+- inputText: "Here's my coffee receipt and photo at the café!"
+
+# Add receipt
+- tapOn: "Add Receipt"
+- tapOn: "Camera Roll"
+
+# Submit proof
+- tapOn: "Submit Proof"
+
+# Verify submission
+- assertVisible: "Proof Submitted"
+- assertVisible: "Under Review"
+
+# Check status
+- tapOn: "View Status"
+- assertVisible: "Verification in Progress"
+- assertVisible: "Estimated time: 24-48 hours"

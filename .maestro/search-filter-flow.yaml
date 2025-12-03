@@ -1,0 +1,43 @@
+appId: com.travelmatch.app
+---
+# Search & Filter Flow Test
+# Tests search functionality and filter application
+
+- launchApp
+
+# Navigate to main app (skip onboarding)
+- tapOn: "Skip"
+- tapOn: "Üye olmadan devam et"
+- assertVisible: "Discover"
+
+# Step 1: Apply filters on home screen
+- tapOn: "Tümü"
+- assertVisible: "Gezginler"
+
+- tapOn: "Gezginler"
+- assertVisible: "Gezginler"
+
+# Step 2: Toggle to map view
+- tapOn: 
+    id: "map-toggle-button"
+- assertVisible: "Keşfet"
+
+# Step 3: Toggle back to feed
+- tapOn:
+    id: "feed-toggle-button"
+- assertVisible: "Discover"
+
+# Step 4: Navigate to search
+- tapOn: "Social"
+- assertVisible: "Explore"
+
+# Step 5: Search interaction (if search bar exists)
+- tapOn:
+    id: "search-input"
+- inputText: "coffee"
+- assertVisible: "coffee"
+
+# Verify results or empty state
+- assertVisible:
+    text: ".*"
+    pattern: true

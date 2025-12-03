@@ -198,33 +198,13 @@ export const GiftSuccessModal: React.FC<Props> = ({
             </View>
           )}
 
-          {/* Action Buttons */}
-          {onViewApprovals && momentTitle && (
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={onViewApprovals}
-              activeOpacity={0.8}
-            >
-              <MaterialCommunityIcons
-                name="account-multiple"
-                size={20}
-                color={COLORS.white}
-              />
-              <Text style={styles.primaryButtonText}>View Approvals</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Return button */}
+          {/* Return button - No approval needed for givers */}
           <TouchableOpacity
-            style={onViewApprovals ? styles.secondaryButton : styles.button}
+            style={styles.button}
             onPress={onClose}
             activeOpacity={0.8}
           >
-            <Text
-              style={
-                onViewApprovals ? styles.secondaryButtonText : styles.buttonText
-              }
-            >
+            <Text style={styles.buttonText}>
               Return Home
             </Text>
           </TouchableOpacity>
@@ -326,7 +306,7 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray,
+    backgroundColor: COLORS.gray[100],
     borderRadius: 999,
     paddingHorizontal: 32,
     paddingVertical: 16,

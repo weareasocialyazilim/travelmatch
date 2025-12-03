@@ -1,15 +1,33 @@
 export type Role = 'Traveler' | 'Local';
 export type KYCStatus = 'Unverified' | 'Pending' | 'Verified';
 
+export interface UserLocation {
+  lat: number;
+  lng: number;
+  city?: string;
+  country?: string;
+}
+
 export interface User {
   id: string;
   name: string;
   age?: number;
+  email?: string;
+  phoneNumber?: string;
   photoUrl?: string;
+  avatar?: string;
+  bio?: string;
   role: Role;
+  type?: 'traveler' | 'local';
   kyc: KYCStatus;
-  location: { lat: number; lng: number; city?: string };
+  location: UserLocation | string;
   trustScore?: number;
+  isVerified?: boolean;
+  interests?: string[];
+  createdAt?: string;
+  lastActive?: string;
+  travelDays?: number;
+  visitingUntil?: string;
 }
 
 export interface GiftItem {
@@ -21,17 +39,9 @@ export interface GiftItem {
   icon?: string;
 }
 
-export type ProofType = 'photo' | 'receipt' | 'geo' | 'ticket_qr';
+// ProofType and Proof are now exported from domain.ts
 
-export interface Proof {
-  id: string;
-  type: ProofType;
-  mediaUrl?: string;
-  geo?: { lat: number; lng: number };
-  status: 'pending' | 'verified' | 'failed';
-  createdAt: string;
-}
-
+// Gesture proof field is typed inline to avoid circular dependency
 export interface Gesture {
   id: string;
   giverId: string;
@@ -48,7 +58,13 @@ export interface Gesture {
     | 'refunded'
     | 'under_review';
   expiresAt: string;
-  proof?: Proof;
+  proof?: {
+    id: string;
+    type: string;
+    mediaUrl?: string;
+    status: string;
+    createdAt: string;
+  };
 }
 
 export interface Place {

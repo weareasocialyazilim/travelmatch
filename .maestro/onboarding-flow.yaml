@@ -1,0 +1,40 @@
+appId: com.travelmatch.app
+---
+# Onboarding Flow Test
+# Tests complete user journey from app launch through onboarding to main app
+
+- launchApp
+
+# Step 1: Welcome to first onboarding screen
+- tapOn: "Get Started"
+- assertVisible: "Give from the Heart"
+
+# Step 2: Navigate through onboarding screens
+- tapOn: "Next"
+- assertVisible: "Build Trust"
+
+- tapOn: "Next"
+- assertVisible: "Connect Globally"
+
+# Step 3: Skip to welcome
+- tapOn: "Skip"
+- assertVisible: "Welcome to TravelMatch"
+
+# Step 4: Choose email auth
+- tapOn: "Continue with Email"
+- assertVisible: "Sign in with Email"
+
+# Step 5: Enter email
+- tapOn: "Email"
+- inputText: "test@travelmatch.com"
+- tapOn: "Continue"
+
+# Step 6: Skip signup and go to home
+- tapOn: "Üye olmadan devam et"
+- assertVisible: "Discover"
+- assertVisible: "Home"
+
+# Verify bottom navigation is visible
+- assertVisible: "Social"
+- assertVisible: "Activity"
+- assertVisible: "Profile"

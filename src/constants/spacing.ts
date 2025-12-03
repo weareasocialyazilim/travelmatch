@@ -6,3 +6,6 @@ export const spacing = {
   xl: 32,
   xxl: 48,
 };
+
+// Uppercase alias for backwards compatibility
+export const SPACING = spacing;

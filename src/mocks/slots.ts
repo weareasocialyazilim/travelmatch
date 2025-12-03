@@ -1,4 +1,4 @@
-import { GiverSlot } from '../types/domain';
+import type { GiverSlot } from '../types/domain';
 
 export const MOCK_SLOTS: GiverSlot[] = [
   {

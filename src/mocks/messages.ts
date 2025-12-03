@@ -1,4 +1,4 @@
-import { Message } from '../types/domain';
+import type { Message } from '../types/domain';
 
 export const MOCK_MESSAGES: Message[] = [
   {

@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SocialButton from '../components/SocialButton';
 import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { VALUES } from '../constants/values';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type SocialLoginScreenProps = StackScreenProps<
   RootStackParamList,
@@ -16,6 +16,28 @@ type SocialLoginScreenProps = StackScreenProps<
 export const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({
   navigation,
 }) => {
+  // Memoize navigation callbacks
+  const handleGooglePress = useCallback(
+    () => navigation.navigate('CompleteProfile'),
+    [navigation],
+  );
+  const handleApplePress = useCallback(
+    () => navigation.navigate('CompleteProfile'),
+    [navigation],
+  );
+  const handleFacebookPress = useCallback(
+    () => navigation.navigate('CompleteProfile'),
+    [navigation],
+  );
+  const handlePhonePress = useCallback(
+    () => navigation.navigate('PhoneAuth'),
+    [navigation],
+  );
+  const handleEmailPress = useCallback(
+    () => navigation.navigate('EmailAuth'),
+    [navigation],
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
@@ -31,17 +53,17 @@ export const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({
           <SocialButton
             provider="google"
             label="Continue with Google"
-            onPress={() => navigation.navigate('CompleteProfile')}
+            onPress={handleGooglePress}
           />
           <SocialButton
             provider="apple"
             label="Continue with Apple"
-            onPress={() => navigation.navigate('CompleteProfile')}
+            onPress={handleApplePress}
           />
           <SocialButton
             provider="facebook"
             label="Continue with Facebook"
-            onPress={() => navigation.navigate('CompleteProfile')}
+            onPress={handleFacebookPress}
           />
 
           <View style={styles.dividerRow}>
@@ -53,12 +75,12 @@ export const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({
           <SocialButton
             provider="phone"
             label="Continue with Phone"
-            onPress={() => navigation.navigate('PhoneAuth')}
+            onPress={handlePhonePress}
           />
           <SocialButton
             provider="email"
             label="Continue with Email"
-            onPress={() => navigation.navigate('EmailAuth')}
+            onPress={handleEmailPress}
           />
         </View>
       </ScrollView>

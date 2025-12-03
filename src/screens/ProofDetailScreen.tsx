@@ -11,11 +11,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Proof } from '../types';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import type { Proof } from '../types';
+import { logger } from '@/utils/logger';
 import { COLORS } from '../constants/colors';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -84,7 +85,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
         url: `travelmatch://proof/${proof.id}`,
       });
     } catch (error) {
-      console.log('Share error:', error);
+      logger.error('Share error', error as Error);
     }
   };
 
@@ -210,7 +211,12 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
             <View style={styles.infoItem}>
               <Icon name="map-marker" size={16} color={COLORS.textSecondary} />
               <Text style={styles.infoText} numberOfLines={1}>
-                {proof.location}
+                {typeof proof.location === 'string'
+                  ? proof.location
+                  : proof.location?.name ||
+                    `${proof.location?.city || ''}, ${
+                      proof.location?.country || ''
+                    }`}
               </Text>
             </View>
           </View>
@@ -235,7 +241,11 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
               <View style={styles.detailCard}>
                 <Icon name="account" size={24} color={COLORS.coral} />
                 <Text style={styles.detailLabel}>Receiver</Text>
-                <Text style={styles.detailValue}>{proof.receiver}</Text>
+                <Text style={styles.detailValue}>
+                  {typeof proof.receiver === 'string'
+                    ? proof.receiver
+                    : proof.receiver.name}
+                </Text>
               </View>
             )}
 
@@ -472,7 +482,7 @@ const styles = StyleSheet.create({
   typeBadge: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.gray,
+    backgroundColor: COLORS.gray[100],
     borderRadius: 16,
     flexDirection: 'row',
     gap: 6,

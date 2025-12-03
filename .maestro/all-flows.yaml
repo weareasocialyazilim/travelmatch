@@ -1,0 +1,12 @@
+appId: com.travelmatch.app
+---
+# Master E2E Test Suite for TravelMatch
+# This file runs all critical user flows sequentially
+
+# Run all test flows
+- runFlow: login-flow.yaml
+- runFlow: create-moment-flow.yaml
+- runFlow: gift-booking-flow.yaml
+- runFlow: proof-upload-flow.yaml
+- runFlow: chat-flow.yaml
+- runFlow: profile-settings-flow.yaml

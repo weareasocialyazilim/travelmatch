@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
@@ -21,15 +27,33 @@ export const ThankYouModal: React.FC<ThankYouModalProps> = ({
   giverName,
   amount,
 }) => {
+  const scale = useSharedValue(0.8);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (visible) {
+      scale.value = withSpring(1, { damping: 15, stiffness: 150 });
+      opacity.value = withTiming(1, { duration: 300 });
+    } else {
+      scale.value = withTiming(0.8, { duration: 200 });
+      opacity.value = withTiming(0, { duration: 200 });
+    }
+  }, [visible]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.modal}>
+        <Animated.View style={[styles.modal, animatedStyle]}>
           <LinearGradient
             colors={[COLORS.primary, COLORS.accent]}
             style={styles.gradient}
@@ -65,7 +89,7 @@ export const ThankYouModal: React.FC<ThankYouModalProps> = ({
               </View>
             </TouchableOpacity>
           </LinearGradient>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

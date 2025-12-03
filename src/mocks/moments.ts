@@ -1,4 +1,4 @@
-import { Moment } from '../types/domain';
+import type { Moment } from '../types/domain';
 
 export const MOCK_MOMENTS: Moment[] = [
   {
@@ -99,7 +99,7 @@ export const MOCK_MOMENTS: Moment[] = [
       type: 'traveler',
       location: 'New York, NY',
       travelDays: 7,
-      visitingUntil: new Date(Date.now() + 86400000 * 7),
+      visitingUntil: new Date(Date.now() + 86400000 * 7).toISOString(),
     },
     title: 'Coffee Meet & Greet',
     location: {

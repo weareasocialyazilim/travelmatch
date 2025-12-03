@@ -1,4 +1,4 @@
-import { Proof } from '../types/domain';
+import type { Proof } from '../types/domain';
 
 export const MOCK_PROOFS: Proof[] = [
   {

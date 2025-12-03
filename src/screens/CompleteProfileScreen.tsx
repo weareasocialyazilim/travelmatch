@@ -1,4 +1,4 @@
-import { StackScreenProps } from '@react-navigation/stack';
+import type { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -9,21 +9,26 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Platform,
+  ActionSheetIOS,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import * as ImagePicker from 'expo-image-picker';
 import { CARD_SHADOW, COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { VALUES } from '../constants/values';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import Loading from '../components/Loading';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import { LoadingState } from '../components/LoadingState';
 
-const INTERESTS = [
+type IconName = React.ComponentProps<typeof Icon>['name'];
+
+const INTERESTS: { id: string; name: string; icon: IconName }[] = [
   { id: '1', name: 'Travel', icon: 'airplane' },
   { id: '2', name: 'Food', icon: 'food' },
-  { id: '3', name: 'Adventure', icon: 'mountain' },
-  { id: '4', name: 'Culture', icon: 'temple-buddhist' },
+  { id: '3', name: 'Adventure', icon: 'hiking' },
+  { id: '4', name: 'Culture', icon: 'domain' },
   { id: '5', name: 'Photography', icon: 'camera' },
   { id: '6', name: 'Nature', icon: 'tree' },
   { id: '7', name: 'Art', icon: 'palette' },
@@ -44,12 +49,66 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [avatar] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const pickImage = async (useCamera: boolean) => {
+    try {
+      if (useCamera) {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Required', 'Camera permission is needed');
+          return;
+        }
+        const result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.8,
+        });
+        if (!result.canceled && result.assets[0]) {
+          setAvatar(result.assets[0].uri);
+        }
+      } else {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Required', 'Photo library permission is needed');
+          return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.8,
+        });
+        if (!result.canceled && result.assets[0]) {
+          setAvatar(result.assets[0].uri);
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to pick image');
+    }
+  };
+
   const handleSelectAvatar = () => {
-    // Implement image picker
-    Alert.alert('Select Avatar', 'Image picker implementation needed');
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Take Photo', 'Choose from Library'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) pickImage(true);
+          if (buttonIndex === 2) pickImage(false);
+        }
+      );
+    } else {
+      Alert.alert('Add Profile Photo', 'Choose an option', [
+        { text: 'Take Photo', onPress: () => pickImage(true) },
+        { text: 'Choose from Library', onPress: () => pickImage(false) },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
   };
 
   const toggleInterest = (interestId: string) => {
@@ -82,13 +141,13 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      navigation.replace('Home');
+      navigation.replace('Discover');
     }, 1500);
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {loading && <Loading mode="overlay" text="Creating Profile..." />}
+      {loading && <LoadingState type="overlay" message="Creating Profile..." />}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -238,7 +297,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
             {/* Skip */}
             <TouchableOpacity
               style={styles.skipButton}
-              onPress={() => navigation.replace('Home')}
+              onPress={() => navigation.replace('Discover')}
             >
               <Text style={styles.skipText}>Skip for now</Text>
             </TouchableOpacity>

@@ -5,7 +5,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
+    "scheme": "travelmatch",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -14,15 +15,37 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.travelmatch.app",
+      "associatedDomains": [
+        "applinks:travelmatch.app"
+      ],
       "config": {
         "googleMapsApiKey": "AIzaSyDummy-Key-Replace-With-Real-Key"
       }
     },
     "android": {
+      "package": "com.travelmatch.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "travelmatch.app",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "config": {
@@ -33,6 +56,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-localization",
+      "sentry-expo"
+    ]
   }
 }
