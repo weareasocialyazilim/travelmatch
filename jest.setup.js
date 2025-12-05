@@ -8,6 +8,18 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
+// Mock expo-secure-store
+jest.mock('expo-secure-store', () => ({
+  isAvailableAsync: jest.fn(() => Promise.resolve(true)),
+  setItemAsync: jest.fn(() => Promise.resolve()),
+  getItemAsync: jest.fn(() => Promise.resolve(null)),
+  deleteItemAsync: jest.fn(() => Promise.resolve()),
+  WHEN_UNLOCKED: 'WHEN_UNLOCKED',
+  WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY',
+  AFTER_FIRST_UNLOCK: 'AFTER_FIRST_UNLOCK',
+  AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: 'AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY',
+}));
+
 // Mock expo-localization
 jest.mock('expo-localization', () => ({
   getLocales: () => [{ languageCode: 'en', regionCode: 'US' }],

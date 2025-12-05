@@ -11,11 +11,56 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
+// Mock API client
+jest.mock('../../utils/api', () => ({
+  apiClient: {
+    post: jest.fn(),
+    delete: jest.fn(),
+  },
+}));
+
+// Mock secureStorage
+jest.mock('../../utils/secureStorage', () => ({
+  secureStorage: {
+    setItem: jest.fn(() => Promise.resolve()),
+    getItem: jest.fn(() => Promise.resolve(null)),
+    deleteItem: jest.fn(() => Promise.resolve()),
+    deleteItems: jest.fn(() => Promise.resolve()),
+  },
+  AUTH_STORAGE_KEYS: {
+    ACCESS_TOKEN: 'auth_access_token',
+    REFRESH_TOKEN: 'auth_refresh_token',
+    TOKEN_EXPIRES_AT: 'auth_token_expires',
+    USER: '@auth_user',
+  },
+}));
+
+// Mock logger
+jest.mock('../../utils/logger', () => ({
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  },
+}));
+
+// Get mocked apiClient
+import { apiClient } from '../../utils/api';
+const mockApiClient = apiClient as jest.Mocked<typeof apiClient>;
+
 describe('authStore', () => {
   // Reset store before each test
   beforeEach(() => {
+    jest.clearAllMocks();
     act(() => {
-      useAuthStore.getState().logout();
+      useAuthStore.setState({
+        user: null,
+        token: null,
+        refreshToken: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
     });
   });
 
@@ -100,6 +145,20 @@ describe('authStore', () => {
 
   describe('login', () => {
     it('should set loading state while logging in', async () => {
+      // Mock successful login response
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       const loginPromise = act(async () => {
         return useAuthStore.getState().login('test@example.com', 'password');
       });
@@ -112,6 +171,20 @@ describe('authStore', () => {
     });
 
     it('should set user and tokens after successful login', async () => {
+      // Mock successful login response
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore.getState().login('test@example.com', 'password');
       });
@@ -121,12 +194,26 @@ describe('authStore', () => {
 
       expect(user).not.toBeNull();
       expect(user?.email).toBe('test@example.com');
-      expect(token).toBe('mock_token');
+      expect(token).toBe('mock_access_token');
       expect(refreshToken).toBe('mock_refresh_token');
       expect(isAuthenticated).toBe(true);
     });
 
     it('should have user with correct properties', async () => {
+      // Mock successful login response
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore.getState().login('test@example.com', 'password');
       });
@@ -142,6 +229,20 @@ describe('authStore', () => {
 
   describe('register', () => {
     it('should set user after successful registration', async () => {
+      // Mock successful register response
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: {
+            id: '1',
+            email: 'new@example.com',
+            name: 'New User',
+            createdAt: new Date().toISOString(),
+          },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore
           .getState()
@@ -157,6 +258,20 @@ describe('authStore', () => {
     });
 
     it('should set tokens after successful registration', async () => {
+      // Mock successful register response
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: {
+            id: '1',
+            email: 'new@example.com',
+            name: 'New User',
+            createdAt: new Date().toISOString(),
+          },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore
           .getState()
@@ -165,11 +280,25 @@ describe('authStore', () => {
 
       const { token, refreshToken } = useAuthStore.getState();
 
-      expect(token).toBe('mock_token');
+      expect(token).toBe('mock_access_token');
       expect(refreshToken).toBe('mock_refresh_token');
     });
 
     it('should clear loading state after registration', async () => {
+      // Mock successful register response
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: {
+            id: '1',
+            email: 'new@example.com',
+            name: 'New User',
+            createdAt: new Date().toISOString(),
+          },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore
           .getState()
@@ -183,14 +312,25 @@ describe('authStore', () => {
 
   describe('logout', () => {
     it('should clear all auth state', async () => {
-      // First login
-      await act(async () => {
-        await useAuthStore.getState().login('test@example.com', 'password');
+      // Set initial state as logged in
+      act(() => {
+        useAuthStore.setState({
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          token: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+          isAuthenticated: true,
+          isLoading: false,
+        });
       });
 
       // Then logout
-      act(() => {
-        useAuthStore.getState().logout();
+      await act(async () => {
+        await useAuthStore.getState().logout();
       });
 
       const { user, token, refreshToken, isAuthenticated } =
@@ -202,19 +342,31 @@ describe('authStore', () => {
       expect(isAuthenticated).toBe(false);
     });
 
-    it('should work even when not logged in', () => {
-      expect(() => {
-        act(() => {
-          useAuthStore.getState().logout();
-        });
-      }).not.toThrow();
+    it('should work even when not logged in', async () => {
+      await expect(
+        act(async () => {
+          await useAuthStore.getState().logout();
+        }),
+      ).resolves.not.toThrow();
     });
   });
 
   describe('updateUser', () => {
     it('should update user properties', async () => {
-      await act(async () => {
-        await useAuthStore.getState().login('test@example.com', 'password');
+      // Set initial state as logged in
+      act(() => {
+        useAuthStore.setState({
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          token: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+          isAuthenticated: true,
+          isLoading: false,
+        });
       });
 
       act(() => {
@@ -226,8 +378,20 @@ describe('authStore', () => {
     });
 
     it('should preserve other user properties when updating', async () => {
-      await act(async () => {
-        await useAuthStore.getState().login('test@example.com', 'password');
+      // Set initial state as logged in
+      act(() => {
+        useAuthStore.setState({
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          token: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+          isAuthenticated: true,
+          isLoading: false,
+        });
       });
 
       const originalEmail = useAuthStore.getState().user?.email;
@@ -250,8 +414,20 @@ describe('authStore', () => {
     });
 
     it('should allow updating multiple properties at once', async () => {
-      await act(async () => {
-        await useAuthStore.getState().login('test@example.com', 'password');
+      // Set initial state as logged in
+      act(() => {
+        useAuthStore.setState({
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          token: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+          isAuthenticated: true,
+          isLoading: false,
+        });
       });
 
       act(() => {
@@ -280,8 +456,28 @@ describe('authStore', () => {
     });
 
     it('should attempt refresh when refreshToken exists', async () => {
-      await act(async () => {
-        await useAuthStore.getState().login('test@example.com', 'password');
+      // Set initial state with refreshToken
+      act(() => {
+        useAuthStore.setState({
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          token: 'old_access_token',
+          refreshToken: 'mock_refresh_token',
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      });
+
+      // Mock successful refresh response
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          accessToken: 'new_access_token',
+          refreshToken: 'new_refresh_token',
+        },
       });
 
       // This should not throw
@@ -290,11 +486,30 @@ describe('authStore', () => {
           await useAuthStore.getState().refreshAuth();
         }),
       ).resolves.not.toThrow();
+
+      // API should have been called with refresh endpoint
+      expect(mockApiClient.post).toHaveBeenCalledWith('/auth/refresh', {
+        refreshToken: 'mock_refresh_token',
+      });
     });
   });
 
   describe('State Persistence', () => {
     it('should persist user state', async () => {
+      // Mock successful login
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            createdAt: new Date().toISOString(),
+          },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore.getState().login('test@example.com', 'password');
       });
@@ -311,6 +526,23 @@ describe('authStore', () => {
 
   describe('Edge Cases', () => {
     it('should handle concurrent login calls', async () => {
+      // Mock successful login responses for both calls
+      mockApiClient.post
+        .mockResolvedValueOnce({
+          data: {
+            user: { id: '1', email: 'user1@example.com', name: 'User 1', createdAt: new Date().toISOString() },
+            accessToken: 'token1',
+            refreshToken: 'refresh1',
+          },
+        })
+        .mockResolvedValueOnce({
+          data: {
+            user: { id: '2', email: 'user2@example.com', name: 'User 2', createdAt: new Date().toISOString() },
+            accessToken: 'token2',
+            refreshToken: 'refresh2',
+          },
+        });
+
       const login1 = act(async () => {
         await useAuthStore.getState().login('user1@example.com', 'password');
       });
@@ -327,9 +559,18 @@ describe('authStore', () => {
     });
 
     it('should handle login followed by immediate logout', async () => {
+      // Mock successful login
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: { id: '1', email: 'test@example.com', name: 'Test User', createdAt: new Date().toISOString() },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore.getState().login('test@example.com', 'password');
-        useAuthStore.getState().logout();
+        await useAuthStore.getState().logout();
       });
 
       const { isAuthenticated } = useAuthStore.getState();
@@ -337,12 +578,21 @@ describe('authStore', () => {
     });
 
     it('should handle update after logout', async () => {
+      // Mock successful login
+      mockApiClient.post.mockResolvedValueOnce({
+        data: {
+          user: { id: '1', email: 'test@example.com', name: 'Test User', createdAt: new Date().toISOString() },
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        },
+      });
+
       await act(async () => {
         await useAuthStore.getState().login('test@example.com', 'password');
       });
 
-      act(() => {
-        useAuthStore.getState().logout();
+      await act(async () => {
+        await useAuthStore.getState().logout();
         useAuthStore.getState().updateUser({ name: 'Should not update' });
       });
 

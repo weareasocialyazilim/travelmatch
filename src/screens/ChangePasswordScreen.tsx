@@ -65,8 +65,12 @@ const ChangePasswordScreen: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual password change API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Real API call for password change
+      const { apiClient } = await import('../utils/api');
+      await apiClient.post('/auth/change-password', {
+        currentPassword,
+        newPassword,
+      });
 
       Alert.alert('Success', 'Your password has been changed successfully.', [
         {
@@ -74,8 +78,9 @@ const ChangePasswordScreen: React.FC = () => {
           onPress: () => navigation.goBack(),
         },
       ]);
-    } catch {
-      Alert.alert('Error', 'Failed to change password. Please try again.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to change password. Please try again.';
+      Alert.alert('Error', message);
     } finally {
       setIsLoading(false);
     }

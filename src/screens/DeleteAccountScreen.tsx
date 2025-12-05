@@ -77,12 +77,29 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
       confirmText: 'Yes, Delete',
       cancelText: 'Cancel',
       onConfirm: async () => {
-        // Simulate account deletion
-        logger.info('Deleting account...');
-        toast.success(
-          'Account scheduled for deletion. You will receive a confirmation email.',
-        );
-        navigation.navigate('Welcome');
+        try {
+          // Real API call for KVKK/GDPR compliant account deletion
+          const { apiClient } = await import('../utils/api');
+          await apiClient.delete('/user/account', {
+            data: {
+              confirmationText: 'DELETE',
+              reason: 'user_requested',
+            },
+          });
+
+          // Clear local auth state
+          const { useAuthStore } = await import('../stores/authStore');
+          await useAuthStore.getState().logout();
+
+          logger.info('[Account] Deletion request submitted');
+          toast.success(
+            'Account scheduled for deletion. You will receive a confirmation email within 24 hours.',
+          );
+          navigation.navigate('Welcome');
+        } catch (error) {
+          logger.error('[Account] Deletion failed', error as Error);
+          toast.error('Failed to delete account. Please contact support.');
+        }
       },
       onCancel: () => {
         toast.info('Account deletion cancelled');

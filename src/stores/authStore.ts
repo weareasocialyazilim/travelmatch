@@ -29,6 +29,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { secureStorage, AUTH_STORAGE_KEYS } from '../utils/secureStorage';
+import { apiClient } from '../utils/api';
+import { logger } from '../utils/logger';
 
 /**
  * User profile data
@@ -113,69 +116,84 @@ export const useAuthStore = create<AuthState>()(
         }),
 
       // Login
-      login: async (email, _password) => {
+      login: async (email, password) => {
         set({ isLoading: true });
         try {
-          // TODO: Replace with actual API call
-          // const response = await api.post('/auth/login', { email, password });
+          // Real API call
+          const response = await apiClient.post<{
+            user: User;
+            accessToken: string;
+            refreshToken: string;
+          }>('/auth/login', { email, password });
 
-          // Mock response
-          const mockUser: User = {
-            id: '1',
-            email,
-            name: 'John Doe',
-            createdAt: new Date().toISOString(),
-          };
+          const { user, accessToken, refreshToken } = response.data;
 
-          const mockToken = 'mock_token';
-          const mockRefreshToken = 'mock_refresh_token';
+          // Store tokens securely
+          await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+          await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+
+          logger.info('[Auth] Login successful', { userId: user.id });
 
           set({
-            user: mockUser,
-            token: mockToken,
-            refreshToken: mockRefreshToken,
+            user,
+            token: accessToken,
+            refreshToken,
             isAuthenticated: true,
             isLoading: false,
           });
         } catch (error) {
+          logger.error('[Auth] Login failed', error as Error);
           set({ isLoading: false });
           throw error;
         }
       },
 
       // Register
-      register: async (name, email, _password) => {
+      register: async (name, email, password) => {
         set({ isLoading: true });
         try {
-          // TODO: Replace with actual API call
-          // const response = await api.post('/auth/register', { name, email, password });
+          // Real API call
+          const response = await apiClient.post<{
+            user: User;
+            accessToken: string;
+            refreshToken: string;
+          }>('/auth/register', { name, email, password });
 
-          // Mock response
-          const mockUser: User = {
-            id: '1',
-            email,
-            name,
-            createdAt: new Date().toISOString(),
-          };
+          const { user, accessToken, refreshToken } = response.data;
 
-          const mockToken = 'mock_token';
-          const mockRefreshToken = 'mock_refresh_token';
+          // Store tokens securely
+          await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+          await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+
+          logger.info('[Auth] Registration successful', { userId: user.id });
 
           set({
-            user: mockUser,
-            token: mockToken,
-            refreshToken: mockRefreshToken,
+            user,
+            token: accessToken,
+            refreshToken,
             isAuthenticated: true,
             isLoading: false,
           });
         } catch (error) {
+          logger.error('[Auth] Registration failed', error as Error);
           set({ isLoading: false });
           throw error;
         }
       },
 
       // Logout
-      logout: () => {
+      logout: async () => {
+        try {
+          // Clear secure storage
+          await secureStorage.deleteItems([
+            AUTH_STORAGE_KEYS.ACCESS_TOKEN,
+            AUTH_STORAGE_KEYS.REFRESH_TOKEN,
+            AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
+          ]);
+          logger.info('[Auth] Logout successful');
+        } catch (error) {
+          logger.error('[Auth] Error clearing tokens', error as Error);
+        }
         set({
           user: null,
           token: null,
@@ -198,12 +216,23 @@ export const useAuthStore = create<AuthState>()(
         if (!refreshToken) return;
 
         try {
-          // TODO: Replace with actual API call
-          // const response = await api.post('/auth/refresh', { refreshToken });
-          // set({ token: response.data.token });
+          const response = await apiClient.post<{
+            accessToken: string;
+            refreshToken: string;
+          }>('/auth/refresh', { refreshToken });
+
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+          // Update secure storage
+          await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+          await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
+
+          set({ token: accessToken, refreshToken: newRefreshToken });
+          logger.info('[Auth] Token refreshed successfully');
         } catch (error) {
+          logger.error('[Auth] Token refresh failed', error as Error);
           // If refresh fails, logout
-          get().logout();
+          await get().logout();
           throw error;
         }
       },

@@ -87,14 +87,31 @@ export function usePushNotifications() {
 
   useEffect(() => {
     // Register for push notifications
-    registerForPushNotifications().then((token) => {
+    registerForPushNotifications().then(async (token) => {
       if (token) {
         setExpoPushToken(token);
         addBreadcrumb('Push token registered', 'notification', 'info', {
           token,
         });
-        // TODO: Send token to backend
-        // api.post('/user/push-token', { token });
+        // Send token to backend
+        try {
+          const { registerPushToken } = await import('../services/pushTokenService');
+          await registerPushToken(token, {
+            enabled: true,
+            channels: {
+              messages: true,
+              moments: true,
+              gifts: true,
+              trustNotes: true,
+              matches: true,
+              recommendations: true,
+              marketing: false,
+            },
+          });
+          logger.info('[Push] Token sent to backend');
+        } catch (error) {
+          logger.error('[Push] Failed to send token to backend', error as Error);
+        }
       }
     });
 
