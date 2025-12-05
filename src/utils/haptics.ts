@@ -6,6 +6,7 @@
  */
 
 import * as Haptics from 'expo-haptics';
+import { logger } from './logger';
 import { Platform } from 'react-native';
 
 /**
@@ -73,7 +74,7 @@ export const triggerHaptic = async (type: HapticType = HapticType.LIGHT) => {
     // Haptics may not be available on all devices
     if (__DEV__) {
       // eslint-disable-next-line no-console
-      console.warn('Haptic feedback failed:', error);
+      logger.warn('Haptic feedback failed:', error);
     }
   }
 };

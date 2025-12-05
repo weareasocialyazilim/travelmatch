@@ -7,6 +7,7 @@ import type { UseFormProps, UseFormReturn, FieldValues } from 'react-hook-form';
 import { useForm as useHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ZodType, TypeOf } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Zod schema ile entegre form hook
@@ -18,18 +19,21 @@ import type { ZodType, TypeOf } from 'zod';
  *   defaultValues: { email: '', password: '' }
  * });
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useZodForm<TSchema extends ZodType<any, any, any>>(
-  options: Omit<UseFormProps<TypeOf<TSchema>>, 'resolver'> & {
+export function useZodForm<
+  TSchema extends ZodType<FieldValues>,
+  TOutput extends FieldValues = TypeOf<TSchema>,
+>(
+  options: Omit<UseFormProps<TOutput>, 'resolver'> & {
     schema: TSchema;
   },
-): UseFormReturn<TypeOf<TSchema>> {
+): UseFormReturn<TOutput> {
   const { schema, ...formOptions } = options;
 
-  return useHookForm<TypeOf<TSchema>>({
+  return useHookForm<TOutput>({
     ...formOptions,
+    // zodResolver returns a compatible resolver
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(schema) as any,
+    resolver: zodResolver(schema as any) as any,
     mode: formOptions.mode || 'onChange', // Default to real-time validation
   });
 }
@@ -112,3 +116,95 @@ export { useWatch } from 'react-hook-form';
  * />
  */
 export { Controller } from 'react-hook-form';
+
+/**
+ * Enhanced form submission hook with toast notifications and retry logic
+ * Combines form submission with UI feedback
+ *
+ * @example
+ * const { submit, isSubmitting, error } = useFormSubmit({
+ *   onSubmit: async (data) => await api.createMoment(data),
+ *   onSuccess: () => navigation.goBack(),
+ *   successMessage: 'Moment created successfully!',
+ * });
+ */
+export function useFormSubmit<TData extends FieldValues>({
+  onSubmit,
+  onSuccess,
+  onError,
+  successMessage,
+  errorMessage,
+  resetOnSuccess = false,
+  form,
+}: {
+  onSubmit: (data: TData) => Promise<unknown>;
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+  successMessage?: string;
+  errorMessage?: string;
+  resetOnSuccess?: boolean;
+  form?: { reset: () => void };
+}) {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+  const submit = React.useCallback(
+    async (data: TData) => {
+      if (isSubmitting) return;
+
+      setIsSubmitting(true);
+      setError(null);
+      setIsSuccess(false);
+
+      try {
+        await onSubmit(data);
+        setIsSuccess(true);
+
+        if (resetOnSuccess && form) {
+          form.reset();
+        }
+
+        // Log success message if provided
+        if (successMessage) {
+          // Could integrate with toast system here
+          logger.info(successMessage);
+        }
+
+        onSuccess?.();
+      } catch (err) {
+        const error =
+          err instanceof Error
+            ? err
+            : new Error(errorMessage || 'Submission failed');
+        setError(error);
+        onError?.(error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [
+      isSubmitting,
+      onSubmit,
+      onSuccess,
+      onError,
+      successMessage,
+      errorMessage,
+      resetOnSuccess,
+      form,
+    ],
+  );
+
+  const reset = React.useCallback(() => {
+    setError(null);
+    setIsSuccess(false);
+  }, []);
+
+  return {
+    submit,
+    isSubmitting,
+    error,
+    isSuccess,
+    reset,
+  };
+}

@@ -20,9 +20,9 @@ import { SPACING } from '@/constants/spacing';
 import { RADII } from '@/constants/radii';
 import { useHaptics } from '@/hooks/useHaptics';
 import { analytics } from '@/services/analytics';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -61,7 +61,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { impact } = useHaptics();
-  
+
   // Fade animation
   const opacity = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
@@ -74,6 +74,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     } else {
       opacity.value = withTiming(0, { duration: 200 });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const handleRatingPress = (value: number) => {
@@ -95,8 +96,8 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     setIsSubmitting(true);
     impact('medium');
 
-    // Track feedback event
-    analytics.track('feedback_submitted' as any, {
+    // Track feedback event using trackEvent for custom event names
+    analytics.trackEvent('feedback_submitted', {
       rating,
       category: selectedCategory,
       hasComment: comment.length > 0,
@@ -173,7 +174,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   <Ionicons
                     name={value <= rating ? 'star' : 'star-outline'}
                     size={36}
-                    color={value <= rating ? '#FFD700' : COLORS.gray[300]}
+                    color={value <= rating ? COLORS.gold : COLORS.gray[300]}
                   />
                 </TouchableOpacity>
               ))}

@@ -148,6 +148,8 @@
     "privacy": "Gizlilik",
     "notifications": "Bildirimler",
     "language": "Dil",
+    "selectLanguage": "Dil Seçin",
+    "languageNote": "Dil değiştirildikten sonra uygulama hemen güncellenecektir.",
     "theme": "Tema",
     "lightMode": "Açık Mod",
     "darkMode": "Koyu Mod",

@@ -41,12 +41,20 @@ export function usePushNotifications() {
         // Navigate based on notification type
         // Using type assertions for dynamic navigation from push notifications
         if (data.type === 'booking' && data.bookingId) {
-          (navigation as { navigate: (screen: string, params?: unknown) => void }).navigate('BookingDetail', {
+          (
+            navigation as {
+              navigate: (screen: string, params?: unknown) => void;
+            }
+          ).navigate('BookingDetail', {
             bookingId: data.bookingId as string,
           });
         } else if (data.type === 'message' && data.userId) {
           // Chat requires otherUser object - create minimal user for navigation
-          (navigation as { navigate: (screen: string, params?: unknown) => void }).navigate('Chat', {
+          (
+            navigation as {
+              navigate: (screen: string, params?: unknown) => void;
+            }
+          ).navigate('Chat', {
             otherUser: {
               id: data.userId as string,
               name: (data.userName as string) || 'User',
@@ -56,11 +64,19 @@ export function usePushNotifications() {
         } else if (data.type === 'moment' && data.momentId) {
           // MomentDetail requires full moment - navigate to a loading screen
           // that fetches the moment by ID
-          (navigation as { navigate: (screen: string, params?: unknown) => void }).navigate('MomentPreview', {
+          (
+            navigation as {
+              navigate: (screen: string, params?: unknown) => void;
+            }
+          ).navigate('MomentPreview', {
             momentId: data.momentId as string,
           });
         } else if (data.screen) {
-          (navigation as { navigate: (screen: string, params?: unknown) => void }).navigate(data.screen as string);
+          (
+            navigation as {
+              navigate: (screen: string, params?: unknown) => void;
+            }
+          ).navigate(data.screen as string);
         }
       } catch (error) {
         logger.error('Error navigating from notification', error as Error);

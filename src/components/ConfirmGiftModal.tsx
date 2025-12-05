@@ -46,6 +46,7 @@ export const ConfirmGiftModal: React.FC<Props> = ({
       scale.value = withTiming(0.8, { duration: 150 });
       opacity.value = withTiming(0, { duration: 150 });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({

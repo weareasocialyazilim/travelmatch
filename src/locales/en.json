@@ -148,6 +148,8 @@
     "privacy": "Privacy",
     "notifications": "Notifications",
     "language": "Language",
+    "selectLanguage": "Select Language",
+    "languageNote": "The app will update immediately after changing the language.",
     "theme": "Theme",
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode",

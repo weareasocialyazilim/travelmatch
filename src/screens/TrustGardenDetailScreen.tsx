@@ -43,7 +43,11 @@ const TrustGardenDetailScreen: React.FC = () => {
       icon: 'shield-check',
       value: 100,
       maxValue: 100,
-      tips: ['Complete full KYC verification', 'Verify your ID document', 'Add proof of address'],
+      tips: [
+        'Complete full KYC verification',
+        'Verify your ID document',
+        'Add proof of address',
+      ],
     },
     {
       id: '2',
@@ -52,7 +56,11 @@ const TrustGardenDetailScreen: React.FC = () => {
       icon: 'link-variant',
       value: 10,
       maxValue: 15,
-      tips: ['Connect Instagram (+5%)', 'Connect X/Twitter (+5%)', 'Connect Facebook (+5%)'],
+      tips: [
+        'Connect Instagram (+5%)',
+        'Connect X/Twitter (+5%)',
+        'Connect Facebook (+5%)',
+      ],
     },
     {
       id: '3',
@@ -61,7 +69,11 @@ const TrustGardenDetailScreen: React.FC = () => {
       icon: 'check-circle',
       value: 23,
       maxValue: 30,
-      tips: ['Complete more moment requests', 'Maintain high ratings', 'Respond quickly to requests'],
+      tips: [
+        'Complete more moment requests',
+        'Maintain high ratings',
+        'Respond quickly to requests',
+      ],
     },
     {
       id: '4',
@@ -70,7 +82,11 @@ const TrustGardenDetailScreen: React.FC = () => {
       icon: 'message-reply',
       value: 95,
       maxValue: 100,
-      tips: ['Reply within 2 hours', 'Accept or decline requests quickly', 'Keep your calendar updated'],
+      tips: [
+        'Reply within 2 hours',
+        'Accept or decline requests quickly',
+        'Keep your calendar updated',
+      ],
     },
     {
       id: '5',
@@ -79,7 +95,11 @@ const TrustGardenDetailScreen: React.FC = () => {
       icon: 'star',
       value: 4.8,
       maxValue: 5,
-      tips: ['Provide authentic experiences', 'Communicate clearly', 'Go above expectations'],
+      tips: [
+        'Provide authentic experiences',
+        'Communicate clearly',
+        'Go above expectations',
+      ],
     },
   ];
 
@@ -98,9 +118,12 @@ const TrustGardenDetailScreen: React.FC = () => {
 
   const getLevelColor = () => {
     switch (trustData.level) {
-      case 'Blooming': return COLORS.mint;
-      case 'Growing': return COLORS.softOrange;
-      default: return COLORS.coral;
+      case 'Blooming':
+        return COLORS.mint;
+      case 'Growing':
+        return COLORS.softOrange;
+      default:
+        return COLORS.coral;
     }
   };
 
@@ -123,7 +146,11 @@ const TrustGardenDetailScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Trust Garden</Text>
         <View style={styles.placeholder} />
@@ -136,37 +163,56 @@ const TrustGardenDetailScreen: React.FC = () => {
       >
         {/* Trust Overview Card */}
         <View style={[styles.overviewCard, { borderColor: getLevelColor() }]}>
-          <View style={[styles.levelIcon, { backgroundColor: `${getLevelColor()}20` }]}>
-            <MaterialCommunityIcons name="flower" size={32} color={getLevelColor()} />
+          <View
+            style={[
+              styles.levelIcon,
+              { backgroundColor: `${getLevelColor()}20` },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="flower"
+              size={32}
+              color={getLevelColor()}
+            />
           </View>
-          
-          <Text style={[styles.levelName, { color: getLevelColor() }]}>{trustData.level}</Text>
+
+          <Text style={[styles.levelName, { color: getLevelColor() }]}>
+            {trustData.level}
+          </Text>
           <Text style={styles.levelRank}>{trustData.rank} of all users</Text>
-          
+
           <View style={styles.scoreContainer}>
             <View style={styles.scoreCircle}>
               <Text style={styles.scoreValue}>{trustData.score}</Text>
               <Text style={styles.scoreMax}>/100</Text>
             </View>
           </View>
-          
+
           <Text style={styles.levelDescription}>{getLevelDescription()}</Text>
 
           {/* Progress to Next Level */}
           <View style={styles.progressSection}>
             <View style={styles.progressHeader}>
-              <Text style={styles.progressLabel}>Next Level: {trustData.nextLevel}</Text>
-              <Text style={styles.progressPoints}>{trustData.pointsToNext} points needed</Text>
+              <Text style={styles.progressLabel}>
+                Next Level: {trustData.nextLevel}
+              </Text>
+              <Text style={styles.progressPoints}>
+                {trustData.pointsToNext} points needed
+              </Text>
             </View>
             <View style={styles.progressBar}>
-              <View 
+              <View
                 style={[
-                  styles.progressFill, 
-                  { 
-                    width: `${((trustData.score) / (trustData.score + trustData.pointsToNext)) * 100}%`,
-                    backgroundColor: getLevelColor() 
-                  }
-                ]} 
+                  styles.progressFill,
+                  {
+                    width: `${
+                      (trustData.score /
+                        (trustData.score + trustData.pointsToNext)) *
+                      100
+                    }%`,
+                    backgroundColor: getLevelColor(),
+                  },
+                ]}
               />
             </View>
           </View>
@@ -175,101 +221,134 @@ const TrustGardenDetailScreen: React.FC = () => {
         {/* Trust Factors */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>TRUST FACTORS</Text>
-          
+
           {trustFactors.map((factor) => {
             const onPress = getFactorNavigation(factor.id);
             const FactorWrapper = onPress ? TouchableOpacity : View;
-            
+
             return (
-            <FactorWrapper 
-              key={factor.id} 
-              style={styles.factorCard}
-              onPress={onPress}
-              activeOpacity={onPress ? 0.7 : 1}
-            >
-              <View style={styles.factorHeader}>
-                <View style={[styles.factorIcon, { backgroundColor: COLORS.mintTransparent }]}>
-                  <MaterialCommunityIcons
-                    name={factor.icon as any}
-                    size={20}
-                    color={COLORS.mint}
+              <FactorWrapper
+                key={factor.id}
+                style={styles.factorCard}
+                onPress={onPress}
+                activeOpacity={onPress ? 0.7 : 1}
+              >
+                <View style={styles.factorHeader}>
+                  <View
+                    style={[
+                      styles.factorIcon,
+                      { backgroundColor: COLORS.mintTransparent },
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name={
+                        factor.icon as React.ComponentProps<
+                          typeof MaterialCommunityIcons
+                        >['name']
+                      }
+                      size={20}
+                      color={COLORS.mint}
+                    />
+                  </View>
+                  <View style={styles.factorInfo}>
+                    <Text style={styles.factorName}>{factor.name}</Text>
+                    <Text style={styles.factorDesc}>{factor.description}</Text>
+                  </View>
+                  <View style={styles.factorValueContainer}>
+                    <View style={styles.factorValue}>
+                      <Text style={styles.factorValueText}>
+                        {factor.id === '5'
+                          ? factor.value.toFixed(1)
+                          : factor.value}
+                      </Text>
+                      <Text style={styles.factorMaxText}>
+                        /
+                        {factor.id === '5'
+                          ? factor.maxValue.toFixed(1)
+                          : factor.maxValue}
+                      </Text>
+                    </View>
+                    {onPress && (
+                      <MaterialCommunityIcons
+                        name="chevron-right"
+                        size={18}
+                        color={COLORS.textSecondary}
+                      />
+                    )}
+                  </View>
+                </View>
+
+                <View style={styles.factorProgressBar}>
+                  <View
+                    style={[
+                      styles.factorProgressFill,
+                      { width: `${(factor.value / factor.maxValue) * 100}%` },
+                    ]}
                   />
                 </View>
-                <View style={styles.factorInfo}>
-                  <Text style={styles.factorName}>{factor.name}</Text>
-                  <Text style={styles.factorDesc}>{factor.description}</Text>
-                </View>
-                <View style={styles.factorValueContainer}>
-                  <View style={styles.factorValue}>
-                    <Text style={styles.factorValueText}>
-                      {factor.id === '5' ? factor.value.toFixed(1) : factor.value}
-                    </Text>
-                    <Text style={styles.factorMaxText}>
-                      /{factor.id === '5' ? factor.maxValue.toFixed(1) : factor.maxValue}
-                    </Text>
+
+                {factor.value < factor.maxValue && (
+                  <View style={styles.tipsContainer}>
+                    <Text style={styles.tipsTitle}>How to improve:</Text>
+                    {factor.tips.slice(0, 2).map((tip, index) => (
+                      <View key={index} style={styles.tipItem}>
+                        <MaterialCommunityIcons
+                          name="arrow-right"
+                          size={14}
+                          color={COLORS.textSecondary}
+                        />
+                        <Text style={styles.tipText}>{tip}</Text>
+                      </View>
+                    ))}
                   </View>
-                  {onPress && (
-                    <MaterialCommunityIcons name="chevron-right" size={18} color={COLORS.textSecondary} />
-                  )}
-                </View>
-              </View>
-              
-              <View style={styles.factorProgressBar}>
-                <View 
-                  style={[
-                    styles.factorProgressFill, 
-                    { width: `${(factor.value / factor.maxValue) * 100}%` }
-                  ]} 
-                />
-              </View>
-              
-              {factor.value < factor.maxValue && (
-                <View style={styles.tipsContainer}>
-                  <Text style={styles.tipsTitle}>How to improve:</Text>
-                  {factor.tips.slice(0, 2).map((tip, index) => (
-                    <View key={index} style={styles.tipItem}>
-                      <MaterialCommunityIcons name="arrow-right" size={14} color={COLORS.textSecondary} />
-                      <Text style={styles.tipText}>{tip}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </FactorWrapper>
-          );
+                )}
+              </FactorWrapper>
+            );
           })}
         </View>
 
         {/* Trust Levels Explained */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>TRUST LEVELS</Text>
-          
+
           <View style={styles.levelsCard}>
             <View style={styles.levelRow}>
-              <View style={[styles.levelDot, { backgroundColor: COLORS.coral }]} />
+              <View
+                style={[styles.levelDot, { backgroundColor: COLORS.coral }]}
+              />
               <View style={styles.levelInfo}>
                 <Text style={styles.levelTitle}>Sprout</Text>
                 <Text style={styles.levelRange}>0-40 points</Text>
               </View>
             </View>
-            
+
             <View style={styles.levelRow}>
-              <View style={[styles.levelDot, { backgroundColor: COLORS.softOrange }]} />
+              <View
+                style={[
+                  styles.levelDot,
+                  { backgroundColor: COLORS.softOrange },
+                ]}
+              />
               <View style={styles.levelInfo}>
                 <Text style={styles.levelTitle}>Growing</Text>
                 <Text style={styles.levelRange}>41-70 points</Text>
               </View>
             </View>
-            
+
             <View style={styles.levelRow}>
-              <View style={[styles.levelDot, { backgroundColor: COLORS.mint }]} />
+              <View
+                style={[styles.levelDot, { backgroundColor: COLORS.mint }]}
+              />
               <View style={styles.levelInfo}>
                 <Text style={styles.levelTitle}>Blooming</Text>
                 <Text style={styles.levelRange}>71-90 points</Text>
               </View>
             </View>
-            
+
             <View style={styles.levelRow}>
-              <View style={[styles.levelDot, { backgroundColor: '#6366F1' }]} />
+              <View
+                style={[styles.levelDot, { backgroundColor: COLORS.indigo }]}
+              />
               <View style={styles.levelInfo}>
                 <Text style={styles.levelTitle}>Flourishing</Text>
                 <Text style={styles.levelRange}>91-100 points</Text>

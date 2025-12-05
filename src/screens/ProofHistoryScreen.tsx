@@ -67,8 +67,8 @@ const getStatusConfig = (status: string) => {
     case 'approved':
       return {
         icon: 'shield-check' as IconName,
-        color: '#10B981',
-        bgColor: '#10B98120',
+        color: COLORS.emerald,
+        bgColor: COLORS.emeraldTransparent20,
         label: 'Approved',
       };
     case 'pending':

@@ -4,6 +4,7 @@
  */
 
 import type { ComponentType, LazyExoticComponent, ReactNode } from 'react';
+import { COLORS } from '../constants/colors';
 import React, { lazy, Suspense } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
@@ -12,7 +13,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
  */
 const DefaultLoadingFallback = () => (
   <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color="#007AFF" />
+    <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
   </View>
 );
 

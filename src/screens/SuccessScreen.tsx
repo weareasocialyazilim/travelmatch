@@ -14,8 +14,8 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NavigationProp, RouteProp } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -52,7 +52,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
     icon: 'credit-card-check',
     iconColor: COLORS.success,
     title: 'Card Added Successfully',
-    subtitle: 'You can now use this card to support travelers\' moments.',
+    subtitle: "You can now use this card to support travelers' moments.",
     primaryButton: 'Done',
     primaryAction: 'Discover',
   },
@@ -77,7 +77,8 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
     iconColor: COLORS.primary,
     emoji: '🎉',
     title: 'Gift Sent!',
-    subtitle: 'Your gift is now securely held in escrow. We\'ll notify you with proof as soon as the traveler completes the moment.',
+    subtitle:
+      "Your gift is now securely held in escrow. We'll notify you with proof as soon as the traveler completes the moment.",
     primaryButton: 'View Moment',
     primaryAction: 'Discover',
   },
@@ -85,7 +86,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
     icon: 'check-circle',
     iconColor: COLORS.success,
     title: 'Withdrawal Requested',
-    subtitle: 'You\'ll receive the money soon.',
+    subtitle: "You'll receive the money soon.",
     primaryButton: 'Done',
     primaryAction: 'Wallet',
     showDetails: true,
@@ -94,7 +95,8 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
     icon: 'check-circle',
     iconColor: COLORS.success,
     title: 'Dispute Submitted Successfully',
-    subtitle: 'Your dispute has been received and a confirmation email has been sent. Our support team will review your case within 3-5 business days.',
+    subtitle:
+      'Your dispute has been received and a confirmation email has been sent. Our support team will review your case within 3-5 business days.',
     primaryButton: 'Track Dispute Status',
     primaryAction: 'Discover',
     secondaryButton: 'Return to Wallet',
@@ -104,7 +106,8 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
     icon: 'check-circle',
     iconColor: COLORS.success,
     title: 'Proof Uploaded!',
-    subtitle: 'Your proof has been submitted for verification. You\'ll be notified once it\'s approved.',
+    subtitle:
+      "Your proof has been submitted for verification. You'll be notified once it's approved.",
     primaryButton: 'View Proof',
     primaryAction: 'Discover',
   },
@@ -112,15 +115,16 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
     icon: 'check-decagram',
     iconColor: COLORS.success,
     title: 'Proof Approved!',
-    subtitle: 'Congratulations! Your proof has been verified and funds have been released.',
+    subtitle:
+      'Congratulations! Your proof has been verified and funds have been released.',
     primaryButton: 'Done',
     primaryAction: 'Wallet',
   },
   profile_complete: {
     icon: 'account-check',
     iconColor: COLORS.success,
-    title: 'You\'re in!',
-    subtitle: 'Let\'s personalize your TravelMatch journey.',
+    title: "You're in!",
+    subtitle: "Let's personalize your TravelMatch journey.",
     primaryButton: 'Start exploring',
     primaryAction: 'Discover',
   },
@@ -139,25 +143,27 @@ type SuccessScreenRouteProp = RouteProp<RootStackParamList, 'Success'>;
 export const SuccessScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<SuccessScreenRouteProp>();
-  
+
   // Get success type from route params, default to generic
   const successType: SuccessType = route.params?.type || 'generic';
   const customTitle = route.params?.title;
   const customSubtitle = route.params?.subtitle;
   const details = route.params?.details;
-  
+
   const config = SUCCESS_CONFIGS[successType];
-  
+
   const title = customTitle || config.title;
   const subtitle = customSubtitle || config.subtitle;
 
   const handlePrimaryAction = () => {
-    (navigation as any).navigate(config.primaryAction);
+    // Type-safe navigation with proper params
+    const screen = config.primaryAction;
+    navigation.navigate(screen as never);
   };
 
   const handleSecondaryAction = () => {
     if (config.secondaryAction) {
-      (navigation as any).navigate(config.secondaryAction);
+      navigation.navigate(config.secondaryAction as never);
     }
   };
 
@@ -171,15 +177,11 @@ export const SuccessScreen: React.FC = () => {
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-          <MaterialCommunityIcons
-            name="close"
-            size={24}
-            color={COLORS.text}
-          />
+          <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -212,7 +214,9 @@ export const SuccessScreen: React.FC = () => {
               {details.amount && (
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Amount</Text>
-                  <Text style={styles.detailValue}>${details.amount.toFixed(2)}</Text>
+                  <Text style={styles.detailValue}>
+                    ${details.amount.toFixed(2)}
+                  </Text>
                 </View>
               )}
               {details.destination && (
@@ -230,7 +234,9 @@ export const SuccessScreen: React.FC = () => {
               {details.estimatedArrival && (
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Estimated Arrival</Text>
-                  <Text style={styles.detailValue}>{details.estimatedArrival}</Text>
+                  <Text style={styles.detailValue}>
+                    {details.estimatedArrival}
+                  </Text>
                 </View>
               )}
             </View>
@@ -254,7 +260,9 @@ export const SuccessScreen: React.FC = () => {
             onPress={handleSecondaryAction}
             activeOpacity={0.8}
           >
-            <Text style={styles.secondaryButtonText}>{config.secondaryButton}</Text>
+            <Text style={styles.secondaryButtonText}>
+              {config.secondaryButton}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -333,7 +341,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     gap: 16,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -372,7 +380,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -12,58 +13,93 @@ import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import BottomNav from '../components/BottomNav';
+import { ScreenErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';
+import { usePayments } from '../hooks/usePayments';
 
 type FilterType = 'all' | 'incoming' | 'outgoing';
 
-interface Transaction {
-  id: string;
-  type: 'gift_received' | 'withdrawal' | 'gift_sent';
-  title: string;
-  subtitle: string;
-  amount: number;
-  isPositive: boolean;
-  hasProofLoop?: boolean;
-  status?: string;
-}
+// Mock data as fallback while API is not ready
+const MOCK_TRANSACTIONS = [
+  {
+    id: '1',
+    type: 'gift_received' as const,
+    title: 'Gift for Parisian Croissant',
+    subtitle: 'From Sarah • Pending Proof',
+    amount: 10.0,
+    isPositive: true,
+    hasProofLoop: true,
+    status: 'pending',
+  },
+  {
+    id: '2',
+    type: 'withdrawal' as const,
+    title: 'Withdrawal to Bank',
+    subtitle: 'Completed',
+    amount: 50.0,
+    isPositive: false,
+  },
+  {
+    id: '3',
+    type: 'gift_received' as const,
+    title: 'Gift received - Galata coffee',
+    subtitle: 'From Marco • Approved',
+    amount: 5.0,
+    isPositive: true,
+  },
+];
 
 const WalletScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
 
-  const balance = {
-    available: 1250.0,
-    escrow: 300.0,
-  };
+  // Use payments hook
+  const {
+    balance,
+    transactions,
+    balanceLoading,
+    transactionsError: _error,
+    refreshBalance,
+    loadTransactions,
+  } = usePayments();
 
-  const transactions: Transaction[] = [
-    {
-      id: '1',
-      type: 'gift_received',
-      title: 'Gift for Parisian Croissant',
-      subtitle: 'From Sarah • Pending Proof',
-      amount: 10.0,
-      isPositive: true,
-      hasProofLoop: true,
-      status: 'pending',
-    },
-    {
-      id: '2',
-      type: 'withdrawal',
-      title: 'Withdrawal to Bank',
-      subtitle: 'Completed',
-      amount: 50.0,
-      isPositive: false,
-    },
-    {
-      id: '3',
-      type: 'gift_received',
-      title: 'Gift received - Galata coffee',
-      subtitle: 'From Marco • Approved',
-      amount: 5.0,
-      isPositive: true,
-    },
-  ];
+  const isLoading = balanceLoading;
+
+  // Fetch data on mount
+  useEffect(() => {
+    refreshBalance();
+    loadTransactions();
+  }, [refreshBalance, loadTransactions]);
+
+  // Use API transactions or fallback to mock
+  const displayTransactions = useMemo(() => {
+    if (transactions.length > 0) {
+      return transactions.map((t) => ({
+        id: t.id,
+        type: t.type as 'gift_received' | 'withdrawal' | 'gift_sent',
+        title: t.description || t.type,
+        subtitle: t.status || '',
+        amount: t.amount,
+        isPositive: t.type !== 'withdrawal',
+        hasProofLoop: t.type === 'gift_received' && t.status === 'pending',
+        status: t.status,
+      }));
+    }
+    return MOCK_TRANSACTIONS;
+  }, [transactions]);
+
+  // Filter transactions
+  const filteredTransactions = useMemo(() => {
+    if (selectedFilter === 'all') return displayTransactions;
+    if (selectedFilter === 'incoming')
+      return displayTransactions.filter((t) => t.isPositive);
+    return displayTransactions.filter((t) => !t.isPositive);
+  }, [displayTransactions, selectedFilter]);
+
+  const onRefresh = () => {
+    refreshBalance();
+    loadTransactions();
+  };
 
   const handleWithdraw = () => {
     navigation.navigate('Withdraw');
@@ -73,7 +109,9 @@ const WalletScreen = () => {
     navigation.navigate('TransactionHistory');
   };
 
-  const getTransactionIcon = (type: Transaction['type']) => {
+  const getTransactionIcon = (
+    type: 'gift_received' | 'withdrawal' | 'gift_sent',
+  ) => {
     switch (type) {
       case 'gift_received':
         return 'gift';
@@ -114,16 +152,20 @@ const WalletScreen = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
+        }
       >
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>Available Balance</Text>
             <Text style={styles.balanceAmount}>
-              ${balance.available.toFixed(2)}
+              ${(balance?.available || 1250).toFixed(2)}
             </Text>
             <Text style={styles.escrowText}>
-              ${balance.escrow.toFixed(2)} in Escrow (waiting for proof)
+              ${(balance?.pending || 300).toFixed(2)} in Escrow (waiting for
+              proof)
             </Text>
           </View>
           <View style={styles.balanceActions}>
@@ -202,49 +244,62 @@ const WalletScreen = () => {
         <Text style={styles.sectionTitle}>Transactions</Text>
 
         {/* Transaction List */}
-        {transactions.map((transaction) => (
-          <TouchableOpacity
-            key={transaction.id}
-            style={styles.transactionItem}
-            onPress={() =>
-              navigation.navigate('TransactionDetail', {
-                transactionId: transaction.id,
-              })
-            }
-          >
-            <View style={styles.transactionLeft}>
-              <View style={styles.transactionIcon}>
-                <MaterialCommunityIcons
-                  name={getTransactionIcon(transaction.type)}
-                  size={20}
-                  color={COLORS.text}
-                />
-              </View>
-              <View style={styles.transactionInfo}>
-                <Text style={styles.transactionTitle}>{transaction.title}</Text>
-                <Text style={styles.transactionSubtitle}>
-                  {transaction.subtitle}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.transactionRight}>
-              <Text
-                style={[
-                  styles.transactionAmount,
-                  transaction.isPositive && styles.transactionAmountPositive,
-                ]}
-              >
-                {transaction.isPositive ? '+' : '-'}$
-                {transaction.amount.toFixed(2)}
-              </Text>
-              {transaction.hasProofLoop && (
-                <View style={styles.proofLoopBadge}>
-                  <Text style={styles.proofLoopText}>ProofLoop</Text>
+        {filteredTransactions.length === 0 ? (
+          <View style={styles.emptyState}>
+            <MaterialCommunityIcons
+              name="receipt"
+              size={48}
+              color={COLORS.textSecondary}
+            />
+            <Text style={styles.emptyText}>No transactions yet</Text>
+          </View>
+        ) : (
+          filteredTransactions.map((transaction) => (
+            <TouchableOpacity
+              key={transaction.id}
+              style={styles.transactionItem}
+              onPress={() =>
+                navigation.navigate('TransactionDetail', {
+                  transactionId: transaction.id,
+                })
+              }
+            >
+              <View style={styles.transactionLeft}>
+                <View style={styles.transactionIcon}>
+                  <MaterialCommunityIcons
+                    name={getTransactionIcon(transaction.type)}
+                    size={20}
+                    color={COLORS.text}
+                  />
                 </View>
-              )}
-            </View>
-          </TouchableOpacity>
-        ))}
+                <View style={styles.transactionInfo}>
+                  <Text style={styles.transactionTitle}>
+                    {transaction.title}
+                  </Text>
+                  <Text style={styles.transactionSubtitle}>
+                    {transaction.subtitle}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.transactionRight}>
+                <Text
+                  style={[
+                    styles.transactionAmount,
+                    transaction.isPositive && styles.transactionAmountPositive,
+                  ]}
+                >
+                  {transaction.isPositive ? '+' : '-'}$
+                  {transaction.amount.toFixed(2)}
+                </Text>
+                {transaction.hasProofLoop && (
+                  <View style={styles.proofLoopBadge}>
+                    <Text style={styles.proofLoopText}>ProofLoop</Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
@@ -448,9 +503,26 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.amberBright,
   },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    color: COLORS.textSecondary,
+    fontSize: 15,
+    marginTop: 12,
+  },
   bottomSpacer: {
     height: 32,
   },
 });
 
-export default WalletScreen;
+// Wrap with ScreenErrorBoundary for critical wallet functionality
+const WalletScreenWithErrorBoundary = () => (
+  <ScreenErrorBoundary>
+    <WalletScreen />
+  </ScreenErrorBoundary>
+);
+
+export default WalletScreenWithErrorBoundary;

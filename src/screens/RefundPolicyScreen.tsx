@@ -244,7 +244,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
             Our support team is here to help you with any refund questions or
             concerns.
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.contactButton}
             onPress={() => navigation.navigate('Support')}
           >

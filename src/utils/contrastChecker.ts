@@ -1,3 +1,5 @@
+import { logger } from './logger';
+import { COLORS } from '../constants/colors';
 /**
  * WCAG 2.1 Contrast Checker
  * Validates color contrast ratios for accessibility compliance
@@ -38,7 +40,7 @@ export function getContrastRatio(color1: string, color2: string): number {
   const rgb2 = hexToRgb(color2);
 
   if (!rgb1 || !rgb2) {
-    console.warn('Invalid color format. Use hex colors like #FFFFFF');
+    logger.warn('Invalid color format. Use hex colors like #FFFFFF');
     return 1;
   }
 
@@ -129,18 +131,18 @@ export function validateThemeContrast(theme: {
       isLarge: false,
     },
     {
-      fg: '#FFFFFF',
+      fg: COLORS.white,
       bg: theme.primary,
       name: 'white/primary',
       isLarge: false,
     },
     {
-      fg: '#FFFFFF',
+      fg: COLORS.white,
       bg: theme.success,
       name: 'white/success',
       isLarge: false,
     },
-    { fg: '#FFFFFF', bg: theme.error, name: 'white/error', isLarge: false },
+    { fg: COLORS.white, bg: theme.error, name: 'white/error', isLarge: false },
   ];
 
   checks.forEach(({ fg, bg, name, isLarge }) => {
@@ -182,5 +184,5 @@ export function suggestBetterContrast(
   const shouldDarken = bgLuminance > 0.5;
 
   // Simple suggestion: make it black or white based on background
-  return shouldDarken ? '#000000' : '#FFFFFF';
+  return shouldDarken ? COLORS.black : COLORS.white;
 }

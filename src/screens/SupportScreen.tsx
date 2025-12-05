@@ -43,10 +43,6 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
     );
   };
 
-  const handleLiveChat = () => {
-    Alert.alert('Live Chat', 'Live chat will be available soon!');
-  };
-
   const handleCallSupport = () => {
     Linking.openURL('tel:+905551234567');
   };
@@ -85,13 +81,6 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
     },
     {
       id: '3',
-      icon: 'chat-outline',
-      title: 'Live Chat',
-      description: 'Available 9 AM - 6 PM',
-      action: handleLiveChat,
-    },
-    {
-      id: '4',
       icon: 'phone-outline',
       title: 'Call Us',
       description: '+90 555 123 45 67',

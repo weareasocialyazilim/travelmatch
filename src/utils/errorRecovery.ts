@@ -2,6 +2,7 @@
  * Error Recovery Utilities
  * Comprehensive error handling and recovery strategies
  */
+import { logger } from './logger';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -40,7 +41,7 @@ export const fetchWithRetry = async <T>(
     shouldRetry = () => true,
   } = options;
 
-  let lastError: Error;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -75,7 +76,7 @@ export const fetchWithRetry = async <T>(
             ? 60000 // Default 60s if date format
             : retryAfterNum * 1000;
 
-          console.log(
+          logger.debug(
             `Rate limited. Waiting ${delay / 1000}s as per Retry-After header`,
           );
         } else {
@@ -98,7 +99,10 @@ export const fetchWithRetry = async <T>(
     }
   }
 
-  throw lastError!;
+  if (lastError) {
+    throw lastError;
+  }
+  throw new Error('Retry failed with unknown error');
 };
 
 /**
@@ -168,7 +172,7 @@ export const persistAppState = async (
 
     await AsyncStorage.setItem(APP_STATE_BACKUP_KEY, JSON.stringify(backup));
   } catch (error) {
-    console.error('Failed to persist app state:', error);
+    logger.error('Failed to persist app state:', error);
   }
 };
 
@@ -205,7 +209,7 @@ export const recoverAppState = async (
     // Return recovered state
     return backup.state;
   } catch (error) {
-    console.error('Failed to recover app state:', error);
+    logger.error('Failed to recover app state:', error);
     return null;
   }
 };
@@ -217,7 +221,7 @@ export const clearAppStateBackup = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(APP_STATE_BACKUP_KEY);
   } catch (error) {
-    console.error('Failed to clear app state backup:', error);
+    logger.error('Failed to clear app state backup:', error);
   }
 };
 
@@ -290,11 +294,11 @@ class NetworkQueueClass {
 
         if (op.retryCount >= op.maxRetries) {
           // Max retries exceeded - remove from queue
-          console.error('Operation failed after max retries:', op.id, error);
+          logger.error('Operation failed after max retries:', op.id, error);
           this.queue.shift();
         } else {
           // Will retry later
-          console.warn('Operation failed, will retry:', op.id, error);
+          logger.warn('Operation failed, will retry:', op.id, error);
           break;
         }
       }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -9,11 +10,16 @@ import {
   Linking,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import { COLORS } from '../constants/colors';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 export const AboutScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   const appInfo = [
     { icon: 'information' as IconName, label: 'Version', value: '1.0.2' },
     { icon: 'hammer-wrench' as IconName, label: 'Build', value: '245' },
@@ -29,9 +35,9 @@ export const AboutScreen: React.FC = () => {
     },
   ];
 
-  const handleLinkPress = (url: string) => {
+  const _handleLinkPress = (url: string) => {
     Linking.openURL(url).catch((err) =>
-      console.error('Failed to open URL:', err),
+      logger.error('Failed to open URL:', err),
     );
   };
 
@@ -87,12 +93,12 @@ export const AboutScreen: React.FC = () => {
         {/* Legal Links */}
         <View style={styles.legalSection}>
           <TouchableOpacity
-            onPress={() => handleLinkPress('https://travelmatch.com/terms')}
+            onPress={() => navigation.navigate('TermsOfService')}
           >
             <Text style={styles.legalLink}>Terms of Service</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => handleLinkPress('https://travelmatch.com/privacy')}
+            onPress={() => navigation.navigate('PrivacyPolicy')}
           >
             <Text style={styles.legalLink}>Privacy Policy</Text>
           </TouchableOpacity>

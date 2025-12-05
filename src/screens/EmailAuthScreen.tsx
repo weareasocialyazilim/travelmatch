@@ -15,8 +15,8 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LoadingState } from '../components/LoadingState';
 import SocialButton from '../components/SocialButton';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/constants/typography';
-import { spacing } from '@/constants/spacing';
+import { TYPOGRAPHY as _TYPOGRAPHY } from '@/constants/typography';
+import { spacing as _spacing } from '@/constants/spacing';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -64,7 +64,13 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
         >
           <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sign in or sign up</Text>
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            {/* eslint-disable-next-line react-native/no-inline-styles */}
+            <View style={[styles.progressFill, { width: '50%' }]} />
+          </View>
+          <Text style={styles.progressText}>Step 1 of 2</Text>
+        </View>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -107,15 +113,10 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
               autoCapitalize="none"
               autoCorrect={false}
             />
+            {email.length > 0 && !validateEmail(email) && (
+              <Text style={styles.errorText}>Please enter a valid email</Text>
+            )}
           </View>
-
-          {/* Forgot Password Link */}
-          <TouchableOpacity
-            style={styles.forgotPasswordButton}
-            onPress={() => navigation.navigate('ForgotPassword')}
-          >
-            <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Bottom Action Bar */}
@@ -148,8 +149,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: `${COLORS.border}20`,
   },
   backButton: {
     width: 40,
@@ -158,12 +157,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
+  progressContainer: {
     flex: 1,
-    textAlign: 'center',
+    alignItems: 'center',
+  },
+  progressBar: {
+    width: 120,
+    height: 4,
+    backgroundColor: COLORS.border,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.mint,
+    borderRadius: 2,
+  },
+  progressText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 4,
   },
   headerSpacer: {
     width: 40,
@@ -222,26 +235,22 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     height: 56,
-    backgroundColor: COLORS.coral,
+    backgroundColor: COLORS.mint,
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
   continueButtonDisabled: {
-    backgroundColor: `${COLORS.coral}50`,
+    backgroundColor: `${COLORS.mint}50`,
   },
   continueButtonText: {
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '700',
   },
-  forgotPasswordButton: {
-    alignSelf: 'center',
-    paddingVertical: spacing.sm,
-  },
-  forgotPasswordText: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.coral,
-    fontWeight: '600',
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
   },
 });

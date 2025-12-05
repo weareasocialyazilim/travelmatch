@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: SCREEN_HEIGHT * 0.6,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay50,
   },
   topBar: {
     flexDirection: 'row',
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: COLORS.overlay30,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   pageIndicatorInactive: {
     width: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    backgroundColor: COLORS.whiteTransparentLight,
   },
   title: {
     fontSize: 30,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: COLORS.textWhite80,
     textAlign: 'center',
   },
   touchArea: {

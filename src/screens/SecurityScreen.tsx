@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -25,7 +26,7 @@ interface ActiveSession {
 
 const SecurityScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [loginAlertsEnabled, setLoginAlertsEnabled] = useState(true);
@@ -74,7 +75,7 @@ const SecurityScreen: React.FC = () => {
             style: 'destructive',
             onPress: () => setTwoFactorEnabled(false),
           },
-        ]
+        ],
       );
     } else {
       navigation.navigate('TwoFactorSetup');
@@ -90,7 +91,7 @@ const SecurityScreen: React.FC = () => {
       Alert.alert('Error', 'You cannot revoke your current session.');
       return;
     }
-    
+
     Alert.alert(
       'Revoke Session',
       `Are you sure you want to sign out from ${session.device}?`,
@@ -100,10 +101,10 @@ const SecurityScreen: React.FC = () => {
           text: 'Revoke',
           style: 'destructive',
           onPress: () => {
-            console.log('Session revoked:', session.id);
+            logger.debug('Session revoked:', session.id);
           },
         },
-      ]
+      ],
     );
   };
 
@@ -117,10 +118,10 @@ const SecurityScreen: React.FC = () => {
           text: 'Sign Out All',
           style: 'destructive',
           onPress: () => {
-            console.log('All sessions revoked');
+            logger.debug('All sessions revoked');
           },
         },
-      ]
+      ],
     );
   };
 
@@ -139,7 +140,11 @@ const SecurityScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Security</Text>
         <View style={styles.placeholder} />
@@ -153,10 +158,15 @@ const SecurityScreen: React.FC = () => {
         {/* KYC Verification Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>IDENTITY VERIFICATION</Text>
-          
+
           <View style={styles.kycCard}>
             <View style={styles.kycHeader}>
-              <View style={[styles.kycIconContainer, kycStatus.verified && styles.kycVerified]}>
+              <View
+                style={[
+                  styles.kycIconContainer,
+                  kycStatus.verified && styles.kycVerified,
+                ]}
+              >
                 <MaterialCommunityIcons
                   name={kycStatus.verified ? 'shield-check' : 'shield-alert'}
                   size={24}
@@ -177,7 +187,7 @@ const SecurityScreen: React.FC = () => {
                 </View>
               )}
             </View>
-            
+
             {kycStatus.verified && (
               <View style={styles.kycDetails}>
                 <View style={styles.kycDetailRow}>
@@ -186,13 +196,15 @@ const SecurityScreen: React.FC = () => {
                 </View>
                 <View style={styles.kycDetailRow}>
                   <Text style={styles.kycDetailLabel}>Verified On</Text>
-                  <Text style={styles.kycDetailValue}>{kycStatus.verifiedDate}</Text>
+                  <Text style={styles.kycDetailValue}>
+                    {kycStatus.verifiedDate}
+                  </Text>
                 </View>
               </View>
             )}
-            
+
             {!kycStatus.verified && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.verifyButton}
                 onPress={() => navigation.navigate('PaymentsKYC')}
               >
@@ -205,16 +217,30 @@ const SecurityScreen: React.FC = () => {
         {/* Authentication Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>AUTHENTICATION</Text>
-          
+
           <View style={styles.menuCard}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleTwoFactorSetup}>
-              <View style={[styles.menuIcon, { backgroundColor: COLORS.mintTransparent }]}>
-                <MaterialCommunityIcons name="shield-lock" size={20} color={COLORS.mint} />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleTwoFactorSetup}
+            >
+              <View
+                style={[
+                  styles.menuIcon,
+                  { backgroundColor: COLORS.mintTransparent },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="shield-lock"
+                  size={20}
+                  color={COLORS.mint}
+                />
               </View>
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>Two-Factor Authentication</Text>
                 <Text style={styles.menuDesc}>
-                  {twoFactorEnabled ? 'Enabled via Authenticator App' : 'Add extra security to your account'}
+                  {twoFactorEnabled
+                    ? 'Enabled via Authenticator App'
+                    : 'Add extra security to your account'}
                 </Text>
               </View>
               <Switch
@@ -227,13 +253,27 @@ const SecurityScreen: React.FC = () => {
 
             <View style={styles.menuDivider} />
 
-            <TouchableOpacity style={styles.menuItem} onPress={() => setBiometricEnabled(!biometricEnabled)}>
-              <View style={[styles.menuIcon, { backgroundColor: COLORS.softOrangeTransparent }]}>
-                <MaterialCommunityIcons name="fingerprint" size={20} color={COLORS.softOrange} />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setBiometricEnabled(!biometricEnabled)}
+            >
+              <View
+                style={[
+                  styles.menuIcon,
+                  { backgroundColor: COLORS.softOrangeTransparent },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="fingerprint"
+                  size={20}
+                  color={COLORS.softOrange}
+                />
               </View>
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>Biometric Login</Text>
-                <Text style={styles.menuDesc}>Use Face ID or Touch ID to sign in</Text>
+                <Text style={styles.menuDesc}>
+                  Use Face ID or Touch ID to sign in
+                </Text>
               </View>
               <Switch
                 value={biometricEnabled}
@@ -245,15 +285,33 @@ const SecurityScreen: React.FC = () => {
 
             <View style={styles.menuDivider} />
 
-            <TouchableOpacity style={styles.menuItem} onPress={handleChangePassword}>
-              <View style={[styles.menuIcon, { backgroundColor: COLORS.background }]}>
-                <MaterialCommunityIcons name="lock-reset" size={20} color={COLORS.text} />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleChangePassword}
+            >
+              <View
+                style={[
+                  styles.menuIcon,
+                  { backgroundColor: COLORS.background },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="lock-reset"
+                  size={20}
+                  color={COLORS.text}
+                />
               </View>
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>Change Password</Text>
-                <Text style={styles.menuDesc}>Update your account password</Text>
+                <Text style={styles.menuDesc}>
+                  Update your account password
+                </Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -261,18 +319,29 @@ const SecurityScreen: React.FC = () => {
         {/* Alerts Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>SECURITY ALERTS</Text>
-          
+
           <View style={styles.menuCard}>
-            <TouchableOpacity 
-              style={styles.menuItem} 
+            <TouchableOpacity
+              style={styles.menuItem}
               onPress={() => setLoginAlertsEnabled(!loginAlertsEnabled)}
             >
-              <View style={[styles.menuIcon, { backgroundColor: COLORS.coralTransparent }]}>
-                <MaterialCommunityIcons name="bell-alert" size={20} color={COLORS.coral} />
+              <View
+                style={[
+                  styles.menuIcon,
+                  { backgroundColor: COLORS.coralTransparent },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="bell-alert"
+                  size={20}
+                  color={COLORS.coral}
+                />
               </View>
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>Login Alerts</Text>
-                <Text style={styles.menuDesc}>Get notified of new sign-ins</Text>
+                <Text style={styles.menuDesc}>
+                  Get notified of new sign-ins
+                </Text>
               </View>
               <Switch
                 value={loginAlertsEnabled}
@@ -292,7 +361,7 @@ const SecurityScreen: React.FC = () => {
               <Text style={styles.revokeAllText}>Sign Out All</Text>
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.sessionsCard}>
             {activeSessions.map((session, index) => (
               <React.Fragment key={session.id}>
@@ -303,7 +372,11 @@ const SecurityScreen: React.FC = () => {
                 >
                   <View style={styles.sessionIcon}>
                     <MaterialCommunityIcons
-                      name={getDeviceIcon(session.device) as any}
+                      name={
+                        getDeviceIcon(session.device) as React.ComponentProps<
+                          typeof MaterialCommunityIcons
+                        >['name']
+                      }
                       size={20}
                       color={session.isCurrent ? COLORS.mint : COLORS.text}
                     />
@@ -322,10 +395,16 @@ const SecurityScreen: React.FC = () => {
                     </Text>
                   </View>
                   {!session.isCurrent && (
-                    <MaterialCommunityIcons name="close" size={18} color={COLORS.softGray} />
+                    <MaterialCommunityIcons
+                      name="close"
+                      size={18}
+                      color={COLORS.softGray}
+                    />
                   )}
                 </TouchableOpacity>
-                {index < activeSessions.length - 1 && <View style={styles.sessionDivider} />}
+                {index < activeSessions.length - 1 && (
+                  <View style={styles.sessionDivider} />
+                )}
               </React.Fragment>
             ))}
           </View>

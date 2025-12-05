@@ -27,8 +27,8 @@ export const GiftSuccessModal: React.FC<Props> = ({
   visible,
   amount,
   onClose,
-  momentTitle,
-  onViewApprovals,
+  momentTitle: _momentTitle,
+  onViewApprovals: _onViewApprovals,
 }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -204,9 +204,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
             onPress={onClose}
             activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>
-              Return Home
-            </Text>
+            <Text style={styles.buttonText}>Return Home</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -286,36 +284,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-  },
-  primaryButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.mint,
-    borderRadius: 999,
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    width: '100%',
-  },
-  primaryButtonText: {
-    color: COLORS.white,
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  secondaryButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.gray[100],
-    borderRadius: 999,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    width: '100%',
-  },
-  secondaryButtonText: {
-    color: COLORS.text,
-    fontSize: 16,
-    fontWeight: '600',
   },
   subtitle: {
     color: COLORS.textSecondary,

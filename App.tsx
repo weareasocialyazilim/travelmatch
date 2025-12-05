@@ -1,15 +1,27 @@
 import React, { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { ToastProvider } from './src/context/ToastContext';
-import { PerformanceMonitor } from './src/utils/performance';
+import { ConfirmationProvider } from './src/context/ConfirmationContext';
+import { NetworkProvider } from './src/context/NetworkContext';
+import { AuthProvider } from './src/context/AuthContext';
+import { RealtimeProvider } from './src/context/RealtimeContext';
+import { PerformanceMonitor as _PerformanceMonitor } from './src/utils/performance';
 import { PerformanceBenchmark } from './src/utils/performanceBenchmark';
 import { FeedbackModal } from './src/components/FeedbackModal';
 import { useFeedbackPrompt } from './src/hooks/useFeedbackPrompt';
 import { initializeFeatureFlags } from './src/config/featureFlags';
+import { logger } from './src/utils/logger';
 import './src/config/i18n'; // Initialize i18n
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default function App() {
   const { showFeedback, dismissFeedback, incrementSessionCount } =
@@ -22,7 +34,7 @@ export default function App() {
 
     // Initialize feature flags
     initializeFeatureFlags('user-123').then(() => {
-      console.log('✅ [FeatureFlags] Initialized');
+      logger.info('FeatureFlags initialized');
     });
 
     // Import Sentry dynamically
@@ -31,15 +43,15 @@ export default function App() {
         initSentry();
       })
       .catch((error) => {
-        console.warn('Failed to initialize Sentry:', error);
+        logger.warn('Failed to initialize Sentry:', error);
       });
 
     // Performance monitoring
     if (__DEV__) {
       // Initialize performance benchmark
       PerformanceBenchmark.generateReport().then((report) => {
-        console.log(
-          '📊 [Performance] Initial report:',
+        logger.debug(
+          'Performance initial report:',
           report.slowestScreens.slice(0, 3),
         );
       });
@@ -48,20 +60,30 @@ export default function App() {
       const startTime = Date.now();
       setTimeout(() => {
         const tti = Date.now() - startTime;
-        // eslint-disable-next-line no-console
-        console.log(`⚡ Time to Interactive: ${tti}ms`);
+        logger.info(`Time to Interactive: ${tti}ms`);
       }, 0);
     }
-  }, []);
+  }, [incrementSessionCount]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ErrorBoundary>
+    <GestureHandlerRootView style={styles.container}>
+      <ErrorBoundary level="app">
         <SafeAreaProvider>
-          <ToastProvider>
-            <AppNavigator />
-            <FeedbackModal visible={showFeedback} onClose={dismissFeedback} />
-          </ToastProvider>
+          <NetworkProvider>
+            <AuthProvider>
+              <RealtimeProvider>
+                <ToastProvider>
+                  <ConfirmationProvider>
+                    <AppNavigator />
+                    <FeedbackModal
+                      visible={showFeedback}
+                      onClose={dismissFeedback}
+                    />
+                  </ConfirmationProvider>
+                </ToastProvider>
+              </RealtimeProvider>
+            </AuthProvider>
+          </NetworkProvider>
         </SafeAreaProvider>
       </ErrorBoundary>
     </GestureHandlerRootView>

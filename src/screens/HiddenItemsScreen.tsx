@@ -24,14 +24,15 @@ interface HiddenItem {
 
 export const HiddenItemsScreen: React.FC = () => {
   const navigation = useNavigation();
-  
+
   const [hiddenItems, setHiddenItems] = useState<HiddenItem[]>([
     {
       id: '1',
       type: 'gift',
       title: 'Gift from Emma',
       subtitle: '☕ Coffee · $10',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+      avatar:
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
       hiddenAt: '2 days ago',
     },
     {
@@ -39,44 +40,37 @@ export const HiddenItemsScreen: React.FC = () => {
       type: 'gift',
       title: 'Gift from John',
       subtitle: '🍕 Lunch · $25',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+      avatar:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
       hiddenAt: '1 week ago',
     },
   ]);
 
   const handleUnhide = (id: string) => {
-    Alert.alert(
-      'Unhide Item',
-      'This item will be restored to your inbox.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Unhide', 
-          onPress: () => {
-            setHiddenItems(prev => prev.filter(item => item.id !== id));
-            Alert.alert('Done', 'Item has been restored to your inbox.');
-          }
+    Alert.alert('Unhide Item', 'This item will be restored to your inbox.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Unhide',
+        onPress: () => {
+          setHiddenItems((prev) => prev.filter((item) => item.id !== id));
+          Alert.alert('Done', 'Item has been restored to your inbox.');
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleDelete = (id: string) => {
-    Alert.alert(
-      'Delete Permanently?',
-      'This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
-          style: 'destructive',
-          onPress: () => {
-            setHiddenItems(prev => prev.filter(item => item.id !== id));
-            Alert.alert('Deleted', 'Item has been permanently deleted.');
-          }
+    Alert.alert('Delete Permanently?', 'This action cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          setHiddenItems((prev) => prev.filter((item) => item.id !== id));
+          Alert.alert('Deleted', 'Item has been permanently deleted.');
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const renderItem = (item: HiddenItem) => (
@@ -88,17 +82,21 @@ export const HiddenItemsScreen: React.FC = () => {
         <Text style={styles.itemDate}>Hidden {item.hiddenAt}</Text>
       </View>
       <View style={styles.actionButtons}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.unhideButton}
           onPress={() => handleUnhide(item.id)}
         >
           <MaterialCommunityIcons name="eye" size={20} color={COLORS.primary} />
         </TouchableOpacity>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleDelete(item.id)}
         >
-          <MaterialCommunityIcons name="delete" size={20} color={COLORS.error} />
+          <MaterialCommunityIcons
+            name="delete"
+            size={20}
+            color={COLORS.error}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -107,17 +105,21 @@ export const HiddenItemsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Hidden Items</Text>
         <View style={styles.backButton} />
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -125,13 +127,18 @@ export const HiddenItemsScreen: React.FC = () => {
         {hiddenItems.length > 0 ? (
           <>
             <Text style={styles.sectionInfo}>
-              Items you&apos;ve hidden will appear here. You can unhide them or delete them permanently.
+              Items you&apos;ve hidden will appear here. You can unhide them or
+              delete them permanently.
             </Text>
             {hiddenItems.map(renderItem)}
           </>
         ) : (
           <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="eye-off-outline" size={64} color={COLORS.textTertiary} />
+            <MaterialCommunityIcons
+              name="eye-off-outline"
+              size={64}
+              color={COLORS.textTertiary}
+            />
             <Text style={styles.emptyTitle}>No hidden items</Text>
             <Text style={styles.emptySubtitle}>
               Items you hide from your inbox will appear here.

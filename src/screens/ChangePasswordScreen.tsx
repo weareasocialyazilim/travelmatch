@@ -19,7 +19,7 @@ import { COLORS } from '../constants/colors';
 
 const ChangePasswordScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,13 +49,16 @@ const ChangePasswordScreen: React.FC = () => {
     if (!validatePassword(newPassword)) {
       Alert.alert(
         'Weak Password',
-        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.'
+        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.',
       );
       return;
     }
 
     if (currentPassword === newPassword) {
-      Alert.alert('Error', 'New password must be different from current password');
+      Alert.alert(
+        'Error',
+        'New password must be different from current password',
+      );
       return;
     }
 
@@ -63,18 +66,14 @@ const ChangePasswordScreen: React.FC = () => {
 
     try {
       // TODO: Implement actual password change API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      Alert.alert(
-        'Success',
-        'Your password has been changed successfully.',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]
-      );
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      Alert.alert('Success', 'Your password has been changed successfully.', [
+        {
+          text: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
     } catch {
       Alert.alert('Error', 'Failed to change password. Please try again.');
     } finally {
@@ -88,7 +87,7 @@ const ChangePasswordScreen: React.FC = () => {
     onChange: (text: string) => void,
     showPassword: boolean,
     toggleShow: () => void,
-    placeholder: string
+    placeholder: string,
   ) => (
     <View style={styles.inputContainer}>
       <Text style={styles.inputLabel}>{label}</Text>
@@ -103,10 +102,7 @@ const ChangePasswordScreen: React.FC = () => {
           autoCapitalize="none"
           autoCorrect={false}
         />
-        <TouchableOpacity
-          style={styles.eyeButton}
-          onPress={toggleShow}
-        >
+        <TouchableOpacity style={styles.eyeButton} onPress={toggleShow}>
           <MaterialCommunityIcons
             name={showPassword ? 'eye-off' : 'eye'}
             size={20}
@@ -125,7 +121,11 @@ const ChangePasswordScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Change Password</Text>
         <View style={styles.placeholder} />
@@ -149,7 +149,8 @@ const ChangePasswordScreen: React.FC = () => {
               color={COLORS.mint}
             />
             <Text style={styles.infoText}>
-              For your security, please enter your current password before setting a new one.
+              For your security, please enter your current password before
+              setting a new one.
             </Text>
           </View>
 
@@ -160,7 +161,7 @@ const ChangePasswordScreen: React.FC = () => {
             setCurrentPassword,
             showCurrentPassword,
             () => setShowCurrentPassword(!showCurrentPassword),
-            'Enter current password'
+            'Enter current password',
           )}
 
           {renderPasswordInput(
@@ -169,7 +170,7 @@ const ChangePasswordScreen: React.FC = () => {
             setNewPassword,
             showNewPassword,
             () => setShowNewPassword(!showNewPassword),
-            'Enter new password'
+            'Enter new password',
           )}
 
           {renderPasswordInput(
@@ -178,22 +179,37 @@ const ChangePasswordScreen: React.FC = () => {
             setConfirmPassword,
             showConfirmPassword,
             () => setShowConfirmPassword(!showConfirmPassword),
-            'Confirm new password'
+            'Confirm new password',
           )}
 
           {/* Password Match Indicator */}
           {confirmPassword.length > 0 && (
             <View style={styles.matchIndicator}>
               <MaterialCommunityIcons
-                name={newPassword === confirmPassword ? 'check-circle' : 'close-circle'}
+                name={
+                  newPassword === confirmPassword
+                    ? 'check-circle'
+                    : 'close-circle'
+                }
                 size={16}
-                color={newPassword === confirmPassword ? COLORS.mint : COLORS.coral}
+                color={
+                  newPassword === confirmPassword ? COLORS.mint : COLORS.coral
+                }
               />
-              <Text style={[
-                styles.matchText,
-                { color: newPassword === confirmPassword ? COLORS.mint : COLORS.coral }
-              ]}>
-                {newPassword === confirmPassword ? 'Passwords match' : 'Passwords do not match'}
+              <Text
+                style={[
+                  styles.matchText,
+                  {
+                    color:
+                      newPassword === confirmPassword
+                        ? COLORS.mint
+                        : COLORS.coral,
+                  },
+                ]}
+              >
+                {newPassword === confirmPassword
+                  ? 'Passwords match'
+                  : 'Passwords do not match'}
               </Text>
             </View>
           )}
@@ -203,53 +219,77 @@ const ChangePasswordScreen: React.FC = () => {
             <Text style={styles.requirementsTitle}>Password Requirements:</Text>
             <View style={styles.requirementRow}>
               <MaterialCommunityIcons
-                name={newPassword.length >= 8 ? 'check-circle' : 'circle-outline'}
+                name={
+                  newPassword.length >= 8 ? 'check-circle' : 'circle-outline'
+                }
                 size={16}
-                color={newPassword.length >= 8 ? COLORS.mint : COLORS.textSecondary}
+                color={
+                  newPassword.length >= 8 ? COLORS.mint : COLORS.textSecondary
+                }
               />
-              <Text style={[
-                styles.requirementText,
-                newPassword.length >= 8 && styles.requirementMet
-              ]}>
+              <Text
+                style={[
+                  styles.requirementText,
+                  newPassword.length >= 8 && styles.requirementMet,
+                ]}
+              >
                 At least 8 characters
               </Text>
             </View>
             <View style={styles.requirementRow}>
               <MaterialCommunityIcons
-                name={/[A-Z]/.test(newPassword) ? 'check-circle' : 'circle-outline'}
+                name={
+                  /[A-Z]/.test(newPassword) ? 'check-circle' : 'circle-outline'
+                }
                 size={16}
-                color={/[A-Z]/.test(newPassword) ? COLORS.mint : COLORS.textSecondary}
+                color={
+                  /[A-Z]/.test(newPassword) ? COLORS.mint : COLORS.textSecondary
+                }
               />
-              <Text style={[
-                styles.requirementText,
-                /[A-Z]/.test(newPassword) && styles.requirementMet
-              ]}>
+              <Text
+                style={[
+                  styles.requirementText,
+                  /[A-Z]/.test(newPassword) && styles.requirementMet,
+                ]}
+              >
                 One uppercase letter
               </Text>
             </View>
             <View style={styles.requirementRow}>
               <MaterialCommunityIcons
-                name={/[a-z]/.test(newPassword) ? 'check-circle' : 'circle-outline'}
+                name={
+                  /[a-z]/.test(newPassword) ? 'check-circle' : 'circle-outline'
+                }
                 size={16}
-                color={/[a-z]/.test(newPassword) ? COLORS.mint : COLORS.textSecondary}
+                color={
+                  /[a-z]/.test(newPassword) ? COLORS.mint : COLORS.textSecondary
+                }
               />
-              <Text style={[
-                styles.requirementText,
-                /[a-z]/.test(newPassword) && styles.requirementMet
-              ]}>
+              <Text
+                style={[
+                  styles.requirementText,
+                  /[a-z]/.test(newPassword) && styles.requirementMet,
+                ]}
+              >
                 One lowercase letter
               </Text>
             </View>
             <View style={styles.requirementRow}>
               <MaterialCommunityIcons
-                name={/\d/.test(newPassword) ? 'check-circle' : 'circle-outline'}
+                name={
+                  /\d/.test(newPassword) ? 'check-circle' : 'circle-outline'
+                }
                 size={16}
-                color={/\d/.test(newPassword) ? COLORS.mint : COLORS.textSecondary}
+                color={
+                  /\d/.test(newPassword) ? COLORS.mint : COLORS.textSecondary
+                }
               />
-              <Text style={[
-                styles.requirementText,
-                /\d/.test(newPassword) && styles.requirementMet
-              ]}>
+              <Text
+                style={[
+                  styles.requirementText,
+                  /\d/.test(newPassword) && styles.requirementMet,
+                ]}
+              >
                 One number
               </Text>
             </View>
@@ -259,7 +299,7 @@ const ChangePasswordScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.changeButton,
-              isLoading && styles.changeButtonDisabled
+              isLoading && styles.changeButtonDisabled,
             ]}
             onPress={handleChangePassword}
             disabled={isLoading}
@@ -272,9 +312,16 @@ const ChangePasswordScreen: React.FC = () => {
           {/* Forgot Password Link */}
           <TouchableOpacity
             style={styles.forgotButton}
-            onPress={() => Alert.alert('Forgot Password', 'Password reset link will be sent to your email.')}
+            onPress={() =>
+              Alert.alert(
+                'Forgot Password',
+                'Password reset link will be sent to your email.',
+              )
+            }
           >
-            <Text style={styles.forgotButtonText}>Forgot current password?</Text>
+            <Text style={styles.forgotButtonText}>
+              Forgot current password?
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

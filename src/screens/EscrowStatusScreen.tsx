@@ -31,11 +31,11 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { 
-    escrowId, 
-    momentTitle, 
-    amount, 
-    receiverName, 
+  const {
+    escrowId,
+    momentTitle,
+    amount,
+    receiverName,
     receiverAvatar,
     status,
   } = route.params;
@@ -64,29 +64,48 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
         title: 'Proof Uploaded',
         subtitle: `${receiverName} uploaded proof of experience`,
         icon: 'camera-outline',
-        status: status === 'pending_proof' ? 'pending' : 
-               status === 'in_escrow' ? 'current' : 'completed',
-        time: status === 'pending_proof' ? undefined : 
-              status === 'in_escrow' ? undefined : '1 day ago',
+        status:
+          status === 'pending_proof'
+            ? 'pending'
+            : status === 'in_escrow'
+            ? 'current'
+            : 'completed',
+        time:
+          status === 'pending_proof'
+            ? undefined
+            : status === 'in_escrow'
+            ? undefined
+            : '1 day ago',
       },
       {
         id: '4',
         title: 'System Verification',
         subtitle: 'Our system is verifying the proof',
         icon: 'check-decagram',
-        status: status === 'pending_verification' ? 'current' : 
-               (status === 'pending_proof' || status === 'in_escrow') ? 'pending' : 'completed',
+        status:
+          status === 'pending_verification'
+            ? 'current'
+            : status === 'pending_proof' || status === 'in_escrow'
+            ? 'pending'
+            : 'completed',
         time: status === 'verified' ? '3 hours ago' : undefined,
       },
       {
         id: '5',
         title: status === 'refunded' ? 'Refunded' : 'Funds Released',
-        subtitle: status === 'refunded' 
-          ? 'Verification failed. Funds returned to your balance.'
-          : `$${amount} released to ${receiverName}`,
+        subtitle:
+          status === 'refunded'
+            ? 'Verification failed. Funds returned to your balance.'
+            : `$${amount} released to ${receiverName}`,
         icon: status === 'refunded' ? 'undo-variant' : 'check-circle-outline',
-        status: (status === 'verified' || status === 'refunded') ? 'completed' : 'pending',
-        time: (status === 'verified' || status === 'refunded') ? 'Just now' : undefined,
+        status:
+          status === 'verified' || status === 'refunded'
+            ? 'completed'
+            : 'pending',
+        time:
+          status === 'verified' || status === 'refunded'
+            ? 'Just now'
+            : undefined,
       },
     ];
 
@@ -194,7 +213,9 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
         <View style={styles.statusCard}>
           <View style={styles.receiverInfo}>
             <Image
-              source={{ uri: receiverAvatar || 'https://via.placeholder.com/100' }}
+              source={{
+                uri: receiverAvatar || 'https://via.placeholder.com/100',
+              }}
               style={styles.receiverAvatar}
             />
             <View style={styles.receiverDetails}>
@@ -202,15 +223,26 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
               <Text style={styles.momentTitle}>{momentTitle}</Text>
             </View>
           </View>
-          
+
           <View style={styles.amountContainer}>
             <Text style={styles.amountLabel}>Gesture Amount</Text>
             <Text style={styles.amountValue}>${amount}</Text>
           </View>
 
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor() + '20' }]}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getStatusColor() + '20' },
+            ]}
+          >
             <MaterialCommunityIcons
-              name={status === 'verified' ? 'check-circle' : status === 'refunded' ? 'undo-variant' : 'timer-sand'}
+              name={
+                status === 'verified'
+                  ? 'check-circle'
+                  : status === 'refunded'
+                  ? 'undo-variant'
+                  : 'timer-sand'
+              }
               size={16}
               color={getStatusColor()}
             />
@@ -223,7 +255,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
         {/* Timeline */}
         <View style={styles.timelineContainer}>
           <Text style={styles.sectionTitle}>Escrow Timeline</Text>
-          
+
           {steps.map((step, index) => (
             <View key={step.id} style={styles.timelineItem}>
               {/* Timeline Line */}
@@ -285,9 +317,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
                 >
                   {step.subtitle}
                 </Text>
-                {step.time && (
-                  <Text style={styles.stepTime}>{step.time}</Text>
-                )}
+                {step.time && <Text style={styles.stepTime}>{step.time}</Text>}
               </View>
             </View>
           ))}
@@ -301,8 +331,9 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
             color={COLORS.primary}
           />
           <Text style={styles.infoText}>
-            Your funds are securely held until the proof is verified by our system. 
-            If verification fails, your money will be automatically refunded.
+            Your funds are securely held until the proof is verified by our
+            system. If verification fails, your money will be automatically
+            refunded.
           </Text>
         </View>
 
@@ -322,7 +353,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
                 <Text style={styles.secondaryButtonText}>Send Reminder</Text>
               </TouchableOpacity>
             )}
-            
+
             <TouchableOpacity
               style={styles.primaryButton}
               onPress={handleMessageReceiver}
@@ -332,7 +363,9 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
                 size={20}
                 color={COLORS.white}
               />
-              <Text style={styles.primaryButtonText}>Message {receiverName}</Text>
+              <Text style={styles.primaryButtonText}>
+                Message {receiverName}
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -410,7 +443,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,

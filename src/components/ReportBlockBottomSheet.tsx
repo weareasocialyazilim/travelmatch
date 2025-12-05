@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -9,8 +10,6 @@ import {
   ScrollView,
   Dimensions,
   Pressable,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -46,7 +45,12 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
     }
   }, [visible]);
 
-  console.log('ReportBlockBottomSheet render - visible:', visible, 'expandedSection:', expandedSection);
+  logger.debug(
+    'ReportBlockBottomSheet render - visible:',
+    visible,
+    'expandedSection:',
+    expandedSection,
+  );
 
   const handleReportUser = () => {
     setExpandedSection('reason');
@@ -101,7 +105,9 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
             {/* Header */}
             <View style={styles.header}>
               <Text style={styles.title}>Report or block</Text>
-              <Text style={styles.subtitle}>Help us keep TravelMatch safe.</Text>
+              <Text style={styles.subtitle}>
+                Help us keep TravelMatch safe.
+              </Text>
             </View>
 
             {/* Content */}
@@ -110,23 +116,73 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
             >
-                {/* Show main menu when not in report mode */}
-                {expandedSection !== 'reason' && (
-                  <View style={styles.menuContainer}>
-                    {/* Action Options */}
+              {/* Show main menu when not in report mode */}
+              {expandedSection !== 'reason' && (
+                <View style={styles.menuContainer}>
+                  {/* Action Options */}
+                  <TouchableOpacity
+                    style={styles.actionItem}
+                    onPress={handleReportUser}
+                  >
+                    <View style={styles.actionLeft}>
+                      <View style={styles.actionIcon}>
+                        <MaterialCommunityIcons
+                          name="flag"
+                          size={20}
+                          color={COLORS.text}
+                        />
+                      </View>
+                      <Text style={styles.actionText}>Report {targetType}</Text>
+                    </View>
+                    <MaterialCommunityIcons
+                      name="chevron-right"
+                      size={24}
+                      color={COLORS.textSecondary}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.actionItemLarge}
+                    onPress={handleBlockUser}
+                  >
+                    <View style={styles.actionLeft}>
+                      <View style={styles.actionIconLarge}>
+                        <MaterialCommunityIcons
+                          name="account-cancel"
+                          size={24}
+                          color={COLORS.text}
+                        />
+                      </View>
+                      <View style={styles.actionTextContainer}>
+                        <Text style={styles.actionTextBold}>
+                          Block {targetType}
+                        </Text>
+                        <Text style={styles.actionTextSubtitle}>
+                          You won&apos;t see each other
+                        </Text>
+                      </View>
+                    </View>
+                    <MaterialCommunityIcons
+                      name="chevron-right"
+                      size={24}
+                      color={COLORS.textSecondary}
+                    />
+                  </TouchableOpacity>
+
+                  {targetType === 'moment' && (
                     <TouchableOpacity
                       style={styles.actionItem}
-                      onPress={handleReportUser}
+                      onPress={handleHideMoment}
                     >
                       <View style={styles.actionLeft}>
                         <View style={styles.actionIcon}>
                           <MaterialCommunityIcons
-                            name="flag"
+                            name="eye-off"
                             size={20}
                             color={COLORS.text}
                           />
                         </View>
-                        <Text style={styles.actionText}>Report {targetType}</Text>
+                        <Text style={styles.actionText}>Hide this moment</Text>
                       </View>
                       <MaterialCommunityIcons
                         name="chevron-right"
@@ -134,171 +190,125 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                         color={COLORS.textSecondary}
                       />
                     </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.actionItemLarge}
-                      onPress={handleBlockUser}
-                    >
-                      <View style={styles.actionLeft}>
-                        <View style={styles.actionIconLarge}>
-                          <MaterialCommunityIcons
-                            name="account-cancel"
-                            size={24}
-                            color={COLORS.text}
-                          />
-                        </View>
-                        <View style={styles.actionTextContainer}>
-                          <Text style={styles.actionTextBold}>Block {targetType}</Text>
-                          <Text style={styles.actionTextSubtitle}>
-                            You won&apos;t see each other
-                          </Text>
-                        </View>
-                      </View>
-                      <MaterialCommunityIcons
-                        name="chevron-right"
-                        size={24}
-                        color={COLORS.textSecondary}
-                      />
-                    </TouchableOpacity>
-
-                    {targetType === 'moment' && (
-                      <TouchableOpacity
-                        style={styles.actionItem}
-                        onPress={handleHideMoment}
-                      >
-                        <View style={styles.actionLeft}>
-                          <View style={styles.actionIcon}>
-                            <MaterialCommunityIcons
-                              name="eye-off"
-                              size={20}
-                              color={COLORS.text}
-                            />
-                          </View>
-                          <Text style={styles.actionText}>Hide this moment</Text>
-                        </View>
-                        <MaterialCommunityIcons
-                          name="chevron-right"
-                          size={24}
-                          color={COLORS.textSecondary}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
-
-                {/* Expandable Reason Section - Only show when user clicked Report */}
-                {expandedSection === 'reason' && (
-                  <View style={styles.reportContainer}>
-                    <TouchableOpacity
-                      style={styles.expandableHeader}
-                      onPress={() => setExpandedSection(null)}
-                    >
-                      <Text style={styles.expandableTitle}>Why are you reporting?</Text>
-                      <MaterialCommunityIcons
-                        name="chevron-up"
-                        size={20}
-                        color={COLORS.text}
-                      />
-                    </TouchableOpacity>
-
-                    {/* Radio Options */}
-                    <TouchableOpacity
-                      style={[
-                        styles.radioOption,
-                        selectedReason === 'scam' && styles.radioOptionSelected,
-                      ]}
-                      onPress={() => setSelectedReason('scam')}
-                    >
-                      <Text style={styles.radioLabel}>Scam or fake story</Text>
-                      <View style={styles.radioCircle}>
-                        {selectedReason === 'scam' && (
-                          <View style={styles.radioDot} />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.radioOption,
-                        selectedReason === 'hate' && styles.radioOptionSelected,
-                      ]}
-                      onPress={() => setSelectedReason('hate')}
-                    >
-                      <Text style={styles.radioLabel}>Hate / harassment</Text>
-                      <View style={styles.radioCircle}>
-                        {selectedReason === 'hate' && (
-                          <View style={styles.radioDot} />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.radioOption,
-                        selectedReason === 'inappropriate' &&
-                          styles.radioOptionSelected,
-                      ]}
-                      onPress={() => setSelectedReason('inappropriate')}
-                    >
-                      <Text style={styles.radioLabel}>Inappropriate content</Text>
-                      <View style={styles.radioCircle}>
-                        {selectedReason === 'inappropriate' && (
-                          <View style={styles.radioDot} />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.radioOption,
-                        selectedReason === 'other' && styles.radioOptionSelected,
-                      ]}
-                      onPress={() => setSelectedReason('other')}
-                    >
-                      <Text style={styles.radioLabel}>Other</Text>
-                      <View style={styles.radioCircle}>
-                        {selectedReason === 'other' && (
-                          <View style={styles.radioDot} />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-
-                    {/* Details Textarea */}
-                    <TextInput
-                      style={styles.textarea}
-                      placeholder="Please describe the issue"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={details}
-                      onChangeText={setDetails}
-                      multiline
-                      numberOfLines={6}
-                      textAlignVertical="top"
-                    />
-                  </View>
-                )}
-              </ScrollView>
-
-              {/* Action Buttons - Only show when reporting */}
-              {expandedSection === 'reason' && (
-                <View style={styles.footerContainer}>
-                  <View style={styles.footer}>
-                    <TouchableOpacity
-                      style={styles.submitButton}
-                      onPress={handleSubmit}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.submitButtonText}>Submit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.cancelButton}
-                      onPress={handleCancel}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.cancelButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                  </View>
+                  )}
                 </View>
               )}
+
+              {/* Expandable Reason Section - Only show when user clicked Report */}
+              {expandedSection === 'reason' && (
+                <View style={styles.reportContainer}>
+                  <TouchableOpacity
+                    style={styles.expandableHeader}
+                    onPress={() => setExpandedSection(null)}
+                  >
+                    <Text style={styles.expandableTitle}>
+                      Why are you reporting?
+                    </Text>
+                    <MaterialCommunityIcons
+                      name="chevron-up"
+                      size={20}
+                      color={COLORS.text}
+                    />
+                  </TouchableOpacity>
+
+                  {/* Radio Options */}
+                  <TouchableOpacity
+                    style={[
+                      styles.radioOption,
+                      selectedReason === 'scam' && styles.radioOptionSelected,
+                    ]}
+                    onPress={() => setSelectedReason('scam')}
+                  >
+                    <Text style={styles.radioLabel}>Scam or fake story</Text>
+                    <View style={styles.radioCircle}>
+                      {selectedReason === 'scam' && (
+                        <View style={styles.radioDot} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.radioOption,
+                      selectedReason === 'hate' && styles.radioOptionSelected,
+                    ]}
+                    onPress={() => setSelectedReason('hate')}
+                  >
+                    <Text style={styles.radioLabel}>Hate / harassment</Text>
+                    <View style={styles.radioCircle}>
+                      {selectedReason === 'hate' && (
+                        <View style={styles.radioDot} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.radioOption,
+                      selectedReason === 'inappropriate' &&
+                        styles.radioOptionSelected,
+                    ]}
+                    onPress={() => setSelectedReason('inappropriate')}
+                  >
+                    <Text style={styles.radioLabel}>Inappropriate content</Text>
+                    <View style={styles.radioCircle}>
+                      {selectedReason === 'inappropriate' && (
+                        <View style={styles.radioDot} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.radioOption,
+                      selectedReason === 'other' && styles.radioOptionSelected,
+                    ]}
+                    onPress={() => setSelectedReason('other')}
+                  >
+                    <Text style={styles.radioLabel}>Other</Text>
+                    <View style={styles.radioCircle}>
+                      {selectedReason === 'other' && (
+                        <View style={styles.radioDot} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+
+                  {/* Details Textarea */}
+                  <TextInput
+                    style={styles.textarea}
+                    placeholder="Please describe the issue"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={details}
+                    onChangeText={setDetails}
+                    multiline
+                    numberOfLines={6}
+                    textAlignVertical="top"
+                  />
+                </View>
+              )}
+            </ScrollView>
+
+            {/* Action Buttons - Only show when reporting */}
+            {expandedSection === 'reason' && (
+              <View style={styles.footerContainer}>
+                <View style={styles.footer}>
+                  <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={handleSubmit}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.submitButtonText}>Submit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={handleCancel}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </SafeAreaView>
         </View>
       </View>
@@ -317,20 +327,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay50,
   },
   modalContent: {
     backgroundColor: COLORS.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
   },
-  container: {
-  },
+  container: {},
   handleContainer: {
     alignItems: 'center',
     paddingVertical: 12,

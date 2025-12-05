@@ -100,7 +100,7 @@ class AnalyticsService {
     this.userProperties = { ...this.userProperties, ...properties };
 
     // eslint-disable-next-line no-console
-    console.log('👤 User identified:', userId, properties);
+    logger.debug('👤 User identified:', userId, properties);
     // TODO: Call your analytics provider's identify method
   }
 
@@ -121,7 +121,7 @@ class AnalyticsService {
     };
 
     // eslint-disable-next-line no-console
-    console.log('📊 Event tracked:', eventData);
+    logger.debug('📊 Event tracked:', eventData);
     // TODO: Call your analytics provider's track method
 
     // Example for different providers:
@@ -137,7 +137,7 @@ class AnalyticsService {
     if (!this.isEnabled) return;
 
     // eslint-disable-next-line no-console
-    console.log('📱 Screen viewed:', screenName, properties);
+    logger.debug('📱 Screen viewed:', screenName, properties);
     this.track(AnalyticsEvent.MOMENT_VIEWED, {
       screen: screenName,
       ...properties,
@@ -161,7 +161,7 @@ class AnalyticsService {
     };
 
     // eslint-disable-next-line no-console
-    console.log('📊 Custom event tracked:', eventData);
+    logger.debug('📊 Custom event tracked:', eventData);
   }
 
   /**
@@ -196,7 +196,7 @@ class AnalyticsService {
 
     this.userId = undefined;
     this.userProperties = {};
-    console.log('🔄 Analytics reset');
+    logger.debug('🔄 Analytics reset');
     // TODO: Call your analytics provider's reset method
   }
 }

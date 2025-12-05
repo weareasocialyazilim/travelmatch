@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,27 +15,61 @@ import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { COLORS } from '../constants/colors';
 import { LanguageSelectionBottomSheet } from '../components/LanguageSelectionBottomSheet';
+import { CURRENT_USER, isKYCVerified } from '../mocks/currentUser';
 
 const AppSettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   // Notification settings
   const [pushEnabled, setPushEnabled] = useState(true);
   const [chatNotifications, setChatNotifications] = useState(true);
   const [requestNotifications, setRequestNotifications] = useState(true);
   const [marketingNotifications, setMarketingNotifications] = useState(false);
-  
+
   // Privacy settings
   const [profileVisible, setProfileVisible] = useState(true);
-  const [showOnlineStatus, setShowOnlineStatus] = useState(true);
-  const [showLastSeen, setShowLastSeen] = useState(false);
-  
+
+  // KYC status from centralized user data
+  const isIdentityVerified = isKYCVerified(CURRENT_USER);
+  const memberSince = CURRENT_USER.memberSince;
+
   // Language
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isLanguageSheetVisible, setIsLanguageSheetVisible] = useState(false);
 
   const handleClearCache = () => {
-    console.log('Clear cache');
+    Alert.alert(
+      'Clear Cache',
+      'This will clear all cached data. Are you sure?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: () => {
+            // Clear cache logic here
+            Alert.alert('Success', 'Cache cleared successfully');
+          },
+        },
+      ],
+    );
+  };
+
+  const handleSignOut = () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: () => {
+          // Sign out logic - navigate to auth screen
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Welcome' }],
+          });
+        },
+      },
+    ]);
   };
 
   return (
@@ -45,7 +80,11 @@ const AppSettingsScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>App Settings</Text>
         <View style={styles.placeholder} />
@@ -59,89 +98,131 @@ const AppSettingsScreen: React.FC = () => {
         {/* Notifications Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>NOTIFICATIONS</Text>
-          
+
           <View style={styles.settingsCard}>
             <View style={styles.settingItem}>
-              <View style={[styles.settingIcon, { backgroundColor: COLORS.coralTransparent }]}>
-                <MaterialCommunityIcons name="bell" size={20} color={COLORS.coral} />
+              <View
+                style={[
+                  styles.settingIcon,
+                  { backgroundColor: COLORS.coralTransparent },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="bell"
+                  size={20}
+                  color={COLORS.coral}
+                />
               </View>
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Push Notifications</Text>
-                <Text style={styles.settingDesc}>Enable all notifications</Text>
+                <Text style={styles.settingDesc}>
+                  {pushEnabled
+                    ? 'All notifications are enabled'
+                    : 'All notifications are disabled'}
+                </Text>
               </View>
               <Switch
                 value={pushEnabled}
-                onValueChange={setPushEnabled}
+                onValueChange={(value) => {
+                  setPushEnabled(value);
+                  // If turning off push, disable all sub-notifications
+                  if (!value) {
+                    setChatNotifications(false);
+                    setRequestNotifications(false);
+                    setMarketingNotifications(false);
+                  }
+                }}
                 trackColor={{ false: COLORS.border, true: COLORS.mint }}
                 thumbColor={COLORS.white}
               />
             </View>
 
-            <View style={styles.divider} />
+            {/* Only show sub-notifications if push is enabled */}
+            {pushEnabled && (
+              <>
+                <View style={styles.divider} />
 
-            <View style={styles.settingItem}>
-              <View style={styles.settingIconPlaceholder} />
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Chat Messages</Text>
-                <Text style={styles.settingDesc}>New message notifications</Text>
-              </View>
-              <Switch
-                value={chatNotifications}
-                onValueChange={setChatNotifications}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-                disabled={!pushEnabled}
-              />
-            </View>
+                <View style={styles.settingItem}>
+                  <View style={styles.settingIconPlaceholder} />
+                  <View style={styles.settingContent}>
+                    <Text style={styles.settingLabel}>Chat Messages</Text>
+                    <Text style={styles.settingDesc}>
+                      New message notifications
+                    </Text>
+                  </View>
+                  <Switch
+                    value={chatNotifications}
+                    onValueChange={setChatNotifications}
+                    trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                    thumbColor={COLORS.white}
+                  />
+                </View>
 
-            <View style={styles.divider} />
+                <View style={styles.divider} />
 
-            <View style={styles.settingItem}>
-              <View style={styles.settingIconPlaceholder} />
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Request Updates</Text>
-                <Text style={styles.settingDesc}>Gift requests and proofs</Text>
-              </View>
-              <Switch
-                value={requestNotifications}
-                onValueChange={setRequestNotifications}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-                disabled={!pushEnabled}
-              />
-            </View>
+                <View style={styles.settingItem}>
+                  <View style={styles.settingIconPlaceholder} />
+                  <View style={styles.settingContent}>
+                    <Text style={styles.settingLabel}>Request Updates</Text>
+                    <Text style={styles.settingDesc}>
+                      Gift requests and proofs
+                    </Text>
+                  </View>
+                  <Switch
+                    value={requestNotifications}
+                    onValueChange={setRequestNotifications}
+                    trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                    thumbColor={COLORS.white}
+                  />
+                </View>
 
-            <View style={styles.divider} />
+                <View style={styles.divider} />
 
-            <View style={styles.settingItem}>
-              <View style={styles.settingIconPlaceholder} />
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Marketing</Text>
-                <Text style={styles.settingDesc}>Tips, offers, and news</Text>
-              </View>
-              <Switch
-                value={marketingNotifications}
-                onValueChange={setMarketingNotifications}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-                disabled={!pushEnabled}
-              />
-            </View>
+                <View style={styles.settingItem}>
+                  <View style={styles.settingIconPlaceholder} />
+                  <View style={styles.settingContent}>
+                    <Text style={styles.settingLabel}>Marketing</Text>
+                    <Text style={styles.settingDesc}>
+                      Tips, offers, and news
+                    </Text>
+                  </View>
+                  <Switch
+                    value={marketingNotifications}
+                    onValueChange={setMarketingNotifications}
+                    trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                    thumbColor={COLORS.white}
+                  />
+                </View>
+              </>
+            )}
           </View>
         </View>
 
         {/* Privacy Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>PRIVACY</Text>
-          
+
           <View style={styles.settingsCard}>
             <View style={styles.settingItem}>
-              <View style={[styles.settingIcon, { backgroundColor: COLORS.mintTransparent }]}>
-                <MaterialCommunityIcons name="eye" size={20} color={COLORS.mint} />
+              <View
+                style={[
+                  styles.settingIcon,
+                  { backgroundColor: COLORS.mintTransparent },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="eye"
+                  size={20}
+                  color={COLORS.mint}
+                />
               </View>
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Profile Visibility</Text>
-                <Text style={styles.settingDesc}>Allow others to find you</Text>
+                <Text style={styles.settingDesc}>
+                  {profileVisible
+                    ? 'Others can discover your profile'
+                    : 'Your profile is hidden from search'}
+                </Text>
               </View>
               <Switch
                 value={profileVisible}
@@ -150,61 +231,39 @@ const AppSettingsScreen: React.FC = () => {
                 thumbColor={COLORS.white}
               />
             </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingIconPlaceholder} />
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Online Status</Text>
-                <Text style={styles.settingDesc}>Show when you are online</Text>
-              </View>
-              <Switch
-                value={showOnlineStatus}
-                onValueChange={setShowOnlineStatus}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-              />
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingIconPlaceholder} />
-              <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, !showOnlineStatus && styles.settingLabelDisabled]}>Last Seen</Text>
-                <Text style={styles.settingDesc}>
-                  {showOnlineStatus ? 'Show your last active time' : 'Enable Online Status first'}
-                </Text>
-              </View>
-              <Switch
-                value={showLastSeen}
-                onValueChange={setShowLastSeen}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-                disabled={!showOnlineStatus}
-              />
-            </View>
           </View>
         </View>
 
         {/* Language Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>LANGUAGE</Text>
-          
+
           <View style={styles.settingsCard}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.settingItem}
               onPress={() => setIsLanguageSheetVisible(true)}
             >
-              <View style={[styles.settingIcon, { backgroundColor: COLORS.softOrangeTransparent }]}>
-                <MaterialCommunityIcons name="translate" size={20} color={COLORS.softOrange} />
+              <View
+                style={[
+                  styles.settingIcon,
+                  { backgroundColor: COLORS.softOrangeTransparent },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="translate"
+                  size={20}
+                  color={COLORS.softOrange}
+                />
               </View>
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>App Language</Text>
                 <Text style={styles.settingDesc}>{selectedLanguage}</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -212,20 +271,35 @@ const AppSettingsScreen: React.FC = () => {
         {/* Share Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>SHARE</Text>
-          
+
           <View style={styles.settingsCard}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.settingItem}
               onPress={() => navigation.navigate('InviteFriends')}
             >
-              <View style={[styles.settingIcon, { backgroundColor: COLORS.mintTransparent }]}>
-                <MaterialCommunityIcons name="account-plus" size={20} color={COLORS.mint} />
+              <View
+                style={[
+                  styles.settingIcon,
+                  { backgroundColor: COLORS.mintTransparent },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="account-plus"
+                  size={20}
+                  color={COLORS.mint}
+                />
               </View>
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Invite Friends</Text>
-                <Text style={styles.settingDesc}>Share TravelMatch with friends</Text>
+                <Text style={styles.settingDesc}>
+                  Share TravelMatch with friends
+                </Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -233,15 +307,29 @@ const AppSettingsScreen: React.FC = () => {
         {/* Storage Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>STORAGE</Text>
-          
+
           <View style={styles.settingsCard}>
-            <TouchableOpacity style={styles.settingItem} onPress={handleClearCache}>
-              <View style={[styles.settingIcon, { backgroundColor: COLORS.background }]}>
-                <MaterialCommunityIcons name="broom" size={20} color={COLORS.text} />
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={handleClearCache}
+            >
+              <View
+                style={[
+                  styles.settingIcon,
+                  { backgroundColor: COLORS.background },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="broom"
+                  size={20}
+                  color={COLORS.text}
+                />
               </View>
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Clear Cache</Text>
-                <Text style={styles.settingDesc}>Free up storage space</Text>
+                <Text style={styles.settingDesc}>
+                  Images will be re-downloaded
+                </Text>
               </View>
               <Text style={styles.cacheSize}>24.5 MB</Text>
             </TouchableOpacity>
@@ -251,7 +339,7 @@ const AppSettingsScreen: React.FC = () => {
         {/* About Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>ABOUT</Text>
-          
+
           <View style={styles.settingsCard}>
             <View style={styles.settingItem}>
               <View style={styles.settingContent}>
@@ -266,25 +354,39 @@ const AppSettingsScreen: React.FC = () => {
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Member Since</Text>
               </View>
-              <Text style={styles.memberSinceText}>March 2024</Text>
+              <Text style={styles.memberSinceText}>{memberSince}</Text>
             </View>
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.settingItem}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => navigation.navigate('TermsOfService')}
+            >
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Terms of Service</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
             </TouchableOpacity>
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.settingItem}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => navigation.navigate('PrivacyPolicy')}
+            >
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Privacy Policy</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
             </TouchableOpacity>
 
             <View style={styles.divider} />
@@ -293,7 +395,129 @@ const AppSettingsScreen: React.FC = () => {
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Open Source Licenses</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Account Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>ACCOUNT</Text>
+
+          <View style={styles.settingsCard}>
+            {/* Identity Verification */}
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() =>
+                !isIdentityVerified &&
+                navigation.navigate('IdentityVerification')
+              }
+              disabled={isIdentityVerified}
+            >
+              <View
+                style={[
+                  styles.settingIcon,
+                  {
+                    backgroundColor: isIdentityVerified
+                      ? COLORS.mintTransparent
+                      : COLORS.warningLight,
+                  },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name={isIdentityVerified ? 'shield-check' : 'shield-account'}
+                  size={20}
+                  color={isIdentityVerified ? COLORS.mint : COLORS.warning}
+                />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingLabel}>Identity Verification</Text>
+                <Text style={styles.settingDesc}>
+                  {isIdentityVerified
+                    ? 'Your identity has been verified'
+                    : 'Verify your identity to unlock full features'}
+                </Text>
+              </View>
+              {isIdentityVerified ? (
+                <View style={styles.verifiedBadge}>
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={14}
+                    color={COLORS.white}
+                  />
+                  <Text style={styles.verifiedBadgeText}>Verified</Text>
+                </View>
+              ) : (
+                <View style={styles.verifyBadge}>
+                  <Text style={styles.verifyBadgeText}>Verify</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={handleSignOut}
+            >
+              <View
+                style={[
+                  styles.settingIcon,
+                  { backgroundColor: COLORS.warningLight },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="logout"
+                  size={20}
+                  color={COLORS.warning}
+                />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingLabel}>Sign Out</Text>
+                <Text style={styles.settingDesc}>Log out of your account</Text>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => navigation.navigate('DeleteAccount')}
+            >
+              <View
+                style={[
+                  styles.settingIcon,
+                  { backgroundColor: COLORS.errorLight },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="delete-outline"
+                  size={20}
+                  color={COLORS.error}
+                />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingLabel, { color: COLORS.error }]}>
+                  Delete Account
+                </Text>
+                <Text style={styles.settingDesc}>
+                  Permanently delete your account
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -305,7 +529,9 @@ const AppSettingsScreen: React.FC = () => {
         visible={isLanguageSheetVisible}
         onClose={() => setIsLanguageSheetVisible(false)}
         onLanguageChange={(lang: string) => {
-          setSelectedLanguage(lang === 'en' ? 'English' : lang === 'tr' ? 'Türkçe' : lang);
+          setSelectedLanguage(
+            lang === 'en' ? 'English' : lang === 'tr' ? 'Türkçe' : lang,
+          );
           setIsLanguageSheetVisible(false);
         }}
       />
@@ -416,9 +642,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
   },
-  settingLabelDisabled: {
-    color: COLORS.textSecondary,
-    opacity: 0.5,
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.mint,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  verifiedBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+  verifyBadge: {
+    backgroundColor: COLORS.warningLight,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  verifyBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.warning,
   },
 
   bottomSpacer: {

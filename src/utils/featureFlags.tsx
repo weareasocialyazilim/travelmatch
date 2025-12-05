@@ -2,8 +2,9 @@
  * Feature Flags & A/B Testing System
  * Safe feature rollout with remote configuration
  */
+import { logger } from './logger';
 
-import { useState, useEffect, ComponentType } from 'react';
+import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { analytics } from '../services/analytics';
 
@@ -110,7 +111,7 @@ class FeatureFlagService {
       // Fetch from remote config (Firebase, LaunchDarkly, etc.)
       await this.fetchRemoteConfig();
     } catch (error) {
-      console.error('Failed to initialize feature flags:', error);
+      logger.error('Failed to initialize feature flags:', error);
     }
   }
 
@@ -130,9 +131,9 @@ class FeatureFlagService {
       */
 
       // For now, use defaults
-      console.log('Remote config: Using default flags');
+      logger.debug('Remote config: Using default flags');
     } catch (error) {
-      console.error('Failed to fetch remote config:', error);
+      logger.error('Failed to fetch remote config:', error);
     }
   }
 
@@ -231,7 +232,7 @@ class FeatureFlagService {
   trackConversion(testName: string, metricName: string, value?: number): void {
     const test = this.abTests.get(testName);
     if (!test) {
-      console.warn(`A/B test "${testName}" not found`);
+      logger.warn(`A/B test "${testName}" not found`);
       return;
     }
 
@@ -270,7 +271,7 @@ class FeatureFlagService {
     try {
       await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.flags));
     } catch (error) {
-      console.error('Failed to persist feature flags:', error);
+      logger.error('Failed to persist feature flags:', error);
     }
   }
 
@@ -282,7 +283,7 @@ class FeatureFlagService {
       const tests = Object.fromEntries(this.abTests);
       await AsyncStorage.setItem(this.AB_TEST_KEY, JSON.stringify(tests));
     } catch (error) {
-      console.error('Failed to persist A/B tests:', error);
+      logger.error('Failed to persist A/B tests:', error);
     }
   }
 
@@ -338,7 +339,7 @@ export const withFeatureFlag = <P extends object>(
   Component: React.ComponentType<P>,
   Fallback?: React.ComponentType<P>,
 ) => {
-  return (props: P) => {
+  const FeatureFlaggedComponent = (props: P) => {
     const enabled = useFeatureFlag(flag);
 
     if (enabled) {
@@ -351,4 +352,8 @@ export const withFeatureFlag = <P extends object>(
 
     return null;
   };
+
+  FeatureFlaggedComponent.displayName = `WithFeatureFlag(${flag})`;
+
+  return FeatureFlaggedComponent;
 };

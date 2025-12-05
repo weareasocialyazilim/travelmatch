@@ -14,9 +14,14 @@ import { COLORS } from '../constants/colors';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
-type TwoFactorSetupScreenProps = StackScreenProps<RootStackParamList, 'TwoFactorSetup'>;
+type TwoFactorSetupScreenProps = StackScreenProps<
+  RootStackParamList,
+  'TwoFactorSetup'
+>;
 
-export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navigation }) => {
+export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
+  navigation,
+}) => {
   const [step, setStep] = useState<'intro' | 'verify' | 'success'>('intro');
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +35,10 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
     setTimeout(() => {
       setIsLoading(false);
       setStep('verify');
-      Alert.alert('Code Sent', 'A verification code has been sent to your phone');
+      Alert.alert(
+        'Code Sent',
+        'A verification code has been sent to your phone',
+      );
     }, 1000);
   };
 
@@ -65,11 +73,11 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
           color={COLORS.primary}
         />
       </View>
-      
+
       <Text style={styles.title}>Two-Factor Authentication</Text>
       <Text style={styles.description}>
-        Add an extra layer of security to your account. You&apos;ll need to enter a 
-        verification code each time you sign in.
+        Add an extra layer of security to your account. You&apos;ll need to
+        enter a verification code each time you sign in.
       </Text>
 
       <View style={styles.benefitsContainer}>
@@ -79,7 +87,9 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
             size={24}
             color={COLORS.success}
           />
-          <Text style={styles.benefitText}>Protect against unauthorized access</Text>
+          <Text style={styles.benefitText}>
+            Protect against unauthorized access
+          </Text>
         </View>
         <View style={styles.benefitRow}>
           <MaterialCommunityIcons
@@ -87,7 +97,9 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
             size={24}
             color={COLORS.success}
           />
-          <Text style={styles.benefitText}>Secure your wallet and transactions</Text>
+          <Text style={styles.benefitText}>
+            Secure your wallet and transactions
+          </Text>
         </View>
         <View style={styles.benefitRow}>
           <MaterialCommunityIcons
@@ -138,9 +150,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
         textAlign="center"
       />
 
-      <Text style={styles.hint}>
-        Demo: Enter 123456 to verify
-      </Text>
+      <Text style={styles.hint}>Demo: Enter 123456 to verify</Text>
 
       <TouchableOpacity
         style={styles.primaryButton}
@@ -175,7 +185,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
 
       <Text style={styles.title}>2FA Enabled!</Text>
       <Text style={styles.description}>
-        Your account is now protected with two-factor authentication. 
+        Your account is now protected with two-factor authentication.
         You&apos;ll need to enter a code each time you sign in.
       </Text>
 
@@ -183,7 +193,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
         <Text style={styles.backupCodeLabel}>Backup Code</Text>
         <Text style={styles.backupCode}>{secretKey}</Text>
         <Text style={styles.backupCodeHint}>
-          Save this code somewhere safe. You can use it to recover your account 
+          Save this code somewhere safe. You can use it to recover your account
           if you lose access to your phone.
         </Text>
       </View>
@@ -217,7 +227,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({ navi
         <View style={styles.headerButton} />
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

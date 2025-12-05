@@ -1,3 +1,9 @@
+/**
+ * Input Component
+ * A feature-rich text input with label, error handling,
+ * icons, password visibility toggle, and validation states.
+ */
+
 import React, { useState, memo, useCallback, useMemo } from 'react';
 import type { ViewStyle, TextInputProps } from 'react-native';
 import {
@@ -11,17 +17,57 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 
 interface InputProps extends TextInputProps {
+  /** Input label text */
   label?: string;
+  /** Error message - shows in red below input */
   error?: string;
+  /** Helper text hint */
   hint?: string;
+  /** Left icon name from MaterialCommunityIcons */
   leftIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
+  /** Right icon name from MaterialCommunityIcons */
   rightIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
+  /** Handler for right icon press */
   onRightIconPress?: () => void;
+  /** Container wrapper styles */
   containerStyle?: ViewStyle;
+  /** Show required asterisk on label */
   required?: boolean;
+  /** Show success checkmark (for validation) */
   showSuccess?: boolean;
 }
 
+/**
+ * Input - Text input with full feature set
+ *
+ * Features:
+ * - Floating label
+ * - Error/hint messages
+ * - Left/right icons
+ * - Password visibility toggle
+ * - Focus state styling
+ *
+ * @example
+ * ```tsx
+ * // Basic input
+ * <Input label="Email" placeholder="Enter email" />
+ *
+ * // With validation error
+ * <Input
+ *   label="Password"
+ *   secureTextEntry
+ *   error="Password too weak"
+ * />
+ *
+ * // With icons
+ * <Input
+ *   label="Search"
+ *   leftIcon="magnify"
+ *   rightIcon="close"
+ *   onRightIconPress={handleClear}
+ * />
+ * ```
+ */
 export const Input: React.FC<InputProps> = memo(
   ({
     label,

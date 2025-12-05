@@ -11,13 +11,14 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
+import { ScreenErrorBoundary } from '../components/ErrorBoundary';
 
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 
-export default function WithdrawScreen({ navigation }: WithdrawScreenProps) {
+function WithdrawScreen({ navigation }: WithdrawScreenProps) {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const availableBalance = 1250.0;
@@ -28,14 +29,14 @@ export default function WithdrawScreen({ navigation }: WithdrawScreenProps) {
       return;
     }
     // Navigate to success screen with withdrawal details
-    navigation.navigate('Success', { 
+    navigation.navigate('Success', {
       type: 'withdraw',
       details: {
         amount: parseFloat(amount),
         destination: 'Bank Account (••• 4242)',
         estimatedArrival: '1-3 business days',
         referenceId: 'WD-' + Date.now().toString().slice(-8),
-      }
+      },
     });
   };
 
@@ -96,7 +97,7 @@ export default function WithdrawScreen({ navigation }: WithdrawScreenProps) {
               <Text style={styles.accountBank}>Bank of America</Text>
             </View>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.changeButton}
             onPress={() => navigation.navigate('PaymentMethods')}
             activeOpacity={0.7}
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
   },
   balanceOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: COLORS.overlay40,
     justifyContent: 'flex-end',
     padding: 16,
   },
@@ -312,3 +313,12 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
 });
+
+// Wrap with ScreenErrorBoundary for critical withdrawal functionality
+const WithdrawScreenWithErrorBoundary = (props: WithdrawScreenProps) => (
+  <ScreenErrorBoundary>
+    <WithdrawScreen {...props} />
+  </ScreenErrorBoundary>
+);
+
+export default WithdrawScreenWithErrorBoundary;

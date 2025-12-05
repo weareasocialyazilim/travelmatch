@@ -3,12 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  Modal,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
+import { GenericBottomSheet } from './ui/GenericBottomSheet';
 
 type Language = 'English' | 'Turkish' | 'Spanish' | 'French';
 
@@ -33,99 +32,52 @@ export const LanguageSelectionBottomSheet: React.FC<
   };
 
   return (
-    <Modal
+    <GenericBottomSheet
       visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
+      onClose={onClose}
+      title="Language"
+      height="auto"
+      showHandle
+      testID="language-selection-sheet"
+      accessibilityLabel="Select language"
+      renderFooter={() => (
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Save Changes</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     >
-      <TouchableOpacity
-        style={styles.backdrop}
-        activeOpacity={1}
-        onPress={onClose}
-      >
-        <TouchableOpacity activeOpacity={1} style={styles.sheetContainer}>
-          {/* Handle */}
-          <View style={styles.handleContainer}>
-            <View style={styles.handle} />
-          </View>
-
-          {/* Header */}
-          <Text style={styles.header}>Language</Text>
-
-          {/* Language List */}
-          <ScrollView style={styles.languageList}>
-            {languages.map((language) => (
-              <TouchableOpacity
-                key={language}
-                style={[
-                  styles.languageItem,
-                  tempSelection === language && styles.languageItemSelected,
-                ]}
-                onPress={() => setTempSelection(language)}
-              >
-                <Text style={styles.languageLabel}>{language}</Text>
-                <View
-                  style={[
-                    styles.radio,
-                    tempSelection === language && styles.radioSelected,
-                  ]}
-                >
-                  {tempSelection === language && (
-                    <View style={styles.radioDot} />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Save Button */}
-          <View style={styles.footer}>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save Changes</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </TouchableOpacity>
-    </Modal>
+      <ScrollView style={styles.languageList}>
+        {languages.map((language) => (
+          <TouchableOpacity
+            key={language}
+            style={[
+              styles.languageItem,
+              tempSelection === language && styles.languageItemSelected,
+            ]}
+            onPress={() => setTempSelection(language)}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: tempSelection === language }}
+            accessibilityLabel={language}
+          >
+            <Text style={styles.languageLabel}>{language}</Text>
+            <View
+              style={[
+                styles.radio,
+                tempSelection === language && styles.radioSelected,
+              ]}
+            >
+              {tempSelection === language && <View style={styles.radioDot} />}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </GenericBottomSheet>
   );
 };
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
-  },
-  sheetContainer: {
-    backgroundColor: COLORS.cardBackground,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    maxHeight: SCREEN_HEIGHT * 0.9,
-  },
-  handleContainer: {
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 12,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.border,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text,
-    letterSpacing: -0.5,
-  },
   languageList: {
     paddingHorizontal: 24,
     paddingTop: 16,

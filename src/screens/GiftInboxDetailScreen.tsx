@@ -40,7 +40,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
     canStartChat,
   } = route.params;
 
-  const [isHidden, setIsHidden] = useState(false);
+  const [_isHidden, setIsHidden] = useState(false);
   const [showReportSheet, setShowReportSheet] = useState(false);
 
   const handleStartChat = () => {
@@ -48,7 +48,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       Alert.alert(
         'Upload Proof First',
         'You need to upload proof for pending gifts before starting a chat.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
       return;
     }
@@ -74,7 +74,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
   const handleHide = () => {
     Alert.alert(
       'Hide Gifts',
-      `Hide all gifts from ${senderName}? This won't affect your received money.`,
+      `Hide all gifts from ${senderName}? This won&apos;t affect your received money.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -86,7 +86,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
             navigation.goBack();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -94,29 +94,46 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
     setShowReportSheet(true);
   };
 
-  const handleReportSubmit = (action: string, reason?: string, details?: string) => {
+  const handleReportSubmit = (
+    action: string,
+    _reason?: string,
+    _details?: string,
+  ) => {
     if (action === 'block') {
       Alert.alert('User Blocked', `${senderName} has been blocked.`);
     } else if (action === 'report') {
-      Alert.alert('Report Submitted', `Thank you for reporting. We'll review this within 24 hours.`);
+      Alert.alert(
+        'Report Submitted',
+        `Thank you for reporting. We&apos;ll review this within 24 hours.`,
+      );
     } else if (action === 'hide') {
       setIsHidden(true);
       navigation.goBack();
     }
   };
 
-  const handleUploadProof = (giftId: string) => {
+  const handleUploadProof = (_giftId: string) => {
     navigation.navigate('ProofUpload');
   };
 
-  const getGiftStatusInfo = (status: string): { icon: IconName; color: string; text: string } => {
+  const getGiftStatusInfo = (
+    status: string,
+  ): { icon: IconName; color: string; text: string } => {
     switch (status) {
       case 'received':
         return { icon: 'check-circle', color: COLORS.mint, text: 'Received' };
       case 'pending_proof':
-        return { icon: 'camera-outline', color: COLORS.coral, text: 'Upload Proof' };
+        return {
+          icon: 'camera-outline',
+          color: COLORS.coral,
+          text: 'Upload Proof',
+        };
       case 'verifying':
-        return { icon: 'timer-sand', color: COLORS.softOrange, text: 'Verifying...' };
+        return {
+          icon: 'timer-sand',
+          color: COLORS.softOrange,
+          text: 'Verifying...',
+        };
       case 'verified':
         return { icon: 'check-decagram', color: COLORS.mint, text: 'Verified' };
       case 'failed':
@@ -147,9 +164,13 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{senderName}'s Gifts</Text>
+        <Text style={styles.headerTitle}>{senderName}&apos;s Gifts</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -163,32 +184,53 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
           <TouchableOpacity onPress={handleViewProfile}>
             <Image source={{ uri: senderAvatar }} style={styles.avatar} />
           </TouchableOpacity>
-          
+
           <View style={styles.profileInfo}>
             <View style={styles.nameRow}>
-              <Text style={styles.name}>{senderName}, {senderAge}</Text>
+              <Text style={styles.name}>
+                {senderName}, {senderAge}
+              </Text>
               {senderVerified && (
-                <MaterialCommunityIcons name="check-decagram" size={18} color={COLORS.primary} />
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={18}
+                  color={COLORS.primary}
+                />
               )}
             </View>
-            
+
             <Text style={styles.city}>📍 {senderCity}</Text>
-            
+
             <View style={styles.statsRow}>
               <View style={styles.stat}>
-                <MaterialCommunityIcons name="star" size={16} color={COLORS.softOrange} />
+                <MaterialCommunityIcons
+                  name="star"
+                  size={16}
+                  color={COLORS.softOrange}
+                />
                 <Text style={styles.statText}>{senderRating}</Text>
               </View>
               <View style={styles.stat}>
-                <MaterialCommunityIcons name="airplane" size={16} color={COLORS.primary} />
+                <MaterialCommunityIcons
+                  name="airplane"
+                  size={16}
+                  color={COLORS.primary}
+                />
                 <Text style={styles.statText}>{senderTripCount} trips</Text>
               </View>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.viewProfileButton} onPress={handleViewProfile}>
+          <TouchableOpacity
+            style={styles.viewProfileButton}
+            onPress={handleViewProfile}
+          >
             <Text style={styles.viewProfileText}>View Profile</Text>
-            <MaterialCommunityIcons name="chevron-right" size={16} color={COLORS.primary} />
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={16}
+              color={COLORS.primary}
+            />
           </TouchableOpacity>
         </View>
 
@@ -196,14 +238,16 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
         <View style={styles.totalCard}>
           <Text style={styles.totalLabel}>Total Received</Text>
           <Text style={styles.totalAmount}>${totalAmount}</Text>
-          <Text style={styles.giftCount}>{gifts.length} gift{gifts.length > 1 ? 's' : ''}</Text>
+          <Text style={styles.giftCount}>
+            {gifts.length} gift{gifts.length > 1 ? 's' : ''}
+          </Text>
         </View>
 
         {/* Gifts List */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Gifts</Text>
-          
-          {gifts.map((gift: any) => {
+
+          {gifts.map((gift) => {
             const statusInfo = getGiftStatusInfo(gift.status);
             return (
               <View key={gift.id} style={styles.giftItem}>
@@ -211,26 +255,43 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
                   <Text style={styles.giftEmoji}>{gift.momentEmoji}</Text>
                   <View style={styles.giftInfo}>
                     <Text style={styles.giftTitle}>{gift.momentTitle}</Text>
-                    <Text style={styles.giftAmount}>${gift.amount} · {getPaymentTypeLabel(gift.paymentType)}</Text>
+                    <Text style={styles.giftAmount}>
+                      ${gift.amount} · {getPaymentTypeLabel(gift.paymentType)}
+                    </Text>
                   </View>
                 </View>
-                
-                <Text style={styles.giftMessage}>"{gift.message}"</Text>
-                
+
+                <Text style={styles.giftMessage}>
+                  &quot;{gift.message}&quot;
+                </Text>
+
                 <View style={styles.giftFooter}>
                   <View style={styles.giftStatus}>
-                    <MaterialCommunityIcons name={statusInfo.icon} size={16} color={statusInfo.color} />
-                    <Text style={[styles.giftStatusText, { color: statusInfo.color }]}>
+                    <MaterialCommunityIcons
+                      name={statusInfo.icon}
+                      size={16}
+                      color={statusInfo.color}
+                    />
+                    <Text
+                      style={[
+                        styles.giftStatusText,
+                        { color: statusInfo.color },
+                      ]}
+                    >
                       {statusInfo.text}
                     </Text>
                   </View>
-                  
+
                   {gift.status === 'pending_proof' && (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.uploadButton}
                       onPress={() => handleUploadProof(gift.id)}
                     >
-                      <MaterialCommunityIcons name="camera" size={16} color={COLORS.white} />
+                      <MaterialCommunityIcons
+                        name="camera"
+                        size={16}
+                        color={COLORS.white}
+                      />
                       <Text style={styles.uploadButtonText}>Upload</Text>
                     </TouchableOpacity>
                   )}
@@ -245,41 +306,68 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.startChatButton,
-              !canStartChat && styles.startChatButtonDisabled
+              !canStartChat && styles.startChatButtonDisabled,
             ]}
             onPress={handleStartChat}
           >
-            <MaterialCommunityIcons 
-              name="message-outline" 
-              size={20} 
-              color={canStartChat ? COLORS.white : COLORS.textSecondary} 
+            <MaterialCommunityIcons
+              name="message-outline"
+              size={20}
+              color={canStartChat ? COLORS.white : COLORS.textSecondary}
             />
-            <Text style={[
-              styles.startChatText,
-              !canStartChat && styles.startChatTextDisabled
-            ]}>
-              {canStartChat ? `Start Chat with ${senderName}` : 'Upload proof to start chat'}
+            <Text
+              style={[
+                styles.startChatText,
+                !canStartChat && styles.startChatTextDisabled,
+              ]}
+            >
+              {canStartChat
+                ? `Start Chat with ${senderName}`
+                : 'Upload proof to start chat'}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.secondaryActions}>
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleHide}>
-              <MaterialCommunityIcons name="eye-off-outline" size={20} color={COLORS.textSecondary} />
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleHide}
+            >
+              <MaterialCommunityIcons
+                name="eye-off-outline"
+                size={20}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.secondaryButtonText}>Hide</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleReport}>
-              <MaterialCommunityIcons name="flag-outline" size={20} color={COLORS.error} />
-              <Text style={[styles.secondaryButtonText, { color: COLORS.error }]}>Report</Text>
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleReport}
+            >
+              <MaterialCommunityIcons
+                name="flag-outline"
+                size={20}
+                color={COLORS.error}
+              />
+              <Text
+                style={[styles.secondaryButtonText, { color: COLORS.error }]}
+              >
+                Report
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Info Box */}
         <View style={styles.infoBox}>
-          <MaterialCommunityIcons name="information-outline" size={20} color={COLORS.primary} />
+          <MaterialCommunityIcons
+            name="information-outline"
+            size={20}
+            color={COLORS.primary}
+          />
           <Text style={styles.infoText}>
-            Starting a chat won't affect your received gifts. You can chat freely once you upload proof for any escrow gifts.
+            Starting a chat won&apos;t affect your received gifts. You can chat
+            freely once you upload proof for any escrow gifts.
           </Text>
         </View>
       </ScrollView>
@@ -334,7 +422,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -426,7 +514,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,

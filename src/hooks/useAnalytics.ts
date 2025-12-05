@@ -84,8 +84,7 @@ export const useActionTracking = () => {
   const route = useRoute();
 
   return (action: string, properties?: Record<string, unknown>) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track(action as any, {
+    analytics.trackEvent(action, {
       screen: route.name,
       timestamp: Date.now(),
       ...properties,
@@ -120,8 +119,7 @@ export const useFunnelTracking = (funnelName: string) => {
     funnelStartTime.current = Date.now();
     currentStep.current = 0;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track(`${funnelName}_started` as any, {
+    analytics.trackEvent(`${funnelName}_started`, {
       funnel: funnelName,
       screen: route.name,
       ...properties,
@@ -131,8 +129,7 @@ export const useFunnelTracking = (funnelName: string) => {
   const step = (stepName: string, properties?: Record<string, unknown>) => {
     currentStep.current += 1;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track(`${funnelName}_step` as any, {
+    analytics.trackEvent(`${funnelName}_step`, {
       funnel: funnelName,
       step: stepName,
       stepNumber: currentStep.current,
@@ -149,8 +146,7 @@ export const useFunnelTracking = (funnelName: string) => {
       ? Date.now() - funnelStartTime.current
       : 0;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track(`${funnelName}_completed` as any, {
+    analytics.trackEvent(`${funnelName}_completed`, {
       funnel: funnelName,
       duration,
       steps: currentStep.current,
@@ -168,8 +164,7 @@ export const useFunnelTracking = (funnelName: string) => {
       ? Date.now() - funnelStartTime.current
       : 0;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track(`${funnelName}_abandoned` as any, {
+    analytics.trackEvent(`${funnelName}_abandoned`, {
       funnel: funnelName,
       duration,
       lastStep: currentStep.current,
@@ -209,8 +204,7 @@ export const useErrorTracking = () => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track('error_occurred' as any, {
+    analytics.trackEvent('error_occurred', {
       error: errorMessage,
       stack: errorStack,
       screen: route.name,
@@ -232,8 +226,7 @@ export const useErrorTracking = () => {
  */
 export const useAnalytics = () => {
   const trackEvent = (action: string, properties?: Record<string, unknown>) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track(action as any, {
+    analytics.trackEvent(action, {
       screen: 'app',
       timestamp: Date.now(),
       ...properties,
@@ -247,8 +240,7 @@ export const useAnalytics = () => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics.track('error_occurred' as any, {
+    analytics.trackEvent('error_occurred', {
       error: errorMessage,
       stack: errorStack,
       screen: 'app',

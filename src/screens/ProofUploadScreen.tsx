@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
   Platform,
 } from 'react-native';
@@ -96,18 +98,25 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
       if (useCamera) {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('Permission Required', 'Camera permission is needed to take photos');
+          Alert.alert(
+            'Permission Required',
+            'Camera permission is needed to take photos',
+          );
           return;
         }
       } else {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('Permission Required', 'Gallery permission is needed to select photos');
+          Alert.alert(
+            'Permission Required',
+            'Gallery permission is needed to select photos',
+          );
           return;
         }
       }
 
-      const result = useCamera 
+      const result = useCamera
         ? await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -122,7 +131,10 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
           });
 
       if (!result.canceled && result.assets[0]) {
-        setProof({ ...proof, photos: [...(proof.photos || []), result.assets[0].uri] });
+        setProof({
+          ...proof,
+          photos: [...(proof.photos || []), result.assets[0].uri],
+        });
       }
     };
 
@@ -135,7 +147,7 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
         (buttonIndex) => {
           if (buttonIndex === 1) showPicker(true);
           if (buttonIndex === 2) showPicker(false);
-        }
+        },
       );
     } else {
       Alert.alert('Add Photo', 'Select proof photo', [
@@ -155,8 +167,11 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
     //   setProof({ ...proof, documents: [...proof.documents, result.uri] });
     // }
     Alert.alert('Add Ticket/Receipt', 'Select receipt or ticket document', [
-      { text: 'Choose File', onPress: () => console.log('Open document picker') },
-      { text: 'Cancel', style: 'cancel' }
+      {
+        text: 'Choose File',
+        onPress: () => logger.debug('Open document picker'),
+      },
+      { text: 'Cancel', style: 'cancel' },
     ]);
   };
 
@@ -174,9 +189,11 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         });
-        
-        const locationName = address 
-          ? `${address.street || ''} ${address.city || ''}, ${address.country || ''}`.trim()
+
+        const locationName = address
+          ? `${address.street || ''} ${address.city || ''}, ${
+              address.country || ''
+            }`.trim()
           : 'Current Location';
 
         setProof({
@@ -187,7 +204,7 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
             name: locationName,
           },
         });
-        
+
         Alert.alert('Location Set', locationName);
       } catch (error) {
         Alert.alert('Error', 'Could not get current location');
@@ -203,20 +220,16 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
         (buttonIndex) => {
           if (buttonIndex === 1) getCurrentLocation();
           if (buttonIndex === 2) {
-            Alert.prompt(
-              'Enter Location',
-              'Type the location name',
-              (text) => {
-                if (text) {
-                  setProof({
-                    ...proof,
-                    location: { lat: 0, lng: 0, name: text },
-                  });
-                }
+            Alert.prompt('Enter Location', 'Type the location name', (text) => {
+              if (text) {
+                setProof({
+                  ...proof,
+                  location: { lat: 0, lng: 0, name: text },
+                });
               }
-            );
+            });
           }
-        }
+        },
       );
     } else {
       Alert.alert('Select Location', 'Choose location option', [
@@ -310,7 +323,7 @@ export const ProofUploadScreen: React.FC<ProofUploadScreenProps> = ({
           {proof.photos?.map((photo) => (
             <View key={photo} style={styles.photoPreview}>
               <Image source={{ uri: photo }} style={styles.photoImage} />
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.removePhoto}
                 onPress={() => handleRemovePhoto(photo)}
               >
@@ -627,9 +640,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: LAYOUT.padding * 2,
     paddingVertical: LAYOUT.padding * 1.5,
-  },
-  headerSpacer: {
-    width: 40,
   },
   headerTitle: {
     color: COLORS.text,

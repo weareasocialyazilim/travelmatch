@@ -4,7 +4,7 @@
  * Replaces: GiftBottomSheet → PaymentSheet → SuccessModal → ShareModal
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useScreenPerformance } from '../hooks/useScreenPerformance';
 import {
   View,
@@ -69,20 +69,25 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   navigation,
 }) => {
   const { recipientId, recipientName, momentId } = route.params;
-  
-  // Create a placeholder moment object - in production, fetch from API using momentId
-  const moment: Moment = {
-    id: momentId || 'placeholder',
-    title: 'Gift Moment',
-    story: '',
-    imageUrl: '',
-    price: 0,
-    availability: '',
-    location: { name: '', city: '', country: '' },
-    user: { name: recipientName, avatar: '' },
-  };
 
-  const [selectedRecipient, setSelectedRecipient] = useState<string>(recipientId || '');
+  // Create a placeholder moment object - in production, fetch from API using momentId
+  const moment: Moment = useMemo(
+    () => ({
+      id: momentId || 'placeholder',
+      title: 'Gift Moment',
+      story: '',
+      imageUrl: '',
+      price: 0,
+      availability: '',
+      location: { name: '', city: '', country: '' },
+      user: { name: recipientName, avatar: '' },
+    }),
+    [momentId, recipientName],
+  );
+
+  const [_selectedRecipient, _setSelectedRecipient] = useState<string>(
+    recipientId || '',
+  );
   const [recipientEmail, setRecipientEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [selectedPayment, setSelectedPayment] = useState<string>(
@@ -146,7 +151,15 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
         price: moment.price,
       });
     }, 2000);
-  }, [recipientEmail, moment, selectedPayment, message, impact, trackEvent]);
+  }, [
+    recipientEmail,
+    moment,
+    selectedPayment,
+    message,
+    impact,
+    trackEvent,
+    trackInteraction,
+  ]);
 
   // Handle share
   const handleShare = useCallback(() => {
@@ -253,7 +266,9 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
               <Text style={styles.momentTitle} numberOfLines={2}>
                 {moment.title}
               </Text>
-              <Text style={styles.momentLocation}>{moment.location.city}</Text>
+              <Text style={styles.momentLocation}>
+                {moment.location?.city || 'Unknown Location'}
+              </Text>
               <Text style={styles.momentPrice}>${moment.price}</Text>
             </View>
           </View>
@@ -302,7 +317,9 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
                 onPress={() => handleSelectPayment(method.id)}
               >
                 <Icon
-                  name={method.icon as any}
+                  name={
+                    method.icon as React.ComponentProps<typeof Icon>['name']
+                  }
                   size={24}
                   color={
                     selectedPayment === method.id

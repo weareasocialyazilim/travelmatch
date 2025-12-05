@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -22,14 +22,14 @@ interface BadgeProps {
   style?: ViewStyle;
 }
 
-export const Badge: React.FC<BadgeProps> = ({
+export const Badge = memo<BadgeProps>(function Badge({
   label,
   variant = 'default',
   size = 'md',
   icon,
   dot = false,
   style,
-}) => {
+}) {
   const getVariantStyles = (): { bg: string; text: string } => {
     switch (variant) {
       case 'success':
@@ -104,7 +104,7 @@ export const Badge: React.FC<BadgeProps> = ({
       </Text>
     </View>
   );
-};
+});
 
 // Notification Badge (for tab bar, etc.)
 interface NotificationBadgeProps {
@@ -113,21 +113,19 @@ interface NotificationBadgeProps {
   style?: ViewStyle;
 }
 
-export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
-  count,
-  max = 99,
-  style,
-}) => {
-  if (count <= 0) return null;
+export const NotificationBadge = memo<NotificationBadgeProps>(
+  function NotificationBadge({ count, max = 99, style }) {
+    if (count <= 0) return null;
 
-  const displayCount = count > max ? `${max}+` : count.toString();
+    const displayCount = count > max ? `${max}+` : count.toString();
 
-  return (
-    <View style={[styles.notificationBadge, style]}>
-      <Text style={styles.notificationText}>{displayCount}</Text>
-    </View>
-  );
-};
+    return (
+      <View style={[styles.notificationBadge, style]}>
+        <Text style={styles.notificationText}>{displayCount}</Text>
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

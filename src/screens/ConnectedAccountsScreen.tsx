@@ -27,14 +27,14 @@ interface SocialAccount {
 
 const ConnectedAccountsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   const [accounts, setAccounts] = useState<SocialAccount[]>([
     {
       id: '1',
       platform: 'instagram',
       name: 'Instagram',
       icon: 'instagram',
-      color: '#E4405F',
+      color: COLORS.instagram,
       connected: true,
       username: '@sophia_travels',
       followers: 15200,
@@ -44,7 +44,7 @@ const ConnectedAccountsScreen: React.FC = () => {
       platform: 'twitter',
       name: 'X (Twitter)',
       icon: 'twitter',
-      color: '#000000',
+      color: COLORS.black,
       connected: true,
       username: '@sophia_carter',
       followers: 3400,
@@ -54,7 +54,7 @@ const ConnectedAccountsScreen: React.FC = () => {
       platform: 'linkedin',
       name: 'LinkedIn',
       icon: 'linkedin',
-      color: '#0A66C2',
+      color: COLORS.linkedin,
       connected: false,
     },
   ]);
@@ -70,16 +70,21 @@ const ConnectedAccountsScreen: React.FC = () => {
             text: 'Disconnect',
             style: 'destructive',
             onPress: () => {
-              setAccounts(prev =>
-                prev.map(a =>
+              setAccounts((prev) =>
+                prev.map((a) =>
                   a.id === account.id
-                    ? { ...a, connected: false, username: undefined, followers: undefined }
-                    : a
-                )
+                    ? {
+                        ...a,
+                        connected: false,
+                        username: undefined,
+                        followers: undefined,
+                      }
+                    : a,
+                ),
               );
             },
           },
-        ]
+        ],
       );
     } else {
       // Simulate connecting
@@ -92,16 +97,21 @@ const ConnectedAccountsScreen: React.FC = () => {
             text: 'Continue',
             onPress: () => {
               // Simulate successful connection
-              setAccounts(prev =>
-                prev.map(a =>
+              setAccounts((prev) =>
+                prev.map((a) =>
                   a.id === account.id
-                    ? { ...a, connected: true, username: '@user_' + account.platform, followers: 1000 }
-                    : a
-                )
+                    ? {
+                        ...a,
+                        connected: true,
+                        username: '@user_' + account.platform,
+                        followers: 1000,
+                      }
+                    : a,
+                ),
               );
             },
           },
-        ]
+        ],
       );
     }
   };
@@ -116,7 +126,7 @@ const ConnectedAccountsScreen: React.FC = () => {
     return count.toString();
   };
 
-  const connectedCount = accounts.filter(a => a.connected).length;
+  const connectedCount = accounts.filter((a) => a.connected).length;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -126,7 +136,11 @@ const ConnectedAccountsScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Connected Accounts</Text>
         <View style={styles.placeholder} />
@@ -140,13 +154,18 @@ const ConnectedAccountsScreen: React.FC = () => {
         {/* Info Card */}
         <View style={styles.infoCard}>
           <View style={styles.infoIcon}>
-            <MaterialCommunityIcons name="shield-check" size={24} color={COLORS.mint} />
+            <MaterialCommunityIcons
+              name="shield-check"
+              size={24}
+              color={COLORS.mint}
+            />
           </View>
           <View style={styles.infoContent}>
             <Text style={styles.infoTitle}>Build Trust</Text>
             <Text style={styles.infoText}>
-              Connect your social accounts to verify your identity and build trust with other users.
-              Connected accounts increase your Trust Garden score.
+              Connect your social accounts to verify your identity and build
+              trust with other users. Connected accounts increase your Trust
+              Garden score.
             </Text>
           </View>
         </View>
@@ -167,7 +186,7 @@ const ConnectedAccountsScreen: React.FC = () => {
         {/* Accounts List */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>SOCIAL ACCOUNTS</Text>
-          
+
           <View style={styles.accountsCard}>
             {accounts.map((account, index) => (
               <React.Fragment key={account.id}>
@@ -175,12 +194,23 @@ const ConnectedAccountsScreen: React.FC = () => {
                   style={styles.accountItem}
                   onPress={() => handleConnect(account)}
                 >
-                  <View style={[styles.accountIcon, { backgroundColor: `${account.color}15` }]}>
+                  <View
+                    style={[
+                      styles.accountIcon,
+                      { backgroundColor: `${account.color}15` },
+                    ]}
+                  >
                     {account.platform === 'twitter' ? (
-                      <Text style={[styles.xLogo, { color: account.color }]}>𝕏</Text>
+                      <Text style={[styles.xLogo, { color: account.color }]}>
+                        𝕏
+                      </Text>
                     ) : (
                       <MaterialCommunityIcons
-                        name={account.icon as any}
+                        name={
+                          account.icon as React.ComponentProps<
+                            typeof MaterialCommunityIcons
+                          >['name']
+                        }
                         size={20}
                         color={account.color}
                       />
@@ -190,7 +220,9 @@ const ConnectedAccountsScreen: React.FC = () => {
                     <Text style={styles.accountName}>{account.name}</Text>
                     {account.connected ? (
                       <View style={styles.accountMeta}>
-                        <Text style={styles.accountUsername}>{account.username}</Text>
+                        <Text style={styles.accountUsername}>
+                          {account.username}
+                        </Text>
                         {account.followers && (
                           <>
                             <Text style={styles.accountDot}>•</Text>
@@ -201,12 +233,18 @@ const ConnectedAccountsScreen: React.FC = () => {
                         )}
                       </View>
                     ) : (
-                      <Text style={styles.accountNotConnected}>Not connected</Text>
+                      <Text style={styles.accountNotConnected}>
+                        Not connected
+                      </Text>
                     )}
                   </View>
                   {account.connected ? (
                     <View style={styles.connectedBadge}>
-                      <MaterialCommunityIcons name="check" size={14} color={COLORS.mint} />
+                      <MaterialCommunityIcons
+                        name="check"
+                        size={14}
+                        color={COLORS.mint}
+                      />
                     </View>
                   ) : (
                     <Text style={styles.connectText}>Connect</Text>
@@ -221,23 +259,32 @@ const ConnectedAccountsScreen: React.FC = () => {
         {/* Benefits */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>BENEFITS</Text>
-          
+
           <View style={styles.benefitsCard}>
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
-                <MaterialCommunityIcons name="shield-star" size={18} color={COLORS.mint} />
+                <MaterialCommunityIcons
+                  name="shield-star"
+                  size={18}
+                  color={COLORS.mint}
+                />
               </View>
               <View style={styles.benefitContent}>
                 <Text style={styles.benefitTitle}>Verified Badge</Text>
                 <Text style={styles.benefitDesc}>
-                  Get a verified badge on your profile when you connect 2+ accounts
+                  Get a verified badge on your profile when you connect 2+
+                  accounts
                 </Text>
               </View>
             </View>
 
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
-                <MaterialCommunityIcons name="trending-up" size={18} color={COLORS.softOrange} />
+                <MaterialCommunityIcons
+                  name="trending-up"
+                  size={18}
+                  color={COLORS.softOrange}
+                />
               </View>
               <View style={styles.benefitContent}>
                 <Text style={styles.benefitTitle}>Higher Trust Score</Text>
@@ -249,7 +296,11 @@ const ConnectedAccountsScreen: React.FC = () => {
 
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
-                <MaterialCommunityIcons name="share-variant" size={18} color={COLORS.coral} />
+                <MaterialCommunityIcons
+                  name="share-variant"
+                  size={18}
+                  color={COLORS.coral}
+                />
               </View>
               <View style={styles.benefitContent}>
                 <Text style={styles.benefitTitle}>Easy Sharing</Text>

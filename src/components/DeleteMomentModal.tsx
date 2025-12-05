@@ -35,6 +35,7 @@ export const DeleteMomentModal: React.FC<DeleteMomentModalProps> = ({
       translateY.value = withTiming(50, { duration: 200 });
       opacity.value = withTiming(0, { duration: 200 });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -60,7 +61,7 @@ export const DeleteMomentModal: React.FC<DeleteMomentModalProps> = ({
             <MaterialCommunityIcons
               name={'delete' as IconName}
               size={40}
-              color="#E53E3E"
+              color={COLORS.errorRed}
             />
           </View>
 
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay50,
   },
   modalContent: {
     width: '100%',

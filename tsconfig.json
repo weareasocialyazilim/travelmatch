@@ -17,5 +17,12 @@
       "@/theme/*": ["src/theme/*"],
       "@/navigation/*": ["src/navigation/*"]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__mocks__/**"
+  ]
 }

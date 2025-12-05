@@ -38,7 +38,7 @@ export const useScreenPerformance = (screenName: string) => {
     // TODO: Send to analytics/monitoring service
     if (typeof global.performance !== 'undefined') {
       // eslint-disable-next-line no-console
-      console.log(`📊 [Performance] ${screenName}:`, {
+      logger.debug(`📊 [Performance] ${screenName}:`, {
         mountTime: mountDuration,
         timestamp: new Date().toISOString(),
       });
@@ -62,7 +62,7 @@ export const useScreenPerformance = (screenName: string) => {
 
       // TODO: Send to analytics service
       // eslint-disable-next-line no-console
-      console.log(`🎯 [Interaction] ${screenName} - ${interactionName}:`, {
+      logger.debug(`🎯 [Interaction] ${screenName} - ${interactionName}:`, {
         metadata,
         timestamp: new Date().toISOString(),
       });
@@ -74,8 +74,9 @@ export const useScreenPerformance = (screenName: string) => {
    * Cleanup on unmount
    */
   useEffect(() => {
+    const mountTime = mountTimeRef.current;
     return () => {
-      const totalTime = Date.now() - mountTimeRef.current;
+      const totalTime = Date.now() - mountTime;
       logger.debug(
         `[Performance] ${screenName} unmounted after ${totalTime}ms`,
       );

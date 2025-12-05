@@ -4,7 +4,8 @@
  */
 
 import { analytics } from './analytics';
-import type { Moment, User } from '../types';
+import { logger } from '../utils/logger';
+import type { Moment } from '../types';
 
 /**
  * User Profile Interface
@@ -143,7 +144,7 @@ class PersonalizationService {
       // TODO: Implement actual ML-based personalization
       return moments.slice(0, limit);
     } catch (error) {
-      console.error('Failed to get personalized recommendations:', error);
+      logger.error('Failed to get personalized recommendations:', error);
       // Fallback to returning all moments
       return moments.slice(0, limit);
     }
@@ -174,7 +175,7 @@ class PersonalizationService {
     price: number,
   ): Promise<void> {
     // TODO: Implement API call to update profile
-    console.log('Profile would be updated from booking:', { momentId, price });
+    logger.debug('Profile would be updated from booking:', { momentId, price });
   }
 
   /**
@@ -207,7 +208,8 @@ class PersonalizationService {
 
     // Activity match (40% weight)
     const categoryId = moment.category?.id;
-    const activityMatch = categoryId && userProfile.favoriteActivities.includes(categoryId);
+    const activityMatch =
+      categoryId && userProfile.favoriteActivities.includes(categoryId);
     if (activityMatch) score += 0.4;
 
     // Price range match (30% weight)

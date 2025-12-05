@@ -2,6 +2,7 @@
  * Search History Hook
  * Manages search history with AsyncStorage persistence
  */
+import { logger } from '../utils/logger';
 
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,7 +26,7 @@ export const useSearchHistory = () => {
         setHistory(JSON.parse(stored));
       }
     } catch (error) {
-      console.error('Failed to load search history:', error);
+      logger.error('Failed to load search history:', error);
     } finally {
       setIsLoading(false);
     }
@@ -39,7 +40,7 @@ export const useSearchHistory = () => {
         JSON.stringify(newHistory),
       );
     } catch (error) {
-      console.error('Failed to save search history:', error);
+      logger.error('Failed to save search history:', error);
     }
   };
 
@@ -75,7 +76,7 @@ export const useSearchHistory = () => {
     try {
       await AsyncStorage.removeItem(SEARCH_HISTORY_KEY);
     } catch (error) {
-      console.error('Failed to clear search history:', error);
+      logger.error('Failed to clear search history:', error);
     }
   }, []);
 

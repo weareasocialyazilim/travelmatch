@@ -2,6 +2,7 @@
  * Performance Utilities
  * Memoization ve optimization helpers
  */
+import { logger } from './logger';
 
 import { useCallback, useRef, useEffect, useState } from 'react';
 
@@ -231,11 +232,17 @@ class PerformanceMonitorClass {
 
         // Alert on low FPS
         if (fps < 30) {
-          console.warn('⚠️ Low FPS detected:', fps);
+          logger.warn('⚠️ Low FPS detected:', fps);
 
           // Send to analytics/Sentry
-          if (typeof (global as Record<string, unknown>).Sentry !== 'undefined') {
-            ((global as Record<string, unknown>).Sentry as { captureMessage: (msg: string, opts: unknown) => void }).captureMessage('Performance degradation', {
+          if (
+            typeof (global as Record<string, unknown>).Sentry !== 'undefined'
+          ) {
+            (
+              (global as Record<string, unknown>).Sentry as {
+                captureMessage: (msg: string, opts: unknown) => void;
+              }
+            ).captureMessage('Performance degradation', {
               level: 'warning',
               extra: { fps },
             });
@@ -277,10 +284,14 @@ class PerformanceMonitorClass {
 
       // Alert on high memory
       if (usage > 80) {
-        console.warn('⚠️ High memory usage:', `${usage.toFixed(1)}%`);
+        logger.warn('⚠️ High memory usage:', `${usage.toFixed(1)}%`);
 
         if (typeof (global as Record<string, unknown>).Sentry !== 'undefined') {
-          ((global as Record<string, unknown>).Sentry as { captureMessage: (msg: string, opts: unknown) => void }).captureMessage('High memory usage', {
+          (
+            (global as Record<string, unknown>).Sentry as {
+              captureMessage: (msg: string, opts: unknown) => void;
+            }
+          ).captureMessage('High memory usage', {
             level: 'warning',
             extra: {
               usage,
@@ -307,10 +318,14 @@ class PerformanceMonitorClass {
 
     // Alert on slow API
     if (latency > 3000) {
-      console.warn('⚠️ Slow API response:', endpoint, `${latency}ms`);
+      logger.warn('⚠️ Slow API response:', endpoint, `${latency}ms`);
 
       if (typeof (global as Record<string, unknown>).Sentry !== 'undefined') {
-        ((global as Record<string, unknown>).Sentry as { captureMessage: (msg: string, opts: unknown) => void }).captureMessage('Slow API response', {
+        (
+          (global as Record<string, unknown>).Sentry as {
+            captureMessage: (msg: string, opts: unknown) => void;
+          }
+        ).captureMessage('Slow API response', {
           level: 'warning',
           extra: { endpoint, latency, ...metadata },
         });
@@ -325,7 +340,7 @@ class PerformanceMonitorClass {
     this.recordMetric(`screen_load_${screenName}`, loadTime);
 
     if (loadTime > 2000) {
-      console.warn('⚠️ Slow screen load:', screenName, `${loadTime}ms`);
+      logger.warn('⚠️ Slow screen load:', screenName, `${loadTime}ms`);
     }
   };
 
@@ -353,7 +368,7 @@ class PerformanceMonitorClass {
 
     // Log in development
     if (__DEV__) {
-      console.log('📊 Metric:', name, value, metadata);
+      logger.debug('📊 Metric:', name, value, metadata);
     }
   };
 

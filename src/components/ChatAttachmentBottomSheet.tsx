@@ -22,12 +22,7 @@ interface ChatAttachmentBottomSheetProps {
 
 export const ChatAttachmentBottomSheet: React.FC<
   ChatAttachmentBottomSheetProps
-> = ({
-  visible,
-  onClose,
-  onPhotoVideo,
-  onGift,
-}) => {
+> = ({ visible, onClose, onPhotoVideo, onGift }) => {
   const options = [
     {
       id: 'photo',
@@ -55,11 +50,8 @@ export const ChatAttachmentBottomSheet: React.FC<
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <Pressable 
-        style={styles.backdrop}
-        onPress={onClose}
-      >
-        <Pressable 
+      <Pressable style={styles.backdrop} onPress={onClose}>
+        <Pressable
           style={styles.sheetContainer}
           onPress={(e) => e.stopPropagation()}
         >
@@ -83,7 +75,12 @@ export const ChatAttachmentBottomSheet: React.FC<
                   }}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.iconContainer, { backgroundColor: option.color + '20' }]}>
+                  <View
+                    style={[
+                      styles.iconContainer,
+                      { backgroundColor: option.color + '20' },
+                    ]}
+                  >
                     <MaterialCommunityIcons
                       name={option.icon}
                       size={28}
@@ -92,7 +89,9 @@ export const ChatAttachmentBottomSheet: React.FC<
                   </View>
                   <View style={styles.optionTextContainer}>
                     <Text style={styles.optionLabel}>{option.label}</Text>
-                    <Text style={styles.optionDescription}>{option.description}</Text>
+                    <Text style={styles.optionDescription}>
+                      {option.description}
+                    </Text>
                   </View>
                   <MaterialCommunityIcons
                     name={'chevron-right' as IconName}
@@ -120,7 +119,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay50,
     justifyContent: 'flex-end',
   },
   sheetContainer: {
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     maxHeight: SCREEN_HEIGHT * 0.9,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,

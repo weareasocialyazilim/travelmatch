@@ -1,5 +1,13 @@
 import React, { memo, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Share,
+  Alert,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import type { Moment } from '../types';
@@ -15,10 +23,11 @@ interface MomentCardProps {
   moment: Moment;
   onPress: () => void;
   onGiftPress: (moment: Moment) => void;
+  onSharePress?: (moment: Moment) => void;
 }
 
 const MomentCard: React.FC<MomentCardProps> = memo(
-  ({ moment, onPress, onGiftPress }) => {
+  ({ moment, onPress, onGiftPress, onSharePress }) => {
     const { impact } = useHaptics();
     const {
       animatedStyle: cardScale,
@@ -36,6 +45,37 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         onGiftPress(moment);
       },
       [moment, onGiftPress, impact],
+    );
+
+    const handleSharePress = useCallback(
+      async (e: unknown) => {
+        if (e && typeof e === 'object' && 'stopPropagation' in e) {
+          (e as { stopPropagation: () => void }).stopPropagation();
+        }
+        impact('light');
+
+        if (onSharePress) {
+          onSharePress(moment);
+          return;
+        }
+
+        // Default share behavior
+        try {
+          const shareUrl = `https://travelmatch.app/moment/${moment.id}`;
+          const shareMessage = `Check out this moment on TravelMatch: ${moment.title}\n${shareUrl}`;
+
+          await Share.share({
+            message: shareMessage,
+            url: shareUrl,
+            title: moment.title,
+          });
+        } catch (error) {
+          if ((error as Error).message !== 'User did not share') {
+            Alert.alert('Error', 'Could not share this moment');
+          }
+        }
+      },
+      [moment, onSharePress, impact],
     );
 
     const handleMaybeLater = useCallback(
@@ -59,6 +99,10 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         onPressIn={onCardPressIn}
         onPressOut={onCardPressOut}
         activeOpacity={1}
+        accessibilityLabel={`Moment: ${moment.title} by ${
+          moment.user?.name || 'Unknown'
+        }`}
+        accessibilityRole="button"
       >
         <Animated.View style={[styles.card, cardScale]}>
           <View style={styles.cardImageContainer}>
@@ -66,22 +110,41 @@ const MomentCard: React.FC<MomentCardProps> = memo(
               source={{ uri: moment.imageUrl }}
               style={styles.cardImage}
               resizeMode="cover"
+              accessibilityLabel={`Photo of ${moment.title}`}
             />
+
+            {/* Share Button */}
+            <TouchableOpacity
+              style={styles.shareButton}
+              onPress={handleSharePress}
+              activeOpacity={0.8}
+              accessibilityLabel="Share this moment"
+              accessibilityRole="button"
+            >
+              <MaterialCommunityIcons
+                name="share-variant"
+                size={20}
+                color={COLORS.white}
+              />
+            </TouchableOpacity>
 
             <View style={styles.userBadge}>
               <Image
-                source={{ uri: moment.user.avatar }}
+                source={{
+                  uri: moment.user?.avatar || 'https://via.placeholder.com/150',
+                }}
                 style={styles.userAvatar}
+                accessibilityLabel={`${moment.user?.name || 'User'}'s avatar`}
               />
               <View style={styles.userInfo}>
                 <Text style={styles.userName} numberOfLines={1}>
-                  {moment.user.name}
-                  {moment.user.isVerified && (
+                  {moment.user?.name || 'Anonymous'}
+                  {moment.user?.isVerified && (
                     <Text style={styles.verifiedBadge}> ✓</Text>
                   )}
                 </Text>
                 <Text style={styles.userRole} numberOfLines={1}>
-                  {moment.user.role}
+                  {moment.user?.role || 'Traveler'}
                 </Text>
               </View>
             </View>
@@ -180,6 +243,18 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.h3,
     marginBottom: spacing.xs,
   },
+  shareButton: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.overlay50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
   detailItem: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -229,7 +304,7 @@ const styles = StyleSheet.create({
   },
   userBadge: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: COLORS.overlay75,
     borderRadius: 18,
     bottom: spacing.sm,
     flexDirection: 'row',
@@ -257,7 +332,7 @@ const styles = StyleSheet.create({
   },
   userRole: {
     ...TYPOGRAPHY.caption,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: COLORS.textWhite80,
     fontSize: 11,
     marginTop: 1,
   },

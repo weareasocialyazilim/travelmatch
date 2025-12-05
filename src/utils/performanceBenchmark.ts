@@ -6,7 +6,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { InteractionManager, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { performance as performancePolyfill } from 'perf_hooks';
+import { performance as _performancePolyfill } from 'perf_hooks';
+import { logger } from './logger';
 
 /**
  * Performance Metrics
@@ -89,7 +90,7 @@ class PerformanceBenchmarkService {
 
     // Log slow screens
     if (mountTime + renderTime > this.SLOW_SCREEN_THRESHOLD) {
-      console.warn(
+      logger.warn(
         `[Performance] Slow screen detected: ${screenName} (${
           mountTime + renderTime
         }ms)`,
@@ -128,7 +129,7 @@ class PerformanceBenchmarkService {
 
     // Log slow components
     if (renderTime > this.SLOW_COMPONENT_THRESHOLD) {
-      console.warn(
+      logger.warn(
         `[Performance] Slow component render: ${componentName} (${renderTime}ms)`,
       );
     }
@@ -139,9 +140,11 @@ class PerformanceBenchmarkService {
    */
   private async getMemoryUsage(): Promise<number> {
     try {
-      if (Platform.OS === 'web' && (performance as any).memory) {
-        const memory = (performance as any).memory;
-        return memory.usedJSHeapSize / 1024 / 1024; // Convert to MB
+      const perfWithMemory = performance as {
+        memory?: { usedJSHeapSize: number };
+      };
+      if (Platform.OS === 'web' && perfWithMemory.memory) {
+        return perfWithMemory.memory.usedJSHeapSize / 1024 / 1024; // Convert to MB
       }
       // React Native doesn't provide direct memory access
       return 0;
@@ -289,7 +292,7 @@ class PerformanceBenchmarkService {
       };
       await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
-      console.error('[Performance] Failed to save metrics:', error);
+      logger.error('[Performance] Failed to save metrics:', error);
     }
   }
 
@@ -305,7 +308,7 @@ class PerformanceBenchmarkService {
         this.componentMetrics = new Map(parsed.componentMetrics || []);
       }
     } catch (error) {
-      console.error('[Performance] Failed to load metrics:', error);
+      logger.error('[Performance] Failed to load metrics:', error);
     }
   }
 }
@@ -342,18 +345,18 @@ export const useScreenPerformance = (screenName: string) => {
 
   const trackMount = useCallback(() => {
     const mountTime = Date.now() - mountTimeRef.current;
-    console.log(`[Performance] ${screenName} mounted in ${mountTime}ms`);
+    logger.debug(`[Performance] ${screenName} mounted in ${mountTime}ms`);
   }, [screenName]);
 
   const trackRender = useCallback(() => {
     const renderTime = Date.now() - mountTimeRef.current;
-    console.log(`[Performance] ${screenName} rendered in ${renderTime}ms`);
+    logger.debug(`[Performance] ${screenName} rendered in ${renderTime}ms`);
   }, [screenName]);
 
   const trackInteraction = useCallback(
     (action: string) => {
       const interactionTime = Date.now() - mountTimeRef.current;
-      console.log(
+      logger.debug(
         `[Performance] ${screenName} - ${action} at ${interactionTime}ms`,
       );
     },

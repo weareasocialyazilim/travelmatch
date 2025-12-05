@@ -4,6 +4,7 @@
  */
 
 import { Linking } from 'react-native';
+import { logger } from './logger';
 import type { NavigationContainerRef } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -120,7 +121,7 @@ export async function getInitialURL(): Promise<string | null> {
   try {
     return await Linking.getInitialURL();
   } catch (error) {
-    console.error('Error getting initial URL:', error);
+    logger.error('Error getting initial URL:', error);
     return null;
   }
 }

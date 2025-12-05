@@ -1,6 +1,7 @@
 /**
  * Image Picker Component
- * Complete image selection with preview and upload
+ * Complete image selection with camera/gallery access,
+ * preview, validation, and upload progress tracking.
  */
 
 import React, { useState } from 'react';
@@ -28,10 +29,15 @@ import { radii } from '../../constants/radii';
 import { TYPOGRAPHY } from '../../constants/typography';
 
 interface ImagePickerProps {
+  /** Callback when image is uploaded successfully */
   onImageSelected?: (url: string) => void;
+  /** Upload endpoint URL */
   uploadUrl?: string;
+  /** Maximum file size in MB */
   maxSizeMB?: number;
+  /** Allow selecting multiple images */
   allowMultiple?: boolean;
+  /** Show image preview after selection */
   showPreview?: boolean;
 }
 

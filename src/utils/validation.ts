@@ -222,3 +222,203 @@ export type AddCardInput = z.infer<typeof addCardSchema>;
 export type AddBankAccountInput = z.infer<typeof addBankAccountSchema>;
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type SearchInput = z.infer<typeof searchSchema>;
+
+/**
+ * Report Schemas
+ */
+export const reportSchema = z.object({
+  reason: z.enum([
+    'spam',
+    'harassment',
+    'inappropriate_content',
+    'fraud',
+    'other',
+  ]),
+  description: z
+    .string()
+    .min(10, 'Please provide more details (at least 10 characters)')
+    .max(1000, 'Description must be less than 1000 characters'),
+  evidence: z
+    .array(z.string().url('Invalid evidence URL'))
+    .max(5, 'Maximum 5 evidence files allowed')
+    .optional(),
+});
+
+export type ReportInput = z.infer<typeof reportSchema>;
+
+/**
+ * Notification Settings Schema
+ */
+export const notificationSettingsSchema = z.object({
+  pushEnabled: z.boolean(),
+  emailEnabled: z.boolean(),
+  smsEnabled: z.boolean(),
+  marketingEnabled: z.boolean(),
+  newMessages: z.boolean(),
+  momentUpdates: z.boolean(),
+  requestUpdates: z.boolean(),
+  paymentUpdates: z.boolean(),
+});
+
+export type NotificationSettingsInput = z.infer<
+  typeof notificationSettingsSchema
+>;
+
+/**
+ * Privacy Settings Schema
+ */
+export const privacySettingsSchema = z.object({
+  profileVisibility: z.enum(['public', 'friends', 'private']),
+  showLocation: z.boolean(),
+  showOnlineStatus: z.boolean(),
+  allowMessagesFrom: z.enum(['everyone', 'friends', 'none']),
+  showActivityStatus: z.boolean(),
+});
+
+export type PrivacySettingsInput = z.infer<typeof privacySettingsSchema>;
+
+/**
+ * Contact Form Schema
+ */
+export const contactSchema = z.object({
+  subject: z
+    .string()
+    .min(5, 'Subject must be at least 5 characters')
+    .max(100, 'Subject must be less than 100 characters'),
+  message: z
+    .string()
+    .min(20, 'Message must be at least 20 characters')
+    .max(2000, 'Message must be less than 2000 characters'),
+  category: z.enum(['general', 'support', 'billing', 'partnership', 'other']),
+  email: z.string().email('Invalid email address').optional(),
+});
+
+export type ContactInput = z.infer<typeof contactSchema>;
+
+/**
+ * Feedback Schema
+ */
+export const feedbackSchema = z.object({
+  type: z.enum(['bug', 'feature', 'improvement', 'other']),
+  title: z
+    .string()
+    .min(5, 'Title must be at least 5 characters')
+    .max(100, 'Title must be less than 100 characters'),
+  description: z
+    .string()
+    .min(20, 'Description must be at least 20 characters')
+    .max(2000, 'Description must be less than 2000 characters'),
+  priority: z.enum(['low', 'medium', 'high']).optional(),
+  attachments: z
+    .array(z.string().url('Invalid attachment URL'))
+    .max(3, 'Maximum 3 attachments allowed')
+    .optional(),
+});
+
+export type FeedbackInput = z.infer<typeof feedbackSchema>;
+
+/**
+ * Coordinate Schema (reusable)
+ */
+export const coordinateSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+
+export type Coordinate = z.infer<typeof coordinateSchema>;
+
+/**
+ * Date Range Schema (reusable)
+ */
+export const dateRangeSchema = z
+  .object({
+    startDate: z.date(),
+    endDate: z.date(),
+  })
+  .refine((data) => data.startDate <= data.endDate, {
+    message: 'Start date must be before or equal to end date',
+    path: ['endDate'],
+  });
+
+export type DateRange = z.infer<typeof dateRangeSchema>;
+
+/**
+ * Pagination Schema
+ */
+export const paginationSchema = z.object({
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).max(100).default(20),
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+});
+
+export type PaginationInput = z.infer<typeof paginationSchema>;
+
+/**
+ * Withdrawal Schema
+ */
+export const withdrawalSchema = z.object({
+  amount: z.number().min(10, 'Minimum withdrawal amount is $10'),
+  destinationType: z.enum(['bank', 'card']),
+  destinationId: z.string().min(1, 'Destination is required'),
+});
+
+export type WithdrawalInput = z.infer<typeof withdrawalSchema>;
+
+/**
+ * Dispute Schema
+ */
+export const disputeSchema = z.object({
+  transactionId: z.string().min(1, 'Transaction ID is required'),
+  reason: z.enum([
+    'not_as_described',
+    'not_received',
+    'unauthorized',
+    'duplicate',
+    'other',
+  ]),
+  description: z
+    .string()
+    .min(20, 'Please provide more details (at least 20 characters)')
+    .max(2000, 'Description must be less than 2000 characters'),
+  evidence: z
+    .array(z.string().url('Invalid evidence URL'))
+    .min(1, 'At least one piece of evidence is required')
+    .max(10, 'Maximum 10 evidence files allowed'),
+});
+
+export type DisputeInput = z.infer<typeof disputeSchema>;
+
+/**
+ * Helper function to validate and parse data
+ */
+export const validateInput = <T>(
+  schema: z.ZodSchema<T>,
+  data: unknown,
+): { success: true; data: T } | { success: false; errors: z.ZodError } => {
+  const result = schema.safeParse(data);
+  if (result.success) {
+    return { success: true, data: result.data };
+  }
+  return { success: false, errors: result.error };
+};
+
+/**
+ * Helper to format Zod errors for display
+ */
+export const formatZodErrors = (
+  errors: z.ZodError,
+): Record<string, string[]> => {
+  const formattedErrors: Record<string, string[]> = {};
+
+  errors.issues.forEach((issue) => {
+    const path = issue.path.join('.');
+    if (!formattedErrors[path]) {
+      formattedErrors[path] = [];
+    }
+    formattedErrors[path].push(issue.message);
+  });
+
+  return formattedErrors;
+};
+

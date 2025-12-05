@@ -6,6 +6,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { featureFlagService, type FeatureFlags } from '../utils/featureFlags';
 import Constants from 'expo-constants';
+import { logger } from '../utils/logger';
 
 // Environment-based configuration
 const getRemoteConfigUrl = () => {
@@ -42,12 +43,12 @@ export const fetchRemoteConfig = async (): Promise<Partial<FeatureFlags>> => {
     // Try to get cached config first
     const cached = await getCachedConfig();
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('🚩 [RemoteConfig] Using cached config');
+      logger.debug('🚩 [RemoteConfig] Using cached config');
       return cached.flags;
     }
 
     // Fetch from remote with timeout
-    console.log(`🚩 [RemoteConfig] Fetching from ${REMOTE_CONFIG_URL}...`);
+    logger.debug(`🚩 [RemoteConfig] Fetching from ${REMOTE_CONFIG_URL}...`);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
@@ -72,17 +73,14 @@ export const fetchRemoteConfig = async (): Promise<Partial<FeatureFlags>> => {
     // Cache the response
     await cacheConfig(data);
 
-    console.log(
+    logger.debug(
       '✅ [RemoteConfig] Fetched successfully:',
       Object.keys(data.flags).length,
       'flags',
     );
     return data.flags;
   } catch (error) {
-    console.warn(
-      '⚠️ [RemoteConfig] Fetch failed, using local defaults:',
-      error,
-    );
+    logger.warn('⚠️ [RemoteConfig] Fetch failed, using local defaults:', error);
     return {};
   }
 };
@@ -97,7 +95,7 @@ const getCachedConfig = async (): Promise<RemoteConfigResponse | null> => {
 
     return JSON.parse(cached);
   } catch (error) {
-    console.error('[RemoteConfig] Cache read error:', error);
+    logger.error('[RemoteConfig] Cache read error:', error);
     return null;
   }
 };
@@ -109,7 +107,7 @@ const cacheConfig = async (config: RemoteConfigResponse): Promise<void> => {
   try {
     await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(config));
   } catch (error) {
-    console.error('[RemoteConfig] Cache write error:', error);
+    logger.error('[RemoteConfig] Cache write error:', error);
   }
 };
 
@@ -119,9 +117,9 @@ const cacheConfig = async (config: RemoteConfigResponse): Promise<void> => {
 export const clearRemoteConfigCache = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(CACHE_KEY);
-    console.log('🗑️ [RemoteConfig] Cache cleared');
+    logger.debug('🗑️ [RemoteConfig] Cache cleared');
   } catch (error) {
-    console.error('[RemoteConfig] Cache clear error:', error);
+    logger.error('[RemoteConfig] Cache clear error:', error);
   }
 };
 
@@ -129,9 +127,9 @@ export const clearRemoteConfigCache = async (): Promise<void> => {
  * Initialize feature flags with remote config
  */
 export const initializeWithRemoteConfig = async (
-  userId: string,
+  _userId: string,
 ): Promise<typeof featureFlagService> => {
-  console.log('🚩 [RemoteConfig] Initializing feature flags...');
+  logger.debug('🚩 [RemoteConfig] Initializing feature flags...');
 
   // Initialize and return service instance
   await featureFlagService.initialize();
@@ -143,11 +141,13 @@ export const initializeWithRemoteConfig = async (
   if (Object.keys(remoteFlags).length > 0) {
     Object.entries(remoteFlags).forEach(([key, value]) => {
       if (typeof value === 'boolean') {
-        (featureFlagService as unknown as { flags: Record<string, boolean> }).flags[key] = value;
+        (
+          featureFlagService as unknown as { flags: Record<string, boolean> }
+        ).flags[key] = value;
       }
     });
 
-    console.log('✅ [RemoteConfig] Merged remote flags with local defaults');
+    logger.debug('✅ [RemoteConfig] Merged remote flags with local defaults');
   }
 
   return featureFlagService;
@@ -159,7 +159,7 @@ export const initializeWithRemoteConfig = async (
 export const refreshRemoteConfig = async (
   service: typeof featureFlagService,
 ): Promise<void> => {
-  console.log('🔄 [RemoteConfig] Force refreshing...');
+  logger.debug('🔄 [RemoteConfig] Force refreshing...');
 
   // Clear cache
   await clearRemoteConfigCache();
@@ -171,11 +171,12 @@ export const refreshRemoteConfig = async (
   if (Object.keys(remoteFlags).length > 0) {
     Object.entries(remoteFlags).forEach(([key, value]) => {
       if (typeof value === 'boolean') {
-        (service as unknown as { flags: Record<string, boolean> }).flags[key] = value;
+        (service as unknown as { flags: Record<string, boolean> }).flags[key] =
+          value;
       }
     });
 
-    console.log('✅ [RemoteConfig] Refreshed successfully');
+    logger.debug('✅ [RemoteConfig] Refreshed successfully');
   }
 };
 

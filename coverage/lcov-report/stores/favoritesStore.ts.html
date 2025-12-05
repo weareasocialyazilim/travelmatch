@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -135,35 +135,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -187,35 +187,35 @@ interface FavoritesState {
   clearFavorites: () =&gt; void;
 }
 &nbsp;
-export const useFavoritesStore = <span class="cstat-no" title="statement not covered" >create&lt;FavoritesState&gt;()(</span>
+export const useFavoritesStore = create&lt;FavoritesState&gt;()(
   persist(
-<span class="fstat-no" title="function not covered" >    (s</span>et, get) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+    (set, get) =&gt; ({
       // Initial State
       favoriteIds: [],
 &nbsp;
       // Add Favorite
-      addFavorite: <span class="fstat-no" title="function not covered" >(m</span>omentId) =&gt;
-<span class="cstat-no" title="statement not covered" >        set(<span class="fstat-no" title="function not covered" >(s</span>tate) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+      addFavorite: (momentId) =&gt;
+        set((state) =&gt; ({
           favoriteIds: [...state.favoriteIds, momentId],
         })),
 &nbsp;
       // Remove Favorite
-      removeFavorite: <span class="fstat-no" title="function not covered" >(m</span>omentId) =&gt;
-<span class="cstat-no" title="statement not covered" >        set(<span class="fstat-no" title="function not covered" >(s</span>tate) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-          favoriteIds: state.favoriteIds.filter(<span class="fstat-no" title="function not covered" >(i</span>d) =&gt; <span class="cstat-no" title="statement not covered" >id !== momentId)</span>,
+      removeFavorite: (momentId) =&gt;
+        set((state) =&gt; ({
+          favoriteIds: state.favoriteIds.filter((id) =&gt; id !== momentId),
         })),
 &nbsp;
       // Check if Favorite
-      isFavorite: <span class="fstat-no" title="function not covered" >(m</span>omentId) =&gt; {
-<span class="cstat-no" title="statement not covered" >        return get().favoriteIds.includes(momentId);</span>
+      isFavorite: (momentId) =&gt; {
+        return get().favoriteIds.includes(momentId);
       },
 &nbsp;
       // Clear All
-      clearFavorites: <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >set({ favoriteIds: [] }),</span>
+      clearFavorites: () =&gt; set({ favoriteIds: [] }),
     }),
     {
       name: 'favorites-storage',
-      storage: createJSONStorage(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >AsyncStorage)</span>,
+      storage: createJSONStorage(() =&gt; AsyncStorage),
     },
   ),
 );
@@ -226,7 +226,7 @@ export const useFavoritesStore = <span class="cstat-no" title="statement not cov
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-02T09:56:27.673Z
+                at 2025-12-05T15:44:08.502Z
             </div>
         <script src="../prettify.js"></script>
         <script>

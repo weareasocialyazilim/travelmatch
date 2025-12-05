@@ -10,15 +10,27 @@ import {
 } from 'react-native';
 import { COLORS } from '../constants/colors';
 
+/**
+ * Props for FilterBottomSheet component
+ */
 interface FilterBottomSheetProps {
+  /** Whether the bottom sheet is visible */
   visible: boolean;
+  /** Callback when the sheet is closed */
   onClose: () => void;
+  /** Callback when filters are applied with selected options */
   onApply: (filters: FilterOptions) => void;
 }
 
+/**
+ * Filter options for moments discovery
+ */
 interface FilterOptions {
+  /** Selected category (e.g., 'Coffee', 'Meals') */
   category: string;
+  /** Price range filter */
   priceRange: { min: number; max: number };
+  /** Timing filter for availability */
   timing: 'today' | 'next3days' | 'thisweek';
 }
 
@@ -29,6 +41,19 @@ const TIMING_OPTIONS = [
   { value: 'thisweek', label: 'This week' },
 ];
 
+/**
+ * Bottom sheet for filtering moments by category, price, and timing.
+ * Provides interactive controls for setting filter criteria.
+ *
+ * @example
+ * ```tsx
+ * <FilterBottomSheet
+ *   visible={showFilters}
+ *   onClose={() => setShowFilters(false)}
+ *   onApply={(filters) => applyFilters(filters)}
+ * />
+ * ```
+ */
 export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = ({
   visible,
   onClose,
@@ -200,7 +225,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay50,
   },
   bottomSheet: {
     position: 'absolute',

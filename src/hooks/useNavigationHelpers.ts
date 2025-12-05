@@ -63,13 +63,15 @@ export const navigationHelpers = {
   },
 
   /**
-   * Navigate to search with optional initial query
+   * Navigate to discover (search is part of Discover screen)
+   * @deprecated Use navigation.navigate('Discover') directly
    */
   goToSearch: (
     navigation: StackNavigationProp<RootStackParamList>,
-    initialQuery?: string,
+    _initialQuery?: string,
   ) => {
-    navigation.navigate('Search', { initialQuery });
+    // Search functionality is integrated into Discover screen
+    navigation.navigate('Discover');
   },
 
   /**

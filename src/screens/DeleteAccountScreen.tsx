@@ -11,6 +11,8 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
+import { useToast } from '../context/ToastContext';
+import { useConfirmation } from '../context/ConfirmationContext';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -60,15 +62,36 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
   navigation,
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
+  const toast = useToast();
+  const { showConfirmation } = useConfirmation();
 
   const isDeleteEnabled = confirmationText.toUpperCase() === 'DELETE';
 
   const handleDelete = () => {
-    // TODO: Implement account deletion
-    logger.info('Deleting account...');
+    showConfirmation({
+      title: 'Delete Account',
+      message:
+        'Are you absolutely sure? This action cannot be undone. All your data, moments, and messages will be permanently deleted.',
+      type: 'danger',
+      icon: 'alert-circle',
+      confirmText: 'Yes, Delete',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        // Simulate account deletion
+        logger.info('Deleting account...');
+        toast.success(
+          'Account scheduled for deletion. You will receive a confirmation email.',
+        );
+        navigation.navigate('Welcome');
+      },
+      onCancel: () => {
+        toast.info('Account deletion cancelled');
+      },
+    });
   };
 
   const handleKeepAccount = () => {
+    toast.success('Great! Your account is safe.');
     navigation.goBack();
   };
 

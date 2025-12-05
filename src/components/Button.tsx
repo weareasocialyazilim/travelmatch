@@ -52,8 +52,11 @@ const Button: React.FC<ButtonProps> = memo(
         onPressOut={onPressOut}
         disabled={disabled}
         activeOpacity={1}
+        accessible={true}
         accessibilityRole="button"
         accessibilityLabel={title}
+        accessibilityState={{ disabled }}
+        accessibilityHint={disabled ? 'Button is disabled' : undefined}
       >
         <Animated.View style={animatedStyle}>
           <Text

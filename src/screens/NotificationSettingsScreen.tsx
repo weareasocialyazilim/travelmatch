@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -114,16 +115,18 @@ export const NotificationSettingsScreen: React.FC<
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
         if (saved) {
           const savedValues = JSON.parse(saved);
-          setSections(prev => prev.map(section => ({
-            ...section,
-            settings: section.settings.map(setting => ({
-              ...setting,
-              value: savedValues[setting.id] ?? setting.value
-            }))
-          })));
+          setSections((prev) =>
+            prev.map((section) => ({
+              ...section,
+              settings: section.settings.map((setting) => ({
+                ...setting,
+                value: savedValues[setting.id] ?? setting.value,
+              })),
+            })),
+          );
         }
       } catch (error) {
-        console.log('Failed to load notification settings');
+        logger.debug('Failed to load notification settings');
       }
     };
     loadSettings();
@@ -137,18 +140,18 @@ export const NotificationSettingsScreen: React.FC<
     if (setting) {
       setting.value = !setting.value;
       setSections(newSections);
-      
+
       // Save to AsyncStorage
       const allSettings: Record<string, boolean> = {};
-      newSections.forEach(section => {
-        section.settings.forEach(s => {
+      newSections.forEach((section) => {
+        section.settings.forEach((s) => {
           allSettings[s.id] = s.value;
         });
       });
       try {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allSettings));
       } catch (error) {
-        console.log('Failed to save notification settings');
+        logger.debug('Failed to save notification settings');
       }
     }
   };

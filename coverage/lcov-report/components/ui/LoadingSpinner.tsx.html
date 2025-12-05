@@ -119,7 +119,9 @@
 <a name='L54'></a><a href='#L54'>54</a>
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -140,18 +142,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -159,6 +149,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -175,7 +174,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { memo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/colors';
@@ -188,26 +192,28 @@ interface LoadingSpinnerProps {
   style?: ViewStyle;
 }
 &nbsp;
-export const LoadingSpinner: React.FC&lt;LoadingSpinnerProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span></span>
-  size = <span class="branch-0 cbranch-no" title="branch not covered" >'large',</span>
-  color = <span class="branch-0 cbranch-no" title="branch not covered" >COLORS.primary,</span>
-  text,
-  fullScreen = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
-  style,
-}) =&gt; {
-  const content = (
-<span class="cstat-no" title="statement not covered" >    &lt;View style={[styles.container, style]}&gt;</span>
-      &lt;ActivityIndicator size={size} color={color} /&gt;
-      {text &amp;&amp; &lt;Text style={styles.text}&gt;{text}&lt;/Text&gt;}
-    &lt;/View&gt;
-  );
+export const LoadingSpinner = <span class="cstat-no" title="statement not covered" >memo&lt;LoadingSpinnerProps&gt;(</span>
+  function <span class="fstat-no" title="function not covered" >LoadingSpinner(</span>{
+    size = <span class="branch-0 cbranch-no" title="branch not covered" >'large',</span>
+    color = <span class="branch-0 cbranch-no" title="branch not covered" >COLORS.primary,</span>
+    text,
+    fullScreen = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
+    style,
+  }) {
+    const content = (
+<span class="cstat-no" title="statement not covered" >      &lt;View style={[styles.container, style]}&gt;</span>
+        &lt;ActivityIndicator size={size} color={color} /&gt;
+        {text &amp;&amp; &lt;Text style={styles.text}&gt;{text}&lt;/Text&gt;}
+      &lt;/View&gt;
+    );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (fullScreen) {</span>
-<span class="cstat-no" title="statement not covered" >    return &lt;View style={styles.fullScreen}&gt;{content}&lt;/View&gt;;</span>
-  }
+<span class="cstat-no" title="statement not covered" >    if (fullScreen) {</span>
+<span class="cstat-no" title="statement not covered" >      return &lt;View style={styles.fullScreen}&gt;{content}&lt;/View&gt;;</span>
+    }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return content;</span>
-};
+<span class="cstat-no" title="statement not covered" >    return content;</span>
+  },
+);
 &nbsp;
 const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   container: {
@@ -238,7 +244,7 @@ export default LoadingSpinner;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-02T09:56:27.673Z
+                at 2025-12-05T15:44:08.502Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

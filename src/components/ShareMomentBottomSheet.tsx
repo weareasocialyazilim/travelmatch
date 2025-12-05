@@ -1,4 +1,5 @@
 import React from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -16,13 +17,34 @@ import { COLORS } from '../constants/colors';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
+/**
+ * Props for ShareMomentBottomSheet component
+ */
 interface ShareMomentBottomSheetProps {
+  /** Whether the bottom sheet is visible */
   visible: boolean;
+  /** Callback when the sheet is closed */
   onClose: () => void;
+  /** The URL to share */
   momentUrl?: string;
+  /** The title/message to share */
   momentTitle?: string;
 }
 
+/**
+ * Bottom sheet for sharing moments via various platforms.
+ * Supports native share, copy link, and platform-specific sharing.
+ *
+ * @example
+ * ```tsx
+ * <ShareMomentBottomSheet
+ *   visible={showShare}
+ *   onClose={() => setShowShare(false)}
+ *   momentUrl="https://travelmatch.com/moment/123"
+ *   momentTitle="Amazing coffee experience!"
+ * />
+ * ```
+ */
 export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
   visible,
   onClose,
@@ -47,7 +69,7 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       });
       onClose();
     } catch (error) {
-      console.error('Share error:', error);
+      logger.error('Share error:', error);
     }
   };
 
@@ -88,16 +110,16 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       icon: 'whatsapp' as IconName,
       label: 'Share to WhatsApp',
       onPress: handleWhatsApp,
-      backgroundColor: '#25D36620',
-      iconColor: '#25D366',
+      backgroundColor: COLORS.whatsappTransparent20,
+      iconColor: COLORS.whatsapp,
     },
     {
       id: 'instagram',
       icon: 'instagram' as IconName,
       label: 'Share to Instagram',
       onPress: handleInstagram,
-      backgroundColor: '#E1306C20',
-      iconColor: '#E1306C',
+      backgroundColor: COLORS.instagramTransparent20,
+      iconColor: COLORS.instagram,
     },
   ];
 
@@ -187,7 +209,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: COLORS.overlay40,
     justifyContent: 'flex-end',
   },
   sheetContainer: {

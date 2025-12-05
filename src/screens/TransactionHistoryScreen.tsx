@@ -41,7 +41,7 @@ export const TransactionHistoryScreen: React.FC = () => {
       amount: 50.0,
       status: 'Completed',
       icon: 'inbox-arrow-down',
-      iconBgColor: '#28A74533',
+      iconBgColor: COLORS.successTransparent33,
     },
     {
       id: '2',
@@ -86,11 +86,11 @@ export const TransactionHistoryScreen: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Completed':
-        return { bg: '#28A74533', text: COLORS.success };
+        return { bg: COLORS.successTransparent33, text: COLORS.success };
       case 'Verified':
-        return { bg: '#007BFF33', text: '#007BFF' };
+        return { bg: COLORS.infoTransparent33, text: COLORS.buttonPrimary };
       case 'Pending':
-        return { bg: '#FFC10733', text: '#FFC107' };
+        return { bg: COLORS.warningTransparent33, text: COLORS.warning };
       case 'Failed':
         return { bg: `${COLORS.primary}33`, text: COLORS.primary };
       default:
@@ -160,7 +160,11 @@ export const TransactionHistoryScreen: React.FC = () => {
                   key={transaction.id}
                   style={styles.transactionCard}
                   activeOpacity={0.7}
-                  onPress={() => navigation.navigate('TransactionDetail', { transactionId: transaction.id })}
+                  onPress={() =>
+                    navigation.navigate('TransactionDetail', {
+                      transactionId: transaction.id,
+                    })
+                  }
                 >
                   {/* Icon */}
                   <View

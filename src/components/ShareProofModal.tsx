@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -39,6 +40,16 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
   proofUrl,
 }) => {
   const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleCopy = async () => {
     try {
@@ -47,12 +58,16 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
       } else {
         // For React Native, you would use @react-native-clipboard/clipboard
         // For now, just simulate the copy
-        console.log('Copied to clipboard:', proofUrl);
+        logger.debug('Copied to clipboard:', proofUrl);
       }
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // Clear previous timeout
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy:', error);
+      logger.error('Failed to copy:', error);
     }
   };
 

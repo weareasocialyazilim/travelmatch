@@ -90,18 +90,24 @@ const MyMomentsScreen: React.FC = () => {
   const moments = activeTab === 'active' ? activeMoments : completedMoments;
 
   // Convert MyMoment to full Moment type for navigation
-  const convertToMoment = (myMoment: MyMoment): MomentType & { status?: string } => {
-    const [city, country] = myMoment.location.split(', ');
+  const convertToMoment = (
+    myMoment: MyMoment,
+  ): MomentType & { status?: string } => {
+    const [city, country] = (myMoment.location || 'Unknown, Unknown').split(
+      ', ',
+    );
     return {
       id: myMoment.id,
       title: myMoment.title,
-      story: `Experience ${myMoment.title} in ${myMoment.location}`,
+      story: `Experience ${myMoment.title} in ${
+        myMoment.location || 'Unknown Location'
+      }`,
       imageUrl: myMoment.image,
       image: myMoment.image,
       price: myMoment.price,
       status: myMoment.status, // Pass status for owner view conditional rendering
       location: {
-        city: city || myMoment.location,
+        city: city || myMoment.location || 'Unknown City',
         country: country || '',
       },
       availability: myMoment.status === 'active' ? 'Available' : 'Completed',
@@ -123,13 +129,18 @@ const MyMomentsScreen: React.FC = () => {
     };
   };
 
-  const getStatusBadge = (status: MyMoment['status'], requestCount?: number) => {
+  const getStatusBadge = (
+    status: MyMoment['status'],
+    requestCount?: number,
+  ) => {
     switch (status) {
       case 'active':
         return (
           <View style={[styles.statusBadge, styles.activeBadge]}>
             <Text style={styles.activeBadgeText}>
-              {requestCount && requestCount > 0 ? `${requestCount} requests` : 'Live'}
+              {requestCount && requestCount > 0
+                ? `${requestCount} requests`
+                : 'Live'}
             </Text>
           </View>
         );
@@ -142,7 +153,11 @@ const MyMomentsScreen: React.FC = () => {
       case 'completed':
         return (
           <View style={[styles.statusBadge, styles.completedBadge]}>
-            <MaterialCommunityIcons name="check" size={12} color={COLORS.mint} />
+            <MaterialCommunityIcons
+              name="check"
+              size={12}
+              color={COLORS.mint}
+            />
             <Text style={styles.completedBadgeText}>Completed</Text>
           </View>
         );
@@ -151,7 +166,7 @@ const MyMomentsScreen: React.FC = () => {
 
   const handleMomentPress = (myMoment: MyMoment) => {
     const fullMoment = convertToMoment(myMoment);
-    navigation.navigate('MomentDetail', { 
+    navigation.navigate('MomentDetail', {
       moment: fullMoment,
       isOwner: true,
       pendingRequests: myMoment.requestCount || 0,
@@ -170,7 +185,11 @@ const MyMomentsScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Moments</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleCreateMoment}>
@@ -184,7 +203,12 @@ const MyMomentsScreen: React.FC = () => {
           style={[styles.tab, activeTab === 'active' && styles.activeTab]}
           onPress={() => setActiveTab('active')}
         >
-          <Text style={[styles.tabText, activeTab === 'active' && styles.activeTabText]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'active' && styles.activeTabText,
+            ]}
+          >
             Active ({activeMoments.length})
           </Text>
         </TouchableOpacity>
@@ -192,7 +216,12 @@ const MyMomentsScreen: React.FC = () => {
           style={[styles.tab, activeTab === 'completed' && styles.activeTab]}
           onPress={() => setActiveTab('completed')}
         >
-          <Text style={[styles.tabText, activeTab === 'completed' && styles.activeTabText]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'completed' && styles.activeTabText,
+            ]}
+          >
             Completed ({completedMoments.length})
           </Text>
         </TouchableOpacity>
@@ -207,13 +236,17 @@ const MyMomentsScreen: React.FC = () => {
           <View style={styles.emptyState}>
             <View style={styles.emptyIcon}>
               <MaterialCommunityIcons
-                name={activeTab === 'active' ? 'map-marker-star' : 'check-circle'}
+                name={
+                  activeTab === 'active' ? 'map-marker-star' : 'check-circle'
+                }
                 size={48}
                 color={COLORS.softGray}
               />
             </View>
             <Text style={styles.emptyTitle}>
-              {activeTab === 'active' ? 'No active moments' : 'No completed moments yet'}
+              {activeTab === 'active'
+                ? 'No active moments'
+                : 'No completed moments yet'}
             </Text>
             <Text style={styles.emptySubtitle}>
               {activeTab === 'active'
@@ -221,8 +254,15 @@ const MyMomentsScreen: React.FC = () => {
                 : 'Complete your first moment to see it here'}
             </Text>
             {activeTab === 'active' && (
-              <TouchableOpacity style={styles.createButton} onPress={handleCreateMoment}>
-                <MaterialCommunityIcons name="plus" size={18} color={COLORS.white} />
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={handleCreateMoment}
+              >
+                <MaterialCommunityIcons
+                  name="plus"
+                  size={18}
+                  color={COLORS.white}
+                />
                 <Text style={styles.createButtonText}>Create Moment</Text>
               </TouchableOpacity>
             )}
@@ -235,7 +275,10 @@ const MyMomentsScreen: React.FC = () => {
               onPress={() => handleMomentPress(moment)}
               activeOpacity={0.7}
             >
-              <Image source={{ uri: moment.image }} style={styles.momentImage} />
+              <Image
+                source={{ uri: moment.image }}
+                style={styles.momentImage}
+              />
               <View style={styles.momentContent}>
                 <View style={styles.momentHeader}>
                   <Text style={styles.momentTitle} numberOfLines={1}>
@@ -249,18 +292,26 @@ const MyMomentsScreen: React.FC = () => {
                     size={14}
                     color={COLORS.textSecondary}
                   />
-                  <Text style={styles.momentLocationText}>{moment.location}</Text>
+                  <Text style={styles.momentLocationText}>
+                    {moment.location}
+                  </Text>
                 </View>
                 <View style={styles.momentFooter}>
                   <Text style={styles.momentPrice}>${moment.price}</Text>
                   {moment.status === 'completed' && moment.rating && (
                     <View style={styles.ratingContainer}>
-                      <MaterialCommunityIcons name="star" size={14} color={COLORS.softOrange} />
+                      <MaterialCommunityIcons
+                        name="star"
+                        size={14}
+                        color={COLORS.softOrange}
+                      />
                       <Text style={styles.ratingText}>{moment.rating}.0</Text>
                     </View>
                   )}
                   {moment.status === 'completed' && moment.completedDate && (
-                    <Text style={styles.completedDate}>{moment.completedDate}</Text>
+                    <Text style={styles.completedDate}>
+                      {moment.completedDate}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -279,7 +330,9 @@ const MyMomentsScreen: React.FC = () => {
             <Text style={styles.summaryTitle}>Summary</Text>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Total completed</Text>
-              <Text style={styles.summaryValue}>{completedMoments.length} moments</Text>
+              <Text style={styles.summaryValue}>
+                {completedMoments.length} moments
+              </Text>
             </View>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Total earned</Text>

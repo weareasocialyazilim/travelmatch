@@ -3,7 +3,8 @@
  * Initialize and configure feature flags system with remote config support
  */
 
-import { featureFlagService } from '../utils/featureFlags';
+import type { featureFlagService } from '../utils/featureFlags';
+import { logger } from '../utils/logger';
 import { initializeWithRemoteConfig } from './remoteConfig';
 
 type FeatureFlagServiceType = typeof featureFlagService;
@@ -20,7 +21,7 @@ export const initializeFeatureFlags = async (userId: string) => {
   // Log active flags in development
   if (__DEV__ && cachedService) {
     const flags = cachedService.getAllFlags();
-    console.log('🚩 [FeatureFlags] Initialized with flags:', flags);
+    logger.debug('🚩 [FeatureFlags] Initialized with flags:', flags);
   }
 
   return cachedService;

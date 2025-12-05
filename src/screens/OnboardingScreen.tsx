@@ -1,4 +1,7 @@
-import type { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
+import type {
+  StackNavigationProp,
+  StackScreenProps,
+} from '@react-navigation/stack';
 import React, { useRef, useState } from 'react';
 import type { ImageSourcePropType } from 'react-native';
 import {
@@ -65,7 +68,8 @@ type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   navigation: navProp,
 }) => {
-  const defaultNavigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const defaultNavigation =
+    useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);

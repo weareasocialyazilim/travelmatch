@@ -21,3 +21,25 @@ export { EnhancedLoginForm } from './EnhancedLoginForm';
 
 // Performance Optimized
 export { OptimizedListItem } from './OptimizedListItem';
+export {
+  OptimizedFlatList,
+  useOptimizedRenderItem,
+  useInfiniteScroll,
+  getItemLayout,
+} from './OptimizedFlatList';
+export { MemoizedMomentCard, MemoizedMessageItem } from './MemoizedMomentCard';
+
+// Bottom Sheets
+export {
+  GenericBottomSheet,
+  ConfirmationBottomSheet,
+  SelectionBottomSheet,
+} from './GenericBottomSheet';
+export type {
+  BottomSheetRef,
+  GenericBottomSheetProps,
+  ConfirmationBottomSheetProps,
+  SelectionBottomSheetProps,
+  SelectionOption,
+  BottomSheetHeight,
+} from './GenericBottomSheet';

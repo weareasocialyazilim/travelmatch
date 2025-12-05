@@ -20,6 +20,7 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 import BottomNav from '../components/BottomNav';
 import { AddCardBottomSheet } from '../components/AddCardBottomSheet';
 import { RemoveCardModal } from '../components/RemoveCardModal';
+import { ScreenErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 
@@ -51,7 +52,8 @@ const PaymentMethodsScreen = () => {
   const [cardCvv, setCardCvv] = useState('');
   const [isWalletOptionsVisible, setIsWalletOptionsVisible] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
-  const [isConfigureWalletVisible, setIsConfigureWalletVisible] = useState(false);
+  const [isConfigureWalletVisible, setIsConfigureWalletVisible] =
+    useState(false);
   const [walletSettings, setWalletSettings] = useState({
     isDefaultPayment: false,
     requireAuth: true,
@@ -76,7 +78,7 @@ const PaymentMethodsScreen = () => {
       // Gerçek uygulamada PassKit ile kontrol edilecek
       // const isAvailable = await PassKit.canMakePayments();
       // setIsApplePayAvailable(isAvailable);
-      
+
       // Şimdilik simüle edelim
       setIsApplePayAvailable(true);
     } else if (Platform.OS === 'android') {
@@ -86,14 +88,15 @@ const PaymentMethodsScreen = () => {
   };
 
   // Platform'a göre wallet listesi
-  const wallets: Wallet[] = Platform.select({
-    ios: [{ id: '1', name: 'Apple Pay', status: 'Connected' }],
-    android: [{ id: '2', name: 'Google Pay', status: 'Connected' }],
-    default: [
-      { id: '1', name: 'Apple Pay', status: 'Connected' },
-      { id: '2', name: 'Google Pay', status: 'Connected' },
-    ],
-  }) || [];
+  const wallets: Wallet[] =
+    Platform.select({
+      ios: [{ id: '1', name: 'Apple Pay', status: 'Connected' }],
+      android: [{ id: '2', name: 'Google Pay', status: 'Connected' }],
+      default: [
+        { id: '1', name: 'Apple Pay', status: 'Connected' },
+        { id: '2', name: 'Google Pay', status: 'Connected' },
+      ],
+    }) || [];
 
   const handleAddCard = () => {
     trackInteraction('add_card');
@@ -103,21 +106,21 @@ const PaymentMethodsScreen = () => {
 
   const handleConnectWallet = async () => {
     const walletName = Platform.OS === 'ios' ? 'Apple Pay' : 'Google Pay';
-    
+
     if (!isApplePayAvailable) {
       Alert.alert(
         `${walletName} Not Available`,
         `Please set up ${walletName} in your device settings first.`,
         [
           { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Open Settings', 
+          {
+            text: 'Open Settings',
             onPress: () => {
               // Linking.openSettings(); // Gerçek uygulamada bu kullanılır
               logger.info(`Opening device settings for ${walletName} setup`);
-            }
-          }
-        ]
+            },
+          },
+        ],
       );
       return;
     }
@@ -127,15 +130,15 @@ const PaymentMethodsScreen = () => {
       `By connecting ${walletName}, you agree to use it as a payment method in this app.`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Connect', 
+        {
+          text: 'Connect',
           onPress: () => {
             setIsWalletConnected(true);
             trackInteraction('wallet_connected', { wallet: walletName });
             logger.info(`${walletName} connected successfully`);
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -156,13 +159,13 @@ const PaymentMethodsScreen = () => {
   const handleSetAsDefault = () => {
     if (selectedCard && !selectedCard.isDefault) {
       // Kartı default yap ve wallet'ın default'unu kaldır
-      setWalletSettings(prev => ({ ...prev, isDefaultPayment: false }));
-      
-      setSavedCards(prevCards =>
-        prevCards.map(c => ({
+      setWalletSettings((prev) => ({ ...prev, isDefaultPayment: false }));
+
+      setSavedCards((prevCards) =>
+        prevCards.map((c) => ({
           ...c,
           isDefault: c.id === selectedCard.id,
-        }))
+        })),
       );
       logger.info('Set as default:', selectedCard.lastFour);
     }
@@ -180,7 +183,7 @@ const PaymentMethodsScreen = () => {
   const formatExpiryDate = (text: string) => {
     // Sadece rakamları al
     const cleaned = text.replace(/\D/g, '');
-    
+
     // MM/YY formatına çevir
     if (cleaned.length >= 2) {
       return cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4);
@@ -195,7 +198,11 @@ const PaymentMethodsScreen = () => {
 
   const handleSaveCardEdit = () => {
     if (selectedCard && cardExpiry && cardCvv) {
-      logger.info('Card updated:', { lastFour: selectedCard.lastFour, expiry: cardExpiry, cvv: cardCvv });
+      logger.info('Card updated:', {
+        lastFour: selectedCard.lastFour,
+        expiry: cardExpiry,
+        cvv: cardCvv,
+      });
       // Burada card bilgilerini güncelleyebilirsiniz
       setCardExpiry('');
       setCardCvv('');
@@ -211,7 +218,9 @@ const PaymentMethodsScreen = () => {
 
   const confirmRemoveCard = () => {
     if (selectedCard) {
-      setSavedCards(prevCards => prevCards.filter(c => c.id !== selectedCard.id));
+      setSavedCards((prevCards) =>
+        prevCards.filter((c) => c.id !== selectedCard.id),
+      );
       logger.info('Remove card:', selectedCard.lastFour);
     }
     setIsRemoveModalVisible(false);
@@ -220,24 +229,26 @@ const PaymentMethodsScreen = () => {
 
   const handleSaveWalletSettings = () => {
     logger.info('Wallet settings saved:', walletSettings);
-    
+
     // Eğer wallet default yapıldıysa, kartların default'unu kaldır
     if (walletSettings.isDefaultPayment) {
-      setSavedCards(prevCards =>
-        prevCards.map(c => ({
+      setSavedCards((prevCards) =>
+        prevCards.map((c) => ({
           ...c,
           isDefault: false,
-        }))
+        })),
       );
     }
-    
+
     setIsConfigureWalletVisible(false);
     setSelectedWallet(null);
   };
 
   const handleDisconnectWallet = () => {
-    const walletName = selectedWallet?.name || (Platform.OS === 'ios' ? 'Apple Pay' : 'Google Pay');
-    
+    const walletName =
+      selectedWallet?.name ||
+      (Platform.OS === 'ios' ? 'Apple Pay' : 'Google Pay');
+
     Alert.alert(
       `Disconnect ${walletName}`,
       `Are you sure you want to disconnect ${walletName}? You can reconnect it anytime.`,
@@ -259,7 +270,7 @@ const PaymentMethodsScreen = () => {
             trackInteraction('wallet_disconnected', { wallet: walletName });
           },
         },
-      ]
+      ],
     );
   };
 
@@ -349,7 +360,7 @@ const PaymentMethodsScreen = () => {
                 />
               </TouchableOpacity>
               <Text style={styles.walletHelpText}>
-                {Platform.OS === 'ios' 
+                {Platform.OS === 'ios'
                   ? 'Make sure Apple Pay is set up on your device'
                   : 'Make sure Google Pay is set up on your device'}
               </Text>
@@ -368,9 +379,15 @@ const PaymentMethodsScreen = () => {
               >
                 <View style={styles.cardIcon}>
                   <MaterialCommunityIcons
-                    name={card.brand === 'Visa' ? 'credit-card' : 'credit-card-outline'}
+                    name={
+                      card.brand === 'Visa'
+                        ? 'credit-card'
+                        : 'credit-card-outline'
+                    }
                     size={20}
-                    color={card.brand === 'Visa' ? '#1A1F71' : '#EB001B'}
+                    color={
+                      card.brand === 'Visa' ? COLORS.visa : COLORS.mastercard
+                    }
                   />
                 </View>
                 <View style={styles.cardTextContainer}>
@@ -410,8 +427,10 @@ const PaymentMethodsScreen = () => {
               <Text style={styles.priorityNoticeDescription}>
                 {isWalletConnected && walletSettings.isDefaultPayment
                   ? `${wallets[0]?.name} will be used for all payments. Cards are backup options.`
-                  : savedCards.find(c => c.isDefault)
-                  ? `${savedCards.find(c => c.isDefault)?.brand} •••• ${savedCards.find(c => c.isDefault)?.lastFour} will be used for payments.`
+                  : savedCards.find((c) => c.isDefault)
+                  ? `${savedCards.find((c) => c.isDefault)?.brand} •••• ${
+                      savedCards.find((c) => c.isDefault)?.lastFour
+                    } will be used for payments.`
                   : 'Please set a default payment method.'}
               </Text>
             </View>
@@ -425,7 +444,8 @@ const PaymentMethodsScreen = () => {
               color={COLORS.textSecondary}
             />
             <Text style={styles.securityText}>
-              All payment data is encrypted and{'\n'}securely stored. We never store full card numbers.
+              All payment data is encrypted and{'\n'}securely stored. We never
+              store full card numbers.
             </Text>
           </View>
 
@@ -445,8 +465,11 @@ const PaymentMethodsScreen = () => {
       <AddCardBottomSheet
         visible={isAddCardVisible}
         onClose={() => setIsAddCardVisible(false)}
-        onAddCard={(cardNumber: string, expiry: string, cvv: string) => {
-          logger.info('Card added:', { cardNumber: cardNumber.slice(-4), expiry });
+        onAddCard={(cardNumber: string, expiry: string, _cvv: string) => {
+          logger.info('Card added:', {
+            cardNumber: cardNumber.slice(-4),
+            expiry,
+          });
           setIsAddCardVisible(false);
           const newCard: SavedCard = {
             id: Date.now().toString(),
@@ -454,7 +477,7 @@ const PaymentMethodsScreen = () => {
             lastFour: cardNumber.slice(-4),
             isDefault: savedCards.length === 0,
           };
-          setSavedCards(prev => [...prev, newCard]);
+          setSavedCards((prev) => [...prev, newCard]);
         }}
       />
 
@@ -476,16 +499,18 @@ const PaymentMethodsScreen = () => {
         onRequestClose={() => setIsWalletOptionsVisible(false)}
       >
         <View style={styles.modalBackdrop}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.modalBackdropTouchable}
             activeOpacity={1}
             onPress={() => setIsWalletOptionsVisible(false)}
           />
           <View style={styles.bottomSheet}>
             <View style={styles.sheetHandle} />
-            
+
             <Text style={styles.sheetTitle}>{selectedWallet?.name}</Text>
-            <Text style={styles.sheetSubtitle}>Manage your wallet connection</Text>
+            <Text style={styles.sheetSubtitle}>
+              Manage your wallet connection
+            </Text>
 
             <View style={styles.sheetOptions}>
               <TouchableOpacity
@@ -501,9 +526,7 @@ const PaymentMethodsScreen = () => {
                   size={24}
                   color={COLORS.brown}
                 />
-                <Text style={styles.sheetOptionText}>
-                  Configure Wallet
-                </Text>
+                <Text style={styles.sheetOptionText}>Configure Wallet</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -515,7 +538,9 @@ const PaymentMethodsScreen = () => {
                   size={24}
                   color={COLORS.error}
                 />
-                <Text style={[styles.sheetOptionText, styles.sheetOptionDanger]}>
+                <Text
+                  style={[styles.sheetOptionText, styles.sheetOptionDanger]}
+                >
                   Disconnect Wallet
                 </Text>
               </TouchableOpacity>
@@ -539,14 +564,14 @@ const PaymentMethodsScreen = () => {
         onRequestClose={() => setIsEditCardVisible(false)}
       >
         <View style={styles.modalBackdrop}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.modalBackdropTouchable}
             activeOpacity={1}
             onPress={() => setIsEditCardVisible(false)}
           />
           <View style={styles.bottomSheet}>
             <View style={styles.sheetHandle} />
-            
+
             <Text style={styles.sheetTitle}>Edit Card</Text>
             <Text style={styles.sheetSubtitle}>
               {selectedCard?.brand} •••• {selectedCard?.lastFour}
@@ -592,7 +617,7 @@ const PaymentMethodsScreen = () => {
               >
                 <Text style={styles.editButtonSecondaryText}>Cancel</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.editButton, styles.editButtonPrimary]}
                 onPress={handleSaveCardEdit}
@@ -612,25 +637,34 @@ const PaymentMethodsScreen = () => {
         onRequestClose={() => setIsConfigureWalletVisible(false)}
       >
         <View style={styles.modalBackdrop}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.modalBackdropTouchable}
             activeOpacity={1}
             onPress={() => setIsConfigureWalletVisible(false)}
           />
           <View style={styles.bottomSheet}>
             <View style={styles.sheetHandle} />
-            
-            <Text style={styles.sheetTitle}>{selectedWallet?.name} Settings</Text>
-            <Text style={styles.sheetSubtitle}>Configure your wallet preferences</Text>
 
-            <ScrollView style={styles.configureScroll} showsVerticalScrollIndicator={false}>
+            <Text style={styles.sheetTitle}>
+              {selectedWallet?.name} Settings
+            </Text>
+            <Text style={styles.sheetSubtitle}>
+              Configure your wallet preferences
+            </Text>
+
+            <ScrollView
+              style={styles.configureScroll}
+              showsVerticalScrollIndicator={false}
+            >
               <View style={styles.configureContent}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.configureItem}
-                  onPress={() => setWalletSettings(prev => ({ 
-                    ...prev, 
-                    isDefaultPayment: !prev.isDefaultPayment 
-                  }))}
+                  onPress={() =>
+                    setWalletSettings((prev) => ({
+                      ...prev,
+                      isDefaultPayment: !prev.isDefaultPayment,
+                    }))
+                  }
                   activeOpacity={0.7}
                 >
                   <View style={styles.configureIcon}>
@@ -653,21 +687,25 @@ const PaymentMethodsScreen = () => {
                   </View>
                   <Switch
                     value={walletSettings.isDefaultPayment}
-                    onValueChange={(value) => setWalletSettings(prev => ({ 
-                      ...prev, 
-                      isDefaultPayment: value 
-                    }))}
+                    onValueChange={(value) =>
+                      setWalletSettings((prev) => ({
+                        ...prev,
+                        isDefaultPayment: value,
+                      }))
+                    }
                     trackColor={{ false: COLORS.softGray, true: COLORS.mint }}
                     thumbColor={COLORS.white}
                   />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.configureItem}
-                  onPress={() => setWalletSettings(prev => ({ 
-                    ...prev, 
-                    requireAuth: !prev.requireAuth 
-                  }))}
+                  onPress={() =>
+                    setWalletSettings((prev) => ({
+                      ...prev,
+                      requireAuth: !prev.requireAuth,
+                    }))
+                  }
                   activeOpacity={0.7}
                 >
                   <View style={styles.configureIcon}>
@@ -685,21 +723,25 @@ const PaymentMethodsScreen = () => {
                   </View>
                   <Switch
                     value={walletSettings.requireAuth}
-                    onValueChange={(value) => setWalletSettings(prev => ({ 
-                      ...prev, 
-                      requireAuth: value 
-                    }))}
+                    onValueChange={(value) =>
+                      setWalletSettings((prev) => ({
+                        ...prev,
+                        requireAuth: value,
+                      }))
+                    }
                     trackColor={{ false: COLORS.softGray, true: COLORS.mint }}
                     thumbColor={COLORS.white}
                   />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.configureItem}
-                  onPress={() => setWalletSettings(prev => ({ 
-                    ...prev, 
-                    enableNotifications: !prev.enableNotifications 
-                  }))}
+                  onPress={() =>
+                    setWalletSettings((prev) => ({
+                      ...prev,
+                      enableNotifications: !prev.enableNotifications,
+                    }))
+                  }
                   activeOpacity={0.7}
                 >
                   <View style={styles.configureIcon}>
@@ -717,10 +759,12 @@ const PaymentMethodsScreen = () => {
                   </View>
                   <Switch
                     value={walletSettings.enableNotifications}
-                    onValueChange={(value) => setWalletSettings(prev => ({ 
-                      ...prev, 
-                      enableNotifications: value 
-                    }))}
+                    onValueChange={(value) =>
+                      setWalletSettings((prev) => ({
+                        ...prev,
+                        enableNotifications: value,
+                      }))
+                    }
                     trackColor={{ false: COLORS.softGray, true: COLORS.mint }}
                     thumbColor={COLORS.white}
                   />
@@ -748,14 +792,14 @@ const PaymentMethodsScreen = () => {
         onRequestClose={() => setIsCardOptionsVisible(false)}
       >
         <View style={styles.modalBackdrop}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.modalBackdropTouchable}
             activeOpacity={1}
             onPress={() => setIsCardOptionsVisible(false)}
           />
           <View style={styles.bottomSheet}>
             <View style={styles.sheetHandle} />
-            
+
             <Text style={styles.sheetTitle}>
               {selectedCard?.brand} •••• {selectedCard?.lastFour}
             </Text>
@@ -767,14 +811,22 @@ const PaymentMethodsScreen = () => {
                 onPress={handleSetAsDefault}
               >
                 <MaterialCommunityIcons
-                  name={selectedCard?.isDefault ? "check-circle" : "circle-outline"}
+                  name={
+                    selectedCard?.isDefault ? 'check-circle' : 'circle-outline'
+                  }
                   size={24}
-                  color={selectedCard?.isDefault ? COLORS.brown : COLORS.textSecondary}
+                  color={
+                    selectedCard?.isDefault
+                      ? COLORS.brown
+                      : COLORS.textSecondary
+                  }
                 />
-                <Text style={[
-                  styles.sheetOptionText,
-                  selectedCard?.isDefault && styles.sheetOptionTextActive
-                ]}>
+                <Text
+                  style={[
+                    styles.sheetOptionText,
+                    selectedCard?.isDefault && styles.sheetOptionTextActive,
+                  ]}
+                >
                   {selectedCard?.isDefault ? 'Default Card' : 'Set as Default'}
                 </Text>
               </TouchableOpacity>
@@ -788,9 +840,7 @@ const PaymentMethodsScreen = () => {
                   size={24}
                   color={COLORS.brown}
                 />
-                <Text style={styles.sheetOptionText}>
-                  Edit Card Details
-                </Text>
+                <Text style={styles.sheetOptionText}>Edit Card Details</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -802,7 +852,9 @@ const PaymentMethodsScreen = () => {
                   size={24}
                   color={COLORS.error}
                 />
-                <Text style={[styles.sheetOptionText, styles.sheetOptionDanger]}>
+                <Text
+                  style={[styles.sheetOptionText, styles.sheetOptionDanger]}
+                >
                   Remove Card
                 </Text>
               </TouchableOpacity>
@@ -963,7 +1015,7 @@ const styles = StyleSheet.create({
   },
   priorityNotice: {
     flexDirection: 'row',
-    backgroundColor: '#FFF8E1',
+    backgroundColor: COLORS.amberLight,
     padding: 16,
     borderRadius: 12,
     marginHorizontal: 16,
@@ -1017,7 +1069,7 @@ const styles = StyleSheet.create({
   modalBackdrop: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay50,
   },
   modalBackdropTouchable: {
     flex: 1,
@@ -1113,10 +1165,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
   },
-  inputPlaceholder: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-  },
   editNote: {
     fontSize: 13,
     color: COLORS.textSecondary,
@@ -1195,7 +1243,7 @@ const styles = StyleSheet.create({
   },
   configureWarning: {
     fontSize: 11,
-    color: '#FF6F00',
+    color: COLORS.amberDark,
     marginTop: 4,
     fontStyle: 'italic',
   },
@@ -1240,4 +1288,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PaymentMethodsScreen;
+// Wrap with ScreenErrorBoundary for critical payment functionality
+const PaymentMethodsScreenWithErrorBoundary = () => (
+  <ScreenErrorBoundary>
+    <PaymentMethodsScreen />
+  </ScreenErrorBoundary>
+);
+
+export default PaymentMethodsScreenWithErrorBoundary;

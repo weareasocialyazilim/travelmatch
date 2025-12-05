@@ -16,11 +16,11 @@ export const WelcomeScreen: React.FC<{
   navigation: { navigate: (route: string) => void };
 }> = ({ navigation }) => {
   const handleCreateAccount = () => {
-    navigation.navigate('EmailAuth');
+    navigation.navigate('Register');
   };
 
   const handleLogin = () => {
-    navigation.navigate('EmailAuth');
+    navigation.navigate('Login');
   };
 
   const handleTermsPress = () => {
@@ -49,7 +49,8 @@ export const WelcomeScreen: React.FC<{
           <View style={styles.textSection}>
             <Text style={styles.headline}>Welcome to TravelMatch</Text>
             <Text style={styles.bodyText}>
-              Gift real travel moments.{'\n'}Verified. Secure. Human.
+              Connect with locals. Share experiences.{'\n'}Make every trip
+              meaningful.
             </Text>
           </View>
         </View>
@@ -77,9 +78,14 @@ export const WelcomeScreen: React.FC<{
           {/* Footer Text */}
           <Text style={styles.footerText}>
             By continuing, you agree to our{' '}
-            <Text style={styles.footerLink} onPress={handleTermsPress}>Terms</Text>
+            <Text style={styles.footerLink} onPress={handleTermsPress}>
+              Terms
+            </Text>
             {' & '}
-            <Text style={styles.footerLink} onPress={handlePrivacyPress}>Privacy</Text>.
+            <Text style={styles.footerLink} onPress={handlePrivacyPress}>
+              Privacy
+            </Text>
+            .
           </Text>
         </View>
       </View>
@@ -144,7 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   primaryButton: {
-    backgroundColor: COLORS.coral,
+    backgroundColor: COLORS.mint,
     borderRadius: 28,
     height: 56,
     alignItems: 'center',
@@ -165,10 +171,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     borderWidth: 2,
-    borderColor: `${COLORS.textSecondary}30`,
+    borderColor: COLORS.mint,
   },
   secondaryButtonText: {
-    color: COLORS.textSecondary,
+    color: COLORS.mint,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.25,

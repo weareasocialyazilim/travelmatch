@@ -144,7 +144,11 @@
 <a name='L79'></a><a href='#L79'>79</a>
 <a name='L80'></a><a href='#L80'>80</a>
 <a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -182,15 +186,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -204,6 +199,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -258,43 +266,47 @@ export const useRoute = <span class="cstat-no" title="statement not covered" ><s
 export const navigationHelpers = <span class="cstat-no" title="statement not covered" >{</span>
   /**
    * Navigate to moment detail
+   * Note: MomentDetail requires full Moment object, not just momentId
    */
   goToMomentDetail: <span class="fstat-no" title="function not covered" >(</span>
     navigation: StackNavigationProp&lt;RootStackParamList&gt;,
-    momentId: string,
+    moment: RootStackParamList['MomentDetail']['moment'],
   ) =&gt; {
-<span class="cstat-no" title="statement not covered" >    navigation.navigate('MomentDetail', { momentId });</span>
+<span class="cstat-no" title="statement not covered" >    navigation.navigate('MomentDetail', { moment });</span>
   },
 &nbsp;
   /**
    * Navigate to profile
+   * Note: ProfileDetail uses userId param
    */
   goToProfile: <span class="fstat-no" title="function not covered" >(</span>
     navigation: StackNavigationProp&lt;RootStackParamList&gt;,
     userId: string,
   ) =&gt; {
-<span class="cstat-no" title="statement not covered" >    navigation.navigate('Profile', { userId });</span>
+<span class="cstat-no" title="statement not covered" >    navigation.navigate('ProfileDetail', { userId });</span>
   },
 &nbsp;
   /**
    * Navigate to chat
+   * Note: Chat requires otherUser object
    */
   goToChat: <span class="fstat-no" title="function not covered" >(</span>
     navigation: StackNavigationProp&lt;RootStackParamList&gt;,
-    userId: string,
-    userName: string,
+    otherUser: RootStackParamList['Chat']['otherUser'],
   ) =&gt; {
-<span class="cstat-no" title="statement not covered" >    navigation.navigate('Chat', { userId, userName });</span>
+<span class="cstat-no" title="statement not covered" >    navigation.navigate('Chat', { otherUser });</span>
   },
 &nbsp;
   /**
-   * Navigate to search with filters
+   * Navigate to discover (search is part of Discover screen)
+   * @deprecated Use navigation.navigate('Discover') directly
    */
-  goToFilteredSearch: <span class="fstat-no" title="function not covered" >(</span>
+  goToSearch: <span class="fstat-no" title="function not covered" >(</span>
     navigation: StackNavigationProp&lt;RootStackParamList&gt;,
-    filters: RootStackParamList['FilterResults']['filters'],
+    _initialQuery?: string,
   ) =&gt; {
-<span class="cstat-no" title="statement not covered" >    navigation.navigate('FilterResults', { filters });</span>
+    // Search functionality is integrated into Discover screen
+<span class="cstat-no" title="statement not covered" >    navigation.navigate('Discover');</span>
   },
 &nbsp;
   /**
@@ -313,7 +325,7 @@ export const navigationHelpers = <span class="cstat-no" title="statement not cov
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-02T09:56:27.673Z
+                at 2025-12-05T15:44:08.502Z
             </div>
         <script src="../prettify.js"></script>
         <script>

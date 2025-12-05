@@ -1,15 +1,61 @@
 /**
  * Logger Utility
- * Replaces console.log with environment-aware logging
+ * Environment-aware logging system with structured output and performance tracking
+ * @module utils/logger
+ *
+ * @description
+ * Replaces console.log with a production-safe logger that:
+ * - Only logs in development by default
+ * - Provides structured log levels (debug, info, warn, error)
+ * - Includes timestamps and prefixes
+ * - Supports performance timing and grouped logs
+ *
+ * @example
+ * ```typescript
+ * import { logger } from '@/utils/logger';
+ *
+ * // Basic logging
+ * logger.debug('Debug message');
+ * logger.info('User logged in', { userId: '123' });
+ * logger.warn('Rate limit approaching');
+ * logger.error('Failed to fetch data', error);
+ *
+ * // Performance timing
+ * logger.time('API Call');
+ * await fetchData();
+ * logger.timeEnd('API Call'); // Logs duration
+ *
+ * // Grouped logs
+ * logger.group('Form Validation', () => {
+ *   logger.info('Validating email...');
+ *   logger.info('Validating password...');
+ * });
+ * ```
  */
 
+/** Log level types */
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
+/**
+ * Logger configuration options
+ */
 interface LoggerConfig {
+  /** Enable logging in production (default: false) */
   enableInProduction?: boolean;
+  /** Prefix for all log messages (default: [TravelMatch]) */
   prefix?: string;
 }
 
+/**
+ * Logger class for structured, environment-aware logging
+ *
+ * @example
+ * ```typescript
+ * // Create custom logger instance
+ * const apiLogger = new Logger({ prefix: '[API]' });
+ * apiLogger.info('Request sent');
+ * ```
+ */
 class Logger {
   private config: LoggerConfig;
 

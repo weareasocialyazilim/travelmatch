@@ -24,6 +24,11 @@ import type {
   ProofsResponse,
   WalletResponse,
   GenericSuccessResponse,
+  Moment,
+  User,
+  SearchFilters,
+  TransactionResponse,
+  ProofResponse,
 } from '../types/api';
 import {
   AppError,
@@ -269,10 +274,10 @@ export const apiService = {
 
     getById: (id: string) => api.get<MomentResponse>(`/moments/${id}`),
 
-    create: (data: Partial<import('../types/api').Moment>) =>
+    create: (data: Partial<Moment>) =>
       api.post<MomentResponse>('/moments', data),
 
-    update: (id: string, data: Partial<import('../types/api').Moment>) =>
+    update: (id: string, data: Partial<Moment>) =>
       api.put<MomentResponse>(`/moments/${id}`, data),
 
     delete: (id: string) =>
@@ -297,7 +302,7 @@ export const apiService = {
   user: {
     getProfile: () => api.get<UserResponse>('/user/profile'),
 
-    updateProfile: (data: Partial<import('../types/api').User>) =>
+    updateProfile: (data: Partial<User>) =>
       api.put<UserResponse>('/user/profile', data),
 
     getById: (id: string) => api.get<UserResponse>(`/users/${id}`),
@@ -323,9 +328,7 @@ export const apiService = {
       api.get<TransactionsResponse>('/transactions', { params }),
 
     getById: (id: string) =>
-      api.get<import('../types/api').TransactionResponse>(
-        `/transactions/${id}`,
-      ),
+      api.get<TransactionResponse>(`/transactions/${id}`),
   },
 
   // Notifications
@@ -345,7 +348,7 @@ export const apiService = {
 
   // Search
   search: {
-    moments: (query: string, filters?: import('../types/api').SearchFilters) =>
+    moments: (query: string, filters?: SearchFilters) =>
       api.post<SearchResponse>('/search', { query, filters }),
   },
 
@@ -355,7 +358,7 @@ export const apiService = {
       api.get<ProofsResponse>('/proofs', { params }),
 
     submit: (data: { momentId: string; imageUrl: string }) =>
-      api.post<import('../types/api').ProofResponse>('/proofs', data),
+      api.post<ProofResponse>('/proofs', data),
 
     approve: (id: string) =>
       api.post<GenericSuccessResponse>(`/proofs/${id}/approve`),

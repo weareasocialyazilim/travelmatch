@@ -1,4 +1,7 @@
-import { getContrastRatio as _getContrastRatio, meetsWCAG_AA as _meetsWCAG_AA } from '../utils/contrastChecker';
+import {
+  getContrastRatio as _getContrastRatio,
+  meetsWCAG_AA as _meetsWCAG_AA,
+} from '../utils/contrastChecker';
 
 export const COLORS = {
   // Primary colors
@@ -21,7 +24,7 @@ export const COLORS = {
   surface: '#FFFFFF',
   surfaceLight: '#FFFFFF',
   surfaceDark: '#1A2F23',
-  
+
   // Overlay
   overlay: 'rgba(0, 0, 0, 0.5)',
 
@@ -51,6 +54,8 @@ export const COLORS = {
   white: '#FFFFFF',
   black: '#000000',
   border: '#E5E5E5',
+  borderDark: '#2D4A3A',
+  cardDark: '#243D2F',
   transparent: 'transparent',
   mintTransparent: 'rgba(166, 229, 193, 0.12)',
   mintTransparentLight: 'rgba(166, 229, 193, 0.15)',
@@ -71,6 +76,22 @@ export const COLORS = {
   blackTransparentDarker: 'rgba(0,0,0,0.08)',
   subtitle: 'rgba(255, 255, 255, 0.9)',
   mapHeader: 'rgba(246, 242, 236, 0.95)',
+
+  // Overlay colors
+  overlay30: 'rgba(0, 0, 0, 0.3)',
+  overlay40: 'rgba(0, 0, 0, 0.4)',
+  overlay50: 'rgba(0, 0, 0, 0.5)',
+  overlay60: 'rgba(0, 0, 0, 0.6)',
+  overlay70: 'rgba(0, 0, 0, 0.7)',
+  overlay75: 'rgba(0, 0, 0, 0.75)',
+  whiteOverlay20: 'rgba(255, 255, 255, 0.2)',
+  whiteOverlay30: 'rgba(255, 255, 255, 0.3)',
+  whiteOverlay70: 'rgba(255, 255, 255, 0.7)',
+  whiteOverlay80: 'rgba(255, 255, 255, 0.8)',
+  textWhite70: 'rgba(255, 255, 255, 0.7)',
+  textWhite80: 'rgba(255, 255, 255, 0.8)',
+  shadowColor: '#000',
+  errorBackground: '#FEF2F2',
 
   // Card colors
   cardBackground: '#FFFFFF',
@@ -115,7 +136,6 @@ export const COLORS = {
   instagram: '#E4405F',
 
   // Other colors
-  errorBackground: '#FFE6E6',
   softOrange: '#FFA94D',
   softRed: '#FF8787',
   softGray: '#B8B4AF',
@@ -154,14 +174,42 @@ export const COLORS = {
   buttonDark: '#1E1E1E',
   buttonDisabled: '#D0D0D0',
 
-  // Shadow
-  shadowColor: '#000000',
-
   // Input
   inputBackground: '#F5F5F5',
 
   // Soft gray transparent
   softGrayTransparent: 'rgba(184, 180, 175, 0.15)',
+
+  // Social/Brand colors (additional)
+  telegram: '#0088CC',
+  linkedin: '#0A66C2',
+  tiktok: '#000000',
+  visa: '#1A1F71',
+  mastercard: '#EB001B',
+
+  // Status colors with transparency
+  successTransparent33: '#28A74533',
+  infoTransparent33: '#007BFF33',
+  warningTransparent33: '#FFC10733',
+
+  // Accent colors
+  indigo: '#6366F1',
+  amber: '#F59E0B',
+  amberLight: '#FFF8E1',
+  amberDark: '#FF6F00',
+  emerald: '#10B981',
+
+  // Transparency variants
+  emeraldTransparent20: '#10B98120',
+  whatsappTransparent20: '#25D36620',
+  instagramTransparent20: '#E1306C20',
+
+  // Notification/Status type colors
+  violet: '#8B5CF6',
+  pink: '#EC4899',
+  grayMedium: '#6B7280',
+  grayLight: '#9CA3AF',
+  orangeAlt: '#F97316',
 } as const;
 
 // Font sizes

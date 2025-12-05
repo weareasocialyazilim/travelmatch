@@ -12,7 +12,10 @@ import { PasswordInput } from './PasswordInput';
 import type { TextInputProps } from 'react-native';
 
 interface ControlledInputProps<T extends FieldValues>
-  extends Omit<TextInputProps, 'value' | 'onChangeText' | 'onChange' | 'onBlur'> {
+  extends Omit<
+    TextInputProps,
+    'value' | 'onChangeText' | 'onChange' | 'onBlur'
+  > {
   name: Path<T>;
   control: Control<T>;
   label?: string;
@@ -129,7 +132,7 @@ export function ControlledInput<T extends FieldValues>({
           <InputWithValidation
             InputComponent={InputComponent}
             label={label}
-            value={value as string ?? ''}
+            value={(value as string) ?? ''}
             onChange={(text: string) => onChange(text)}
             onBlur={() => onBlur()}
             error={error}

@@ -68,7 +68,7 @@ export const ClearCacheDialog: React.FC<ClearCacheDialogProps> = ({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: COLORS.overlay40,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,

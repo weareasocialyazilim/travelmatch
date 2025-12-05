@@ -5,6 +5,8 @@
 
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import type { NavigationContainerRef } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/types';
 import {
   getInitialURL,
   subscribeToDeepLinks,
@@ -19,8 +21,8 @@ import {
  * useDeepLinking();
  */
 export function useDeepLinking() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const navigation = useNavigation() as any;
+  const navigation =
+    useNavigation() as NavigationContainerRef<RootStackParamList>;
 
   useEffect(() => {
     // Handle initial URL (app opened from link)

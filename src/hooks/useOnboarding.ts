@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ONBOARDING_KEY = '@has_seen_onboarding';
@@ -16,7 +17,7 @@ export const useOnboarding = () => {
       const value = await AsyncStorage.getItem(ONBOARDING_KEY);
       setHasSeenOnboarding(value === 'true');
     } catch (error) {
-      console.log('Error checking onboarding status:', error);
+      logger.debug('Error checking onboarding status:', error);
     } finally {
       setIsLoading(false);
     }
@@ -27,7 +28,7 @@ export const useOnboarding = () => {
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
       setHasSeenOnboarding(true);
     } catch (error) {
-      console.log('Error saving onboarding status:', error);
+      logger.debug('Error saving onboarding status:', error);
     }
   };
 
@@ -36,7 +37,7 @@ export const useOnboarding = () => {
       await AsyncStorage.removeItem(ONBOARDING_KEY);
       setHasSeenOnboarding(false);
     } catch (error) {
-      console.log('Error resetting onboarding status:', error);
+      logger.debug('Error resetting onboarding status:', error);
     }
   };
 

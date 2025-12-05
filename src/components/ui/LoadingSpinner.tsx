@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/colors';
@@ -11,26 +11,28 @@ interface LoadingSpinnerProps {
   style?: ViewStyle;
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  size = 'large',
-  color = COLORS.primary,
-  text,
-  fullScreen = false,
-  style,
-}) => {
-  const content = (
-    <View style={[styles.container, style]}>
-      <ActivityIndicator size={size} color={color} />
-      {text && <Text style={styles.text}>{text}</Text>}
-    </View>
-  );
+export const LoadingSpinner = memo<LoadingSpinnerProps>(
+  function LoadingSpinner({
+    size = 'large',
+    color = COLORS.primary,
+    text,
+    fullScreen = false,
+    style,
+  }) {
+    const content = (
+      <View style={[styles.container, style]}>
+        <ActivityIndicator size={size} color={color} />
+        {text && <Text style={styles.text}>{text}</Text>}
+      </View>
+    );
 
-  if (fullScreen) {
-    return <View style={styles.fullScreen}>{content}</View>;
-  }
+    if (fullScreen) {
+      return <View style={styles.fullScreen}>{content}</View>;
+    }
 
-  return content;
-};
+    return content;
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

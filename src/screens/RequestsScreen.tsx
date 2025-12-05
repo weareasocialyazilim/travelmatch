@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -15,18 +16,28 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NavigationProp, RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNav from '../components/BottomNav';
 import { COLORS } from '../constants/colors';
+import { useRequests } from '../hooks/useRequests';
+import { useNotifications } from '../hooks/useNotifications';
+import {
+  RequestsListSkeleton as _RequestsListSkeleton,
+  ErrorState as _ErrorState,
+} from '../components';
+import { FadeInView as _FadeInView } from '../components/AnimatedComponents';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 // Enable LayoutAnimation for Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -70,15 +81,65 @@ interface NotificationItem {
   timeAgo: string;
   isRead: boolean;
   momentId?: string;
+  // Navigation targets
+  targetType?: 'moment' | 'wallet' | 'profile' | 'request';
+  targetData?: {
+    momentId?: string;
+    momentTitle?: string;
+    userId?: string;
+    transactionId?: string;
+    reviewerId?: string;
+    reviewerName?: string;
+    reviewRating?: number;
+  };
 }
+
+type RequestsRouteProp = RouteProp<RootStackParamList, 'Requests'>;
 
 const RequestsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<TabType>('pending');
+  const route = useRoute<RequestsRouteProp>();
+  const [selectedTab, setSelectedTab] = useState<TabType>(
+    route.params?.initialTab || 'pending',
+  );
   const [hiddenRequestIds, setHiddenRequestIds] = useState<string[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Mock Data - Pending Requests
+  // Use requests hook for API integration
+  const {
+    receivedRequests: _receivedRequests,
+    receivedLoading: requestsLoading,
+    receivedError: _requestsError,
+    refreshReceived: fetchReceivedRequests,
+    acceptRequest,
+    declineRequest,
+  } = useRequests();
+
+  // Use notifications hook for API integration
+  const {
+    notifications: _apiNotifications,
+    loading: notificationsLoading,
+    refresh: fetchNotifications,
+    markAsRead: _markAsRead,
+  } = useNotifications();
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchReceivedRequests();
+    fetchNotifications();
+  }, [fetchReceivedRequests, fetchNotifications]);
+
+  // Refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([fetchReceivedRequests(), fetchNotifications()]);
+    setRefreshing(false);
+  }, [fetchReceivedRequests, fetchNotifications]);
+
+  const _isLoading =
+    selectedTab === 'pending' ? requestsLoading : notificationsLoading;
+
+  // Mock Data - Pending Requests (fallback)
   const [requests, setRequests] = useState<RequestItem[]>([
     {
       id: 'r1',
@@ -86,7 +147,8 @@ const RequestsScreen: React.FC = () => {
         id: 'mehmet-1',
         name: 'Mehmet',
         age: 32,
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
         rating: 4.8,
         isVerified: true,
         tripCount: 12,
@@ -108,7 +170,8 @@ const RequestsScreen: React.FC = () => {
         id: 'sarah-1',
         name: 'Sarah',
         age: 25,
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
         rating: 4.9,
         isVerified: true,
         tripCount: 8,
@@ -130,7 +193,8 @@ const RequestsScreen: React.FC = () => {
         id: 'alex-1',
         name: 'Alex',
         age: 28,
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
         rating: 4.7,
         isVerified: true,
         tripCount: 15,
@@ -139,7 +203,7 @@ const RequestsScreen: React.FC = () => {
       momentTitle: 'Coffee',
       momentEmoji: '☕',
       amount: 25,
-      message: "Let's grab a coffee at the best local spot!",
+      message: 'Let&apos;s grab a coffee at the best local spot!',
       createdAt: '2024-01-15T08:00:00Z',
       timeAgo: '30m ago',
       isNew: true,
@@ -159,15 +223,29 @@ const RequestsScreen: React.FC = () => {
       timeAgo: '1h ago',
       isRead: false,
       momentId: 'moment-1',
+      targetType: 'moment',
+      targetData: {
+        momentId: 'moment-1',
+        momentTitle: 'Coffee Date',
+      },
     },
     {
       id: 'n2',
       type: 'review',
       title: 'New Review',
       body: 'James left you a 5-star review! ⭐',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+      avatar:
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
       timeAgo: '3h ago',
       isRead: false,
+      targetType: 'moment',
+      targetData: {
+        momentId: 'moment-museum',
+        momentTitle: 'Museum Tour',
+        reviewerId: 'james-1',
+        reviewerName: 'James',
+        reviewRating: 5,
+      },
     },
     {
       id: 'n3',
@@ -176,15 +254,25 @@ const RequestsScreen: React.FC = () => {
       body: 'You received €50 from your museum tour.',
       timeAgo: '1d ago',
       isRead: true,
+      targetType: 'wallet',
+      targetData: {
+        transactionId: 'tx-123',
+      },
     },
     {
       id: 'n4',
       type: 'new_request',
       title: 'New Request',
       body: 'Emma wants to join your city walk tour.',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+      avatar:
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
       timeAgo: '2d ago',
       isRead: true,
+      targetType: 'moment',
+      targetData: {
+        momentId: 'moment-2',
+        momentTitle: 'City Walk Tour',
+      },
     },
   ]);
 
@@ -197,39 +285,36 @@ const RequestsScreen: React.FC = () => {
       const hidden = await AsyncStorage.getItem(STORAGE_KEYS.HIDDEN_REQUESTS);
       if (hidden) setHiddenRequestIds(JSON.parse(hidden));
     } catch (error) {
-      console.error('Error loading hidden IDs:', error);
+      logger.error('Error loading hidden IDs:', error);
     }
   };
 
   const saveHiddenIds = async (ids: string[]) => {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.HIDDEN_REQUESTS, JSON.stringify(ids));
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.HIDDEN_REQUESTS,
+        JSON.stringify(ids),
+      );
     } catch (error) {
-      console.error('Error saving hidden IDs:', error);
+      logger.error('Error saving hidden IDs:', error);
     }
   };
 
   const filteredRequests = useMemo(() => {
-    return requests.filter(item => !hiddenRequestIds.includes(item.id));
+    return requests.filter((item) => !hiddenRequestIds.includes(item.id));
   }, [requests, hiddenRequestIds]);
 
   const newRequestsCount = useMemo(() => {
-    return filteredRequests.filter(r => r.isNew).length;
+    return filteredRequests.filter((r) => r.isNew).length;
   }, [filteredRequests]);
 
   const unreadNotificationsCount = useMemo(() => {
-    return notifications.filter(n => !n.isRead).length;
+    return notifications.filter((n) => !n.isRead).length;
   }, [notifications]);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setTimeout(() => setRefreshing(false), 1000);
-  }, []);
-
-  const handleAccept = (item: RequestItem) => {
+  const handleAccept = async (item: RequestItem) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     if (item.proofRequired && !item.proofUploaded) {
       Alert.alert(
         'Proof Required',
@@ -240,101 +325,158 @@ const RequestsScreen: React.FC = () => {
             text: 'Upload Proof',
             onPress: () => handleUploadProof(item),
           },
-        ]
+        ],
       );
       return;
     }
 
-    Alert.alert(
-      'Accept Request?',
-      `Accept ${item.person.name}'s request for ${item.momentTitle}?\n\nAmount: €${item.amount}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Accept',
-          onPress: () => {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setRequests(prev => prev.filter(r => r.id !== item.id));
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            // Navigate to chat with User object
-            navigation.navigate('Chat', {
-              otherUser: {
-                id: item.person.id,
-                name: item.person.name,
-                avatar: item.person.avatar,
-                rating: item.person.rating,
-                isVerified: item.person.isVerified,
-              } as any,
-            });
-          },
-        },
-      ]
-    );
+    // Accept via API
+    const success = await acceptRequest(item.id);
+    if (success) {
+      // Update local state
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setRequests((prev) => prev.filter((r) => r.id !== item.id));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
   };
 
-  const handleDecline = (item: RequestItem) => {
+  const handleDecline = async (item: RequestItem) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert(
-      'Decline Request?',
-      `Decline ${item.person.name}'s request?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Decline',
-          style: 'destructive',
-          onPress: () => {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    Alert.alert('Decline Request?', `Decline ${item.person.name}'s request?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Decline',
+        style: 'destructive',
+        onPress: async () => {
+          const success = await declineRequest(item.id);
+          if (success) {
+            LayoutAnimation.configureNext(
+              LayoutAnimation.Presets.easeInEaseOut,
+            );
             const newHidden = [...hiddenRequestIds, item.id];
             setHiddenRequestIds(newHidden);
             saveHiddenIds(newHidden);
-          },
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleUploadProof = (item: RequestItem) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      'Upload Proof',
-      'Take a photo or select from gallery',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Camera',
-          onPress: () => {
-            setRequests(prev => prev.map(r =>
-              r.id === item.id ? { ...r, proofUploaded: true } : r
-            ));
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          },
+    Alert.alert('Upload Proof', 'Take a photo or select from gallery', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Camera',
+        onPress: () => {
+          setRequests((prev) =>
+            prev.map((r) =>
+              r.id === item.id ? { ...r, proofUploaded: true } : r,
+            ),
+          );
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         },
-        {
-          text: 'Gallery',
-          onPress: () => {
-            setRequests(prev => prev.map(r =>
-              r.id === item.id ? { ...r, proofUploaded: true } : r
-            ));
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          },
+      },
+      {
+        text: 'Gallery',
+        onPress: () => {
+          setRequests((prev) =>
+            prev.map((r) =>
+              r.id === item.id ? { ...r, proofUploaded: true } : r,
+            ),
+          );
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleNotificationPress = (notification: NotificationItem) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
-    // Mark as read
-    setNotifications(prev => prev.map(n =>
-      n.id === notification.id ? { ...n, isRead: true } : n
-    ));
 
-    // Navigate based on type - Note: MomentDetail requires full moment object
-    // For now, navigate to profile or show alert since we only have momentId
-    if (notification.momentId) {
-      // TODO: Fetch moment data and navigate properly
-      console.log('Would navigate to moment:', notification.momentId);
+    // Mark as read
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n)),
+    );
+
+    // Navigate based on targetType
+    switch (notification.targetType) {
+      case 'moment':
+        // Navigate to MomentDetail with mock moment data
+        if (notification.targetData?.momentId) {
+          navigation.navigate('MomentDetail', {
+            moment: {
+              id: notification.targetData.momentId,
+              title: notification.targetData.momentTitle || 'Experience',
+              story: `Your ${
+                notification.targetData.momentTitle || 'experience'
+              } details.`,
+              imageUrl:
+                notification.type === 'review'
+                  ? 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800'
+                  : 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800',
+              price: 25,
+              availability:
+                notification.type === 'completed' ? 'Completed' : 'Available',
+              status:
+                notification.type === 'completed' ||
+                notification.type === 'review'
+                  ? 'completed'
+                  : 'active',
+              location: {
+                name: 'Local Experience',
+                city: 'Istanbul',
+                country: 'Turkey',
+              },
+              user: {
+                id: 'current-user',
+                name: 'You',
+                avatar:
+                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+                isVerified: true,
+              },
+              // Include review info if this is a review notification
+              ...(notification.type === 'review' &&
+              notification.targetData?.reviewerName
+                ? {
+                    latestReview: {
+                      reviewerId: notification.targetData.reviewerId,
+                      reviewerName: notification.targetData.reviewerName,
+                      rating: notification.targetData.reviewRating || 5,
+                    },
+                  }
+                : {}),
+            },
+            isOwner: true,
+            pendingRequests: notification.type === 'new_request' ? 1 : 0,
+          });
+        }
+        break;
+
+      case 'wallet':
+        navigation.navigate('Wallet');
+        break;
+
+      case 'profile':
+        // Navigate to a specific user's profile
+        if (notification.targetData?.userId) {
+          navigation.navigate('ProfileDetail', {
+            userId: notification.targetData.userId,
+          });
+        } else {
+          navigation.navigate('Profile');
+        }
+        break;
+
+      case 'request':
+        // Switch to pending tab
+        setSelectedTab('pending');
+        break;
+
+      default:
+        // Fallback - just mark as read
+        break;
     }
   };
 
@@ -343,25 +485,35 @@ const RequestsScreen: React.FC = () => {
       {/* Compact Header - Name + Category + Price on same row */}
       <View style={styles.cardHeader}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('ProfileDetail', { userId: item.person.id })}
+          onPress={() =>
+            navigation.navigate('ProfileDetail', { userId: item.person.id })
+          }
           style={styles.avatarContainer}
         >
           <Image source={{ uri: item.person.avatar }} style={styles.avatar} />
           {item.person.isVerified && (
             <View style={styles.verifiedBadge}>
-              <MaterialCommunityIcons name="check-decagram" size={12} color={COLORS.primary} />
+              <MaterialCommunityIcons
+                name="check-decagram"
+                size={12}
+                color={COLORS.primary}
+              />
             </View>
           )}
         </TouchableOpacity>
-        
+
         <View style={styles.headerInfo}>
           <View style={styles.nameRow}>
-            <Text style={styles.personName}>{item.person.name}, {item.person.age}</Text>
-            <Text style={styles.categoryInline}>{item.momentEmoji} {item.momentTitle}</Text>
+            <Text style={styles.personName}>
+              {item.person.name}, {item.person.age}
+            </Text>
+            <Text style={styles.categoryInline}>
+              {item.momentEmoji} {item.momentTitle}
+            </Text>
             {item.isNew && <View style={styles.newDot} />}
           </View>
           <View style={styles.metaRow}>
-            <MaterialCommunityIcons name="star" size={12} color="#FFB800" />
+            <MaterialCommunityIcons name="star" size={12} color={COLORS.gold} />
             <Text style={styles.rating}>{item.person.rating}</Text>
             <Text style={styles.separator}>•</Text>
             <Text style={styles.city}>{item.person.city}</Text>
@@ -369,50 +521,68 @@ const RequestsScreen: React.FC = () => {
             <Text style={styles.timeAgo}>{item.timeAgo}</Text>
           </View>
         </View>
-        
+
         <View style={styles.amountBadge}>
           <Text style={styles.amountText}>€{item.amount}</Text>
         </View>
       </View>
 
       {/* Compact Message - single line */}
-      <Text style={styles.message} numberOfLines={1}>"{item.message}"</Text>
+      <Text style={styles.message} numberOfLines={1}>
+        &quot;{item.message}&quot;
+      </Text>
 
       {/* Compact Proof Status + Actions */}
       <View style={styles.actionsRow}>
         {item.proofRequired && (
-          <View style={[styles.proofStatusCompact, item.proofUploaded && styles.proofUploadedCompact]}>
+          <View
+            style={[
+              styles.proofStatusCompact,
+              item.proofUploaded && styles.proofUploadedCompact,
+            ]}
+          >
             <MaterialCommunityIcons
-              name={item.proofUploaded ? 'check-circle' : 'alert-circle-outline'}
+              name={
+                item.proofUploaded ? 'check-circle' : 'alert-circle-outline'
+              }
               size={14}
               color={item.proofUploaded ? COLORS.success : COLORS.warning}
             />
-            <Text style={[styles.proofTextCompact, item.proofUploaded && styles.proofTextUploadedCompact]}>
+            <Text
+              style={[
+                styles.proofTextCompact,
+                item.proofUploaded && styles.proofTextUploadedCompact,
+              ]}
+            >
               {item.proofUploaded ? 'Proof Uploaded' : 'Proof Required'}
             </Text>
           </View>
         )}
-        
+
         {/* Actions */}
         <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.declineButton}
-          onPress={() => handleDecline(item)}
-        >
-          <Text style={styles.declineButtonText}>Decline</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[
-            styles.acceptButton,
-            item.proofRequired && !item.proofUploaded && styles.acceptButtonDisabled
-          ]}
-          onPress={() => handleAccept(item)}
-        >
-          <Text style={styles.acceptButtonText}>
-            {item.proofRequired && !item.proofUploaded ? 'Upload Proof' : 'Accept'}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.declineButton}
+            onPress={() => handleDecline(item)}
+          >
+            <Text style={styles.declineButtonText}>Decline</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.acceptButton,
+              item.proofRequired &&
+                !item.proofUploaded &&
+                styles.acceptButtonDisabled,
+            ]}
+            onPress={() => handleAccept(item)}
+          >
+            <Text style={styles.acceptButtonText}>
+              {item.proofRequired && !item.proofUploaded
+                ? 'Upload Proof'
+                : 'Accept'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -421,38 +591,63 @@ const RequestsScreen: React.FC = () => {
   const renderNotificationItem = (item: NotificationItem) => {
     const getIcon = () => {
       switch (item.type) {
-        case 'completed': return 'check-circle';
-        case 'review': return 'star';
-        case 'payment': return 'cash';
-        case 'new_request': return 'account-plus';
-        default: return 'bell';
+        case 'completed':
+          return 'check-circle';
+        case 'review':
+          return 'star';
+        case 'payment':
+          return 'cash';
+        case 'new_request':
+          return 'account-plus';
+        default:
+          return 'bell';
       }
     };
 
     const getIconColor = () => {
       switch (item.type) {
-        case 'completed': return COLORS.success;
-        case 'review': return '#FFB800';
-        case 'payment': return COLORS.primary;
-        case 'new_request': return COLORS.info;
-        default: return COLORS.textSecondary;
+        case 'completed':
+          return COLORS.success;
+        case 'review':
+          return COLORS.gold;
+        case 'payment':
+          return COLORS.primary;
+        case 'new_request':
+          return COLORS.info;
+        default:
+          return COLORS.textSecondary;
       }
     };
 
     return (
       <TouchableOpacity
         key={item.id}
-        style={[styles.notificationItem, !item.isRead && styles.notificationUnread]}
+        style={[
+          styles.notificationItem,
+          !item.isRead && styles.notificationUnread,
+        ]}
         onPress={() => handleNotificationPress(item)}
       >
         {item.avatar ? (
-          <Image source={{ uri: item.avatar }} style={styles.notificationAvatar} />
+          <Image
+            source={{ uri: item.avatar }}
+            style={styles.notificationAvatar}
+          />
         ) : (
-          <View style={[styles.notificationIcon, { backgroundColor: `${getIconColor()}20` }]}>
-            <MaterialCommunityIcons name={getIcon()} size={20} color={getIconColor()} />
+          <View
+            style={[
+              styles.notificationIcon,
+              { backgroundColor: `${getIconColor()}20` },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name={getIcon()}
+              size={20}
+              color={getIconColor()}
+            />
           </View>
         )}
-        
+
         <View style={styles.notificationContent}>
           <Text style={styles.notificationTitle}>{item.title}</Text>
           <Text style={styles.notificationBody}>{item.body}</Text>
@@ -472,7 +667,12 @@ const RequestsScreen: React.FC = () => {
           style={[styles.tab, selectedTab === 'pending' && styles.tabActive]}
           onPress={() => setSelectedTab('pending')}
         >
-          <Text style={[styles.tabText, selectedTab === 'pending' && styles.tabTextActive]}>
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === 'pending' && styles.tabTextActive,
+            ]}
+          >
             Pending
           </Text>
           {newRequestsCount > 0 && (
@@ -483,15 +683,25 @@ const RequestsScreen: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tab, selectedTab === 'notifications' && styles.tabActive]}
+          style={[
+            styles.tab,
+            selectedTab === 'notifications' && styles.tabActive,
+          ]}
           onPress={() => setSelectedTab('notifications')}
         >
-          <Text style={[styles.tabText, selectedTab === 'notifications' && styles.tabTextActive]}>
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === 'notifications' && styles.tabTextActive,
+            ]}
+          >
             Notifications
           </Text>
           {unreadNotificationsCount > 0 && (
             <View style={styles.tabBadge}>
-              <Text style={styles.tabBadgeText}>{unreadNotificationsCount}</Text>
+              <Text style={styles.tabBadgeText}>
+                {unreadNotificationsCount}
+              </Text>
             </View>
           )}
         </TouchableOpacity>
@@ -511,25 +721,32 @@ const RequestsScreen: React.FC = () => {
             filteredRequests.map(renderRequestCard)
           ) : (
             <View style={styles.emptyState}>
-              <MaterialCommunityIcons name="inbox-outline" size={64} color={COLORS.textSecondary} />
+              <MaterialCommunityIcons
+                name="inbox-outline"
+                size={64}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.emptyTitle}>No Pending Requests</Text>
               <Text style={styles.emptySubtitle}>
-                When travelers request to join your moments, they'll appear here.
+                When travelers request to join your moments, they&apos;ll appear
+                here.
               </Text>
             </View>
           )
+        ) : notifications.length > 0 ? (
+          notifications.map(renderNotificationItem)
         ) : (
-          notifications.length > 0 ? (
-            notifications.map(renderNotificationItem)
-          ) : (
-            <View style={styles.emptyState}>
-              <MaterialCommunityIcons name="bell-outline" size={64} color={COLORS.textSecondary} />
-              <Text style={styles.emptyTitle}>No Notifications</Text>
-              <Text style={styles.emptySubtitle}>
-                You're all caught up! New updates will appear here.
-              </Text>
-            </View>
-          )
+          <View style={styles.emptyState}>
+            <MaterialCommunityIcons
+              name="bell-outline"
+              size={64}
+              color={COLORS.textSecondary}
+            />
+            <Text style={styles.emptyTitle}>No Notifications</Text>
+            <Text style={styles.emptySubtitle}>
+              You&apos;re all caught up! New updates will appear here.
+            </Text>
+          </View>
         )}
       </ScrollView>
 
@@ -600,7 +817,7 @@ const styles = StyleSheet.create({
   },
   declineButton: {
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: COLORS.backgroundSecondary,
     borderRadius: 8,
     flex: 1,
     paddingVertical: 10,
@@ -630,20 +847,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 16,
   },
-  header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
   headerInfo: {
     flex: 1,
-  },
-  headerTitle: {
-    color: COLORS.text,
-    fontSize: 20,
-    fontWeight: '700',
   },
   message: {
     color: COLORS.textSecondary,
@@ -658,25 +863,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     marginTop: 2,
-  },
-  momentEmoji: {
-    fontSize: 16,
-  },
-  momentInfo: {
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  momentTitle: {
-    color: COLORS.text,
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
   },
   nameRow: {
     alignItems: 'center',
@@ -739,27 +925,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  proofStatus: {
-    alignItems: 'center',
-    backgroundColor: `${COLORS.warning}15`,
-    borderRadius: 8,
-    flexDirection: 'row',
-    gap: 6,
-    marginTop: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  proofText: {
-    color: COLORS.warning,
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  proofTextUploaded: {
-    color: COLORS.success,
-  },
-  proofUploaded: {
-    backgroundColor: `${COLORS.success}15`,
-  },
   rating: {
     color: COLORS.text,
     fontSize: 12,
@@ -770,7 +935,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 8,
     padding: 12,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 4,

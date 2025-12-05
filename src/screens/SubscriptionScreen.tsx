@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -110,7 +111,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const handleSubscribe = (planId: string) => {
     // Implement subscription logic
-    console.log('Subscribe to plan', { planId });
+    logger.debug('Subscribe to plan', { planId });
   };
 
   const renderPlanCard = (plan: Plan) => {

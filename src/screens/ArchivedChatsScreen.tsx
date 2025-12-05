@@ -26,12 +26,13 @@ interface ArchivedChat {
 
 export const ArchivedChatsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([
     {
       id: '1',
       name: 'Michael',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+      avatar:
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
       lastMessage: 'It was nice meeting you!',
       archivedAt: '3 days ago',
       isVerified: true,
@@ -52,14 +53,14 @@ export const ArchivedChatsScreen: React.FC = () => {
       'This chat will be restored to your chats list.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Unarchive', 
+        {
+          text: 'Unarchive',
           onPress: () => {
-            setArchivedChats(prev => prev.filter(chat => chat.id !== id));
+            setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
             Alert.alert('Done', 'Chat has been restored to your chats.');
-          }
+          },
         },
-      ]
+      ],
     );
   };
 
@@ -69,15 +70,15 @@ export const ArchivedChatsScreen: React.FC = () => {
       'This will permanently delete this conversation. This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
+        {
+          text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            setArchivedChats(prev => prev.filter(chat => chat.id !== id));
+            setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
             Alert.alert('Deleted', 'Chat has been permanently deleted.');
-          }
+          },
         },
-      ]
+      ],
     );
   };
 
@@ -97,8 +98,8 @@ export const ArchivedChatsScreen: React.FC = () => {
   };
 
   const renderChat = (chat: ArchivedChat) => (
-    <TouchableOpacity 
-      key={chat.id} 
+    <TouchableOpacity
+      key={chat.id}
       style={styles.chatCard}
       onPress={() => handleOpenChat(chat)}
     >
@@ -106,27 +107,41 @@ export const ArchivedChatsScreen: React.FC = () => {
         <Image source={{ uri: chat.avatar }} style={styles.avatar} />
         {chat.isVerified && (
           <View style={styles.verifiedBadge}>
-            <MaterialCommunityIcons name="check-decagram" size={14} color={COLORS.primary} />
+            <MaterialCommunityIcons
+              name="check-decagram"
+              size={14}
+              color={COLORS.primary}
+            />
           </View>
         )}
       </View>
       <View style={styles.chatContent}>
         <Text style={styles.chatName}>{chat.name}</Text>
-        <Text style={styles.chatMessage} numberOfLines={1}>{chat.lastMessage}</Text>
+        <Text style={styles.chatMessage} numberOfLines={1}>
+          {chat.lastMessage}
+        </Text>
         <Text style={styles.chatDate}>Archived {chat.archivedAt}</Text>
       </View>
       <View style={styles.actionButtons}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.unarchiveButton}
           onPress={() => handleUnarchive(chat.id)}
         >
-          <MaterialCommunityIcons name="archive-arrow-up" size={20} color={COLORS.primary} />
+          <MaterialCommunityIcons
+            name="archive-arrow-up"
+            size={20}
+            color={COLORS.primary}
+          />
         </TouchableOpacity>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleDelete(chat.id)}
         >
-          <MaterialCommunityIcons name="delete" size={20} color={COLORS.error} />
+          <MaterialCommunityIcons
+            name="delete"
+            size={20}
+            color={COLORS.error}
+          />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -135,17 +150,21 @@ export const ArchivedChatsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Archived Chats</Text>
         <View style={styles.backButton} />
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -153,16 +172,22 @@ export const ArchivedChatsScreen: React.FC = () => {
         {archivedChats.length > 0 ? (
           <>
             <Text style={styles.sectionInfo}>
-              Archived chats are hidden from your main chats list. You can still access them here.
+              Archived chats are hidden from your main chats list. You can still
+              access them here.
             </Text>
             {archivedChats.map(renderChat)}
           </>
         ) : (
           <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="archive-off-outline" size={64} color={COLORS.textTertiary} />
+            <MaterialCommunityIcons
+              name="archive-off-outline"
+              size={64}
+              color={COLORS.textTertiary}
+            />
             <Text style={styles.emptyTitle}>No archived chats</Text>
             <Text style={styles.emptySubtitle}>
-              Chats you archive will appear here. Long press on a chat to archive it.
+              Chats you archive will appear here. Long press on a chat to
+              archive it.
             </Text>
           </View>
         )}

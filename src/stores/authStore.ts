@@ -1,40 +1,93 @@
 /**
  * Auth Store
- * Zustand ile auth state management
+ *
+ * Zustand store for authentication state management.
+ * Persists auth state to AsyncStorage for session persistence.
+ *
+ * @module stores/authStore
+ *
+ * @example
+ * ```tsx
+ * import { useAuthStore } from '../stores/authStore';
+ *
+ * const MyComponent = () => {
+ *   const { user, isAuthenticated, login, logout } = useAuthStore();
+ *
+ *   const handleLogin = async () => {
+ *     await login('user@example.com', 'password');
+ *   };
+ *
+ *   return isAuthenticated ? (
+ *     <Text>Welcome, {user?.name}</Text>
+ *   ) : (
+ *     <Button onPress={handleLogin}>Login</Button>
+ *   );
+ * };
+ * ```
  */
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/**
+ * User profile data
+ */
 export interface User {
+  /** Unique user identifier */
   id: string;
+  /** User's email address */
   email: string;
+  /** User's display name */
   name: string;
+  /** URL to user's avatar image */
   avatar?: string;
+  /** User's bio/description */
   bio?: string;
+  /** User's location string */
   location?: string;
+  /** Account creation timestamp */
   createdAt: string;
 }
 
+/**
+ * Auth store state and actions
+ */
 interface AuthState {
   // State
+  /** Current user data, null if not logged in */
   user: User | null;
+  /** JWT access token */
   token: string | null;
+  /** Token for refreshing access token */
   refreshToken: string | null;
+  /** Whether user is authenticated */
   isAuthenticated: boolean;
+  /** Whether auth operation is in progress */
   isLoading: boolean;
 
   // Actions
+  /** Set user data */
   setUser: (user: User | null) => void;
+  /** Set authentication tokens */
   setTokens: (token: string, refreshToken: string) => void;
+  /** Login with email and password */
   login: (email: string, _password: string) => Promise<void>;
+  /** Register new account */
   register: (name: string, email: string, _password: string) => Promise<void>;
+  /** Logout and clear session */
   logout: () => void;
+  /** Update user profile data */
   updateUser: (updates: Partial<User>) => void;
+  /** Refresh authentication tokens */
   refreshAuth: () => Promise<void>;
 }
 
+/**
+ * Zustand auth store with persistence
+ *
+ * @returns Auth state and actions
+ */
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({

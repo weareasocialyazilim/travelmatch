@@ -31,11 +31,11 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { 
-    gestureId, 
-    momentTitle, 
-    amount, 
-    senderName, 
+  const {
+    gestureId,
+    momentTitle,
+    amount,
+    senderName,
     senderAvatar,
     isAnonymous,
     status,
@@ -47,7 +47,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
       {
         id: '1',
         title: 'Gesture Received',
-        subtitle: isAnonymous 
+        subtitle: isAnonymous
           ? `Anonymous supporter sent you $${amount}`
           : `${senderName} sent you $${amount}`,
         icon: 'gift-outline',
@@ -67,8 +67,12 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
         title: 'Verification',
         subtitle: 'System verified your proof',
         icon: 'check-decagram',
-        status: status === 'pending_verification' ? 'current' : 
-               status === 'verified' ? 'completed' : 'pending',
+        status:
+          status === 'pending_verification'
+            ? 'current'
+            : status === 'verified'
+            ? 'completed'
+            : 'pending',
         time: status === 'verified' ? '1 day ago' : undefined,
       },
       {
@@ -150,19 +154,15 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
         {/* Gift Card */}
         <View style={styles.giftCard}>
           <View style={styles.giftIconContainer}>
-            <MaterialCommunityIcons
-              name="gift"
-              size={40}
-              color={COLORS.mint}
-            />
+            <MaterialCommunityIcons name="gift" size={40} color={COLORS.mint} />
           </View>
-          
+
           <Text style={styles.giftTitle}>You received a gesture!</Text>
-          
+
           <View style={styles.amountContainer}>
             <Text style={styles.amountValue}>${amount}</Text>
             <Text style={styles.amountLabel}>
-              for "{momentTitle}"
+              for &quot;{momentTitle}&quot;
             </Text>
           </View>
 
@@ -182,7 +182,9 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
             ) : (
               <View style={styles.senderInfo}>
                 <Image
-                  source={{ uri: senderAvatar || 'https://via.placeholder.com/100' }}
+                  source={{
+                    uri: senderAvatar || 'https://via.placeholder.com/100',
+                  }}
                   style={styles.senderAvatar}
                 />
                 <View>
@@ -194,24 +196,31 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
           </View>
 
           {/* Status Badge */}
-          <View style={[
-            styles.statusBadge,
-            { 
-              backgroundColor: status === 'verified' 
-                ? COLORS.mint + '20' 
-                : COLORS.primary + '20' 
-            }
-          ]}>
+          <View
+            style={[
+              styles.statusBadge,
+              {
+                backgroundColor:
+                  status === 'verified'
+                    ? COLORS.mint + '20'
+                    : COLORS.primary + '20',
+              },
+            ]}
+          >
             <MaterialCommunityIcons
               name={status === 'verified' ? 'check-circle' : 'timer-sand'}
               size={16}
               color={status === 'verified' ? COLORS.mint : COLORS.primary}
             />
-            <Text style={[
-              styles.statusText,
-              { color: status === 'verified' ? COLORS.mint : COLORS.primary }
-            ]}>
-              {status === 'verified' ? 'Verified & Added to Balance' : 'Pending Verification'}
+            <Text
+              style={[
+                styles.statusText,
+                { color: status === 'verified' ? COLORS.mint : COLORS.primary },
+              ]}
+            >
+              {status === 'verified'
+                ? 'Verified & Added to Balance'
+                : 'Pending Verification'}
             </Text>
           </View>
         </View>
@@ -219,7 +228,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
         {/* Timeline */}
         <View style={styles.timelineContainer}>
           <Text style={styles.sectionTitle}>Progress</Text>
-          
+
           {steps.map((step, index) => (
             <View key={step.id} style={styles.timelineItem}>
               {/* Timeline Line */}
@@ -281,9 +290,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                 >
                   {step.subtitle}
                 </Text>
-                {step.time && (
-                  <Text style={styles.stepTime}>{step.time}</Text>
-                )}
+                {step.time && <Text style={styles.stepTime}>{step.time}</Text>}
               </View>
             </View>
           ))}
@@ -317,12 +324,17 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                     size={20}
                     color={COLORS.white}
                   />
-                  <Text style={styles.primaryButtonText}>Say Thanks to {senderName}</Text>
+                  <Text style={styles.primaryButtonText}>
+                    Say Thanks to {senderName}
+                  </Text>
                 </TouchableOpacity>
               )}
-              
+
               <TouchableOpacity
-                style={[styles.secondaryButton, isAnonymous && styles.primaryButton]}
+                style={[
+                  styles.secondaryButton,
+                  isAnonymous && styles.primaryButton,
+                ]}
                 onPress={handleViewBalance}
               >
                 <MaterialCommunityIcons
@@ -330,10 +342,12 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                   size={20}
                   color={isAnonymous ? COLORS.white : COLORS.primary}
                 />
-                <Text style={[
-                  styles.secondaryButtonText,
-                  isAnonymous && styles.primaryButtonText
-                ]}>
+                <Text
+                  style={[
+                    styles.secondaryButtonText,
+                    isAnonymous && styles.primaryButtonText,
+                  ]}
+                >
                   View Balance
                 </Text>
               </TouchableOpacity>
@@ -349,7 +363,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
             color={COLORS.primary}
           />
           <Text style={styles.infoText}>
-            {status === 'verified' 
+            {status === 'verified'
               ? 'The funds have been added to your balance. You can withdraw or use them for your next experience.'
               : 'Upload proof of your experience to unlock the funds. Our system will verify automatically.'}
           </Text>
@@ -397,7 +411,7 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,

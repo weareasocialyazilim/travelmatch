@@ -136,7 +136,7 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
                     <MaterialCommunityIcons
                       name={'check-decagram' as IconName}
                       size={16}
-                      color="#008080"
+                      color={COLORS.teal}
                     />
                     <Text style={styles.statusBadgeTextVerified}>
                       Proof Received
@@ -147,7 +147,7 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
                     <MaterialCommunityIcons
                       name={'clock-outline' as IconName}
                       size={16}
-                      color="#F59E0B"
+                      color={COLORS.warning}
                     />
                     <Text style={styles.statusBadgeTextPending}>
                       Awaiting Proof
@@ -295,36 +295,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: COLORS.warning,
-  },
-  emptyState: {
-    paddingHorizontal: 32,
-    paddingTop: 96,
-    paddingBottom: 48,
-    alignItems: 'center',
-  },
-  emptyIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  emptyTextContainer: {
-    alignItems: 'center',
-    maxWidth: 320,
-    gap: 8,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  emptyDescription: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
   },
 });

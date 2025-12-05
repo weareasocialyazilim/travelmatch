@@ -28,9 +28,9 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { impact } = useHaptics();
 
-  const handleTabPress = (screen: string) => {
+  const handleTabPress = (screen: keyof RootStackParamList) => {
     impact('light');
-    (navigation as any).navigate(screen);
+    navigation.navigate(screen as never);
   };
 
   return (
@@ -47,10 +47,14 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
         <MaterialCommunityIcons
           name={activeTab === 'Discover' ? 'compass' : 'compass-outline'}
           size={24}
-          color={activeTab === 'Discover' ? COLORS.primary : COLORS.textSecondary}
+          color={
+            activeTab === 'Discover' ? COLORS.primary : COLORS.textSecondary
+          }
         />
         <Text
-          style={activeTab === 'Discover' ? styles.navTextActive : styles.navText}
+          style={
+            activeTab === 'Discover' ? styles.navTextActive : styles.navText
+          }
         >
           Discover
         </Text>
@@ -69,7 +73,9 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
           <MaterialCommunityIcons
             name={activeTab === 'Requests' ? 'inbox-full' : 'inbox-outline'}
             size={24}
-            color={activeTab === 'Requests' ? COLORS.primary : COLORS.textSecondary}
+            color={
+              activeTab === 'Requests' ? COLORS.primary : COLORS.textSecondary
+            }
           />
           {requestsBadge > 0 && (
             <View style={styles.badge}>
@@ -80,7 +86,9 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
           )}
         </View>
         <Text
-          style={activeTab === 'Requests' ? styles.navTextActive : styles.navText}
+          style={
+            activeTab === 'Requests' ? styles.navTextActive : styles.navText
+          }
         >
           Requests
         </Text>
@@ -96,11 +104,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
         accessibilityHint="Create a new moment"
       >
         <View style={styles.createButton}>
-          <MaterialCommunityIcons
-            name="plus"
-            size={28}
-            color={COLORS.white}
-          />
+          <MaterialCommunityIcons name="plus" size={28} color={COLORS.white} />
         </View>
       </TouchableOpacity>
 
@@ -117,7 +121,9 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
           <MaterialCommunityIcons
             name={activeTab === 'Messages' ? 'chat' : 'chat-outline'}
             size={24}
-            color={activeTab === 'Messages' ? COLORS.primary : COLORS.textSecondary}
+            color={
+              activeTab === 'Messages' ? COLORS.primary : COLORS.textSecondary
+            }
           />
           {messagesBadge > 0 && (
             <View style={styles.badge}>
@@ -128,7 +134,9 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
           )}
         </View>
         <Text
-          style={activeTab === 'Messages' ? styles.navTextActive : styles.navText}
+          style={
+            activeTab === 'Messages' ? styles.navTextActive : styles.navText
+          }
         >
           Messages
         </Text>
@@ -163,8 +171,13 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
 });
 
 BottomNav.propTypes = {
-  activeTab: PropTypes.oneOf(['Discover', 'Requests', 'Create', 'Messages', 'Profile'])
-    .isRequired,
+  activeTab: PropTypes.oneOf([
+    'Discover',
+    'Requests',
+    'Create',
+    'Messages',
+    'Profile',
+  ]).isRequired,
 };
 
 const styles = StyleSheet.create({

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,40 +16,115 @@ import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import BottomNav from '../components/BottomNav';
 import { COLORS } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
+import {
+  CURRENT_USER,
+  isVerified as checkIsVerified,
+  getProofScore,
+} from '../mocks/currentUser';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AVATAR_SIZE = 90;
 const MOMENT_CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
 
-// Mock moments data
+// Mock moments data - user's own moments
 const MOCK_MOMENTS = [
-  { id: '1', title: 'Coffee Tour', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400', price: 25, isActive: true },
-  { id: '2', title: 'Street Food Walk', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400', price: 40, isActive: true },
-  { id: '3', title: 'Art Gallery Visit', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400', price: 30, isActive: true },
-  { id: '4', title: 'Jazz Night', image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400', price: 35, isActive: false },
-  { id: '5', title: 'Wine Tasting', image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400', price: 55, isActive: false },
+  {
+    id: '1',
+    title: 'Coffee Tour',
+    image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
+    price: 25,
+    isActive: true,
+    location: 'Istanbul, Turkey',
+  },
+  {
+    id: '2',
+    title: 'Street Food Walk',
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400',
+    price: 40,
+    isActive: true,
+    location: 'Bangkok, Thailand',
+  },
+  {
+    id: '3',
+    title: 'Art Gallery Visit',
+    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
+    price: 30,
+    isActive: true,
+    location: 'Paris, France',
+  },
+  {
+    id: '4',
+    title: 'Jazz Night',
+    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400',
+    price: 35,
+    isActive: false,
+    location: 'New Orleans, USA',
+  },
+  {
+    id: '5',
+    title: 'Wine Tasting',
+    image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400',
+    price: 55,
+    isActive: false,
+    location: 'Napa Valley, USA',
+  },
 ];
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
 
-  // Mock user data
-  const userData = {
-    name: 'Sophia Carter',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-    isVerified: true,
-    location: 'San Francisco, CA',
-    trustScore: 92,
-    momentsCount: 28,
-    exchangesCount: 156,
-    responseRate: 98,
-    activeMoments: 5,
-    completedMoments: 23,
-    walletBalance: 1250.00,
-    giftsCount: 12,
-    savedCount: 8,
-  };
+  // Get user from auth context, fallback to mock
+  const { user: authUser, isLoading: _authLoading } = useAuth();
+
+  // User data - merge auth user with mock data for complete profile
+  const userData = useMemo(() => {
+    if (authUser) {
+      // Use auth user data with fallbacks from mock
+      const authUserAny = authUser as unknown as Record<string, unknown>;
+      return {
+        name: authUser.name || CURRENT_USER.name,
+        avatarUrl:
+          (authUserAny.profilePhoto as string) ||
+          (authUserAny.avatarUrl as string) ||
+          CURRENT_USER.avatarUrl,
+        isVerified:
+          authUser.kyc === 'Verified' || checkIsVerified(CURRENT_USER),
+        location:
+          typeof authUser.location === 'string'
+            ? authUser.location
+            : (authUser.location as { city?: string })?.city ||
+              CURRENT_USER.location,
+        trustScore: getProofScore(CURRENT_USER), // Will be from API later
+        momentsCount: CURRENT_USER.momentsCount,
+        exchangesCount: CURRENT_USER.exchangesCount,
+        responseRate: CURRENT_USER.responseRate,
+        activeMoments: CURRENT_USER.activeMoments,
+        completedMoments: CURRENT_USER.completedMoments,
+        walletBalance: CURRENT_USER.walletBalance,
+        giftsSentCount: CURRENT_USER.giftsSentCount,
+        savedCount: CURRENT_USER.savedCount,
+      };
+    }
+
+    // Fallback to mock data
+    return {
+      name: CURRENT_USER.name,
+      avatarUrl: CURRENT_USER.avatarUrl,
+      isVerified: checkIsVerified(CURRENT_USER),
+      location: CURRENT_USER.location,
+      trustScore: getProofScore(CURRENT_USER),
+      momentsCount: CURRENT_USER.momentsCount,
+      exchangesCount: CURRENT_USER.exchangesCount,
+      responseRate: CURRENT_USER.responseRate,
+      activeMoments: CURRENT_USER.activeMoments,
+      completedMoments: CURRENT_USER.completedMoments,
+      walletBalance: CURRENT_USER.walletBalance,
+      giftsSentCount: CURRENT_USER.giftsSentCount,
+      savedCount: CURRENT_USER.savedCount,
+    };
+  }, [authUser]);
 
   // Navigation handlers
   const handleEditProfile = () => navigation.navigate('EditProfile');
@@ -58,28 +133,52 @@ const ProfileScreen: React.FC = () => {
   const handleSettings = () => navigation.navigate('AppSettings');
   const handleWallet = () => navigation.navigate('Wallet');
   const handleMyGifts = () => navigation.navigate('MyGifts');
-  const handleSaved = () => navigation.navigate('SavedMoments');
+  const handleSavedMoments = () => navigation.navigate('SavedMoments');
 
-  const activeMoments = MOCK_MOMENTS.filter(m => m.isActive);
-  const pastMoments = MOCK_MOMENTS.filter(m => !m.isActive);
+  const activeMoments = MOCK_MOMENTS.filter((m) => m.isActive);
+  const pastMoments = MOCK_MOMENTS.filter((m) => !m.isActive);
   const displayedMoments = activeTab === 'active' ? activeMoments : pastMoments;
 
-  const renderMomentCard = ({ item }: { item: typeof MOCK_MOMENTS[0] }) => (
-    <TouchableOpacity 
-      style={styles.momentCard} 
+  const renderMomentCard = ({ item }: { item: (typeof MOCK_MOMENTS)[0] }) => (
+    <TouchableOpacity
+      style={styles.momentCard}
       activeOpacity={0.8}
-      onPress={() => navigation.navigate('MomentDetail', { 
-        moment: { 
-          id: item.id, 
-          title: item.title, 
-          imageUrl: item.image, 
-          price: item.price 
-        } as any 
-      })}
+      accessibilityLabel={`${item.title}, $${item.price}`}
+      accessibilityRole="button"
+      accessibilityHint="Opens moment details"
+      onPress={() =>
+        navigation.navigate('MomentDetail', {
+          moment: {
+            id: item.id,
+            title: item.title,
+            imageUrl: item.image,
+            image: item.image,
+            price: item.price,
+            story: `Experience ${item.title} - a unique local moment curated by you.`,
+            availability: item.isActive ? 'Available' : 'Completed',
+            status: item.isActive ? 'active' : 'completed',
+            location: {
+              name: item.location,
+              city: item.location.split(', ')[0],
+              country: item.location.split(', ')[1] || '',
+            },
+            user: {
+              id: 'current-user',
+              name: userData.name,
+              avatar: userData.avatarUrl,
+              isVerified: userData.isVerified,
+              location: userData.location,
+            },
+          },
+          isOwner: true, // This is the user's own moment
+        })
+      }
     >
       <Image source={{ uri: item.image }} style={styles.momentImage} />
       <View style={styles.momentInfo}>
-        <Text style={styles.momentTitle} numberOfLines={1}>{item.title}</Text>
+        <Text style={styles.momentTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
         <Text style={styles.momentPrice}>${item.price}</Text>
       </View>
     </TouchableOpacity>
@@ -93,17 +192,29 @@ const ProfileScreen: React.FC = () => {
           <View style={styles.headerSpacer} />
           <Text style={styles.headerTitle}>Profile</Text>
           <View style={styles.headerActions}>
-            <TouchableOpacity 
-              style={styles.headerButton} 
+            <TouchableOpacity
+              style={styles.headerButton}
               onPress={handleEditProfile}
+              accessibilityLabel="Edit profile"
+              accessibilityRole="button"
             >
-              <MaterialCommunityIcons name="pencil-outline" size={22} color={COLORS.text} />
+              <MaterialCommunityIcons
+                name="pencil-outline"
+                size={22}
+                color={COLORS.text}
+              />
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.headerButton} 
+            <TouchableOpacity
+              style={styles.headerButton}
               onPress={handleSettings}
+              accessibilityLabel="Settings"
+              accessibilityRole="button"
             >
-              <MaterialCommunityIcons name="cog-outline" size={22} color={COLORS.text} />
+              <MaterialCommunityIcons
+                name="cog-outline"
+                size={22}
+                color={COLORS.text}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -115,15 +226,22 @@ const ProfileScreen: React.FC = () => {
           {/* Profile Info Section */}
           <View style={styles.profileSection}>
             {/* Avatar */}
-            <TouchableOpacity 
-              style={styles.avatarWrapper} 
+            <TouchableOpacity
+              style={styles.avatarWrapper}
               onPress={handleEditProfile}
               activeOpacity={0.9}
             >
-              <Image source={{ uri: userData.avatarUrl }} style={styles.avatar} />
+              <Image
+                source={{ uri: userData.avatarUrl }}
+                style={styles.avatar}
+              />
               {userData.isVerified && (
                 <View style={styles.verifiedBadge}>
-                  <MaterialCommunityIcons name="check-decagram" size={22} color={COLORS.mint} />
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={22}
+                    color={COLORS.mint}
+                  />
                 </View>
               )}
             </TouchableOpacity>
@@ -131,27 +249,54 @@ const ProfileScreen: React.FC = () => {
             {/* Name & Location */}
             <Text style={styles.userName}>{userData.name}</Text>
             <View style={styles.locationRow}>
-              <MaterialCommunityIcons name="map-marker" size={16} color={COLORS.textSecondary} />
+              <MaterialCommunityIcons
+                name="map-marker"
+                size={16}
+                color={COLORS.textSecondary}
+              />
               <Text style={styles.locationText}>{userData.location}</Text>
             </View>
 
             {/* ProofScore Badge */}
-            <TouchableOpacity style={styles.proofScoreBadge} onPress={handleTrustGarden}>
-              <MaterialCommunityIcons name="shield-check" size={16} color={COLORS.mint} />
+            <TouchableOpacity
+              style={styles.proofScoreBadge}
+              onPress={handleTrustGarden}
+              accessibilityLabel={`ProofScore ${userData.trustScore} percent. Tap to view Trust Garden`}
+              accessibilityRole="button"
+            >
+              <MaterialCommunityIcons
+                name="shield-check"
+                size={16}
+                color={COLORS.mint}
+              />
               <Text style={styles.proofScoreText}>
                 ProofScore {userData.trustScore}%
               </Text>
-              <MaterialCommunityIcons name="chevron-right" size={16} color={COLORS.mint} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={16}
+                color={COLORS.mint}
+              />
             </TouchableOpacity>
 
             {/* Stats Row */}
             <View style={styles.statsRow}>
-              <TouchableOpacity style={styles.statItem} onPress={handleMyMoments}>
+              <TouchableOpacity
+                style={styles.statItem}
+                onPress={handleMyMoments}
+                accessibilityLabel={`${userData.momentsCount} Moments. Tap to view`}
+                accessibilityRole="button"
+              >
                 <Text style={styles.statNumber}>{userData.momentsCount}</Text>
                 <Text style={styles.statLabel}>Moments</Text>
               </TouchableOpacity>
               <View style={styles.statDivider} />
-              <TouchableOpacity style={styles.statItem} onPress={handleMyGifts}>
+              <TouchableOpacity
+                style={styles.statItem}
+                onPress={handleMyGifts}
+                accessibilityLabel={`${userData.exchangesCount} Exchanges. Tap to view`}
+                accessibilityRole="button"
+              >
                 <Text style={styles.statNumber}>{userData.exchangesCount}</Text>
                 <Text style={styles.statLabel}>Exchanges</Text>
               </TouchableOpacity>
@@ -164,69 +309,134 @@ const ProfileScreen: React.FC = () => {
           </View>
 
           {/* Wallet Card */}
-          <TouchableOpacity style={styles.walletCard} onPress={handleWallet}>
+          <TouchableOpacity
+            style={styles.walletCard}
+            onPress={handleWallet}
+            accessibilityLabel={`Wallet balance $${userData.walletBalance.toFixed(
+              2,
+            )}. Tap to manage`}
+            accessibilityRole="button"
+          >
             <View style={styles.walletLeft}>
               <View style={styles.walletIconWrapper}>
-                <MaterialCommunityIcons name="wallet" size={24} color={COLORS.mint} />
+                <MaterialCommunityIcons
+                  name="wallet"
+                  size={24}
+                  color={COLORS.mint}
+                />
               </View>
               <View>
                 <Text style={styles.walletLabel}>Wallet</Text>
-                <Text style={styles.walletBalance}>${userData.walletBalance.toFixed(2)}</Text>
+                <Text style={styles.walletBalance}>
+                  ${userData.walletBalance.toFixed(2)}
+                </Text>
               </View>
             </View>
-            <MaterialCommunityIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={24}
+              color={COLORS.textSecondary}
+            />
           </TouchableOpacity>
 
           {/* Quick Links */}
           <View style={styles.quickLinks}>
-            <TouchableOpacity style={styles.quickLink} onPress={handleMyGifts}>
+            <TouchableOpacity
+              style={styles.quickLink}
+              onPress={handleMyGifts}
+              accessibilityLabel={`Gifts Sent: ${userData.giftsSentCount}. Tap to view`}
+              accessibilityRole="button"
+            >
               <View style={styles.quickLinkLeft}>
-                <MaterialCommunityIcons name="gift-outline" size={22} color={COLORS.softOrange} />
-                <Text style={styles.quickLinkText}>My Gifts</Text>
+                <MaterialCommunityIcons
+                  name="gift-outline"
+                  size={22}
+                  color={COLORS.softOrange}
+                />
+                <Text style={styles.quickLinkText}>Gifts Sent</Text>
               </View>
               <View style={styles.quickLinkRight}>
-                <Text style={styles.quickLinkCount}>{userData.giftsCount}</Text>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textSecondary} />
+                <Text style={styles.quickLinkCount}>
+                  {userData.giftsSentCount}
+                </Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.textSecondary}
+                />
               </View>
             </TouchableOpacity>
             <View style={styles.quickLinkDivider} />
-            <TouchableOpacity style={styles.quickLink} onPress={handleSaved}>
+            <TouchableOpacity
+              style={styles.quickLink}
+              onPress={handleSavedMoments}
+              accessibilityLabel={`Saved Moments: ${userData.savedCount}. Tap to view`}
+              accessibilityRole="button"
+            >
               <View style={styles.quickLinkLeft}>
-                <MaterialCommunityIcons name="bookmark-outline" size={22} color={COLORS.coral} />
-                <Text style={styles.quickLinkText}>Saved</Text>
+                <MaterialCommunityIcons
+                  name="bookmark-outline"
+                  size={22}
+                  color={COLORS.coral}
+                />
+                <Text style={styles.quickLinkText}>Saved Moments</Text>
               </View>
               <View style={styles.quickLinkRight}>
                 <Text style={styles.quickLinkCount}>{userData.savedCount}</Text>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textSecondary} />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.textSecondary}
+                />
               </View>
             </TouchableOpacity>
           </View>
 
           {/* Moments Tabs */}
           <View style={styles.tabsContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.tab, activeTab === 'active' && styles.tabActive]}
               onPress={() => setActiveTab('active')}
+              accessibilityLabel="Active Moments tab"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: activeTab === 'active' }}
             >
-              <MaterialCommunityIcons 
-                name="map-marker-star" 
-                size={18} 
-                color={activeTab === 'active' ? COLORS.mint : COLORS.textSecondary} 
+              <MaterialCommunityIcons
+                name="map-marker-star"
+                size={18}
+                color={
+                  activeTab === 'active' ? COLORS.mint : COLORS.textSecondary
+                }
               />
-              <Text style={[styles.tabText, activeTab === 'active' && styles.tabTextActive]}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === 'active' && styles.tabTextActive,
+                ]}
+              >
                 Active ({userData.activeMoments})
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.tab, activeTab === 'past' && styles.tabActive]}
               onPress={() => setActiveTab('past')}
+              accessibilityLabel="Past Moments tab"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: activeTab === 'past' }}
             >
-              <MaterialCommunityIcons 
-                name="history" 
-                size={18} 
-                color={activeTab === 'past' ? COLORS.mint : COLORS.textSecondary} 
+              <MaterialCommunityIcons
+                name="history"
+                size={18}
+                color={
+                  activeTab === 'past' ? COLORS.mint : COLORS.textSecondary
+                }
               />
-              <Text style={[styles.tabText, activeTab === 'past' && styles.tabTextActive]}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === 'past' && styles.tabTextActive,
+                ]}
+              >
                 Past ({userData.completedMoments})
               </Text>
             </TouchableOpacity>
@@ -238,7 +448,7 @@ const ProfileScreen: React.FC = () => {
               <FlatList
                 data={displayedMoments}
                 renderItem={renderMomentCard}
-                keyExtractor={item => item.id}
+                keyExtractor={(item) => item.id}
                 numColumns={2}
                 scrollEnabled={false}
                 columnWrapperStyle={styles.momentRow}
@@ -246,16 +456,15 @@ const ProfileScreen: React.FC = () => {
               />
             ) : (
               <View style={styles.emptyState}>
-                <MaterialCommunityIcons 
-                  name={activeTab === 'active' ? 'map-marker-plus' : 'history'} 
-                  size={48} 
-                  color={COLORS.softGray} 
+                <MaterialCommunityIcons
+                  name={activeTab === 'active' ? 'map-marker-plus' : 'history'}
+                  size={48}
+                  color={COLORS.softGray}
                 />
                 <Text style={styles.emptyText}>
-                  {activeTab === 'active' 
-                    ? 'No active moments yet' 
-                    : 'No past moments'
-                  }
+                  {activeTab === 'active'
+                    ? 'No active moments yet'
+                    : 'No past moments'}
                 </Text>
                 {activeTab === 'active' && (
                   <TouchableOpacity style={styles.createButton}>
@@ -491,9 +700,7 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: COLORS.border,
     marginLeft: 50,
-  },
-
-  // Tabs
+  }, // Tabs
   tabsContainer: {
     flexDirection: 'row',
     marginHorizontal: 16,

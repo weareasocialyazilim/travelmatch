@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -52,8 +53,7 @@ const STORAGE_KEY = '@blocked_users';
 export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
   navigation,
 }) => {
-  const [blockedUsers, setBlockedUsers] =
-    useState<BlockedUser[]>([]);
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
 
   // Load blocked users on mount
   useEffect(() => {
@@ -67,7 +67,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
           setBlockedUsers(MOCK_BLOCKED_USERS);
         }
       } catch (error) {
-        console.log('Failed to load blocked users');
+        logger.debug('Failed to load blocked users');
         setBlockedUsers(MOCK_BLOCKED_USERS);
       }
     };
@@ -83,16 +83,21 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
         {
           text: 'Unblock',
           onPress: async () => {
-            const newBlockedUsers = blockedUsers.filter(user => user.id !== userId);
+            const newBlockedUsers = blockedUsers.filter(
+              (user) => user.id !== userId,
+            );
             setBlockedUsers(newBlockedUsers);
             try {
-              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newBlockedUsers));
+              await AsyncStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(newBlockedUsers),
+              );
             } catch (error) {
-              console.log('Failed to save blocked users');
+              logger.debug('Failed to save blocked users');
             }
           },
         },
-      ]
+      ],
     );
   };
 

@@ -1,15 +1,22 @@
 import React, { Suspense, useState, useEffect } from 'react';
+import { COLORS } from '../constants/colors';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { lazyLoad } from '../utils/lazyLoad';
 import { useFeatureFlag } from '../utils/featureFlags';
+import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 
 // Loading fallback for lazy-loaded screens
+const loadingStyle = {
+  flex: 1,
+  justifyContent: 'center' as const,
+  alignItems: 'center' as const,
+};
 const LoadingFallback = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <ActivityIndicator size="large" color="#007AFF" />
+  <View style={loadingStyle}>
+    <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
   </View>
 );
 
@@ -40,6 +47,16 @@ const PhoneAuthScreen = lazyLoad(() =>
 const EmailAuthScreen = lazyLoad(() =>
   import('../screens/EmailAuthScreen').then((m) => ({
     default: m.EmailAuthScreen,
+  })),
+);
+const RegisterScreen = lazyLoad(() =>
+  import('../screens/RegisterScreen').then((m) => ({
+    default: m.RegisterScreen,
+  })),
+);
+const LoginScreen = lazyLoad(() =>
+  import('../screens/LoginScreen').then((m) => ({
+    default: m.LoginScreen,
   })),
 );
 
@@ -229,11 +246,22 @@ const DeleteAccountScreen = lazyLoad(
   () => import('../screens/DeleteAccountScreen'),
 );
 
-// Identity verification (unified wizard)
-const IdentityVerificationWizardScreen = lazyLoad(() =>
-  import('../screens/IdentityVerificationWizardScreen').then((m) => ({
-    default: m.IdentityVerificationWizardScreen,
-  })),
+// Identity verification (modular KYC screens)
+const KYCIntroScreen = lazyLoad(() => import('../screens/kyc/KYCIntroScreen'));
+const KYCDocumentTypeScreen = lazyLoad(
+  () => import('../screens/kyc/KYCDocumentTypeScreen'),
+);
+const KYCDocumentCaptureScreen = lazyLoad(
+  () => import('../screens/kyc/KYCDocumentCaptureScreen'),
+);
+const KYCSelfieScreen = lazyLoad(
+  () => import('../screens/kyc/KYCSelfieScreen'),
+);
+const KYCReviewScreen = lazyLoad(
+  () => import('../screens/kyc/KYCReviewScreen'),
+);
+const KYCPendingScreen = lazyLoad(
+  () => import('../screens/kyc/KYCPendingScreen'),
 );
 
 // Social (lazy load)
@@ -244,12 +272,8 @@ const InviteFriendsScreen = lazyLoad(
 const ReputationScreen = lazyLoad(() => import('../screens/ReputationScreen'));
 
 // Profile sub-screens (lazy load)
-const MyMomentsScreen = lazyLoad(
-  () => import('../screens/MyMomentsScreen'),
-);
-const SecurityScreen = lazyLoad(
-  () => import('../screens/SecurityScreen'),
-);
+const MyMomentsScreen = lazyLoad(() => import('../screens/MyMomentsScreen'));
+const SecurityScreen = lazyLoad(() => import('../screens/SecurityScreen'));
 const ChangePasswordScreen = lazyLoad(
   () => import('../screens/ChangePasswordScreen'),
 );
@@ -273,6 +297,45 @@ const RefundRequestScreen = lazyLoad(() =>
   })),
 );
 
+// New screens (lazy load)
+const BookingDetailScreen = lazyLoad(() =>
+  import('../screens/BookingDetailScreen').then((m) => ({
+    default: m.BookingDetailScreen,
+  })),
+);
+const ShareMomentScreen = lazyLoad(() =>
+  import('../screens/ShareMomentScreen').then((m) => ({
+    default: m.ShareMomentScreen,
+  })),
+);
+
+// New Footer screens (lazy load)
+const ContactScreen = lazyLoad(() =>
+  import('../screens/ContactScreen').then((m) => ({
+    default: m.ContactScreen,
+  })),
+);
+const HelpScreen = lazyLoad(() =>
+  import('../screens/HelpScreen').then((m) => ({
+    default: m.HelpScreen,
+  })),
+);
+const SafetyScreen = lazyLoad(() =>
+  import('../screens/SafetyScreen').then((m) => ({
+    default: m.SafetyScreen,
+  })),
+);
+
+// Theme Settings
+const ThemeSettingsScreen = lazyLoad(
+  () => import('../screens/ThemeSettingsScreen'),
+);
+
+// Language Settings
+const LanguageSettingsScreen = lazyLoad(
+  () => import('../screens/LanguageSettingsScreen'),
+);
+
 // Keep frequently accessed screens eager
 import { SelectPlaceScreen } from '../screens/SelectPlaceScreen';
 import { ReceiverApprovalScreen } from '../screens/ReceiverApprovalScreen';
@@ -287,6 +350,7 @@ const SuccessScreen = lazyLoad(() => import('../screens/SuccessScreen'));
 import type { SuccessType } from '../screens/SuccessScreen';
 
 import type { Moment, User, SelectedGiver } from '../types';
+import type { VerificationData as KYCVerificationData } from '../screens/kyc/types';
 
 // Success screen details interface
 interface SuccessDetails {
@@ -300,6 +364,8 @@ export type RootStackParamList = {
   // Onboarding & Auth
   Onboarding: undefined;
   Welcome: undefined;
+  Register: undefined;
+  Login: undefined;
   SocialLogin: undefined;
   PhoneAuth: undefined;
   EmailAuth: undefined;
@@ -311,6 +377,8 @@ export type RootStackParamList = {
   SuccessConfirmation: undefined;
   Maintenance: undefined;
   About: undefined;
+  ThemeSettings: undefined;
+  LanguageSettings: undefined;
   DisputeTransaction: undefined;
   DisputeStatus: undefined;
   ProofVerification: undefined;
@@ -328,9 +396,9 @@ export type RootStackParamList = {
 
   // Main App
   Discover: undefined;
-  Requests: undefined;
+  Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
   Messages: undefined;
-  
+
   CreateMoment: undefined;
   EditMoment: { momentId: string };
   MomentDetail: { moment: Moment; isOwner?: boolean; pendingRequests?: number };
@@ -350,7 +418,7 @@ export type RootStackParamList = {
   MatchConfirmation: { selectedGivers: SelectedGiver[] };
 
   // Communication
-  Chat: { otherUser: User };
+  Chat: { otherUser: User; conversationId?: string };
 
   // Transactions
   TransactionDetail: { transactionId: string };
@@ -364,7 +432,12 @@ export type RootStackParamList = {
     amount: number;
     receiverName: string;
     receiverAvatar?: string;
-    status: 'pending_proof' | 'in_escrow' | 'pending_verification' | 'verified' | 'refunded';
+    status:
+      | 'pending_proof'
+      | 'in_escrow'
+      | 'pending_verification'
+      | 'verified'
+      | 'refunded';
   };
   GestureReceived: {
     gestureId: string;
@@ -394,7 +467,12 @@ export type RootStackParamList = {
       amount: number;
       message: string;
       paymentType: 'direct' | 'half_escrow' | 'full_escrow';
-      status: 'received' | 'pending_proof' | 'verifying' | 'verified' | 'failed';
+      status:
+        | 'received'
+        | 'pending_proof'
+        | 'verifying'
+        | 'verified'
+        | 'failed';
       createdAt: string;
     }>;
     totalAmount: number;
@@ -416,8 +494,13 @@ export type RootStackParamList = {
   HiddenItems: undefined;
   ArchivedChats: undefined;
 
-  // Identity Verification (unified wizard)
+  // Identity Verification (modular KYC flow)
   IdentityVerification: undefined;
+  KYCDocumentType: { data: KYCVerificationData };
+  KYCDocumentCapture: { data: KYCVerificationData };
+  KYCSelfie: { data: KYCVerificationData };
+  KYCReview: { data: KYCVerificationData };
+  KYCPending: undefined;
 
   // Social & Invite
   InviteFriends: undefined;
@@ -448,7 +531,7 @@ export type RootStackParamList = {
 
   // Place Selection
   SelectPlace: undefined;
-  
+
   // New Profile sub-screens
   MyMoments: undefined;
   Security: undefined;
@@ -459,9 +542,17 @@ export type RootStackParamList = {
 
   // Missing routes
   BookingDetail: { bookingId: string };
-  UnifiedGiftFlow: { recipientId: string; recipientName: string; momentId?: string };
+  UnifiedGiftFlow: {
+    recipientId: string;
+    recipientName: string;
+    momentId?: string;
+  };
   ShareMoment: { momentId: string };
-  Search: { initialQuery?: string };
+
+  // Footer pages
+  Contact: undefined;
+  Help: undefined;
+  Safety: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -470,16 +561,20 @@ const ONBOARDING_KEY = '@has_seen_onboarding';
 
 const AppNavigator = () => {
   // Feature flags for conditional routing
-  const useUnifiedGiftFlow = useFeatureFlag('unifiedGiftFlow');
+  const _useUnifiedGiftFlow = useFeatureFlag('unifiedGiftFlow');
 
   // Check if user has seen onboarding
-  const [initialRoute, setInitialRoute] = useState<'Onboarding' | 'Welcome' | null>(null);
+  const [initialRoute, setInitialRoute] = useState<
+    'Onboarding' | 'Welcome' | null
+  >(null);
 
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
         const hasSeenOnboarding = await AsyncStorage.getItem(ONBOARDING_KEY);
-        setInitialRoute(hasSeenOnboarding === 'true' ? 'Welcome' : 'Onboarding');
+        setInitialRoute(
+          hasSeenOnboarding === 'true' ? 'Welcome' : 'Onboarding',
+        );
       } catch {
         setInitialRoute('Onboarding');
       }
@@ -507,201 +602,292 @@ const AppNavigator = () => {
   };
 
   return (
-    <NavigationContainer linking={linking}>
-      <Suspense fallback={<LoadingFallback />}>
-        <Stack.Navigator
-          initialRouteName={initialRoute}
-          screenOptions={{
-            headerShown: false,
-            cardStyleInterpolator: ({ current: { progress } }) => ({
-              cardStyle: {
-                opacity: progress,
-              },
-            }),
-            transitionSpec: {
-              open: {
-                animation: 'timing',
-                config: {
-                  duration: 200,
+    <NavigationErrorBoundary>
+      <NavigationContainer linking={linking}>
+        <Suspense fallback={<LoadingFallback />}>
+          <Stack.Navigator
+            initialRouteName={initialRoute}
+            screenOptions={{
+              headerShown: false,
+              cardStyleInterpolator: ({ current: { progress } }) => ({
+                cardStyle: {
+                  opacity: progress,
+                },
+              }),
+              transitionSpec: {
+                open: {
+                  animation: 'timing',
+                  config: {
+                    duration: 200,
+                  },
+                },
+                close: {
+                  animation: 'timing',
+                  config: {
+                    duration: 200,
+                  },
                 },
               },
-              close: {
-                animation: 'timing',
-                config: {
-                  duration: 200,
-                },
-              },
-            },
-          }}
-        >
-          {/* Onboarding & Auth */}
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="SocialLogin" component={SocialLoginScreen} />
-          <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
-          <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
-          <Stack.Screen name="TwoFactorSetup" component={TwoFactorSetupScreen} />
-          <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
-          <Stack.Screen
-            name="WaitingForCode"
-            component={WaitingForCodeScreen}
-          />
-          <Stack.Screen
-            name="SuccessConfirmation"
-            component={SuccessConfirmationScreen}
-          />
-          <Stack.Screen name="Maintenance" component={MaintenanceScreen} />
-          <Stack.Screen name="About" component={AboutScreen} />
-          <Stack.Screen
-            name="DisputeTransaction"
-            component={DisputeTransactionScreen}
-          />
-          <Stack.Screen name="DisputeStatus" component={DisputeStatusScreen} />
-          <Stack.Screen
-            name="ProofVerification"
-            component={ProofVerificationScreen}
-          />
-          <Stack.Screen
-            name="TransactionHistory"
-            component={TransactionHistoryScreen}
-          />
-          <Stack.Screen name="PaymentFailed" component={PaymentFailedScreen} />
-          <Stack.Screen
-            name="CompleteProfile"
-            component={CompleteProfileScreen}
-          />
-          
-          {/* Unified Success Screen */}
-          <Stack.Screen name="Success" component={SuccessScreen} />
+            }}
+          >
+            {/* Onboarding & Auth */}
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="SocialLogin" component={SocialLoginScreen} />
+            <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
+            <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPasswordScreen}
+            />
+            <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
+            <Stack.Screen
+              name="TwoFactorSetup"
+              component={TwoFactorSetupScreen}
+            />
+            <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
+            <Stack.Screen
+              name="WaitingForCode"
+              component={WaitingForCodeScreen}
+            />
+            <Stack.Screen
+              name="SuccessConfirmation"
+              component={SuccessConfirmationScreen}
+            />
+            <Stack.Screen name="Maintenance" component={MaintenanceScreen} />
+            <Stack.Screen name="About" component={AboutScreen} />
+            <Stack.Screen
+              name="ThemeSettings"
+              component={ThemeSettingsScreen}
+            />
+            <Stack.Screen
+              name="LanguageSettings"
+              component={LanguageSettingsScreen}
+            />
+            <Stack.Screen
+              name="DisputeTransaction"
+              component={DisputeTransactionScreen}
+            />
+            <Stack.Screen
+              name="DisputeStatus"
+              component={DisputeStatusScreen}
+            />
+            <Stack.Screen
+              name="ProofVerification"
+              component={ProofVerificationScreen}
+            />
+            <Stack.Screen
+              name="TransactionHistory"
+              component={TransactionHistoryScreen}
+            />
+            <Stack.Screen
+              name="PaymentFailed"
+              component={PaymentFailedScreen}
+            />
+            <Stack.Screen
+              name="CompleteProfile"
+              component={CompleteProfileScreen}
+            />
 
-          {/* Main App - New consolidated screens */}
-          <Stack.Screen name="Discover" component={DiscoverScreen} />
-          <Stack.Screen name="Requests" component={RequestsScreen} />
-          <Stack.Screen name="Messages" component={MessagesScreen} />
-          
-          <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
-          <Stack.Screen name="EditMoment" component={EditMomentScreen} />
-          <Stack.Screen name="MomentDetail" component={MomentDetailScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="ProfileDetail" component={ProfileDetailScreen} />
-          <Stack.Screen name="MyGifts" component={MyGiftsScreen} />
-          <Stack.Screen name="TrustNotes" component={TrustNotesScreen} />
-          <Stack.Screen name="MomentGallery" component={MomentGalleryScreen} />
-          <Stack.Screen name="ProofHistory" component={ProofHistoryScreen} />
+            {/* Unified Success Screen */}
+            <Stack.Screen name="Success" component={SuccessScreen} />
 
-          {/* Proof System */}
-          <Stack.Screen name="ProofUpload" component={ProofUploadScreen} />
-          <Stack.Screen name="ProofDetail" component={ProofDetailScreen} />
+            {/* Main App - New consolidated screens */}
+            <Stack.Screen name="Discover" component={DiscoverScreen} />
+            <Stack.Screen name="Requests" component={RequestsScreen} />
+            <Stack.Screen name="Messages" component={MessagesScreen} />
 
-          {/* Approval & Matching */}
-          <Stack.Screen
-            name="ReceiverApproval"
-            component={ReceiverApprovalScreen}
-          />
-          <Stack.Screen
-            name="MatchConfirmation"
-            component={MatchConfirmationScreen}
-          />
+            <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
+            <Stack.Screen name="EditMoment" component={EditMomentScreen} />
+            <Stack.Screen name="MomentDetail" component={MomentDetailScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen
+              name="ProfileDetail"
+              component={ProfileDetailScreen}
+            />
+            <Stack.Screen name="MyGifts" component={MyGiftsScreen} />
+            <Stack.Screen name="TrustNotes" component={TrustNotesScreen} />
+            <Stack.Screen
+              name="MomentGallery"
+              component={MomentGalleryScreen}
+            />
+            <Stack.Screen name="ProofHistory" component={ProofHistoryScreen} />
 
-          {/* Communication */}
-          <Stack.Screen name="Chat" component={ChatScreen} />
+            {/* Proof System */}
+            <Stack.Screen name="ProofUpload" component={ProofUploadScreen} />
+            <Stack.Screen name="ProofDetail" component={ProofDetailScreen} />
 
-          {/* Transactions */}
-          <Stack.Screen
-            name="TransactionDetail"
-            component={TransactionDetailScreen}
-          />
-          <Stack.Screen name="RefundPolicy" component={RefundPolicyScreen} />
-          <Stack.Screen name="RefundRequest" component={RefundRequestScreen} />
+            {/* Approval & Matching */}
+            <Stack.Screen
+              name="ReceiverApproval"
+              component={ReceiverApprovalScreen}
+            />
+            <Stack.Screen
+              name="MatchConfirmation"
+              component={MatchConfirmationScreen}
+            />
 
-          {/* Escrow & Gesture Tracking */}
-          <Stack.Screen name="EscrowStatus" component={EscrowStatusScreen} />
-          <Stack.Screen name="GestureReceived" component={GestureReceivedScreen} />
+            {/* Communication */}
+            <Stack.Screen name="Chat" component={ChatScreen} />
 
-          {/* Gift Inbox */}
-          <Stack.Screen name="GiftInbox" component={GiftInboxScreen} />
-          <Stack.Screen name="GiftInboxDetail" component={GiftInboxDetailScreen} />
+            {/* Transactions */}
+            <Stack.Screen
+              name="TransactionDetail"
+              component={TransactionDetailScreen}
+            />
+            <Stack.Screen name="RefundPolicy" component={RefundPolicyScreen} />
+            <Stack.Screen
+              name="RefundRequest"
+              component={RefundRequestScreen}
+            />
 
-          {/* Settings */}
-          <Stack.Screen name="Subscription" component={SubscriptionScreen} />
-          <Stack.Screen name="Support" component={SupportScreen} />
-          <Stack.Screen name="FAQ" component={FAQScreen} />
-          <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} />
-          <Stack.Screen name="DisputeProof" component={DisputeProofScreen} />
-          <Stack.Screen
-            name="NotificationSettings"
-            component={NotificationSettingsScreen}
-          />
-          <Stack.Screen
-            name="HowEscrowWorks"
-            component={HowEscrowWorksScreen}
-          />
-          <Stack.Screen name="SavedMoments" component={SavedMomentsScreen} />
-          <Stack.Screen name="ReportMoment" component={ReportMomentScreen} />
-          <Stack.Screen name="ReportUser" component={ReportUserScreen} />
-          <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
-          <Stack.Screen name="HiddenItems" component={HiddenItemsScreen} />
-          <Stack.Screen name="ArchivedChats" component={ArchivedChatsScreen} />
+            {/* Escrow & Gesture Tracking */}
+            <Stack.Screen name="EscrowStatus" component={EscrowStatusScreen} />
+            <Stack.Screen
+              name="GestureReceived"
+              component={GestureReceivedScreen}
+            />
 
-          {/* Identity Verification (Unified Wizard) */}
-          <Stack.Screen
-            name="IdentityVerification"
-            component={IdentityVerificationWizardScreen}
-          />
+            {/* Gift Inbox */}
+            <Stack.Screen name="GiftInbox" component={GiftInboxScreen} />
+            <Stack.Screen
+              name="GiftInboxDetail"
+              component={GiftInboxDetailScreen}
+            />
 
-          {/* Social & Invite */}
-          <Stack.Screen name="InviteFriends" component={InviteFriendsScreen} />
+            {/* Settings */}
+            <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+            <Stack.Screen name="Support" component={SupportScreen} />
+            <Stack.Screen name="FAQ" component={FAQScreen} />
+            <Stack.Screen
+              name="DeleteAccount"
+              component={DeleteAccountScreen}
+            />
+            <Stack.Screen name="DisputeProof" component={DisputeProofScreen} />
+            <Stack.Screen
+              name="NotificationSettings"
+              component={NotificationSettingsScreen}
+            />
+            <Stack.Screen
+              name="HowEscrowWorks"
+              component={HowEscrowWorksScreen}
+            />
+            <Stack.Screen name="SavedMoments" component={SavedMomentsScreen} />
+            <Stack.Screen name="ReportMoment" component={ReportMomentScreen} />
+            <Stack.Screen name="ReportUser" component={ReportUserScreen} />
+            <Stack.Screen name="BlockedUsers" component={BlockedUsersScreen} />
+            <Stack.Screen name="HiddenItems" component={HiddenItemsScreen} />
+            <Stack.Screen
+              name="ArchivedChats"
+              component={ArchivedChatsScreen}
+            />
 
-          {/* Reputation */}
-          <Stack.Screen name="Reputation" component={ReputationScreen} />
+            {/* Identity Verification (Modular KYC Flow) */}
+            <Stack.Screen
+              name="IdentityVerification"
+              component={KYCIntroScreen}
+            />
+            <Stack.Screen
+              name="KYCDocumentType"
+              component={KYCDocumentTypeScreen}
+            />
+            <Stack.Screen
+              name="KYCDocumentCapture"
+              component={KYCDocumentCaptureScreen}
+            />
+            <Stack.Screen name="KYCSelfie" component={KYCSelfieScreen} />
+            <Stack.Screen name="KYCReview" component={KYCReviewScreen} />
+            <Stack.Screen name="KYCPending" component={KYCPendingScreen} />
 
-          {/* Legal & Policy */}
-          <Stack.Screen
-            name="TermsOfService"
-            component={TermsOfServiceScreen}
-          />
-          <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
-          <Stack.Screen name="PaymentsKYC" component={PaymentsKYCScreen} />
+            {/* Social & Invite */}
+            <Stack.Screen
+              name="InviteFriends"
+              component={InviteFriendsScreen}
+            />
 
-          {/* Withdraw */}
-          <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+            {/* Reputation */}
+            <Stack.Screen name="Reputation" component={ReputationScreen} />
 
-          {/* Moment Publishing */}
-          <Stack.Screen name="MomentPreview" component={MomentPreviewScreen} />
-          <Stack.Screen
-            name="MomentPublished"
-            component={MomentPublishedScreen}
-          />
+            {/* Legal & Policy */}
+            <Stack.Screen
+              name="TermsOfService"
+              component={TermsOfServiceScreen}
+            />
+            <Stack.Screen
+              name="PrivacyPolicy"
+              component={PrivacyPolicyScreen}
+            />
+            <Stack.Screen name="PaymentsKYC" component={PaymentsKYCScreen} />
 
-          {/* Payment Methods */}
-          <Stack.Screen
-            name="PaymentMethods"
-            component={PaymentMethodsScreen}
-          />
+            {/* Withdraw */}
+            <Stack.Screen name="Withdraw" component={WithdrawScreen} />
 
-          {/* Wallet & Settings */}
-          <Stack.Screen name="Wallet" component={WalletScreen} />
-          <Stack.Screen
-            name="NotificationDetail"
-            component={NotificationDetailScreen}
-          />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            {/* Moment Publishing */}
+            <Stack.Screen
+              name="MomentPreview"
+              component={MomentPreviewScreen}
+            />
+            <Stack.Screen
+              name="MomentPublished"
+              component={MomentPublishedScreen}
+            />
 
-          {/* Place Selection */}
-          <Stack.Screen name="SelectPlace" component={SelectPlaceScreen} />
-          
-          {/* Profile Sub-screens */}
-          <Stack.Screen name="MyMoments" component={MyMomentsScreen} />
-          <Stack.Screen name="Security" component={SecurityScreen} />
-          <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-          <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
-          <Stack.Screen name="ConnectedAccounts" component={ConnectedAccountsScreen} />
-          <Stack.Screen name="TrustGardenDetail" component={TrustGardenDetailScreen} />
-        </Stack.Navigator>
-      </Suspense>
-    </NavigationContainer>
+            {/* Payment Methods */}
+            <Stack.Screen
+              name="PaymentMethods"
+              component={PaymentMethodsScreen}
+            />
+
+            {/* Wallet & Settings */}
+            <Stack.Screen name="Wallet" component={WalletScreen} />
+            <Stack.Screen name="Settings" component={AppSettingsScreen} />
+            <Stack.Screen
+              name="NotificationDetail"
+              component={NotificationDetailScreen}
+            />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+
+            {/* Place Selection */}
+            <Stack.Screen name="SelectPlace" component={SelectPlaceScreen} />
+
+            {/* Profile Sub-screens */}
+            <Stack.Screen name="MyMoments" component={MyMomentsScreen} />
+            <Stack.Screen name="Security" component={SecurityScreen} />
+            <Stack.Screen
+              name="ChangePassword"
+              component={ChangePasswordScreen}
+            />
+            <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
+            <Stack.Screen
+              name="ConnectedAccounts"
+              component={ConnectedAccountsScreen}
+            />
+            <Stack.Screen
+              name="TrustGardenDetail"
+              component={TrustGardenDetailScreen}
+            />
+
+            {/* New Screens */}
+            <Stack.Screen
+              name="BookingDetail"
+              component={BookingDetailScreen}
+            />
+            <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
+            <Stack.Screen
+              name="UnifiedGiftFlow"
+              component={UnifiedGiftFlowScreen}
+            />
+
+            {/* Footer Pages */}
+            <Stack.Screen name="Contact" component={ContactScreen} />
+            <Stack.Screen name="Help" component={HelpScreen} />
+            <Stack.Screen name="Safety" component={SafetyScreen} />
+          </Stack.Navigator>
+        </Suspense>
+      </NavigationContainer>
+    </NavigationErrorBoundary>
   );
 };
 

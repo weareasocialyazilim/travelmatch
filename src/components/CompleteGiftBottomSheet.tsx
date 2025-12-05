@@ -47,6 +47,7 @@ export const CompleteGiftBottomSheet: React.FC<
       translateY.value = withTiming(500, { duration: 200 });
       opacity.value = withTiming(0, { duration: 200 });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -127,7 +128,7 @@ export const CompleteGiftBottomSheet: React.FC<
             <TextInput
               style={styles.input}
               placeholder="Card number"
-              placeholderTextColor="#9C6C49"
+              placeholderTextColor={COLORS.brown}
               value={cardNumber}
               onChangeText={setCardNumber}
               keyboardType="numeric"
@@ -137,14 +138,14 @@ export const CompleteGiftBottomSheet: React.FC<
               <TextInput
                 style={[styles.input, styles.halfInput]}
                 placeholder="Expiry"
-                placeholderTextColor="#9C6C49"
+                placeholderTextColor={COLORS.brown}
                 value={expiry}
                 onChangeText={setExpiry}
               />
               <TextInput
                 style={[styles.input, styles.halfInput]}
                 placeholder="CVC"
-                placeholderTextColor="#9C6C49"
+                placeholderTextColor={COLORS.brown}
                 value={cvc}
                 onChangeText={setCvc}
                 keyboardType="numeric"
@@ -155,7 +156,7 @@ export const CompleteGiftBottomSheet: React.FC<
             <TextInput
               style={styles.input}
               placeholder="Name on card"
-              placeholderTextColor="#9C6C49"
+              placeholderTextColor={COLORS.brown}
               value={nameOnCard}
               onChangeText={setNameOnCard}
             />

@@ -3,7 +3,7 @@
  * Optimized image loading with lazy loading, caching, and error handling
  */
 
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import type { ImageProps, ViewStyle } from 'react-native';
 import { Image, ActivityIndicator, View, StyleSheet } from 'react-native';
 import { useLazyImage, imageCacheManager } from '../../utils/imageOptimization';
@@ -43,7 +43,7 @@ interface LazyImageProps extends Omit<ImageProps, 'source'> {
  * />
  * ```
  */
-export const LazyImage: React.FC<LazyImageProps> = ({
+export const LazyImage = memo<LazyImageProps>(function LazyImage({
   source,
   loadingComponent,
   errorComponent,
@@ -52,9 +52,9 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   fadeInDuration = 300,
   style,
   ...imageProps
-}) => {
+}) {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { isLoading, hasError } = useLazyImage(source!);
+  const { isLoading, hasError } = useLazyImage(source ?? { uri: '' });
 
   // Check if already cached
   const isCached =
@@ -103,7 +103,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         <View
           style={[styles.container, styles.loadingContainer, containerStyle]}
         >
-          <ActivityIndicator size="small" color="#007AFF" />
+          <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
         </View>
       );
     }
@@ -121,12 +121,12 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       />
       {!imageLoaded && showLoading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="small" color="#007AFF" />
+          <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
         </View>
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

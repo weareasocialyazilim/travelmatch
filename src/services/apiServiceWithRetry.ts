@@ -2,6 +2,7 @@
  * API Service with Error Recovery
  * Enhanced API service with automatic retry and error recovery
  */
+import { logger } from '../utils/logger';
 
 import { api } from '../utils/api';
 import { fetchWithRetry, isRetryableError } from '../utils/errorRecovery';
@@ -20,7 +21,7 @@ export const getMomentsWithRetry = async (): Promise<Moment[]> => {
       backoff: 'exponential',
       shouldRetry: isRetryableError,
       onRetry: (attempt, error) => {
-        console.log(`Retrying getMoments (${attempt}/3):`, error.message);
+        logger.debug(`Retrying getMoments (${attempt}/3):`, error.message);
       },
     });
 
@@ -29,7 +30,7 @@ export const getMomentsWithRetry = async (): Promise<Moment[]> => {
 
     return data;
   } catch (error) {
-    console.error('Failed to fetch moments after retries:', error);
+    logger.error('Failed to fetch moments after retries:', error);
     throw error;
   }
 };
@@ -50,7 +51,7 @@ export const getMomentByIdWithRetry = async (
 
     return data;
   } catch (error) {
-    console.error(`Failed to fetch moment ${id} after retries:`, error);
+    logger.error(`Failed to fetch moment ${id} after retries:`, error);
     throw error;
   }
 };
@@ -72,7 +73,7 @@ export const getUserProfileWithRetry = async (userId: string) => {
 
     return data;
   } catch (error) {
-    console.error(`Failed to fetch user ${userId} after retries:`, error);
+    logger.error(`Failed to fetch user ${userId} after retries:`, error);
     throw error;
   }
 };
@@ -103,7 +104,7 @@ export const searchMomentsWithRetry = async (
 
     return data;
   } catch (error) {
-    console.error('Failed to search moments after retries:', error);
+    logger.error('Failed to search moments after retries:', error);
     throw error;
   }
 };
@@ -125,7 +126,7 @@ export const getConversationsWithRetry = async () => {
 
     return data;
   } catch (error) {
-    console.error('Failed to fetch conversations after retries:', error);
+    logger.error('Failed to fetch conversations after retries:', error);
     throw error;
   }
 };

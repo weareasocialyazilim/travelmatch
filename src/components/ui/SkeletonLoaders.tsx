@@ -80,7 +80,7 @@ export const SkeletonMomentDetail: React.FC = () => {
       <Skeleton height={60} style={styles.spacing} />
       <Skeleton height={60} style={styles.spacing} />
       <View style={styles.row}>
-        <Skeleton height={50} borderRadius={radii.lg} style={{ flex: 1 }} />
+        <Skeleton height={50} borderRadius={radii.lg} style={styles.flex1} />
         <Skeleton height={50} width={50} borderRadius={radii.lg} />
       </View>
     </View>
@@ -146,5 +146,8 @@ const styles = StyleSheet.create({
   },
   spacing: {
     marginBottom: spacing.sm,
+  },
+  flex1: {
+    flex: 1,
   },
 });

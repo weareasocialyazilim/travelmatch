@@ -1,19 +1,43 @@
-import React from 'react';
+/**
+ * Divider Component
+ * A horizontal line separator with optional centered text.
+ * Used to visually separate content sections.
+ */
+
+import React, { memo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/colors';
 
 interface DividerProps {
+  /** Optional centered text (creates OR-style divider) */
   text?: string;
+  /** Vertical spacing around divider - sm(8), md(16), lg(24) */
   spacing?: 'sm' | 'md' | 'lg';
+  /** Additional styles */
   style?: ViewStyle;
 }
 
-export const Divider: React.FC<DividerProps> = ({
+/**
+ * Divider - Horizontal separator line
+ *
+ * @example
+ * ```tsx
+ * // Simple divider
+ * <Divider />
+ *
+ * // With text (OR separator)
+ * <Divider text="OR" />
+ *
+ * // With custom spacing
+ * <Divider spacing="lg" />
+ * ```
+ */
+export const Divider = memo<DividerProps>(function Divider({
   text,
   spacing = 'md',
   style,
-}) => {
+}) {
   const getSpacing = (): number => {
     switch (spacing) {
       case 'sm':
@@ -48,7 +72,7 @@ export const Divider: React.FC<DividerProps> = ({
   return (
     <View style={[styles.line, { marginVertical: spacingValue }, style]} />
   );
-};
+});
 
 const styles = StyleSheet.create({
   containerWithText: {

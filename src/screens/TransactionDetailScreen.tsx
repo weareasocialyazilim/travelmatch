@@ -217,8 +217,9 @@ export const TransactionDetailScreen: React.FC<
             <TouchableOpacity
               style={styles.proofCard}
               onPress={() =>
+                transaction.proofId &&
                 navigation.navigate('ProofDetail', {
-                  proofId: transaction.proofId!,
+                  proofId: transaction.proofId,
                 })
               }
               activeOpacity={0.8}

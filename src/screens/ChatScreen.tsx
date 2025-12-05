@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,9 @@ import {
 } from '../utils/listOptimization';
 import { ChatAttachmentBottomSheet } from '../components/ChatAttachmentBottomSheet';
 import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
+import { useMessages } from '../hooks/useMessages';
+import { useTypingIndicator } from '../context/RealtimeContext';
+import { logger } from '../utils/logger';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'Chat'>;
 type ChatScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Chat'>;
@@ -43,16 +46,69 @@ interface Message {
 const ChatScreen: React.FC = () => {
   const route = useRoute<ChatScreenRouteProp>();
   const navigation = useNavigation<ChatScreenNavigationProp>();
-  const { otherUser } = route.params;
+  const { otherUser, conversationId } = route.params;
   const [messageText, setMessageText] = useState('');
   const [showAttachmentSheet, setShowAttachmentSheet] = useState(false);
   const [showChatOptions, setShowChatOptions] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Use messages hook for API integration
+  const {
+    messages: _apiMessages,
+    messagesLoading: _isLoading,
+    sendMessage,
+    loadMessages,
+  } = useMessages();
+
+  // Typing indicator
+  const {
+    typingUserIds: _typingUserIds,
+    isAnyoneTyping,
+    startTyping,
+    stopTyping,
+  } = useTypingIndicator(conversationId || 'default');
+
+  // Fetch messages when screen loads
+  useEffect(() => {
+    if (conversationId) {
+      loadMessages(conversationId);
+    }
+  }, [conversationId, loadMessages]);
+
+  // Handle text input changes for typing indicator
+  const handleTextChange = useCallback(
+    (text: string) => {
+      setMessageText(text);
+
+      // Send typing start
+      if (text.length > 0) {
+        startTyping();
+
+        // Clear previous timeout
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+
+        // Stop typing after 2 seconds of no input
+        typingTimeoutRef.current = setTimeout(() => {
+          stopTyping();
+        }, 2000);
+      } else {
+        stopTyping();
+      }
+    },
+    [startTyping, stopTyping],
+  );
 
   // Escrow logic: System automatically verifies proof
   // No manual approve/reject by users
   const isSender = true; // In real app: check if currentUserId === chat.senderId
   // Type assertion to allow all valid status values for comparison
-  const proofStatus = 'verified' as 'pending' | 'verified' | 'rejected' | 'disputed'; // Status from API
+  const proofStatus = 'verified' as
+    | 'pending'
+    | 'verified'
+    | 'rejected'
+    | 'disputed'; // Status from API
 
   // Generate system messages based on escrow status
   const getSystemMessages = (): Message[] => {
@@ -86,7 +142,7 @@ const ChatScreen: React.FC = () => {
 
   const getProofSystemMessage = (): string => {
     if (proofStatus === 'pending') {
-      return isSender 
+      return isSender
         ? 'Proof uploaded by receiver. System is verifying...'
         : 'You uploaded proof. System is verifying...';
     } else if (proofStatus === 'verified') {
@@ -137,7 +193,7 @@ const ChatScreen: React.FC = () => {
   ];
 
   useEffect(() => {
-    console.log('ChatScreen state:', { showAttachmentSheet, showChatOptions });
+    logger.debug('ChatScreen state:', { showAttachmentSheet, showChatOptions });
   }, [showAttachmentSheet, showChatOptions]);
 
   const { trackMount, trackInteraction } = useScreenPerformance('ChatScreen');
@@ -146,12 +202,23 @@ const ChatScreen: React.FC = () => {
     trackMount();
   }, [trackMount]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (messageText.trim()) {
       trackInteraction('message_sent', {
         message_length: messageText.length,
         recipient: otherUser.name,
       });
+
+      // Send via API if conversationId exists
+      if (conversationId) {
+        await sendMessage({
+          conversationId,
+          content: messageText.trim(),
+          type: 'text',
+        });
+      }
+
+      stopTyping();
       setMessageText('');
     }
   };
@@ -199,9 +266,7 @@ const ChatScreen: React.FC = () => {
                   size={16}
                   color={COLORS.warning}
                 />
-                <Text style={styles.proofStatusText}>
-                  Verifying proof...
-                </Text>
+                <Text style={styles.proofStatusText}>Verifying proof...</Text>
               </View>
             )}
             {proofStatus === 'verified' && (
@@ -286,6 +351,8 @@ const ChatScreen: React.FC = () => {
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
           >
             <MaterialCommunityIcons
               name="arrow-left"
@@ -293,15 +360,21 @@ const ChatScreen: React.FC = () => {
               color={COLORS.text}
             />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.headerUserInfo}
-            onPress={() => navigation.navigate('ProfileDetail', { userId: otherUser.id })}
+            onPress={() =>
+              navigation.navigate('ProfileDetail', { userId: otherUser.id })
+            }
             activeOpacity={0.7}
+            accessibilityLabel={`View ${otherUser.name}'s profile`}
+            accessibilityRole="button"
           >
             <View style={styles.avatarContainer}>
               <Image
                 source={{
-                  uri: otherUser.avatar || 'https://images.unsplash.com/photo-1544025162-d76694265947?w=100',
+                  uri:
+                    otherUser.avatar ||
+                    'https://images.unsplash.com/photo-1544025162-d76694265947?w=100',
                 }}
                 style={styles.headerAvatar}
               />
@@ -315,9 +388,7 @@ const ChatScreen: React.FC = () => {
             </View>
             <View style={styles.headerTextInfo}>
               <View style={styles.headerNameRow}>
-                <Text style={styles.headerName}>
-                  {otherUser.name}
-                </Text>
+                <Text style={styles.headerName}>{otherUser.name}</Text>
                 <MaterialCommunityIcons
                   name="check-decagram"
                   size={18}
@@ -327,14 +398,17 @@ const ChatScreen: React.FC = () => {
               <Text style={styles.headerRole}>Traveler</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.moreButton}
             onPress={() => {
-              console.log('More button pressed - opening chat options');
+              logger.debug('More button pressed - opening chat options');
               setShowChatOptions(true);
             }}
             activeOpacity={0.6}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessibilityLabel="More chat options"
+            accessibilityRole="button"
+            accessibilityHint="Opens menu for blocking, reporting, or archiving"
           >
             <MaterialCommunityIcons
               name="dots-vertical"
@@ -345,55 +419,60 @@ const ChatScreen: React.FC = () => {
         </View>
 
         {/* Linked Moment Card */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.linkedMomentCard}
           onPress={() => {
-            console.log('Moment card pressed - navigating to MomentDetail');
-              navigation.navigate('MomentDetail', {
-                moment: {
-                  id: 'moment-123',
-                  title: 'Coffee at a Parisian Café',
-                  story: 'Enjoy coffee with a view of the Eiffel Tower. Experience authentic Parisian café culture while enjoying breathtaking views of the iconic Eiffel Tower.',
-                  imageUrl: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
-                  price: 15,
-                  availability: 'Dec 5-10',
-                  category: {
-                    id: 'food',
-                    label: 'Food & Drink',
-                    emoji: '☕',
-                  },
-                  location: {
-                    name: 'Café de Paris',
-                    city: 'Paris',
-                    country: 'France',
-                  },
-                  user: {
-                    name: otherUser.name,
-                    avatar: otherUser.avatar,
-                    type: otherUser.type || 'traveler',
-                    isVerified: otherUser.isVerified || true,
-                    location: 'Paris, France',
-                    travelDays: 7,
-                  },
+            logger.debug('Moment card pressed - navigating to MomentDetail');
+            navigation.navigate('MomentDetail', {
+              moment: {
+                id: 'moment-123',
+                title: 'Coffee at a Parisian Café',
+                story:
+                  'Enjoy coffee with a view of the Eiffel Tower. Experience authentic Parisian café culture while enjoying breathtaking views of the iconic Eiffel Tower.',
+                imageUrl:
+                  'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
+                price: 15,
+                availability: 'Dec 5-10',
+                category: {
+                  id: 'food',
+                  label: 'Food & Drink',
+                  emoji: '☕',
                 },
-              });
+                location: {
+                  name: 'Café de Paris',
+                  city: 'Paris',
+                  country: 'France',
+                },
+                user: {
+                  name: otherUser.name,
+                  avatar: otherUser.avatar,
+                  type: otherUser.type || 'traveler',
+                  isVerified: otherUser.isVerified || true,
+                  location: 'Paris, France',
+                  travelDays: 7,
+                },
+              },
+            });
+          }}
+          activeOpacity={0.7}
+          accessibilityLabel="View linked moment: Coffee at a Parisian Café"
+          accessibilityRole="button"
+          accessibilityHint="Opens the moment details"
+        >
+          <Image
+            source={{
+              uri: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
             }}
-            activeOpacity={0.7}
-          >
-            <Image
-              source={{
-                uri: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
-              }}
-              style={styles.momentThumbnail}
-            />
-            <View style={styles.momentInfo}>
-              <Text style={styles.momentTitle}>Coffee at a Parisian Café</Text>
-              <Text style={styles.momentSubtitle}>Gifted by you</Text>
-            </View>
-            <View style={styles.viewButton}>
-              <Text style={styles.viewButtonText}>View</Text>
-            </View>
-          </TouchableOpacity>
+            style={styles.momentThumbnail}
+          />
+          <View style={styles.momentInfo}>
+            <Text style={styles.momentTitle}>Coffee at a Parisian Café</Text>
+            <Text style={styles.momentSubtitle}>Gifted by you</Text>
+          </View>
+          <View style={styles.viewButton}>
+            <Text style={styles.viewButtonText}>View</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Messages */}
@@ -415,14 +494,19 @@ const ChatScreen: React.FC = () => {
         <View style={styles.inputBar}>
           <View style={styles.inputContainer}>
             <View style={styles.inputWrapper} pointerEvents="box-none">
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.attachButton}
                 onPress={() => {
-                  console.log('Attach button pressed - opening attachment sheet');
+                  logger.debug(
+                    'Attach button pressed - opening attachment sheet',
+                  );
                   setShowAttachmentSheet(true);
                 }}
                 activeOpacity={0.6}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                accessibilityLabel="Attach file"
+                accessibilityRole="button"
+                accessibilityHint="Opens attachment options"
               >
                 <MaterialCommunityIcons
                   name="plus-circle"
@@ -435,16 +519,26 @@ const ChatScreen: React.FC = () => {
                 placeholder="Thank them or ask a question..."
                 placeholderTextColor={COLORS.textSecondary}
                 value={messageText}
-                onChangeText={setMessageText}
+                onChangeText={handleTextChange}
                 multiline={false}
                 returnKeyType="send"
                 onSubmitEditing={handleSend}
                 blurOnSubmit={false}
                 editable={true}
                 contextMenuHidden={false}
+                accessibilityLabel="Message input"
+                accessibilityHint="Type your message here"
               />
+              {isAnyoneTyping && (
+                <Text style={styles.typingIndicator}>typing...</Text>
+              )}
             </View>
-            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={handleSend}
+              accessibilityLabel="Send message"
+              accessibilityRole="button"
+            >
               <MaterialCommunityIcons
                 name="send"
                 size={24}
@@ -462,9 +556,9 @@ const ChatScreen: React.FC = () => {
         onPhotoVideo={async () => {
           setShowAttachmentSheet(false);
           Alert.alert('Photo/Video', 'Select media to send', [
-            { text: 'Camera', onPress: () => console.log('Open camera') },
-            { text: 'Gallery', onPress: () => console.log('Open gallery') },
-            { text: 'Cancel', style: 'cancel' }
+            { text: 'Camera', onPress: () => logger.debug('Open camera') },
+            { text: 'Gallery', onPress: () => logger.debug('Open gallery') },
+            { text: 'Cancel', style: 'cancel' },
           ]);
         }}
         onGift={() => {
@@ -481,14 +575,20 @@ const ChatScreen: React.FC = () => {
         visible={showChatOptions}
         onClose={() => setShowChatOptions(false)}
         onSubmit={(action, reason, details) => {
-          console.log('Chat action:', action, reason, details);
+          logger.debug('Chat action:', action, reason, details);
           if (action === 'block') {
             Alert.alert('User Blocked', `You have blocked ${otherUser.name}`);
             navigation.goBack();
           } else if (action === 'report') {
-            Alert.alert('Report Submitted', 'Thank you for reporting. We will review this.');
+            Alert.alert(
+              'Report Submitted',
+              'Thank you for reporting. We will review this.',
+            );
           } else if (action === 'mute') {
-            Alert.alert('Notifications Muted', `You won't receive notifications from ${otherUser.name}`);
+            Alert.alert(
+              'Notifications Muted',
+              `You won't receive notifications from ${otherUser.name}`,
+            );
           }
           setShowChatOptions(false);
         }}
@@ -708,28 +808,6 @@ const styles = StyleSheet.create({
     color: COLORS.success,
     flex: 1,
   },
-  proofContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  proofIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.mintTransparent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  proofInfo: {
-    flex: 1,
-  },
-  proofTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-    flex: 1,
-  },
   proofFilename: {
     fontSize: 12,
     color: COLORS.success,
@@ -758,47 +836,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.error,
     fontWeight: '600',
-  },
-  proofActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    paddingLeft: 4,
-  },
-  approveButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    backgroundColor: COLORS.coral,
-    borderRadius: 9999,
-    marginRight: 8,
-  },
-  approveButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  rejectButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    backgroundColor: COLORS.white,
-    borderRadius: 9999,
-  },
-  rejectButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-  },
-  proofWaitingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 8,
-    paddingLeft: 4,
-  },
-  proofWaitingText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    fontStyle: 'italic',
   },
   inputBar: {
     backgroundColor: COLORS.background,
@@ -832,6 +869,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.text,
     paddingRight: 16,
+  },
+  typingIndicator: {
+    position: 'absolute',
+    right: 16,
+    fontSize: 12,
+    color: COLORS.primary,
+    fontStyle: 'italic',
   },
   sendButton: {
     width: 48,

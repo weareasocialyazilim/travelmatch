@@ -4,9 +4,11 @@
  */
 
 import * as Notifications from 'expo-notifications';
+import { COLORS } from '../constants/colors';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { logger } from './logger';
 
 // Configure notification behavior
 Notifications.setNotificationHandler({
@@ -25,7 +27,7 @@ Notifications.setNotificationHandler({
  */
 export async function registerForPushNotifications(): Promise<string | null> {
   if (!Device.isDevice) {
-    console.warn('Push notifications only work on physical devices');
+    logger.warn('Push notifications only work on physical devices');
     return null;
   }
 
@@ -42,7 +44,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
     }
 
     if (finalStatus !== 'granted') {
-      console.warn('Push notification permission denied');
+      logger.warn('Push notification permission denied');
       return null;
     }
 
@@ -50,7 +52,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
 
     if (!projectId) {
-      console.warn('No Expo project ID found. Add to app.json');
+      logger.warn('No Expo project ID found. Add to app.json');
       return null;
     }
 
@@ -64,13 +66,13 @@ export async function registerForPushNotifications(): Promise<string | null> {
         name: 'default',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF6B6B',
+        lightColor: COLORS.coral,
       });
     }
 
     return token.data;
   } catch (error) {
-    console.error('Error registering for push notifications:', error);
+    logger.error('Error registering for push notifications:', error);
     return null;
   }
 }
@@ -96,7 +98,7 @@ export async function scheduleLocalNotification(
     });
     return id;
   } catch (error) {
-    console.error('Error scheduling notification:', error);
+    logger.error('Error scheduling notification:', error);
     return null;
   }
 }
@@ -108,7 +110,7 @@ export async function cancelNotification(notificationId: string) {
   try {
     await Notifications.cancelScheduledNotificationAsync(notificationId);
   } catch (error) {
-    console.error('Error canceling notification:', error);
+    logger.error('Error canceling notification:', error);
   }
 }
 
@@ -119,7 +121,7 @@ export async function cancelAllNotifications() {
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
   } catch (error) {
-    console.error('Error canceling all notifications:', error);
+    logger.error('Error canceling all notifications:', error);
   }
 }
 
@@ -130,7 +132,7 @@ export async function getBadgeCount(): Promise<number> {
   try {
     return await Notifications.getBadgeCountAsync();
   } catch (error) {
-    console.error('Error getting badge count:', error);
+    logger.error('Error getting badge count:', error);
     return 0;
   }
 }
@@ -142,7 +144,7 @@ export async function setBadgeCount(count: number) {
   try {
     await Notifications.setBadgeCountAsync(count);
   } catch (error) {
-    console.error('Error setting badge count:', error);
+    logger.error('Error setting badge count:', error);
   }
 }
 
@@ -154,7 +156,7 @@ export async function clearAllNotifications() {
     await Notifications.dismissAllNotificationsAsync();
     await setBadgeCount(0);
   } catch (error) {
-    console.error('Error clearing notifications:', error);
+    logger.error('Error clearing notifications:', error);
   }
 }
 

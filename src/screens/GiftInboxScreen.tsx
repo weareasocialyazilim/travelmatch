@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
-  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -61,8 +60,18 @@ const GiftInboxScreen: React.FC = () => {
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [showSortModal, setShowSortModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const refreshTimeoutRef = useRef<NodeJS.Timeout>(undefined);
 
-  // Mock data - gerçek uygulamada API'den gelecek
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Mock data - gerçek uygulamada API&apos;den gelecek
   const [inboxItems] = useState<GiftInboxItem[]>([
     {
       id: '1',
@@ -70,7 +79,8 @@ const GiftInboxScreen: React.FC = () => {
         id: 'alex-1',
         name: 'Alex',
         age: 28,
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
         rating: 4.8,
         isVerified: true,
         tripCount: 12,
@@ -92,14 +102,14 @@ const GiftInboxScreen: React.FC = () => {
           momentTitle: 'Lunch at Kadıköy',
           momentEmoji: '🍕',
           amount: 25,
-          message: "Let's meet for lunch!",
+          message: 'Let&apos;s meet for lunch!',
           paymentType: 'direct',
           status: 'received',
           createdAt: '2024-01-15T14:00:00Z',
         },
       ],
       totalAmount: 33,
-      latestMessage: "Let's meet for lunch!",
+      latestMessage: 'Let&apos;s meet for lunch!',
       latestGiftAt: '30m ago',
       canStartChat: true,
       score: 9,
@@ -110,7 +120,8 @@ const GiftInboxScreen: React.FC = () => {
         id: 'sarah-1',
         name: 'Sarah',
         age: 25,
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
         rating: 4.9,
         isVerified: true,
         tripCount: 8,
@@ -140,7 +151,8 @@ const GiftInboxScreen: React.FC = () => {
         id: 'mehmet-1',
         name: 'Mehmet',
         age: 32,
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
         rating: 4.7,
         isVerified: true,
         tripCount: 15,
@@ -170,7 +182,8 @@ const GiftInboxScreen: React.FC = () => {
         id: 'emma-1',
         name: 'Emma',
         age: 26,
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
         rating: 4.3,
         isVerified: false,
         tripCount: 3,
@@ -200,7 +213,8 @@ const GiftInboxScreen: React.FC = () => {
         id: 'john-1',
         name: 'John',
         age: 30,
-        avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
+        avatar:
+          'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
         rating: 4.6,
         isVerified: true,
         tripCount: 7,
@@ -232,12 +246,14 @@ const GiftInboxScreen: React.FC = () => {
     .slice(0, 5);
 
   // New Today
-  const newToday = inboxItems.filter(item => 
-    item.latestGiftAt.includes('m ago') || item.latestGiftAt.includes('h ago')
+  const newToday = inboxItems.filter(
+    (item) =>
+      item.latestGiftAt.includes('m ago') ||
+      item.latestGiftAt.includes('h ago'),
   );
 
   // Apply filters
-  const filteredItems = inboxItems.filter(item => {
+  const filteredItems = inboxItems.filter((item) => {
     switch (filterBy) {
       case 'thirty_plus':
         return item.totalAmount >= 30;
@@ -268,7 +284,11 @@ const GiftInboxScreen: React.FC = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    // Clear previous timeout
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    refreshTimeoutRef.current = setTimeout(() => setRefreshing(false), 1000);
   }, []);
 
   const handleItemPress = (item: GiftInboxItem) => {
@@ -287,17 +307,31 @@ const GiftInboxScreen: React.FC = () => {
     });
   };
 
-  const getStatusIcon = (item: GiftInboxItem): { icon: IconName; color: string; text: string } => {
+  const getStatusIcon = (
+    item: GiftInboxItem,
+  ): { icon: IconName; color: string; text: string } => {
     if (item.canStartChat) {
-      return { icon: 'check-circle', color: COLORS.mint, text: 'Ready to chat' };
+      return {
+        icon: 'check-circle',
+        color: COLORS.mint,
+        text: 'Ready to chat',
+      };
     }
-    const pendingGift = item.gifts.find(g => g.status === 'pending_proof');
+    const pendingGift = item.gifts.find((g) => g.status === 'pending_proof');
     if (pendingGift) {
-      return { icon: 'camera-outline', color: COLORS.coral, text: 'Upload proof' };
+      return {
+        icon: 'camera-outline',
+        color: COLORS.coral,
+        text: 'Upload proof',
+      };
     }
-    const verifyingGift = item.gifts.find(g => g.status === 'verifying');
+    const verifyingGift = item.gifts.find((g) => g.status === 'verifying');
     if (verifyingGift) {
-      return { icon: 'timer-sand', color: COLORS.softOrange, text: 'Verifying...' };
+      return {
+        icon: 'timer-sand',
+        color: COLORS.softOrange,
+        text: 'Verifying...',
+      };
     }
     return { icon: 'gift-outline', color: COLORS.primary, text: 'Pending' };
   };
@@ -308,16 +342,29 @@ const GiftInboxScreen: React.FC = () => {
       style={styles.topPickCard}
       onPress={() => handleItemPress(item)}
     >
-      <Image source={{ uri: item.sender.avatar }} style={styles.topPickAvatar} />
+      <Image
+        source={{ uri: item.sender.avatar }}
+        style={styles.topPickAvatar}
+      />
       {item.sender.isVerified && (
         <View style={styles.verifiedBadge}>
-          <MaterialCommunityIcons name="check-decagram" size={14} color={COLORS.primary} />
+          <MaterialCommunityIcons
+            name="check-decagram"
+            size={14}
+            color={COLORS.primary}
+          />
         </View>
       )}
-      <Text style={styles.topPickName} numberOfLines={1}>{item.sender.name}</Text>
+      <Text style={styles.topPickName} numberOfLines={1}>
+        {item.sender.name}
+      </Text>
       <Text style={styles.topPickAmount}>${item.totalAmount}</Text>
       <View style={styles.topPickRating}>
-        <MaterialCommunityIcons name="star" size={12} color={COLORS.softOrange} />
+        <MaterialCommunityIcons
+          name="star"
+          size={12}
+          color={COLORS.softOrange}
+        />
         <Text style={styles.topPickRatingText}>{item.sender.rating}</Text>
       </View>
     </TouchableOpacity>
@@ -332,35 +379,51 @@ const GiftInboxScreen: React.FC = () => {
         onPress={() => handleItemPress(item)}
       >
         <View style={styles.inboxItemLeft}>
-          <Image source={{ uri: item.sender.avatar }} style={styles.inboxAvatar} />
+          <Image
+            source={{ uri: item.sender.avatar }}
+            style={styles.inboxAvatar}
+          />
           {item.sender.isVerified && (
             <View style={styles.inboxVerifiedBadge}>
-              <MaterialCommunityIcons name="check-decagram" size={12} color={COLORS.primary} />
+              <MaterialCommunityIcons
+                name="check-decagram"
+                size={12}
+                color={COLORS.primary}
+              />
             </View>
           )}
         </View>
-        
+
         <View style={styles.inboxItemContent}>
           <View style={styles.inboxItemHeader}>
             <Text style={styles.inboxName}>
               {item.sender.name}, {item.sender.age}
             </Text>
             <View style={styles.inboxRating}>
-              <MaterialCommunityIcons name="star" size={12} color={COLORS.softOrange} />
+              <MaterialCommunityIcons
+                name="star"
+                size={12}
+                color={COLORS.softOrange}
+              />
               <Text style={styles.inboxRatingText}>{item.sender.rating}</Text>
             </View>
           </View>
-          
+
           <Text style={styles.inboxGiftCount}>
-            {item.gifts.length} gift{item.gifts.length > 1 ? 's' : ''} · ${item.totalAmount} total
+            {item.gifts.length} gift{item.gifts.length > 1 ? 's' : ''} · $
+            {item.totalAmount} total
           </Text>
-          
+
           <Text style={styles.inboxMessage} numberOfLines={1}>
-            "{item.latestMessage}"
+            &quot;{item.latestMessage}&quot;
           </Text>
-          
+
           <View style={styles.inboxStatus}>
-            <MaterialCommunityIcons name={status.icon} size={14} color={status.color} />
+            <MaterialCommunityIcons
+              name={status.icon}
+              size={14}
+              color={status.color}
+            />
             <Text style={[styles.inboxStatusText, { color: status.color }]}>
               {status.text}
             </Text>
@@ -369,7 +432,11 @@ const GiftInboxScreen: React.FC = () => {
 
         <View style={styles.inboxItemRight}>
           <Text style={styles.inboxTime}>{item.latestGiftAt}</Text>
-          <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textSecondary} />
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={20}
+            color={COLORS.textSecondary}
+          />
         </View>
       </TouchableOpacity>
     );
@@ -377,19 +444,27 @@ const GiftInboxScreen: React.FC = () => {
 
   const getSortLabel = (sort: SortOption) => {
     switch (sort) {
-      case 'newest': return 'Newest';
-      case 'highest_amount': return 'Highest Amount';
-      case 'highest_rating': return 'Highest Rating';
-      case 'best_match': return 'Best Match';
+      case 'newest':
+        return 'Newest';
+      case 'highest_amount':
+        return 'Highest Amount';
+      case 'highest_rating':
+        return 'Highest Rating';
+      case 'best_match':
+        return 'Best Match';
     }
   };
 
   const getFilterLabel = (filter: FilterOption) => {
     switch (filter) {
-      case 'all': return 'All';
-      case 'thirty_plus': return '$30+';
-      case 'verified_only': return 'Verified';
-      case 'ready_to_chat': return 'Ready to Chat';
+      case 'all':
+        return 'All';
+      case 'thirty_plus':
+        return '$30+';
+      case 'verified_only':
+        return 'Verified';
+      case 'ready_to_chat':
+        return 'Ready to Chat';
     }
   };
 
@@ -399,7 +474,11 @@ const GiftInboxScreen: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>🎁 Gift Inbox</Text>
         <TouchableOpacity style={styles.settingsButton}>
-          <MaterialCommunityIcons name="cog-outline" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="cog-outline"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
       </View>
 
@@ -416,10 +495,12 @@ const GiftInboxScreen: React.FC = () => {
           <View style={styles.sectionHeader}>
             <View>
               <Text style={styles.sectionTitle}>⭐ Top Picks</Text>
-              <Text style={styles.sectionSubtitle}>High rated & meaningful gifts</Text>
+              <Text style={styles.sectionSubtitle}>
+                High rated & meaningful gifts
+              </Text>
             </View>
           </View>
-          
+
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -433,15 +514,23 @@ const GiftInboxScreen: React.FC = () => {
         {newToday.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>🆕 New Today ({newToday.length})</Text>
+              <Text style={styles.sectionTitle}>
+                🆕 New Today ({newToday.length})
+              </Text>
             </View>
-            
+
             <View style={styles.inboxList}>
               {newToday.slice(0, 3).map(renderInboxItem)}
               {newToday.length > 3 && (
                 <TouchableOpacity style={styles.seeAllButton}>
-                  <Text style={styles.seeAllText}>See All ({newToday.length})</Text>
-                  <MaterialCommunityIcons name="chevron-right" size={16} color={COLORS.primary} />
+                  <Text style={styles.seeAllText}>
+                    See All ({newToday.length})
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={16}
+                    color={COLORS.primary}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -451,30 +540,52 @@ const GiftInboxScreen: React.FC = () => {
         {/* All Gifts Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>📥 All Gifts ({sortedItems.length})</Text>
+            <Text style={styles.sectionTitle}>
+              📥 All Gifts ({sortedItems.length})
+            </Text>
           </View>
 
           {/* Filter & Sort Bar */}
           <View style={styles.filterBar}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.filterButton}
               onPress={() => setShowFilterModal(true)}
             >
-              <MaterialCommunityIcons name="filter-variant" size={16} color={COLORS.primary} />
-              <Text style={styles.filterButtonText}>{getFilterLabel(filterBy)}</Text>
-              <MaterialCommunityIcons name="chevron-down" size={16} color={COLORS.primary} />
+              <MaterialCommunityIcons
+                name="filter-variant"
+                size={16}
+                color={COLORS.primary}
+              />
+              <Text style={styles.filterButtonText}>
+                {getFilterLabel(filterBy)}
+              </Text>
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={16}
+                color={COLORS.primary}
+              />
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.filterButton}
               onPress={() => setShowSortModal(true)}
             >
-              <MaterialCommunityIcons name="sort" size={16} color={COLORS.primary} />
-              <Text style={styles.filterButtonText}>{getSortLabel(sortBy)}</Text>
-              <MaterialCommunityIcons name="chevron-down" size={16} color={COLORS.primary} />
+              <MaterialCommunityIcons
+                name="sort"
+                size={16}
+                color={COLORS.primary}
+              />
+              <Text style={styles.filterButtonText}>
+                {getSortLabel(sortBy)}
+              </Text>
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={16}
+                color={COLORS.primary}
+              />
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.inboxList}>
             {sortedItems.map(renderInboxItem)}
           </View>
@@ -483,14 +594,21 @@ const GiftInboxScreen: React.FC = () => {
 
       {/* Sort Modal */}
       {showSortModal && (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setShowSortModal(false)}
         >
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Sort By</Text>
-            {(['newest', 'highest_amount', 'highest_rating', 'best_match'] as SortOption[]).map((option) => (
+            {(
+              [
+                'newest',
+                'highest_amount',
+                'highest_rating',
+                'best_match',
+              ] as SortOption[]
+            ).map((option) => (
               <TouchableOpacity
                 key={option}
                 style={styles.modalOption}
@@ -499,14 +617,20 @@ const GiftInboxScreen: React.FC = () => {
                   setShowSortModal(false);
                 }}
               >
-                <Text style={[
-                  styles.modalOptionText,
-                  sortBy === option && styles.modalOptionSelected
-                ]}>
+                <Text
+                  style={[
+                    styles.modalOptionText,
+                    sortBy === option && styles.modalOptionSelected,
+                  ]}
+                >
                   {getSortLabel(option)}
                 </Text>
                 {sortBy === option && (
-                  <MaterialCommunityIcons name="check" size={20} color={COLORS.primary} />
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 )}
               </TouchableOpacity>
             ))}
@@ -516,14 +640,21 @@ const GiftInboxScreen: React.FC = () => {
 
       {/* Filter Modal */}
       {showFilterModal && (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setShowFilterModal(false)}
         >
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter</Text>
-            {(['all', 'thirty_plus', 'verified_only', 'ready_to_chat'] as FilterOption[]).map((option) => (
+            {(
+              [
+                'all',
+                'thirty_plus',
+                'verified_only',
+                'ready_to_chat',
+              ] as FilterOption[]
+            ).map((option) => (
               <TouchableOpacity
                 key={option}
                 style={styles.modalOption}
@@ -532,14 +663,20 @@ const GiftInboxScreen: React.FC = () => {
                   setShowFilterModal(false);
                 }}
               >
-                <Text style={[
-                  styles.modalOptionText,
-                  filterBy === option && styles.modalOptionSelected
-                ]}>
+                <Text
+                  style={[
+                    styles.modalOptionText,
+                    filterBy === option && styles.modalOptionSelected,
+                  ]}
+                >
                   {getFilterLabel(option)}
                 </Text>
                 {filterBy === option && (
-                  <MaterialCommunityIcons name="check" size={20} color={COLORS.primary} />
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 )}
               </TouchableOpacity>
             ))}
@@ -608,7 +745,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -658,7 +795,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -771,7 +908,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: COLORS.overlay50,
     justifyContent: 'flex-end',
   },
   modalContent: {

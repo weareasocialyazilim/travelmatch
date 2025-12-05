@@ -21,12 +21,20 @@ import type { MomentData } from '../types';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.85;
 
+/** Supported payment methods for gifting moments */
 type PaymentMethod = 'apple-pay' | 'google-pay' | 'card';
 
+/**
+ * Props for GiftMomentBottomSheet component
+ */
 interface Props {
+  /** Whether the bottom sheet is visible */
   visible: boolean;
+  /** The moment data to be gifted */
   moment: MomentData | null;
+  /** Callback when the sheet is closed */
   onClose: () => void;
+  /** Callback when a gift is confirmed with selected payment method */
   onGift: (paymentMethod: PaymentMethod) => void;
 }
 
@@ -44,6 +52,20 @@ const formatDateRange = (start: Date, end: Date) => {
   })} – ${end.toLocaleDateString('en-US', { day: 'numeric' })}`;
 };
 
+/**
+ * Bottom sheet for gifting a moment to another user.
+ * Includes payment method selection, date selection, and confirmation flow.
+ *
+ * @example
+ * ```tsx
+ * <GiftMomentBottomSheet
+ *   visible={showGiftSheet}
+ *   moment={selectedMoment}
+ *   onClose={() => setShowGiftSheet(false)}
+ *   onGift={(method) => handleGift(method)}
+ * />
+ * ```
+ */
 export const GiftMomentBottomSheet: React.FC<Props> = ({
   visible,
   moment,
@@ -199,7 +221,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                   color={COLORS.textSecondary}
                 />
                 <Text style={styles.previewMetaText}>
-                  {moment.location.name}
+                  {moment.location?.name || 'Unknown Location'}
                 </Text>
               </View>
               <View style={styles.previewMeta}>
@@ -260,7 +282,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             <View style={styles.paymentRow}>
               <Text style={styles.paymentLabel}>Amount</Text>
               <Text style={styles.paymentValue}>
-                ${moment.price.toFixed(2)}
+                ${(moment.price ?? 0).toFixed(2)}
               </Text>
             </View>
             <View style={styles.paymentRow}>
@@ -271,7 +293,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             <View style={styles.paymentRow}>
               <Text style={styles.paymentTotal}>Total</Text>
               <Text style={styles.paymentTotal}>
-                ${moment.price.toFixed(2)}
+                ${(moment.price ?? 0).toFixed(2)}
               </Text>
             </View>
           </View>
@@ -377,7 +399,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
               activeOpacity={0.8}
             >
               <Text style={styles.ctaButtonText}>
-                Send • ${moment.price.toFixed(2)}
+                Send • ${(moment.price ?? 0).toFixed(2)}
               </Text>
             </TouchableOpacity>
           </View>
@@ -388,8 +410,8 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
       {visible && (
         <ConfirmGiftModal
           visible={showConfirmModal}
-          amount={moment.price}
-          recipientName={moment.user.name}
+          amount={moment.price ?? 0}
+          recipientName={moment.user?.name || 'Unknown'}
           onCancel={() => setShowConfirmModal(false)}
           onConfirm={handleConfirmGift}
         />
@@ -447,7 +469,7 @@ const styles = StyleSheet.create({
     bottom: 4,
     left: 4,
     right: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: COLORS.overlay60,
     borderRadius: 4,
     paddingVertical: 2,
     paddingHorizontal: 4,

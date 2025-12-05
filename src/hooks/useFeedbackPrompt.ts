@@ -3,7 +3,8 @@
  * Automatically trigger feedback modal based on user behavior
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { analytics } from '../services/analytics';
 
@@ -90,13 +91,13 @@ export const useFeedbackPrompt = () => {
         });
       }
     } catch (error) {
-      console.error('[FeedbackPrompt] Error checking conditions:', error);
+      logger.error('[FeedbackPrompt] Error checking conditions:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const incrementSessionCount = async () => {
+  const incrementSessionCount = useCallback(async () => {
     try {
       const current = await AsyncStorage.getItem(FEEDBACK_KEYS.SESSION_COUNT);
       const count = current ? parseInt(current) : 0;
@@ -105,11 +106,11 @@ export const useFeedbackPrompt = () => {
         (count + 1).toString(),
       );
     } catch (error) {
-      console.error('[FeedbackPrompt] Error incrementing session:', error);
+      logger.error('[FeedbackPrompt] Error incrementing session:', error);
     }
-  };
+  }, []);
 
-  const incrementMomentsViewed = async () => {
+  const incrementMomentsViewed = useCallback(async () => {
     try {
       const current = await AsyncStorage.getItem(FEEDBACK_KEYS.MOMENTS_VIEWED);
       const count = current ? parseInt(current) : 0;
@@ -118,11 +119,11 @@ export const useFeedbackPrompt = () => {
         (count + 1).toString(),
       );
     } catch (error) {
-      console.error('[FeedbackPrompt] Error incrementing moments:', error);
+      logger.error('[FeedbackPrompt] Error incrementing moments:', error);
     }
-  };
+  }, []);
 
-  const incrementTripsBooked = async () => {
+  const incrementTripsBooked = useCallback(async () => {
     try {
       const current = await AsyncStorage.getItem(FEEDBACK_KEYS.TRIPS_BOOKED);
       const count = current ? parseInt(current) : 0;
@@ -131,11 +132,11 @@ export const useFeedbackPrompt = () => {
         (count + 1).toString(),
       );
     } catch (error) {
-      console.error('[FeedbackPrompt] Error incrementing trips:', error);
+      logger.error('[FeedbackPrompt] Error incrementing trips:', error);
     }
-  };
+  }, []);
 
-  const dismissFeedback = (reason?: 'completed' | 'dismissed') => {
+  const dismissFeedback = useCallback((reason?: 'completed' | 'dismissed') => {
     setShowFeedback(false);
 
     // Track dismissal
@@ -144,7 +145,7 @@ export const useFeedbackPrompt = () => {
         reason: 'user_closed',
       });
     }
-  };
+  }, []);
 
   return {
     showFeedback,

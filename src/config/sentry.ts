@@ -7,6 +7,7 @@
  */
 
 import * as Sentry from '@sentry/react-native';
+import { logger } from '../utils/logger';
 import { Platform as _Platform } from 'react-native';
 
 // Sentry DSN (replace with your actual DSN)
@@ -19,7 +20,7 @@ const SENTRY_DSN = __DEV__
  */
 export function initSentry() {
   if (!SENTRY_DSN) {
-    console.log('Sentry disabled in development');
+    logger.debug('Sentry disabled in development');
     return;
   }
 
@@ -42,7 +43,9 @@ export function initSentry() {
         delete event.user.email;
         delete event.user.ip_address;
         // Keep only non-sensitive identifiers
-        event.user.username = String(event.user.username || event.user.id || 'anonymous');
+        event.user.username = String(
+          event.user.username || event.user.id || 'anonymous',
+        );
       }
 
       // Remove sensitive request data

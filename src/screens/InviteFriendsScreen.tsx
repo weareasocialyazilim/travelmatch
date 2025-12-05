@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -39,7 +40,7 @@ export default function InviteFriendsScreen({
         message: `Join me on TravelMatch! Use my invite code: ${inviteCode}`,
       });
     } catch (error) {
-      console.error('Share failed:', error);
+      logger.error('Share failed:', error);
     }
   };
 

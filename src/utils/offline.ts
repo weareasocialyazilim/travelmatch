@@ -4,6 +4,7 @@
  */
 
 import NetInfo from '@react-native-community/netinfo';
+import { logger } from './logger';
 import { useState, useEffect } from 'react';
 
 /**
@@ -118,7 +119,7 @@ export const retryWithBackoff = async <T>(
   maxRetries = 3,
   baseDelay = 1000,
 ): Promise<T> => {
-  let lastError: Error;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -134,7 +135,10 @@ export const retryWithBackoff = async <T>(
     }
   }
 
-  throw lastError!;
+  if (lastError) {
+    throw lastError;
+  }
+  throw new Error('Retry failed with unknown error');
 };
 
 /**
@@ -200,7 +204,7 @@ class OfflineQueue {
         await executeRequest(request);
         this.remove(request.id);
       } catch (error) {
-        console.error(`Failed to process queued request: ${request.id}`, error);
+        logger.error(`Failed to process queued request: ${request.id}`, error);
         // Keep in queue to retry later
       }
     }

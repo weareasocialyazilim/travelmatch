@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { logger } from './logger';
 
 type Timer = NodeJS.Timeout | number;
 type Listener = { remove?: () => void; unsubscribe?: () => void };
@@ -34,46 +35,52 @@ export const useMemoryLeakDetector = (componentName: string) => {
 
   useEffect(() => {
     if (__DEV__) {
-      console.log(`📊 [Memory] ${componentName} mounted`);
+      logger.debug(`📊 [Memory] ${componentName} mounted`);
     }
 
+    const mountTimeValue = mountTime.current;
+    const timersValue = timers.current;
+    const intervalsValue = intervals.current;
+    const listenersValue = listeners.current;
+    const subscriptionsValue = subscriptions.current;
+
     return () => {
-      const lifetime = Date.now() - mountTime.current;
+      const lifetime = Date.now() - mountTimeValue;
 
       // Check for uncleaned timers
-      if (timers.current.length > 0) {
-        console.warn(
-          `⚠️ [Memory Leak] ${componentName}: ${timers.current.length} timer(s) not cleared`,
+      if (timersValue.length > 0) {
+        logger.warn(
+          `⚠️ [Memory Leak] ${componentName}: ${timersValue.length} timer(s) not cleared`,
           { lifetime: `${lifetime}ms` },
         );
       }
 
       // Check for uncleaned intervals
-      if (intervals.current.length > 0) {
-        console.warn(
-          `⚠️ [Memory Leak] ${componentName}: ${intervals.current.length} interval(s) not cleared`,
+      if (intervalsValue.length > 0) {
+        logger.warn(
+          `⚠️ [Memory Leak] ${componentName}: ${intervalsValue.length} interval(s) not cleared`,
           { lifetime: `${lifetime}ms` },
         );
       }
 
       // Check for uncleaned listeners
-      if (listeners.current.length > 0) {
-        console.warn(
-          `⚠️ [Memory Leak] ${componentName}: ${listeners.current.length} listener(s) not removed`,
+      if (listenersValue.length > 0) {
+        logger.warn(
+          `⚠️ [Memory Leak] ${componentName}: ${listenersValue.length} listener(s) not removed`,
           { lifetime: `${lifetime}ms` },
         );
       }
 
       // Check for uncleaned subscriptions
-      if (subscriptions.current.length > 0) {
-        console.warn(
-          `⚠️ [Memory Leak] ${componentName}: ${subscriptions.current.length} subscription(s) not unsubscribed`,
+      if (subscriptionsValue.length > 0) {
+        logger.warn(
+          `⚠️ [Memory Leak] ${componentName}: ${subscriptionsValue.length} subscription(s) not unsubscribed`,
           { lifetime: `${lifetime}ms` },
         );
       }
 
       if (__DEV__) {
-        console.log(
+        logger.debug(
           `📊 [Memory] ${componentName} unmounted (lifetime: ${lifetime}ms)`,
         );
       }
@@ -94,7 +101,7 @@ export const useMemoryLeakDetector = (componentName: string) => {
  *
  * @example
  * const safeSetTimeout = useSafeTimeout('MyComponent');
- * safeSetTimeout(() => console.log('Hello'), 1000);
+ * safeSetTimeout(() => logger.debug('Hello'), 1000);
  */
 export const useSafeTimeout = (componentName: string) => {
   const { timers } = useMemoryLeakDetector(componentName);
@@ -111,10 +118,12 @@ export const useSafeTimeout = (componentName: string) => {
   };
 
   useEffect(() => {
+    const currentTimers = timers.current;
     return () => {
-      timers.current.forEach((timer) => clearTimeout(timer));
+      currentTimers.forEach((timer) => clearTimeout(timer));
       timers.current = [];
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return safeSetTimeout;
@@ -126,7 +135,7 @@ export const useSafeTimeout = (componentName: string) => {
  *
  * @example
  * const safeSetInterval = useSafeInterval('MyComponent');
- * safeSetInterval(() => console.log('Tick'), 1000);
+ * safeSetInterval(() => logger.debug('Tick'), 1000);
  */
 export const useSafeInterval = (componentName: string) => {
   const { intervals } = useMemoryLeakDetector(componentName);
@@ -138,10 +147,12 @@ export const useSafeInterval = (componentName: string) => {
   };
 
   useEffect(() => {
+    const currentIntervals = intervals.current;
     return () => {
-      intervals.current.forEach((interval) => clearInterval(interval));
+      currentIntervals.forEach((interval) => clearInterval(interval));
       intervals.current = [];
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return safeSetInterval;
@@ -161,7 +172,7 @@ export const useMemoryMonitor = (componentName: string) => {
       const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
       const usage = ((usedJSHeapSize / totalJSHeapSize) * 100).toFixed(2);
 
-      console.log(
+      logger.debug(
         `📊 [Memory] ${componentName} - Heap usage: ${usage}% (${Math.round(
           usedJSHeapSize / 1024 / 1024,
         )}MB / ${Math.round(totalJSHeapSize / 1024 / 1024)}MB)`,

@@ -1,4 +1,5 @@
 // Note: For production, use expo-secure-store or @react-native-async-storage/async-storage
+import { logger } from './logger';
 // npx expo install expo-secure-store
 // npx expo install @react-native-async-storage/async-storage
 
@@ -14,7 +15,7 @@ export const secureStorage = {
     try {
       memoryStorage.set(`@secure_${key}`, value);
     } catch (error) {
-      console.error('SecureStore setItem error:', error);
+      logger.error('SecureStore setItem error:', error);
       throw error;
     }
   },
@@ -23,7 +24,7 @@ export const secureStorage = {
     try {
       return memoryStorage.get(`@secure_${key}`) || null;
     } catch (error) {
-      console.error('SecureStore getItem error:', error);
+      logger.error('SecureStore getItem error:', error);
       return null;
     }
   },
@@ -32,7 +33,7 @@ export const secureStorage = {
     try {
       memoryStorage.delete(`@secure_${key}`);
     } catch (error) {
-      console.error('SecureStore removeItem error:', error);
+      logger.error('SecureStore removeItem error:', error);
       throw error;
     }
   },

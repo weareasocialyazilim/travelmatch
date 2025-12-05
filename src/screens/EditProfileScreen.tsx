@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   TextInput,
   Alert,
   Platform,
+  // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
   KeyboardAvoidingView,
   ActivityIndicator,
@@ -25,13 +26,16 @@ const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   // Original profile data (mock - would come from store/API)
-  const originalProfile = {
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-    name: 'Sophia Carter',
-    username: 'sophia_carter',
-    bio: 'Coffee enthusiast & travel addict. Discovering hidden gems around the world.',
-    location: 'San Francisco, CA',
-  };
+  const originalProfile = useMemo(
+    () => ({
+      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+      name: 'Sophia Carter',
+      username: 'sophia_carter',
+      bio: 'Coffee enthusiast & travel addict. Discovering hidden gems around the world.',
+      location: 'San Francisco, CA',
+    }),
+    [],
+  );
 
   // Editable state
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
@@ -39,10 +43,12 @@ const EditProfileScreen = () => {
   const [username, setUsername] = useState(originalProfile.username);
   const [bio, setBio] = useState(originalProfile.bio);
   const [location, setLocation] = useState(originalProfile.location);
-  
+
   // UI state
   const [isSaving, setIsSaving] = useState(false);
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
+    null,
+  );
   const [checkingUsername, setCheckingUsername] = useState(false);
 
   const BIO_MAX_LENGTH = 200;
@@ -73,7 +79,9 @@ const EditProfileScreen = () => {
     setCheckingUsername(true);
     const timer = setTimeout(() => {
       // Simulate API check - in real app, call backend
-      const isAvailable = !['emma', 'john', 'admin', 'test'].includes(username.toLowerCase());
+      const isAvailable = !['emma', 'john', 'admin', 'test'].includes(
+        username.toLowerCase(),
+      );
       setUsernameAvailable(isAvailable);
       setCheckingUsername(false);
     }, 500);
@@ -89,7 +97,7 @@ const EditProfileScreen = () => {
           Alert.alert(
             'Permission Required',
             'Camera permission is needed to take photos. Please enable it in Settings.',
-            [{ text: 'OK' }]
+            [{ text: 'OK' }],
           );
           return;
         }
@@ -103,12 +111,13 @@ const EditProfileScreen = () => {
           setAvatarUri(result.assets[0].uri);
         }
       } else {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert(
             'Permission Required',
             'Photo library permission is needed to select photos. Please enable it in Settings.',
-            [{ text: 'OK' }]
+            [{ text: 'OK' }],
           );
           return;
         }
@@ -143,18 +152,26 @@ const EditProfileScreen = () => {
           if (buttonIndex === 1) pickImage(true);
           if (buttonIndex === 2) pickImage(false);
           if (buttonIndex === 3 && avatarUri) setAvatarUri(null);
-        }
+        },
       );
     } else {
-      const alertOptions: { text: string; onPress?: () => void; style?: 'cancel' | 'destructive' }[] = [
+      const alertOptions: {
+        text: string;
+        onPress?: () => void;
+        style?: 'cancel' | 'destructive';
+      }[] = [
         { text: 'Take Photo', onPress: () => pickImage(true) },
         { text: 'Choose from Gallery', onPress: () => pickImage(false) },
       ];
       if (avatarUri) {
-        alertOptions.push({ text: 'Remove Photo', onPress: () => setAvatarUri(null), style: 'destructive' });
+        alertOptions.push({
+          text: 'Remove Photo',
+          onPress: () => setAvatarUri(null),
+          style: 'destructive',
+        });
       }
       alertOptions.push({ text: 'Cancel', style: 'cancel' });
-      
+
       Alert.alert('Change Avatar', 'Choose an option', alertOptions);
     }
   };
@@ -178,18 +195,14 @@ const EditProfileScreen = () => {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      Alert.alert(
-        'Success',
-        'Your profile has been updated.',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]
-      );
+      Alert.alert('Success', 'Your profile has been updated.', [
+        {
+          text: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
     } catch {
       Alert.alert('Error', 'Failed to save profile. Please try again.');
     } finally {
@@ -204,8 +217,12 @@ const EditProfileScreen = () => {
         'You have unsaved changes. Are you sure you want to discard them?',
         [
           { text: 'Keep Editing', style: 'cancel' },
-          { text: 'Discard', style: 'destructive', onPress: () => navigation.goBack() },
-        ]
+          {
+            text: 'Discard',
+            style: 'destructive',
+            onPress: () => navigation.goBack(),
+          },
+        ],
       );
     } else {
       navigation.goBack();
@@ -228,10 +245,12 @@ const EditProfileScreen = () => {
           {isSaving ? (
             <ActivityIndicator size="small" color={COLORS.mint} />
           ) : (
-            <Text style={[
-              styles.saveText,
-              !hasChanges() && styles.saveTextDisabled
-            ]}>
+            <Text
+              style={[
+                styles.saveText,
+                !hasChanges() && styles.saveTextDisabled,
+              ]}
+            >
               Save
             </Text>
           )}
@@ -260,7 +279,11 @@ const EditProfileScreen = () => {
                 style={styles.avatar}
               />
               <View style={styles.cameraOverlay}>
-                <MaterialCommunityIcons name="camera" size={20} color={COLORS.white} />
+                <MaterialCommunityIcons
+                  name="camera"
+                  size={20}
+                  color={COLORS.white}
+                />
               </View>
             </View>
             <Text style={styles.changePhotoText}>Change Photo</Text>
@@ -294,7 +317,9 @@ const EditProfileScreen = () => {
                   <TextInput
                     style={[styles.textInput, styles.usernameInput]}
                     value={username}
-                    onChangeText={(text) => setUsername(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    onChangeText={(text) =>
+                      setUsername(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))
+                    }
                     placeholder="username"
                     placeholderTextColor={COLORS.textSecondary}
                     autoCapitalize="none"
@@ -302,17 +327,30 @@ const EditProfileScreen = () => {
                     maxLength={30}
                   />
                   {checkingUsername && (
-                    <ActivityIndicator size="small" color={COLORS.textSecondary} />
+                    <ActivityIndicator
+                      size="small"
+                      color={COLORS.textSecondary}
+                    />
                   )}
                   {!checkingUsername && usernameAvailable === true && (
-                    <MaterialCommunityIcons name="check-circle" size={20} color={COLORS.mint} />
+                    <MaterialCommunityIcons
+                      name="check-circle"
+                      size={20}
+                      color={COLORS.mint}
+                    />
                   )}
                   {!checkingUsername && usernameAvailable === false && (
-                    <MaterialCommunityIcons name="close-circle" size={20} color={COLORS.coral} />
+                    <MaterialCommunityIcons
+                      name="close-circle"
+                      size={20}
+                      color={COLORS.coral}
+                    />
                   )}
                 </View>
                 {usernameAvailable === false && (
-                  <Text style={styles.usernameError}>This username is already taken</Text>
+                  <Text style={styles.usernameError}>
+                    This username is already taken
+                  </Text>
                 )}
               </View>
 
@@ -322,11 +360,14 @@ const EditProfileScreen = () => {
               <View style={styles.inputGroup}>
                 <View style={styles.bioLabelRow}>
                   <Text style={styles.inputLabel}>Bio</Text>
-                  <Text style={[
-                    styles.charCount,
-                    bio.length > BIO_MAX_LENGTH * 0.9 && styles.charCountWarning,
-                    bio.length >= BIO_MAX_LENGTH && styles.charCountError,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.charCount,
+                      bio.length > BIO_MAX_LENGTH * 0.9 &&
+                        styles.charCountWarning,
+                      bio.length >= BIO_MAX_LENGTH && styles.charCountError,
+                    ]}
+                  >
                     {bio.length}/{BIO_MAX_LENGTH}
                   </Text>
                 </View>
@@ -353,7 +394,11 @@ const EditProfileScreen = () => {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Location</Text>
                 <View style={styles.locationInputContainer}>
-                  <MaterialCommunityIcons name="map-marker" size={18} color={COLORS.textSecondary} />
+                  <MaterialCommunityIcons
+                    name="map-marker"
+                    size={18}
+                    color={COLORS.textSecondary}
+                  />
                   <TextInput
                     style={[styles.textInput, styles.locationInput]}
                     value={location}

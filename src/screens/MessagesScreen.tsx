@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,210 +17,290 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 import * as Haptics from 'expo-haptics';
 import BottomNav from '../components/BottomNav';
 import { COLORS } from '../constants/colors';
+import { useMessages } from '../hooks/useMessages';
+import { useRealtime, useRealtimeEvent } from '../context/RealtimeContext';
+import type { MessageEvent } from '../context/RealtimeContext';
+import type { Conversation } from '../services/messageService';
+import { MessagesListSkeleton, ErrorState } from '../components';
+import { FadeInView as _FadeInView } from '../components/AnimatedComponents';
 
-interface Person {
-  id: string;
-  name: string;
-  avatar: string;
-  isOnline?: boolean;
-  isVerified?: boolean;
-}
+// Format time ago
+const formatTimeAgo = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-interface ChatItem {
-  id: string;
-  person: Person;
-  momentTitle: string;
-  momentEmoji: string;
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
-  isTyping?: boolean;
-}
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return '1d ago';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+};
 
 const MessagesScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock Data - Chats
-  const [chats] = useState<ChatItem[]>([
-    {
-      id: 'c1',
-      person: {
-        id: 'maria-1',
-        name: 'Maria',
-        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
-        isOnline: true,
-        isVerified: true,
-      },
-      momentTitle: 'Museum Tour',
-      momentEmoji: '🎭',
-      lastMessage: 'See you tomorrow at 3pm! 🎉',
-      lastMessageTime: '2m ago',
-      unreadCount: 2,
-    },
-    {
-      id: 'c2',
-      person: {
-        id: 'james-1',
-        name: 'James',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-        isOnline: false,
-        isVerified: true,
-      },
-      momentTitle: 'Coffee',
-      momentEmoji: '☕',
-      lastMessage: 'Thanks! It was great meeting you',
-      lastMessageTime: '1h ago',
-      unreadCount: 0,
-    },
-    {
-      id: 'c3',
-      person: {
-        id: 'sophie-1',
-        name: 'Sophie',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-        isOnline: true,
-        isVerified: false,
-      },
-      momentTitle: 'Food Tour',
-      momentEmoji: '🍜',
-      lastMessage: 'The restaurant was amazing!',
-      lastMessageTime: '3h ago',
-      unreadCount: 0,
-      isTyping: true,
-    },
-    {
-      id: 'c4',
-      person: {
-        id: 'david-1',
-        name: 'David',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-        isOnline: false,
-        isVerified: true,
-      },
-      momentTitle: 'City Walk',
-      momentEmoji: '🚶',
-      lastMessage: 'Looking forward to our tour next week',
-      lastMessageTime: '1d ago',
-      unreadCount: 0,
-    },
-    {
-      id: 'c5',
-      person: {
-        id: 'emma-1',
-        name: 'Emma',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-        isOnline: false,
-        isVerified: true,
-      },
-      momentTitle: 'Nightlife',
-      momentEmoji: '🍸',
-      lastMessage: 'That was so much fun!',
-      lastMessageTime: '2d ago',
-      unreadCount: 0,
-    },
-  ]);
+  // Use messages hook
+  const {
+    conversations,
+    conversationsLoading: isLoading,
+    conversationsError: error,
+    refreshConversations,
+  } = useMessages();
 
-  const totalUnreadCount = chats.reduce((sum, c) => sum + c.unreadCount, 0);
+  // Realtime context
+  const { isUserOnline } = useRealtime();
 
-  const filteredChats = chats.filter(chat =>
-    chat.person.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chat.momentTitle.toLowerCase().includes(searchQuery.toLowerCase())
+  // Track typing users
+  const [typingConversations, setTypingConversations] = useState<Set<string>>(
+    new Set(),
+  );
+
+  // Fetch conversations on mount
+  useEffect(() => {
+    refreshConversations();
+  }, [refreshConversations]);
+
+  // Listen for new messages to refresh list
+  useRealtimeEvent<MessageEvent>(
+    'message:new',
+    (_data) => {
+      // Find the conversation and move to top
+      refreshConversations();
+    },
+    [refreshConversations],
+  );
+
+  // Listen for typing indicators
+  useRealtimeEvent<{
+    conversationId: string;
+    userId: string;
+    isTyping: boolean;
+  }>(
+    'message:typing',
+    (data) => {
+      if (data.isTyping) {
+        setTypingConversations(
+          (prev) => new Set([...prev, data.conversationId]),
+        );
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+          setTypingConversations((prev) => {
+            const next = new Set(prev);
+            next.delete(data.conversationId);
+            return next;
+          });
+        }, 5000);
+      } else {
+        setTypingConversations((prev) => {
+          const next = new Set(prev);
+          next.delete(data.conversationId);
+          return next;
+        });
+      }
+    },
+    [],
+  );
+
+  const totalUnreadCount = useMemo(
+    () => conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0),
+    [conversations],
+  );
+
+  const filteredChats = useMemo(
+    () =>
+      conversations.filter(
+        (chat) =>
+          chat.participantName
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          chat.momentTitle?.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    [conversations, searchQuery],
   );
 
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setTimeout(() => setRefreshing(false), 1000);
-  }, []);
+    refreshConversations();
+  }, [refreshConversations]);
 
-  const handleChatPress = (chat: ChatItem) => {
+  const handleChatPress = (conversation: Conversation) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate('Chat', {
       otherUser: {
-        id: chat.person.id,
-        name: chat.person.name,
-        avatar: chat.person.avatar,
-        isVerified: chat.person.isVerified,
-      } as any,
+        id: conversation.participantId || '',
+        name: conversation.participantName || 'User',
+        avatar: conversation.participantAvatar,
+        isVerified: conversation.participantVerified,
+        role: 'Traveler',
+        kyc: 'Verified',
+        location: '',
+      },
+      conversationId: conversation.id,
     });
   };
 
-  const renderChatItem = ({ item }: { item: ChatItem }) => (
-    <TouchableOpacity
-      style={styles.chatItem}
-      onPress={() => handleChatPress(item)}
-      activeOpacity={0.7}
-    >
-      {/* Avatar */}
-      <View style={styles.avatarContainer}>
-        <Image source={{ uri: item.person.avatar }} style={styles.avatar} />
-        {item.person.isOnline && <View style={styles.onlineIndicator} />}
-      </View>
+  const renderChatItem = ({ item }: { item: Conversation }) => {
+    const isOnline = item.participantId
+      ? isUserOnline(item.participantId)
+      : false;
+    const isTyping = typingConversations.has(item.id);
 
-      {/* Content */}
-      <View style={styles.chatContent}>
-        <View style={styles.chatHeader}>
-          <View style={styles.nameContainer}>
-            <Text style={styles.personName}>{item.person.name}</Text>
-            {item.person.isVerified && (
-              <MaterialCommunityIcons name="check-decagram" size={14} color={COLORS.primary} />
-            )}
-          </View>
-          <Text style={styles.timeText}>{item.lastMessageTime}</Text>
+    return (
+      <TouchableOpacity
+        style={styles.chatItem}
+        onPress={() => handleChatPress(item)}
+        activeOpacity={0.7}
+        accessibilityLabel={`Chat with ${item.participantName || 'User'}${
+          item.unreadCount ? `, ${item.unreadCount} unread messages` : ''
+        }`}
+        accessibilityRole="button"
+        accessibilityHint="Opens conversation"
+      >
+        {/* Avatar */}
+        <View style={styles.avatarContainer}>
+          <Image
+            source={{
+              uri: item.participantAvatar || 'https://via.placeholder.com/100',
+            }}
+            style={styles.avatar}
+            accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
+          />
+          {isOnline && <View style={styles.onlineIndicator} />}
         </View>
 
-        {/* Moment Badge */}
-        <View style={styles.momentBadge}>
-          <Text style={styles.momentEmoji}>{item.momentEmoji}</Text>
-          <Text style={styles.momentTitle}>{item.momentTitle}</Text>
-        </View>
-
-        {/* Last Message */}
-        <View style={styles.messageRow}>
-          {item.isTyping ? (
-            <Text style={styles.typingText}>typing...</Text>
-          ) : (
-            <Text
-              style={[styles.lastMessage, item.unreadCount > 0 && styles.lastMessageUnread]}
-              numberOfLines={1}
-            >
-              {item.lastMessage}
+        {/* Content */}
+        <View style={styles.chatContent}>
+          <View style={styles.chatHeader}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.personName}>
+                {item.participantName || 'User'}
+              </Text>
+              {item.participantVerified && (
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={14}
+                  color={COLORS.primary}
+                />
+              )}
+            </View>
+            <Text style={styles.timeText}>
+              {item.lastMessageAt ? formatTimeAgo(item.lastMessageAt) : ''}
             </Text>
-          )}
-          {item.unreadCount > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadText}>{item.unreadCount}</Text>
+          </View>
+
+          {/* Moment Badge */}
+          {item.momentId && (
+            <View style={styles.momentBadge}>
+              <Text style={styles.momentEmoji}>{'✨'}</Text>
+              <Text style={styles.momentTitle}>{item.momentTitle}</Text>
             </View>
           )}
+
+          {/* Last Message */}
+          <View style={styles.messageRow}>
+            {isTyping ? (
+              <Text style={styles.typingText}>typing...</Text>
+            ) : (
+              <Text
+                style={[
+                  styles.lastMessage,
+                  (item.unreadCount || 0) > 0 && styles.lastMessageUnread,
+                ]}
+                numberOfLines={1}
+              >
+                {item.lastMessage || 'Start a conversation'}
+              </Text>
+            )}
+            {(item.unreadCount || 0) > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadText}>{item.unreadCount}</Text>
+              </View>
+            )}
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <MaterialCommunityIcons name="chat-outline" size={64} color={COLORS.textSecondary} />
+      <MaterialCommunityIcons
+        name="chat-outline"
+        size={64}
+        color={COLORS.textSecondary}
+      />
       <Text style={styles.emptyTitle}>No Messages Yet</Text>
       <Text style={styles.emptySubtitle}>
-        When you connect with travelers or hosts, your conversations will appear here.
+        When you connect with travelers or hosts, your conversations will appear
+        here.
       </Text>
       <TouchableOpacity
         style={styles.discoverButton}
         onPress={() => navigation.navigate('Discover')}
+        accessibilityLabel="Discover Moments"
+        accessibilityRole="button"
+        accessibilityHint="Navigate to discover new moments"
       >
         <Text style={styles.discoverButtonText}>Discover Moments</Text>
       </TouchableOpacity>
     </View>
   );
 
+  // Loading state - show skeleton
+  if (isLoading && conversations.length === 0) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <MaterialCommunityIcons
+              name="magnify"
+              size={20}
+              color={COLORS.textSecondary}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search conversations..."
+              placeholderTextColor={COLORS.textSecondary}
+              editable={false}
+            />
+          </View>
+        </View>
+        <MessagesListSkeleton />
+        <BottomNav activeTab="Messages" messagesBadge={0} />
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error && conversations.length === 0) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ErrorState
+          message={error}
+          onRetry={refreshConversations}
+          icon="chat-alert-outline"
+        />
+        <BottomNav activeTab="Messages" messagesBadge={0} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Search Bar - No title header */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
-          <MaterialCommunityIcons name="magnify" size={20} color={COLORS.textSecondary} />
+          <MaterialCommunityIcons
+            name="magnify"
+            size={20}
+            color={COLORS.textSecondary}
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Search conversations..."
@@ -230,7 +310,11 @@ const MessagesScreen: React.FC = () => {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <MaterialCommunityIcons name="close-circle" size={18} color={COLORS.textSecondary} />
+              <MaterialCommunityIcons
+                name="close-circle"
+                size={18}
+                color={COLORS.textSecondary}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -244,7 +328,7 @@ const MessagesScreen: React.FC = () => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
         }
         ListEmptyComponent={renderEmptyState}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -316,30 +400,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 16,
   },
-  header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  headerBadge: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  headerBadgeText: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  headerTitle: {
-    color: COLORS.text,
-    fontSize: 20,
-    fontWeight: '700',
-  },
   lastMessage: {
     color: COLORS.textSecondary,
     flex: 1,
@@ -360,7 +420,7 @@ const styles = StyleSheet.create({
   },
   momentBadge: {
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: COLORS.backgroundSecondary,
     borderRadius: 6,
     flexDirection: 'row',
     gap: 4,
@@ -383,7 +443,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   onlineIndicator: {
-    backgroundColor: '#22C55E',
+    backgroundColor: COLORS.greenBright,
     borderColor: COLORS.white,
     borderRadius: 6,
     borderWidth: 2,

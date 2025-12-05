@@ -39,8 +39,10 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         name: 'Jessica Chen',
         role: 'Traveler',
         location: 'Paris, France',
-        avatar: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400',
-        headerImage: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
+        avatar:
+          'https://images.unsplash.com/photo-1544025162-d76694265947?w=400',
+        headerImage:
+          'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
         isVerified: true,
         proofScore: 9.5,
         successfulExchanges: 12,
@@ -53,8 +55,10 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
       name: 'Alexandra Adams',
       role: 'Traveler',
       location: 'San Francisco, CA',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-      headerImage: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+      avatar:
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+      headerImage:
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
       isVerified: true,
       proofScore: 9.8,
       successfulExchanges: 18,
@@ -86,7 +90,8 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
       title: 'Sunset at the Beach',
       location: 'Malibu, California',
       price: '$25',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400',
+      image:
+        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400',
       status: 'active',
       creator: {
         id: user.id,
@@ -100,7 +105,8 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
       title: 'Morning Coffee Ritual',
       location: 'Paris, France',
       price: '$15',
-      image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
+      image:
+        'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
       status: 'active',
       creator: {
         id: user.id,
@@ -117,7 +123,8 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
       title: 'Mountain Hike Adventure',
       location: 'Swiss Alps',
       price: '$40',
-      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400',
+      image:
+        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400',
       status: 'completed',
       creator: {
         id: user.id,
@@ -130,26 +137,27 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
 
   const handleMomentPress = (moment: ProfileMoment) => {
     // Navigate to MomentDetail with full moment data
-    navigation.navigate('MomentDetail', { 
+    navigation.navigate('MomentDetail', {
       moment: {
         id: moment.id,
         title: moment.title,
         story: moment.title, // Use title as story for simplified data
         imageUrl: moment.image,
-        price: parseInt(moment.price.replace('$', '')) || 0,
+        price: parseInt(moment.price?.replace('$', '') || '0') || 0,
         availability: 'Available',
         location: {
-          name: moment.location,
-          city: moment.location.split(', ')[0],
-          country: moment.location.split(', ')[1] || '',
+          name: moment.location || 'Unknown Location',
+          city: moment.location?.split(', ')[0] || 'Unknown City',
+          country: moment.location?.split(', ')[1] || 'Unknown Country',
         },
         user: {
-          id: moment.creator.id,
-          name: moment.creator.name,
-          avatar: moment.creator.avatar,
+          id: moment.creator?.id || 'unknown',
+          name: moment.creator?.name || 'Anonymous',
+          avatar: moment.creator?.avatar || 'https://via.placeholder.com/150',
         },
-        status: moment.status as 'active' | 'pending' | 'completed',
-      }
+        status:
+          (moment.status as 'active' | 'pending' | 'completed') || 'active',
+      },
     });
   };
 
@@ -157,12 +165,18 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     // Navigate to gift flow
   };
 
-  const handleReportAction = (action: string, reason?: string, details?: string) => {
+  const handleReportAction = (
+    action: string,
+    reason?: string,
+    details?: string,
+  ) => {
     if (action === 'report') {
       Alert.alert(
         'Report Submitted',
-        `Thank you for reporting. We'll review this profile.\n\nReason: ${reason}${details ? `\nDetails: ${details}` : ''}`,
-        [{ text: 'OK' }]
+        `Thank you for reporting. We'll review this profile.\n\nReason: ${reason}${
+          details ? `\nDetails: ${details}` : ''
+        }`,
+        [{ text: 'OK' }],
       );
     } else if (action === 'block') {
       Alert.alert(
@@ -173,7 +187,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
             text: 'OK',
             onPress: () => navigation.goBack(),
           },
-        ]
+        ],
       );
     }
   };
@@ -193,7 +207,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.moreButton}
           onPress={() => setShowReportSheet(true)}
         >
@@ -239,12 +253,22 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         {/* Public Badges - Only non-private info */}
         <View style={styles.badgesContainer}>
           <View style={styles.badge}>
-            <MaterialCommunityIcons name="handshake" size={16} color={COLORS.primary} />
-            <Text style={styles.badgeText}>{user.successfulExchanges} successful exchanges</Text>
+            <MaterialCommunityIcons
+              name="handshake"
+              size={16}
+              color={COLORS.primary}
+            />
+            <Text style={styles.badgeText}>
+              {user.successfulExchanges} successful exchanges
+            </Text>
           </View>
           {user.isFastResponder && (
             <View style={styles.badge}>
-              <MaterialCommunityIcons name="lightning-bolt" size={16} color={COLORS.warning} />
+              <MaterialCommunityIcons
+                name="lightning-bolt"
+                size={16}
+                color={COLORS.warning}
+              />
               <Text style={styles.badgeText}>Fast responder</Text>
             </View>
           )}
@@ -493,31 +517,6 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     letterSpacing: 0.15,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
   segmentedControl: {
     flexDirection: 'row',
     marginHorizontal: 16,
@@ -602,7 +601,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 12,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: COLORS.overlay50,
   },
   momentTitle: {
     fontSize: 14,
@@ -612,7 +611,7 @@ const styles = StyleSheet.create({
   },
   momentLocation: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
+    color: COLORS.textWhite80,
     marginBottom: 4,
   },
   momentPrice: {

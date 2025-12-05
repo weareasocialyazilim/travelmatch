@@ -4,13 +4,12 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Modal,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
+import { GenericBottomSheet } from './ui/GenericBottomSheet';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -53,125 +52,84 @@ export const CurrencySelectionBottomSheet: React.FC<
   };
 
   return (
-    <Modal
+    <GenericBottomSheet
       visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
+      onClose={onClose}
+      title="Currency"
+      height="medium"
+      showHandle
+      keyboardAware
+      testID="currency-selection-sheet"
+      accessibilityLabel="Select currency"
+      renderFooter={() => (
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={handleConfirm}
+            accessibilityRole="button"
+            accessibilityLabel="Confirm selection"
+          >
+            <Text style={styles.confirmButtonText}>Confirm Selection</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     >
-      <TouchableOpacity
-        style={styles.backdrop}
-        activeOpacity={1}
-        onPress={onClose}
-      >
-        <TouchableOpacity activeOpacity={1} style={styles.sheetContainer}>
-          {/* Handle */}
-          <View style={styles.handleContainer}>
-            <View style={styles.handle} />
-          </View>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputWrapper}>
+          <MaterialCommunityIcons
+            name={'magnify' as IconName}
+            size={24}
+            color={COLORS.textSecondary}
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search for a currency"
+            placeholderTextColor={COLORS.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            accessibilityLabel="Search currencies"
+          />
+        </View>
+      </View>
 
-          {/* Header */}
-          <Text style={styles.header}>Currency</Text>
-
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <View style={styles.searchInputWrapper}>
-              <MaterialCommunityIcons
-                name={'magnify' as IconName}
-                size={24}
-                color={COLORS.textSecondary}
-                style={styles.searchIcon}
-              />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search for a currency"
-                placeholderTextColor={COLORS.textSecondary}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
+      {/* Currency List */}
+      <ScrollView style={styles.currencyList}>
+        {filteredCurrencies.map((currency) => (
+          <TouchableOpacity
+            key={currency.code}
+            style={[
+              styles.currencyItem,
+              tempSelection === currency.code && styles.currencyItemSelected,
+            ]}
+            onPress={() => setTempSelection(currency.code)}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: tempSelection === currency.code }}
+            accessibilityLabel={`${currency.code} - ${currency.name}`}
+          >
+            <View style={styles.currencyInfo}>
+              <Text style={styles.currencyCode}>{currency.code}</Text>
+              <Text style={styles.currencyName}>{currency.name}</Text>
             </View>
-          </View>
-
-          {/* Currency List */}
-          <ScrollView style={styles.currencyList}>
-            {filteredCurrencies.map((currency) => (
-              <TouchableOpacity
-                key={currency.code}
-                style={[
-                  styles.currencyItem,
-                  tempSelection === currency.code &&
-                    styles.currencyItemSelected,
-                ]}
-                onPress={() => setTempSelection(currency.code)}
-              >
-                <View style={styles.currencyInfo}>
-                  <Text style={styles.currencyCode}>{currency.code}</Text>
-                  <Text style={styles.currencyName}>{currency.name}</Text>
-                </View>
-                <View
-                  style={[
-                    styles.radio,
-                    tempSelection === currency.code && styles.radioSelected,
-                  ]}
-                >
-                  {tempSelection === currency.code && (
-                    <View style={styles.radioDot} />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Confirm Button */}
-          <View style={styles.footer}>
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={handleConfirm}
+            <View
+              style={[
+                styles.radio,
+                tempSelection === currency.code && styles.radioSelected,
+              ]}
             >
-              <Text style={styles.confirmButtonText}>Confirm Selection</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </TouchableOpacity>
-    </Modal>
+              {tempSelection === currency.code && (
+                <View style={styles.radioDot} />
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </GenericBottomSheet>
   );
 };
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
-  },
-  sheetContainer: {
-    backgroundColor: COLORS.cardBackground,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    maxHeight: SCREEN_HEIGHT * 0.9,
-  },
-  handleContainer: {
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 12,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.border,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-    letterSpacing: 0.24,
-  },
   searchContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,

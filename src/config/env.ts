@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Environment Schema
@@ -49,9 +50,9 @@ function getEnvVars() {
     return envSchema.parse(rawEnv);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('❌ Invalid environment variables:');
+      logger.error('❌ Invalid environment variables:');
       error.issues.forEach((err) => {
-        console.error(`  ${err.path.join('.')}: ${err.message}`);
+        logger.error(`  ${err.path.join('.')}: ${err.message}`);
       });
       throw new Error('Invalid environment configuration');
     }
@@ -111,7 +112,7 @@ export const FEATURES = {
  */
 if (isDevelopment) {
   // eslint-disable-next-line no-console
-  console.log('📦 App Configuration:', {
+  logger.debug('📦 App Configuration:', {
     name: config.APP_NAME,
     version: config.APP_VERSION,
     env: config.NODE_ENV,

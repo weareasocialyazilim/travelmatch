@@ -16,7 +16,10 @@ import { COLORS } from '../constants/colors';
 import { LoadingState } from '../components/LoadingState';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
-type ForgotPasswordScreenProps = StackScreenProps<RootStackParamList, 'ForgotPassword'>;
+type ForgotPasswordScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ForgotPassword'
+>;
 
 export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   navigation,
@@ -60,7 +63,11 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Check Your Email</Text>
           <View style={styles.headerSpacer} />
@@ -74,15 +81,15 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
               color={COLORS.success}
             />
           </View>
-          
+
           <Text style={styles.successTitle}>Email Sent!</Text>
           <Text style={styles.successDescription}>
             We&apos;ve sent a password reset link to:
           </Text>
           <Text style={styles.emailText}>{email}</Text>
           <Text style={styles.successHint}>
-            Check your inbox and click the link to reset your password. 
-            The link will expire in 24 hours.
+            Check your inbox and click the link to reset your password. The link
+            will expire in 24 hours.
           </Text>
 
           <TouchableOpacity
@@ -117,7 +124,11 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reset Password</Text>
         <View style={styles.headerSpacer} />
@@ -140,7 +151,8 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
           {/* Description */}
           <Text style={styles.title}>Forgot your password?</Text>
           <Text style={styles.description}>
-            No worries! Enter your email address and we&apos;ll send you a link to reset your password.
+            No worries! Enter your email address and we&apos;ll send you a link
+            to reset your password.
           </Text>
 
           {/* Email Input */}

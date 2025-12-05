@@ -74,7 +74,7 @@ export const UnblockUserBottomSheet: React.FC<UnblockUserBottomSheetProps> = ({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: COLORS.overlay40,
     justifyContent: 'flex-end',
   },
   bottomSheet: {

@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { useTranslation } from '../../hooks/useTranslation';
 import type { SortOption } from '../../stores/searchStore';
@@ -14,6 +15,8 @@ import { useSearchStore } from '../../stores/searchStore';
 import { spacing } from '../../constants/spacing';
 import { radii } from '../../constants/radii';
 import { TYPOGRAPHY } from '../../constants/typography';
+
+type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 interface SortSelectorProps {
   visible: boolean;
@@ -24,7 +27,7 @@ interface SortSelectorProps {
 const SORT_OPTIONS: Array<{
   value: SortOption;
   label: string;
-  icon: string;
+  icon: IconName;
 }> = [
   { value: 'recent', label: 'Most Recent', icon: 'clock-outline' },
   { value: 'popular', label: 'Most Popular', icon: 'fire' },
@@ -77,8 +80,7 @@ export const SortSelector: React.FC<SortSelectorProps> = ({
                 onPress={() => handleSelect(option.value)}
               >
                 <MaterialCommunityIcons
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  name={option.icon as any}
+                  name={option.icon}
                   size={22}
                   color={isSelected ? colors.primary : colors.textSecondary}
                   style={styles.icon}
@@ -88,8 +90,8 @@ export const SortSelector: React.FC<SortSelectorProps> = ({
                     styles.optionText,
                     {
                       color: isSelected ? colors.primary : colors.text,
-                      fontWeight: isSelected ? '600' : '400',
                     },
+                    isSelected ? styles.selectedText : styles.normalText,
                   ]}
                 >
                   {option.label}
@@ -113,7 +115,7 @@ export const SortSelector: React.FC<SortSelectorProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay50,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -151,5 +153,11 @@ const styles = StyleSheet.create({
   optionText: {
     ...TYPOGRAPHY.body,
     flex: 1,
+  },
+  selectedText: {
+    fontWeight: '600',
+  },
+  normalText: {
+    fontWeight: '400',
   },
 });
