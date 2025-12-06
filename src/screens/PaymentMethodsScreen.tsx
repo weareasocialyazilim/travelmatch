@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useScreenPerformance } from '../hooks/useScreenPerformance';
 import {
   View,
   Text,
@@ -11,18 +10,20 @@ import {
   Switch,
   Alert,
   TextInput,
+  Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import BottomNav from '../components/BottomNav';
-import { AddCardBottomSheet } from '../components/AddCardBottomSheet';
-import { RemoveCardModal } from '../components/RemoveCardModal';
-import { ScreenErrorBoundary } from '../components/ErrorBoundary';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
+import { AddCardBottomSheet } from '../components/AddCardBottomSheet';
+import BottomNav from '../components/BottomNav';
+import { ScreenErrorBoundary } from '../components/ErrorBoundary';
+import { RemoveCardModal } from '../components/RemoveCardModal';
+import { useScreenPerformance } from '../hooks/useScreenPerformance';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 interface Wallet {
   id: string;
@@ -73,16 +74,14 @@ const PaymentMethodsScreen = () => {
     checkApplePayAvailability();
   }, [trackMount]);
 
-  const checkApplePayAvailability = async () => {
+  const checkApplePayAvailability = () => {
     if (Platform.OS === 'ios') {
-      // Gerçek uygulamada PassKit ile kontrol edilecek
+      // TODO: Implement real PassKit check when native module is available
       // const isAvailable = await PassKit.canMakePayments();
       // setIsApplePayAvailable(isAvailable);
-
-      // Şimdilik simüle edelim
       setIsApplePayAvailable(true);
     } else if (Platform.OS === 'android') {
-      // Google Pay availability check
+      // TODO: Implement Google Pay availability check
       setIsApplePayAvailable(true);
     }
   };
@@ -104,7 +103,7 @@ const PaymentMethodsScreen = () => {
     setIsAddCardVisible(true);
   };
 
-  const handleConnectWallet = async () => {
+  const handleConnectWallet = () => {
     const walletName = Platform.OS === 'ios' ? 'Apple Pay' : 'Google Pay';
 
     if (!isApplePayAvailable) {
@@ -116,7 +115,9 @@ const PaymentMethodsScreen = () => {
           {
             text: 'Open Settings',
             onPress: () => {
-              // Linking.openSettings(); // Gerçek uygulamada bu kullanılır
+              Linking.openSettings().catch(() => {
+                logger.warn('Could not open device settings');
+              });
               logger.info(`Opening device settings for ${walletName} setup`);
             },
           },
@@ -426,10 +427,14 @@ const PaymentMethodsScreen = () => {
               <Text style={styles.priorityNoticeTitle}>Payment Priority</Text>
               <Text style={styles.priorityNoticeDescription}>
                 {isWalletConnected && walletSettings.isDefaultPayment
-                  ? `${wallets[0]?.name} will be used for all payments. Cards are backup options.`
+                  ? `${
+                      wallets[0]?.name ?? 'Wallet'
+                    } will be used for all payments. Cards are backup options.`
                   : savedCards.find((c) => c.isDefault)
-                  ? `${savedCards.find((c) => c.isDefault)?.brand} •••• ${
-                      savedCards.find((c) => c.isDefault)?.lastFour
+                  ? `${
+                      savedCards.find((c) => c.isDefault)?.brand ?? 'Card'
+                    } •••• ${
+                      savedCards.find((c) => c.isDefault)?.lastFour ?? '****'
                     } will be used for payments.`
                   : 'Please set a default payment method.'}
               </Text>

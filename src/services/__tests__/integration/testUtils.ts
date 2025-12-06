@@ -17,11 +17,28 @@ import axios from 'axios';
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000/api';
 const TEST_TIMEOUT = 10000; // 10 seconds
 
-// Test user credentials (create a test user in your backend)
+/**
+ * Test user credentials
+ * SECURITY: These should ALWAYS be set via environment variables in CI/CD
+ * Never commit real credentials to version control
+ */
 const TEST_CREDENTIALS = {
   email: process.env.TEST_USER_EMAIL || 'test@example.com',
   password: process.env.TEST_USER_PASSWORD || 'TestPass123!',
 };
+
+// Validate test environment
+if (process.env.NODE_ENV === 'production') {
+  throw new Error(
+    'Integration tests should not run in production environment!',
+  );
+}
+
+if (!process.env.TEST_USER_EMAIL || !process.env.TEST_USER_PASSWORD) {
+  console.warn(
+    '⚠️  WARNING: Using default test credentials. Set TEST_USER_EMAIL and TEST_USER_PASSWORD environment variables for CI/CD.',
+  );
+}
 
 // Create axios instance for testing
 export const createTestClient = (): AxiosInstance => {

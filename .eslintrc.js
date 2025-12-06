@@ -212,5 +212,6 @@ module.exports = {
     '*.d.ts',
     '**/*.stories.tsx',
     '**/*.stories.ts',
+    '**/integration/*.ts',
   ],
 };

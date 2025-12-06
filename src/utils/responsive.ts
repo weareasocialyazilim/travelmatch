@@ -56,11 +56,23 @@ export const isSmallDevice = () => {
 };
 
 /**
- * Responsive Width/Height
- * Based on standard mobile width (375px) and height (812px)
+ * Design System Base Dimensions
+ * Based on iPhone 11/12/13 Pro viewport
+ * These values are used as reference for responsive scaling
  */
-const STANDARD_WIDTH = 375;
-const STANDARD_HEIGHT = 812;
+export const DESIGN_SYSTEM = {
+  /** Base width for responsive calculations (iPhone standard) */
+  STANDARD_WIDTH: 375,
+  /** Base height for responsive calculations (iPhone standard) */
+  STANDARD_HEIGHT: 812,
+  /** Minimum touch target size (WCAG 2.1 AA compliance) */
+  MIN_TOUCH_TARGET: 44,
+  /** Default hit slop for touch targets */
+  DEFAULT_HIT_SLOP: 8,
+} as const;
+
+const STANDARD_WIDTH = DESIGN_SYSTEM.STANDARD_WIDTH;
+const STANDARD_HEIGHT = DESIGN_SYSTEM.STANDARD_HEIGHT;
 
 export const responsiveWidth = (size: number): number => {
   const { width } = Dimensions.get('window');
@@ -161,13 +173,22 @@ export const getGridColumns = (): number => {
 
 /**
  * Hit Slop for better touch targets
+ * Improves accessibility by expanding touch area
  */
-export const getHitSlop = (size = 8) => ({
+export const getHitSlop = (size = DESIGN_SYSTEM.DEFAULT_HIT_SLOP) => ({
   top: size,
   bottom: size,
   left: size,
   right: size,
 });
+
+/**
+ * Minimum touch target helper
+ * Ensures touch targets meet WCAG 2.1 AA guidelines (44x44px minimum)
+ */
+export const ensureMinTouchTarget = (size: number): number => {
+  return Math.max(size, DESIGN_SYSTEM.MIN_TOUCH_TARGET);
+};
 
 /**
  * Safe percentages (for avoiding very large/small values)
