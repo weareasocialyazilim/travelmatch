@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { AppError, getErrorMessage } from '../utils/errors';
+import { AppError, getErrorMessage } from '../utils/appErrors';
 
 /**
  * Result returned by useFetch hook
@@ -83,15 +83,17 @@ export function useFetch<T>(
         });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
+          const errorData = (await response.json().catch(() => ({}))) as {
+            message?: string;
+          };
           const errorMessage =
-            errorData.message || `HTTP error! status: ${response.status}`;
+            errorData.message ?? `HTTP error! status: ${response.status}`;
 
           const apiError = new AppError(errorMessage);
           throw apiError;
         }
 
-        const jsonData = await response.json();
+        const jsonData = (await response.json()) as T;
         setData(jsonData);
         options.onSuccess?.(jsonData);
       } catch (err) {
@@ -112,7 +114,7 @@ export function useFetch<T>(
 
   useEffect(() => {
     const abortController = new AbortController();
-    fetchData(abortController);
+    void fetchData(abortController);
 
     return () => {
       abortController.abort();
@@ -120,7 +122,7 @@ export function useFetch<T>(
   }, [url, fetchData]);
 
   const refetch = () => {
-    fetchData();
+    void fetchData();
   };
 
   return { data, loading, error, refetch };

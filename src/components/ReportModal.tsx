@@ -31,12 +31,12 @@ const colors = {
   border: { light: COLORS.border, medium: COLORS.border },
   status: { error: COLORS.danger },
 };
-import type { ReportReason, ReportTarget } from '../services/moderationService';
+import { useToast } from '../context/ToastContext';
 import {
   moderationService,
   REPORT_REASONS,
 } from '../services/moderationService';
-import { useToast } from '../context/ToastContext';
+import type { ReportReason, ReportTarget } from '../services/moderationService';
 
 interface ReportModalProps {
   visible: boolean;

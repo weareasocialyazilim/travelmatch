@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -14,24 +13,43 @@ import {
   UIManager,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import type { NavigationProp, RouteProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BottomNav from '../components/BottomNav';
-import { COLORS } from '../constants/colors';
-import { useRequests } from '../hooks/useRequests';
-import { useNotifications } from '../hooks/useNotifications';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   RequestsListSkeleton as _RequestsListSkeleton,
   ErrorState as _ErrorState,
 } from '../components';
 import { FadeInView as _FadeInView } from '../components/AnimatedComponents';
+import BottomNav from '../components/BottomNav';
+import { EmptyState } from '../components/ui/EmptyState';
+import { COLORS } from '../constants/colors';
+import { useNotifications } from '../hooks/useNotifications';
+import { useRequests } from '../hooks/useRequests';
+import { logger } from '../utils/logger';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp, RouteProp } from '@react-navigation/native';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
+
+// Format time ago
+const formatTimeAgo = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return '1d ago';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+};
 
 // Enable LayoutAnimation for Android
 if (
@@ -142,142 +160,77 @@ const RequestsScreen: React.FC = () => {
   // Use isLoading for future loading indicator
   void isLoading;
 
-  // Mock Data - Pending Requests (fallback)
-  const [requests, setRequests] = useState<RequestItem[]>([
-    {
-      id: 'r1',
-      person: {
-        id: 'mehmet-1',
-        name: 'Mehmet',
-        age: 32,
-        avatar:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-        rating: 4.8,
-        isVerified: true,
-        tripCount: 12,
-        city: 'Istanbul',
-      },
-      momentTitle: 'Dinner',
-      momentEmoji: '🍽️',
-      amount: 120,
-      message: 'Best local food! I know great places in Kadikoy',
-      createdAt: '2024-01-15T10:30:00Z',
-      timeAgo: '1h ago',
-      isNew: true,
-      proofRequired: true,
-      proofUploaded: false,
-    },
-    {
-      id: 'r2',
-      person: {
-        id: 'sarah-1',
-        name: 'Sarah',
-        age: 25,
-        avatar:
-          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-        rating: 4.9,
-        isVerified: true,
-        tripCount: 8,
-        city: 'London',
-      },
-      momentTitle: 'Museum Tour',
-      momentEmoji: '🎭',
-      amount: 50,
-      message: 'Would love to explore the art galleries together!',
-      createdAt: '2024-01-15T09:00:00Z',
-      timeAgo: '2h ago',
-      isNew: true,
-      proofRequired: false,
-      proofUploaded: false,
-    },
-    {
-      id: 'r3',
-      person: {
-        id: 'alex-1',
-        name: 'Alex',
-        age: 28,
-        avatar:
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-        rating: 4.7,
-        isVerified: true,
-        tripCount: 15,
-        city: 'Istanbul',
-      },
-      momentTitle: 'Coffee',
-      momentEmoji: '☕',
-      amount: 25,
-      message: 'Let&apos;s grab a coffee at the best local spot!',
-      createdAt: '2024-01-15T08:00:00Z',
-      timeAgo: '30m ago',
-      isNew: true,
-      proofRequired: false,
-      proofUploaded: false,
-    },
-  ]);
+  // Requests Data
+  const [requests, setRequests] = useState<RequestItem[]>([]);
 
-  // Mock Data - Notifications
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
-    {
-      id: 'n1',
-      type: 'completed',
-      title: 'Experience Completed! 🎉',
-      body: 'Your coffee date with Maria was marked as complete.',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
-      timeAgo: '1h ago',
-      isRead: false,
-      momentId: 'moment-1',
-      targetType: 'moment',
-      targetData: {
-        momentId: 'moment-1',
-        momentTitle: 'Coffee Date',
-      },
-    },
-    {
-      id: 'n2',
-      type: 'review',
-      title: 'New Review',
-      body: 'James left you a 5-star review! ⭐',
-      avatar:
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-      timeAgo: '3h ago',
-      isRead: false,
-      targetType: 'moment',
-      targetData: {
-        momentId: 'moment-museum',
-        momentTitle: 'Museum Tour',
-        reviewerId: 'james-1',
-        reviewerName: 'James',
-        reviewRating: 5,
-      },
-    },
-    {
-      id: 'n3',
-      type: 'payment',
-      title: 'Payment Received',
-      body: 'You received €50 from your museum tour.',
-      timeAgo: '1d ago',
-      isRead: true,
-      targetType: 'wallet',
-      targetData: {
-        transactionId: 'tx-123',
-      },
-    },
-    {
-      id: 'n4',
-      type: 'new_request',
-      title: 'New Request',
-      body: 'Emma wants to join your city walk tour.',
-      avatar:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-      timeAgo: '2d ago',
-      isRead: true,
-      targetType: 'moment',
-      targetData: {
-        momentId: 'moment-2',
-        momentTitle: 'City Walk Tour',
-      },
-    },
-  ]);
+  // Map API requests to UI items
+  useEffect(() => {
+    if (_receivedRequests) {
+      const mappedRequests: RequestItem[] = _receivedRequests.map((req) => ({
+        id: req.id,
+        person: {
+          id: req.requesterId,
+          name: req.requesterName,
+          age: 0, // Not available
+          avatar: req.requesterAvatar,
+          rating: req.requesterRating || 0,
+          isVerified: req.requesterVerified || false,
+          tripCount: 0, // Not available
+          city: req.requesterLocation || '',
+        },
+        momentTitle: req.momentTitle,
+        momentEmoji: '🎁', // Default
+        amount: req.totalPrice,
+        message: req.message || '',
+        createdAt: req.createdAt,
+        timeAgo: formatTimeAgo(req.createdAt),
+        isNew: req.status === 'pending',
+        proofRequired: false,
+        proofUploaded: false,
+      }));
+      setRequests(mappedRequests);
+    }
+  }, [_receivedRequests]);
+
+
+  // Notifications Data
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+  // Map API notifications to UI items
+  useEffect(() => {
+    if (_apiNotifications) {
+      const mappedNotifications: NotificationItem[] = _apiNotifications.map(
+        (notif) => {
+          let type: NotificationItem['type'] = 'new_request';
+          if (notif.type === 'request_accepted') type = 'accepted';
+          if (notif.type === 'request_completed') type = 'completed';
+          if (notif.type === 'review_received') type = 'review';
+          if (notif.type === 'payment_received') type = 'payment';
+
+          let targetType: NotificationItem['targetType'] = 'request';
+          if (notif.type === 'payment_received') targetType = 'wallet';
+          if (notif.type === 'review_received') targetType = 'moment';
+
+          return {
+            id: notif.id,
+            type,
+            title: notif.title,
+            body: notif.body,
+            avatar: notif.userAvatar,
+            timeAgo: formatTimeAgo(notif.createdAt),
+            isRead: notif.read,
+            momentId: notif.momentId,
+            targetType,
+            targetData: {
+              momentId: notif.momentId,
+              userId: notif.userId,
+            },
+          };
+        },
+      );
+      setNotifications(mappedNotifications);
+    }
+  }, [_apiNotifications]);
 
   useEffect(() => {
     loadHiddenIds();
@@ -286,7 +239,10 @@ const RequestsScreen: React.FC = () => {
   const loadHiddenIds = async () => {
     try {
       const hidden = await AsyncStorage.getItem(STORAGE_KEYS.HIDDEN_REQUESTS);
-      if (hidden) setHiddenRequestIds(JSON.parse(hidden));
+      if (hidden) {
+        const parsed = JSON.parse(hidden) as string[];
+        setHiddenRequestIds(parsed);
+      }
     } catch (error) {
       logger.error('Error loading hidden IDs:', error);
     }
@@ -343,8 +299,8 @@ const RequestsScreen: React.FC = () => {
     }
   };
 
-  const handleDecline = async (item: RequestItem) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  const handleDecline = (item: RequestItem) => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     Alert.alert('Decline Request?', `Decline ${item.person.name}'s request?`, [
       { text: 'Cancel', style: 'cancel' },
@@ -723,33 +679,20 @@ const RequestsScreen: React.FC = () => {
           filteredRequests.length > 0 ? (
             filteredRequests.map(renderRequestCard)
           ) : (
-            <View style={styles.emptyState}>
-              <MaterialCommunityIcons
-                name="inbox-outline"
-                size={64}
-                color={COLORS.textSecondary}
-              />
-              <Text style={styles.emptyTitle}>No Pending Requests</Text>
-              <Text style={styles.emptySubtitle}>
-                When travelers request to join your moments, they&apos;ll appear
-                here.
-              </Text>
-            </View>
+            <EmptyState
+              icon="inbox-outline"
+              title="No Pending Requests"
+              description="When travelers request to join your moments, they'll appear here."
+            />
           )
         ) : notifications.length > 0 ? (
           notifications.map(renderNotificationItem)
         ) : (
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons
-              name="bell-outline"
-              size={64}
-              color={COLORS.textSecondary}
-            />
-            <Text style={styles.emptyTitle}>No Notifications</Text>
-            <Text style={styles.emptySubtitle}>
-              You&apos;re all caught up! New updates will appear here.
-            </Text>
-          </View>
+          <EmptyState
+            icon="bell-outline"
+            title="No Notifications"
+            description="You're all caught up! New updates will appear here."
+          />
         )}
       </ScrollView>
 

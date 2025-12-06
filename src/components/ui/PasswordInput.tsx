@@ -4,8 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { Input } from './Input';
 import type { TextInputProps } from 'react-native';
+import { Input } from './Input';
 
 interface PasswordInputProps extends Omit<TextInputProps, 'secureTextEntry'> {
   label?: string;

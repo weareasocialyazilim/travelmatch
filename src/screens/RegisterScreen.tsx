@@ -1,4 +1,3 @@
-import type { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -11,13 +10,14 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { LoadingState } from '../components/LoadingState';
-import SocialButton from '../components/SocialButton';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
+import { LoadingState } from '../components/LoadingState';
+import SocialButton from '../components/SocialButton';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type RegisterScreenProps = StackScreenProps<RootStackParamList, 'Register'>;
 
@@ -114,18 +114,23 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             </Text>
           </View>
 
-          {/* OAuth Buttons */}
-          <View style={styles.socialButtonsContainer}>
-            <SocialButton
-              provider="apple"
-              label="Continue with Apple"
-              onPress={() => handleSocialLogin('apple')}
-            />
-            <SocialButton
-              provider="google"
-              label="Continue with Google"
-              onPress={() => handleSocialLogin('google')}
-            />
+          {/* Social Login */}
+          <View style={styles.socialSection}>
+            <Text style={styles.socialText}>Or sign up with</Text>
+            <View style={styles.socialButtons}>
+              <SocialButton
+                provider="apple"
+                onPress={() => handleSocialLogin('apple')}
+              />
+              <SocialButton
+                provider="google"
+                onPress={() => handleSocialLogin('google')}
+              />
+              <SocialButton
+                provider="facebook"
+                onPress={() => handleSocialLogin('facebook')}
+              />
+            </View>
           </View>
 
           {/* Divider */}

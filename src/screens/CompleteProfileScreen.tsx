@@ -1,4 +1,3 @@
-import type { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -13,12 +12,13 @@ import {
   // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'expo-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LoadingState } from '../components/LoadingState';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
-import { LoadingState } from '../components/LoadingState';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof Icon>['name'];
 
@@ -125,7 +125,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     }
   };
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
     if (!name.trim()) {
       Alert.alert('Name Required', 'Please enter your name');
       return;

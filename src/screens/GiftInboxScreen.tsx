@@ -8,12 +8,14 @@ import {
   Image,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
+
+import { requestService, GiftRequest } from '../services/requestService';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -71,174 +73,73 @@ const GiftInboxScreen: React.FC = () => {
     };
   }, []);
 
-  // Mock data - gerçek uygulamada API&apos;den gelecek
-  const [inboxItems] = useState<GiftInboxItem[]>([
-    {
-      id: '1',
-      sender: {
-        id: 'alex-1',
-        name: 'Alex',
-        age: 28,
-        avatar:
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-        rating: 4.8,
-        isVerified: true,
-        tripCount: 12,
-        city: 'Istanbul',
-      },
-      gifts: [
-        {
-          id: 'g1',
-          momentTitle: 'Coffee at Soho Café',
-          momentEmoji: '☕',
-          amount: 8,
-          message: 'Love your travel stories!',
+  const [inboxItems, setInboxItems] = useState<GiftInboxItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { requests } = await requestService.getReceivedRequests();
+      
+      // Group by requester
+      const grouped = requests.reduce((acc, req) => {
+        const senderId = req.requesterId;
+        if (!acc[senderId]) {
+          acc[senderId] = {
+            id: senderId,
+            sender: {
+              id: senderId,
+              name: req.requesterName,
+              age: 0,
+              avatar: req.requesterAvatar,
+              rating: req.requesterRating || 0,
+              isVerified: req.requesterVerified || false,
+              tripCount: 0,
+              city: typeof req.requesterLocation === 'string' ? req.requesterLocation : '',
+            },
+            gifts: [],
+            totalAmount: 0,
+            latestMessage: '',
+            latestGiftAt: '',
+            canStartChat: false,
+            score: 0,
+          };
+        }
+        
+        acc[senderId].gifts.push({
+          id: req.id,
+          momentTitle: req.momentTitle,
+          momentEmoji: '🎁',
+          amount: req.totalPrice,
+          message: req.message || '',
           paymentType: 'direct',
-          status: 'received',
-          createdAt: '2024-01-15T10:30:00Z',
-        },
-        {
-          id: 'g2',
-          momentTitle: 'Lunch at Kadıköy',
-          momentEmoji: '🍕',
-          amount: 25,
-          message: 'Let&apos;s meet for lunch!',
-          paymentType: 'direct',
-          status: 'received',
-          createdAt: '2024-01-15T14:00:00Z',
-        },
-      ],
-      totalAmount: 33,
-      latestMessage: 'Let&apos;s meet for lunch!',
-      latestGiftAt: '30m ago',
-      canStartChat: true,
-      score: 9,
-    },
-    {
-      id: '2',
-      sender: {
-        id: 'sarah-1',
-        name: 'Sarah',
-        age: 25,
-        avatar:
-          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-        rating: 4.9,
-        isVerified: true,
-        tripCount: 8,
-        city: 'London',
-      },
-      gifts: [
-        {
-          id: 'g3',
-          momentTitle: 'Museum Tour',
-          momentEmoji: '🎭',
-          amount: 50,
-          message: 'Would love to explore together!',
-          paymentType: 'half_escrow',
-          status: 'pending_proof',
-          createdAt: '2024-01-15T09:00:00Z',
-        },
-      ],
-      totalAmount: 50,
-      latestMessage: 'Would love to explore together!',
-      latestGiftAt: '2h ago',
-      canStartChat: false,
-      score: 10,
-    },
-    {
-      id: '3',
-      sender: {
-        id: 'mehmet-1',
-        name: 'Mehmet',
-        age: 32,
-        avatar:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-        rating: 4.7,
-        isVerified: true,
-        tripCount: 15,
-        city: 'Istanbul',
-      },
-      gifts: [
-        {
-          id: 'g4',
-          momentTitle: 'Dinner Experience',
-          momentEmoji: '🍽️',
-          amount: 120,
-          message: 'Dinner on me! Best local food guaranteed.',
-          paymentType: 'full_escrow',
-          status: 'verified',
-          createdAt: '2024-01-14T20:00:00Z',
-        },
-      ],
-      totalAmount: 120,
-      latestMessage: 'Dinner on me! Best local food guaranteed.',
-      latestGiftAt: '1d ago',
-      canStartChat: true,
-      score: 11,
-    },
-    {
-      id: '4',
-      sender: {
-        id: 'emma-1',
-        name: 'Emma',
-        age: 26,
-        avatar:
-          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-        rating: 4.3,
-        isVerified: false,
-        tripCount: 3,
-        city: 'Paris',
-      },
-      gifts: [
-        {
-          id: 'g5',
-          momentTitle: 'Coffee',
-          momentEmoji: '☕',
-          amount: 10,
-          message: 'Hey!',
-          paymentType: 'direct',
-          status: 'received',
-          createdAt: '2024-01-15T08:00:00Z',
-        },
-      ],
-      totalAmount: 10,
-      latestMessage: 'Hey!',
-      latestGiftAt: '3h ago',
-      canStartChat: true,
-      score: 4,
-    },
-    {
-      id: '5',
-      sender: {
-        id: 'john-1',
-        name: 'John',
-        age: 30,
-        avatar:
-          'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
-        rating: 4.6,
-        isVerified: true,
-        tripCount: 7,
-        city: 'Berlin',
-      },
-      gifts: [
-        {
-          id: 'g6',
-          momentTitle: 'Street Food Tour',
-          momentEmoji: '🥙',
-          amount: 15,
-          message: 'Your food photos look amazing!',
-          paymentType: 'direct',
-          status: 'received',
-          createdAt: '2024-01-15T11:00:00Z',
-        },
-      ],
-      totalAmount: 15,
-      latestMessage: 'Your food photos look amazing!',
-      latestGiftAt: '1h ago',
-      canStartChat: true,
-      score: 6,
-    },
-  ]);
+          status: req.status === 'completed' ? 'received' : 'pending_proof',
+          createdAt: req.createdAt,
+        });
+        
+        acc[senderId].totalAmount += req.totalPrice;
+        acc[senderId].score = acc[senderId].totalAmount; // Simple score based on amount
+
+        if (!acc[senderId].latestGiftAt || new Date(req.createdAt) > new Date(acc[senderId].latestGiftAt)) {
+            acc[senderId].latestGiftAt = req.createdAt;
+            acc[senderId].latestMessage = req.message || '';
+        }
+        
+        return acc;
+      }, {} as Record<string, GiftInboxItem>);
+
+      setInboxItems(Object.values(grouped));
+    } catch (error) {
+      console.error('Failed to fetch requests', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
 
   // Top Picks - highest score
   const topPicks = [...inboxItems]
@@ -284,12 +185,8 @@ const GiftInboxScreen: React.FC = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // Clear previous timeout
-    if (refreshTimeoutRef.current) {
-      clearTimeout(refreshTimeoutRef.current);
-    }
-    refreshTimeoutRef.current = setTimeout(() => setRefreshing(false), 1000);
-  }, []);
+    fetchRequests();
+  }, [fetchRequests]);
 
   const handleItemPress = (item: GiftInboxItem) => {
     navigation.navigate('GiftInboxDetail', {

@@ -15,19 +15,10 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { STRINGS } from '../constants/strings';
-import { LAYOUT } from '../constants/layout';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import { useMoments } from '../hooks';
-
-// Import sub-components
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   PhotoSection,
   TitleInput,
@@ -39,6 +30,15 @@ import {
   getCategoryEmoji,
   type Place,
 } from '../components/createMoment';
+import { COLORS } from '../constants/colors';
+import { LAYOUT } from '../constants/layout';
+import { STRINGS } from '../constants/strings';
+import { VALUES } from '../constants/values';
+import { useMoments } from '../hooks';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
+
+// Import sub-components
 
 const CreateMomentScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -191,8 +191,11 @@ const CreateMomentScreen: React.FC = () => {
   // Handlers
   const handleDatePress = useCallback(() => setShowDatePicker(true), []);
   const handleNavigateToPlaceSearch = useCallback(
-    () => navigation.navigate('SelectPlace'),
-    [navigation],
+    () => {
+      // TODO: Implement proper place selection (Google Places or similar)
+      Alert.alert('Not implemented', 'Place selection coming soon');
+    },
+    [],
   );
 
   return (

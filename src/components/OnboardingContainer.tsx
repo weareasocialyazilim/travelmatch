@@ -5,9 +5,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { useTheme } from '../hooks/useTheme';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { useUIStore } from '../stores/uiStore';
-import { useTheme } from '../hooks/useTheme';
 
 interface OnboardingContainerProps {
   children: React.ReactNode;

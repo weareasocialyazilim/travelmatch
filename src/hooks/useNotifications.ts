@@ -216,13 +216,13 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   // Initial load
   useEffect(() => {
-    fetchNotifications(1, false);
-    fetchPreferences();
+    void fetchNotifications(1, false);
+    void fetchPreferences();
   }, [fetchNotifications, fetchPreferences]);
 
   // Refetch when filter changes
   useEffect(() => {
-    fetchNotifications(1, false);
+    void fetchNotifications(1, false);
   }, [currentFilter, fetchNotifications]);
 
   // TODO: Set up real-time subscription

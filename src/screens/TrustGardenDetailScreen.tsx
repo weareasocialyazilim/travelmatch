@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -6,12 +7,14 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
+import { userService, UserProfile } from '../services/userService';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 interface TrustFactor {
   id: string;
@@ -25,15 +28,40 @@ interface TrustFactor {
 
 const TrustGardenDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  // Mock trust data
-  const trustData = {
-    level: 'Blooming' as 'Sprout' | 'Growing' | 'Blooming',
-    score: 92,
-    rank: 'Top 5%',
-    nextLevel: 'Flourishing',
-    pointsToNext: 8,
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { user: profile } = await userService.getCurrentUser();
+        setUserProfile(profile);
+      } catch (error) {
+        logger.error('Failed to fetch profile', error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const trustScore = user?.trustScore || 0;
+  
+  // Calculate level based on score
+  const getLevel = (score: number) => {
+    if (score < 30) return 'Sprout';
+    if (score < 70) return 'Growing';
+    return 'Blooming';
   };
+
+  // Trust data from real user stats
+  const trustData = {
+    level: getLevel(trustScore),
+    score: trustScore,
+    rank: 'Top 10%', // Placeholder until we have global ranking
+    nextLevel: trustScore < 100 ? 'Flourishing' : 'Max',
+    pointsToNext: Math.max(0, 100 - trustScore),
+  };
+
+  const socialScore = (userProfile?.instagram ? 5 : 0) + (userProfile?.twitter ? 5 : 0) + (userProfile?.website ? 5 : 0);
 
   const trustFactors: TrustFactor[] = [
     {
@@ -41,7 +69,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       name: 'Identity Verification',
       description: 'KYC verification status',
       icon: 'shield-check',
-      value: 100,
+      value: user?.kyc === 'Verified' ? 100 : (user?.kyc === 'Pending' ? 50 : 0),
       maxValue: 100,
       tips: [
         'Complete full KYC verification',
@@ -54,12 +82,12 @@ const TrustGardenDetailScreen: React.FC = () => {
       name: 'Social Connections',
       description: 'Connected social accounts',
       icon: 'link-variant',
-      value: 10,
+      value: socialScore,
       maxValue: 15,
       tips: [
         'Connect Instagram (+5%)',
         'Connect X/Twitter (+5%)',
-        'Connect Facebook (+5%)',
+        'Connect Website (+5%)',
       ],
     },
     {
@@ -67,7 +95,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       name: 'Completed Moments',
       description: 'Successfully fulfilled requests',
       icon: 'check-circle',
-      value: 23,
+      value: userProfile?.momentCount || 0,
       maxValue: 30,
       tips: [
         'Complete more moment requests',
@@ -80,7 +108,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       name: 'Response Rate',
       description: 'Reply to requests promptly',
       icon: 'message-reply',
-      value: 95,
+      value: 95, // TODO: Calculate real response rate
       maxValue: 100,
       tips: [
         'Reply within 2 hours',
@@ -93,7 +121,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       name: 'Ratings Received',
       description: 'Average rating from travelers',
       icon: 'star',
-      value: 4.8,
+      value: userProfile?.rating || 0,
       maxValue: 5,
       tips: [
         'Provide authentic experiences',

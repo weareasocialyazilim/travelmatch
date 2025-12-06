@@ -153,8 +153,11 @@ module.exports = {
   },
   overrides: [
     {
-      // Test files - relaxed rules
+      // Test files - relaxed rules and use test tsconfig
       files: ['**/__tests__/**/*', '**/*.test.ts', '**/*.test.tsx', '**/jest.*.js'],
+      parserOptions: {
+        project: './tsconfig.test.json',
+      },
       rules: {
         'no-console': 'off',
         '@typescript-eslint/no-explicit-any': 'off',

@@ -67,6 +67,118 @@ export const usersService = {
       return { data: null, error: error as Error };
     }
   },
+
+  async follow(followerId: string, followingId: string): Promise<{ error: Error | null }> {
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .insert({ follower_id: followerId, following_id: followingId });
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      logger.error('[DB] Follow user error:', error);
+      return { error: error as Error };
+    }
+  },
+
+  async unfollow(followerId: string, followingId: string): Promise<{ error: Error | null }> {
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .delete()
+        .eq('follower_id', followerId)
+        .eq('following_id', followingId);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      logger.error('[DB] Unfollow user error:', error);
+      return { error: error as Error };
+    }
+  },
+
+  async getFollowers(userId: string): Promise<ListResult<any>> {
+    try {
+      const { data, count, error } = await supabase
+        .from('follows')
+        .select('follower:users(*)', { count: 'exact' })
+        .eq('following_id', userId);
+
+      if (error) throw error;
+      
+      const followers = data?.map((item: any) => item.follower) || [];
+      return { data: followers, count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] Get followers error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+
+  async getFollowing(userId: string): Promise<ListResult<any>> {
+    try {
+      const { data, count, error } = await supabase
+        .from('follows')
+        .select('following:users(*)', { count: 'exact' })
+        .eq('follower_id', userId);
+
+      if (error) throw error;
+
+      const following = data?.map((item: any) => item.following) || [];
+      return { data: following, count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] Get following error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+
+  async checkFollowStatus(followerId: string, followingId: string): Promise<{ isFollowing: boolean; error: Error | null }> {
+    try {
+      const { count, error } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('follower_id', followerId)
+        .eq('following_id', followingId);
+
+      if (error) throw error;
+      return { isFollowing: (count || 0) > 0, error: null };
+    } catch (error) {
+      logger.error('[DB] Check follow status error:', error);
+      return { isFollowing: false, error: error as Error };
+    }
+  },
+
+  async search(query: string, limit: number = 10): Promise<ListResult<Tables['users']['Row']>> {
+    try {
+      const { data, count, error } = await supabase
+        .from('users')
+        .select('*', { count: 'exact' })
+        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
+        .limit(limit);
+
+      if (error) throw error;
+      return { data: data || [], count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] Search users error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+
+  async getSuggested(userId: string, limit: number = 5): Promise<ListResult<Tables['users']['Row']>> {
+    try {
+      const { data, count, error } = await supabase
+        .from('users')
+        .select('*', { count: 'exact' })
+        .neq('id', userId)
+        .limit(limit);
+        
+      if (error) throw error;
+      return { data: data || [], count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] Get suggested users error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
 };
 
 /**
@@ -79,6 +191,12 @@ export const momentsService = {
     category?: string;
     userId?: string;
     status?: string;
+    city?: string;
+    country?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    sortBy?: 'newest' | 'price_low' | 'price_high' | 'rating' | 'popular';
+    search?: string;
   }): Promise<ListResult<Tables['moments']['Row']>> {
     if (!isSupabaseConfigured()) {
       return {
@@ -89,7 +207,7 @@ export const momentsService = {
     }
 
     try {
-      let query = supabase.from('moments').select('*', { count: 'exact' });
+      let query = supabase.from('moments').select('*, users(*)', { count: 'exact' });
 
       if (options?.category) {
         query = query.eq('category', options.category);
@@ -101,9 +219,42 @@ export const momentsService = {
         query = query.eq('status', options.status);
       }
 
-      query = query
-        .order('created_at', { ascending: false })
-        .range(
+      // New filters
+      if (options?.city) {
+        query = query.ilike('location', `%${options.city}%`);
+      }
+      if (options?.country) {
+        query = query.ilike('location', `%${options.country}%`);
+      }
+      if (options?.minPrice) {
+        query = query.gte('price', options.minPrice);
+      }
+      if (options?.maxPrice) {
+        query = query.lte('price', options.maxPrice);
+      }
+      if (options?.search) {
+        query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
+      }
+
+      // Sorting
+      if (options?.sortBy) {
+        switch (options.sortBy) {
+          case 'price_low':
+            query = query.order('price', { ascending: true });
+            break;
+          case 'price_high':
+            query = query.order('price', { ascending: false });
+            break;
+          case 'newest':
+          default:
+            query = query.order('created_at', { ascending: false });
+            break;
+        }
+      } else {
+        query = query.order('created_at', { ascending: false });
+      }
+
+      query = query.range(
           options?.offset || 0,
           (options?.offset || 0) + (options?.limit || 20) - 1,
         );
@@ -153,6 +304,63 @@ export const momentsService = {
     }
   },
 
+  async getSaved(userId: string): Promise<ListResult<Tables['moments']['Row']>> {
+    if (!isSupabaseConfigured()) {
+      return {
+        data: [],
+        count: 0,
+        error: new Error('Supabase not configured'),
+      };
+    }
+
+    try {
+      const { data, count, error } = await supabase
+        .from('favorites')
+        .select('moments(*)', { count: 'exact' })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Extract moments from the join result
+      const moments = data?.map((item: any) => item.moments) || [];
+      
+      return { data: moments, count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] Get saved moments error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+
+  async save(userId: string, momentId: string): Promise<{ error: Error | null }> {
+    try {
+      const { error } = await supabase
+        .from('favorites')
+        .insert({ user_id: userId, moment_id: momentId });
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      logger.error('[DB] Save moment error:', error);
+      return { error: error as Error };
+    }
+  },
+
+  async unsave(userId: string, momentId: string): Promise<{ error: Error | null }> {
+    try {
+      const { error } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('user_id', userId)
+        .eq('moment_id', momentId);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      logger.error('[DB] Unsave moment error:', error);
+      return { error: error as Error };
+    }
+  },
+
   async update(
     id: string,
     updates: Tables['moments']['Update'],
@@ -182,6 +390,36 @@ export const momentsService = {
       return { error: null };
     } catch (error) {
       logger.error('[DB] Delete moment error:', error);
+      return { error: error as Error };
+    }
+  },
+
+  async pause(id: string): Promise<{ error: Error | null }> {
+    try {
+      const { error } = await supabase
+        .from('moments')
+        .update({ status: 'paused' })
+        .eq('id', id);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      logger.error('[DB] Pause moment error:', error);
+      return { error: error as Error };
+    }
+  },
+
+  async activate(id: string): Promise<{ error: Error | null }> {
+    try {
+      const { error } = await supabase
+        .from('moments')
+        .update({ status: 'active' })
+        .eq('id', id);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      logger.error('[DB] Activate moment error:', error);
       return { error: error as Error };
     }
   },
@@ -604,6 +842,240 @@ export const notificationsService = {
   },
 };
 
+/**
+ * Moderation Service (Reports & Blocks)
+ */
+export const moderationService = {
+  // Reports
+  async createReport(
+    report: Tables['reports']['Insert'],
+  ): Promise<DbResult<Tables['reports']['Row']>> {
+    try {
+      const { data, error } = await supabase
+        .from('reports')
+        .insert(report)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      logger.error('[DB] Create report error:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+
+  async listReports(
+    userId: string,
+  ): Promise<ListResult<Tables['reports']['Row']>> {
+    try {
+      const { data, count, error } = await supabase
+        .from('reports')
+        .select('*', { count: 'exact' })
+        .eq('reporter_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return { data: data || [], count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] List reports error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+
+  // Blocks
+  async blockUser(
+    block: Tables['blocks']['Insert'],
+  ): Promise<DbResult<Tables['blocks']['Row']>> {
+    try {
+      const { data, error } = await supabase
+        .from('blocks')
+        .insert(block)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      logger.error('[DB] Block user error:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+
+  async unblockUser(
+    blockerId: string,
+    blockedId: string,
+  ): Promise<{ error: Error | null }> {
+    try {
+      const { error } = await supabase
+        .from('blocks')
+        .delete()
+        .eq('blocker_id', blockerId)
+        .eq('blocked_id', blockedId);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      logger.error('[DB] Unblock user error:', error);
+      return { error: error as Error };
+    }
+  },
+
+  async listBlockedUsers(
+    userId: string,
+  ): Promise<ListResult<Tables['blocks']['Row']>> {
+    try {
+      const { data, count, error } = await supabase
+        .from('blocks')
+        .select('*, blocked:users!blocked_id(*)', { count: 'exact' })
+        .eq('blocker_id', userId);
+
+      if (error) throw error;
+      return { data: data || [], count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] List blocked users error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+};
+
+/**
+ * Transactions Service
+ */
+export const transactionsService = {
+  async list(
+    userId: string,
+    options?: {
+      type?: string;
+      status?: string;
+      limit?: number;
+      startDate?: string;
+      endDate?: string;
+    },
+  ): Promise<ListResult<Tables['transactions']['Row']>> {
+    if (!isSupabaseConfigured()) {
+      return {
+        data: [],
+        count: 0,
+        error: new Error('Supabase not configured'),
+      };
+    }
+
+    try {
+      let query = supabase
+        .from('transactions')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (options?.type) {
+        query = query.eq('type', options.type);
+      }
+      if (options?.status) {
+        query = query.eq('status', options.status);
+      }
+      if (options?.startDate) {
+        query = query.gte('created_at', options.startDate);
+      }
+      if (options?.endDate) {
+        query = query.lte('created_at', options.endDate);
+      }
+      if (options?.limit) {
+        query = query.limit(options.limit);
+      }
+
+      const { data, count, error } = await query;
+
+      if (error) throw error;
+      return { data: data || [], count: count || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] List transactions error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+
+  async get(id: string): Promise<DbResult<Tables['transactions']['Row']>> {
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      logger.error('[DB] Get transaction error:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+
+  async create(
+    transaction: Tables['transactions']['Insert'],
+  ): Promise<DbResult<Tables['transactions']['Row']>> {
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert(transaction)
+        .select()
+        .single();
+
+      if (error) throw error;
+      logger.info('[DB] Transaction created:', data?.id);
+      return { data, error: null };
+    } catch (error) {
+      logger.error('[DB] Create transaction error:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+};
+
+/**
+ * Subscriptions Service
+ */
+export const subscriptionsService = {
+  async getPlans(): Promise<ListResult<any>> {
+    if (!isSupabaseConfigured()) {
+      return {
+        data: [],
+        count: 0,
+        error: new Error('Supabase not configured'),
+      };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('is_active', true)
+        .order('price');
+
+      if (error) throw error;
+      return { data: data || [], count: data?.length || 0, error: null };
+    } catch (error) {
+      logger.error('[DB] Get plans error:', error);
+      return { data: [], count: 0, error: error as Error };
+    }
+  },
+
+  async getUserSubscription(userId: string): Promise<DbResult<any>> {
+    try {
+      const { data, error } = await supabase
+        .from('user_subscriptions')
+        .select('*, plan:subscription_plans(*)')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return { data, error: null };
+    } catch (error) {
+      logger.error('[DB] Get user subscription error:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+};
+
 export default {
   users: usersService,
   moments: momentsService,
@@ -612,4 +1084,7 @@ export default {
   conversations: conversationsService,
   reviews: reviewsService,
   notifications: notificationsService,
+  transactions: transactionsService,
+  moderation: moderationService,
+  subscriptions: subscriptionsService,
 };

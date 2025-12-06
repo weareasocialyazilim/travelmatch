@@ -101,13 +101,8 @@ export type {
   FollowUser,
 } from './userService';
 
-export { analyticsService, EVENTS } from './analyticsService';
-export type {
-  AnalyticsEvent,
-  UserProperties,
-  ScreenViewEvent,
-  EventCategory,
-} from './analyticsService';
+export { personalization } from './personalization';
+export type { UserProfile as PersonalizationProfile } from './personalization';
 
 export { cacheService, cache, CACHE_KEYS } from './cacheService';
 export { offlineSyncQueue } from './offlineSyncQueue';

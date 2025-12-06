@@ -1,8 +1,8 @@
 // Shared KYC Progress Bar Component
 import React from 'react';
 import { View, Text } from 'react-native';
-import { kycStyles } from './styles';
 import { getStepProgress } from './constants';
+import { kycStyles } from './styles';
 
 interface KYCProgressBarProps {
   currentStep: string;

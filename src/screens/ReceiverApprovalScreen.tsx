@@ -7,27 +7,77 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { MOCK_SLOTS } from '../mocks';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LoadingState } from '../components/LoadingState';
+import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { VALUES } from '../constants/values';
-import { COLORS } from '../constants/colors';
-import { LoadingState } from '../components/LoadingState';
+
+import { supabase } from '../config/supabase';
+import { logger } from '../utils/logger';
+
+interface GiverSlot {
+  id: string;
+  amount: number;
+  giver: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
+}
 
 export const ReceiverApprovalScreen: React.FC<{
   navigation: {
     navigate: (route: string, params: { [key: string]: unknown }) => void;
     goBack: () => void;
   };
-  route: { params: { momentTitle: string; totalAmount: number } };
+  route: { params: { momentTitle: string; totalAmount: number; momentId: string } };
 }> = ({ navigation, route }) => {
+  const [slots, setSlots] = useState<GiverSlot[]>([]);
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const momentTitle = route.params?.momentTitle || 'Coffee for a Stranger';
-  const totalAmount = route.params?.totalAmount || 50;
+  const momentTitle = route.params?.momentTitle || 'Moment';
+  const totalAmount = route.params?.totalAmount || 0;
+  const momentId = route.params?.momentId;
+
+  React.useEffect(() => {
+    const fetchRequests = async () => {
+      if (!momentId) return;
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('requests')
+          .select(`
+            id,
+            total_price,
+            requester:profiles!user_id(id, full_name, avatar_url)
+          `)
+          .eq('moment_id', momentId)
+          .eq('status', 'pending');
+
+        if (error) throw error;
+
+        const mappedSlots: GiverSlot[] = (data || []).map((item: any) => ({
+          id: item.id,
+          amount: item.total_price,
+          giver: {
+            id: item.requester?.id,
+            name: item.requester?.full_name || 'Unknown',
+            avatar: item.requester?.avatar_url,
+          },
+        }));
+        setSlots(mappedSlots);
+      } catch (err) {
+        logger.error('Error fetching requests', err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRequests();
+  }, [momentId]);
 
   const toggleSlot = (slotId: string) => {
     if (selectedSlots.includes(slotId)) {
@@ -38,35 +88,43 @@ export const ReceiverApprovalScreen: React.FC<{
   };
 
   const handleApprove = async () => {
-    if (selectedSlots.length === 0) {
-      return;
-    }
+    if (selectedSlots.length === 0) return;
 
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // Update status to accepted for selected
+      const { error } = await supabase
+        .from('requests')
+        .update({ status: 'accepted' })
+        .in('id', selectedSlots);
 
-      const approvedGivers = MOCK_SLOTS.filter((slot) =>
-        selectedSlots.includes(slot.id),
-      ).map((slot) => ({
-        id: slot.giver.id,
-        name: slot.giver.name,
-        avatar: slot.giver.avatar,
-        amount: slot.amount,
-      }));
+      if (error) throw error;
+
+      const approvedGivers = slots
+        .filter((slot) => selectedSlots.includes(slot.id))
+        .map((slot) => ({
+          id: slot.giver.id,
+          name: slot.giver.name,
+          avatar: slot.giver.avatar,
+          amount: slot.amount,
+        }));
 
       navigation.navigate('MatchConfirmation', {
         selectedGivers: approvedGivers,
       });
-    }, 1500);
+    } catch (err) {
+      logger.error('Error approving requests', err as Error);
+      // Show error alert
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRejectAll = () => {
     navigation.goBack();
   };
 
-  const selectedTotalAmount = MOCK_SLOTS.filter((slot) =>
+  const selectedTotalAmount = slots.filter((slot) =>
     selectedSlots.includes(slot.id),
   ).reduce((sum, slot) => sum + slot.amount, 0);
 
@@ -111,7 +169,7 @@ export const ReceiverApprovalScreen: React.FC<{
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>Givers</Text>
             <Text style={styles.summaryValue}>
-              {selectedSlots.length}/{MOCK_SLOTS.length}
+              {selectedSlots.length}/{slots.length}
             </Text>
           </View>
         </View>
@@ -141,94 +199,63 @@ export const ReceiverApprovalScreen: React.FC<{
       >
         <Text style={styles.sectionTitle}>Available Givers</Text>
 
-        {MOCK_SLOTS.map((slot) => {
-          const isSelected = selectedSlots.includes(slot.id);
-          return (
-            <TouchableOpacity
-              key={slot.id}
-              style={[styles.slotCard, isSelected && styles.slotCardSelected]}
-              onPress={() => toggleSlot(slot.id)}
-              activeOpacity={0.8}
-            >
-              {/* Position Badge */}
-              <View style={styles.positionBadge}>
-                <Text style={styles.positionText}>#{slot.position}</Text>
-              </View>
-
-              {/* Selection Indicator */}
-              {isSelected && (
-                <View style={styles.selectedBadge}>
-                  <Icon name="check-circle" size={24} color={COLORS.success} />
+        {slots.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>No pending requests found.</Text>
+          </View>
+        ) : (
+          slots.map((slot, index) => {
+            const isSelected = selectedSlots.includes(slot.id);
+            return (
+              <TouchableOpacity
+                key={slot.id}
+                style={[styles.slotCard, isSelected && styles.slotCardSelected]}
+                onPress={() => toggleSlot(slot.id)}
+                activeOpacity={0.8}
+              >
+                {/* Position Badge */}
+                <View style={styles.positionBadge}>
+                  <Text style={styles.positionText}>#{index + 1}</Text>
                 </View>
-              )}
 
-              <View style={styles.slotContent}>
-                {/* Giver Info */}
-                <View style={styles.giverInfo}>
-                  <Image
-                    source={{ uri: slot.giver.avatar }}
-                    style={styles.giverAvatar}
-                  />
-                  <View style={styles.giverDetails}>
-                    <Text style={styles.giverName}>{slot.giver.name}</Text>
-                    <View style={styles.trustBadge}>
-                      <Icon
-                        name="shield-check"
-                        size={14}
-                        color={COLORS.success}
-                      />
-                      <Text style={styles.trustScore}>
-                        {slot.giver.trustScore}% Trust
-                      </Text>
+                {/* Selection Indicator */}
+                {isSelected && (
+                  <View style={styles.selectedBadge}>
+                    <Icon name="check-circle" size={24} color={COLORS.success} />
+                  </View>
+                )}
+
+                <View style={styles.slotContent}>
+                  {/* Giver Info */}
+                  <View style={styles.giverInfo}>
+                    <Image
+                      source={{ uri: slot.giver.avatar || 'https://via.placeholder.com/150' }}
+                      style={styles.giverAvatar}
+                    />
+                    <View style={styles.giverDetails}>
+                      <Text style={styles.giverName}>{slot.giver.name}</Text>
+                      <View style={styles.trustBadge}>
+                        <Icon
+                          name="shield-check"
+                          size={14}
+                          color={COLORS.success}
+                        />
+                        <Text style={styles.trustScore}>
+                          100% Trust
+                        </Text>
+                      </View>
                     </View>
                   </View>
+
+                  {/* Amount */}
+                  <View style={styles.amountContainer}>
+                    <Text style={styles.amountLabel}>Offer</Text>
+                    <Text style={styles.amountValue}>${slot.amount}</Text>
+                  </View>
                 </View>
-
-                {/* Amount */}
-                <View style={styles.amountContainer}>
-                  <Text style={styles.amountLabel}>Offer</Text>
-                  <Text style={styles.amountValue}>${slot.amount}</Text>
-                </View>
-
-                {/* Message */}
-                <View style={styles.messageContainer}>
-                  <Icon
-                    name="message-text"
-                    size={16}
-                    color={COLORS.textSecondary}
-                  />
-                  <Text style={styles.messageText}>{slot.message}</Text>
-                </View>
-
-                {/* Timestamp */}
-                <Text style={styles.timestamp}>{slot.timestamp}</Text>
-
-                {/* View Profile */}
-                <TouchableOpacity
-                  style={styles.profileButton}
-                  onPress={() =>
-                    navigation.navigate('ProfileDetail', {
-                      userId: slot.giver.id,
-                    })
-                  }
-                >
-                  <Text style={styles.profileButtonText}>View Profile</Text>
-                  <Icon name="chevron-right" size={16} color={COLORS.primary} />
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-
-        {/* Empty State */}
-        {MOCK_SLOTS.length === 0 && (
-          <View style={styles.emptyState}>
-            <Icon name="account-off" size={64} color={COLORS.textSecondary} />
-            <Text style={styles.emptyTitle}>No Givers Yet</Text>
-            <Text style={styles.emptySubtitle}>
-              Waiting for kind people to offer support
-            </Text>
-          </View>
+              </TouchableOpacity>
+            );
+          })
         )}
       </ScrollView>
 

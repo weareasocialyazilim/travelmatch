@@ -81,7 +81,7 @@ export function BaseReportScreen<T extends string = string>({
   detailsPlaceholder = 'Please provide more information...',
   summaryCard,
   radioPosition = 'right',
-  testID,
+  testID = 'base-report-screen',
 }: BaseReportScreenProps<T>): React.JSX.Element {
   const [selectedReason, setSelectedReason] = useState<T | null>(null);
   const [additionalDetails, setAdditionalDetails] = useState('');

@@ -3,22 +3,23 @@
  * expo-notifications configuration and utilities
  */
 
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { COLORS } from '../constants/colors';
-import * as Device from 'expo-device';
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
 import { logger } from './logger';
 
 // Configure notification behavior
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
+  handleNotification: () =>
+    Promise.resolve({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
 });
 
 /**
@@ -49,7 +50,10 @@ export async function registerForPushNotifications(): Promise<string | null> {
     }
 
     // Get push token
-    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId as
+      | string
+      | undefined;
 
     if (!projectId) {
       logger.warn('No Expo project ID found. Add to app.json');
@@ -94,7 +98,7 @@ export async function scheduleLocalNotification(
         data,
         sound: true,
       },
-      trigger: trigger || null, // null = immediate
+      trigger: trigger ?? null, // null = immediate
     });
     return id;
   } catch (error) {

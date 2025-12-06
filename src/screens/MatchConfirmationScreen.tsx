@@ -7,17 +7,17 @@ import {
   FlatList,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { RouteProp, NavigationProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import { COLORS } from '../constants/colors';
-import { spacing } from '../constants/spacing';
-import { radii } from '../constants/radii';
-import { TYPOGRAPHY } from '../constants/typography';
-import { SHADOWS } from '../constants/shadows';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '../components/LoadingState';
+import { COLORS } from '../constants/colors';
+import { radii } from '../constants/radii';
+import { SHADOWS } from '../constants/shadows';
+import { spacing } from '../constants/spacing';
+import { TYPOGRAPHY } from '../constants/typography';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type MatchConfirmationScreenRouteProp = RouteProp<
   RootStackParamList,

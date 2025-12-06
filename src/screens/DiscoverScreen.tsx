@@ -11,18 +11,14 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNav from '../components/BottomNav';
+import { MomentsFeedSkeleton } from '../components/ui/SkeletonLoaders';
 import { COLORS } from '../constants/colors';
-import { logger } from '../utils/logger';
-import { MOCK_MOMENTS } from '../mocks';
-import type { Moment } from '../types';
 import { useMoments } from '../hooks/useMoments';
-import { MomentsFeedSkeleton } from '../components/SkeletonLoader';
+import { logger } from '../utils/logger';
 
 // Import modular components
 import {
@@ -31,8 +27,11 @@ import {
   LocationModal,
   POPULAR_CITIES,
   USER_STORIES,
-} from './discover';
-import type { ViewMode, UserStory, PriceRange } from './discover/types';
+} from '../components/discover';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { Moment } from '../types';
+import type { ViewMode, UserStory, PriceRange } from '../components/discover/types';
+import type { NavigationProp } from '@react-navigation/native';
 
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -135,9 +134,9 @@ const DiscoverScreen = () => {
     setIsPaused(false);
   }, []);
 
-  // Use API moments if available, fallback to mock data
+  // Use API moments
   const baseMoments = useMemo(() => {
-    return apiMoments.length > 0 ? apiMoments : MOCK_MOMENTS;
+    return apiMoments;
   }, [apiMoments]);
 
   // Filter and sort moments

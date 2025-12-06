@@ -9,14 +9,14 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
-import type { StackScreenProps } from '@react-navigation/stack';
+import { VALUES } from '../constants/values';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 interface SupportOption {
   id: string;
@@ -108,7 +108,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Support & Help</Text>
-          <View style={styles.placeholder} />
+          <View style={styles.spacer} />
         </View>
 
         <ScrollView
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  placeholder: {
+  spacer: {
     width: 40,
   },
   scrollContent: {

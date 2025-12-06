@@ -170,7 +170,7 @@ export function useAsync<T, Args extends unknown[] = []>(
   // Execute immediately if specified
   useEffect(() => {
     if (immediate) {
-      execute(...([] as unknown as Args));
+      void execute(...([] as unknown as Args));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,16 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
-import { MOCK_TRANSACTION } from '../mocks';
-import type { StackScreenProps } from '@react-navigation/stack';
+import { VALUES } from '../constants/values';
+import { paymentService, Transaction } from '../services/paymentService';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type TransactionDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -24,8 +25,28 @@ type TransactionDetailScreenProps = StackScreenProps<
 
 export const TransactionDetailScreen: React.FC<
   TransactionDetailScreenProps
-> = ({ navigation, route: _route }) => {
-  const transaction = MOCK_TRANSACTION; // In real app, fetch from route.params or API
+> = ({ navigation, route }) => {
+  const { transactionId } = route.params || {};
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTransaction = async () => {
+      if (!transactionId) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const { transaction } = await paymentService.getTransaction(transactionId);
+        setTransaction(transaction);
+      } catch (error) {
+        console.error('Failed to fetch transaction', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTransaction();
+  }, [transactionId]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -68,6 +89,42 @@ export const TransactionDetailScreen: React.FC<
     });
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!transaction) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ color: COLORS.text }}>Transaction not found</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+            <Text style={{ color: COLORS.primary }}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Map transaction data for display
+  const displayTransaction = {
+    ...transaction,
+    recipient: transaction.metadata?.recipient || { name: 'Unknown', avatar: null },
+    paymentMethod: transaction.metadata?.paymentMethod || { type: 'card', last4: '****' },
+    fees: transaction.metadata?.fees || 0,
+    total: transaction.amount + (transaction.metadata?.fees || 0),
+    reference: transaction.id,
+  };
+
+  // Use displayTransaction instead of transaction for the rest of the render
+  const tx = displayTransaction;
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
@@ -81,228 +138,139 @@ export const TransactionDetailScreen: React.FC<
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.white} />
+          <Icon name="arrow-left" size={24} color="#FFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Transaction Details</Text>
-        <TouchableOpacity
-          style={styles.shareButton}
-          onPress={() => {
-            // Implement share functionality
-          }}
-        >
-          <Icon name="share-variant" size={24} color={COLORS.white} />
-        </TouchableOpacity>
+        <View style={styles.spacer} />
       </LinearGradient>
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        style={styles.content}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        {/* Amount Card */}
-        <View style={styles.amountCard}>
+        {/* Status Card */}
+        <View style={styles.statusCard}>
           <View
             style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(transaction.status) },
+              styles.statusIconContainer,
+              { backgroundColor: getStatusColor(tx.status) + '20' },
             ]}
           >
             <Icon
-              name={getStatusIcon(transaction.status)}
-              size={16}
-              color={COLORS.white}
+              name={getStatusIcon(tx.status)}
+              size={40}
+              color={getStatusColor(tx.status)}
             />
-            <Text style={styles.statusText}>
-              {transaction.status.toUpperCase()}
-            </Text>
           </View>
-
-          <Text style={styles.amountLabel}>Amount</Text>
-          <Text style={styles.amountValue}>
-            ${transaction.amount.toFixed(2)}
+          <Text style={styles.amount}>
+            {tx.currency === 'USD' ? '$' : tx.currency}
+            {tx.amount.toFixed(2)}
           </Text>
-          <Text style={styles.transactionTitle}>{transaction.title}</Text>
-        </View>
-
-        {/* Participants */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Participants</Text>
-
-          {transaction.giver && (
-            <View style={styles.participantCard}>
-              <View style={styles.participantLabel}>
-                <Icon name="hand-heart" size={16} color={COLORS.primary} />
-                <Text style={styles.participantLabelText}>Giver</Text>
-              </View>
-              <View style={styles.participantInfo}>
-                <Image
-                  source={{ uri: transaction.giver.avatar }}
-                  style={styles.participantAvatar}
-                />
-                <Text style={styles.participantName}>
-                  {transaction.giver.name}
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {transaction.receiver && (
-            <View style={styles.participantCard}>
-              <View style={styles.participantLabel}>
-                <Icon name="hand-extended" size={16} color={COLORS.accent} />
-                <Text style={styles.participantLabelText}>Receiver</Text>
-              </View>
-              <View style={styles.participantInfo}>
-                <Image
-                  source={{ uri: transaction.receiver.avatar }}
-                  style={styles.participantAvatar}
-                />
-                <Text style={styles.participantName}>
-                  {transaction.receiver.name}
-                </Text>
-              </View>
-            </View>
-          )}
+          <Text
+            style={[styles.statusText, { color: getStatusColor(tx.status) }]}
+          >
+            {tx.status.toUpperCase()}
+          </Text>
+          <Text style={styles.date}>{formatDate(tx.date)}</Text>
         </View>
 
         {/* Transaction Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Transaction Details</Text>
+          <Text style={styles.sectionTitle}>Details</Text>
+          
+          <View style={styles.row}>
+            <Text style={styles.label}>Type</Text>
+            <Text style={styles.value}>
+              {tx.type.replace('_', ' ').toUpperCase()}
+            </Text>
+          </View>
 
-          <View style={styles.detailsCard}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Transaction ID</Text>
-              <Text style={styles.detailValue}>
-                {transaction.transactionId || transaction.id}
-              </Text>
-            </View>
+          <View style={styles.divider} />
 
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Date & Time</Text>
-              <Text style={styles.detailValue}>
-                {formatDate(transaction.date || transaction.createdAt)}
-              </Text>
-            </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Description</Text>
+            <Text style={styles.value}>{tx.description}</Text>
+          </View>
 
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Payment Method</Text>
-              <Text style={styles.detailValue}>
-                {transaction.paymentMethod}
-              </Text>
-            </View>
+          <View style={styles.divider} />
 
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Type</Text>
-              <Text style={styles.detailValue}>
-                {transaction.type.charAt(0).toUpperCase() +
-                  transaction.type.slice(1)}
-              </Text>
-            </View>
-
-            {transaction.description && (
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Description</Text>
-                <Text style={[styles.detailValue, styles.descriptionValue]}>
-                  {transaction.description}
-                </Text>
-              </View>
-            )}
+          <View style={styles.row}>
+            <Text style={styles.label}>Reference</Text>
+            <Text style={styles.value}>{tx.reference}</Text>
           </View>
         </View>
 
-        {/* Linked Proof */}
-        {transaction.proofId && (
+        {/* Recipient Info (if applicable) */}
+        {tx.recipient && tx.recipient.name !== 'Unknown' && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Linked Proof</Text>
-            <TouchableOpacity
-              style={styles.proofCard}
-              onPress={() =>
-                transaction.proofId &&
-                navigation.navigate('ProofDetail', {
-                  proofId: transaction.proofId,
-                })
-              }
-              activeOpacity={0.8}
-            >
-              <Icon name="check-decagram" size={32} color={COLORS.success} />
-              <View style={styles.proofInfo}>
-                <Text style={styles.proofTitle}>View Proof</Text>
-                <Text style={styles.proofSubtitle}>
-                  See the verified proof for this transaction
-                </Text>
-              </View>
-              <Icon
-                name="chevron-right"
-                size={24}
-                color={COLORS.textSecondary}
+            <Text style={styles.sectionTitle}>
+              {tx.type.includes('sent') ? 'Recipient' : 'Sender'}
+            </Text>
+            <View style={styles.recipientContainer}>
+              <Image
+                source={{ uri: tx.recipient.avatar || 'https://ui-avatars.com/api/?name=' + tx.recipient.name }}
+                style={styles.avatar}
               />
-            </TouchableOpacity>
+              <View style={styles.recipientInfo}>
+                <Text style={styles.recipientName}>{tx.recipient.name}</Text>
+                {tx.recipient.id && (
+                  <Text style={styles.recipientId}>ID: {tx.recipient.id}</Text>
+                )}
+              </View>
+            </View>
           </View>
         )}
 
-        {/* Actions */}
+        {/* Payment Method */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Actions</Text>
-
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => {
-              // Implement download receipt
-            }}
-            activeOpacity={0.8}
-          >
-            <Icon name="download" size={24} color={COLORS.primary} />
-            <Text style={styles.actionButtonText}>Download Receipt</Text>
-            <Icon name="chevron-right" size={20} color={COLORS.textSecondary} />
-          </TouchableOpacity>
-
-          {transaction.status === 'completed' && (
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() =>
-                navigation.navigate('RefundRequest', {
-                  transactionId: transaction.id,
-                })
-              }
-              activeOpacity={0.8}
-            >
-              <Icon name="undo-variant" size={24} color={COLORS.warning} />
-              <Text style={styles.actionButtonText}>Request Refund</Text>
-              <Icon
-                name="chevron-right"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => {
-              // Implement report issue
-            }}
-            activeOpacity={0.8}
-          >
-            <Icon name="alert-circle" size={24} color={COLORS.error} />
-            <Text style={styles.actionButtonText}>Report Issue</Text>
-            <Icon name="chevron-right" size={20} color={COLORS.textSecondary} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Help */}
-        <View style={styles.helpCard}>
-          <Icon name="information" size={20} color={COLORS.info} />
-          <View style={styles.helpContent}>
-            <Text style={styles.helpTitle}>Need Help?</Text>
-            <Text style={styles.helpText}>
-              Contact support if you have questions about this transaction.
+          <Text style={styles.sectionTitle}>Payment Method</Text>
+          <View style={styles.paymentMethodContainer}>
+            <Icon name="credit-card" size={24} color={COLORS.text} />
+            <Text style={styles.paymentMethodText}>
+              {tx.paymentMethod.type.toUpperCase()} •••• {tx.paymentMethod.last4}
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.helpButton}
-            onPress={() => navigation.navigate('Support')}
-          >
-            <Text style={styles.helpButtonText}>Contact</Text>
+        </View>
+
+        {/* Breakdown */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Summary</Text>
+          
+          <View style={styles.row}>
+            <Text style={styles.label}>Subtotal</Text>
+            <Text style={styles.value}>
+              {tx.currency === 'USD' ? '$' : tx.currency}
+              {tx.amount.toFixed(2)}
+            </Text>
+          </View>
+
+          {tx.fees > 0 && (
+            <View style={styles.row}>
+              <Text style={styles.label}>Fees</Text>
+              <Text style={styles.value}>
+                {tx.currency === 'USD' ? '$' : tx.currency}
+                {tx.fees.toFixed(2)}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.divider} />
+
+          <View style={styles.row}>
+            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalValue}>
+              {tx.currency === 'USD' ? '$' : tx.currency}
+              {tx.total.toFixed(2)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Actions */}
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.helpButton}>
+            <Icon name="help-circle-outline" size={20} color={COLORS.primary} />
+            <Text style={styles.helpButtonText}>Report an Issue</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

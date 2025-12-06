@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,14 @@ import {
   SafeAreaView,
   ImageBackground,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { supabase } from '@/config/supabase';
 import { COLORS } from '../constants/colors';
-import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -32,25 +34,39 @@ interface MomentGalleryScreenProps {
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// Mock images - replace with actual data
-const GALLERY_IMAGES = [
-  'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=800',
-  'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800',
-  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
-  'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800',
-];
-
 export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
   navigation,
   route,
 }) => {
-  // TODO: Use momentId to fetch gallery data when API is ready
   const momentId = route.params?.momentId || '';
-  void momentId; // Silence unused variable warning until API integration
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (!momentId) return;
+      try {
+        const { data, error } = await supabase
+          .from('moments')
+          .select('images')
+          .eq('id', momentId)
+          .single();
+        
+        if (data?.images && Array.isArray(data.images)) {
+          setImages(data.images);
+        }
+      } catch (error) {
+        console.error('Error fetching gallery', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchImages();
+  }, [momentId]);
 
   const handleNext = () => {
-    if (currentIndex < GALLERY_IMAGES.length - 1) {
+    if (currentIndex < images.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
@@ -61,11 +77,30 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
     }
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator size="large" color={COLORS.white} />
+      </View>
+    );
+  }
+
+  if (images.length === 0) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <Text style={{ color: COLORS.white }}>No images found</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+          <Text style={{ color: COLORS.primary }}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Background Image */}
       <ImageBackground
-        source={{ uri: GALLERY_IMAGES[currentIndex] }}
+        source={{ uri: images[currentIndex] }}
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -98,7 +133,7 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
         <View style={styles.bottomContent}>
           {/* Page Indicators */}
           <View style={styles.pageIndicators}>
-            {GALLERY_IMAGES.map((_, index) => (
+            {images.map((_, index) => (
               <View
                 key={index}
                 style={[
@@ -136,6 +171,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.black,
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backgroundImage: {
     width: SCREEN_WIDTH,

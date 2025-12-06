@@ -7,14 +7,14 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { logger } from '@/utils/logger';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
+import { SHADOWS } from '../constants/shadows';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
-import { SHADOWS } from '../constants/shadows';
 
 interface NotificationPermissionModalProps {
   visible: boolean;
@@ -25,7 +25,7 @@ interface NotificationPermissionModalProps {
 export const NotificationPermissionModal: React.FC<
   NotificationPermissionModalProps
 > = ({ visible, onClose, onAllow }) => {
-  const handleAllow = async () => {
+  const handleAllow = () => {
     // Request notification permissions
     if (Platform.OS === 'ios') {
       // iOS permission request

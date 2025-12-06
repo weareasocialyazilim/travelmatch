@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { StackScreenProps } from '@react-navigation/stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type GestureReceivedScreenProps = StackScreenProps<
   RootStackParamList,
@@ -49,7 +49,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
         title: 'Gesture Received',
         subtitle: isAnonymous
           ? `Anonymous supporter sent you $${amount}`
-          : `${senderName} sent you $${amount}`,
+          : `${senderName ?? 'Someone'} sent you $${amount}`,
         icon: 'gift-outline',
         status: 'completed',
         time: '3 days ago',

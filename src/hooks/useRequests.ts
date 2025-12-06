@@ -2,16 +2,15 @@
  * useRequests Hook
  * Gift request management for both travelers and hosts
  */
-import { logger } from '../utils/logger';
-
 import { useState, useEffect, useCallback } from 'react';
+import { requestService } from '../services/requestService';
+import { logger } from '../utils/logger';
 import type {
   GiftRequest,
   CreateRequestData,
   RequestStatus,
   RequestFilters,
 } from '../services/requestService';
-import { requestService } from '../services/requestService';
 
 interface UseRequestsReturn {
   // Sent requests (as traveler)
@@ -275,18 +274,18 @@ export const useRequests = (): UseRequestsReturn => {
 
   // Initial load
   useEffect(() => {
-    fetchSentRequests();
-    fetchReceivedRequests();
+    void fetchSentRequests();
+    void fetchReceivedRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Refetch when filters change
   useEffect(() => {
-    fetchSentRequests();
+    void fetchSentRequests();
   }, [sentFilter, fetchSentRequests]);
 
   useEffect(() => {
-    fetchReceivedRequests();
+    void fetchReceivedRequests();
   }, [receivedFilter, fetchReceivedRequests]);
 
   return {

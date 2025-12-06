@@ -11,10 +11,10 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
-import { useToast } from '../context/ToastContext';
 import { useConfirmation } from '../context/ConfirmationContext';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { useToast } from '../context/ToastContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -79,17 +79,10 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
       onConfirm: async () => {
         try {
           // Real API call for KVKK/GDPR compliant account deletion
-          const { apiClient } = await import('../utils/api');
-          await apiClient.delete('/user/account', {
-            data: {
-              confirmationText: 'DELETE',
-              reason: 'user_requested',
-            },
-          });
+          const { deleteAccount } = await import('../services/supabaseAuthService');
+          const { error } = await deleteAccount();
 
-          // Clear local auth state
-          const { useAuthStore } = await import('../stores/authStore');
-          await useAuthStore.getState().logout();
+          if (error) throw error;
 
           logger.info('[Account] Deletion request submitted');
           toast.success(

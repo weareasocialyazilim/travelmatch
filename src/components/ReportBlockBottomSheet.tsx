@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -11,9 +10,10 @@ import {
   Dimensions,
   Pressable,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { logger } from '../utils/logger';
 
 interface ReportBlockBottomSheetProps {
   visible: boolean;
@@ -155,7 +155,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                       </View>
                       <View style={styles.actionTextContainer}>
                         <Text style={styles.actionTextBold}>
-                          Block {targetType}
+                          Block {targetType === 'moment' ? 'author' : targetType}
                         </Text>
                         <Text style={styles.actionTextSubtitle}>
                           You won&apos;t see each other

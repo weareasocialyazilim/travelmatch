@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
 import { COLORS } from '../constants/colors';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 

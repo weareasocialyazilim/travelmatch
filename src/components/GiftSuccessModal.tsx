@@ -12,8 +12,8 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '../constants/colors';
-import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
+import { VALUES } from '../constants/values';
 
 interface Props {
   visible: boolean;
@@ -45,7 +45,9 @@ export const GiftSuccessModal: React.FC<Props> = ({
     if (visible) {
       // Haptic feedback
       if (Platform.OS === 'ios') {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        void Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Success,
+        );
       } else {
         Vibration.vibrate(100);
       }

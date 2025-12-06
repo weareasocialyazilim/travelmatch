@@ -3,10 +3,10 @@
  * Image picker, compression, upload ve caching
  */
 
-import * as ImagePicker from 'expo-image-picker';
+import { Platform as _Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import ExpoFileSystem from 'expo-file-system/build/ExpoFileSystem';
-import { Platform as _Platform } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 // Image Types
 export interface ImageAsset {
@@ -223,7 +223,7 @@ export async function cacheImage(
   await initImageCacheDir();
   const IMAGE_CACHE_DIR = getImageCacheDir();
 
-  const name = filename || `cached_${Date.now()}.jpg`;
+  const name = filename ?? `cached_${Date.now()}.jpg`;
   const cachedPath = `${IMAGE_CACHE_DIR}${name}`;
 
   // Download to cache
@@ -281,7 +281,7 @@ export async function getImageCacheSize(): Promise<number> {
 }
 
 /**
- * Format bytes to human readable
+ * Format file size to human readable
  */
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return '0 Bytes';
@@ -292,7 +292,7 @@ export function formatBytes(bytes: number, decimals = 2): string {
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
 /**

@@ -5,8 +5,8 @@
 
 import { useColorScheme } from 'react-native';
 import { useUIStore } from '../stores/uiStore';
-import type { ColorPalette } from '../theme/colors';
 import { LIGHT_COLORS, DARK_COLORS } from '../theme/colors';
+import type { ColorPalette } from '../theme/colors';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 

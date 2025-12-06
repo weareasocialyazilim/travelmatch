@@ -27,7 +27,7 @@ interface PhotoSectionProps {
 
 const PhotoSection: React.FC<PhotoSectionProps> = memo(
   ({ photo, onPhotoSelected }) => {
-    const pickImage = async () => {
+    const pickImage = () => {
       const showPicker = async (useCamera: boolean) => {
         try {
           if (useCamera) {
@@ -81,14 +81,17 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
             cancelButtonIndex: 0,
           },
           (buttonIndex) => {
-            if (buttonIndex === 1) showPicker(true);
-            if (buttonIndex === 2) showPicker(false);
+            if (buttonIndex === 1) void showPicker(true);
+            if (buttonIndex === 2) void showPicker(false);
           },
         );
       } else {
         Alert.alert('Add Photo', 'Choose an option', [
-          { text: 'Take Photo', onPress: () => showPicker(true) },
-          { text: 'Choose from Gallery', onPress: () => showPicker(false) },
+          { text: 'Take Photo', onPress: () => void showPicker(true) },
+          {
+            text: 'Choose from Gallery',
+            onPress: () => void showPicker(false),
+          },
           { text: 'Cancel', style: 'cancel' },
         ]);
       }

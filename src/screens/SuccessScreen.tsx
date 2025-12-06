@@ -14,11 +14,11 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import type { NavigationProp, RouteProp } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp, RouteProp } from '@react-navigation/native';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 

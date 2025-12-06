@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS users (
   privacy_settings JSONB DEFAULT '{"showOnlineStatus": true, "showLastSeen": true}',
   balance DECIMAL(10,2) DEFAULT 0,
   currency TEXT DEFAULT 'TRY',
+  public_key TEXT, -- For E2E Encryption
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   last_seen_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
@@ -97,6 +98,7 @@ CREATE TABLE IF NOT EXISTS messages (
   conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE NOT NULL,
   sender_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   content TEXT NOT NULL,
+  nonce TEXT, -- For E2E Encryption
   type TEXT DEFAULT 'text' CHECK (type IN ('text', 'image', 'location', 'system')),
   metadata JSONB,
   read_at TIMESTAMP WITH TIME ZONE,

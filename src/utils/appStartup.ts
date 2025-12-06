@@ -167,7 +167,7 @@ class AppStartupTracker {
     }
 
     // Report to analytics (lazy load to avoid circular deps)
-    this.reportToAnalytics(report);
+    void this.reportToAnalytics(report);
 
     return report;
   }

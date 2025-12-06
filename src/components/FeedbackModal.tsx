@@ -15,16 +15,16 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
-import { SPACING } from '@/constants/spacing';
-import { RADII } from '@/constants/radii';
-import { useHaptics } from '@/hooks/useHaptics';
-import { analytics } from '@/services/analytics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { RADII } from '@/constants/radii';
+import { SPACING } from '@/constants/spacing';
+import { useHaptics } from '@/hooks/useHaptics';
+import { analytics } from '@/services/analytics';
+import { COLORS } from '../constants/colors';
 
 interface FeedbackModalProps {
   visible: boolean;
@@ -79,22 +79,22 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   const handleRatingPress = (value: number) => {
     setRating(value);
-    impact('light');
+    void impact('light');
   };
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
-    impact('light');
+    void impact('light');
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (rating === 0) {
-      impact('warning');
+      void impact('warning');
       return;
     }
 
     setIsSubmitting(true);
-    impact('medium');
+    void impact('medium');
 
     // Track feedback event using trackEvent for custom event names
     analytics.trackEvent('feedback_submitted', {
@@ -108,7 +108,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
     // Call parent handler
     if (onSubmit) {
-      await onSubmit({
+      onSubmit({
         rating,
         comment,
         category: selectedCategory,

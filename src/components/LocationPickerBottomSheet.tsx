@@ -7,8 +7,8 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import MapView, { Marker } from 'react-native-maps';
 import { COLORS } from '../constants/colors';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

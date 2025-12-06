@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -9,11 +8,12 @@ import {
   SafeAreaView,
   Switch,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../constants/colors';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { logger } from '../utils/logger';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -114,7 +114,7 @@ export const NotificationSettingsScreen: React.FC<
       try {
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
         if (saved) {
-          const savedValues = JSON.parse(saved);
+          const savedValues = JSON.parse(saved) as Record<string, boolean>;
           setSections((prev) =>
             prev.map((section) => ({
               ...section,
@@ -129,7 +129,7 @@ export const NotificationSettingsScreen: React.FC<
         logger.debug('Failed to load notification settings');
       }
     };
-    loadSettings();
+    void loadSettings();
   }, []);
 
   const toggleSetting = async (sectionIndex: number, settingId: string) => {

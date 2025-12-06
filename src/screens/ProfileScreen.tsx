@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -8,123 +9,107 @@ import {
   Image,
   FlatList,
   Dimensions,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNav from '../components/BottomNav';
 import { COLORS } from '../constants/colors';
 import { useAuth } from '../context/AuthContext';
-import {
-  CURRENT_USER,
-  isVerified as checkIsVerified,
-  getProofScore,
-} from '../mocks/currentUser';
+import { useMoments } from '../hooks/useMoments';
+import { userService, UserProfile } from '../services/userService';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
+import type { Moment } from '../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AVATAR_SIZE = 90;
 const MOMENT_CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
 
-// Mock moments data - user's own moments
-const MOCK_MOMENTS = [
-  {
-    id: '1',
-    title: 'Coffee Tour',
-    image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
-    price: 25,
-    isActive: true,
-    location: 'Istanbul, Turkey',
-  },
-  {
-    id: '2',
-    title: 'Street Food Walk',
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400',
-    price: 40,
-    isActive: true,
-    location: 'Bangkok, Thailand',
-  },
-  {
-    id: '3',
-    title: 'Art Gallery Visit',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-    price: 30,
-    isActive: true,
-    location: 'Paris, France',
-  },
-  {
-    id: '4',
-    title: 'Jazz Night',
-    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400',
-    price: 35,
-    isActive: false,
-    location: 'New Orleans, USA',
-  },
-  {
-    id: '5',
-    title: 'Wine Tasting',
-    image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400',
-    price: 55,
-    isActive: false,
-    location: 'Napa Valley, USA',
-  },
-];
-
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
 
-  // Get user from auth context, fallback to mock
+  // Get user from auth context
   const { user: authUser, isLoading: _authLoading } = useAuth();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  // User data - merge auth user with mock data for complete profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { user } = await userService.getCurrentUser();
+        setUserProfile(user);
+      } catch (error) {
+        logger.error('Failed to fetch user profile', error);
+      }
+    };
+    if (authUser) {
+      fetchProfile();
+    }
+  }, [authUser]);
+  
+  // Get moments
+  const { 
+    myMoments, 
+    myMomentsLoading, 
+    loadMyMoments 
+  } = useMoments();
+
+  useEffect(() => {
+    loadMyMoments();
+  }, [loadMyMoments]);
+
+  // User data - merge auth user with profile data
   const userData = useMemo(() => {
     if (authUser) {
-      // Use auth user data with fallbacks from mock
+      // Use auth user data with fallbacks from profile
       const authUserAny = authUser as unknown as Record<string, unknown>;
       return {
-        name: authUser.name || CURRENT_USER.name,
+        name: authUser.name || userProfile?.name || 'User',
         avatarUrl:
           (authUserAny.profilePhoto as string) ||
           (authUserAny.avatarUrl as string) ||
-          CURRENT_USER.avatarUrl,
+          userProfile?.avatar ||
+          'https://ui-avatars.com/api/?name=User',
         isVerified:
-          authUser.kyc === 'Verified' || checkIsVerified(CURRENT_USER),
+          authUser.kyc === 'Verified' || userProfile?.isVerified || false,
         location:
           typeof authUser.location === 'string'
             ? authUser.location
             : (authUser.location as { city?: string })?.city ||
-              CURRENT_USER.location,
-        trustScore: getProofScore(CURRENT_USER), // Will be from API later
-        momentsCount: CURRENT_USER.momentsCount,
-        exchangesCount: CURRENT_USER.exchangesCount,
-        responseRate: CURRENT_USER.responseRate,
-        activeMoments: CURRENT_USER.activeMoments,
-        completedMoments: CURRENT_USER.completedMoments,
-        walletBalance: CURRENT_USER.walletBalance,
-        giftsSentCount: CURRENT_USER.giftsSentCount,
-        savedCount: CURRENT_USER.savedCount,
+              userProfile?.location?.city ||
+              'Unknown Location',
+        trustScore: authUser.trustScore || userProfile?.rating || 0,
+        momentsCount: myMoments.length || userProfile?.momentCount || 0,
+        exchangesCount: (userProfile?.giftsSent || 0) + (userProfile?.giftsReceived || 0),
+        responseRate: 100, // TODO: Calculate response rate
+        activeMoments: myMoments.filter(m => ['active', 'paused', 'draft'].includes(m.status)).length,
+        completedMoments: myMoments.filter(m => m.status === 'completed').length,
+        walletBalance: 0, // TODO: Fetch wallet balance
+        giftsSentCount: userProfile?.giftsSent || 0,
+        savedCount: 0, // TODO: Fetch saved count
       };
     }
 
-    // Fallback to mock data
+    // Fallback for guest/loading
     return {
-      name: CURRENT_USER.name,
-      avatarUrl: CURRENT_USER.avatarUrl,
-      isVerified: checkIsVerified(CURRENT_USER),
-      location: CURRENT_USER.location,
-      trustScore: getProofScore(CURRENT_USER),
-      momentsCount: CURRENT_USER.momentsCount,
-      exchangesCount: CURRENT_USER.exchangesCount,
-      responseRate: CURRENT_USER.responseRate,
-      activeMoments: CURRENT_USER.activeMoments,
-      completedMoments: CURRENT_USER.completedMoments,
-      walletBalance: CURRENT_USER.walletBalance,
-      giftsSentCount: CURRENT_USER.giftsSentCount,
-      savedCount: CURRENT_USER.savedCount,
+      name: 'Guest',
+      avatarUrl: 'https://ui-avatars.com/api/?name=User',
+      isVerified: false,
+      location: '',
+      trustScore: 0,
+      momentsCount: 0,
+      exchangesCount: 0,
+      responseRate: 0,
+      activeMoments: 0,
+      completedMoments: 0,
+      walletBalance: 0,
+      giftsSentCount: 0,
+      savedCount: 0,
     };
-  }, [authUser]);
+  }, [authUser, myMoments, userProfile]);
 
   // Navigation handlers
   const handleEditProfile = () => navigation.navigate('EditProfile');
@@ -135,54 +120,72 @@ const ProfileScreen: React.FC = () => {
   const handleMyGifts = () => navigation.navigate('MyGifts');
   const handleSavedMoments = () => navigation.navigate('SavedMoments');
 
-  const activeMoments = MOCK_MOMENTS.filter((m) => m.isActive);
-  const pastMoments = MOCK_MOMENTS.filter((m) => !m.isActive);
-  const displayedMoments = activeTab === 'active' ? activeMoments : pastMoments;
-
-  const renderMomentCard = ({ item }: { item: (typeof MOCK_MOMENTS)[0] }) => (
-    <TouchableOpacity
-      style={styles.momentCard}
-      activeOpacity={0.8}
-      accessibilityLabel={`${item.title}, $${item.price}`}
-      accessibilityRole="button"
-      accessibilityHint="Opens moment details"
-      onPress={() =>
-        navigation.navigate('MomentDetail', {
-          moment: {
-            id: item.id,
-            title: item.title,
-            imageUrl: item.image,
-            image: item.image,
-            price: item.price,
-            story: `Experience ${item.title} - a unique local moment curated by you.`,
-            availability: item.isActive ? 'Available' : 'Completed',
-            status: item.isActive ? 'active' : 'completed',
-            location: {
-              name: item.location,
-              city: item.location.split(', ')[0],
-              country: item.location.split(', ')[1] || '',
-            },
-            user: {
-              id: 'current-user',
-              name: userData.name,
-              avatar: userData.avatarUrl,
-              isVerified: userData.isVerified,
-              location: userData.location,
-            },
-          },
-          isOwner: true, // This is the user's own moment
-        })
-      }
-    >
-      <Image source={{ uri: item.image }} style={styles.momentImage} />
-      <View style={styles.momentInfo}>
-        <Text style={styles.momentTitle} numberOfLines={1}>
-          {item.title}
-        </Text>
-        <Text style={styles.momentPrice}>${item.price}</Text>
-      </View>
-    </TouchableOpacity>
+  const activeMomentsList = useMemo(() => 
+    myMoments.filter(m => ['active', 'paused', 'draft'].includes(m.status)),
+    [myMoments]
   );
+
+  const pastMomentsList = useMemo(() => 
+    myMoments.filter(m => m.status === 'completed'),
+    [myMoments]
+  );
+
+  const displayedMoments = activeTab === 'active' ? activeMomentsList : pastMomentsList;
+
+  const renderMomentCard = ({ item }: { item: Moment }) => {
+    const locationStr = typeof item.location === 'string' 
+      ? item.location 
+      : `${item.location?.city || ''}, ${item.location?.country || ''}`;
+      
+    return (
+      <TouchableOpacity
+        style={styles.momentCard}
+        activeOpacity={0.8}
+        accessibilityLabel={`${item.title}, $${item.pricePerGuest}`}
+        accessibilityRole="button"
+        accessibilityHint="Opens moment details"
+        onPress={() =>
+          navigation.navigate('MomentDetail', {
+            moment: {
+              ...item,
+              story: item.description || `Experience ${item.title}`,
+              imageUrl: item.images?.[0] || 'https://ui-avatars.com/api/?name=Moment',
+              image: item.images?.[0] || 'https://ui-avatars.com/api/?name=Moment',
+              price: item.pricePerGuest,
+              availability: item.status === 'active' ? 'Available' : 'Completed',
+              user: {
+                id: 'current-user',
+                name: userData.name,
+                avatar: userData.avatarUrl,
+                isVerified: userData.isVerified,
+                location: userData.location,
+                type: 'traveler',
+                travelDays: 0,
+              },
+              giftCount: 0,
+              category: {
+                id: item.category,
+                label: item.category,
+                emoji: '✨',
+              },
+            },
+            isOwner: true, // This is the user's own moment
+          })
+        }
+      >
+        <Image 
+          source={{ uri: item.images?.[0] || 'https://ui-avatars.com/api/?name=Moment' }} 
+          style={styles.momentImage} 
+        />
+        <View style={styles.momentInfo}>
+          <Text style={styles.momentTitle} numberOfLines={1}>
+            {item.title}
+          </Text>
+          <Text style={styles.momentPrice}>${item.pricePerGuest}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.wrapper}>
@@ -222,6 +225,13 @@ const ProfileScreen: React.FC = () => {
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={myMomentsLoading}
+              onRefresh={loadMyMoments}
+              tintColor={COLORS.coral}
+            />
+          }
         >
           {/* Profile Info Section */}
           <View style={styles.profileSection}>
@@ -444,7 +454,11 @@ const ProfileScreen: React.FC = () => {
 
           {/* Moments Grid */}
           <View style={styles.momentsGrid}>
-            {displayedMoments.length > 0 ? (
+            {myMomentsLoading && myMoments.length === 0 ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.coral} />
+              </View>
+            ) : displayedMoments.length > 0 ? (
               <FlatList
                 data={displayedMoments}
                 renderItem={renderMomentCard}
@@ -740,6 +754,10 @@ const styles = StyleSheet.create({
   momentsGrid: {
     paddingHorizontal: 16,
     paddingTop: 16,
+  },
+  loadingContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
   },
   momentsContent: {
     gap: 12,

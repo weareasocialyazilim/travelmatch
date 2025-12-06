@@ -101,7 +101,7 @@ class CacheService {
       const stored = await AsyncStorage.getItem(getCacheKey(key));
       if (!stored) return null;
 
-      const cacheItem: CacheItem<T> = JSON.parse(stored);
+      const cacheItem = JSON.parse(stored) as CacheItem<T>;
 
       // Check expiry
       if (Date.now() >= cacheItem.expiresAt) {
@@ -137,7 +137,7 @@ class CacheService {
       const stored = await AsyncStorage.getItem(getCacheKey(key));
       if (!stored) return { data: null, isStale: false };
 
-      const cacheItem: CacheItem<T> = JSON.parse(stored);
+      const cacheItem = JSON.parse(stored) as CacheItem<T>;
       const isStale = Date.now() >= cacheItem.expiresAt;
 
       // Update memory cache

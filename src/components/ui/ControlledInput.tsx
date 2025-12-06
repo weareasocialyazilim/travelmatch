@@ -4,12 +4,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import type { Control, FieldValues, Path } from 'react-hook-form';
+import type { TextInputProps } from 'react-native';
 import { Controller } from 'react-hook-form';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Input } from './Input';
 import { PasswordInput } from './PasswordInput';
-import type { TextInputProps } from 'react-native';
+import type { Control, FieldValues, Path } from 'react-hook-form';
 
 interface ControlledInputProps<T extends FieldValues>
   extends Omit<

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -9,12 +8,13 @@ import {
   Switch,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { logger } from '../utils/logger';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 interface ActiveSession {
   id: string;
@@ -147,7 +147,7 @@ const SecurityScreen: React.FC = () => {
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Security</Text>
-        <View style={styles.placeholder} />
+        <View style={styles.spacer} />
       </View>
 
       <ScrollView
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.text,
   },
-  placeholder: {
+  spacer: {
     width: 40,
   },
   scrollView: {

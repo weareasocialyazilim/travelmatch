@@ -7,18 +7,18 @@ import {
   Modal,
   Platform,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { radii } from '../constants/radii';
-import { spacing } from '../constants/spacing';
 import { SHADOWS } from '../constants/shadows';
+import { spacing } from '../constants/spacing';
 
 interface Props {
   visible: boolean;

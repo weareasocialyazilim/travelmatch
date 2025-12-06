@@ -9,12 +9,12 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
-import type { StackScreenProps } from '@react-navigation/stack';
+import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -173,9 +173,9 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     if (action === 'report') {
       Alert.alert(
         'Report Submitted',
-        `Thank you for reporting. We'll review this profile.\n\nReason: ${reason}${
-          details ? `\nDetails: ${details}` : ''
-        }`,
+        `Thank you for reporting. We'll review this profile.\n\nReason: ${
+          reason ?? 'Not specified'
+        }${details ? `\nDetails: ${details}` : ''}`,
         [{ text: 'OK' }],
       );
     } else if (action === 'block') {

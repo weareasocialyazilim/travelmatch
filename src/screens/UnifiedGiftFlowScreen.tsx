@@ -5,7 +5,6 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { useScreenPerformance } from '../hooks/useScreenPerformance';
 import {
   View,
   Text,
@@ -17,17 +16,18 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LoadingState } from '../components/LoadingState';
 import { COLORS } from '../constants/colors';
-import { SPACING } from '../constants/spacing';
 import { RADII } from '../constants/radii';
-import type { StackScreenProps } from '@react-navigation/stack';
+import { SPACING } from '../constants/spacing';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useHaptics } from '../hooks/useHaptics';
+import { useScreenPerformance } from '../hooks/useScreenPerformance';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { Moment } from '../types';
-import { useHaptics } from '../hooks/useHaptics';
-import { useAnalytics } from '../hooks/useAnalytics';
-import { LoadingState } from '../components/LoadingState';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 interface PaymentMethod {
   id: string;
@@ -118,14 +118,14 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   );
 
   // Handle gift purchase
-  const handlePurchase = useCallback(async () => {
+  const handlePurchase = useCallback(() => {
     if (!recipientEmail) {
       alert('Please enter recipient email');
       return;
     }
 
     setLoading(true);
-    impact('medium');
+    void impact('medium');
 
     trackEvent('gift_purchase_started', {
       momentId: moment.id,

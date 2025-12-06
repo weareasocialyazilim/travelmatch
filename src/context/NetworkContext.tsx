@@ -18,13 +18,13 @@ import {
   TouchableOpacity,
   Animated,
 } from 'react-native';
-import type { NetInfoState } from '@react-native-community/netinfo';
-import NetInfo from '@react-native-community/netinfo';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import NetInfo from '@react-native-community/netinfo';
 import { COLORS } from '../constants/colors';
-import { spacing } from '../constants/spacing';
 import { radii as _radii } from '../constants/radii';
+import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
+import type { NetInfoState } from '@react-native-community/netinfo';
 
 interface NetworkContextValue {
   isConnected: boolean;

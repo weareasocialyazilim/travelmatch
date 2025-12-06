@@ -32,8 +32,8 @@ const colors = {
     error: COLORS.danger,
   },
 };
-import { moderationService } from '../services/moderationService';
 import { useToast } from '../context/ToastContext';
+import { moderationService } from '../services/moderationService';
 
 interface BlockConfirmationProps {
   visible: boolean;

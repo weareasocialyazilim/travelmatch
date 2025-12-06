@@ -146,8 +146,9 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   ): string => {
     if (!params) return text;
 
-    return text.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-      return params[key]?.toString() ?? `{{${key}}}`;
+    return text.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
+      const value = params[key];
+      return value !== undefined ? String(value) : `{{${key}}}`;
     });
   };
 

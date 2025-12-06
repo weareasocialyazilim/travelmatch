@@ -1,435 +1,386 @@
 /**
  * FilterModal Component
- * Filter and sort modal for Discover screen
+ * Category, sort, distance, and price filters
  */
 
-import React, { memo, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
-  Modal,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  ScrollView,
   StyleSheet,
+  Modal,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { LAYOUT } from '../../constants/layout';
 import { CATEGORIES, SORT_OPTIONS } from './constants';
-
-// Note: For production, install @react-native-community/slider
-// For now, we'll use a simplified price/distance display
+import type { PriceRange } from './types';
 
 interface FilterModalProps {
   visible: boolean;
   onClose: () => void;
   selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
   sortBy: string;
+  setSortBy: (sort: string) => void;
   maxDistance: number;
-  priceRange: { min: number; max: number };
-  onCategoryChange: (category: string) => void;
-  onSortChange: (sort: string) => void;
-  onDistanceChange: (distance: number) => void;
-  onPriceRangeChange: (range: { min: number; max: number }) => void;
-  onApply: () => void;
-  onClear: () => void;
+  setMaxDistance: (distance: number) => void;
+  priceRange: PriceRange;
+  setPriceRange: (range: PriceRange) => void;
 }
 
-const FilterModal: React.FC<FilterModalProps> = memo(
-  ({
-    visible,
-    onClose,
-    selectedCategory,
-    sortBy,
-    maxDistance,
-    priceRange,
-    onCategoryChange,
-    onSortChange,
-    onDistanceChange,
-    onPriceRangeChange,
-    onApply,
-    onClear,
-  }) => {
-    const [localCategory, setLocalCategory] = useState(selectedCategory);
-    const [localSort, setLocalSort] = useState(sortBy);
-    const [localDistance, setLocalDistance] = useState(maxDistance);
-    const [localPriceRange, setLocalPriceRange] = useState(priceRange);
+const DISTANCE_OPTIONS = [5, 10, 25, 50, 100];
 
-    const handleApply = () => {
-      onCategoryChange(localCategory);
-      onSortChange(localSort);
-      onDistanceChange(localDistance);
-      onPriceRangeChange(localPriceRange);
-      onApply();
-      onClose();
-    };
+const PRICE_OPTIONS = [
+  { min: 0, max: 50, label: '$0-50' },
+  { min: 50, max: 100, label: '$50-100' },
+  { min: 100, max: 250, label: '$100-250' },
+  { min: 0, max: 500, label: 'All' },
+];
 
-    const handleClear = () => {
-      setLocalCategory('all');
-      setLocalSort('nearest');
-      setLocalDistance(50);
-      setLocalPriceRange({ min: 0, max: 500 });
-      onClear();
-    };
+export const FilterModal: React.FC<FilterModalProps> = ({
+  visible,
+  onClose,
+  selectedCategory,
+  setSelectedCategory,
+  sortBy,
+  setSortBy,
+  maxDistance,
+  setMaxDistance,
+  priceRange,
+  setPriceRange,
+}) => {
+  const handleReset = () => {
+    setSelectedCategory('all');
+    setSortBy('nearest');
+    setMaxDistance(50);
+    setPriceRange({ min: 0, max: 500 });
+  };
 
-    return (
-      <Modal
-        visible={visible}
-        animationType="slide"
-        transparent
-        onRequestClose={onClose}
-      >
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.filterModal}>
-                {/* Header */}
-                <View style={styles.filterHeader}>
-                  <TouchableOpacity onPress={handleClear}>
-                    <Text style={styles.filterClearText}>Clear</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.filterTitle}>Filters</Text>
-                  <TouchableOpacity onPress={onClose}>
-                    <MaterialCommunityIcons
-                      name="close"
-                      size={24}
-                      color={COLORS.text}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  {/* Categories */}
-                  <View style={styles.filterSection}>
-                    <Text style={styles.filterSectionTitle}>Category</Text>
-                    <View style={styles.categoryGrid}>
-                      {CATEGORIES.map((cat) => (
-                        <TouchableOpacity
-                          key={cat.id}
-                          style={[
-                            styles.categoryItem,
-                            localCategory === cat.id &&
-                              styles.categoryItemSelected,
-                          ]}
-                          onPress={() => setLocalCategory(cat.id)}
-                          accessibilityRole="button"
-                          accessibilityState={{
-                            selected: localCategory === cat.id,
-                          }}
-                        >
-                          <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                          <Text
-                            style={[
-                              styles.categoryLabel,
-                              localCategory === cat.id &&
-                                styles.categoryLabelSelected,
-                            ]}
-                          >
-                            {cat.label}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  {/* Sort Options */}
-                  <View style={styles.filterSection}>
-                    <Text style={styles.filterSectionTitle}>Sort by</Text>
-                    <View style={styles.sortOptions}>
-                      {SORT_OPTIONS.map((opt) => (
-                        <TouchableOpacity
-                          key={opt.id}
-                          style={[
-                            styles.sortOption,
-                            localSort === opt.id && styles.sortOptionSelected,
-                          ]}
-                          onPress={() => setLocalSort(opt.id)}
-                          accessibilityRole="button"
-                          accessibilityState={{
-                            selected: localSort === opt.id,
-                          }}
-                        >
-                          <MaterialCommunityIcons
-                            name={opt.icon}
-                            size={18}
-                            color={
-                              localSort === opt.id
-                                ? COLORS.text
-                                : COLORS.textSecondary
-                            }
-                          />
-                          <Text
-                            style={[
-                              styles.sortLabel,
-                              localSort === opt.id && styles.sortLabelSelected,
-                            ]}
-                          >
-                            {opt.label}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  {/* Distance Slider */}
-                  <View style={styles.filterSection}>
-                    <View style={styles.sliderHeader}>
-                      <Text style={styles.filterSectionTitle}>
-                        Maximum Distance
-                      </Text>
-                      <Text style={styles.sliderValue}>{localDistance} km</Text>
-                    </View>
-                    {/* Simple distance buttons instead of slider */}
-                    <View style={styles.distanceButtons}>
-                      {[5, 10, 25, 50, 100].map((dist) => (
-                        <TouchableOpacity
-                          key={dist}
-                          style={[
-                            styles.distanceButton,
-                            localDistance === dist &&
-                              styles.distanceButtonActive,
-                          ]}
-                          onPress={() => setLocalDistance(dist)}
-                        >
-                          <Text
-                            style={[
-                              styles.distanceButtonText,
-                              localDistance === dist &&
-                                styles.distanceButtonTextActive,
-                            ]}
-                          >
-                            {dist} km
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  {/* Price Range */}
-                  <View style={styles.filterSection}>
-                    <View style={styles.sliderHeader}>
-                      <Text style={styles.filterSectionTitle}>Price Range</Text>
-                      <Text style={styles.sliderValue}>
-                        ${localPriceRange.min} - ${localPriceRange.max}
-                      </Text>
-                    </View>
-                    {/* Simple price buttons instead of slider */}
-                    <View style={styles.distanceButtons}>
-                      {[50, 100, 200, 300, 500].map((price) => (
-                        <TouchableOpacity
-                          key={price}
-                          style={[
-                            styles.distanceButton,
-                            localPriceRange.max === price &&
-                              styles.distanceButtonActive,
-                          ]}
-                          onPress={() =>
-                            setLocalPriceRange((prev) => ({
-                              ...prev,
-                              max: price,
-                            }))
-                          }
-                        >
-                          <Text
-                            style={[
-                              styles.distanceButtonText,
-                              localPriceRange.max === price &&
-                                styles.distanceButtonTextActive,
-                            ]}
-                          >
-                            ${price}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  <View style={styles.bottomSpacing} />
-                </ScrollView>
-
-                {/* Apply Button */}
-                <View style={styles.filterFooter}>
-                  <TouchableOpacity
-                    style={styles.applyButton}
-                    onPress={handleApply}
-                    accessibilityRole="button"
-                    accessibilityLabel="Apply filters"
-                  >
-                    <Text style={styles.applyButtonText}>Apply Filters</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Filters</Text>
+            <TouchableOpacity onPress={onClose}>
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text}
+              />
+            </TouchableOpacity>
           </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    );
-  },
-);
 
-FilterModal.displayName = 'FilterModal';
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Category */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Category</Text>
+              <View style={styles.categoryGrid}>
+                {CATEGORIES.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    style={[
+                      styles.categoryChip,
+                      selectedCategory === category.id &&
+                        styles.categoryChipActive,
+                    ]}
+                    onPress={() => setSelectedCategory(category.id)}
+                  >
+                    <Text style={styles.categoryChipEmoji}>
+                      {category.emoji}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.categoryChipText,
+                        selectedCategory === category.id &&
+                          styles.categoryChipTextActive,
+                      ]}
+                    >
+                      {category.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Sort By */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Sort by</Text>
+              <View style={styles.sortOptions}>
+                {SORT_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.sortOption,
+                      sortBy === option.id && styles.sortOptionActive,
+                    ]}
+                    onPress={() => setSortBy(option.id)}
+                  >
+                    <MaterialCommunityIcons
+                      name={option.icon}
+                      size={16}
+                      color={sortBy === option.id ? COLORS.white : COLORS.text}
+                    />
+                    <Text
+                      style={[
+                        styles.sortOptionText,
+                        sortBy === option.id && styles.sortOptionTextActive,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Distance */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Max Distance: {maxDistance} km
+              </Text>
+              <View style={styles.distanceOptions}>
+                {DISTANCE_OPTIONS.map((d) => (
+                  <TouchableOpacity
+                    key={d}
+                    style={[
+                      styles.distanceChip,
+                      maxDistance === d && styles.distanceChipActive,
+                    ]}
+                    onPress={() => setMaxDistance(d)}
+                  >
+                    <Text
+                      style={[
+                        styles.distanceChipText,
+                        maxDistance === d && styles.distanceChipTextActive,
+                      ]}
+                    >
+                      {d} km
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Price Range */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Price Range: ${priceRange.min} - ${priceRange.max}
+              </Text>
+              <View style={styles.priceOptions}>
+                {PRICE_OPTIONS.map((range) => (
+                  <TouchableOpacity
+                    key={range.label}
+                    style={[
+                      styles.priceChip,
+                      priceRange.min === range.min &&
+                        priceRange.max === range.max &&
+                        styles.priceChipActive,
+                    ]}
+                    onPress={() => setPriceRange(range)}
+                  >
+                    <Text
+                      style={[
+                        styles.priceChipText,
+                        priceRange.min === range.min &&
+                          priceRange.max === range.max &&
+                          styles.priceChipTextActive,
+                      ]}
+                    >
+                      {range.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+
+          {/* Actions */}
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+              <Text style={styles.resetButtonText}>Reset</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.applyButton} onPress={onClose}>
+              <Text style={styles.applyButtonText}>Apply Filters</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    backgroundColor: COLORS.overlay50,
+  overlay: {
     flex: 1,
+    backgroundColor: COLORS.overlay50,
     justifyContent: 'flex-end',
   },
-  filterModal: {
+  modal: {
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '90%',
-    paddingBottom: 34,
+    maxHeight: '85%',
+    paddingBottom: 40,
   },
-  filterHeader: {
-    alignItems: 'center',
-    borderBottomColor: COLORS.border,
-    borderBottomWidth: 1,
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayLight,
   },
-  filterClearText: {
-    color: COLORS.primary,
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  filterTitle: {
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
     color: COLORS.text,
-    fontSize: 17,
+  },
+  section: {
+    padding: 20,
+    paddingBottom: 0,
+  },
+  sectionTitle: {
+    fontSize: 16,
     fontWeight: '600',
-  },
-  filterSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  filterSectionTitle: {
     color: COLORS.text,
-    fontSize: 15,
-    fontWeight: '600',
     marginBottom: 12,
   },
   categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
   },
-  categoryItem: {
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderColor: COLORS.border,
-    borderRadius: LAYOUT.borderRadius.md,
-    borderWidth: 1,
+  categoryChip: {
     flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: COLORS.grayLight,
     gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
   },
-  categoryItemSelected: {
-    backgroundColor: COLORS.filterPillActive,
-    borderColor: COLORS.primary,
+  categoryChipActive: {
+    backgroundColor: COLORS.mint,
   },
-  categoryEmoji: {
+  categoryChipEmoji: {
     fontSize: 16,
   },
-  categoryLabel: {
-    color: COLORS.textSecondary,
+  categoryChipText: {
     fontSize: 14,
+    color: COLORS.text,
     fontWeight: '500',
   },
-  categoryLabelSelected: {
-    color: COLORS.text,
-    fontWeight: '600',
+  categoryChipTextActive: {
+    color: COLORS.white,
   },
   sortOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
   },
   sortOption: {
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderColor: COLORS.border,
-    borderRadius: LAYOUT.borderRadius.full,
-    borderWidth: 1,
     flexDirection: 'row',
-    gap: 6,
+    alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: COLORS.grayLight,
+    gap: 6,
   },
-  sortOptionSelected: {
-    backgroundColor: COLORS.filterPillActive,
-    borderColor: COLORS.primary,
+  sortOptionActive: {
+    backgroundColor: COLORS.mint,
   },
-  sortLabel: {
-    color: COLORS.textSecondary,
+  sortOptionText: {
     fontSize: 14,
+    color: COLORS.text,
     fontWeight: '500',
   },
-  sortLabelSelected: {
-    color: COLORS.text,
-    fontWeight: '600',
+  sortOptionTextActive: {
+    color: COLORS.white,
   },
-  sliderHeader: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  sliderValue: {
-    color: COLORS.primary,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  distanceButtons: {
+  distanceOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  distanceButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderColor: COLORS.border,
-    borderRadius: LAYOUT.borderRadius.full,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+  distanceChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: COLORS.grayLight,
   },
-  distanceButtonActive: {
-    backgroundColor: COLORS.filterPillActive,
-    borderColor: COLORS.primary,
+  distanceChipActive: {
+    backgroundColor: COLORS.mint,
   },
-  distanceButtonText: {
-    color: COLORS.textSecondary,
+  distanceChipText: {
     fontSize: 14,
+    color: COLORS.text,
     fontWeight: '500',
   },
-  distanceButtonTextActive: {
-    color: COLORS.text,
-    fontWeight: '600',
+  distanceChipTextActive: {
+    color: COLORS.white,
   },
-  filterFooter: {
-    borderTopColor: COLORS.border,
-    borderTopWidth: 1,
+  priceOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  priceChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: COLORS.grayLight,
+  },
+  priceChipActive: {
+    backgroundColor: COLORS.mint,
+  },
+  priceChipText: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  priceChipTextActive: {
+    color: COLORS.white,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 20,
+  },
+  resetButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.gray[300],
+    alignItems: 'center',
+  },
+  resetButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text,
   },
   applyButton: {
+    flex: 2,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: COLORS.mint,
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
-    borderRadius: LAYOUT.borderRadius.full,
-    paddingVertical: 16,
   },
   applyButtonText: {
-    color: COLORS.text,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600',
-  },
-  bottomSpacing: {
-    height: 20,
+    color: COLORS.white,
   },
 });
 

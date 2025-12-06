@@ -1,9 +1,9 @@
 import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
 import PropTypes from 'prop-types';
+import Animated from 'react-native-reanimated';
+import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
 import { useHaptics } from '../hooks/useHaptics';
@@ -29,7 +29,7 @@ export const FilterPill: React.FC<FilterPillProps> = React.memo(
     const { animatedStyle, onPressIn, onPressOut } = usePressScale();
 
     const handlePress = () => {
-      impact('light');
+      void impact('light');
       onPress(filter.id);
     };
 

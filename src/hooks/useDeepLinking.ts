@@ -5,8 +5,6 @@
 
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationContainerRef } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/types';
 import {
   getInitialURL,
   subscribeToDeepLinks,
@@ -21,20 +19,19 @@ import {
  * useDeepLinking();
  */
 export function useDeepLinking() {
-  const navigation =
-    useNavigation() as NavigationContainerRef<RootStackParamList>;
+  const navigation = useNavigation();
 
   useEffect(() => {
     // Handle initial URL (app opened from link)
-    getInitialURL().then((url) => {
+    void getInitialURL().then((url) => {
       if (url) {
-        handleDeepLink(url, navigation);
+        handleDeepLink(url, navigation as never);
       }
     });
 
     // Handle URLs while app is running
     const unsubscribe = subscribeToDeepLinks((url) => {
-      handleDeepLink(url, navigation);
+      handleDeepLink(url, navigation as never);
     });
 
     return unsubscribe;

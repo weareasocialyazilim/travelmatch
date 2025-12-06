@@ -1,21 +1,20 @@
 // KYC Document Capture Screen - Upload/capture document images
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
+import { GUIDELINES } from './constants';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
 import { kycStyles } from './styles';
-import { GUIDELINES } from './constants';
 import type { VerificationData } from './types';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type RouteParams = {
   KYCDocumentCapture: { data: VerificationData };

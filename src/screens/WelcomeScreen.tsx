@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Image,
   StyleSheet,
@@ -7,7 +8,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React from 'react';
 import { COLORS } from '../constants/colors';
 
 const { height: _SCREEN_HEIGHT } = Dimensions.get('window');
@@ -39,6 +39,7 @@ export const WelcomeScreen: React.FC<{
           {/* Illustration */}
           <View style={styles.illustrationContainer}>
             <Image
+              // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
               source={require('../../assets/icon.png')}
               style={styles.illustration}
               resizeMode="contain"
@@ -58,6 +59,19 @@ export const WelcomeScreen: React.FC<{
         {/* Action Section */}
         <View style={styles.actionSection}>
           <View style={styles.buttonContainer}>
+            {/* Apple Sign In (Mock) */}
+            <TouchableOpacity
+              style={[styles.primaryButton, { backgroundColor: '#000000', marginBottom: 12 }]}
+              onPress={() => navigation.navigate('Register')} // Mock action
+              activeOpacity={0.8}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                 {/* Use text icon for now as we don't have Apple icon asset guaranteed */}
+                <Text style={[styles.primaryButtonText, { marginRight: 8 }]}></Text>
+                <Text style={styles.primaryButtonText}>Continue with Apple</Text>
+              </View>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.primaryButton}
               onPress={handleCreateAccount}

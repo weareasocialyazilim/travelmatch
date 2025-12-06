@@ -8,11 +8,11 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
-import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type TwoFactorSetupScreenProps = StackScreenProps<
   RootStackParamList,
@@ -25,21 +25,27 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
   const [step, setStep] = useState<'intro' | 'verify' | 'success'>('intro');
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [secretKey, setSecretKey] = useState<string | null>(null);
 
-  // Mock secret key for demo
-  const secretKey = 'JBSWY3DPEHPK3PXP';
-
-  const handleSendCode = () => {
+  const handleSendCode = async () => {
     setIsLoading(true);
-    // Simulate sending verification code
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // In a real app, this would call the backend to generate a secret
+      // const { secret } = await authService.generateTwoFactorSecret();
+      // setSecretKey(secret);
+      
+      // For now, we simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setStep('verify');
       Alert.alert(
         'Code Sent',
         'A verification code has been sent to your phone',
       );
-    }, 1000);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to send verification code');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerify = () => {
@@ -191,9 +197,11 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
 
       <View style={styles.backupCodeContainer}>
         <Text style={styles.backupCodeLabel}>Backup Code</Text>
-        <Text style={styles.backupCode}>{secretKey}</Text>
-        <Text style={styles.backupCodeHint}>
-          Save this code somewhere safe. You can use it to recover your account
+        <Text style={styles.backupCode}>
+          {secretKey || 'Not generated'}
+        </Text>
+        <Text style={styles.backupHint}>
+          Save this code in a safe place. You can use it to recover your account
           if you lose access to your phone.
         </Text>
       </View>

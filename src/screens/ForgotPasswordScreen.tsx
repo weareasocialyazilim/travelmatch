@@ -1,4 +1,3 @@
-import type { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -10,11 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '../components/LoadingState';
+import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type ForgotPasswordScreenProps = StackScreenProps<
   RootStackParamList,

@@ -9,14 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import type { Proof } from '../types';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { logger } from '@/utils/logger';
 import { COLORS } from '../constants/colors';
-import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { Proof } from '../types';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -81,7 +81,9 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Check out this proof: ${proof.title}\n${proof.description}`,
+        message: `Check out this proof: ${proof.title ?? 'Proof'}\n${
+          proof.description ?? ''
+        }`,
         url: `travelmatch://proof/${proof.id}`,
       });
     } catch (error) {

@@ -1,292 +1,246 @@
-/**
- * LocationModal Component
- * Location picker modal for Discover screen
- */
-
-import React, { memo, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
-  Modal,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  TextInput,
+  Modal,
   ScrollView,
   StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { LAYOUT } from '../../constants/layout';
-import { POPULAR_CITIES } from './constants';
+
+interface City {
+  id: string;
+  name: string;
+  country: string;
+  emoji: string;
+}
 
 interface LocationModalProps {
   visible: boolean;
   onClose: () => void;
+  onLocationSelect: (location: string) => void;
   selectedLocation: string;
   recentLocations: string[];
-  onLocationSelect: (location: string) => void;
-  onUseCurrentLocation: () => void;
+  popularCities: City[];
+  currentLocationName?: string;
 }
 
-const LocationModal: React.FC<LocationModalProps> = memo(
-  ({
-    visible,
-    onClose,
-    selectedLocation,
-    recentLocations,
-    onLocationSelect,
-    onUseCurrentLocation,
-  }) => {
-    const [searchQuery, setSearchQuery] = useState('');
+export const LocationModal: React.FC<LocationModalProps> = ({
+  visible,
+  onClose,
+  onLocationSelect,
+  selectedLocation,
+  recentLocations,
+  popularCities,
+  currentLocationName = 'San Francisco, CA',
+}) => {
+  const handleLocationSelect = (location: string) => {
+    onLocationSelect(location);
+    onClose();
+  };
 
-    const handleLocationSelect = (location: string) => {
-      onLocationSelect(location);
-      onClose();
-    };
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.locationModal}>
+          {/* Header */}
+          <View style={styles.locationModalHeader}>
+            <Text style={styles.locationModalTitle}>Select Location</Text>
+            <TouchableOpacity onPress={onClose}>
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text}
+              />
+            </TouchableOpacity>
+          </View>
 
-    const handleUseCurrentLocation = () => {
-      onUseCurrentLocation();
-      onClose();
-    };
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Current Location */}
+            <TouchableOpacity
+              style={styles.locationOptionCurrent}
+              onPress={() => handleLocationSelect(currentLocationName)}
+            >
+              <View style={styles.locationOptionIconWrapper}>
+                <MaterialCommunityIcons
+                  name="crosshairs-gps"
+                  size={22}
+                  color={COLORS.mint}
+                />
+              </View>
+              <View style={styles.locationOptionInfo}>
+                <Text style={styles.locationOptionTitle}>
+                  Use Current Location
+                </Text>
+                <Text style={styles.locationOptionSubtitle}>
+                  {currentLocationName} (detected)
+                </Text>
+              </View>
+              {selectedLocation === currentLocationName && (
+                <MaterialCommunityIcons
+                  name="check"
+                  size={22}
+                  color={COLORS.mint}
+                />
+              )}
+            </TouchableOpacity>
 
-    return (
-      <Modal
-        visible={visible}
-        animationType="slide"
-        transparent
-        onRequestClose={onClose}
-      >
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.locationModal}>
-                {/* Header */}
-                <View style={styles.locationHeader}>
-                  <Text style={styles.locationTitle}>Select Location</Text>
-                  <TouchableOpacity onPress={onClose}>
-                    <MaterialCommunityIcons
-                      name="close"
-                      size={24}
-                      color={COLORS.text}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                {/* Search */}
-                <View style={styles.searchContainer}>
-                  <MaterialCommunityIcons
-                    name="magnify"
-                    size={20}
-                    color={COLORS.textSecondary}
-                  />
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search city or place..."
-                    placeholderTextColor={COLORS.textTertiary}
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    accessibilityLabel="Search location"
-                  />
-                </View>
-
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  {/* Current Location */}
+            {/* Recent Locations */}
+            {recentLocations.length > 0 && (
+              <View style={styles.locationSection}>
+                <Text style={styles.locationSectionTitle}>Recent</Text>
+                {recentLocations.map((loc, index) => (
                   <TouchableOpacity
-                    style={styles.currentLocationButton}
-                    onPress={handleUseCurrentLocation}
-                    accessibilityRole="button"
-                    accessibilityLabel="Use current location"
+                    key={index}
+                    style={styles.locationOption}
+                    onPress={() => handleLocationSelect(loc)}
                   >
-                    <View style={styles.currentLocationIcon}>
+                    <View style={styles.locationOptionIconWrapper}>
                       <MaterialCommunityIcons
-                        name="crosshairs-gps"
+                        name="history"
                         size={20}
-                        color={COLORS.primary}
+                        color={COLORS.textSecondary}
                       />
                     </View>
-                    <View style={styles.currentLocationContent}>
-                      <Text style={styles.currentLocationTitle}>
-                        Use Current Location
-                      </Text>
-                      <Text style={styles.currentLocationSubtitle}>
-                        {selectedLocation}
-                      </Text>
-                    </View>
-                    <MaterialCommunityIcons
-                      name="chevron-right"
-                      size={20}
-                      color={COLORS.textTertiary}
-                    />
+                    <Text style={styles.locationOptionText}>{loc}</Text>
+                    {selectedLocation === loc && (
+                      <MaterialCommunityIcons
+                        name="check"
+                        size={22}
+                        color={COLORS.mint}
+                      />
+                    )}
                   </TouchableOpacity>
-
-                  {/* Recent Locations */}
-                  {recentLocations.length > 0 && (
-                    <View style={styles.locationSection}>
-                      <Text style={styles.locationSectionTitle}>Recent</Text>
-                      {recentLocations.map((location, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.locationItem}
-                          onPress={() => handleLocationSelect(location)}
-                          accessibilityRole="button"
-                        >
-                          <MaterialCommunityIcons
-                            name="history"
-                            size={20}
-                            color={COLORS.textSecondary}
-                          />
-                          <Text style={styles.locationItemText}>
-                            {location}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  )}
-
-                  {/* Popular Cities */}
-                  <View style={styles.locationSection}>
-                    <Text style={styles.locationSectionTitle}>
-                      Popular Cities
-                    </Text>
-                    {POPULAR_CITIES.map((city) => (
-                      <TouchableOpacity
-                        key={city.id}
-                        style={styles.locationItem}
-                        onPress={() =>
-                          handleLocationSelect(`${city.name}, ${city.country}`)
-                        }
-                        accessibilityRole="button"
-                      >
-                        <Text style={styles.cityEmoji}>{city.emoji}</Text>
-                        <View style={styles.cityInfo}>
-                          <Text style={styles.cityName}>{city.name}</Text>
-                          <Text style={styles.cityCountry}>{city.country}</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </ScrollView>
+                ))}
               </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    );
-  },
-);
+            )}
 
-LocationModal.displayName = 'LocationModal';
+            {/* Popular Cities */}
+            <View style={styles.locationSection}>
+              <Text style={styles.locationSectionTitle}>Popular Cities</Text>
+              {popularCities.map((city) => (
+                <TouchableOpacity
+                  key={city.id}
+                  style={styles.locationOption}
+                  onPress={() =>
+                    handleLocationSelect(`${city.name}, ${city.country}`)
+                  }
+                >
+                  <View style={styles.locationOptionIconWrapper}>
+                    <Text style={styles.locationEmoji}>{city.emoji}</Text>
+                  </View>
+                  <Text style={styles.locationOptionText}>
+                    {city.name}, {city.country}
+                  </Text>
+                  {selectedLocation === `${city.name}, ${city.country}` && (
+                    <MaterialCommunityIcons
+                      name="check"
+                      size={22}
+                      color={COLORS.mint}
+                    />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const styles = StyleSheet.create({
   modalOverlay: {
-    backgroundColor: COLORS.overlay50,
     flex: 1,
+    backgroundColor: COLORS.overlay50,
     justifyContent: 'flex-end',
   },
   locationModal: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '80%',
-    paddingBottom: 34,
+    paddingBottom: 40,
   },
-  locationHeader: {
-    alignItems: 'center',
-    borderBottomColor: COLORS.border,
-    borderBottomWidth: 1,
+  locationModalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
-  locationTitle: {
+  locationModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
     color: COLORS.text,
-    fontSize: 17,
-    fontWeight: '600',
   },
-  searchContainer: {
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderRadius: LAYOUT.borderRadius.md,
+  locationOptionCurrent: {
     flexDirection: 'row',
-    gap: 10,
-    marginHorizontal: 20,
-    marginVertical: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  searchInput: {
-    color: COLORS.text,
-    flex: 1,
-    fontSize: 15,
-  },
-  currentLocationButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.filterPillActive,
-    borderRadius: LAYOUT.borderRadius.md,
-    flexDirection: 'row',
-    gap: 12,
-    marginHorizontal: 20,
-    marginVertical: 8,
-    padding: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+    backgroundColor: COLORS.primaryMuted,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.mint,
   },
-  currentLocationIcon: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 20,
-    height: 40,
-    justifyContent: 'center',
+  locationOptionIconWrapper: {
     width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
-  currentLocationContent: {
+  locationOptionInfo: {
     flex: 1,
   },
-  currentLocationTitle: {
-    color: COLORS.text,
+  locationOptionTitle: {
     fontSize: 15,
     fontWeight: '600',
+    color: COLORS.text,
   },
-  currentLocationSubtitle: {
-    color: COLORS.textSecondary,
+  locationOptionSubtitle: {
     fontSize: 13,
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
   locationSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    marginTop: 24,
+    paddingHorizontal: 16,
   },
   locationSectionTitle: {
-    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  locationItem: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 12,
-    paddingVertical: 12,
-  },
-  locationItemText: {
-    color: COLORS.text,
-    fontSize: 15,
-  },
-  cityEmoji: {
-    fontSize: 24,
-  },
-  cityInfo: {
-    flex: 1,
-  },
-  cityName: {
-    color: COLORS.text,
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  cityCountry: {
     color: COLORS.textSecondary,
-    fontSize: 13,
-    marginTop: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 12,
+  },
+  locationOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  locationOptionText: {
+    flex: 1,
+    fontSize: 15,
+    color: COLORS.text,
+  },
+  locationEmoji: {
+    fontSize: 20,
   },
 });
 

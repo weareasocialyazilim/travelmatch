@@ -4,7 +4,8 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { api } from '../utils/api';
+import { supabase } from '../config/supabase';
+import { momentsService } from '../services/supabaseDbService';
 import { logger } from '../utils/logger';
 
 // Types
@@ -123,6 +124,30 @@ interface UseMomentsReturn {
 
 const DEFAULT_PAGE_SIZE = 10;
 
+const mapToMoment = (row: any): Moment => ({
+  id: row.id,
+  title: row.title,
+  description: row.description,
+  category: row.category,
+  location: row.location,
+  images: row.images || [],
+  pricePerGuest: row.price,
+  currency: row.currency,
+  maxGuests: row.max_guests,
+  duration: row.duration,
+  availability: row.availability || [],
+  hostId: row.user_id,
+  hostName: row.users?.name || row.user?.name || 'Unknown',
+  hostAvatar: row.users?.avatar || row.user?.avatar || '',
+  hostRating: 0,
+  hostReviewCount: 0,
+  saves: 0,
+  isSaved: false,
+  status: row.status,
+  createdAt: row.created_at,
+  updatedAt: row.updated_at,
+});
+
 export const useMoments = (): UseMomentsReturn => {
   // Mount tracking ref to prevent memory leaks
   const mountedRef = useRef(true);
@@ -163,25 +188,37 @@ export const useMoments = (): UseMomentsReturn => {
         if (!append) setLoading(true);
         setError(null);
 
-        const response = await api.get<{ moments: Moment[]; total: number }>(
-          '/moments',
-          {
-            params: { ...filters, page: pageNum, pageSize: DEFAULT_PAGE_SIZE },
-          },
-        );
+        const { data, count, error } = await momentsService.list({
+          limit: DEFAULT_PAGE_SIZE,
+          offset: (pageNum - 1) * DEFAULT_PAGE_SIZE,
+          category: filters.category,
+          city: filters.city,
+          country: filters.country,
+          minPrice: filters.minPrice,
+          maxPrice: filters.maxPrice,
+          sortBy: filters.sortBy,
+          search: filters.search,
+        });
+
+        if (error) throw error;
 
         if (!mountedRef.current) return;
 
+        // Map Supabase rows to Moment type
+        const mappedMoments: Moment[] = data.map(mapToMoment);
+
         if (append) {
-          setMoments((prev) => [...prev, ...response.moments]);
+          setMoments((prev) => [...prev, ...mappedMoments]);
         } else {
-          setMoments(response.moments);
+          setMoments(mappedMoments);
         }
 
-        setHasMore(response.moments.length === DEFAULT_PAGE_SIZE);
+        setHasMore(mappedMoments.length === DEFAULT_PAGE_SIZE);
       } catch (err) {
         if (mountedRef.current) {
-          setError(err instanceof Error ? err.message : 'Failed to load moments');
+          setError(
+            err instanceof Error ? err.message : 'Failed to load moments',
+          );
         }
       } finally {
         if (mountedRef.current) {
@@ -231,8 +268,9 @@ export const useMoments = (): UseMomentsReturn => {
    */
   const getMoment = useCallback(async (id: string): Promise<Moment | null> => {
     try {
-      const response = await api.get<{ moment: Moment }>(`/moments/${id}`);
-      return response.moment;
+      const { data, error } = await momentsService.getById(id);
+      if (error) throw error;
+      return data ? mapToMoment(data) : null;
     } catch (err) {
       logger.error('Failed to get moment:', err);
       return null;
@@ -245,11 +283,35 @@ export const useMoments = (): UseMomentsReturn => {
   const createMoment = useCallback(
     async (data: CreateMomentData): Promise<Moment | null> => {
       try {
-        const response = await api.post<{ moment: Moment }>('/moments', data);
-        if (mountedRef.current) {
-          setMyMoments((prev) => [response.moment, ...prev]);
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
+
+        const momentData = {
+          user_id: user.id,
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          location: data.location,
+          images: data.images,
+          price: data.pricePerGuest,
+          currency: data.currency,
+          max_guests: data.maxGuests,
+          duration: data.duration,
+          availability: data.availability,
+          status: 'active',
+        };
+
+        const { data: moment, error } = await momentsService.create(momentData);
+        if (error) throw error;
+        
+        const newMoment = moment ? mapToMoment(moment) : null;
+        if (newMoment) {
+          setMyMoments((prev) => [newMoment, ...prev]);
+          setMoments((prev) => [newMoment, ...prev]);
         }
-        return response.moment;
+        return newMoment;
       } catch (err) {
         logger.error('Failed to create moment:', err);
         return null;
@@ -267,21 +329,31 @@ export const useMoments = (): UseMomentsReturn => {
       data: Partial<CreateMomentData>,
     ): Promise<Moment | null> => {
       try {
-        const response = await api.put<{ moment: Moment }>(
-          `/moments/${id}`,
-          data,
-        );
+        const updates: any = {};
+        if (data.title) updates.title = data.title;
+        if (data.description) updates.description = data.description;
+        if (data.category) updates.category = data.category;
+        if (data.location) updates.location = data.location;
+        if (data.images) updates.images = data.images;
+        if (data.pricePerGuest) updates.price = data.pricePerGuest;
+        if (data.currency) updates.currency = data.currency;
+        if (data.maxGuests) updates.max_guests = data.maxGuests;
+        if (data.duration) updates.duration = data.duration;
+        if (data.availability) updates.availability = data.availability;
 
-        if (!mountedRef.current) return response.moment;
+        const { data: moment, error } = await momentsService.update(id, updates);
+        if (error) throw error;
 
-        // Update in all lists
-        const updateInList = (list: Moment[]) =>
-          list.map((m) => (m.id === id ? response.moment : m));
-
-        setMoments(updateInList);
-        setMyMoments(updateInList);
-
-        return response.moment;
+        const updatedMoment = moment ? mapToMoment(moment) : null;
+        if (updatedMoment) {
+          setMoments((prev) =>
+            prev.map((m) => (m.id === id ? updatedMoment : m)),
+          );
+          setMyMoments((prev) =>
+            prev.map((m) => (m.id === id ? updatedMoment : m)),
+          );
+        }
+        return updatedMoment;
       } catch (err) {
         logger.error('Failed to update moment:', err);
         return null;
@@ -295,13 +367,11 @@ export const useMoments = (): UseMomentsReturn => {
    */
   const deleteMoment = useCallback(async (id: string): Promise<boolean> => {
     try {
-      await api.delete(`/moments/${id}`);
+      const { error } = await momentsService.delete(id);
+      if (error) throw error;
 
-      if (mountedRef.current) {
-        setMoments((prev) => prev.filter((m) => m.id !== id));
-        setMyMoments((prev) => prev.filter((m) => m.id !== id));
-      }
-
+      setMoments((prev) => prev.filter((m) => m.id !== id));
+      setMyMoments((prev) => prev.filter((m) => m.id !== id));
       return true;
     } catch (err) {
       logger.error('Failed to delete moment:', err);
@@ -314,18 +384,14 @@ export const useMoments = (): UseMomentsReturn => {
    */
   const pauseMoment = useCallback(async (id: string): Promise<boolean> => {
     try {
-      await api.post(`/moments/${id}/pause`);
-
-      if (!mountedRef.current) return true;
+      const { error } = await momentsService.pause(id);
+      if (error) throw error;
 
       const updateStatus = (list: Moment[]) =>
-        list.map((m) =>
-          m.id === id ? { ...m, status: 'paused' as const } : m,
-        );
+        list.map((m) => (m.id === id ? { ...m, status: 'paused' as const } : m));
 
       setMoments(updateStatus);
       setMyMoments(updateStatus);
-
       return true;
     } catch (err) {
       logger.error('Failed to pause moment:', err);
@@ -338,18 +404,14 @@ export const useMoments = (): UseMomentsReturn => {
    */
   const activateMoment = useCallback(async (id: string): Promise<boolean> => {
     try {
-      await api.post(`/moments/${id}/activate`);
-
-      if (!mountedRef.current) return true;
+      const { error } = await momentsService.activate(id);
+      if (error) throw error;
 
       const updateStatus = (list: Moment[]) =>
-        list.map((m) =>
-          m.id === id ? { ...m, status: 'active' as const } : m,
-        );
+        list.map((m) => (m.id === id ? { ...m, status: 'active' as const } : m));
 
       setMoments(updateStatus);
       setMyMoments(updateStatus);
-
       return true;
     } catch (err) {
       logger.error('Failed to activate moment:', err);
@@ -363,9 +425,13 @@ export const useMoments = (): UseMomentsReturn => {
   const saveMoment = useCallback(
     async (id: string): Promise<boolean> => {
       try {
-        await api.post(`/moments/${id}/save`);
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
 
-        if (!mountedRef.current) return true;
+        const { error } = await momentsService.save(user.id, id);
+        if (error) throw error;
 
         const updateSave = (list: Moment[]) =>
           list.map((m) =>
@@ -398,7 +464,13 @@ export const useMoments = (): UseMomentsReturn => {
    */
   const unsaveMoment = useCallback(async (id: string): Promise<boolean> => {
     try {
-      await api.delete(`/moments/${id}/save`);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await momentsService.unsave(user.id, id);
+      if (error) throw error;
 
       if (!mountedRef.current) return true;
 
@@ -426,10 +498,17 @@ export const useMoments = (): UseMomentsReturn => {
   const loadMyMoments = useCallback(async () => {
     try {
       setMyMomentsLoading(true);
-      const response = await api.get<{ moments: Moment[] }>('/moments/my');
-      if (mountedRef.current) {
-        setMyMoments(response.moments);
-      }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await momentsService.list({ userId: user.id });
+      if (error) throw error;
+
+      const mappedMoments: Moment[] = data.map(mapToMoment);
+
+      setMyMoments(mappedMoments);
     } catch (err) {
       logger.error('Failed to load my moments:', err);
     } finally {
@@ -445,10 +524,20 @@ export const useMoments = (): UseMomentsReturn => {
   const loadSavedMoments = useCallback(async () => {
     try {
       setSavedMomentsLoading(true);
-      const response = await api.get<{ moments: Moment[] }>('/moments/saved');
-      if (mountedRef.current) {
-        setSavedMoments(response.moments);
-      }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await momentsService.getSaved(user.id);
+      if (error) throw error;
+
+      const mappedMoments: Moment[] = data.map((row: any) => ({
+        ...mapToMoment(row),
+        isSaved: true,
+      }));
+
+      setSavedMoments(mappedMoments);
     } catch (err) {
       logger.error('Failed to load saved moments:', err);
     } finally {
@@ -462,14 +551,14 @@ export const useMoments = (): UseMomentsReturn => {
   useEffect(() => {
     if (!initialLoadDone.current) {
       initialLoadDone.current = true;
-      fetchMoments(1, false);
+      void fetchMoments(1, false);
     }
   }, [fetchMoments]);
 
   // Refetch when filters change
   useEffect(() => {
     if (initialLoadDone.current) {
-      fetchMoments(1, false);
+      void fetchMoments(1, false);
     }
   }, [filters, fetchMoments]);
 

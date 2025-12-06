@@ -3,9 +3,8 @@
  * Authentication methods using Supabase
  */
 
-import { auth, isSupabaseConfigured } from '../config/supabase';
+import { auth, supabase, isSupabaseConfigured } from '../config/supabase';
 import { logger } from '../utils/logger';
-import { secureStorage, AUTH_STORAGE_KEYS } from '../utils/secureStorage';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 
 export interface AuthResult {
@@ -13,6 +12,14 @@ export interface AuthResult {
   session: Session | null;
   error: AuthError | null;
 }
+
+/**
+ * Get current session
+ */
+export const getSession = async (): Promise<{ session: Session | null; error: AuthError | null }> => {
+  const { data, error } = await auth.getSession();
+  return { session: data.session, error };
+};
 
 /**
  * Sign up with email and password
@@ -43,17 +50,6 @@ export const signUpWithEmail = async (
     if (error) {
       logger.error('[Auth] Sign up error:', error);
       return { user: null, session: null, error };
-    }
-
-    if (data.session) {
-      await secureStorage.setItem(
-        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-        data.session.access_token,
-      );
-      await secureStorage.setItem(
-        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-        data.session.refresh_token,
-      );
     }
 
     logger.info('[Auth] Sign up successful', { userId: data.user?.id });
@@ -89,17 +85,6 @@ export const signInWithEmail = async (
     if (error) {
       logger.error('[Auth] Sign in error:', error);
       return { user: null, session: null, error };
-    }
-
-    if (data.session) {
-      await secureStorage.setItem(
-        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-        data.session.access_token,
-      );
-      await secureStorage.setItem(
-        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-        data.session.refresh_token,
-      );
     }
 
     logger.info('[Auth] Sign in successful', { userId: data.user?.id });
@@ -153,13 +138,6 @@ export const signOut = async (): Promise<{ error: AuthError | null }> => {
   try {
     const { error } = await auth.signOut();
 
-    // Clear stored tokens
-    await secureStorage.deleteItems([
-      AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-      AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-      AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
-    ]);
-
     if (error) {
       logger.error('[Auth] Sign out error:', error);
       return { error };
@@ -170,25 +148,6 @@ export const signOut = async (): Promise<{ error: AuthError | null }> => {
   } catch (error) {
     logger.error('[Auth] Sign out exception:', error);
     return { error: error as AuthError };
-  }
-};
-
-/**
- * Get current session
- */
-export const getSession = async (): Promise<Session | null> => {
-  try {
-    const { data, error } = await auth.getSession();
-
-    if (error) {
-      logger.error('[Auth] Get session error:', error);
-      return null;
-    }
-
-    return data.session;
-  } catch (error) {
-    logger.error('[Auth] Get session exception:', error);
-    return null;
   }
 };
 
@@ -293,18 +252,22 @@ export const updateProfile = async (data: {
  */
 export const deleteAccount = async (): Promise<{ error: AuthError | null }> => {
   try {
-    // Note: This requires a server-side function or admin API
-    // For now, we'll sign out the user
-    // TODO: Implement proper account deletion via Edge Function
+    // 1. Mark user as deleted in public.users
+    const { data: userData } = await auth.getUser();
+    if (userData?.user) {
+      const { error: dbError } = await supabase
+        .from('users')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', userData.user.id);
 
+      if (dbError) {
+        logger.error('[Auth] Delete account DB error:', dbError);
+        // We continue to sign out to ensure user cannot access the app
+      }
+    }
+
+    // 2. Sign out
     const { error } = await auth.signOut();
-
-    // Clear stored tokens
-    await secureStorage.deleteItems([
-      AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-      AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-      AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
-    ]);
 
     if (error) {
       logger.error('[Auth] Delete account error:', error);

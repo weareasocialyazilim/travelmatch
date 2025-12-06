@@ -10,11 +10,10 @@ import {
   Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
 import { ScreenErrorBoundary } from '../components/ErrorBoundary';
-
-import type { StackScreenProps } from '@react-navigation/stack';
+import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 

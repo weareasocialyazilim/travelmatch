@@ -7,48 +7,19 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNav from '../components/BottomNav';
 import { ScreenErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';
 import { usePayments } from '../hooks/usePayments';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 type FilterType = 'all' | 'incoming' | 'outgoing';
 
-// Mock data as fallback while API is not ready
-const MOCK_TRANSACTIONS = [
-  {
-    id: '1',
-    type: 'gift_received' as const,
-    title: 'Gift for Parisian Croissant',
-    subtitle: 'From Sarah • Pending Proof',
-    amount: 10.0,
-    isPositive: true,
-    hasProofLoop: true,
-    status: 'pending',
-  },
-  {
-    id: '2',
-    type: 'withdrawal' as const,
-    title: 'Withdrawal to Bank',
-    subtitle: 'Completed',
-    amount: 50.0,
-    isPositive: false,
-  },
-  {
-    id: '3',
-    type: 'gift_received' as const,
-    title: 'Gift received - Galata coffee',
-    subtitle: 'From Marco • Approved',
-    amount: 5.0,
-    isPositive: true,
-  },
-];
-
+// Mock data removed
 const WalletScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
@@ -71,21 +42,18 @@ const WalletScreen = () => {
     loadTransactions();
   }, [refreshBalance, loadTransactions]);
 
-  // Use API transactions or fallback to mock
+  // Use API transactions
   const displayTransactions = useMemo(() => {
-    if (transactions.length > 0) {
-      return transactions.map((t) => ({
-        id: t.id,
-        type: t.type as 'gift_received' | 'withdrawal' | 'gift_sent',
-        title: t.description || t.type,
-        subtitle: t.status || '',
-        amount: t.amount,
-        isPositive: t.type !== 'withdrawal',
-        hasProofLoop: t.type === 'gift_received' && t.status === 'pending',
-        status: t.status,
-      }));
-    }
-    return MOCK_TRANSACTIONS;
+    return transactions.map((t) => ({
+      id: t.id,
+      type: t.type as 'gift_received' | 'withdrawal' | 'gift_sent',
+      title: t.description || t.type,
+      subtitle: t.status || '',
+      amount: t.amount,
+      isPositive: t.type !== 'withdrawal',
+      hasProofLoop: t.type === 'gift_received' && t.status === 'pending',
+      status: t.status,
+    }));
   }, [transactions]);
 
   // Filter transactions

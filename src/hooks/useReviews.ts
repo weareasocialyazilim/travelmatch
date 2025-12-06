@@ -4,14 +4,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { reviewService } from '../services/reviewService';
+import { logger } from '../utils/logger';
 import type {
   Review,
   ReviewStats,
   CreateReviewData,
   ReviewFilters,
 } from '../services/reviewService';
-import { reviewService } from '../services/reviewService';
-import { logger } from '../utils/logger';
 
 interface PendingReview {
   requestId: string;
@@ -311,10 +311,10 @@ export const useReviews = (): UseReviewsReturn => {
 
   // Initial load
   useEffect(() => {
-    refreshWritten();
-    refreshReceived();
-    refreshPending();
-    fetchMyStats();
+    void refreshWritten();
+    void refreshReceived();
+    void refreshPending();
+    void fetchMyStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

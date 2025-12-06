@@ -5,9 +5,9 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
-import type * as Notifications from 'expo-notifications';
+import { logger } from '@/utils/logger';
+import { addBreadcrumb } from '../config/sentry';
 import {
   registerForPushNotifications,
   addNotificationReceivedListener,
@@ -16,8 +16,8 @@ import {
   getBadgeCount,
   setBadgeCount,
 } from '../utils/notifications';
-import { addBreadcrumb } from '../config/sentry';
-import { logger } from '@/utils/logger';
+import type { NavigationProp } from '@react-navigation/native';
+import type * as Notifications from 'expo-notifications';
 
 export function usePushNotifications() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -86,37 +86,11 @@ export function usePushNotifications() {
   );
 
   useEffect(() => {
-    // Register for push notifications
-    registerForPushNotifications().then(async (token) => {
-      if (token) {
-        setExpoPushToken(token);
-        addBreadcrumb('Push token registered', 'notification', 'info', {
-          token,
-        });
-        // Send token to backend
-        try {
-          const { registerPushToken } = await import('../services/pushTokenService');
-          await registerPushToken(token, {
-            enabled: true,
-            channels: {
-              messages: true,
-              moments: true,
-              gifts: true,
-              trustNotes: true,
-              matches: true,
-              recommendations: true,
-              marketing: false,
-            },
-          });
-          logger.info('[Push] Token sent to backend');
-        } catch (error) {
-          logger.error('[Push] Failed to send token to backend', error as Error);
-        }
-      }
-    });
-
+    // Only set up listeners, do NOT request permissions automatically
+    // Permissions should be requested when the user enables notifications in settings
+    
     // Load initial badge count
-    getBadgeCount().then(setBadgeCountState);
+    void getBadgeCount().then(setBadgeCountState);
 
     // Listen for notifications while app is foregrounded
     notificationListener.current = addNotificationReceivedListener(
@@ -129,7 +103,7 @@ export function usePushNotifications() {
         // Increment badge count
         setBadgeCountState((prev) => {
           const newCount = prev + 1;
-          setBadgeCount(newCount);
+          void setBadgeCount(newCount);
           return newCount;
         });
       },
@@ -142,12 +116,12 @@ export function usePushNotifications() {
       addBreadcrumb('Notification tapped', 'notification', 'info', { data });
 
       // Handle deep linking from notification
-      handleNotificationNavigation(data);
+      void handleNotificationNavigation(data);
 
       // Decrement badge count
       setBadgeCountState((prev) => {
         const newCount = Math.max(0, prev - 1);
-        setBadgeCount(newCount);
+        void setBadgeCount(newCount);
         return newCount;
       });
     });
@@ -162,9 +136,39 @@ export function usePushNotifications() {
     };
   }, [handleNotificationNavigation]);
 
-  const clearBadge = async () => {
-    await setBadgeCount(0);
-    setBadgeCountState(0);
+  const requestPermissions = async () => {
+    const token = await registerForPushNotifications();
+    if (token) {
+      setExpoPushToken(token);
+      addBreadcrumb('Push token registered', 'notification', 'info', {
+        token,
+      });
+      // Send token to backend
+      try {
+        const { registerPushToken } = await import(
+          '../services/pushTokenService'
+        );
+        await registerPushToken(token, {
+          enabled: true,
+          channels: {
+            messages: true,
+            moments: true,
+            gifts: true,
+            trustNotes: true,
+            matches: true,
+            recommendations: true,
+            marketing: false,
+          },
+        });
+        logger.info('[Push] Token sent to backend');
+      } catch (error) {
+        logger.error(
+          '[Push] Failed to send token to backend',
+          error as Error,
+        );
+      }
+    }
+    return token;
   };
 
   return {
@@ -172,5 +176,6 @@ export function usePushNotifications() {
     notification,
     badgeCount,
     clearBadge,
+    requestPermissions,
   };
 }

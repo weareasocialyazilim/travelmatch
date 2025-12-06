@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Animated, Alert, StyleSheet } from 'react-native';
-import type { RouteProp, NavigationProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
 import { GiftMomentBottomSheet } from '../components/GiftMomentBottomSheet';
 import { GiftSuccessModal } from '../components/GiftSuccessModal';
+import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
-import { useScreenPerformance } from '../utils/performanceBenchmark';
 import { useMoments } from '../hooks';
-
+import { useAnalytics } from '../hooks/useAnalytics';
+import { requestService } from '../services/requestService';
+import { reviewService } from '../services/reviewService';
 import {
   MomentHeader,
   MomentGallery,
@@ -19,14 +19,16 @@ import {
   ReviewsSection,
   SummarySection,
   ActionBar,
-} from './moment-detail';
+} from '../components/moment-detail';
 import type {
   MomentUser,
   PendingRequest,
   Review,
   ActionLoadingState,
-} from './moment-detail';
+} from '../components/moment-detail';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { MomentData } from '../types';
+import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type MomentDetailRouteProp = RouteProp<RootStackParamList, 'MomentDetail'>;
 
@@ -45,7 +47,15 @@ const MomentDetailScreen: React.FC = () => {
 
   // Hooks
   const { saveMoment, deleteMoment } = useMoments();
-  const { trackMount, trackInteraction } = useScreenPerformance('MomentDetail');
+  const { trackEvent } = useAnalytics();
+
+  const trackMount = useCallback(() => {
+    trackEvent('moment_detail_view', { momentId: moment.id });
+  }, [moment.id, trackEvent]);
+
+  const trackInteraction = useCallback((action: string) => {
+    trackEvent(action, { momentId: moment.id });
+  }, [moment.id, trackEvent]);
 
   // User data - coerce to MomentUser type
   const userSource = moment.user || moment.creator;
@@ -65,54 +75,62 @@ const MomentDetailScreen: React.FC = () => {
   // State
   const [showGiftSheet, setShowGiftSheet] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showReportSheet, setShowReportSheet] = useState(false);
   const [giftAmount, setGiftAmount] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
   const [actionLoading, setActionLoading] = useState<ActionLoadingState>(null);
 
   const [pendingRequestsList, setPendingRequestsList] = useState<
     PendingRequest[]
-  >([
-    {
-      id: '1',
-      name: 'John Davidson',
-      avatar:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      message: 'Would love to join!',
-    },
-    {
-      id: '2',
-      name: 'Sarah Miller',
-      avatar:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-      message: 'This looks amazing!',
-    },
-    {
-      id: '3',
-      name: 'Mike Roberts',
-      avatar:
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-      message: 'Count me in!',
-    },
-  ]);
+  >([]);
 
-  const completedReviews: Review[] = [
-    {
-      id: '1',
-      name: 'Emma Wilson',
-      avatar:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-      rating: 5,
-      text: 'Amazing experience! Highly recommend.',
-    },
-    {
-      id: '2',
-      name: 'David Chen',
-      avatar:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-      rating: 4,
-      text: 'Great host, wonderful time!',
-    },
-  ];
+  const [reviews, setReviews] = useState<Review[]>([]);
+
+  // Fetch data
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const { reviews: apiReviews } = await reviewService.getReviews({
+          momentId: moment.id,
+        });
+        const mappedReviews = apiReviews.map((r) => ({
+          id: r.id,
+          name: r.reviewerName,
+          avatar: r.reviewerAvatar,
+          rating: r.rating,
+          text: r.comment,
+        }));
+        setReviews(mappedReviews);
+      } catch (error) {
+        // Silent fail
+      }
+    };
+
+    fetchReviews();
+  }, [moment.id]);
+
+  useEffect(() => {
+    if (isOwner) {
+      const fetchRequests = async () => {
+        try {
+          const { requests } = await requestService.getReceivedRequests({
+            momentId: moment.id,
+            status: 'pending',
+          });
+          const mappedRequests = requests.map((r) => ({
+            id: r.id,
+            name: r.requesterName,
+            avatar: r.requesterAvatar,
+            message: r.message || '',
+          }));
+          setPendingRequestsList(mappedRequests);
+        } catch (error) {
+          // Silent fail
+        }
+      };
+      fetchRequests();
+    }
+  }, [isOwner, moment.id]);
 
   // Animation
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -234,6 +252,16 @@ const MomentDetailScreen: React.FC = () => {
     navigation.navigate('CreateMoment' as never);
   }, [navigation]);
 
+  const handleReport = useCallback(() => {
+    setShowReportSheet(true);
+  }, []);
+
+  const handleReportSubmit = useCallback((action: string, reason?: string, details?: string) => {
+    // In a real app, this would call an API
+    setShowReportSheet(false);
+    Alert.alert('Report Submitted', 'Thank you for keeping our community safe.');
+  }, [moment.id]);
+
   // Gift sheet moment data
   const giftSheetMoment: MomentData | null = showGiftSheet
     ? {
@@ -276,14 +304,6 @@ const MomentDetailScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Hero Image */}
-      <MomentGallery
-        imageUrl={moment.imageUrl}
-        headerHeight={headerHeight}
-        imageOpacity={imageOpacity}
-      />
-
-      {/* Header */}
       <MomentHeader
         navigation={navigation}
         isOwner={isOwner}
@@ -295,6 +315,7 @@ const MomentDetailScreen: React.FC = () => {
         onDelete={handleDelete}
         onShare={handleShare}
         onEdit={handleEdit}
+        onReport={handleReport}
       />
 
       {/* Scrollable Content */}
@@ -339,7 +360,7 @@ const MomentDetailScreen: React.FC = () => {
 
           {/* Owner Completed: Reviews */}
           {isOwner && isCompleted && (
-            <ReviewsSection reviews={completedReviews} />
+            <ReviewsSection reviews={reviews} />
           )}
 
           <View style={styles.bottomSpacer} />
@@ -373,6 +394,14 @@ const MomentDetailScreen: React.FC = () => {
           setShowSuccessModal(false);
           navigation.goBack();
         }}
+      />
+
+      {/* Report/Block Sheet */}
+      <ReportBlockBottomSheet
+        visible={showReportSheet}
+        onClose={() => setShowReportSheet(false)}
+        onSubmit={handleReportSubmit}
+        targetType="moment"
       />
     </View>
   );

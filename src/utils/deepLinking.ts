@@ -5,8 +5,8 @@
 
 import { Linking } from 'react-native';
 import { logger } from './logger';
-import type { NavigationContainerRef } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/types';
+import type { NavigationContainerRef } from '@react-navigation/native';
 
 export const DEEP_LINK_CONFIG = {
   prefixes: ['travelmatch://', 'https://travelmatch.app'],
@@ -150,13 +150,13 @@ export function generateDeepLink(
 
   switch (screen) {
     case 'MomentDetail':
-      return `${baseUrl}/moment/${params?.momentId || ''}`;
+      return `${baseUrl}/moment/${String(params?.momentId ?? '')}`;
     case 'Profile':
-      return `${baseUrl}/profile/${params?.userId || ''}`;
+      return `${baseUrl}/profile/${String(params?.userId ?? '')}`;
     case 'BookingDetail':
-      return `${baseUrl}/booking/${params?.bookingId || ''}`;
+      return `${baseUrl}/booking/${String(params?.bookingId ?? '')}`;
     case 'Chat':
-      return `${baseUrl}/chat/${params?.conversationId || ''}`;
+      return `${baseUrl}/chat/${String(params?.conversationId ?? '')}`;
     default:
       return baseUrl;
   }

@@ -1,12 +1,7 @@
-/**
- * Discover Screen Data Constants
- * Categories, Sort Options, Cities, Stories data
- */
+// Discover Screen Constants
+import type { Category, SortOption, City, UserStory } from './types';
 
-import type { MaterialCommunityIcons } from '@expo/vector-icons';
-
-// Categories for filter modal
-export const CATEGORIES = [
+export const CATEGORIES: Category[] = [
   { id: 'all', label: 'All', emoji: '✨' },
   { id: 'coffee', label: 'Coffee', emoji: '☕' },
   { id: 'food', label: 'Food', emoji: '🍕' },
@@ -18,18 +13,14 @@ export const CATEGORIES = [
   { id: 'gift', label: 'Gifts', emoji: '🎁' },
 ];
 
-export const SORT_OPTIONS: Array<{
-  id: string;
-  label: string;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
-}> = [
+export const SORT_OPTIONS: SortOption[] = [
   { id: 'nearest', label: 'Nearest', icon: 'map-marker' },
   { id: 'newest', label: 'Newest', icon: 'clock-outline' },
   { id: 'price_low', label: 'Price ↑', icon: 'arrow-up' },
   { id: 'price_high', label: 'Price ↓', icon: 'arrow-down' },
 ];
 
-export const POPULAR_CITIES = [
+export const POPULAR_CITIES: City[] = [
   { id: 'istanbul', name: 'Istanbul', country: 'Turkey', emoji: '🇹🇷' },
   { id: 'paris', name: 'Paris', country: 'France', emoji: '🇫🇷' },
   { id: 'london', name: 'London', country: 'UK', emoji: '🇬🇧' },
@@ -38,59 +29,9 @@ export const POPULAR_CITIES = [
   { id: 'barcelona', name: 'Barcelona', country: 'Spain', emoji: '🇪🇸' },
 ];
 
-export interface StoryItem {
-  id: string;
-  imageUrl: string;
-  title: string;
-  description: string;
-  location: string;
-  distance: string;
-  price: number;
-  time: string;
-}
+export const STORY_DURATION = 5000; // 5 seconds per story
 
-export interface UserStory {
-  id: string;
-  name: string;
-  avatar: string;
-  hasStory: boolean;
-  isNew: boolean;
-  stories: StoryItem[];
-}
-
-// User Stories Data with multiple moments per user
 export const USER_STORIES: UserStory[] = [
-  {
-    id: '1',
-    name: 'Anna',
-    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    hasStory: true,
-    isNew: true,
-    stories: [
-      {
-        id: 's1-1',
-        imageUrl:
-          'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800',
-        title: 'Best Coffee in Town',
-        description: 'Amazing latte art and cozy atmosphere',
-        location: 'Brooklyn, NY',
-        distance: '0.5 km',
-        price: 15,
-        time: '2h ago',
-      },
-      {
-        id: 's1-2',
-        imageUrl:
-          'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800',
-        title: 'Vintage Cafe',
-        description: 'Hidden gem with the best pastries',
-        location: 'Brooklyn, NY',
-        distance: '0.8 km',
-        price: 20,
-        time: '3h ago',
-      },
-    ],
-  },
   {
     id: '2',
     name: 'Mike',
@@ -103,17 +44,17 @@ export const USER_STORIES: UserStory[] = [
         imageUrl:
           'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800',
         title: 'Rooftop Dinner',
-        description: 'Best views of the city skyline',
+        description: 'Stunning sunset views with amazing food',
         location: 'Manhattan, NY',
-        distance: '2.3 km',
+        distance: '2.1 km',
         price: 85,
-        time: '4h ago',
+        time: '1h ago',
       },
     ],
   },
   {
     id: '3',
-    name: 'Sophie',
+    name: 'Sara',
     avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
     hasStory: true,
     isNew: false,
@@ -121,19 +62,41 @@ export const USER_STORIES: UserStory[] = [
       {
         id: 's3-1',
         imageUrl:
-          'https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800',
-        title: 'Art Gallery Tour',
+          'https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?w=800',
+        title: 'Street Art Tour',
+        description: 'Discover hidden murals and graffiti art',
+        location: 'Bushwick, NY',
+        distance: '3.2 km',
+        price: 25,
+        time: '5h ago',
+      },
+      {
+        id: 's3-2',
+        imageUrl:
+          'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+        title: 'Gallery Opening',
         description: 'Contemporary art exhibition',
         location: 'Chelsea, NY',
-        distance: '1.5 km',
-        price: 45,
+        distance: '4.0 km',
+        price: 0,
         time: '6h ago',
+      },
+      {
+        id: 's3-3',
+        imageUrl:
+          'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800',
+        title: 'Photography Walk',
+        description: 'Capture the best spots in the city',
+        location: 'SoHo, NY',
+        distance: '1.5 km',
+        price: 30,
+        time: '8h ago',
       },
     ],
   },
   {
     id: '4',
-    name: 'James',
+    name: 'John',
     avatar: 'https://randomuser.me/api/portraits/men/75.jpg',
     hasStory: true,
     isNew: false,
@@ -141,36 +104,110 @@ export const USER_STORIES: UserStory[] = [
       {
         id: 's4-1',
         imageUrl:
-          'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=800',
-        title: 'Jazz Night',
-        description: 'Live jazz at the Blue Note',
-        location: 'Greenwich Village',
-        distance: '3.0 km',
-        price: 60,
-        time: '8h ago',
+          'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800',
+        title: 'Food Market Tour',
+        description: 'Taste the best local cuisines',
+        location: 'Queens, NY',
+        distance: '5.0 km',
+        price: 45,
+        time: '4h ago',
       },
     ],
   },
   {
     id: '5',
     name: 'Emma',
-    avatar: 'https://randomuser.me/api/portraits/women/17.jpg',
+    avatar: 'https://randomuser.me/api/portraits/women/90.jpg',
     hasStory: true,
-    isNew: false,
+    isNew: true,
     stories: [
       {
         id: 's5-1',
         imageUrl:
-          'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
-        title: 'Brunch Spot',
-        description: 'Best avocado toast in town',
-        location: 'SoHo, NY',
-        distance: '1.8 km',
+          'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+        title: 'Sunrise Yoga',
+        description: 'Start your day with peace and energy',
+        location: 'Central Park, NY',
+        distance: '1.0 km',
+        price: 20,
+        time: '30m ago',
+      },
+      {
+        id: 's5-2',
+        imageUrl:
+          'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800',
+        title: 'Meditation Session',
+        description: 'Find your inner calm',
+        location: 'Bryant Park, NY',
+        distance: '0.7 km',
+        price: 15,
+        time: '1h ago',
+      },
+    ],
+  },
+  {
+    id: '6',
+    name: 'Chris',
+    avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
+    hasStory: true,
+    isNew: false,
+    stories: [
+      {
+        id: 's6-1',
+        imageUrl:
+          'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800',
+        title: 'Jazz Night',
+        description: 'Live music at the best jazz club',
+        location: 'Harlem, NY',
+        distance: '6.0 km',
         price: 35,
-        time: '1d ago',
+        time: '3h ago',
+      },
+    ],
+  },
+  {
+    id: '7',
+    name: 'Lisa',
+    avatar: 'https://randomuser.me/api/portraits/women/33.jpg',
+    hasStory: true,
+    isNew: true,
+    stories: [
+      {
+        id: 's7-1',
+        imageUrl:
+          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
+        title: 'Vintage Shopping',
+        description: 'Best thrift stores in the city',
+        location: 'Williamsburg, NY',
+        distance: '2.5 km',
+        price: 0,
+        time: '2h ago',
+      },
+      {
+        id: 's7-2',
+        imageUrl:
+          'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800',
+        title: 'Boutique Tour',
+        description: 'Discover unique local designers',
+        location: 'Nolita, NY',
+        distance: '1.8 km',
+        price: 10,
+        time: '4h ago',
       },
     ],
   },
 ];
 
-export const STORY_DURATION = 5000; // 5 seconds per story
+export const DEFAULT_FILTERS = {
+  category: 'all',
+  sortBy: 'nearest',
+  maxDistance: 50,
+  priceRange: { min: 0, max: 500 },
+  location: 'San Francisco, CA',
+};
+
+export const DEFAULT_RECENT_LOCATIONS = [
+  'New York, NY',
+  'Los Angeles, CA',
+  'Chicago, IL',
+];

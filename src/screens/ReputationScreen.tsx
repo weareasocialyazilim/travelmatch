@@ -66,8 +66,8 @@ const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type ReputationScreenProps = StackScreenProps<RootStackParamList, 'Reputation'>;
 

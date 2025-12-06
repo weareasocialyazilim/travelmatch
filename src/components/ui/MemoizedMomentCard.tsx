@@ -14,8 +14,8 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { spacing } from '../../constants/spacing';
 import { radii } from '../../constants/radii';
+import { spacing } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import type { Moment } from '../../types';
 

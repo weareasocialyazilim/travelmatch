@@ -184,6 +184,36 @@ jobs:
       - name: Build Preview
         run: eas build --platform all --profile preview --non-interactive
 
+  # EAS Build for Production (main branch only)
+  eas-build-production:
+    name: EAS Build (Production)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [lint, test, e2e, quality-gate]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Build Production
+        run: eas build --platform all --profile production --non-interactive
+
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest

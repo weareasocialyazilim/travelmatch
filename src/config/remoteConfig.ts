@@ -4,18 +4,21 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { featureFlagService, type FeatureFlags } from '../utils/featureFlags';
 import Constants from 'expo-constants';
+import { featureFlagService, type FeatureFlags } from '../utils/featureFlags';
 import { logger } from '../utils/logger';
 
 // Environment-based configuration
-const getRemoteConfigUrl = () => {
+const getRemoteConfigUrl = (): string => {
   // Priority: Runtime env var > Expo config > Default
-  if (process.env.REMOTE_CONFIG_URL) {
-    return process.env.REMOTE_CONFIG_URL;
+  const envUrl = process.env.REMOTE_CONFIG_URL as string | undefined;
+  if (envUrl) {
+    return envUrl;
   }
 
-  const extra = Constants.expoConfig?.extra;
+  const extra = Constants.expoConfig?.extra as
+    | { remoteConfigUrl?: string }
+    | undefined;
   if (extra?.remoteConfigUrl) {
     return extra.remoteConfigUrl;
   }
@@ -68,6 +71,7 @@ export const fetchRemoteConfig = async (): Promise<Partial<FeatureFlags>> => {
       throw new Error(`HTTP ${response.status}`);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const data: RemoteConfigResponse = await response.json();
 
     // Cache the response
@@ -93,7 +97,7 @@ const getCachedConfig = async (): Promise<RemoteConfigResponse | null> => {
     const cached = await AsyncStorage.getItem(CACHE_KEY);
     if (!cached) return null;
 
-    return JSON.parse(cached);
+    return JSON.parse(cached) as RemoteConfigResponse;
   } catch (error) {
     logger.error('[RemoteConfig] Cache read error:', error);
     return null;

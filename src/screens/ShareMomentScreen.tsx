@@ -10,13 +10,12 @@ import {
   Clipboard,
   Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import type { NavigationProp, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMoments, Moment } from '../hooks/useMoments';
 import type { RootStackParamList } from '../navigation/AppNavigator';
-import { COLORS } from '../constants/colors';
-import { MOCK_MOMENTS } from '../mocks';
+import type { NavigationProp, RouteProp } from '@react-navigation/native';
 
 type ShareMomentScreenProps = RouteProp<RootStackParamList, 'ShareMoment'>;
 
@@ -32,9 +31,28 @@ export const ShareMomentScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<ShareMomentScreenProps>();
   const { momentId } = route.params;
+  const { getMoment } = useMoments();
+  const [moment, setMoment] = useState<Moment | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [linkCopied, setLinkCopied] = useState(false);
   const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch moment details
+  useEffect(() => {
+    const fetchMoment = async () => {
+      if (!momentId) return;
+      try {
+        const data = await getMoment(momentId);
+        setMoment(data);
+      } catch (error) {
+        console.error('Failed to fetch moment', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMoment();
+  }, [momentId, getMoment]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -45,30 +63,28 @@ export const ShareMomentScreen: React.FC = () => {
     };
   }, []);
 
-  // Find the moment (mock data)
-  const moment = MOCK_MOMENTS.find((m) => m.id === momentId) || {
+  const displayMoment = moment || {
     id: momentId,
-    title: 'Amazing Experience',
+    title: 'TravelMatch Moment',
     description: 'Check out this amazing moment!',
-    imageUrl:
-      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
-    price: 25,
+    images: ['https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400'],
+    pricePerGuest: 0,
   };
 
   const shareUrl = `https://travelmatch.app/moment/${momentId}`;
-  const shareMessage = `Check out this moment on TravelMatch: ${moment.title}\n${shareUrl}`;
+  const shareMessage = `Check out this moment on TravelMatch: ${displayMoment.title}\n${shareUrl}`;
 
   const handleNativeShare = useCallback(async () => {
     try {
       await Share.share({
         message: shareMessage,
         url: shareUrl,
-        title: moment.title,
+        title: displayMoment.title,
       });
     } catch (error) {
       Alert.alert('Error', 'Could not share this moment');
     }
-  }, [shareMessage, shareUrl, moment.title]);
+  }, [shareMessage, shareUrl, displayMoment.title]);
 
   const handleCopyLink = useCallback(() => {
     Clipboard.setString(shareUrl);

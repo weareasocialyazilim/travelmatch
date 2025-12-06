@@ -31,10 +31,9 @@ import React, {
   useCallback,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { User } from '../types/index';
-import { api } from '../utils/api';
-import { analyticsService } from '../services/analyticsService';
+import * as authService from '../services/supabaseAuthService';
 import { secureStorage, AUTH_STORAGE_KEYS } from '../utils/secureStorage';
+import type { User } from '../types/index';
 
 /**
  * Authentication tokens stored securely
@@ -244,17 +243,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     // Token expired, try to refresh
     try {
-      const response = await api.post<{
-        accessToken: string;
-        expiresIn: number;
-      }>('/auth/refresh', {
-        refreshToken: tokens.refreshToken,
-      });
+      const { session } = await authService.getSession();
+      
+      if (!session) {
+        throw new Error('Session expired');
+      }
 
       const newTokens: AuthTokens = {
-        ...tokens,
-        accessToken: response.accessToken,
-        expiresAt: now + response.expiresIn * 1000,
+        accessToken: session.access_token,
+        refreshToken: session.refresh_token,
+        expiresAt: (session.expires_at || 0) * 1000,
       };
 
       await saveTokens(newTokens);
@@ -295,13 +293,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             setUser(parsedUser);
             setTokens(parsedTokens);
             setAuthState('authenticated');
-
-            // Identify user in analytics
-            analyticsService.identify({
-              userId: parsedUser.id,
-              email: parsedUser.email,
-              name: parsedUser.name,
-            });
           } else {
             // Tokens expired, clear data
             await clearAuthData();
@@ -314,7 +305,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
     };
 
-    loadAuthState();
+    void loadAuthState();
   }, []);
 
   /**
@@ -324,30 +315,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     credentials: LoginCredentials,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await api.post<{
-        user: User;
-        accessToken: string;
-        refreshToken: string;
-        expiresIn: number;
-      }>('/auth/login', credentials);
+      const { user: authUser, session, error } = await authService.signInWithEmail(
+        credentials.email,
+        credentials.password
+      );
+
+      if (error) throw error;
+      if (!authUser || !session) throw new Error('Login failed');
+
+      const user: User = {
+        id: authUser.id,
+        email: authUser.email || '',
+        name: authUser.user_metadata?.name || '',
+        avatar: authUser.user_metadata?.avatar_url,
+      };
 
       const newTokens: AuthTokens = {
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-        expiresAt: Date.now() + response.expiresIn * 1000,
+        accessToken: session.access_token,
+        refreshToken: session.refresh_token,
+        expiresAt: (session.expires_at || 0) * 1000,
       };
 
       await saveTokens(newTokens);
-      await saveUser(response.user);
+      await saveUser(user);
       setAuthState('authenticated');
-
-      // Analytics
-      analyticsService.track('login', 'interaction', { method: 'email' });
-      analyticsService.identify({
-        userId: response.user.id,
-        email: response.user.email,
-        name: response.user.name,
-      });
 
       return { success: true };
     } catch (error) {
@@ -363,30 +354,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     data: RegisterData,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await api.post<{
-        user: User;
-        accessToken: string;
-        refreshToken: string;
-        expiresIn: number;
-      }>('/auth/register', data);
+      const { user: authUser, session, error } = await authService.signUpWithEmail(
+        data.email,
+        data.password,
+        { name: data.name }
+      );
 
-      const newTokens: AuthTokens = {
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-        expiresAt: Date.now() + response.expiresIn * 1000,
-      };
+      if (error) throw error;
+      if (!authUser) throw new Error('Registration failed');
 
-      await saveTokens(newTokens);
-      await saveUser(response.user);
-      setAuthState('authenticated');
+      if (session) {
+        const user: User = {
+          id: authUser.id,
+          email: authUser.email || '',
+          name: authUser.user_metadata?.name || '',
+          avatar: authUser.user_metadata?.avatar_url,
+        };
 
-      // Analytics
-      analyticsService.track('sign_up', 'interaction', { method: 'email' });
-      analyticsService.identify({
-        userId: response.user.id,
-        email: response.user.email,
-        name: response.user.name,
-      });
+        const newTokens: AuthTokens = {
+          accessToken: session.access_token,
+          refreshToken: session.refresh_token,
+          expiresAt: (session.expires_at || 0) * 1000,
+        };
+
+        await saveTokens(newTokens);
+        await saveUser(user);
+        setAuthState('authenticated');
+      }
 
       return { success: true };
     } catch (error) {
@@ -403,36 +397,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     data: SocialAuthData,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await api.post<{
-        user: User;
-        accessToken: string;
-        refreshToken: string;
-        expiresIn: number;
-        isNewUser: boolean;
-      }>('/auth/social', data);
+      // TODO: Implement Supabase social auth
+      // This requires platform specific setup (Google Sign-In, Apple Sign-In)
+      // and passing the ID token to Supabase
+      
+      /*
+      const { data: session, error } = await supabase.auth.signInWithIdToken({
+        provider: data.provider,
+        token: data.token,
+      })
+      */
 
-      const newTokens: AuthTokens = {
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-        expiresAt: Date.now() + response.expiresIn * 1000,
-      };
-
-      await saveTokens(newTokens);
-      await saveUser(response.user);
-      setAuthState('authenticated');
-
-      // Analytics
-      const eventName = response.isNewUser ? 'sign_up' : 'login';
-      analyticsService.track(eventName, 'interaction', {
-        method: data.provider,
-      });
-      analyticsService.identify({
-        userId: response.user.id,
-        email: response.user.email,
-        name: response.user.name,
-      });
-
-      return { success: true };
+      throw new Error('Social auth not implemented yet');
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Social auth failed';
@@ -441,21 +417,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   /**
-   * Logout
+   * Logout user
    */
   const logout = async (): Promise<void> => {
     try {
-      // Call logout endpoint to invalidate tokens on server
-      if (tokens) {
-        await api.post('/auth/logout', { refreshToken: tokens.refreshToken });
-      }
+      await authService.signOut();
     } catch {
       // Server logout failed, but continue with local cleanup
     } finally {
       // Clear local data regardless of server response
       await clearAuthData();
-      analyticsService.track('logout', 'interaction');
-      analyticsService.reset();
     }
   };
 
@@ -464,8 +435,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
    */
   const refreshUser = async (): Promise<void> => {
     try {
-      const response = await api.get<{ user: User }>('/users/me');
-      await saveUser(response.user);
+      const { user: authUser } = await authService.getCurrentUser();
+      if (authUser) {
+        const user: User = {
+          id: authUser.id,
+          email: authUser.email || '',
+          name: authUser.user_metadata?.name || '',
+          avatar: authUser.user_metadata?.avatar_url,
+        };
+        await saveUser(user);
+      }
     } catch {
       // Silent fail - user data will be refreshed on next successful request
     }
@@ -478,7 +457,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     if (user) {
       const updatedUser = { ...user, ...data };
       setUser(updatedUser);
-      AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+      void AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
     }
   };
 
@@ -489,7 +468,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     email: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      await api.post('/auth/forgot-password', { email });
+      const { error } = await authService.resetPasswordForEmail(email);
+      if (error) throw error;
       return { success: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Request failed';

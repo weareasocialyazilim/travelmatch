@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '../utils/logger';
 
 const ONBOARDING_KEY = '@has_seen_onboarding';
 
@@ -9,7 +9,7 @@ export const useOnboarding = () => {
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
 
   useEffect(() => {
-    checkOnboardingStatus();
+    void checkOnboardingStatus();
   }, []);
 
   const checkOnboardingStatus = async () => {

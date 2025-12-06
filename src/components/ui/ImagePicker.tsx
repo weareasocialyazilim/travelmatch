@@ -15,18 +15,18 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import type { ImageAsset } from '../../utils/imageHandling';
+import { COLORS } from '../../constants/colors';
+import { radii } from '../../constants/radii';
+import { spacing } from '../../constants/spacing';
+import { TYPOGRAPHY } from '../../constants/typography';
+import { useImageUpload } from '../../hooks/useImageUpload';
 import {
   pickImageFromCamera,
   pickImageFromGallery,
   validateImageFile,
   formatBytes,
 } from '../../utils/imageHandling';
-import { useImageUpload } from '../../hooks/useImageUpload';
-import { COLORS } from '../../constants/colors';
-import { spacing } from '../../constants/spacing';
-import { radii } from '../../constants/radii';
-import { TYPOGRAPHY } from '../../constants/typography';
+import type { ImageAsset } from '../../utils/imageHandling';
 
 interface ImagePickerProps {
   /** Callback when image is uploaded successfully */

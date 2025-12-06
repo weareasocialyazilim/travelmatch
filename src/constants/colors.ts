@@ -1,7 +1,4 @@
-import {
-  getContrastRatio as _getContrastRatio,
-  meetsWCAG_AA as _meetsWCAG_AA,
-} from '../utils/contrastChecker';
+
 
 export const COLORS = {
   // Primary colors

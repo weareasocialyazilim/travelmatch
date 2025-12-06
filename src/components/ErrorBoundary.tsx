@@ -2,13 +2,13 @@ import type { ReactNode } from 'react';
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Sentry from '../config/sentry';
 import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { radii } from '../constants/radii';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { logger } from '../utils/logger';
-import * as Sentry from '../config/sentry';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -81,6 +81,7 @@ export class ErrorBoundary extends Component<
     const { children: _children, fallback, level = 'component' } = this.props;
 
     if (hasError && error) {
+      console.log('ErrorBoundary rendering error view. styles:', styles);
       // Use custom fallback if provided
       if (fallback) {
         return fallback(error, this.handleReset);

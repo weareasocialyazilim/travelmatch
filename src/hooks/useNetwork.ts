@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { NetInfoState } from '@react-native-community/netinfo';
 import NetInfo from '@react-native-community/netinfo';
+import type { NetInfoState } from '@react-native-community/netinfo';
 
 interface NetworkStatus {
   isConnected: boolean;
@@ -31,7 +31,7 @@ export const useNetwork = (): UseNetworkReturn => {
 
   useEffect(() => {
     // Get initial state
-    NetInfo.fetch().then(handleNetInfoChange);
+    void NetInfo.fetch().then(handleNetInfoChange);
 
     // Subscribe to network changes
     const unsubscribe = NetInfo.addEventListener(handleNetInfoChange);

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -13,9 +12,9 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-
-import type { StackScreenProps } from '@react-navigation/stack';
+import { logger } from '../utils/logger';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type InviteFriendsScreenProps = StackScreenProps<
   RootStackParamList,

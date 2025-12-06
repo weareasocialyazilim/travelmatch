@@ -6,6 +6,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '../utils/logger';
+import { secureStorage } from '../utils/secureStorage';
 
 // Supabase credentials from environment variables
 const SUPABASE_URL: string =
@@ -23,12 +24,27 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 /**
+ * Custom storage adapter for Supabase to use SecureStore
+ */
+const SupabaseStorage = {
+  getItem: (key: string) => {
+    return secureStorage.getItem(key);
+  },
+  setItem: (key: string, value: string) => {
+    return secureStorage.setItem(key, value);
+  },
+  removeItem: (key: string) => {
+    return secureStorage.deleteItem(key);
+  },
+};
+
+/**
  * Supabase client instance
- * Configured with AsyncStorage for session persistence in React Native
+ * Configured with SecureStore for session persistence in React Native
  */
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: AsyncStorage,
+    storage: SupabaseStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false, // Disable for React Native

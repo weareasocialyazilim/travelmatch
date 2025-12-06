@@ -3,9 +3,9 @@
  * Initialize and configure feature flags system with remote config support
  */
 
-import type { featureFlagService } from '../utils/featureFlags';
 import { logger } from '../utils/logger';
 import { initializeWithRemoteConfig } from './remoteConfig';
+import type { featureFlagService } from '../utils/featureFlags';
 
 type FeatureFlagServiceType = typeof featureFlagService;
 let cachedService: FeatureFlagServiceType | null = null;

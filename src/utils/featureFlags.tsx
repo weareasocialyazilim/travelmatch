@@ -2,11 +2,11 @@
  * Feature Flags & A/B Testing System
  * Safe feature rollout with remote configuration
  */
-import { logger } from './logger';
 
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { analytics } from '../services/analytics';
+import { logger } from './logger';
 
 /**
  * Feature Flag Configuration
@@ -56,7 +56,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   mlDrivenSearch: false,
   lazyImageLoading: true,
   optimizedBundleSize: true,
-  performanceMonitoring: true,
+  performanceMonitoring: false,
   inAppFeedback: true,
   granularNotifications: true,
   darkModeContrast: true,
@@ -98,18 +98,21 @@ class FeatureFlagService {
       // Load from local storage
       const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
       if (stored) {
-        this.flags = { ...DEFAULT_FLAGS, ...JSON.parse(stored) };
+        this.flags = {
+          ...DEFAULT_FLAGS,
+          ...(JSON.parse(stored) as Partial<FeatureFlags>),
+        };
       }
 
       // Load A/B tests
       const storedTests = await AsyncStorage.getItem(this.AB_TEST_KEY);
       if (storedTests) {
-        const tests = JSON.parse(storedTests);
+        const tests = JSON.parse(storedTests) as Record<string, ABTest>;
         this.abTests = new Map(Object.entries(tests));
       }
 
       // Fetch from remote config (Firebase, LaunchDarkly, etc.)
-      await this.fetchRemoteConfig();
+      void this.fetchRemoteConfig();
     } catch (error) {
       logger.error('Failed to initialize feature flags:', error);
     }
@@ -118,23 +121,19 @@ class FeatureFlagService {
   /**
    * Fetch remote configuration
    */
-  private async fetchRemoteConfig(): Promise<void> {
-    try {
-      // TODO: Replace with actual remote config service
-      // Example: Firebase Remote Config, LaunchDarkly, Split.io
-      /*
-      const response = await fetch('https://api.yourapp.com/config/features');
-      const remoteFlags = await response.json();
-      
-      this.flags = { ...this.flags, ...remoteFlags };
-      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.flags));
+  private fetchRemoteConfig(): void {
+    // TODO: Replace with actual remote config service
+    // Example: Firebase Remote Config, LaunchDarkly, Split.io
+    /*
+    const response = await fetch('https://api.yourapp.com/config/features');
+    const remoteFlags = await response.json();
+    
+    this.flags = { ...this.flags, ...remoteFlags };
+    await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.flags));
       */
 
-      // For now, use defaults
-      logger.debug('Remote config: Using default flags');
-    } catch (error) {
-      logger.error('Failed to fetch remote config:', error);
-    }
+    // For now, use defaults
+    logger.debug('Remote config: Using default flags');
   }
 
   /**
@@ -206,7 +205,7 @@ class FeatureFlagService {
     };
 
     this.abTests.set(testName, test);
-    this.persistABTests();
+    void this.persistABTests();
 
     analytics.trackEvent('ab_test_assigned', {
       testName,
@@ -320,7 +319,7 @@ export const useFeatureFlag = (flag: keyof FeatureFlags): boolean => {
  */
 export const useABTest = (testName: string, userId: string): Variant => {
   const [variant, setVariant] = useState<Variant>(
-    featureFlagService.getVariant(testName) || 'control',
+    featureFlagService.getVariant(testName) ?? 'control',
   );
 
   useEffect(() => {

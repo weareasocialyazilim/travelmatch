@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,131 +6,89 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { useMoments } from '../hooks/useMoments';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { Moment as MomentType } from '../types';
+import type { NavigationProp } from '@react-navigation/native';
 
 type TabType = 'active' | 'completed';
-
-interface MyMoment {
-  id: string;
-  title: string;
-  location: string;
-  price: number;
-  image: string;
-  status: 'active' | 'pending' | 'completed';
-  requestCount?: number;
-  completedDate?: string;
-  rating?: number;
-}
 
 const MyMomentsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<TabType>('active');
 
-  // Mock data
-  const activeMoments: MyMoment[] = [
-    {
-      id: '1',
-      title: 'Best Croissant in Paris',
-      location: 'Paris, France',
-      price: 15,
-      image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a',
-      status: 'active',
-      requestCount: 3,
-    },
-    {
-      id: '2',
-      title: 'Hidden Cafe in Tokyo',
-      location: 'Tokyo, Japan',
-      price: 20,
-      image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24',
-      status: 'pending',
-      requestCount: 1,
-    },
-    {
-      id: '3',
-      title: 'Street Art Tour Barcelona',
-      location: 'Barcelona, Spain',
-      price: 25,
-      image: 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3',
-      status: 'active',
-      requestCount: 0,
-    },
-  ];
+  const {
+    myMoments,
+    myMomentsLoading,
+    loadMyMoments,
+  } = useMoments();
 
-  const completedMoments: MyMoment[] = [
-    {
-      id: '4',
-      title: 'Sunset at Santorini',
-      location: 'Santorini, Greece',
-      price: 30,
-      image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff',
-      status: 'completed',
-      completedDate: 'Nov 28, 2024',
-      rating: 5,
-    },
-    {
-      id: '5',
-      title: 'Local Food Market',
-      location: 'Bangkok, Thailand',
-      price: 12,
-      image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1',
-      status: 'completed',
-      completedDate: 'Nov 15, 2024',
-      rating: 4,
-    },
-  ];
+  useEffect(() => {
+    loadMyMoments();
+  }, [loadMyMoments]);
+
+  const activeMoments = useMemo(() => 
+    myMoments.filter(m => ['active', 'paused', 'draft'].includes(m.status)),
+    [myMoments]
+  );
+
+  const completedMoments = useMemo(() => 
+    myMoments.filter(m => m.status === 'completed'),
+    [myMoments]
+  );
 
   const moments = activeTab === 'active' ? activeMoments : completedMoments;
 
-  // Convert MyMoment to full Moment type for navigation
+  // Convert Moment to full Moment type for navigation
   const convertToMoment = (
-    myMoment: MyMoment,
+    moment: any,
   ): MomentType & { status?: string } => {
-    const [city, country] = (myMoment.location || 'Unknown, Unknown').split(
-      ', ',
-    );
+    const locationStr = typeof moment.location === 'string' 
+      ? moment.location 
+      : `${moment.location?.city || ''}, ${moment.location?.country || ''}`;
+      
+    const [city, country] = locationStr.split(', ');
+    
     return {
-      id: myMoment.id,
-      title: myMoment.title,
-      story: `Experience ${myMoment.title} in ${
-        myMoment.location || 'Unknown Location'
-      }`,
-      imageUrl: myMoment.image,
-      image: myMoment.image,
-      price: myMoment.price,
-      status: myMoment.status, // Pass status for owner view conditional rendering
+      id: moment.id,
+      title: moment.title,
+      story: moment.description || `Experience ${moment.title}`,
+      imageUrl: moment.images?.[0] || 'https://via.placeholder.com/150',
+      image: moment.images?.[0] || 'https://via.placeholder.com/150',
+      price: moment.pricePerGuest,
+      status: moment.status,
       location: {
-        city: city || myMoment.location || 'Unknown City',
+        city: city || 'Unknown City',
         country: country || '',
       },
-      availability: myMoment.status === 'active' ? 'Available' : 'Completed',
+      availability: moment.status === 'active' ? 'Available' : 'Completed',
       user: {
-        id: 'current-user',
-        name: 'You',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+        id: moment.hostId,
+        name: moment.hostName,
+        avatar: moment.hostAvatar,
         type: 'traveler',
         isVerified: true,
-        location: myMoment.location,
+        location: locationStr,
         travelDays: 0,
       },
-      giftCount: myMoment.requestCount || 0,
+      giftCount: 0,
       category: {
-        id: 'experience',
-        label: 'Experience',
+        id: moment.category,
+        label: moment.category,
         emoji: '✨',
       },
     };
   };
 
   const getStatusBadge = (
-    status: MyMoment['status'],
+    status: string,
     requestCount?: number,
   ) => {
     switch (status) {
@@ -144,10 +102,10 @@ const MyMomentsScreen: React.FC = () => {
             </Text>
           </View>
         );
-      case 'pending':
+      case 'draft':
         return (
           <View style={[styles.statusBadge, styles.pendingBadge]}>
-            <Text style={styles.pendingBadgeText}>Pending</Text>
+            <Text style={styles.pendingBadgeText}>Draft</Text>
           </View>
         );
       case 'completed':
@@ -161,15 +119,17 @@ const MyMomentsScreen: React.FC = () => {
             <Text style={styles.completedBadgeText}>Completed</Text>
           </View>
         );
+      default:
+        return null;
     }
   };
 
-  const handleMomentPress = (myMoment: MyMoment) => {
-    const fullMoment = convertToMoment(myMoment);
+  const handleMomentPress = (moment: any) => {
+    const fullMoment = convertToMoment(moment);
     navigation.navigate('MomentDetail', {
       moment: fullMoment,
       isOwner: true,
-      pendingRequests: myMoment.requestCount || 0,
+      pendingRequests: 0,
     });
   };
 
@@ -231,8 +191,19 @@ const MyMomentsScreen: React.FC = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={myMomentsLoading}
+            onRefresh={loadMyMoments}
+            tintColor={COLORS.coral}
+          />
+        }
       >
-        {moments.length === 0 ? (
+        {myMomentsLoading && myMoments.length === 0 ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.coral} />
+          </View>
+        ) : moments.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={styles.emptyIcon}>
               <MaterialCommunityIcons
@@ -520,6 +491,12 @@ const styles = StyleSheet.create({
   },
 
   // Empty State
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 40,
+  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: 60,

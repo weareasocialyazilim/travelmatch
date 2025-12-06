@@ -2,9 +2,8 @@
  * Performance Utilities
  * Memoization ve optimization helpers
  */
-import { logger } from './logger';
-
 import { useCallback, useRef, useEffect, useState } from 'react';
+import { logger } from './logger';
 
 /**
  * Debounce Hook
@@ -118,7 +117,7 @@ export const flatListOptimizations = {
     item: T,
     index: number,
   ) => {
-    return item.id?.toString() || index.toString();
+    return item.id?.toString() ?? index.toString();
   },
 
   /**
@@ -274,12 +273,14 @@ class PerformanceMonitorClass {
     // @ts-expect-error - performance.memory is non-standard but available in React Native
     if (performance.memory) {
       // @ts-expect-error - performance.memory types
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
-      const usage = (usedJSHeapSize / totalJSHeapSize) * 100;
+      const usage =
+        ((usedJSHeapSize as number) / (totalJSHeapSize as number)) * 100;
 
       this.recordMetric('memory_usage_percent', usage, {
-        usedMB: Math.round(usedJSHeapSize / 1024 / 1024),
-        totalMB: Math.round(totalJSHeapSize / 1024 / 1024),
+        usedMB: Math.round((usedJSHeapSize as number) / 1024 / 1024),
+        totalMB: Math.round((totalJSHeapSize as number) / 1024 / 1024),
       });
 
       // Alert on high memory

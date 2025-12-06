@@ -12,24 +12,25 @@ import {
   Alert,
   ScrollView as _ScrollView,
 } from 'react-native';
-import { useScreenPerformance } from '../hooks/useScreenPerformance';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { RouteProp } from '@react-navigation/native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ChatAttachmentBottomSheet } from '../components/ChatAttachmentBottomSheet';
+import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
 import { COLORS } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
+import { useTypingIndicator } from '../context/RealtimeContext';
+import { useMessages } from '../hooks/useMessages';
+import { useScreenPerformance } from '../hooks/useScreenPerformance';
 import {
   CHAT_LIST_CONFIG,
   ITEM_HEIGHTS,
   createGetItemLayout,
 } from '../utils/listOptimization';
-import { ChatAttachmentBottomSheet } from '../components/ChatAttachmentBottomSheet';
-import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
-import { useMessages } from '../hooks/useMessages';
-import { useTypingIndicator } from '../context/RealtimeContext';
 import { logger } from '../utils/logger';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RouteProp } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'Chat'>;
 type ChatScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Chat'>;
@@ -51,6 +52,8 @@ const ChatScreen: React.FC = () => {
   const [showAttachmentSheet, setShowAttachmentSheet] = useState(false);
   const [showChatOptions, setShowChatOptions] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { user: currentUser } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // Use messages hook for API integration
   const {
@@ -74,6 +77,21 @@ const ChatScreen: React.FC = () => {
       loadMessages(conversationId);
     }
   }, [conversationId, loadMessages]);
+
+  // Map API messages to UI messages
+  useEffect(() => {
+    if (_apiMessages) {
+      const mappedMessages: Message[] = _apiMessages.map((msg) => ({
+        id: msg.id,
+        type: (msg.type === 'location' ? 'text' : msg.type) as Message['type'],
+        text: msg.content,
+        imageUrl: msg.imageUrl,
+        user: msg.senderId === currentUser?.id ? 'me' : 'other',
+        timestamp: msg.createdAt,
+      }));
+      setMessages(mappedMessages);
+    }
+  }, [_apiMessages, currentUser]);
 
   // Handle text input changes for typing indicator
   const handleTextChange = useCallback(
@@ -482,7 +500,7 @@ const ChatScreen: React.FC = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <FlatList<Message>
-          data={MOCK_MESSAGES}
+          data={messages}
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messagesList}
@@ -553,7 +571,7 @@ const ChatScreen: React.FC = () => {
       <ChatAttachmentBottomSheet
         visible={showAttachmentSheet}
         onClose={() => setShowAttachmentSheet(false)}
-        onPhotoVideo={async () => {
+        onPhotoVideo={() => {
           setShowAttachmentSheet(false);
           Alert.alert('Photo/Video', 'Select media to send', [
             { text: 'Camera', onPress: () => logger.debug('Open camera') },

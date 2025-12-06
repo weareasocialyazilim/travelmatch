@@ -5,32 +5,12 @@
  * Persists auth state to AsyncStorage for session persistence.
  *
  * @module stores/authStore
- *
- * @example
- * ```tsx
- * import { useAuthStore } from '../stores/authStore';
- *
- * const MyComponent = () => {
- *   const { user, isAuthenticated, login, logout } = useAuthStore();
- *
- *   const handleLogin = async () => {
- *     await login('user@example.com', 'password');
- *   };
- *
- *   return isAuthenticated ? (
- *     <Text>Welcome, {user?.name}</Text>
- *   ) : (
- *     <Button onPress={handleLogin}>Login</Button>
- *   );
- * };
- * ```
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { secureStorage, AUTH_STORAGE_KEYS } from '../utils/secureStorage';
-import { apiClient } from '../utils/api';
+import * as authService from '../services/supabaseAuthService';
 import { logger } from '../utils/logger';
 
 /**
@@ -79,7 +59,7 @@ interface AuthState {
   /** Register new account */
   register: (name: string, email: string, _password: string) => Promise<void>;
   /** Logout and clear session */
-  logout: () => void;
+  logout: () => Promise<void>;
   /** Update user profile data */
   updateUser: (updates: Partial<User>) => void;
   /** Refresh authentication tokens */
@@ -119,25 +99,23 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         set({ isLoading: true });
         try {
-          // Real API call
-          const response = await apiClient.post<{
-            user: User;
-            accessToken: string;
-            refreshToken: string;
-          }>('/auth/login', { email, password });
+          const { user, session, error } = await authService.signInWithEmail(email, password);
 
-          const { user, accessToken, refreshToken } = response.data;
+          if (error) throw error;
+          if (!user || !session) throw new Error('Login failed');
 
-          // Store tokens securely
-          await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-          await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-
-          logger.info('[Auth] Login successful', { userId: user.id });
+          const storeUser: User = {
+            id: user.id,
+            email: user.email || '',
+            name: user.user_metadata?.name || '',
+            avatar: user.user_metadata?.avatar_url,
+            createdAt: user.created_at,
+          };
 
           set({
-            user,
-            token: accessToken,
-            refreshToken,
+            user: storeUser,
+            token: session.access_token,
+            refreshToken: session.refresh_token,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -152,28 +130,31 @@ export const useAuthStore = create<AuthState>()(
       register: async (name, email, password) => {
         set({ isLoading: true });
         try {
-          // Real API call
-          const response = await apiClient.post<{
-            user: User;
-            accessToken: string;
-            refreshToken: string;
-          }>('/auth/register', { name, email, password });
+          const { user, session, error } = await authService.signUpWithEmail(email, password, { name });
 
-          const { user, accessToken, refreshToken } = response.data;
+          if (error) throw error;
+          if (!user) throw new Error('Registration failed');
 
-          // Store tokens securely
-          await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-          await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+          if (session) {
+            const storeUser: User = {
+              id: user.id,
+              email: user.email || '',
+              name: user.user_metadata?.name || '',
+              avatar: user.user_metadata?.avatar_url,
+              createdAt: user.created_at,
+            };
 
-          logger.info('[Auth] Registration successful', { userId: user.id });
-
-          set({
-            user,
-            token: accessToken,
-            refreshToken,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+            set({
+              user: storeUser,
+              token: session.access_token,
+              refreshToken: session.refresh_token,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+          } else {
+            logger.info('[Auth] Registration successful, waiting for email confirmation');
+            set({ isLoading: false });
+          }
         } catch (error) {
           logger.error('[Auth] Registration failed', error as Error);
           set({ isLoading: false });
@@ -184,15 +165,10 @@ export const useAuthStore = create<AuthState>()(
       // Logout
       logout: async () => {
         try {
-          // Clear secure storage
-          await secureStorage.deleteItems([
-            AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-            AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-            AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
-          ]);
+          await authService.signOut();
           logger.info('[Auth] Logout successful');
         } catch (error) {
-          logger.error('[Auth] Error clearing tokens', error as Error);
+          logger.error('[Auth] Error signing out', error as Error);
         }
         set({
           user: null,
@@ -212,28 +188,19 @@ export const useAuthStore = create<AuthState>()(
 
       // Refresh Auth
       refreshAuth: async () => {
-        const { refreshToken } = get();
-        if (!refreshToken) return;
-
         try {
-          const response = await apiClient.post<{
-            accessToken: string;
-            refreshToken: string;
-          }>('/auth/refresh', { refreshToken });
-
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-          // Update secure storage
-          await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-          await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
-
-          set({ token: accessToken, refreshToken: newRefreshToken });
-          logger.info('[Auth] Token refreshed successfully');
+          const { session } = await authService.getSession();
+          if (session) {
+            set({ 
+              token: session.access_token, 
+              refreshToken: session.refresh_token 
+            });
+          } else {
+            get().logout();
+          }
         } catch (error) {
           logger.error('[Auth] Token refresh failed', error as Error);
-          // If refresh fails, logout
-          await get().logout();
-          throw error;
+          get().logout();
         }
       },
     }),

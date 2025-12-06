@@ -177,14 +177,14 @@ class Logger {
     this.remoteLogQueue.push(entry);
     // Flush immediately if queue is large
     if (this.remoteLogQueue.length >= 50) {
-      this.flushRemoteLogs();
+      void this.flushRemoteLogs();
     }
   }
 
   private startRemoteFlush(): void {
     // Flush every 30 seconds
     this.flushInterval = setInterval(() => {
-      this.flushRemoteLogs();
+      void this.flushRemoteLogs();
     }, 30000);
   }
 
@@ -392,7 +392,7 @@ class Logger {
       clearInterval(this.flushInterval);
       this.flushInterval = null;
     }
-    this.flushRemoteLogs();
+    void this.flushRemoteLogs();
   }
 }
 

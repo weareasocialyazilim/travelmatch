@@ -4,17 +4,17 @@
  */
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { COLORS } from '../../constants/colors';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS } from '../../constants/colors';
+import { radii } from '../../constants/radii';
+import { spacing } from '../../constants/spacing';
+import { TYPOGRAPHY } from '../../constants/typography';
 import { useTheme } from '../../hooks/useTheme';
 import { useTranslation } from '../../hooks/useTranslation';
-import type { SortOption } from '../../stores/searchStore';
 import { useSearchStore } from '../../stores/searchStore';
-import { spacing } from '../../constants/spacing';
-import { radii } from '../../constants/radii';
-import { TYPOGRAPHY } from '../../constants/typography';
+import type { SortOption } from '../../stores/searchStore';
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 

@@ -8,11 +8,11 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import { COLORS } from '../constants/colors';
 import PropTypes from 'prop-types';
+import { COLORS } from '../constants/colors';
 import { useHaptics } from '../hooks/useHaptics';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 interface BottomNavProps {
   activeTab: 'Discover' | 'Requests' | 'Create' | 'Messages' | 'Profile';
@@ -29,7 +29,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
   const { impact } = useHaptics();
 
   const handleTabPress = (screen: keyof RootStackParamList) => {
-    impact('light');
+    void impact('light');
     navigation.navigate(screen as never);
   };
 
@@ -231,6 +231,10 @@ const styles = StyleSheet.create({
   navItem: {
     alignItems: 'center',
     gap: 2,
+    minHeight: 44,
+    minWidth: 60, // Increased touch target width
+    justifyContent: 'center',
+    paddingVertical: 4,
   },
   navText: {
     color: COLORS.textSecondary,

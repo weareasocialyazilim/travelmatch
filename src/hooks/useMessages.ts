@@ -2,15 +2,14 @@
  * useMessages Hook
  * Real-time messaging with conversations and messages
  */
-import { logger } from '../utils/logger';
-
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { messageService } from '../services/messageService';
+import { logger } from '../utils/logger';
 import type {
   Conversation,
   Message,
   SendMessageRequest,
 } from '../services/messageService';
-import { messageService } from '../services/messageService';
 
 interface UseMessagesReturn {
   // Conversations
@@ -86,7 +85,9 @@ export const useMessages = (): UseMessagesReturn => {
     } catch (error) {
       if (mountedRef.current) {
         setConversationsError(
-          error instanceof Error ? error.message : 'Failed to load conversations',
+          error instanceof Error
+            ? error.message
+            : 'Failed to load conversations',
         );
       }
     } finally {
@@ -109,9 +110,9 @@ export const useMessages = (): UseMessagesReturn => {
       const response = await messageService.getMessages(conversationId, {
         page: 1,
       });
-      
+
       if (!mountedRef.current) return;
-      
+
       setMessages(response.messages);
       setHasMoreMessages(response.hasMore);
 
@@ -234,9 +235,9 @@ export const useMessages = (): UseMessagesReturn => {
     async (conversationId: string): Promise<boolean> => {
       try {
         await messageService.archiveConversation(conversationId);
-        
+
         if (!mountedRef.current) return true;
-        
+
         setConversations((prev) =>
           prev.filter((conv) => conv.id !== conversationId),
         );
@@ -257,7 +258,7 @@ export const useMessages = (): UseMessagesReturn => {
 
   // Initial load
   useEffect(() => {
-    refreshConversations();
+    void refreshConversations();
   }, [refreshConversations]);
 
   // TODO: Set up real-time subscription for new messages

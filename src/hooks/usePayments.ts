@@ -25,6 +25,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { paymentService } from '../services/paymentService';
+import { logger } from '../utils/logger';
 import type {
   PaymentCard,
   BankAccount,
@@ -33,8 +35,6 @@ import type {
   TransactionType,
   PaymentStatus,
 } from '../services/paymentService';
-import { paymentService } from '../services/paymentService';
-import { logger } from '../utils/logger';
 
 /**
  * Return type for the usePayments hook

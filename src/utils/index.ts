@@ -27,37 +27,13 @@ export type { StandardizedError, UseErrorHandlerReturn } from './errorHandler';
 // Performance
 export * from './performance';
 
-// Accessibility Audit
-export {
-  AccessibilityAuditor,
-  useAccessibilityAudit,
-  A11ySeverity,
-  A11yIssueType,
-} from './accessibilityAudit';
-export type { A11yIssue, A11yAuditResult } from './accessibilityAudit';
-
-// Bundle Optimization
-export {
-  BundleSizeAnalyzer,
-  useDynamicImport,
-  DEFAULT_IMAGE_CONFIG,
-  HIGH_QUALITY_IMAGE_CONFIG,
-  THUMBNAIL_IMAGE_CONFIG,
-} from './bundleOptimization';
-export type {
-  BundleSizeMetrics,
-  OptimizationRecommendation,
-  ImageOptimizationConfig,
-} from './bundleOptimization';
-
-// Rate Limiter
+// Rate Limiter (RateLimitError excluded - use from appErrors instead)
 export {
   checkRateLimit,
   withRateLimit,
   resetRateLimit,
   resetAllRateLimits,
   getRateLimitStatus,
-  RateLimitError,
   DebouncedRateLimiter,
   RATE_LIMIT_CONFIGS,
 } from './rateLimiter';

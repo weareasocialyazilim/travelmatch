@@ -1,4 +1,3 @@
-import type { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -11,13 +10,14 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { LoadingState } from '../components/LoadingState';
-import SocialButton from '../components/SocialButton';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
+import { LoadingState } from '../components/LoadingState';
+import SocialButton from '../components/SocialButton';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type LoginScreenProps = StackScreenProps<RootStackParamList, 'Login'>;
 

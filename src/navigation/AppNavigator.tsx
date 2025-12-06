@@ -121,12 +121,7 @@ const MomentGalleryScreen = lazyLoad(() =>
     default: m.MomentGalleryScreen,
   })),
 );
-const MomentPreviewScreen = lazyLoad(
-  () => import('../screens/MomentPreviewScreen'),
-);
-const MomentPublishedScreen = lazyLoad(
-  () => import('../screens/MomentPublishedScreen'),
-);
+
 const SavedMomentsScreen = lazyLoad(() =>
   import('../screens/SavedMomentsScreen').then((m) => ({
     default: m.SavedMomentsScreen,
@@ -134,20 +129,24 @@ const SavedMomentsScreen = lazyLoad(() =>
 );
 
 // Frequently accessed - keep eager
-import { DisputeTransactionScreen } from '../screens/DisputeTransactionScreen';
-import { DisputeStatusScreen } from '../screens/DisputeStatusScreen';
-import { ProofVerificationScreen } from '../screens/ProofVerificationScreen';
 import { MyGiftsScreen } from '../screens/MyGiftsScreen';
 import { TrustNotesScreen } from '../screens/TrustNotesScreen';
+
+// Dispute Flow (lazy load)
+const DisputeFlowScreen = lazyLoad(() =>
+  import('../screens/DisputeFlowScreen').then((m) => ({
+    default: m.DisputeFlowScreen,
+  })),
+);
 // Proof system (lazy load large screens)
 const ProofHistoryScreen = lazyLoad(() =>
   import('../screens/ProofHistoryScreen').then((m) => ({
     default: m.ProofHistoryScreen,
   })),
 );
-const ProofUploadScreen = lazyLoad(() =>
-  import('../screens/ProofUploadScreen').then((m) => ({
-    default: m.ProofUploadScreen,
+const ProofFlowScreen = lazyLoad(() =>
+  import('../screens/ProofFlowScreen').then((m) => ({
+    default: m.ProofFlowScreen,
   })),
 );
 const UnifiedGiftFlowScreen = lazyLoad(() =>
@@ -159,9 +158,6 @@ const ProofDetailScreen = lazyLoad(() =>
   import('../screens/ProofDetailScreen').then((m) => ({
     default: m.ProofDetailScreen,
   })),
-);
-const DisputeProofScreen = lazyLoad(
-  () => import('../screens/DisputeProofScreen'),
 );
 
 // Escrow & Gesture screens (lazy load)
@@ -308,31 +304,10 @@ const ShareMomentScreen = lazyLoad(() =>
   })),
 );
 
-// New Footer screens (lazy load)
-const ContactScreen = lazyLoad(() =>
-  import('../screens/ContactScreen').then((m) => ({
-    default: m.ContactScreen,
-  })),
-);
-const HelpScreen = lazyLoad(() =>
-  import('../screens/HelpScreen').then((m) => ({
-    default: m.HelpScreen,
-  })),
-);
 const SafetyScreen = lazyLoad(() =>
   import('../screens/SafetyScreen').then((m) => ({
     default: m.SafetyScreen,
   })),
-);
-
-// Theme Settings
-const ThemeSettingsScreen = lazyLoad(
-  () => import('../screens/ThemeSettingsScreen'),
-);
-
-// Language Settings
-const LanguageSettingsScreen = lazyLoad(
-  () => import('../screens/LanguageSettingsScreen'),
 );
 
 // Keep frequently accessed screens eager
@@ -341,8 +316,8 @@ import ChatScreen from '../screens/ChatScreen';
 import NotificationDetailScreen from '../screens/NotificationDetailScreen';
 import { ProfileDetailScreen } from '../screens/ProfileDetailScreen';
 import { ReceiverApprovalScreen } from '../screens/ReceiverApprovalScreen';
-import { SelectPlaceScreen } from '../screens/SelectPlaceScreen';
-import SocialLoginScreen from '../screens/SocialLoginScreen';
+// import { SelectPlaceScreen } from '../screens/SelectPlaceScreen';
+// import SocialLoginScreen from '../screens/SocialLoginScreen';
 import { WelcomeScreen } from '../screens/WelcomeScreen';
 import { lazyLoad } from '../utils/lazyLoad';
 
@@ -361,30 +336,33 @@ interface SuccessDetails {
   estimatedArrival?: string;
 }
 
+
 export type RootStackParamList = {
-  // Onboarding & Auth
-  Onboarding: undefined;
   Welcome: undefined;
-  Register: undefined;
+  Onboarding: undefined;
   Login: undefined;
-  SocialLogin: undefined;
+  Register: undefined;
   PhoneAuth: undefined;
   EmailAuth: undefined;
   ForgotPassword: undefined;
-  SetPassword: undefined;
-  TwoFactorSetup: undefined;
   VerifyCode: undefined;
   WaitingForCode: undefined;
   SuccessConfirmation: undefined;
   Maintenance: undefined;
   About: undefined;
-  ThemeSettings: undefined;
-  LanguageSettings: undefined;
-  DisputeTransaction: undefined;
-  DisputeStatus: undefined;
-  ProofVerification: undefined;
-  TransactionHistory: undefined;
-  PaymentFailed: undefined;
+  
+  // Dispute Flow
+  DisputeFlow: {
+    type: 'transaction' | 'proof';
+    id: string;
+    details?: any;
+  };
+  
+  // Deprecated - to be removed
+  // DisputeTransaction: undefined;
+  // DisputeStatus: undefined;
+  // DisputeProof: { proofId: string };
+
   CompleteProfile: undefined;
 
   // Unified Success Screen - replaces individual success screens
@@ -411,7 +389,7 @@ export type RootStackParamList = {
   ProofHistory: { momentId: string };
 
   // Proof System
-  ProofUpload: undefined;
+  ProofFlow: undefined;
   ProofDetail: { proofId: string };
 
   // Approval & Matching
@@ -485,7 +463,6 @@ export type RootStackParamList = {
   Support: undefined;
   FAQ: undefined;
   DeleteAccount: undefined;
-  DisputeProof: { proofId: string };
   NotificationSettings: undefined;
   HowEscrowWorks: undefined;
   SavedMoments: undefined;
@@ -518,8 +495,8 @@ export type RootStackParamList = {
   Withdraw: undefined;
 
   // Moment Publishing
-  MomentPreview: { momentId: string };
-  MomentPublished: { momentId: string };
+  // MomentPreview: { momentId: string };
+  // MomentPublished: { momentId: string };
 
   // Payment Methods
   PaymentMethods: undefined;
@@ -531,7 +508,7 @@ export type RootStackParamList = {
   EditProfile: undefined;
 
   // Place Selection
-  SelectPlace: undefined;
+  // SelectPlace: undefined;
 
   // New Profile sub-screens
   MyMoments: undefined;
@@ -551,8 +528,8 @@ export type RootStackParamList = {
   ShareMoment: { momentId: string };
 
   // Footer pages
-  Contact: undefined;
-  Help: undefined;
+  // Contact: undefined;
+  // Footer pages
   Safety: undefined;
 };
 
@@ -633,13 +610,9 @@ const AppNavigator = () => {
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="SocialLogin" component={SocialLoginScreen} />
             <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
             <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
-            <Stack.Screen
-              name="ForgotPassword"
-              component={ForgotPasswordScreen}
-            />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
             <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
             <Stack.Screen
               name="TwoFactorSetup"
@@ -656,26 +629,11 @@ const AppNavigator = () => {
             />
             <Stack.Screen name="Maintenance" component={MaintenanceScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
-            <Stack.Screen
-              name="ThemeSettings"
-              component={ThemeSettingsScreen}
-            />
-            <Stack.Screen
-              name="LanguageSettings"
-              component={LanguageSettingsScreen}
-            />
-            <Stack.Screen
-              name="DisputeTransaction"
-              component={DisputeTransactionScreen}
-            />
-            <Stack.Screen
-              name="DisputeStatus"
-              component={DisputeStatusScreen}
-            />
-            <Stack.Screen
-              name="ProofVerification"
-              component={ProofVerificationScreen}
-            />
+            
+            {/* Dispute Flow */}
+            <Stack.Screen name="DisputeFlow" component={DisputeFlowScreen} />
+
+
             <Stack.Screen
               name="TransactionHistory"
               component={TransactionHistoryScreen}
@@ -714,7 +672,7 @@ const AppNavigator = () => {
             <Stack.Screen name="ProofHistory" component={ProofHistoryScreen} />
 
             {/* Proof System */}
-            <Stack.Screen name="ProofUpload" component={ProofUploadScreen} />
+            <Stack.Screen name="ProofFlow" component={ProofFlowScreen} />
             <Stack.Screen name="ProofDetail" component={ProofDetailScreen} />
 
             {/* Approval & Matching */}
@@ -763,7 +721,6 @@ const AppNavigator = () => {
               name="DeleteAccount"
               component={DeleteAccountScreen}
             />
-            <Stack.Screen name="DisputeProof" component={DisputeProofScreen} />
             <Stack.Screen
               name="NotificationSettings"
               component={NotificationSettingsScreen}
@@ -823,14 +780,14 @@ const AppNavigator = () => {
             <Stack.Screen name="Withdraw" component={WithdrawScreen} />
 
             {/* Moment Publishing */}
-            <Stack.Screen
+            {/* <Stack.Screen
               name="MomentPreview"
               component={MomentPreviewScreen}
             />
             <Stack.Screen
               name="MomentPublished"
               component={MomentPublishedScreen}
-            />
+            /> */}
 
             {/* Payment Methods */}
             <Stack.Screen
@@ -848,7 +805,7 @@ const AppNavigator = () => {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
 
             {/* Place Selection */}
-            <Stack.Screen name="SelectPlace" component={SelectPlaceScreen} />
+            {/* <Stack.Screen name="SelectPlace" component={SelectPlaceScreen} /> */}
 
             {/* Profile Sub-screens */}
             <Stack.Screen name="MyMoments" component={MyMomentsScreen} />
@@ -879,8 +836,8 @@ const AppNavigator = () => {
             />
 
             {/* Footer Pages */}
-            <Stack.Screen name="Contact" component={ContactScreen} />
-            <Stack.Screen name="Help" component={HelpScreen} />
+            {/* <Stack.Screen name="Contact" component={ContactScreen} />
+            <Stack.Screen name="Help" component={HelpScreen} /> */}
             <Stack.Screen name="Safety" component={SafetyScreen} />
           </Stack.Navigator>
         </Suspense>

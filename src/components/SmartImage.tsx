@@ -75,9 +75,8 @@ const SmartImage: React.FC<SmartImageProps> = ({
     style,
   ]) as ViewStyle;
 
-  const containerWidth = (combinedContainerStyle as ViewStyle).width || '100%';
-  const containerHeight =
-    (combinedContainerStyle as ViewStyle).height || '100%';
+  const containerWidth = combinedContainerStyle.width || '100%';
+  const containerHeight = combinedContainerStyle.height || '100%';
 
   const combinedImageStyle = StyleSheet.flatten([
     styles.image,

@@ -4,9 +4,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { analytics } from '../services/analytics';
+import { logger } from '../utils/logger';
 
 interface FeedbackConditions {
   lastShown: number | null;
@@ -34,7 +34,7 @@ export const useFeedbackPrompt = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkFeedbackConditions();
+    void checkFeedbackConditions();
   }, []);
 
   const checkFeedbackConditions = async () => {

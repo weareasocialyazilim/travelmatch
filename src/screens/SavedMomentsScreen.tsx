@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,18 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Image,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { EmptyState } from '../components/ui/EmptyState';
+import { LoadingState } from '../components/LoadingState';
 import { COLORS } from '../constants/colors';
-import EmptyState from '../components/EmptyState';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { useMoments } from '../hooks/useMoments';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { Moment } from '../types';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -24,64 +30,86 @@ interface SavedMomentsScreenProps {
   navigation: SavedMomentsScreenNavigationProp;
 }
 
-interface SavedMoment {
-  id: string;
-  title: string;
-  location: string;
-  price: number;
-  category: string;
-  imageUrl: string;
-  isSaved: boolean;
-}
-
-const MOCK_MOMENTS: SavedMoment[] = [
-  {
-    id: '1',
-    title: 'Artisan Roastery Tour',
-    location: 'Paris',
-    price: 15,
-    category: 'Coffee',
-    imageUrl: 'https://via.placeholder.com/70',
-    isSaved: true,
-  },
-  {
-    id: '2',
-    title: 'Sunrise Hot Air Balloon Ride',
-    location: 'Cappadocia',
-    price: 150,
-    category: 'Experiences',
-    imageUrl: 'https://via.placeholder.com/70',
-    isSaved: true,
-  },
-  {
-    id: '3',
-    title: 'Barista Masterclass',
-    location: 'Milan',
-    price: 45,
-    category: 'Coffee',
-    imageUrl: 'https://via.placeholder.com/70',
-    isSaved: true,
-  },
-];
-
-type FilterOption = 'All' | 'Coffee' | 'Experiences';
-
 export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
   navigation,
 }) => {
-  const [selectedFilter, setSelectedFilter] = useState<FilterOption>('All');
-  const [moments, setMoments] = useState<SavedMoment[]>(MOCK_MOMENTS);
+  const [selectedFilter, setSelectedFilter] = useState<string>('All');
+  
+  const {
+    savedMoments,
+    savedMomentsLoading,
+    loadSavedMoments,
+    unsaveMoment,
+  } = useMoments();
 
-  const filteredMoments = moments.filter((moment) => {
-    if (selectedFilter === 'All') return true;
-    return moment.category === selectedFilter;
-  });
+  useEffect(() => {
+    loadSavedMoments();
+  }, [loadSavedMoments]);
 
-  const toggleSave = (id: string) => {
-    setMoments((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, isSaved: !m.isSaved } : m)),
-    );
+  // Extract unique categories from saved moments
+  const filterOptions = useMemo(() => {
+    const categories = new Set(savedMoments.map(m => m.category));
+    return ['All', ...Array.from(categories)];
+  }, [savedMoments]);
+
+  const filteredMoments = useMemo(() => {
+    if (selectedFilter === 'All') return savedMoments;
+    return savedMoments.filter(m => m.category === selectedFilter);
+  }, [savedMoments, selectedFilter]);
+
+  const handleUnsave = async (id: string) => {
+    await unsaveMoment(id);
   };
+
+  const handleMomentPress = (moment: Moment) => {
+    navigation.navigate('MomentDetail', {
+      moment: {
+        ...moment,
+        // Ensure required fields for MomentDetail are present
+        story: moment.description || '',
+        imageUrl: moment.images?.[0] || '',
+        image: moment.images?.[0] || '',
+        availability: 'Available', // Default
+        user: {
+          id: moment.hostId,
+          name: moment.hostName,
+          avatar: moment.hostAvatar,
+          type: 'traveler',
+          isVerified: true,
+          location: '',
+          travelDays: 0,
+        },
+        giftCount: 0,
+        category: {
+          id: moment.category,
+          label: moment.category,
+          emoji: '✨',
+        },
+      },
+    });
+  };
+
+  if (savedMomentsLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => navigation.goBack()}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Saved Moments</Text>
+          <View style={styles.headerButton} />
+        </View>
+        <LoadingState type="skeleton" count={3} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,40 +130,57 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
         <View style={styles.headerButton} />
       </View>
 
-      {/* Segmented Control */}
-      <View style={styles.segmentedContainer}>
-        <View style={styles.segmentedControl}>
-          {(['All', 'Coffee', 'Experiences'] as FilterOption[]).map(
-            (option) => (
-              <TouchableOpacity
-                key={option}
-                style={[
-                  styles.segmentButton,
-                  selectedFilter === option && styles.segmentButtonActive,
-                ]}
-                onPress={() => setSelectedFilter(option)}
-                activeOpacity={0.7}
-              >
-                <Text
+      {/* Segmented Control - Only show if we have categories */}
+      {filterOptions.length > 1 && (
+        <View style={styles.segmentedContainer}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.segmentedControlContent}
+          >
+            <View style={styles.segmentedControl}>
+              {filterOptions.map((option) => (
+                <TouchableOpacity
+                  key={option}
                   style={[
-                    styles.segmentText,
-                    selectedFilter === option && styles.segmentTextActive,
+                    styles.segmentButton,
+                    selectedFilter === option && styles.segmentButtonActive,
                   ]}
+                  onPress={() => setSelectedFilter(option)}
+                  activeOpacity={0.7}
                 >
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            ),
-          )}
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      selectedFilter === option && styles.segmentTextActive,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
         </View>
-      </View>
+      )}
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={savedMomentsLoading}
+            onRefresh={loadSavedMoments}
+            tintColor={COLORS.coral}
+          />
+        }
       >
-        {filteredMoments.length === 0 ? (
+        {savedMomentsLoading && savedMoments.length === 0 ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.coral} />
+          </View>
+        ) : filteredMoments.length === 0 ? (
           // Empty State
           <EmptyState
             illustrationType="no_moments"
@@ -146,29 +191,38 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
           // List of Saved Moments
           <View style={styles.momentsList}>
             {filteredMoments.map((moment) => (
-              <View key={moment.id} style={styles.momentItem}>
+              <TouchableOpacity 
+                key={moment.id} 
+                style={styles.momentItem}
+                onPress={() => handleMomentPress(moment)}
+                activeOpacity={0.7}
+              >
                 <View style={styles.momentContent}>
-                  <View style={styles.momentImage} />
+                  <Image 
+                    source={{ uri: moment.images?.[0] || 'https://via.placeholder.com/70' }} 
+                    style={styles.momentImage} 
+                  />
                   <View style={styles.momentInfo}>
                     <Text style={styles.momentTitle} numberOfLines={1}>
                       {moment.title}
                     </Text>
                     <Text style={styles.momentDetails} numberOfLines={1}>
-                      {moment.location} • ${moment.price} • {moment.category}
+                      {typeof moment.location === 'string' ? moment.location : moment.location?.city} • ${moment.pricePerGuest} • {moment.category}
                     </Text>
                   </View>
                 </View>
                 <TouchableOpacity
-                  onPress={() => toggleSave(moment.id)}
+                  onPress={() => handleUnsave(moment.id)}
                   activeOpacity={0.7}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <MaterialCommunityIcons
-                    name={moment.isSaved ? 'bookmark' : 'bookmark-outline'}
+                    name="bookmark"
                     size={24}
                     color={COLORS.primary}
                   />
                 </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
@@ -203,8 +257,10 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   segmentedContainer: {
-    paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  segmentedControlContent: {
+    paddingHorizontal: 16,
   },
   segmentedControl: {
     flexDirection: 'row',
@@ -212,13 +268,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 4,
     height: 40,
+    alignSelf: 'flex-start',
   },
   segmentButton: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
+    minWidth: 80,
   },
   segmentButtonActive: {
     backgroundColor: COLORS.white,
@@ -242,6 +299,12 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 40,
   },
   momentsList: {
     paddingHorizontal: 16,

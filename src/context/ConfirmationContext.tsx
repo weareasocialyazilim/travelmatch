@@ -4,7 +4,6 @@
  */
 
 import type { ReactNode } from 'react';
-import { logger } from '../utils/logger';
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import {
   View,
@@ -17,10 +16,11 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-import { spacing } from '../constants/spacing';
 import { radii } from '../constants/radii';
-import { TYPOGRAPHY } from '../constants/typography';
 import { SHADOWS } from '../constants/shadows';
+import { spacing } from '../constants/spacing';
+import { TYPOGRAPHY } from '../constants/typography';
+import { logger } from '../utils/logger';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 

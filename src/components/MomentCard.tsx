@@ -9,15 +9,15 @@ import {
   Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Animated from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
-import type { Moment } from '../types';
 import { radii } from '../constants/radii';
+import { SHADOWS } from '../constants/shadows';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
-import { SHADOWS } from '../constants/shadows';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePressScale } from '../utils/animations';
-import Animated from 'react-native-reanimated';
+import type { Moment } from '../types';
 
 interface MomentCardProps {
   moment: Moment;
@@ -41,7 +41,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         if (e && typeof e === 'object' && 'stopPropagation' in e) {
           (e as { stopPropagation: () => void }).stopPropagation();
         }
-        impact('medium');
+        void impact('medium');
         onGiftPress(moment);
       },
       [moment, onGiftPress, impact],
@@ -52,7 +52,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         if (e && typeof e === 'object' && 'stopPropagation' in e) {
           (e as { stopPropagation: () => void }).stopPropagation();
         }
-        impact('light');
+        void impact('light');
 
         if (onSharePress) {
           onSharePress(moment);
@@ -83,13 +83,13 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         if (e && typeof e === 'object' && 'stopPropagation' in e) {
           (e as { stopPropagation: () => void }).stopPropagation();
         }
-        impact('light');
+        void impact('light');
       },
       [impact],
     );
 
     const handleCardPress = useCallback(() => {
-      impact('light');
+      void impact('light');
       onPress();
     }, [onPress, impact]);
 

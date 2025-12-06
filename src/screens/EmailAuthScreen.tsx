@@ -1,4 +1,3 @@
-import type { StackScreenProps } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -10,15 +9,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '@/constants/colors';
+import { spacing as _spacing } from '@/constants/spacing';
+import { TYPOGRAPHY as _TYPOGRAPHY } from '@/constants/typography';
+import { logger } from '@/utils/logger';
 import { LoadingState } from '../components/LoadingState';
 import SocialButton from '../components/SocialButton';
-import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY as _TYPOGRAPHY } from '@/constants/typography';
-import { spacing as _spacing } from '@/constants/spacing';
-import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type EmailAuthScreenProps = StackScreenProps<RootStackParamList, 'EmailAuth'>;
 

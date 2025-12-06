@@ -9,20 +9,20 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
 import * as Haptics from 'expo-haptics';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MessagesListSkeleton, ErrorState, EmptyState } from '../components';
+import { FadeInView as _FadeInView } from '../components/AnimatedComponents';
 import BottomNav from '../components/BottomNav';
 import { COLORS } from '../constants/colors';
-import { useMessages } from '../hooks/useMessages';
 import { useRealtime, useRealtimeEvent } from '../context/RealtimeContext';
+import { useMessages } from '../hooks/useMessages';
 import type { MessageEvent } from '../context/RealtimeContext';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { Conversation } from '../services/messageService';
-import { MessagesListSkeleton, ErrorState } from '../components';
-import { FadeInView as _FadeInView } from '../components/AnimatedComponents';
+import type { NavigationProp } from '@react-navigation/native';
 
 // Format time ago
 const formatTimeAgo = (dateString: string): string => {
@@ -197,7 +197,7 @@ const MessagesScreen: React.FC = () => {
           {/* Moment Badge */}
           {item.momentId && (
             <View style={styles.momentBadge}>
-              <Text style={styles.momentEmoji}>{'✨'}</Text>
+              <Text style={styles.momentEmoji}>✨</Text>
               <Text style={styles.momentTitle}>{item.momentTitle}</Text>
             </View>
           )}
@@ -229,27 +229,14 @@ const MessagesScreen: React.FC = () => {
   };
 
   const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <MaterialCommunityIcons
-        name="chat-outline"
-        size={64}
-        color={COLORS.textSecondary}
-      />
-      <Text style={styles.emptyTitle}>No Messages Yet</Text>
-      <Text style={styles.emptySubtitle}>
-        When you connect with travelers or hosts, your conversations will appear
-        here.
-      </Text>
-      <TouchableOpacity
-        style={styles.discoverButton}
-        onPress={() => navigation.navigate('Discover')}
-        accessibilityLabel="Discover Moments"
-        accessibilityRole="button"
-        accessibilityHint="Navigate to discover new moments"
-      >
-        <Text style={styles.discoverButtonText}>Discover Moments</Text>
-      </TouchableOpacity>
-    </View>
+    <EmptyState
+      icon="chat-outline"
+      title="No Messages Yet"
+      description="When you connect with travelers or hosts, your conversations will appear here."
+      actionLabel="Discover Moments"
+      onAction={() => navigation.navigate('Discover')}
+      style={{ paddingTop: 80 }}
+    />
   );
 
   // Loading state - show skeleton

@@ -81,7 +81,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
       }
     }, [amount]);
 
-    const pickLocation = async () => {
+    const pickLocation = () => {
       const getCurrentLocation = async () => {
         try {
           const { status } = await Location.requestForegroundPermissionsAsync();
@@ -114,13 +114,16 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
             cancelButtonIndex: 0,
           },
           (buttonIndex) => {
-            if (buttonIndex === 1) getCurrentLocation();
+            if (buttonIndex === 1) void getCurrentLocation();
             if (buttonIndex === 2) onNavigateToPlaceSearch?.();
           },
         );
       } else {
         Alert.alert('Select Location', 'Choose an option', [
-          { text: 'Use Current Location', onPress: getCurrentLocation },
+          {
+            text: 'Use Current Location',
+            onPress: () => void getCurrentLocation(),
+          },
           { text: 'Search Place', onPress: () => onNavigateToPlaceSearch?.() },
           { text: 'Cancel', style: 'cancel' },
         ]);

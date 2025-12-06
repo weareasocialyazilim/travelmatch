@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
+import { SHADOWS } from '../constants/shadows';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
-import { SHADOWS } from '../constants/shadows';
 
 interface ThankYouModalProps {
   visible: boolean;

@@ -25,6 +25,7 @@ module.exports = function (api) {
       ],
       '@babel/plugin-transform-export-namespace-from',
       'react-native-reanimated/plugin',
+      ['transform-remove-console', { exclude: ['error', 'warn'] }],
     ],
   };
 };

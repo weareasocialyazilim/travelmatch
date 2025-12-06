@@ -1,7 +1,7 @@
-import { User } from './core';
+import type { User } from './core';
 
-// Re-export User for convenience
-export { User };
+// User is re-exported from core.ts via index.ts
+// Using type import here to avoid duplicate export error
 
 // ========== Message Types ==========
 export interface Message {

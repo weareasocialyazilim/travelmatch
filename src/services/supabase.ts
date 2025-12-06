@@ -33,6 +33,7 @@ export {
   conversationsService,
   reviewsService,
   notificationsService,
+  subscriptionsService,
 } from './supabaseDbService';
 
 // Storage Service

@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '../utils/logger';
 import {
   cacheService,
   CACHE_KEYS as _CACHE_KEYS,
 } from '../services/cacheService';
-import type { OfflineActionType } from '../services/offlineSyncQueue';
 import { offlineSyncQueue } from '../services/offlineSyncQueue';
+import { logger } from '../utils/logger';
 import { useNetwork } from './useNetwork';
+import type { OfflineActionType } from '../services/offlineSyncQueue';
 
 interface UseOfflineDataOptions<T> {
   cacheKey: string;
@@ -45,14 +45,14 @@ export function useOfflineData<T>({
 
   // Load cached data on mount
   useEffect(() => {
-    loadCachedData();
+    void loadCachedData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cacheKey]);
 
   // Fetch fresh data when online
   useEffect(() => {
     if (isOnline && !loading) {
-      fetchData();
+      void fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOnline]);

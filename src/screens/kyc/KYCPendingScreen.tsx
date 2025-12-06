@@ -1,13 +1,12 @@
 // KYC Pending Screen - Verification submitted, waiting for review
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, CommonActions } from '@react-navigation/native';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
-import { kycStyles } from './styles';
 import { NEXT_STEPS } from './constants';
+import { kycStyles } from './styles';
 
 const KYCPendingScreen: React.FC = () => {
   const navigation = useNavigation();

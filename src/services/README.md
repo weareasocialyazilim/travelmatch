@@ -12,7 +12,7 @@ This directory contains service modules that handle API communication and extern
 | `paymentService.ts` | Payment processing, wallet, transactions |
 | `cacheService.ts` | Offline caching with AsyncStorage |
 | `notificationService.ts` | Push notification handling |
-| `analyticsService.ts` | Analytics event tracking |
+| `loggingService.ts` | Unified logging and error tracking |
 
 ### Usage
 

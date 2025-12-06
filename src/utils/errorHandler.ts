@@ -2,9 +2,9 @@
  * Standardized API Error Handling
  * Centralized error management for consistent error handling across the app
  */
-
-import { logger } from './logger';
+import { useState, useCallback } from 'react';
 import { ErrorCode, getErrorMessage, getErrorCode } from './errors';
+import { logger } from './logger';
 
 /**
  * Error Severity Levels
@@ -138,7 +138,7 @@ export const standardizeError = (
   );
 
   // Log the error
-  logger.error(`[${context || 'Error'}] ${code}: ${message}`, {
+  logger.error(`[${context ?? 'Error'}] ${code}: ${message}`, {
     code,
     severity,
     context,
@@ -249,7 +249,6 @@ export const ErrorHandler = new ErrorHandlerClass();
 /**
  * React hook for error handling
  */
-import { useState, useCallback } from 'react';
 
 export interface UseErrorHandlerReturn {
   error: StandardizedError | null;

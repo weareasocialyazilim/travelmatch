@@ -4,10 +4,10 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { ImageAsset, UploadProgress } from '../utils/imageHandling';
-import type { AxiosProgressEvent } from 'axios';
 import axios from 'axios';
 import { useToast } from '../context/ToastContext';
+import type { ImageAsset, UploadProgress } from '../utils/imageHandling';
+import type { AxiosProgressEvent } from 'axios';
 
 interface UploadOptions {
   onProgress?: (progress: UploadProgress) => void;
@@ -20,6 +20,11 @@ interface UploadState {
   progress: UploadProgress;
   error: Error | null;
   uploadedUrl: string | null;
+}
+
+interface CloudinaryResponse {
+  url?: string;
+  secure_url?: string;
 }
 
 export function useImageUpload() {
@@ -60,32 +65,36 @@ export function useImageUpload() {
         } as unknown as Blob);
 
         // Upload with progress tracking
-        const response = await axios.post(uploadUrl, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        const response = await axios.post<CloudinaryResponse>(
+          uploadUrl,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+              const total = progressEvent.total ?? 0;
+              const loaded = progressEvent.loaded;
+              const percentage =
+                total > 0 ? Math.round((loaded * 100) / total) : 0;
+
+              const progress: UploadProgress = {
+                loaded,
+                total,
+                percentage,
+              };
+
+              setState((prev) => ({
+                ...prev,
+                progress,
+              }));
+
+              options?.onProgress?.(progress);
+            },
           },
-          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-            const total = progressEvent.total || 0;
-            const loaded = progressEvent.loaded;
-            const percentage =
-              total > 0 ? Math.round((loaded * 100) / total) : 0;
+        );
 
-            const progress: UploadProgress = {
-              loaded,
-              total,
-              percentage,
-            };
-
-            setState((prev) => ({
-              ...prev,
-              progress,
-            }));
-
-            options?.onProgress?.(progress);
-          },
-        });
-
-        const uploadedUrl = response.data.url || response.data.secure_url;
+        const uploadedUrl = response.data.url ?? response.data.secure_url ?? '';
 
         setState({
           isUploading: false,
@@ -162,39 +171,44 @@ export function useMultiImageUpload() {
 
         try {
           const formData = new FormData();
-          const fileExtension = image.uri.split('.').pop() || 'jpg';
+          const fileExtension = image.uri.split('.').pop() ?? 'jpg';
           const fileName =
-            image.fileName || `image_${Date.now()}_${index}.${fileExtension}`;
+            image.fileName ?? `image_${Date.now()}_${index}.${fileExtension}`;
 
           formData.append('file', {
             uri: image.uri,
             name: fileName,
-            type: image.mimeType || `image/${fileExtension}`,
+            type: image.mimeType ?? `image/${fileExtension}`,
           } as unknown as Blob);
 
-          const response = await axios.post(uploadUrl, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-            onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-              const total = progressEvent.total || 0;
-              const loaded = progressEvent.loaded;
-              const percentage =
-                total > 0 ? Math.round((loaded * 100) / total) : 0;
+          const response = await axios.post<CloudinaryResponse>(
+            uploadUrl,
+            formData,
+            {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+                const total = progressEvent.total ?? 0;
+                const loaded = progressEvent.loaded;
+                const percentage =
+                  total > 0 ? Math.round((loaded * 100) / total) : 0;
 
-              setUploads((prev) => {
-                const next = new Map(prev);
-                const current = next.get(key);
-                if (current) {
-                  next.set(key, {
-                    ...current,
-                    progress: { loaded, total, percentage },
-                  });
-                }
-                return next;
-              });
+                setUploads((prev) => {
+                  const next = new Map(prev);
+                  const current = next.get(key);
+                  if (current) {
+                    next.set(key, {
+                      ...current,
+                      progress: { loaded, total, percentage },
+                    });
+                  }
+                  return next;
+                });
+              },
             },
-          });
+          );
 
-          const uploadedUrl = response.data.url || response.data.secure_url;
+          const uploadedUrl =
+            response.data.url ?? response.data.secure_url ?? '';
 
           setUploads((prev) => {
             const next = new Map(prev);
@@ -227,7 +241,8 @@ export function useMultiImageUpload() {
         }
       });
 
-      return Promise.all(uploadPromises);
+      const results = await Promise.all(uploadPromises);
+      return results.filter((url): url is string => url !== undefined);
     },
     [],
   );

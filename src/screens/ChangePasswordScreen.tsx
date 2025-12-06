@@ -10,12 +10,12 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 const ChangePasswordScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -79,7 +79,10 @@ const ChangePasswordScreen: React.FC = () => {
         },
       ]);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to change password. Please try again.';
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to change password. Please try again.';
       Alert.alert('Error', message);
     } finally {
       setIsLoading(false);

@@ -32,7 +32,7 @@ export function useThemedStyles<T extends NamedStyles<T>>(
 
   return useMemo(() => {
     const rawStyles = styleFactory(colors, isDark);
-    return StyleSheet.create(rawStyles) as T;
+    return StyleSheet.create(rawStyles);
   }, [colors, isDark, styleFactory]);
 }
 

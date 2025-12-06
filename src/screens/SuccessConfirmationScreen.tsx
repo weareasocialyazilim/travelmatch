@@ -7,10 +7,10 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 export const SuccessConfirmationScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

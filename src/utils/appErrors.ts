@@ -4,6 +4,38 @@
  */
 
 /**
+ * Standardized error codes for the application
+ * @enum {string}
+ */
+export enum ErrorCode {
+  // Network Errors
+  /** Network connection failed or unavailable */
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  /** Request timed out */
+  TIMEOUT_ERROR = 'TIMEOUT_ERROR',
+
+  // API Errors
+  /** Generic API error */
+  API_ERROR = 'API_ERROR',
+  /** Authentication required (401) */
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  /** Permission denied (403) */
+  FORBIDDEN = 'FORBIDDEN',
+  /** Resource not found (404) */
+  NOT_FOUND = 'NOT_FOUND',
+  /** Input validation failed (422) */
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+
+  // App Errors
+  /** Unknown or unexpected error */
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  /** Local storage operation failed */
+  STORAGE_ERROR = 'STORAGE_ERROR',
+  /** Device permission denied */
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
+}
+
+/**
  * Base Application Error
  */
 export class AppError extends Error {
@@ -99,6 +131,70 @@ export class ApiError extends AppError {
 }
 
 /**
+ * Authentication required error (401)
+ */
+export class UnauthorizedError extends AppError {
+  constructor(message = 'You are not authorized to perform this action') {
+    super(message, {
+      code: ErrorCode.UNAUTHORIZED,
+      statusCode: 401,
+    });
+    this.name = 'UnauthorizedError';
+  }
+}
+
+/**
+ * Resource not found error (404)
+ */
+export class NotFoundError extends AppError {
+  constructor(message = 'Resource not found') {
+    super(message, {
+      code: ErrorCode.NOT_FOUND,
+      statusCode: 404,
+    });
+    this.name = 'NotFoundError';
+  }
+}
+
+/**
+ * Safely extracts error message from any error type
+ */
+export const getErrorMessage = (error: unknown): string => {
+  if (error instanceof AppError) {
+    return error.message;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return 'An unexpected error occurred';
+};
+
+/**
+ * Safely extracts error code from any error type
+ */
+export const getErrorCode = (error: unknown): string => {
+  if (error instanceof AppError) {
+    return error.code;
+  }
+
+  return ErrorCode.UNKNOWN_ERROR;
+};
+
+export const isOperationalError = (error: unknown): boolean => {
+  if (error instanceof AppError) {
+    return error.isOperational;
+  }
+
+  return false;
+};
+
+/**
  * Authentication Error
  */
 export class AuthError extends AppError {
@@ -146,31 +242,7 @@ export class ValidationError extends AppError {
   }
 }
 
-/**
- * Not Found Error
- */
-export class NotFoundError extends AppError {
-  public readonly resource?: string;
 
-  constructor(
-    message = 'Resource not found',
-    options: {
-      resource?: string;
-      context?: Record<string, unknown>;
-      originalError?: Error;
-    } = {},
-  ) {
-    super(message, {
-      code: 'NOT_FOUND',
-      statusCode: 404,
-      isOperational: true,
-      context: options.context,
-      originalError: options.originalError,
-    });
-    this.name = 'NotFoundError';
-    this.resource = options.resource;
-  }
-}
 
 /**
  * Permission Error
@@ -284,24 +356,7 @@ export const isValidationError = (error: unknown): error is ValidationError => {
   return error instanceof ValidationError;
 };
 
-/**
- * Extract user-friendly message from error
- */
-export const getErrorMessage = (error: unknown): string => {
-  if (isAppError(error)) {
-    return error.message;
-  }
 
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  if (typeof error === 'string') {
-    return error;
-  }
-
-  return 'An unexpected error occurred';
-};
 
 /**
  * Convert unknown error to AppError

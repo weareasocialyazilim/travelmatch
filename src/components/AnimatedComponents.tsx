@@ -71,7 +71,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 
   const handlePress = () => {
     if (haptic) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     onPress();
   };
@@ -201,7 +201,7 @@ export const ScaleOnPress: React.FC<ScaleOnPressProps> = ({
 
   const handlePress = () => {
     if (haptic) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     onPress?.();
   };

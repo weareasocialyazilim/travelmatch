@@ -8,12 +8,12 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { StackScreenProps } from '@react-navigation/stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import { COLORS } from '../constants/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
+import { COLORS } from '../constants/colors';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 

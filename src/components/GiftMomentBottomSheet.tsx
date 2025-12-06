@@ -13,9 +13,9 @@ import {
   PanResponder,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ConfirmGiftModal } from './ConfirmGiftModal';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
+import { ConfirmGiftModal } from './ConfirmGiftModal';
 import type { MomentData } from '../types';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');

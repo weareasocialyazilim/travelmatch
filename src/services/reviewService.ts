@@ -3,8 +3,9 @@
  * Ratings, reviews, and feedback operations
  */
 
-import { api } from '../utils/api';
-import { COLORS } from '../constants/colors';
+import { supabase } from '../config/supabase';
+import { reviewsService as dbReviewsService } from './supabaseDbService';
+import { logger } from '../utils/logger';
 
 // Types
 export interface Review {
@@ -54,41 +55,167 @@ export interface ReviewStats {
 }
 
 export interface CreateReviewData {
-  requestId: string;
+  requestId: string; // Links to the transaction/request
   rating: number;
   comment: string;
 }
 
 export interface ReviewFilters {
-  userId?: string;
+  userId?: string; // User being reviewed
+  reviewerId?: string; // User who wrote the review
   momentId?: string;
-  minRating?: number;
-  maxRating?: number;
+  rating?: number;
   page?: number;
   pageSize?: number;
-  sortBy?: 'newest' | 'oldest' | 'highest' | 'lowest';
 }
 
 // Review Service
 export const reviewService = {
   /**
-   * Get reviews for a user
+   * Create a new review
    */
-  getUserReviews: async (
-    userId: string,
-    filters?: ReviewFilters,
-  ): Promise<{ reviews: Review[]; stats: ReviewStats; total: number }> => {
-    return api.get(`/users/${userId}/reviews`, { params: filters });
+  createReview: async (
+    data: CreateReviewData,
+  ): Promise<{ review: Review }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Fetch request details to get moment_id and host_id/user_id
+      const { data: request, error: reqError } = await supabase
+        .from('requests')
+        .select('moment_id, host_id, user_id')
+        .eq('id', data.requestId)
+        .single();
+
+      if (reqError || !request) throw new Error('Request not found');
+
+      // Determine who is being reviewed
+      // If I am the host, I review the user. If I am the user, I review the host.
+      let reviewedId = '';
+      if (user.id === request.host_id) {
+        reviewedId = request.user_id;
+      } else if (user.id === request.user_id) {
+        reviewedId = request.host_id;
+      } else {
+        throw new Error('Not authorized to review this request');
+      }
+
+      const { data: newReview, error } = await dbReviewsService.create({
+        moment_id: request.moment_id,
+        reviewer_id: user.id,
+        reviewed_id: reviewedId,
+        rating: data.rating,
+        comment: data.comment,
+      });
+
+      if (error) throw error;
+
+      // Construct return object
+      // We need to fetch names/avatars or return simplified object
+      // For now, simplified
+      const review: Review = {
+        id: newReview!.id,
+        rating: newReview!.rating,
+        comment: newReview!.comment || '',
+        reviewerId: user.id,
+        reviewerName: '', // Fetch if needed
+        reviewerAvatar: '',
+        revieweeId: reviewedId,
+        revieweeName: '',
+        momentId: request.moment_id,
+        momentTitle: '',
+        requestId: data.requestId,
+        createdAt: newReview!.created_at,
+        isVerified: true,
+        isEdited: false,
+      };
+
+      return { review };
+    } catch (error) {
+      logger.error('Create review error:', error);
+      throw error;
+    }
   },
 
   /**
-   * Get reviews for a moment
+   * Get reviews for a user or moment
    */
-  getMomentReviews: async (
-    momentId: string,
-    filters?: Omit<ReviewFilters, 'momentId'>,
+  getReviews: async (
+    filters: ReviewFilters,
   ): Promise<{ reviews: Review[]; stats: ReviewStats; total: number }> => {
-    return api.get(`/moments/${momentId}/reviews`, { params: filters });
+    try {
+      let data: any[] = [];
+      let count = 0;
+
+      if (filters.userId) {
+        const result = await dbReviewsService.listByUser(filters.userId);
+        data = result.data;
+        count = result.count;
+      } else {
+        // TODO: Implement listByMoment or generic list in db service
+        // For now, return empty if not by user
+        return {
+          reviews: [],
+          stats: {
+            averageRating: 0,
+            totalReviews: 0,
+            ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+          },
+          total: 0,
+        };
+      }
+
+      const reviews: Review[] = data.map((row: any) => ({
+        id: row.id,
+        rating: row.rating,
+        comment: row.comment || '',
+        reviewerId: row.reviewer_id,
+        reviewerName: row.reviewer?.full_name || 'User',
+        reviewerAvatar: row.reviewer?.avatar_url || '',
+        revieweeId: row.reviewed_id,
+        revieweeName: '', // Could be fetched
+        momentId: row.moment_id,
+        momentTitle: row.moment?.title || '',
+        requestId: '', // Not stored in reviews table directly usually
+        createdAt: row.created_at,
+        isVerified: true,
+        isEdited: false,
+      }));
+
+      // Calculate stats
+      const stats: ReviewStats = {
+        averageRating: 0,
+        totalReviews: count,
+        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      };
+
+      if (count > 0) {
+        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+        stats.averageRating = sum / count;
+        reviews.forEach((r) => {
+          const rating = Math.round(r.rating) as 1 | 2 | 3 | 4 | 5;
+          if (stats.ratingDistribution[rating] !== undefined) {
+            stats.ratingDistribution[rating]++;
+          }
+        });
+      }
+
+      return { reviews, stats, total: count };
+    } catch (error) {
+      logger.error('Get reviews error:', error);
+      return {
+        reviews: [],
+        stats: {
+          averageRating: 0,
+          totalReviews: 0,
+          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        },
+        total: 0,
+      };
+    }
   },
 
   /**
@@ -97,7 +224,42 @@ export const reviewService = {
   getMyWrittenReviews: async (
     filters?: ReviewFilters,
   ): Promise<{ reviews: Review[]; total: number }> => {
-    return api.get('/reviews/written', { params: filters });
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, count, error } = await supabase
+        .from('reviews')
+        .select('*, reviewer:users(*), moment:moments(*)', { count: 'exact' })
+        .eq('reviewer_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const reviews: Review[] = (data || []).map((row: any) => ({
+        id: row.id,
+        rating: row.rating,
+        comment: row.comment || '',
+        reviewerId: row.reviewer_id,
+        reviewerName: 'Me',
+        reviewerAvatar: '',
+        revieweeId: row.reviewed_id,
+        revieweeName: '',
+        momentId: row.moment_id,
+        momentTitle: row.moment?.title || '',
+        requestId: '',
+        createdAt: row.created_at,
+        isVerified: true,
+        isEdited: false,
+      }));
+
+      return { reviews, total: count || 0 };
+    } catch (error) {
+      logger.error('Get my written reviews error:', error);
+      return { reviews: [], total: 0 };
+    }
   },
 
   /**
@@ -106,7 +268,25 @@ export const reviewService = {
   getMyReceivedReviews: async (
     filters?: ReviewFilters,
   ): Promise<{ reviews: Review[]; stats: ReviewStats; total: number }> => {
-    return api.get('/reviews/received', { params: filters });
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      return reviewService.getReviews({ ...filters, userId: user.id });
+    } catch (error) {
+      logger.error('Get my received reviews error:', error);
+      return {
+        reviews: [],
+        stats: {
+          averageRating: 0,
+          totalReviews: 0,
+          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        },
+        total: 0,
+      };
+    }
   },
 
   /**
@@ -121,100 +301,11 @@ export const reviewService = {
       userName: string;
       userAvatar: string;
       completedAt: string;
-      expiresAt: string; // Review window expires
     }>;
   }> => {
-    return api.get('/reviews/pending');
+    // TODO: Implement query to find completed requests where I haven't left a review yet
+    return { pendingReviews: [] };
   },
-
-  /**
-   * Create a review
-   */
-  createReview: async (data: CreateReviewData): Promise<{ review: Review }> => {
-    return api.post('/reviews', data);
-  },
-
-  /**
-   * Update a review (within edit window)
-   */
-  updateReview: async (
-    reviewId: string,
-    data: { rating?: number; comment?: string },
-  ): Promise<{ review: Review }> => {
-    return api.put(`/reviews/${reviewId}`, data);
-  },
-
-  /**
-   * Delete a review (within delete window)
-   */
-  deleteReview: async (reviewId: string): Promise<{ success: boolean }> => {
-    return api.delete(`/reviews/${reviewId}`);
-  },
-
-  /**
-   * Respond to a review (as reviewee)
-   */
-  respondToReview: async (
-    reviewId: string,
-    text: string,
-  ): Promise<{ review: Review }> => {
-    return api.post(`/reviews/${reviewId}/respond`, { text });
-  },
-
-  /**
-   * Report a review
-   */
-  reportReview: async (
-    reviewId: string,
-    reason: string,
-  ): Promise<{ success: boolean }> => {
-    return api.post(`/reviews/${reviewId}/report`, { reason });
-  },
-
-  /**
-   * Get review summary for current user
-   */
-  getMyReviewStats: async (): Promise<{ stats: ReviewStats }> => {
-    return api.get('/reviews/my-stats');
-  },
-
-  /**
-   * Check if user can review a request
-   */
-  canReviewRequest: async (
-    requestId: string,
-  ): Promise<{ canReview: boolean; reason?: string }> => {
-    return api.get(`/reviews/can-review/${requestId}`);
-  },
-};
-
-// Helper functions
-export const getRatingLabel = (rating: number): string => {
-  const labels: Record<number, string> = {
-    1: 'Poor',
-    2: 'Fair',
-    3: 'Good',
-    4: 'Very Good',
-    5: 'Excellent',
-  };
-  return labels[rating] || '';
-};
-
-export const getRatingColor = (rating: number): string => {
-  if (rating >= 4.5) return COLORS.emerald; // Green
-  if (rating >= 3.5) return COLORS.greenBright; // Light green
-  if (rating >= 2.5) return COLORS.warning; // Yellow
-  if (rating >= 1.5) return COLORS.orangeAlt; // Orange
-  return COLORS.error; // Red
-};
-
-export const formatRating = (rating: number): string => {
-  return rating.toFixed(1);
-};
-
-export const calculatePercentage = (count: number, total: number): number => {
-  if (total === 0) return 0;
-  return Math.round((count / total) * 100);
 };
 
 export default reviewService;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -9,11 +8,12 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../constants/colors';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { logger } from '../utils/logger';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -61,7 +61,8 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
       try {
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
         if (saved) {
-          setBlockedUsers(JSON.parse(saved));
+          const parsed = JSON.parse(saved) as BlockedUser[];
+          setBlockedUsers(parsed);
         } else {
           // First time - use mock data
           setBlockedUsers(MOCK_BLOCKED_USERS);
@@ -71,7 +72,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
         setBlockedUsers(MOCK_BLOCKED_USERS);
       }
     };
-    loadBlockedUsers();
+    void loadBlockedUsers();
   }, []);
 
   const handleUnblock = (userId: string, userName: string) => {

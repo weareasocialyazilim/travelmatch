@@ -151,7 +151,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         setIsLoaded(true);
       }
     };
-    loadTheme();
+    void loadTheme();
   }, []);
 
   // Determine if dark mode is active
@@ -180,7 +180,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Toggle between light and dark
   const toggleTheme = useCallback(() => {
     const newMode = isDark ? 'light' : 'dark';
-    setThemeMode(newMode);
+    void setThemeMode(newMode);
   }, [isDark, setThemeMode]);
 
   const value = useMemo(

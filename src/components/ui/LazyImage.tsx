@@ -6,8 +6,8 @@
 import React, { memo, useState } from 'react';
 import type { ImageProps, ViewStyle } from 'react-native';
 import { Image, ActivityIndicator, View, StyleSheet } from 'react-native';
-import { useLazyImage, imageCacheManager } from '../../utils/imageOptimization';
 import { COLORS } from '../../constants/colors';
+import { useLazyImage, imageCacheManager } from '../../utils/imageOptimization';
 
 interface LazyImageProps extends Omit<ImageProps, 'source'> {
   /** Image source */

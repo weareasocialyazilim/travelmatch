@@ -1,5 +1,5 @@
-import { spacing } from './spacing';
 import { radii } from './radii';
+import { spacing } from './spacing';
 
 export const LAYOUT = {
   // Convenience padding (legacy keys used across codebase)

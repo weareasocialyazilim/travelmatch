@@ -1,100 +1,25 @@
-import React, { useState } from 'react';
-import { logger } from '../utils/logger';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
-import { VALUES } from '../constants/values';
 import { LAYOUT } from '../constants/layout';
-import type { StackScreenProps } from '@react-navigation/stack';
+import { VALUES } from '../constants/values';
+import { logger } from '../utils/logger';
+import { subscriptionsService } from '../services/supabase';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
-type IconName = React.ComponentProps<typeof Icon>['name'];
-
-interface Plan {
-  id: string;
-  name: string;
-  price: number;
-  interval: 'month' | 'year';
-  features: string[];
-  popular?: boolean;
-  color: string;
-  icon: IconName;
-}
-
-const PLANS: Plan[] = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    interval: 'month',
-    color: COLORS.textSecondary,
-    icon: 'gift',
-    features: [
-      '3 gestures per month',
-      'Basic proof verification',
-      'Community access',
-      'Profile with Trust Score',
-    ],
-  },
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: 10,
-    interval: 'month',
-    color: COLORS.primary,
-    icon: 'rocket',
-    features: [
-      '10 gestures per month',
-      'Priority proof verification',
-      'Advanced analytics',
-      'Badge & recognition',
-      'Email support',
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 25,
-    interval: 'month',
-    popular: true,
-    color: COLORS.accent,
-    icon: 'star',
-    features: [
-      'Unlimited gestures',
-      'Instant verification',
-      'Premium analytics',
-      'Featured profile',
-      'Priority support',
-      'API access',
-      'Custom branding',
-    ],
-  },
-  {
-    id: 'vip',
-    name: 'VIP',
-    price: 50,
-    interval: 'month',
-    color: COLORS.warning,
-    icon: 'crown',
-    features: [
-      'All Pro features',
-      'Dedicated account manager',
-      'White-label solution',
-      'Custom integrations',
-      'Enterprise support',
-      'Exclusive events access',
-      'Partnership opportunities',
-    ],
-  },
-];
+import { PLANS } from '../constants/plans';
+import type { Plan } from '../constants/plans';
 
 type SubscriptionScreenProps = StackScreenProps<
   RootStackParamList,
@@ -108,6 +33,30 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>(
     'month',
   );
+  const [plans, setPlans] = useState<Plan[]>(PLANS);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      setLoading(true);
+      const { data } = await subscriptionsService.getPlans();
+      if (data && data.length > 0) {
+        const mappedPlans: Plan[] = data.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          interval: p.interval,
+          features: p.features,
+          popular: p.is_popular,
+          color: p.color,
+          icon: p.icon,
+        }));
+        setPlans(mappedPlans);
+      }
+      setLoading(false);
+    };
+    fetchPlans();
+  }, []);
 
   const handleSubscribe = (planId: string) => {
     // Implement subscription logic
@@ -223,6 +172,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             Monthly
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[
             styles.toggleButton,

@@ -18,7 +18,7 @@ export const useScreenReader = () => {
       setIsScreenReaderEnabled(enabled);
     };
 
-    checkScreenReader();
+    void checkScreenReader();
 
     const subscription = AccessibilityInfo.addEventListener(
       'screenReaderChanged',
@@ -45,7 +45,7 @@ export const useReduceMotion = () => {
       setReduceMotionEnabled(enabled);
     };
 
-    checkReduceMotion();
+    void checkReduceMotion();
 
     const subscription = AccessibilityInfo.addEventListener(
       'reduceMotionChanged',

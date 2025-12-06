@@ -6,9 +6,9 @@
  * Sentry is initialized after first render via dynamic import in App.tsx.
  */
 
+import { Platform as _Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { logger } from '../utils/logger';
-import { Platform as _Platform } from 'react-native';
 
 // Sentry DSN (replace with your actual DSN)
 const SENTRY_DSN = __DEV__

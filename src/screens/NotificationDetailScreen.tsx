@@ -7,13 +7,13 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { RouteProp, NavigationProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type NotificationDetailScreenRouteProp = RouteProp<
   RootStackParamList,

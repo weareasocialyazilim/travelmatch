@@ -49,8 +49,8 @@ const INFO_ITEMS: InfoItem[] = [
   },
 ];
 
-import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type PaymentsKYCScreenProps = StackScreenProps<
   RootStackParamList,

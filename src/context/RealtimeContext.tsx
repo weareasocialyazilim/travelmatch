@@ -8,8 +8,8 @@ import React, {
   useRef,
 } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
-import { useAuth } from './AuthContext';
 import { logger } from '../utils/logger';
+import { useAuth } from './AuthContext';
 
 // Event types
 export type RealtimeEventType =
@@ -115,7 +115,9 @@ const RealtimeContext = createContext<RealtimeContextType | undefined>(
 
 // WebSocket configuration
 const WS_CONFIG = {
-  url: process.env.EXPO_PUBLIC_WS_URL || 'wss://api.travelmatch.com/ws',
+  url:
+    (process.env.EXPO_PUBLIC_WS_URL as string) ??
+    'wss://api.travelmatch.com/ws',
   reconnectDelay: 1000,
   maxReconnectDelay: 30000,
   reconnectMultiplier: 1.5,
@@ -233,7 +235,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
 
       ws.onmessage = (event) => {
         try {
-          const message = JSON.parse(event.data) as {
+          const message = JSON.parse(event.data as string) as {
             type: string;
             payload: unknown;
           };
@@ -298,7 +300,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
               reconnectDelayRef.current * WS_CONFIG.reconnectMultiplier,
               WS_CONFIG.maxReconnectDelay,
             );
-            connect();
+            void connect();
           }, reconnectDelayRef.current);
         } else {
           setConnectionState('disconnected');
@@ -328,7 +330,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   const reconnect = useCallback(() => {
     disconnect();
     reconnectDelayRef.current = WS_CONFIG.reconnectDelay;
-    connect();
+    void connect();
   }, [disconnect, connect]);
 
   /**
@@ -389,7 +391,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   // Connect when authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      connect();
+      void connect();
     } else {
       disconnect();
     }
@@ -409,7 +411,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       ) {
         // App came to foreground
         if (isAuthenticated && connectionState === 'disconnected') {
-          connect();
+          void connect();
         }
       } else if (
         appStateRef.current === 'active' &&

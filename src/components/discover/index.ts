@@ -1,10 +1,13 @@
-/**
- * Discover Components Index
- * Export all discover sub-components
- */
+// Discover Screen Components - Barrel exports
+export { StoryItem } from './StoryItem';
+export { SingleMomentCard } from './SingleMomentCard';
+export { GridMomentCard } from './GridMomentCard';
+export { CategoryFilter } from './CategoryFilter';
+export { DiscoverHeader } from './DiscoverHeader';
+export { StoryViewer } from './StoryViewer';
+export { FilterModal } from './FilterModal';
+export { LocationModal } from './LocationModal';
 
-export { default as StoriesRow } from './StoriesRow';
-export { default as DiscoverHeader } from './DiscoverHeader';
-export { default as FilterModal } from './FilterModal';
-export { default as LocationModal } from './LocationModal';
+// Re-export types and constants
+export * from './types';
 export * from './constants';

@@ -2,9 +2,8 @@
  * Error Recovery Utilities
  * Comprehensive error handling and recovery strategies
  */
-import { logger } from './logger';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from './logger';
 
 /**
  * Retry options for network requests
@@ -60,14 +59,17 @@ export const fetchWithRetry = async <T>(
       }
 
       // Handle rate limiting (429) with Retry-After header
-      // @ts-expect-error - response may exist on error object
-      const status = lastError.status || lastError.response?.status;
+      const errorWithResponse = lastError as Error & {
+        status?: number;
+        response?: { status?: number; headers?: Record<string, string> };
+      };
+      const status =
+        errorWithResponse.status ?? errorWithResponse.response?.status;
       let delay: number;
 
       if (status === 429) {
         // Check for Retry-After header
-        // @ts-expect-error - response headers may exist
-        const retryAfter = lastError.response?.headers?.['retry-after'];
+        const retryAfter = errorWithResponse.response?.headers?.['retry-after'];
 
         if (retryAfter) {
           // Retry-After can be in seconds or HTTP date
@@ -127,9 +129,12 @@ export const isRetryableError = (error: Error): boolean => {
   if (isNetworkError(error)) return true;
 
   // 5xx server errors are retryable
-  // @ts-expect-error - status may exist on error object
-  const status = error.status || error.statusCode;
-  if (status >= 500 && status < 600) return true;
+  const errorWithStatus = error as Error & {
+    status?: number;
+    statusCode?: number;
+  };
+  const status = errorWithStatus.status ?? errorWithStatus.statusCode;
+  if (status !== undefined && status >= 500 && status < 600) return true;
 
   // 429 Too Many Requests is retryable
   if (status === 429) return true;
@@ -196,7 +201,7 @@ export const recoverAppState = async (
     const backupStr = await AsyncStorage.getItem(APP_STATE_BACKUP_KEY);
     if (!backupStr) return null;
 
-    const backup: AppStateBackup = JSON.parse(backupStr);
+    const backup = JSON.parse(backupStr) as AppStateBackup;
 
     // Check if backup is too old
     const age = Date.now() - backup.timestamp;
@@ -259,17 +264,17 @@ class NetworkQueueClass {
     operation: () => Promise<unknown>,
     options: { id?: string; maxRetries?: number } = {},
   ): string => {
-    const id = options.id || `op_${Date.now()}_${Math.random()}`;
+    const id = options.id ?? `op_${Date.now()}_${Math.random()}`;
 
     this.queue.push({
       id,
       operation,
       retryCount: 0,
-      maxRetries: options.maxRetries || 3,
+      maxRetries: options.maxRetries ?? 3,
       createdAt: Date.now(),
     });
 
-    this.process();
+    void this.process();
 
     return id;
   };

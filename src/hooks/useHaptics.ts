@@ -4,9 +4,9 @@
  * @module hooks/useHaptics
  */
 
+import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { logger } from '../utils/logger';
-import { Platform } from 'react-native';
 
 /**
  * Available haptic feedback types

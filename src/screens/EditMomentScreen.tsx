@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,15 @@ import {
   TextInput,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
 import { logger } from '@/utils/logger';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { supabase } from '@/config/supabase';
+import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -34,17 +36,63 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
 }) => {
   const { momentId } = route.params || {};
 
-  // Dummy data - replace with actual data fetching
-  const [title, setTitle] = useState('Eiffel Tower Visit');
-  const [description, setDescription] = useState(
-    'Amazing experience visiting the iconic Eiffel Tower. The view from the top was breathtaking!',
-  );
-  const [price, setPrice] = useState('25');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
-    // TODO: Implement save logic
-    logger.info('Saving moment', { momentId, title, description, price });
-    navigation.goBack();
+  useEffect(() => {
+    const fetchMoment = async () => {
+      if (!momentId) return;
+      try {
+        const { data, error } = await supabase
+          .from('moments')
+          .select('title, description, price')
+          .eq('id', momentId)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setTitle(data.title);
+          setDescription(data.description || '');
+          setPrice(data.price?.toString() || '');
+        }
+      } catch (error) {
+        logger.error('Error fetching moment', error as Error);
+        Alert.alert('Error', 'Failed to load moment details');
+      }
+    };
+    fetchMoment();
+  }, [momentId]);
+
+  const handleSave = async () => {
+    if (!title || !price) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('moments')
+        .update({
+          title,
+          description,
+          price: parseFloat(price),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', momentId);
+
+      if (error) throw error;
+      
+      logger.info('Moment updated', { momentId });
+      navigation.goBack();
+    } catch (error) {
+      logger.error('Error updating moment', error as Error);
+      Alert.alert('Error', 'Failed to update moment');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

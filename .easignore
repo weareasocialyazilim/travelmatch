@@ -1,0 +1,18 @@
+# Ignore development and test files
+__mocks__/
+__tests__/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+.maestro/
+scripts/
+.storybook/
+coverage/
+docs/
+.github/
+.husky/
+.vscode/
+*.config.js
+*.setup.js
+tsconfig.test.json

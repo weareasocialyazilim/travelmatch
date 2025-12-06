@@ -14,19 +14,19 @@ import {
   Keyboard,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS } from '../../constants/colors';
+import { radii } from '../../constants/radii';
+import { spacing } from '../../constants/spacing';
+import { TYPOGRAPHY } from '../../constants/typography';
 import { useTheme } from '../../hooks/useTheme';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSearchStore } from '../../stores/searchStore';
-import { useDebounce } from '../../utils/performance';
-import { spacing } from '../../constants/spacing';
-import { radii } from '../../constants/radii';
-import { TYPOGRAPHY } from '../../constants/typography';
-import { COLORS } from '../../constants/colors';
 import {
   VERTICAL_LIST_CONFIG,
   ITEM_HEIGHTS,
   createGetItemLayout,
 } from '../../utils/listOptimization';
+import { useDebounce } from '../../utils/performance';
 
 interface EnhancedSearchBarProps {
   placeholder?: string;

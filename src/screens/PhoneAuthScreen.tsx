@@ -9,15 +9,15 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { COLORS, CARD_SHADOW } from '../constants/colors';
-import { VALUES } from '../constants/values';
-import { LAYOUT } from '../constants/layout';
-import type { StackScreenProps } from '@react-navigation/stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '../components/LoadingState';
+import { COLORS, CARD_SHADOW } from '../constants/colors';
+import { LAYOUT } from '../constants/layout';
+import { VALUES } from '../constants/values';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type PhoneAuthScreenProps = StackScreenProps<RootStackParamList, 'PhoneAuth'>;
 
@@ -30,7 +30,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
   const [loading, setLoading] = useState(false);
   const otpInputs = useRef<(TextInput | null)[]>([]);
 
-  const handleSendOTP = async () => {
+  const handleSendOTP = () => {
     if (phoneNumber.length < 10) {
       Alert.alert('Invalid Phone', 'Please enter a valid phone number');
       return;
@@ -43,7 +43,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
     }, 1000);
   };
 
-  const handleVerifyOTP = async () => {
+  const handleVerifyOTP = () => {
     const otpCode = otp.join('');
     if (otpCode.length < 6) {
       Alert.alert('Invalid OTP', 'Please enter the 6-digit code.');

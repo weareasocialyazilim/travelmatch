@@ -9,12 +9,10 @@ export const MaintenanceScreen: React.FC = () => {
       <View style={styles.content}>
         {/* Illustration */}
         <View style={styles.illustrationContainer}>
-          <Image
-            source={{
-              uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCalu2-rIyVHbcA-s4tk41DdvDP88QWpT4OYdktVBo33e92eWDyyk0Ue-t8jJm-Lsg1O5pkg9HtiNCbiphgKxQ_kem8qIFpmNq17iX_lreodMRBxZSdEqLq7ofEGl-FX5GejWLqsjVC7ChJPkIiXLGQohdrxEDtHbq-xxxBRY7htYVDdFplk18-wb_0QC1xiVsA0BPRGxI_BrgzsI0JbgG29ZHOF5cqv-3G4RGwq4OAVVLJzmtHmh2ol3uMa3UOvLci4YY46a7nInS2',
-            }}
-            style={styles.illustration}
-            resizeMode="contain"
+          <MaterialCommunityIcons
+            name="hammer-wrench"
+            size={120}
+            color={COLORS.primary}
           />
         </View>
 

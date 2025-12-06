@@ -36,7 +36,6 @@ import {
   setTag,
 } from '../config/sentry';
 import { logger, Logger } from '../utils/logger';
-import { analyticsService } from './analyticsService';
 
 /**
  * Screen tracking options
@@ -154,17 +153,6 @@ class LoggingService {
       loadTime,
     });
 
-    // Track in analytics
-    analyticsService.trackScreen({
-      screenName,
-      screenClass: screenName,
-      properties: {
-        previousScreen,
-        loadTime,
-        ...screenParams,
-      },
-    });
-
     // Warn about slow screen loads
     if (loadTime && loadTime > 3000) {
       this.trackPerformance('screen_load', loadTime, {
@@ -203,13 +191,6 @@ class LoggingService {
       screen: this.currentScreen,
       ...context,
     });
-
-    // Track in analytics
-    analyticsService.track(action, category as never, {
-      screen: this.currentScreen,
-      ...context,
-      duration,
-    });
   }
 
   /**
@@ -245,13 +226,6 @@ class LoggingService {
 
     // Capture in Sentry
     captureException(errorObj, errorContext);
-
-    // Track error event in analytics
-    analyticsService.trackError(errorObj, {
-      severity,
-      screen,
-      userAction,
-    });
 
     // Set error tag for filtering
     setTag('last_error_screen', screen);
@@ -316,16 +290,6 @@ class LoggingService {
         },
       );
     }
-
-    // Track in analytics
-    analyticsService.track('performance_metric', 'performance', {
-      name,
-      durationMs,
-      operation,
-      isSlow,
-      screen: this.currentScreen,
-      ...metadata,
-    });
 
     // Report very slow operations to Sentry
     if (durationMs > 5000) {
@@ -402,13 +366,6 @@ class LoggingService {
     context?: Record<string, unknown>,
   ): void {
     logger.info(`Conversion: ${conversionType}`, { value, ...context });
-
-    analyticsService.track(`conversion_${conversionType}`, 'transaction', {
-      conversionType,
-      value,
-      screen: this.currentScreen,
-      ...context,
-    });
 
     setTag('last_conversion', conversionType);
   }

@@ -3,11 +3,11 @@
  * Form state management ve validation helpers
  */
 
-import type { UseFormProps, UseFormReturn, FieldValues } from 'react-hook-form';
-import { useForm as useHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { ZodType, TypeOf } from 'zod';
+import { useForm as useHookForm } from 'react-hook-form';
 import { logger } from '../utils/logger';
+import type { UseFormProps, UseFormReturn, FieldValues } from 'react-hook-form';
+import type { ZodType, TypeOf } from 'zod';
 
 /**
  * Zod schema ile entegre form hook
@@ -32,7 +32,7 @@ export function useZodForm<
   return useHookForm<TOutput>({
     ...formOptions,
     // zodResolver returns a compatible resolver
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema as any) as any,
     mode: formOptions.mode || 'onChange', // Default to real-time validation
   });

@@ -1,20 +1,19 @@
 // KYC Selfie Screen - Liveness check and selfie capture
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
 import { kycStyles } from './styles';
 import type { VerificationData } from './types';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type RouteParams = {
   KYCSelfie: { data: VerificationData };

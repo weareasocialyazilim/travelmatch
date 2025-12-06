@@ -1,21 +1,20 @@
 // KYC Document Type Selection Screen
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
+import { DOCUMENT_OPTIONS } from './constants';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
 import { kycStyles } from './styles';
-import { DOCUMENT_OPTIONS } from './constants';
 import type { DocumentType, VerificationData } from './types';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 type RouteParams = {
   KYCDocumentType: { data: VerificationData };

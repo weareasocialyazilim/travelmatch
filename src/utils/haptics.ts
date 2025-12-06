@@ -5,9 +5,9 @@
  * Android: Uses Vibration API
  */
 
+import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { logger } from './logger';
-import { Platform } from 'react-native';
 
 /**
  * Haptic feedback types
@@ -147,7 +147,7 @@ export const withHaptic = <T extends (...args: unknown[]) => unknown>(
   hapticType: HapticType = HapticType.LIGHT,
 ): ((...args: Parameters<T>) => ReturnType<T>) => {
   return (...args: Parameters<T>): ReturnType<T> => {
-    triggerHaptic(hapticType);
+    void triggerHaptic(hapticType);
     return callback(...args) as ReturnType<T>;
   };
 };

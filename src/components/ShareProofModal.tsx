@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -12,9 +11,10 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
+import { SHADOWS } from '../constants/shadows';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
-import { SHADOWS } from '../constants/shadows';
+import { logger } from '../utils/logger';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 

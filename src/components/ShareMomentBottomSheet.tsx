@@ -1,5 +1,4 @@
 import React from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -14,6 +13,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
+import { logger } from '../utils/logger';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -51,9 +51,9 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
   momentUrl = 'https://travelmatch.com/moment/123',
   momentTitle = 'Check out this amazing travel moment!',
 }) => {
-  const handleCopyLink = async () => {
+  const handleCopyLink = () => {
     try {
-      await Clipboard.setString(momentUrl);
+      Clipboard.setString(momentUrl);
       Alert.alert('Success', 'Link copied to clipboard!');
       onClose();
     } catch (error) {

@@ -1,145 +1,123 @@
-/**
- * DiscoverHeader Component
- * Header with location and view toggle for Discover screen
- */
-
-import React, { memo } from 'react';
+// Discover Header - Top bar with location, filter and view toggle
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
+import type { DiscoverHeaderProps } from './types';
 
-type ViewMode = 'single' | 'grid';
+export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
+  location,
+  viewMode,
+  activeFiltersCount,
+  onLocationPress,
+  onFilterPress,
+  onViewModeToggle,
+}) => (
+  <View style={styles.header}>
+    {/* Location Selector */}
+    <TouchableOpacity
+      style={styles.locationSelector}
+      onPress={onLocationPress}
+      activeOpacity={0.7}
+    >
+      <MaterialCommunityIcons name="map-marker" size={18} color={COLORS.mint} />
+      <Text style={styles.locationText} numberOfLines={1}>
+        {location}
+      </Text>
+      <MaterialCommunityIcons
+        name="chevron-down"
+        size={18}
+        color={COLORS.textSecondary}
+      />
+    </TouchableOpacity>
 
-interface DiscoverHeaderProps {
-  selectedLocation: string;
-  viewMode: ViewMode;
-  onLocationPress: () => void;
-  onViewModeToggle: () => void;
-  onFilterPress: () => void;
-}
-
-const DiscoverHeader: React.FC<DiscoverHeaderProps> = memo(
-  ({
-    selectedLocation,
-    viewMode,
-    onLocationPress,
-    onViewModeToggle,
-    onFilterPress,
-  }) => {
-    return (
-      <View style={styles.header}>
-        {/* Location Selector */}
-        <TouchableOpacity
-          style={styles.locationSelector}
-          onPress={onLocationPress}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel="Change location"
-        >
-          <MaterialCommunityIcons
-            name="map-marker"
-            size={20}
-            color={COLORS.primary}
-          />
-          <View style={styles.locationInfo}>
-            <Text style={styles.locationLabel}>Discover in</Text>
-            <View style={styles.locationRow}>
-              <Text style={styles.locationText} numberOfLines={1}>
-                {selectedLocation}
-              </Text>
-              <MaterialCommunityIcons
-                name="chevron-down"
-                size={18}
-                color={COLORS.text}
-              />
-            </View>
+    {/* Right Controls */}
+    <View style={styles.headerControls}>
+      {/* Filter Button */}
+      <TouchableOpacity
+        style={styles.controlButton}
+        onPress={onFilterPress}
+        activeOpacity={0.7}
+      >
+        <MaterialCommunityIcons
+          name="filter-variant"
+          size={22}
+          color={COLORS.text}
+        />
+        {activeFiltersCount > 0 && (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
           </View>
-        </TouchableOpacity>
+        )}
+      </TouchableOpacity>
 
-        {/* Right Actions */}
-        <View style={styles.headerActions}>
-          {/* View Mode Toggle */}
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={onViewModeToggle}
-            accessibilityRole="button"
-            accessibilityLabel={`Switch to ${
-              viewMode === 'single' ? 'grid' : 'single'
-            } view`}
-          >
-            <MaterialCommunityIcons
-              name={viewMode === 'single' ? 'view-grid' : 'view-agenda'}
-              size={22}
-              color={COLORS.text}
-            />
-          </TouchableOpacity>
-
-          {/* Filter Button */}
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={onFilterPress}
-            accessibilityRole="button"
-            accessibilityLabel="Open filters"
-          >
-            <MaterialCommunityIcons
-              name="tune-variant"
-              size={22}
-              color={COLORS.text}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  },
+      {/* View Toggle */}
+      <TouchableOpacity
+        style={styles.controlButton}
+        onPress={onViewModeToggle}
+        activeOpacity={0.7}
+      >
+        <MaterialCommunityIcons
+          name={viewMode === 'single' ? 'view-grid' : 'view-agenda'}
+          size={22}
+          color={COLORS.text}
+        />
+      </TouchableOpacity>
+    </View>
+  </View>
 );
-
-DiscoverHeader.displayName = 'DiscoverHeader';
 
 const styles = StyleSheet.create({
   header: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderBottomColor: COLORS.border,
-    borderBottomWidth: 1,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   locationSelector: {
+    flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  locationInfo: {
-    flex: 1,
-  },
-  locationLabel: {
-    color: COLORS.textSecondary,
-    fontSize: 12,
-  },
-  locationRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
+    marginRight: 16,
   },
   locationText: {
-    color: COLORS.text,
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '600',
+    color: COLORS.text,
+    marginLeft: 6,
+    flex: 1,
   },
-  headerActions: {
+  headerControls: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
-  iconButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderRadius: 20,
-    height: 40,
-    justifyContent: 'center',
+  controlButton: {
     width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: COLORS.mint,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: COLORS.white,
   },
 });
-
-export default DiscoverHeader;

@@ -8,9 +8,9 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
 
 interface HiddenItem {
@@ -25,26 +25,14 @@ interface HiddenItem {
 export const HiddenItemsScreen: React.FC = () => {
   const navigation = useNavigation();
 
-  const [hiddenItems, setHiddenItems] = useState<HiddenItem[]>([
-    {
-      id: '1',
-      type: 'gift',
-      title: 'Gift from Emma',
-      subtitle: '☕ Coffee · $10',
-      avatar:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-      hiddenAt: '2 days ago',
-    },
-    {
-      id: '2',
-      type: 'gift',
-      title: 'Gift from John',
-      subtitle: '🍕 Lunch · $25',
-      avatar:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-      hiddenAt: '1 week ago',
-    },
-  ]);
+  const [hiddenItems, setHiddenItems] = useState<HiddenItem[]>([]);
+
+  // TODO: Fetch hidden items from API
+  /*
+  useEffect(() => {
+    // fetchHiddenItems().then(setHiddenItems);
+  }, []);
+  */
 
   const handleUnhide = (id: string) => {
     Alert.alert('Unhide Item', 'This item will be restored to your inbox.', [

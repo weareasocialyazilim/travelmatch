@@ -67,8 +67,8 @@ const SECTIONS: Section[] = [
   },
 ];
 
-import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 type PrivacyPolicyScreenProps = StackScreenProps<
   RootStackParamList,

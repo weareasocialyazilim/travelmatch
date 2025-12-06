@@ -4,13 +4,20 @@ import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { Button } from './Button';
+import { EmptyStateIllustration } from './EmptyStateIllustration';
+import type { IllustrationType } from './EmptyStateIllustration';
+import { spacing } from '../../constants/spacing';
+import { TYPOGRAPHY } from '../../constants/typography';
 
 interface EmptyStateProps {
   icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   title: string;
   description?: string;
+  subtitle?: string; // Alias for description to support both props
   actionLabel?: string;
   onAction?: () => void;
+  illustration?: React.ReactNode;
+  illustrationType?: IllustrationType;
   style?: ViewStyle;
 }
 
@@ -18,21 +25,34 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   icon = 'inbox-outline',
   title,
   description,
+  subtitle,
   actionLabel,
   onAction,
+  illustration,
+  illustrationType,
   style,
 }) => {
+  const desc = description || subtitle;
+
   return (
     <View style={[styles.container, style]}>
-      <View style={styles.iconContainer}>
-        <MaterialCommunityIcons
-          name={icon}
-          size={48}
-          color={COLORS.gray[400]}
-        />
-      </View>
+      {illustration ? (
+        illustration
+      ) : illustrationType ? (
+        <EmptyStateIllustration type={illustrationType} size={160} />
+      ) : (
+        <View style={styles.iconContainer}>
+          <MaterialCommunityIcons
+            name={icon}
+            size={48}
+            color={COLORS.gray[400]}
+          />
+        </View>
+      )}
+      
       <Text style={styles.title}>{title}</Text>
-      {description && <Text style={styles.description}>{description}</Text>}
+      {desc && <Text style={styles.description}>{desc}</Text>}
+      
       {actionLabel && onAction && (
         <Button
           title={actionLabel}
@@ -48,37 +68,34 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 32,
+    padding: spacing.xl,
+    flex: 1,
   },
   iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: COLORS.gray[100],
     alignItems: 'center',
+    backgroundColor: COLORS.gray[100],
+    borderRadius: 50,
+    height: 100,
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.lg,
+    width: 100,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
+    ...TYPOGRAPHY.h3,
     color: COLORS.text,
+    marginBottom: spacing.xs,
     textAlign: 'center',
-    marginBottom: 8,
   },
   description: {
-    fontSize: 14,
+    ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
+    marginBottom: spacing.lg,
     textAlign: 'center',
-    maxWidth: 280,
-    lineHeight: 20,
+    maxWidth: '80%',
   },
   button: {
-    marginTop: 24,
+    minWidth: 120,
   },
 });
-
-export default EmptyState;

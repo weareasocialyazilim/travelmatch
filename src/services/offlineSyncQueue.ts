@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { logger } from '../utils/logger';
 import NetInfo from '@react-native-community/netinfo';
+import { logger } from '../utils/logger';
 
 // Queue storage key
 const QUEUE_KEY = '@travelmatch_offline_queue';
@@ -49,7 +49,7 @@ class OfflineSyncQueue {
   private listeners: Set<(queue: OfflineAction[]) => void> = new Set();
 
   constructor() {
-    this.loadQueue();
+    void this.loadQueue();
     this.setupNetworkListener();
   }
 
@@ -60,7 +60,7 @@ class OfflineSyncQueue {
     try {
       const stored = await AsyncStorage.getItem(QUEUE_KEY);
       if (stored) {
-        this.queue = JSON.parse(stored);
+        this.queue = JSON.parse(stored) as OfflineAction[];
         // Reset any actions that were processing when app closed
         this.queue = this.queue.map((action) =>
           action.status === 'processing'
@@ -92,7 +92,7 @@ class OfflineSyncQueue {
   private setupNetworkListener(): void {
     NetInfo.addEventListener((state) => {
       if (state.isConnected && state.isInternetReachable) {
-        this.processQueue();
+        void this.processQueue();
       }
     });
   }
@@ -145,7 +145,7 @@ class OfflineSyncQueue {
     // Try to process immediately if online
     const netState = await NetInfo.fetch();
     if (netState.isConnected && netState.isInternetReachable) {
-      this.processQueue();
+      void this.processQueue();
     }
 
     return action.id;

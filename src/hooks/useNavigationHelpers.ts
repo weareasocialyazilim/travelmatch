@@ -7,9 +7,9 @@ import {
   useNavigation as useNavigationRN,
   useRoute as useRouteRN,
 } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/types';
+import type { RouteProp } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 /**
  * Type-safe useNavigation hook

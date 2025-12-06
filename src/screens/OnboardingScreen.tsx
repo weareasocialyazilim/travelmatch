@@ -13,11 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
-import { HORIZONTAL_LIST_CONFIG } from '../utils/listOptimization';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import { useAnalytics } from '../hooks/useAnalytics';
 
 const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
   Dimensions.get('window');
@@ -29,39 +24,46 @@ interface OnboardingPage {
   image: ImageSourcePropType;
 }
 
+/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment */
 const ONBOARDING_PAGES: OnboardingPage[] = [
   {
     id: '1',
     title: 'Welcome to TravelMatch',
     description:
       'Connect and support travelers on their unique journeys through verified, heartfelt gifts.',
-    image: require('../../assets/icon.png'),
+    image: require('../../assets/icon.png') as ImageSourcePropType,
   },
   {
     id: '2',
     title: 'Share Your Journey',
     description:
       'Create moments from your travels and receive gifts from supporters around the world.',
-    image: require('../../assets/icon.png'),
+    image: require('../../assets/icon.png') as ImageSourcePropType,
   },
   {
     id: '3',
     title: 'Build Trust Together',
     description:
       'Every verified moment strengthens our community. Your proof of experience matters.',
-    image: require('../../assets/icon.png'),
+    image: require('../../assets/icon.png') as ImageSourcePropType,
   },
   {
     id: '4',
     title: 'Start Your Adventure',
     description:
       'Join thousands of travelers connecting through meaningful gifts and authentic experiences.',
-    image: require('../../assets/icon.png'),
+    image: require('../../assets/icon.png') as ImageSourcePropType,
   },
 ];
+/* eslint-enable @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment */
 
-import { useOnboarding } from '../hooks/useOnboarding';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../constants/colors';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useOnboarding } from '../hooks/useOnboarding';
+import { HORIZONTAL_LIST_CONFIG } from '../utils/listOptimization';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 

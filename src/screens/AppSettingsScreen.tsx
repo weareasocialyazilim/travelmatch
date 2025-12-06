@@ -8,17 +8,18 @@ import {
   Switch,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import { COLORS } from '../constants/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LanguageSelectionBottomSheet } from '../components/LanguageSelectionBottomSheet';
-import { CURRENT_USER, isKYCVerified } from '../mocks/currentUser';
+import { COLORS } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 const AppSettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { user, logout } = useAuth();
 
   // Notification settings
   const [pushEnabled, setPushEnabled] = useState(true);
@@ -29,9 +30,9 @@ const AppSettingsScreen: React.FC = () => {
   // Privacy settings
   const [profileVisible, setProfileVisible] = useState(true);
 
-  // KYC status from centralized user data
-  const isIdentityVerified = isKYCVerified(CURRENT_USER);
-  const memberSince = CURRENT_USER.memberSince;
+  // KYC status from auth context
+  const isIdentityVerified = user?.kyc === 'Verified';
+  const memberSince = user?.createdAt ? new Date(user.createdAt).getFullYear().toString() : '2024';
 
   // Language
   const [selectedLanguage, setSelectedLanguage] = useState('English');
@@ -57,16 +58,17 @@ const AppSettingsScreen: React.FC = () => {
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
       {
         text: 'Sign Out',
         style: 'destructive',
-        onPress: () => {
-          // Sign out logic - navigate to auth screen
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Welcome' }],
-          });
+        onPress: async () => {
+          try {
+            await logout();
+            // Navigation is typically handled by the auth state change in AppNavigator
+          } catch (error) {
+            console.error('Sign out failed', error);
+            Alert.alert('Error', 'Failed to sign out');
+          }
         },
       },
     ]);

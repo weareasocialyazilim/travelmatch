@@ -14,27 +14,33 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import * as ImagePicker from 'expo-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
+import { userService } from '../services/userService';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { user, refreshUser } = useAuth();
 
-  // Original profile data (mock - would come from store/API)
+  // Original profile data from auth context
   const originalProfile = useMemo(
-    () => ({
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-      name: 'Sophia Carter',
-      username: 'sophia_carter',
-      bio: 'Coffee enthusiast & travel addict. Discovering hidden gems around the world.',
-      location: 'San Francisco, CA',
-    }),
-    [],
+    () => {
+      const userAny = user as any;
+      return {
+        avatarUrl: userAny?.profilePhoto || userAny?.avatarUrl || 'https://via.placeholder.com/150',
+        name: user?.name || '',
+        username: userAny?.username || '',
+        bio: userAny?.bio || '',
+        location: typeof user?.location === 'string' ? user.location : userAny?.location?.city || '',
+      };
+    },
+    [user],
   );
 
   // Editable state
@@ -43,6 +49,14 @@ const EditProfileScreen = () => {
   const [username, setUsername] = useState(originalProfile.username);
   const [bio, setBio] = useState(originalProfile.bio);
   const [location, setLocation] = useState(originalProfile.location);
+
+  // Update state when user data loads
+  useEffect(() => {
+    setName(originalProfile.name);
+    setUsername(originalProfile.username);
+    setBio(originalProfile.bio);
+    setLocation(originalProfile.location);
+  }, [originalProfile]);
 
   // UI state
   const [isSaving, setIsSaving] = useState(false);
@@ -77,13 +91,15 @@ const EditProfileScreen = () => {
     }
 
     setCheckingUsername(true);
-    const timer = setTimeout(() => {
-      // Simulate API check - in real app, call backend
-      const isAvailable = !['emma', 'john', 'admin', 'test'].includes(
-        username.toLowerCase(),
-      );
-      setUsernameAvailable(isAvailable);
-      setCheckingUsername(false);
+    const timer = setTimeout(async () => {
+      try {
+        const isAvailable = await userService.checkUsernameAvailability(username);
+        setUsernameAvailable(isAvailable);
+      } catch (error) {
+        // Ignore error
+      } finally {
+        setCheckingUsername(false);
+      }
     }, 500);
 
     return () => clearTimeout(timer);
@@ -101,18 +117,19 @@ const EditProfileScreen = () => {
           );
           return;
         }
+
         const result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ['images'],
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [1, 1],
           quality: 0.8,
         });
-        if (!result.canceled && result.assets[0]) {
+
+        if (!result.canceled) {
           setAvatarUri(result.assets[0].uri);
         }
       } else {
-        const { status } =
-          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert(
             'Permission Required',
@@ -121,20 +138,60 @@ const EditProfileScreen = () => {
           );
           return;
         }
+
         const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ['images'],
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [1, 1],
           quality: 0.8,
         });
-        if (!result.canceled && result.assets[0]) {
+
+        if (!result.canceled) {
           setAvatarUri(result.assets[0].uri);
         }
       }
-    } catch {
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to pick image');
     }
   };
+
+  const handleSave = async () => {
+    if (!hasChanges()) return;
+
+    if (usernameAvailable === false) {
+      Alert.alert('Error', 'Username is not available');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Upload avatar if changed
+      if (avatarUri) {
+        await userService.updateAvatar(avatarUri);
+      }
+
+      // Update profile
+      await userService.updateProfile({
+        name,
+        username,
+        bio,
+        location,
+      });
+
+      // Refresh user context
+      await refreshUser();
+
+      Alert.alert('Success', 'Profile updated successfully', [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+
 
   const handleChangeAvatar = () => {
     const options = avatarUri
@@ -176,39 +233,7 @@ const EditProfileScreen = () => {
     }
   };
 
-  const handleSave = async () => {
-    // Validation
-    if (!name.trim()) {
-      Alert.alert('Error', 'Name is required');
-      return;
-    }
-    if (!username.trim() || username.length < 3) {
-      Alert.alert('Error', 'Username must be at least 3 characters');
-      return;
-    }
-    if (usernameAvailable === false) {
-      Alert.alert('Error', 'This username is not available');
-      return;
-    }
 
-    setIsSaving(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      Alert.alert('Success', 'Your profile has been updated.', [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ]);
-    } catch {
-      Alert.alert('Error', 'Failed to save profile. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const handleCancel = () => {
     if (hasChanges()) {

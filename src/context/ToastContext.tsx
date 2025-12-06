@@ -13,10 +13,10 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
-import { spacing } from '../constants/spacing';
 import { radii } from '../constants/radii';
-import { TYPOGRAPHY } from '../constants/typography';
 import { SHADOWS } from '../constants/shadows';
+import { spacing } from '../constants/spacing';
+import { TYPOGRAPHY } from '../constants/typography';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 

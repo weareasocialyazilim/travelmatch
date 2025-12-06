@@ -4,9 +4,9 @@
  */
 
 import type { ComponentType, LazyExoticComponent, ReactNode } from 'react';
-import { COLORS } from '../constants/colors';
 import React, { lazy, Suspense } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { COLORS } from '../constants/colors';
 
 /**
  * Default loading fallback
@@ -51,6 +51,7 @@ export function preloadComponent<
   // @ts-expect-error Accessing internal React lazy _init property for preloading - no public API available
   if (component._init) {
     // @ts-expect-error Accessing internal React lazy _payload property for preloading
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     component._init(component._payload);
   }
 }
@@ -66,7 +67,7 @@ export function withLazy<P extends object>(
   const LazyComponent = lazy(importFn);
 
   const LazyComponentWrapper = (props: P) => (
-    <Suspense fallback={fallback || <DefaultLoadingFallback />}>
+    <Suspense fallback={fallback ?? <DefaultLoadingFallback />}>
       <LazyComponent {...props} />
     </Suspense>
   );
