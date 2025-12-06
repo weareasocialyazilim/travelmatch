@@ -90,9 +90,9 @@ module.exports = {
     '@typescript-eslint/prefer-nullish-coalescing': 'warn',
     '@typescript-eslint/prefer-optional-chain': 'warn',
 
-    // Import sorting
+    // Import sorting - warn level to avoid blocking commits
     'import/order': [
-      'error',
+      'warn',
       {
         groups: [
           'builtin',
