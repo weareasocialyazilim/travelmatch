@@ -1,43 +1,7 @@
-// Note: For production, use expo-secure-store or @react-native-async-storage/async-storage
-import { logger } from './logger';
-// npx expo install expo-secure-store
-// npx expo install @react-native-async-storage/async-storage
-
-// Simple in-memory storage for development
-const memoryStorage = new Map<string, string>();
-
 /**
- * Secure storage for sensitive data (tokens, passwords, etc.)
- * TODO: Replace with expo-secure-store for production
+ * Security utilities for input validation and sanitization
+ * Note: For secure storage, use secureStorage from './secureStorage'
  */
-export const secureStorage = {
-  async setItem(key: string, value: string): Promise<void> {
-    try {
-      memoryStorage.set(`@secure_${key}`, value);
-    } catch (error) {
-      logger.error('SecureStore setItem error:', error);
-      throw error;
-    }
-  },
-
-  async getItem(key: string): Promise<string | null> {
-    try {
-      return memoryStorage.get(`@secure_${key}`) || null;
-    } catch (error) {
-      logger.error('SecureStore getItem error:', error);
-      return null;
-    }
-  },
-
-  async removeItem(key: string): Promise<void> {
-    try {
-      memoryStorage.delete(`@secure_${key}`);
-    } catch (error) {
-      logger.error('SecureStore removeItem error:', error);
-      throw error;
-    }
-  },
-};
 
 /**
  * Sanitize user input to prevent XSS and injection attacks
