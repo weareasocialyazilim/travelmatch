@@ -2,15 +2,14 @@
  * useNotifications Hook
  * Real-time notifications with badge count
  */
-import { logger } from '../utils/logger';
-
 import { useState, useEffect, useCallback } from 'react';
+import { notificationService } from '../services/notificationService';
+import { logger } from '../utils/logger';
 import type {
   Notification,
   NotificationPreferences,
   NotificationType,
 } from '../services/notificationService';
-import { notificationService } from '../services/notificationService';
 
 interface UseNotificationsReturn {
   // Notifications
@@ -188,7 +187,14 @@ export const useNotifications = (): UseNotificationsReturn => {
       const response = await notificationService.getPreferences();
       setPreferences(response.preferences);
     } catch (err) {
-      logger.error('Failed to fetch preferences:', err);
+      // Development mode veya backend yokken sessizce varsayılan kullan
+      if (__DEV__) {
+        logger.debug(
+          '[Notifications] Using default preferences (backend unavailable)',
+        );
+      } else {
+        logger.error('Failed to fetch preferences:', err);
+      }
     }
   }, []);
 

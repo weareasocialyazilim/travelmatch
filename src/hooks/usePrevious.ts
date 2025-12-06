@@ -19,7 +19,7 @@ import { useRef, useEffect } from 'react';
  * ```
  */
 export function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
+  const ref = useRef<T | undefined>(undefined);
 
   useEffect(() => {
     ref.current = value;
@@ -66,7 +66,7 @@ export function useValueChange<T>(value: T): {
   previous: T | undefined;
   hasChanged: boolean;
 } {
-  const previousRef = useRef<T>();
+  const previousRef = useRef<T | undefined>(undefined);
   const isFirstRender = useRef(true);
 
   const hasChanged = !isFirstRender.current && previousRef.current !== value;
@@ -100,7 +100,7 @@ export function useDeepCompare<T>(
   previous: T | undefined;
   hasChanged: boolean;
 } {
-  const previousRef = useRef<T>();
+  const previousRef = useRef<T | undefined>(undefined);
   const isFirstRender = useRef(true);
 
   const hasChanged =

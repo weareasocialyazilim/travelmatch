@@ -5,11 +5,11 @@
  */
 
 import { z } from 'zod';
+import { AppError, ErrorCode } from './errors';
 import { logger } from './logger';
 import { checkRateLimit, RATE_LIMIT_CONFIGS } from './rateLimiter';
 import { sanitizeInput } from './security';
 import { formatZodErrors } from './validation';
-import { AppError, ErrorCode } from './errors';
 
 /**
  * Rate limit types for different API operations
@@ -201,21 +201,21 @@ export const createApiResponse = <T>(
 /**
  * Handle API errors consistently
  */
-export const handleApiRequestError = (
+export const handleApiRequestError = <T = never>(
   error: unknown,
   context?: string,
-): ApiResponse<never> => {
-  logger.error(`API Error [${context}]:`, error);
+): ApiResponse<T> => {
+  logger.error(`API Error [${context ?? 'unknown'}]:`, error);
 
   if (error instanceof AppError) {
-    return createApiResponse(false, undefined, {
+    return createApiResponse<T>(false, undefined as T | undefined, {
       code: error.code,
       message: error.message,
     });
   }
 
   if (error instanceof z.ZodError) {
-    return createApiResponse(false, undefined, {
+    return createApiResponse<T>(false, undefined as T | undefined, {
       code: ErrorCode.VALIDATION_ERROR,
       message: 'Validation failed',
       details: formatZodErrors(error),
@@ -223,13 +223,13 @@ export const handleApiRequestError = (
   }
 
   if (error instanceof Error) {
-    return createApiResponse(false, undefined, {
+    return createApiResponse<T>(false, undefined as T | undefined, {
       code: ErrorCode.UNKNOWN_ERROR,
       message: __DEV__ ? error.message : 'An unexpected error occurred',
     });
   }
 
-  return createApiResponse(false, undefined, {
+  return createApiResponse<T>(false, undefined as T | undefined, {
     code: ErrorCode.UNKNOWN_ERROR,
     message: 'An unexpected error occurred',
   });
@@ -251,9 +251,14 @@ export const withApiMiddleware = <TInput, TOutput>(
       });
 
       if (!validation.valid) {
-        return createApiResponse(false, undefined, validation.error, {
-          rateLimitRemaining: validation.rateLimitRemaining,
-        });
+        return createApiResponse<TOutput>(
+          false,
+          undefined as TOutput | undefined,
+          validation.error,
+          {
+            rateLimitRemaining: validation.rateLimitRemaining,
+          },
+        );
       }
 
       // Execute handler

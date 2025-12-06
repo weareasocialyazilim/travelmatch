@@ -180,6 +180,17 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 'off',
       },
     },
+    {
+      // Supabase service files - relaxed type-checking for Supabase client
+      files: ['**/services/supabase*.ts', '**/config/supabase.ts'],
+      rules: {
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
+      },
+    },
   ],
   settings: {
     react: {
@@ -199,5 +210,7 @@ module.exports = {
     '.expo/',
     'dist/',
     '*.d.ts',
+    '**/*.stories.tsx',
+    '**/*.stories.ts',
   ],
 };

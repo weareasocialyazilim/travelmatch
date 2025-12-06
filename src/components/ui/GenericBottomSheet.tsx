@@ -25,8 +25,8 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { a11yProps } from '../../utils/accessibility';
 
@@ -126,6 +126,14 @@ export const GenericBottomSheet = forwardRef<
         : typeof height === 'number'
         ? height
         : HEIGHT_MAP[height] || HEIGHT_MAP.medium;
+
+    // Reset translateY when visibility changes
+    useEffect(() => {
+      if (!visible) {
+        translateY.setValue(SCREEN_HEIGHT);
+        backdropOpacity.setValue(0);
+      }
+    }, [visible, translateY, backdropOpacity]);
 
     // Pan responder for swipe gestures
     const panResponder = useRef(

@@ -23,6 +23,8 @@
     "**/__tests__/**",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "**/__mocks__/**"
+    "**/__mocks__/**",
+    "**/*.stories.ts",
+    "**/*.stories.tsx"
   ]
 }

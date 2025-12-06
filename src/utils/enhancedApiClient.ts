@@ -5,16 +5,21 @@
  */
 
 import { api } from './api';
+import { CircuitBreakerError, ServiceBreakers } from './circuitBreaker';
+import { fetchWithRetry, isRetryableError } from './errorRecovery';
 import { logger } from './logger';
+import { PerformanceMonitor } from './performance';
 import {
   checkRateLimit,
   RateLimitError,
   RATE_LIMIT_CONFIGS,
 } from './rateLimiter';
 import type { CircuitBreaker, CircuitState } from './circuitBreaker';
-import { CircuitBreakerError, ServiceBreakers } from './circuitBreaker';
-import { fetchWithRetry, isRetryableError } from './errorRecovery';
-import { PerformanceMonitor } from './performance';
+
+/**
+ * Rate limit configuration type
+ */
+type RateLimitConfig = { maxRequests: number; windowMs: number };
 
 /**
  * Request configuration options
@@ -23,7 +28,7 @@ interface RequestConfig {
   /** Rate limit key (uses endpoint by default) */
   rateLimitKey?: string;
   /** Rate limit config (uses standard by default) */
-  rateLimitConfig?: typeof RATE_LIMIT_CONFIGS.standard;
+  rateLimitConfig?: RateLimitConfig;
   /** Circuit breaker to use */
   circuitBreaker?: CircuitBreaker;
   /** Enable retry with backoff */
@@ -129,8 +134,9 @@ class EnhancedApiClient {
       backoff: 'exponential',
       shouldRetry: isRetryableError,
       onRetry: (attempt, error) => {
+        const maxRetries = config.maxRetries ?? 3;
         logger.debug(
-          `Retrying ${endpoint} (${attempt}/${config.maxRetries}):`,
+          `Retrying ${endpoint} (${attempt}/${maxRetries}):`,
           error.message,
         );
       },

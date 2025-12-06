@@ -1,0 +1,334 @@
+/**
+ * Supabase Storage Service
+ * File upload/download operations for TravelMatch
+ */
+
+import { File, Paths } from 'expo-file-system';
+import { supabase, isSupabaseConfigured } from '../config/supabase';
+import { logger } from '../utils/logger';
+
+// ArrayBuffer to Base64 conversion
+const encode = (buffer: ArrayBuffer): string => {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+};
+
+export type StorageBucket = 'avatars' | 'moments' | 'proofs' | 'messages';
+
+interface UploadResult {
+  url: string | null;
+  path: string | null;
+  error: Error | null;
+}
+
+interface DownloadResult {
+  localUri: string | null;
+  error: Error | null;
+}
+
+/**
+ * Generate a unique file name
+ */
+const generateFileName = (originalName: string, userId: string): string => {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  const extension = originalName.split('.').pop() || 'jpg';
+  return `${userId}/${timestamp}-${random}.${extension}`;
+};
+
+/**
+ * Upload a file from URI
+ */
+export const uploadFile = async (
+  bucket: StorageBucket,
+  fileUri: string,
+  userId: string,
+  options?: {
+    fileName?: string;
+    contentType?: string;
+  },
+): Promise<UploadResult> => {
+  if (!isSupabaseConfigured()) {
+    return {
+      url: null,
+      path: null,
+      error: new Error('Supabase not configured'),
+    };
+  }
+
+  try {
+    // Read file using new SDK 54 File API
+    const file = new File(fileUri);
+    const arrayBuffer = await file.arrayBuffer();
+
+    const fileName = options?.fileName || generateFileName(fileUri, userId);
+    const contentType = options?.contentType || getMimeType(fileUri);
+
+    // Upload to Supabase
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, arrayBuffer, {
+        contentType,
+        upsert: false,
+      });
+
+    if (error) throw error;
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(data.path);
+
+    logger.info('[Storage] File uploaded:', { bucket, path: data.path });
+
+    return {
+      url: urlData.publicUrl,
+      path: data.path,
+      error: null,
+    };
+  } catch (error) {
+    logger.error('[Storage] Upload error:', error);
+    return { url: null, path: null, error: error as Error };
+  }
+};
+
+/**
+ * Upload multiple files
+ */
+export const uploadFiles = async (
+  bucket: StorageBucket,
+  fileUris: string[],
+  userId: string,
+): Promise<UploadResult[]> => {
+  const results = await Promise.all(
+    fileUris.map((uri) => uploadFile(bucket, uri, userId)),
+  );
+  return results;
+};
+
+/**
+ * Download a file to local storage
+ */
+export const downloadFile = async (
+  bucket: StorageBucket,
+  path: string,
+): Promise<DownloadResult> => {
+  if (!isSupabaseConfigured()) {
+    return { localUri: null, error: new Error('Supabase not configured') };
+  }
+
+  try {
+    const { data, error } = await supabase.storage.from(bucket).download(path);
+
+    if (error) throw error;
+
+    // Save to local cache using SDK 54 File API
+    const fileName = path.split('/').pop() || 'download';
+    const cacheFile = new File(Paths.cache, fileName);
+
+    const arrayBuffer = await data.arrayBuffer();
+    const base64 = encode(arrayBuffer);
+
+    // Write returns void (not Promise), wrap with Promise.resolve for consistency
+    cacheFile.write(base64, { encoding: 'base64' });
+
+    return { localUri: cacheFile.uri, error: null };
+  } catch (error) {
+    logger.error('[Storage] Download error:', error);
+    return { localUri: null, error: error as Error };
+  }
+};
+
+/**
+ * Delete a file
+ */
+export const deleteFile = async (
+  bucket: StorageBucket,
+  path: string,
+): Promise<{ error: Error | null }> => {
+  if (!isSupabaseConfigured()) {
+    return { error: new Error('Supabase not configured') };
+  }
+
+  try {
+    const { error } = await supabase.storage.from(bucket).remove([path]);
+
+    if (error) throw error;
+
+    logger.info('[Storage] File deleted:', { bucket, path });
+    return { error: null };
+  } catch (error) {
+    logger.error('[Storage] Delete error:', error);
+    return { error: error as Error };
+  }
+};
+
+/**
+ * Delete multiple files
+ */
+export const deleteFiles = async (
+  bucket: StorageBucket,
+  paths: string[],
+): Promise<{ error: Error | null }> => {
+  if (!isSupabaseConfigured()) {
+    return { error: new Error('Supabase not configured') };
+  }
+
+  try {
+    const { error } = await supabase.storage.from(bucket).remove(paths);
+
+    if (error) throw error;
+
+    logger.info('[Storage] Files deleted:', { bucket, count: paths.length });
+    return { error: null };
+  } catch (error) {
+    logger.error('[Storage] Delete files error:', error);
+    return { error: error as Error };
+  }
+};
+
+/**
+ * Get signed URL for private file
+ */
+export const getSignedUrl = async (
+  bucket: StorageBucket,
+  path: string,
+  expiresIn = 3600, // 1 hour default
+): Promise<{ url: string | null; error: Error | null }> => {
+  if (!isSupabaseConfigured()) {
+    return { url: null, error: new Error('Supabase not configured') };
+  }
+
+  try {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, expiresIn);
+
+    if (error) throw error;
+
+    return { url: data.signedUrl, error: null };
+  } catch (error) {
+    logger.error('[Storage] Get signed URL error:', error);
+    return { url: null, error: error as Error };
+  }
+};
+
+/**
+ * Get public URL (for public buckets)
+ */
+export const getPublicUrl = (bucket: StorageBucket, path: string): string => {
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+};
+
+/**
+ * List files in a folder
+ */
+export const listFiles = async (
+  bucket: StorageBucket,
+  folder: string,
+): Promise<{ files: string[]; error: Error | null }> => {
+  if (!isSupabaseConfigured()) {
+    return { files: [], error: new Error('Supabase not configured') };
+  }
+
+  try {
+    const { data, error } = await supabase.storage.from(bucket).list(folder);
+
+    if (error) throw error;
+
+    const files = data?.map((file) => `${folder}/${file.name}`) || [];
+    return { files, error: null };
+  } catch (error) {
+    logger.error('[Storage] List files error:', error);
+    return { files: [], error: error as Error };
+  }
+};
+
+/**
+ * Helper to get MIME type from file URI
+ */
+const getMimeType = (uri: string): string => {
+  const extension = uri.split('.').pop()?.toLowerCase();
+  const mimeTypes: Record<string, string> = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    heic: 'image/heic',
+    heif: 'image/heif',
+    mp4: 'video/mp4',
+    mov: 'video/quicktime',
+    pdf: 'application/pdf',
+  };
+  return mimeTypes[extension || ''] || 'application/octet-stream';
+};
+
+/**
+ * Upload avatar specifically
+ */
+export const uploadAvatar = async (
+  fileUri: string,
+  userId: string,
+): Promise<UploadResult> => {
+  // Delete old avatar first
+  await deleteFiles('avatars', [`${userId}/`]);
+
+  return uploadFile('avatars', fileUri, userId, {
+    fileName: `${userId}/avatar.${fileUri.split('.').pop() || 'jpg'}`,
+  });
+};
+
+/**
+ * Upload moment images
+ */
+export const uploadMomentImages = async (
+  fileUris: string[],
+  userId: string,
+  momentId: string,
+): Promise<UploadResult[]> => {
+  const results = await Promise.all(
+    fileUris.map((uri, index) =>
+      uploadFile('moments', uri, userId, {
+        fileName: `${userId}/${momentId}/${index}.${
+          uri.split('.').pop() || 'jpg'
+        }`,
+      }),
+    ),
+  );
+  return results;
+};
+
+/**
+ * Upload proof image
+ */
+export const uploadProofImage = async (
+  fileUri: string,
+  userId: string,
+  momentId: string,
+): Promise<UploadResult> => {
+  return uploadFile('proofs', fileUri, userId, {
+    fileName: `${userId}/${momentId}/proof.${
+      fileUri.split('.').pop() || 'jpg'
+    }`,
+  });
+};
+
+export default {
+  uploadFile,
+  uploadFiles,
+  downloadFile,
+  deleteFile,
+  deleteFiles,
+  getSignedUrl,
+  getPublicUrl,
+  listFiles,
+  uploadAvatar,
+  uploadMomentImages,
+  uploadProofImage,
+};

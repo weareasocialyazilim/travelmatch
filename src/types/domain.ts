@@ -110,6 +110,8 @@ export interface ProofStoryAuthor {
 }
 
 export interface ProofStoryStats {
+  views?: number;
+  likes?: number;
   shares: number;
 }
 

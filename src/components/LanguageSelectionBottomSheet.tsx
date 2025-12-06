@@ -36,7 +36,7 @@ export const LanguageSelectionBottomSheet: React.FC<
       visible={visible}
       onClose={onClose}
       title="Language"
-      height="auto"
+      height="medium"
       showHandle
       testID="language-selection-sheet"
       accessibilityLabel="Select language"
