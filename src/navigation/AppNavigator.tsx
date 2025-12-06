@@ -1,11 +1,12 @@
+/* eslint-disable import/order */
+// Note: import/order disabled because lazyLoad imports are grouped by feature, not alphabetically
 import React, { Suspense, useState, useEffect } from 'react';
-import { COLORS } from '../constants/colors';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { lazyLoad } from '../utils/lazyLoad';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
+import { COLORS } from '../constants/colors';
 
 // Loading fallback for lazy-loaded screens
 const loadingStyle = {
@@ -35,7 +36,6 @@ import MomentDetailScreen from '../screens/MomentDetailScreen';
 
 // Onboarding & Welcome - eagerly loaded as initial routes
 import { OnboardingScreen } from '../screens/OnboardingScreen';
-import { WelcomeScreen } from '../screens/WelcomeScreen';
 
 // Auth screens (lazy load)
 const PhoneAuthScreen = lazyLoad(() =>
@@ -62,9 +62,9 @@ const LoginScreen = lazyLoad(() =>
 // Keep critical auth screens eager for fast auth flow
 import { CompleteProfileScreen } from '../screens/CompleteProfileScreen';
 import { SetPasswordScreen } from '../screens/SetPasswordScreen';
+import { SuccessConfirmationScreen } from '../screens/SuccessConfirmationScreen';
 import { TwoFactorSetupScreen } from '../screens/TwoFactorSetupScreen';
 import { VerifyCodeScreen } from '../screens/VerifyCodeScreen';
-import { SuccessConfirmationScreen } from '../screens/SuccessConfirmationScreen';
 import { WaitingForCodeScreen } from '../screens/WaitingForCodeScreen';
 import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 
@@ -336,20 +336,22 @@ const LanguageSettingsScreen = lazyLoad(
 );
 
 // Keep frequently accessed screens eager
-import { SelectPlaceScreen } from '../screens/SelectPlaceScreen';
-import { ReceiverApprovalScreen } from '../screens/ReceiverApprovalScreen';
 import MatchConfirmationScreen from '../screens/MatchConfirmationScreen';
 import ChatScreen from '../screens/ChatScreen';
 import NotificationDetailScreen from '../screens/NotificationDetailScreen';
 import { ProfileDetailScreen } from '../screens/ProfileDetailScreen';
+import { ReceiverApprovalScreen } from '../screens/ReceiverApprovalScreen';
+import { SelectPlaceScreen } from '../screens/SelectPlaceScreen';
 import SocialLoginScreen from '../screens/SocialLoginScreen';
+import { WelcomeScreen } from '../screens/WelcomeScreen';
+import { lazyLoad } from '../utils/lazyLoad';
 
 // Unified Success Screen
 const SuccessScreen = lazyLoad(() => import('../screens/SuccessScreen'));
-import type { SuccessType } from '../screens/SuccessScreen';
 
-import type { Moment, User, SelectedGiver } from '../types';
 import type { VerificationData as KYCVerificationData } from '../screens/kyc/types';
+import type { SuccessType } from '../screens/SuccessScreen';
+import type { Moment, User, SelectedGiver } from '../types';
 
 // Success screen details interface
 interface SuccessDetails {

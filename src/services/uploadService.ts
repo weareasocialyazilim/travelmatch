@@ -2,9 +2,8 @@
  * Upload Service
  * Image and file upload operations with progress tracking
  */
-import { logger } from '../utils/logger';
-
 import * as FileSystem from 'expo-file-system';
+import { logger } from '../utils/logger';
 
 // Types
 export interface UploadProgress {
@@ -52,10 +51,10 @@ const UPLOAD_URL = __DEV__
  * Note: Requires expo-image-manipulator to be installed for compression
  * If not installed, returns the original image
  */
-export const compressImage = async (
+export const compressImage = (
   uri: string,
   _options: { maxWidth?: number; maxHeight?: number; quality?: number } = {},
-): Promise<string> => {
+): string => {
   // For now, return original - install expo-image-manipulator for compression
   // npm install expo-image-manipulator
   logger.debug(
@@ -97,8 +96,8 @@ export const uploadService = {
     } = options;
 
     try {
-      // Compress image first
-      const compressedUri = await compressImage(uri, {
+      // Compress image first (sync for now, will be async when expo-image-manipulator is added)
+      const compressedUri = compressImage(uri, {
         maxWidth,
         maxHeight,
         quality,
@@ -106,7 +105,7 @@ export const uploadService = {
 
       // Get file info
       const fileInfo = await getFileInfo(compressedUri);
-      if (!fileInfo || !fileInfo.exists) {
+      if (!fileInfo?.exists) {
         throw new Error('File not found');
       }
 
@@ -138,7 +137,7 @@ export const uploadService = {
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
-              const response = JSON.parse(xhr.responseText);
+              const response = JSON.parse(xhr.responseText) as UploadResult;
               resolve(response);
             } catch {
               reject(new Error('Invalid response'));

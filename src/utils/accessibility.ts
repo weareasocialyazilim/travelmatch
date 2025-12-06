@@ -122,7 +122,7 @@ export const announce = (
 /**
  * Check if screen reader is enabled
  */
-export const isScreenReaderEnabled = async (): Promise<boolean> => {
+export const isScreenReaderEnabled = (): boolean => {
   // TODO: Implement with AccessibilityInfo.isScreenReaderEnabled()
   return false;
 };

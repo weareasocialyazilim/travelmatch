@@ -3,8 +3,8 @@
  * ML-driven recommendation system with user profiling
  */
 
-import { analytics } from './analytics';
 import { logger } from '../utils/logger';
+import { analytics } from './analytics';
 import type { Moment } from '../types';
 
 /**
@@ -138,7 +138,7 @@ class PersonalizationService {
   /**
    * Get personalized moment recommendations
    */
-  async getRecommendations(moments: Moment[], limit = 20): Promise<Moment[]> {
+  getRecommendations(moments: Moment[], limit = 20): Moment[] {
     try {
       // For now, just return the moments as-is
       // TODO: Implement actual ML-based personalization
@@ -153,7 +153,7 @@ class PersonalizationService {
   /**
    * Get user profile
    */
-  async getUserProfile(): Promise<UserProfile> {
+  getUserProfile(): UserProfile {
     // Return default profile
     // TODO: Implement actual user profile fetching
     return {
@@ -170,10 +170,7 @@ class PersonalizationService {
   /**
    * Update user profile from booking
    */
-  private async updateProfileFromBooking(
-    momentId: string,
-    price: number,
-  ): Promise<void> {
+  private updateProfileFromBooking(momentId: string, price: number): void {
     // TODO: Implement API call to update profile
     logger.debug('Profile would be updated from booking:', { momentId, price });
   }
@@ -181,7 +178,7 @@ class PersonalizationService {
   /**
    * Get user activity pattern
    */
-  async getActivityPattern(): Promise<ActivityPattern> {
+  getActivityPattern(): ActivityPattern {
     // Return default pattern
     // TODO: Implement actual activity pattern analysis
     return {
@@ -195,8 +192,8 @@ class PersonalizationService {
   /**
    * Get optimal notification time for user
    */
-  async getOptimalNotificationTime(): Promise<number> {
-    const pattern = await this.getActivityPattern();
+  getOptimalNotificationTime(): number {
+    const pattern = this.getActivityPattern();
     return pattern.preferredNotificationTime;
   }
 
