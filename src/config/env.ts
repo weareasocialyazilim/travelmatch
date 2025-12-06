@@ -22,7 +22,16 @@ const envSchema = z.object({
   SOCKET_URL: z.string().url().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   GOOGLE_MAPS_API_KEY: z.string().optional(),
+  // Supabase configuration
+  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_ANON_KEY: z.string().optional(),
 });
+
+/**
+ * Production environment validation
+ * These variables MUST be set in production
+ */
+const REQUIRED_IN_PRODUCTION = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
 
 /**
  * Parse and validate environment variables
@@ -34,20 +43,44 @@ function getEnvVars() {
   // For now, using default values
 
   const rawEnv = {
-    API_URL: process.env.EXPO_PUBLIC_API_URL,
+    API_URL: process.env.EXPO_PUBLIC_API_URL as string | undefined,
     NODE_ENV: process.env.NODE_ENV as 'development' | 'production' | 'test',
-    APP_NAME: 'TravelMatch',
-    APP_VERSION: '1.0.0',
+    APP_NAME: 'TravelMatch' as const,
+    APP_VERSION: '1.0.0' as const,
     ENABLE_ANALYTICS: process.env.EXPO_PUBLIC_ENABLE_ANALYTICS === 'true',
     ENABLE_LOGGING: __DEV__,
-    MAX_UPLOAD_SIZE: 10485760,
-    SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL,
-    STRIPE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_STRIPE_KEY,
-    GOOGLE_MAPS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY,
+    MAX_UPLOAD_SIZE: 10485760 as const,
+    SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL as string | undefined,
+    STRIPE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_STRIPE_KEY as
+      | string
+      | undefined,
+    GOOGLE_MAPS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY as
+      | string
+      | undefined,
+    SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined,
+    SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as
+      | string
+      | undefined,
   };
 
   try {
-    return envSchema.parse(rawEnv);
+    const parsed = envSchema.parse(rawEnv);
+
+    // Validate required variables in production
+    if (parsed.NODE_ENV === 'production') {
+      const missing = REQUIRED_IN_PRODUCTION.filter(
+        (key) => !rawEnv[key as keyof typeof rawEnv],
+      );
+      if (missing.length > 0) {
+        throw new Error(
+          `Missing required environment variables in production: ${missing.join(
+            ', ',
+          )}`,
+        );
+      }
+    }
+
+    return parsed;
   } catch (error) {
     if (error instanceof z.ZodError) {
       logger.error('❌ Invalid environment variables:');
@@ -105,6 +138,7 @@ export const FEATURES = {
   SOCKET_ENABLED: !!config.SOCKET_URL,
   PAYMENTS_ENABLED: !!config.STRIPE_PUBLISHABLE_KEY,
   MAPS_ENABLED: !!config.GOOGLE_MAPS_API_KEY,
+  SUPABASE_ENABLED: !!config.SUPABASE_URL && !!config.SUPABASE_ANON_KEY,
 } as const;
 
 /**
