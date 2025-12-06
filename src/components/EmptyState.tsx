@@ -27,23 +27,6 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   illustration,
   illustrationType,
 }) => {
-  // Prefer illustration over icon
-  const _renderVisual = () => {
-    if (illustrationType) {
-      return <EmptyStateIllustration type={illustrationType} size={200} />;
-    }
-    if (illustration) {
-      return illustration;
-    }
-    return (
-      <MaterialCommunityIcons
-        name={icon}
-        size={64}
-        color={COLORS.textSecondary}
-      />
-    );
-  };
-
   return (
     <View style={styles.container}>
       {illustration ? (

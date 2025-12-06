@@ -42,10 +42,10 @@ const UPLOAD_URL = __DEV__
   ? 'http://localhost:3000/api/upload'
   : 'https://api.travelmatch.com/api/upload';
 
+// TODO: Enable when Cloudinary integration is needed
 // Cloudinary config (alternative)
-const _CLOUDINARY_URL =
-  'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload';
-const _CLOUDINARY_UPLOAD_PRESET = 'travelmatch';
+// const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload';
+// const CLOUDINARY_UPLOAD_PRESET = 'travelmatch';
 
 /**
  * Compress and resize image before upload
@@ -243,7 +243,7 @@ export const uploadService = {
    */
   uploadKYCDocument: async (
     uri: string,
-    documentType: 'id_front' | 'id_back' | 'selfie',
+    _documentType: 'id_front' | 'id_back' | 'selfie',
     onProgress?: (progress: UploadProgress) => void,
   ): Promise<UploadResult> => {
     return uploadService.uploadImage(uri, {

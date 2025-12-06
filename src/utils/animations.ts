@@ -8,7 +8,6 @@ import {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  Easing,
 } from 'react-native-reanimated';
 
 /**
@@ -20,13 +19,11 @@ const SPRING_CONFIG = {
   mass: 0.5,
 };
 
-/**
- * Timing Animation Config
- */
-const _TIMING_CONFIG = {
-  duration: 200,
-  easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-};
+// TODO: Use timing config for alternative animation styles
+// const TIMING_CONFIG = {
+//   duration: 200,
+//   easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+// };
 
 /**
  * Press Scale Animation Hook

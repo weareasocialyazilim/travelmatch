@@ -139,14 +139,6 @@ export const AvatarImage: React.FC<AvatarImageProps> = ({
 }) => {
   const [showFallback, setShowFallback] = useState(!uri);
 
-  // Get initials from name
-  const _initials = name
-    .split(' ')
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-
   const handleError = useCallback(() => {
     setShowFallback(true);
   }, []);

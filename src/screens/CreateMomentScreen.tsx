@@ -304,7 +304,7 @@ const CreateMomentScreen: React.FC = () => {
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           minimumDate={new Date()}
           maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
-          onChange={(event, date) => {
+          onChange={(_event, date) => {
             setShowDatePicker(Platform.OS !== 'ios');
             if (date) setSelectedDate(date);
           }}

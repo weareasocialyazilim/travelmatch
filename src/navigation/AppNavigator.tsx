@@ -5,7 +5,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { lazyLoad } from '../utils/lazyLoad';
-import { useFeatureFlag } from '../utils/featureFlags';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 
 // Loading fallback for lazy-loaded screens
@@ -560,9 +559,6 @@ const Stack = createStackNavigator<RootStackParamList>();
 const ONBOARDING_KEY = '@has_seen_onboarding';
 
 const AppNavigator = () => {
-  // Feature flags for conditional routing
-  const _useUnifiedGiftFlow = useFeatureFlag('unifiedGiftFlow');
-
   // Check if user has seen onboarding
   const [initialRoute, setInitialRoute] = useState<
     'Onboarding' | 'Welcome' | null

@@ -136,8 +136,11 @@ const RequestsScreen: React.FC = () => {
     setRefreshing(false);
   }, [fetchReceivedRequests, fetchNotifications]);
 
-  const _isLoading =
+  // Loading state based on selected tab
+  const isLoading =
     selectedTab === 'pending' ? requestsLoading : notificationsLoading;
+  // Use isLoading for future loading indicator
+  void isLoading;
 
   // Mock Data - Pending Requests (fallback)
   const [requests, setRequests] = useState<RequestItem[]>([

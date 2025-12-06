@@ -1,5 +1,4 @@
 import React from 'react';
-import { logger } from '../utils/logger';
 import {
   View,
   Text,
@@ -7,7 +6,6 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  Linking,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -34,12 +32,6 @@ export const AboutScreen: React.FC = () => {
       value: '© 2023 TravelMatch Inc.',
     },
   ];
-
-  const _handleLinkPress = (url: string) => {
-    Linking.openURL(url).catch((err) =>
-      logger.error('Failed to open URL:', err),
-    );
-  };
 
   return (
     <SafeAreaView style={styles.container}>

@@ -264,8 +264,10 @@ class PersonalizationService {
 
   /**
    * Get recent interaction history
+   * @param limit - Maximum number of interactions to return
+   * @returns Recent user interactions
    */
-  private getRecentHistory(limit: number): UserInteraction[] {
+  getRecentHistory(limit: number): UserInteraction[] {
     return this.interactions.slice(-limit);
   }
 

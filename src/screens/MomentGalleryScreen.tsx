@@ -44,7 +44,9 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
   navigation,
   route,
 }) => {
-  const _momentId = route.params?.momentId || '';
+  // TODO: Use momentId to fetch gallery data when API is ready
+  const momentId = route.params?.momentId || '';
+  void momentId; // Silence unused variable warning until API integration
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = () => {

@@ -99,7 +99,9 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
   navigation,
   route,
 }) => {
-  const _momentId = route.params?.momentId || '';
+  // TODO: Use momentId to fetch proof history when API is ready
+  const momentId = route.params?.momentId || '';
+  void momentId; // Silence unused variable warning until API integration
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>

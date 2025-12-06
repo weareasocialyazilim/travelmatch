@@ -4,7 +4,8 @@ import { logger } from '../utils/logger';
 // Cache configuration
 const CACHE_PREFIX = '@travelmatch_cache_';
 const DEFAULT_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
-const _MAX_CACHE_SIZE_MB = 50; // Maximum cache size in MB
+// TODO: Implement cache size limit enforcement
+// const MAX_CACHE_SIZE_MB = 50;
 
 interface CacheItem<T> {
   data: T;

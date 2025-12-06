@@ -106,18 +106,17 @@ export const a11yProps = {
 
 /**
  * Announce to screen reader
+ * @param _message - Message to announce (placeholder implementation)
+ * @param _priority - Priority level for announcement
  */
 export const announce = (
-  message: string,
+  _message: string,
   _priority: 'polite' | 'assertive' = 'polite',
 ) => {
-  if (Platform.OS === 'ios') {
-    // iOS: Use AccessibilityInfo
-    // AccessibilityInfo.announceForAccessibility(message);
-  } else if (Platform.OS === 'android') {
-    // Android: Use AccessibilityInfo with priority
-    // AccessibilityInfo.announceForAccessibility(message);
-  }
+  // TODO: Implement with AccessibilityInfo.announceForAccessibility
+  // if (Platform.OS === 'ios' || Platform.OS === 'android') {
+  //   AccessibilityInfo.announceForAccessibility(message);
+  // }
 };
 
 /**
@@ -130,17 +129,19 @@ export const isScreenReaderEnabled = async (): Promise<boolean> => {
 
 /**
  * Color Contrast Checker (WCAG AA: 4.5:1 for normal text, 3:1 for large text)
+ * @param _foreground - Foreground color (placeholder implementation)
+ * @param _background - Background color (placeholder implementation)
+ * @param isLargeText - Whether text is large (18pt+ or 14pt+ bold)
  */
 export const meetsContrastRequirements = (
-  foreground: string,
-  background: string,
+  _foreground: string,
+  _background: string,
   isLargeText = false,
 ): boolean => {
   // TODO: Implement contrast ratio calculation
-  // This is a simplified version
-  const _minRatio = isLargeText ? 3 : 4.5;
-  // Calculate actual contrast ratio and compare
-  return true; // Placeholder
+  const minRatio = isLargeText ? 3 : 4.5;
+  void minRatio; // Will be used when calculation is implemented
+  return true; // Placeholder - assume compliance until implemented
 };
 
 /**
