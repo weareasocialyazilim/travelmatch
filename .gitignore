@@ -49,3 +49,6 @@ yarn-error.*
 # Maestro E2E test results
 .maestro/results/
 .maestro/.maestro/
+
+# Test coverage
+coverage/
