@@ -1,0 +1,243 @@
+name: Visual Regression Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'packages/design-system/**'
+      - 'admin/**'
+      - 'apps/mobile/src/components/**'
+      - '.github/workflows/visual-regression.yml'
+  
+  push:
+    branches: [main]
+  
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  design-system-visual-tests:
+    name: Design System - Chromatic
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for TurboSnap
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build Storybook
+        run: |
+          cd packages/design-system
+          pnpm run build-storybook
+        env:
+          NODE_ENV: production
+      
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: packages/design-system
+          buildScriptName: build-storybook
+          exitZeroOnChanges: true
+          exitOnceUploaded: true
+          onlyChanged: true
+          zip: true
+          autoAcceptChanges: main
+        env:
+          NODE_ENV: production
+      
+      - name: Upload Storybook artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: design-system-storybook
+          path: packages/design-system/storybook-static
+          retention-days: 7
+
+  admin-panel-visual-tests:
+    name: Admin Panel - Chromatic
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build Admin Storybook
+        run: |
+          cd admin
+          pnpm run build-storybook
+        env:
+          NODE_ENV: production
+      
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_ADMIN_PROJECT_TOKEN }}
+          workingDir: admin
+          buildScriptName: build-storybook
+          exitZeroOnChanges: true
+          exitOnceUploaded: true
+          onlyChanged: true
+          zip: true
+          autoAcceptChanges: main
+        env:
+          NODE_ENV: production
+      
+      - name: Upload Admin Storybook artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: admin-storybook
+          path: admin/storybook-static
+          retention-days: 7
+
+  mobile-visual-tests:
+    name: Mobile App - Chromatic
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Generate Storybook stories
+        run: |
+          cd apps/mobile
+          pnpm run storybook:generate
+      
+      - name: Build Mobile Storybook
+        run: |
+          cd apps/mobile
+          pnpm run build-storybook
+        env:
+          NODE_ENV: production
+      
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_MOBILE_PROJECT_TOKEN }}
+          workingDir: apps/mobile
+          buildScriptName: build-storybook
+          exitZeroOnChanges: true
+          exitOnceUploaded: true
+          onlyChanged: true
+          zip: true
+          autoAcceptChanges: main
+        env:
+          NODE_ENV: production
+      
+      - name: Upload Mobile Storybook artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: mobile-storybook
+          path: apps/mobile/storybook-static
+          retention-days: 7
+
+  visual-regression-summary:
+    name: Visual Regression Summary
+    runs-on: ubuntu-latest
+    needs: [design-system-visual-tests, admin-panel-visual-tests, mobile-visual-tests]
+    if: always()
+    
+    steps:
+      - name: Check test results
+        run: |
+          echo "Design System: ${{ needs.design-system-visual-tests.result }}"
+          echo "Admin Panel: ${{ needs.admin-panel-visual-tests.result }}"
+          echo "Mobile App: ${{ needs.mobile-visual-tests.result }}"
+          
+          if [ "${{ needs.design-system-visual-tests.result }}" == "failure" ] || \
+             [ "${{ needs.admin-panel-visual-tests.result }}" == "failure" ] || \
+             [ "${{ needs.mobile-visual-tests.result }}" == "failure" ]; then
+            echo "❌ Visual regression tests failed"
+            exit 1
+          else
+            echo "✅ All visual regression tests passed"
+          fi
+      
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const designSystem = '${{ needs.design-system-visual-tests.result }}';
+            const adminPanel = '${{ needs.admin-panel-visual-tests.result }}';
+            const mobile = '${{ needs.mobile-visual-tests.result }}';
+            
+            const getEmoji = (status) => status === 'success' ? '✅' : '❌';
+            
+            const comment = `
+            ## 📸 Visual Regression Test Results
+            
+            | Component | Status |
+            |-----------|--------|
+            | Design System | ${getEmoji(designSystem)} ${designSystem} |
+            | Admin Panel | ${getEmoji(adminPanel)} ${adminPanel} |
+            | Mobile App | ${getEmoji(mobile)} ${mobile} |
+            
+            ${designSystem === 'failure' || adminPanel === 'failure' || mobile === 'failure' 
+              ? '⚠️ **Visual changes detected!** Please review the changes in Chromatic.' 
+              : '✨ No visual changes detected.'}
+            
+            [View Chromatic Dashboard →](https://www.chromatic.com/builds?appId=${{ secrets.CHROMATIC_PROJECT_ID }})
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

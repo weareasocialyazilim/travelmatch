@@ -1,0 +1,38 @@
+appId: com.travelmatch.app
+---
+# Favorite Moments E2E Test
+# Tests adding/removing favorites
+
+- launchApp
+- tapOn: "Explore"
+- assertVisible: "Search moments"
+
+# View moment detail
+- tapOn:
+    id: "moment-card-0"
+- assertVisible: "Add to favorites"
+
+# Add to favorites
+- tapOn: "Add to favorites"
+- assertVisible: "Removed from favorites"
+
+# Navigate to favorites
+- tapOn: "Back"
+- tapOn: "Favorites"
+- assertVisible: "Your Favorites"
+
+# Verify moment in favorites
+- assertVisible:
+    id: "moment-card-0"
+
+# Remove from favorites
+- tapOn:
+    id: "moment-card-0"
+- tapOn: "Remove from favorites"
+- assertVisible: "Add to favorites"
+
+# Verify removed
+- tapOn: "Back"
+- tapOn: "Favorites"
+- assertNotVisible:
+    id: "moment-card-0"

@@ -1,0 +1,48 @@
+appId: com.travelmatch.app
+---
+# Block User E2E Test
+# Tests blocking/unblocking users
+
+- launchApp
+- tapOn: "Messages"
+- assertVisible: "Your Messages"
+
+# Open conversation
+- tapOn:
+    id: "conversation-0"
+- assertVisible: "John Doe"
+
+# Access user profile
+- tapOn: "John Doe"
+- assertVisible: "Profile"
+- assertVisible: "Trust Score"
+
+# Block user
+- tapOn: "More Options"
+- tapOn: "Block User"
+- assertVisible: "Block John Doe?"
+- assertVisible: "They won't be able to message you"
+- tapOn: "Block"
+
+# Verify blocked
+- assertVisible: "User Blocked"
+- tapOn: "Back"
+- assertNotVisible:
+    id: "conversation-0"
+
+# View blocked users
+- tapOn: "Profile"
+- tapOn: "Settings"
+- tapOn: "Privacy & Safety"
+- tapOn: "Blocked Users"
+- assertVisible: "John Doe"
+
+# Unblock user
+- tapOn: "John Doe"
+- tapOn: "Unblock"
+- assertVisible: "Unblock John Doe?"
+- tapOn: "Unblock"
+
+# Verify unblocked
+- assertNotVisible: "John Doe"
+- tapOn: "Back"

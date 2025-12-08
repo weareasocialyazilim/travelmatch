@@ -209,33 +209,68 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ============================================
 
 -- Update updated_at triggers
-CREATE TRIGGER update_users_updated_at
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_users_updated_at') THEN
+        CREATE TRIGGER update_users_updated_at
   BEFORE UPDATE ON users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+    END IF;
+END $$;
 
-CREATE TRIGGER update_moments_updated_at
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_moments_updated_at') THEN
+        CREATE TRIGGER update_moments_updated_at
   BEFORE UPDATE ON moments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+    END IF;
+END $$;
 
-CREATE TRIGGER update_requests_updated_at
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_requests_updated_at') THEN
+        CREATE TRIGGER update_requests_updated_at
   BEFORE UPDATE ON requests
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+    END IF;
+END $$;
 
-CREATE TRIGGER update_conversations_updated_at
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_conversations_updated_at') THEN
+        CREATE TRIGGER update_conversations_updated_at
   BEFORE UPDATE ON conversations
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+    END IF;
+END $$;
 
 -- Update user rating trigger
-CREATE TRIGGER update_rating_after_review
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_rating_after_review') THEN
+        CREATE TRIGGER update_rating_after_review
   AFTER INSERT OR UPDATE ON reviews
   FOR EACH ROW EXECUTE FUNCTION update_user_rating();
+    END IF;
+END $$;
 
 -- Update moment participants trigger
-CREATE TRIGGER update_participants_on_request
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_participants_on_request') THEN
+        CREATE TRIGGER update_participants_on_request
   AFTER INSERT OR UPDATE OR DELETE ON requests
   FOR EACH ROW EXECUTE FUNCTION update_moment_participants();
+    END IF;
+END $$;
 
 -- Update conversation last message trigger
-CREATE TRIGGER update_conversation_on_message
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_conversation_on_message') THEN
+        CREATE TRIGGER update_conversation_on_message
   AFTER INSERT ON messages
   FOR EACH ROW EXECUTE FUNCTION update_conversation_last_message();
+    END IF;
+END $$;

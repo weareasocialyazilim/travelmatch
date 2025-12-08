@@ -1,0 +1,30 @@
+{
+  "recommendations": [
+    // Essential
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
+    "github.copilot",
+    
+    // TypeScript & React
+    "dsznajder.es7-react-js-snippets",
+    
+    // React Native & Expo
+    "msjsdiag.vscode-react-native",
+    "expo.vscode-expo-tools",
+    
+    // Database & Supabase
+    "supabase.supabase-vscode",
+    
+    // Testing
+    "orta.vscode-jest",
+    
+    // Utilities
+    "christian-kohler.path-intellisense",
+    "mikestead.dotenv",
+    "streetsidesoftware.code-spell-checker",
+    
+    // Git
+    "mhutchie.git-graph"
+  ]
+}

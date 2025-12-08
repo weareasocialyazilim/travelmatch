@@ -1,5 +1,5 @@
-import { AuthBindings } from "@refinedev/core";
-import { SupabaseClient } from "@supabase/supabase-js";
+import type { AuthBindings } from '@refinedev/core';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export const authProvider = (supabaseClient: SupabaseClient): AuthBindings => ({
   login: async ({ email, password }) => {
@@ -13,7 +13,7 @@ export const authProvider = (supabaseClient: SupabaseClient): AuthBindings => ({
         success: false,
         error: {
           message: error.message,
-          name: "LoginError",
+          name: 'LoginError',
         },
       };
     }
@@ -21,33 +21,33 @@ export const authProvider = (supabaseClient: SupabaseClient): AuthBindings => ({
     if (data.session) {
       // Check for Admin role
       const { data: profile } = await supabaseClient
-        .from("profiles")
-        .select("role")
-        .eq("id", data.session.user.id)
+        .from('profiles')
+        .select('role')
+        .eq('id', data.session.user.id)
         .single();
 
-      if (profile?.role !== "Admin") {
+      if (profile?.role !== 'Admin') {
         await supabaseClient.auth.signOut();
         return {
           success: false,
           error: {
-            message: "Unauthorized: You do not have admin access",
-            name: "UnauthorizedError",
+            message: 'Unauthorized: You do not have admin access',
+            name: 'UnauthorizedError',
           },
         };
       }
 
       return {
         success: true,
-        redirectTo: "/",
+        redirectTo: '/',
       };
     }
 
     return {
       success: false,
       error: {
-        message: "Login failed",
-        name: "LoginError",
+        message: 'Login failed',
+        name: 'LoginError',
       },
     };
   },
@@ -59,14 +59,14 @@ export const authProvider = (supabaseClient: SupabaseClient): AuthBindings => ({
         success: false,
         error: {
           message: error.message,
-          name: "LogoutError",
+          name: 'LogoutError',
         },
       };
     }
 
     return {
       success: true,
-      redirectTo: "/login",
+      redirectTo: '/login',
     };
   },
   check: async () => {
@@ -76,7 +76,7 @@ export const authProvider = (supabaseClient: SupabaseClient): AuthBindings => ({
     if (!session) {
       return {
         authenticated: false,
-        redirectTo: "/login",
+        redirectTo: '/login',
       };
     }
 
@@ -86,17 +86,17 @@ export const authProvider = (supabaseClient: SupabaseClient): AuthBindings => ({
   },
   getPermissions: async () => {
     const { data } = await supabaseClient.auth.getUser();
-    
+
     if (data.user) {
       const { data: profile } = await supabaseClient
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
         .single();
-        
+
       return profile?.role;
     }
-    
+
     return null;
   },
   getIdentity: async () => {

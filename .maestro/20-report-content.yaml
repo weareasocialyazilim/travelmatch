@@ -1,0 +1,49 @@
+appId: com.travelmatch.app
+---
+# Report Content E2E Test
+# Tests reporting inappropriate moments or users
+
+- launchApp
+- tapOn: "Explore"
+- assertVisible: "Search moments"
+
+# View moment to report
+- tapOn:
+    id: "moment-card-0"
+- assertVisible: "Moment Details"
+
+# Report moment
+- tapOn: "More Options"
+- tapOn: "Report"
+- assertVisible: "Report this moment"
+
+# Select reason
+- tapOn: "Reason"
+- tapOn: "Inappropriate content"
+- tapOn: "Details"
+- inputText: "This moment contains inappropriate language"
+
+# Upload evidence
+- tapOn: "Add Screenshots"
+# Mock screenshot upload
+- assertVisible: "Evidence added"
+
+# Submit report
+- tapOn: "Submit Report"
+
+# Verify submission
+- assertVisible: "Report Submitted"
+- assertVisible: "Thank you for keeping our community safe"
+- assertVisible: "Report ID"
+
+# Test reporting user
+- tapOn: "Back"
+- tapOn: "Host Profile"
+- tapOn: "More Options"
+- tapOn: "Report User"
+- tapOn: "Reason"
+- tapOn: "Harassment"
+- tapOn: "Submit Report"
+
+# Verify user report
+- assertVisible: "User Report Submitted"

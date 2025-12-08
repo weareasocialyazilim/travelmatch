@@ -1,0 +1,23 @@
+appId: com.travelmatch.app
+---
+# Login Flow E2E Test
+# Tests user authentication with email and password
+
+- launchApp
+- tapOn: "Log in"
+- assertVisible: "Email"
+- assertVisible: "Password"
+
+# Enter credentials
+- tapOn: "Email"
+- inputText: "test@example.com"
+- tapOn: "Password"
+- inputText: "password123"
+
+# Submit login
+- tapOn: "Log in"
+
+# Verify successful login
+- assertVisible: "Explore"
+- assertVisible: "My Moments"
+- assertNotVisible: "Log in"

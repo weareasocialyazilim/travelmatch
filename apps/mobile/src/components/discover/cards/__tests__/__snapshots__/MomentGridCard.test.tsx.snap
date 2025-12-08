@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MomentGridCard Component Snapshots matches snapshot for left column 1`] = `null`;
+
+exports[`MomentGridCard Component Snapshots matches snapshot for right column 1`] = `null`;

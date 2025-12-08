@@ -1,0 +1,53 @@
+<!-- Performance monitoring script -->
+<script>
+  // Capture console logs for test runner
+  window.__consoleLogs = [];
+  
+  const originalConsole = {
+    log: console.log,
+    warn: console.warn,
+    error: console.error,
+  };
+
+  ['log', 'warn', 'error'].forEach(type => {
+    console[type] = function(...args) {
+      window.__consoleLogs.push({
+        type,
+        message: args.join(' '),
+        timestamp: Date.now(),
+      });
+      originalConsole[type].apply(console, args);
+    };
+  });
+
+  // Track render count for performance monitoring
+  if (window.React) {
+    const originalCreateElement = React.createElement;
+    React.createElement = function(...args) {
+      if (window.__performanceMarks) {
+        window.__performanceMarks.renderCount++;
+      }
+      return originalCreateElement.apply(this, args);
+    };
+  }
+
+  // Performance observer for long tasks
+  if ('PerformanceObserver' in window) {
+    const observer = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.duration > 50) {
+          console.warn('⚠️ Long task detected:', {
+            name: entry.name,
+            duration: Math.round(entry.duration) + 'ms',
+          });
+        }
+      }
+    });
+
+    observer.observe({ entryTypes: ['measure', 'longtask'] });
+  }
+</script>
+
+<!-- Visual regression testing metadata -->
+<meta name="chromatic-test" content="true" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />

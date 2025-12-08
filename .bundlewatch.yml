@@ -1,0 +1,121 @@
+# Bundle Size Tracking Configuration
+# Analyzes and tracks bundle sizes across builds
+
+version: 1
+
+# Size limits (in KB)
+limits:
+  # Mobile app bundles
+  mobile:
+    android:
+      main: 500  # Main bundle
+      vendor: 1500  # Third-party libraries
+      assets: 2000  # Images, fonts, etc.
+      total: 4000  # Total APK size
+    ios:
+      main: 500
+      vendor: 1500
+      assets: 2000
+      total: 4000
+
+  # Admin panel bundles
+  admin:
+    main: 300
+    vendor: 800
+    assets: 500
+    total: 1600
+
+  # Design system
+  design-system:
+    main: 150
+    vendor: 200
+    total: 350
+
+  # Shared packages
+  shared:
+    main: 100
+    vendor: 100
+    total: 200
+
+# Bundle analysis configuration
+analysis:
+  # Generate detailed reports
+  detailed: true
+  
+  # Compare with baseline
+  compareBaseline: true
+  
+  # Fail build if size increases by more than threshold
+  failOnIncrease:
+    enabled: true
+    threshold: 10  # percentage
+  
+  # Track individual module sizes
+  trackModules: true
+  
+  # Compression
+  compression:
+    enabled: true
+    algorithm: 'gzip'
+
+# What to track
+tracking:
+  - name: 'Mobile Android'
+    path: 'apps/mobile/android/app/build/outputs/apk/release'
+    pattern: '*.apk'
+    limit: 4000
+  
+  - name: 'Mobile iOS'
+    path: 'apps/mobile/ios/build/Build/Products/Release-iphoneos'
+    pattern: '*.ipa'
+    limit: 4000
+  
+  - name: 'Admin Bundle'
+    path: 'admin/dist'
+    pattern: '*.js'
+    limit: 1600
+  
+  - name: 'Design System'
+    path: 'packages/design-system/dist'
+    pattern: '*.js'
+    limit: 350
+
+# Alerts
+alerts:
+  # Slack webhook
+  slack:
+    enabled: false
+    webhook: ${SLACK_WEBHOOK_URL}
+  
+  # GitHub comment
+  github:
+    enabled: true
+    comment: true
+  
+  # Email
+  email:
+    enabled: false
+    recipients: []
+
+# Reports
+reports:
+  # HTML report
+  html:
+    enabled: true
+    output: 'bundle-reports'
+  
+  # JSON report for CI
+  json:
+    enabled: true
+    output: 'bundle-size.json'
+  
+  # Markdown for PR comments
+  markdown:
+    enabled: true
+    output: 'bundle-size.md'
+
+# Baseline (auto-updated on main branch)
+baseline:
+  file: '.bundle-size-baseline.json'
+  autoUpdate: true
+  branches: ['main', 'master']

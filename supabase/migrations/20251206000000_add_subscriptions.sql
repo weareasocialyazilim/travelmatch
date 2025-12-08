@@ -39,12 +39,24 @@ ALTER TABLE subscription_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- Plans are readable by everyone
-CREATE POLICY "Plans are viewable by everyone" ON subscription_plans
-  FOR SELECT USING (true);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE policyname = 'Plans are viewable by everyone' AND tablename = 'subscription_plans'
+    ) THEN
+        CREATE POLICY "Plans are viewable by everyone" ON subscription_plans FOR SELECT USING (true);
+    END IF;
+END $$;
 
 -- Users can view their own subscriptions
-CREATE POLICY "Users can view own subscriptions" ON user_subscriptions
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE policyname = 'Users can view own subscriptions' AND tablename = 'user_subscriptions'
+    ) THEN
+        CREATE POLICY "Users can view own subscriptions" ON user_subscriptions FOR SELECT USING (auth.uid() = user_id);
+    END IF;
+END $$;
 
 -- Insert Default Plans (matching constants/plans.ts)
 INSERT INTO subscription_plans (id, name, price, interval, features, is_popular, color, icon) VALUES

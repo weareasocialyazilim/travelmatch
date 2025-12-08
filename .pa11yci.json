@@ -1,0 +1,21 @@
+{
+  "defaults": {
+    "timeout": 30000,
+    "chromeLaunchConfig": {
+      "args": ["--no-sandbox"]
+    },
+    "standard": "WCAG2AA",
+    "runners": ["axe", "htmlcs"],
+    "ignore": [
+      "notice",
+      "warning"
+    ]
+  },
+  "urls": [
+    "http://localhost:4173",
+    "http://localhost:4173/moments",
+    "http://localhost:4173/profile",
+    "http://localhost:4173/search",
+    "http://localhost:4173/gifts"
+  ]
+}

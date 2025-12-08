@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MomentSingleCard Component Snapshots matches snapshot for basic moment 1`] = `null`;
+
+exports[`MomentSingleCard Component Snapshots matches snapshot for verified host 1`] = `null`;
+
+exports[`MomentSingleCard Component Snapshots matches snapshot with distance 1`] = `null`;

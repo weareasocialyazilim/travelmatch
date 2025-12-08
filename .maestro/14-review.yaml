@@ -1,0 +1,43 @@
+appId: com.travelmatch.app
+---
+# Review Flow E2E Test
+# Tests leaving reviews after moment completion
+
+- launchApp
+- tapOn: "My Requests"
+- tapOn: "Completed"
+- assertVisible: "Leave Review"
+
+# Start review
+- tapOn:
+    id: "completed-moment-0"
+- tapOn: "Leave Review"
+- assertVisible: "Rate your experience"
+
+# Rate moment (5 stars)
+- tapOn:
+    id: "star-5"
+- assertVisible: "Excellent"
+
+# Write review
+- tapOn: "Write your review"
+- inputText: "Amazing experience! Highly recommended."
+
+# Rate host
+- tapOn: "Rate Host"
+- tapOn:
+    id: "host-star-5"
+
+# Optional photo upload
+- tapOn: "Add Photos"
+- tapOn: "Camera"
+# Mock camera capture
+- assertVisible: "Photo added"
+
+# Submit review
+- tapOn: "Submit Review"
+
+# Verify review submitted
+- assertVisible: "Thank you for your review"
+- tapOn: "Done"
+- assertNotVisible: "Leave Review"

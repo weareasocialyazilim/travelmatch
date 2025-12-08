@@ -1,0 +1,31 @@
+appId: com.travelmatch.app
+---
+# Search and Filter Moments E2E Test
+# Tests search functionality with filters
+
+- launchApp
+- tapOn: "Explore"
+- assertVisible: "Search moments"
+
+# Search for moments
+- tapOn: "Search moments"
+- inputText: "coffee"
+- assertVisible: "Coffee"
+
+# Apply filters
+- tapOn: "Filters"
+- assertVisible: "Price Range"
+- tapOn: "Category"
+- tapOn: "Food & Drink"
+- tapOn: "Distance"
+- tapOn: "Within 5 km"
+- tapOn: "Apply Filters"
+
+# Verify filtered results
+- assertVisible: "Coffee"
+- assertVisible: "Food & Drink"
+
+# Clear filters
+- tapOn: "Filters"
+- tapOn: "Clear All"
+- tapOn: "Apply Filters"

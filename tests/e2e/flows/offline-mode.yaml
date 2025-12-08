@@ -1,0 +1,81 @@
+# Maestro Flow: Offline Mode Testing
+# Tests app behavior when network is unavailable
+
+appId: com.travelmatch.app
+---
+
+# Start with network enabled
+- launchApp
+- assertVisible: "Discover"
+
+# Navigate to moments feed
+- tapOn: "Moments"
+- wait: 2000
+- assertVisible:
+    id: "moments-feed"
+
+# Disable network
+- runScript:
+    script: |
+      adb shell svc wifi disable
+      adb shell svc data disable
+
+# Try to refresh (should show cached data)
+- scroll:
+    direction: DOWN
+    startYPercentage: 10
+    endYPercentage: 80
+- wait: 1000
+- assertVisible: "Offline mode"
+- assertVisible:
+    id: "moments-feed"  # Cached data still visible
+
+# Try to like moment (should queue)
+- tapOn:
+    id: "moment-like-button-0"
+- assertVisible: "Action queued"
+- assertVisible: "Will sync when online"
+
+# Try to post moment (should queue)
+- tapOn:
+    id: "create-moment-button"
+- tapOn: "Add Photos"
+- wait: 1000
+- tapOn:
+    id: "caption-input"
+- inputText: "Testing offline mode"
+- tapOn: "Post"
+- assertVisible: "Queued for posting"
+
+# Navigate to profile (cached data)
+- tapOn: "Profile"
+- wait: 500
+- assertVisible:
+    id: "profile-photo"
+- assertVisible:
+    id: "profile-name"
+
+# Try to edit profile (should warn)
+- tapOn: "Edit Profile"
+- assertVisible: "No internet connection"
+- assertVisible: "Changes will sync when online"
+
+# Enable network
+- runScript:
+    script: |
+      adb shell svc wifi enable
+      adb shell svc data enable
+
+# Wait for reconnection
+- wait: 3000
+- assertVisible: "Back online"
+- assertVisible: "Syncing..."
+
+# Verify queued actions synced
+- tapOn: "Moments"
+- wait: 2000
+- assertVisible: "Testing offline mode"
+- assertVisible:
+    id: "moment-liked-0"
+
+# Success!

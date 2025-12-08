@@ -69,7 +69,14 @@ module.exports = {
         caughtErrorsIgnorePattern: '^_',
       },
     ],
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error', // ✅ CHANGED: warn → error for type safety
+    '@typescript-eslint/no-unsafe-assignment': 'warn',
+    '@typescript-eslint/no-unsafe-member-access': 'warn',
+    '@typescript-eslint/no-unsafe-call': 'warn',
+    '@typescript-eslint/no-unsafe-argument': 'warn',
+    '@typescript-eslint/no-unsafe-return': 'warn',
+    '@typescript-eslint/restrict-template-expressions': 'warn',
+    '@typescript-eslint/restrict-plus-operands': 'warn',
     '@typescript-eslint/consistent-type-imports': [
       'error',
       {
@@ -154,13 +161,17 @@ module.exports = {
   overrides: [
     {
       // Test files - relaxed rules and use test tsconfig
-      files: ['**/__tests__/**/*', '**/*.test.ts', '**/*.test.tsx', '**/jest.*.js'],
+      files: ['**/__tests__/**/*', '**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/jest.*.js'],
+      env: {
+        jest: true,
+      },
       parserOptions: {
         project: './tsconfig.test.json',
       },
       rules: {
         'no-console': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',
@@ -174,6 +185,8 @@ module.exports = {
       files: ['*.config.js', '*.config.ts', '.eslintrc.js', '.prettierrc.js'],
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
       },
     },
     {
@@ -181,6 +194,26 @@ module.exports = {
       files: ['**/__mocks__/**/*', '**/mocks/**/*'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+    {
+      // Supabase Edge Functions - Deno runtime
+      files: ['supabase/functions/**/*.ts'],
+      env: {
+        browser: false,
+        node: false,
+      },
+      globals: {
+        Deno: 'readonly',
+      },
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
+        'import/no-unresolved': 'off', // Deno uses different module resolution
       },
     },
     {
@@ -212,9 +245,12 @@ module.exports = {
     'android/',
     '.expo/',
     'dist/',
+    'build/',
     '*.d.ts',
     '**/*.stories.tsx',
     '**/*.stories.ts',
     '**/integration/*.ts',
+    '.github/workflows/*.yml',
+    '.github/workflows/*.yaml',
   ],
 };

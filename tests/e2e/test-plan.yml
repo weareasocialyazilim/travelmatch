@@ -1,0 +1,289 @@
+# E2E Test Suite - Enhanced with Maestro & Detox
+# Comprehensive end-to-end testing across user journeys
+
+# Test scenarios directory structure:
+# tests/e2e/
+#   ├── flows/           # Complete user journeys
+#   ├── screens/         # Individual screen tests
+#   ├── components/      # Component interaction tests
+#   └── performance/     # Performance & load tests
+
+# Critical User Flows (Priority 1)
+flows:
+  - name: 'User Onboarding Flow'
+    file: 'onboarding-complete.yaml'
+    priority: critical
+    duration: ~3min
+    steps:
+      - Open app
+      - View welcome screens
+      - Sign up with email
+      - Phone verification
+      - Basic profile setup
+      - Photo upload
+      - Interest selection
+      - Enable notifications
+      - Complete onboarding
+    assertions:
+      - User logged in
+      - Profile created
+      - Photos uploaded
+
+  - name: 'Discover & Match Flow'
+    file: 'discover-match.yaml'
+    priority: critical
+    duration: ~2min
+    steps:
+      - Navigate to Discover
+      - View user profiles
+      - Like/skip profiles
+      - Create match
+      - View match notification
+      - Navigate to matches
+    assertions:
+      - Profiles loaded
+      - Match created
+      - Notification shown
+
+  - name: 'Messaging Flow'
+    file: 'messaging.yaml'
+    priority: critical
+    duration: ~2min
+    steps:
+      - Open match
+      - Send text message
+      - Send photo
+      - Send location
+      - View message history
+      - Delete message
+    assertions:
+      - Messages sent
+      - Real-time updates
+      - Media uploaded
+
+  - name: 'Moments Feed Flow'
+    file: 'moments-feed.yaml'
+    priority: high
+    duration: ~3min
+    steps:
+      - View moments feed
+      - Scroll feed
+      - Like moment
+      - Comment on moment
+      - Share moment
+      - Create new moment
+      - Upload photos
+      - Add location
+      - Post moment
+    assertions:
+      - Feed loaded
+      - Interactions work
+      - Moment posted
+
+  - name: 'Profile Management Flow'
+    file: 'profile-management.yaml'
+    priority: high
+    duration: ~2min
+    steps:
+      - View own profile
+      - Edit bio
+      - Update photos
+      - Change settings
+      - Verify ID
+      - View verification status
+    assertions:
+      - Profile updated
+      - Changes saved
+      - Verification initiated
+
+  - name: 'Payment Flow'
+    file: 'payment-complete.yaml'
+    priority: high
+    duration: ~2min
+    steps:
+      - Navigate to premium
+      - View plans
+      - Select plan
+      - Enter payment details
+      - Complete purchase
+      - Verify premium access
+    assertions:
+      - Payment processed
+      - Premium activated
+      - Features unlocked
+
+  - name: 'Search & Filter Flow'
+    file: 'search-filter.yaml'
+    priority: medium
+    duration: ~2min
+    steps:
+      - Open search
+      - Apply filters (age, location, interests)
+      - View filtered results
+      - Save search
+      - Clear filters
+    assertions:
+      - Filters applied
+      - Results updated
+      - Search saved
+
+# Edge Cases & Error Scenarios (Priority 2)
+edge_cases:
+  - name: 'Offline Mode'
+    file: 'offline-mode.yaml'
+    steps:
+      - Disable network
+      - Navigate app (cached data)
+      - Attempt to post moment
+      - Enable network
+      - Verify sync
+    assertions:
+      - Cached data shown
+      - Queue saved
+      - Synced when online
+
+  - name: 'Session Expiry'
+    file: 'session-expiry.yaml'
+    steps:
+      - Log in
+      - Force token expiry
+      - Attempt action
+      - Re-authenticate
+      - Retry action
+    assertions:
+      - Redirect to login
+      - Re-auth successful
+      - Action completed
+
+  - name: 'Network Errors'
+    file: 'network-errors.yaml'
+    steps:
+      - Simulate slow network
+      - Simulate timeout
+      - Simulate 500 error
+      - Verify error handling
+      - Retry mechanism
+    assertions:
+      - Error shown
+      - Retry works
+      - Graceful degradation
+
+# Performance Tests (Priority 3)
+performance:
+  - name: 'Feed Scroll Performance'
+    file: 'feed-scroll-perf.yaml'
+    metrics:
+      - FPS >= 55
+      - Memory < 150MB
+      - Load time < 2s
+    steps:
+      - Load feed
+      - Fast scroll
+      - Monitor FPS
+      - Check memory
+
+  - name: 'Image Load Performance'
+    file: 'image-load-perf.yaml'
+    metrics:
+      - First image < 500ms
+      - All images < 2s
+      - Cache hit rate > 80%
+    steps:
+      - Load profile with images
+      - Measure load times
+      - Check cache usage
+
+# Accessibility Tests (Priority 3)
+accessibility:
+  - name: 'Screen Reader Navigation'
+    file: 'screen-reader.yaml'
+    steps:
+      - Enable VoiceOver/TalkBack
+      - Navigate screens
+      - Verify labels
+      - Test interactions
+
+  - name: 'Large Text Support'
+    file: 'large-text.yaml'
+    steps:
+      - Enable large text
+      - Verify layouts
+      - Check overflow
+      - Test readability
+
+# Test Configuration
+config:
+  # Device configurations
+  devices:
+    android:
+      - name: 'Pixel 7'
+        os: 'Android 13'
+      - name: 'Samsung Galaxy S21'
+        os: 'Android 12'
+    ios:
+      - name: 'iPhone 14 Pro'
+        os: 'iOS 16'
+      - name: 'iPhone 12'
+        os: 'iOS 15'
+
+  # Environment
+  environment:
+    API_URL: 'https://staging-api.travelmatch.com'
+    TIMEOUT: 30000
+    RETRY_COUNT: 3
+
+  # Reporting
+  reporting:
+    screenshots: true
+    video: true
+    logs: true
+    performance: true
+
+  # Parallel execution
+  parallel:
+    enabled: true
+    workers: 4
+
+  # Test data
+  testData:
+    users:
+      - email: 'test1@travelmatch.com'
+        password: 'TestPassword123!'
+      - email: 'test2@travelmatch.com'
+        password: 'TestPassword123!'
+    
+  # Timeouts
+  timeouts:
+    short: 5000    # Element appears
+    medium: 15000  # Network request
+    long: 30000    # Complex operation
+
+# CI/CD Integration
+ci:
+  # Run on PR
+  pr:
+    - onboarding-complete
+    - discover-match
+    - messaging
+  
+  # Run on main branch
+  main:
+    - all flows
+    - performance tests
+  
+  # Nightly runs
+  nightly:
+    - all flows
+    - edge cases
+    - performance
+    - accessibility
+
+# Metrics & Thresholds
+thresholds:
+  passRate: 95%        # Min 95% tests pass
+  flakeRate: 5%        # Max 5% flaky tests
+  duration: 30min      # Max 30 min total
+  coverage:
+    critical: 100%     # All critical flows
+    high: 90%          # 90% high priority
+    medium: 70%        # 70% medium priority

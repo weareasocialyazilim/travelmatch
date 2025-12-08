@@ -1,0 +1,173 @@
+# Maestro Flow: Moments Feed
+# Tests social feed functionality
+
+appId: com.travelmatch.app
+---
+
+# Navigate to moments
+- launchApp
+- tapOn: "Moments"
+- assertVisible: "Moments"
+
+# Verify feed loads
+- assertVisible:
+    id: "moments-feed"
+- wait: 1000
+
+# Scroll feed
+- scroll:
+    direction: DOWN
+- scroll:
+    direction: DOWN
+- scroll:
+    direction: UP
+
+# Like a moment
+- tapOn:
+    id: "moment-like-button-0"
+- assertVisible:
+    id: "moment-liked-0"
+- wait: 500
+
+# Unlike moment
+- tapOn:
+    id: "moment-like-button-0"
+- assertNotVisible:
+    id: "moment-liked-0"
+
+# View moment details
+- tapOn:
+    id: "moment-card-0"
+- assertVisible: "Moment Details"
+- assertVisible:
+    id: "moment-photo"
+- assertVisible:
+    id: "moment-caption"
+- assertVisible:
+    id: "moment-location"
+- assertVisible:
+    id: "comment-section"
+
+# Like from detail view
+- tapOn:
+    id: "like-button"
+- assertVisible: "Liked"
+
+# Add comment
+- tapOn:
+    id: "comment-input"
+- inputText: "Amazing photo! 📸"
+- tapOn:
+    id: "post-comment-button"
+- assertVisible: "Amazing photo! 📸"
+- wait: 500
+
+# Reply to comment
+- tapOn:
+    id: "comment-0"
+- tapOn: "Reply"
+- tapOn:
+    id: "comment-input"
+- inputText: "Thanks!"
+- tapOn:
+    id: "post-comment-button"
+- assertVisible: "Thanks!"
+
+# Delete own comment
+- longPressOn: "Thanks!"
+- tapOn: "Delete"
+- tapOn: "Confirm"
+- assertNotVisible: "Thanks!"
+
+# Share moment
+- tapOn:
+    id: "share-button"
+- assertVisible: "Share via"
+- tapOn: "Copy Link"
+- assertVisible: "Link copied"
+
+# Go back to feed
+- tapOn:
+    id: "back-button"
+- assertVisible: "Moments"
+
+# Create new moment
+- tapOn:
+    id: "create-moment-button"
+- assertVisible: "Create Moment"
+
+# Select photos
+- tapOn: "Add Photos"
+- tapOn: "Choose from library"
+# Mocked photo selection
+- wait: 1000
+- assertVisible:
+    id: "selected-photo-0"
+
+# Add another photo
+- tapOn: "Add Photos"
+- tapOn: "Choose from library"
+- wait: 1000
+- assertVisible:
+    id: "selected-photo-1"
+
+# Add caption
+- tapOn:
+    id: "caption-input"
+- inputText: "Beautiful sunset at the beach 🌅"
+
+# Add location
+- tapOn: "Add Location"
+- tapOn: "Current Location"
+- wait: 1000
+- assertVisible: "Location added"
+
+# Add tags
+- tapOn: "Add Tags"
+- tapOn: "#sunset"
+- tapOn: "#beach"
+- tapOn: "#travel"
+- assertVisible: "#sunset"
+
+# Preview moment
+- tapOn: "Preview"
+- assertVisible: "Beautiful sunset at the beach 🌅"
+- assertVisible:
+    id: "preview-photo-0"
+- tapOn: "Edit"
+
+# Post moment
+- tapOn: "Post"
+- wait: 2000
+- assertVisible: "Moment posted!"
+
+# Verify moment appears in feed
+- assertVisible: "Moments"
+- assertVisible: "Beautiful sunset at the beach 🌅"
+
+# View own moment
+- tapOn:
+    id: "moment-card-0"
+- assertVisible: "Edit"
+- assertVisible: "Delete"
+
+# Edit moment
+- tapOn: "Edit"
+- tapOn:
+    id: "caption-input"
+- clearText
+- inputText: "Incredible sunset! 🌅✨"
+- tapOn: "Save"
+- assertVisible: "Moment updated"
+- assertVisible: "Incredible sunset! 🌅✨"
+
+# Delete moment (optional - destructive)
+# - tapOn: "Delete"
+# - tapOn: "Confirm"
+# - assertNotVisible: "Incredible sunset! 🌅✨"
+
+# Go back to feed
+- tapOn:
+    id: "back-button"
+
+# Success!

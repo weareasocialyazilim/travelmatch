@@ -1,0 +1,611 @@
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  RefreshControl,
+  StatusBar,
+  ActivityIndicator,
+} from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomNav from '../components/BottomNav';
+import {
+  StoryViewer,
+  FilterModal,
+  LocationModal,
+  DiscoverHeader,
+  StoryItem,
+  POPULAR_CITIES,
+  USER_STORIES,
+} from '../components/discover';
+import MomentSingleCard from '../components/discover/cards/MomentSingleCard';
+import MomentGridCard from '../components/discover/cards/MomentGridCard';
+import { MomentsFeedSkeleton } from '../components/ui/SkeletonLoaders';
+import { COLORS } from '../constants/colors';
+import { useMoments } from '../hooks/useMoments';
+import { logger } from '../utils/logger';
+
+// Import modular components
+import type {
+  ViewMode,
+  UserStory,
+  PriceRange,
+} from '../components/discover/types';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { Moment } from '../types';
+import type { NavigationProp } from '@react-navigation/native';
+
+const DiscoverScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  // Use moments hook for data fetching
+  const {
+    moments: apiMoments,
+    loading,
+    error,
+    refresh: refreshMoments,
+    loadMore,
+    hasMore,
+    setFilters,
+  } = useMoments();
+
+  // UI States
+  const [viewMode, setViewMode] = useState<ViewMode>('single');
+  const [refreshing, setRefreshing] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showStoryViewer, setShowStoryViewer] = useState(false);
+  const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
+    null,
+  );
+
+  // Story viewer states
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [currentUserIndex, setCurrentUserIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Filter states
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('nearest');
+  const [maxDistance, setMaxDistance] = useState(50);
+  const [priceRange, setPriceRange] = useState<PriceRange>({
+    min: 0,
+    max: 500,
+  });
+
+  // Location state
+  const [selectedLocation, setSelectedLocation] = useState('San Francisco, CA');
+  const [recentLocations, setRecentLocations] = useState([
+    'New York, NY',
+    'Los Angeles, CA',
+    'Chicago, IL',
+  ]);
+
+  // Refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refreshMoments();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshMoments]);
+
+  // Story navigation handlers
+  const goToNextStory = useCallback(() => {
+    if (!selectedStoryUser) return;
+
+    const currentUserStories = selectedStoryUser.stories;
+
+    if (currentStoryIndex < currentUserStories.length - 1) {
+      setCurrentStoryIndex((prev) => prev + 1);
+    } else {
+      const nextUserIndex = currentUserIndex + 1;
+      if (nextUserIndex < USER_STORIES.length) {
+        setCurrentUserIndex(nextUserIndex);
+        setSelectedStoryUser(USER_STORIES[nextUserIndex]);
+        setCurrentStoryIndex(0);
+      } else {
+        closeStoryViewer();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+
+  const goToPreviousStory = useCallback(() => {
+    if (!selectedStoryUser) return;
+
+    if (currentStoryIndex > 0) {
+      setCurrentStoryIndex((prev) => prev - 1);
+    } else {
+      const prevUserIndex = currentUserIndex - 1;
+      if (prevUserIndex >= 0) {
+        const prevUser = USER_STORIES[prevUserIndex];
+        setCurrentUserIndex(prevUserIndex);
+        setSelectedStoryUser(prevUser);
+        setCurrentStoryIndex(prevUser.stories.length - 1);
+      }
+    }
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+
+  const closeStoryViewer = useCallback(() => {
+    setShowStoryViewer(false);
+    setSelectedStoryUser(null);
+    setCurrentStoryIndex(0);
+    setCurrentUserIndex(0);
+    setIsPaused(false);
+  }, []);
+
+  // Use API moments
+  const baseMoments = useMemo(() => {
+    return apiMoments;
+  }, [apiMoments]);
+
+  // Filter and sort moments
+  const filteredMoments = useMemo(() => {
+    let moments = [...baseMoments] as Moment[];
+
+    if (selectedCategory !== 'all') {
+      moments = moments.filter(
+        (m) => m.category?.id?.toLowerCase() === selectedCategory,
+      );
+    }
+
+    moments = moments.filter((m) => {
+      const price = m.price || 0;
+      return price >= priceRange.min && price <= priceRange.max;
+    });
+
+    switch (sortBy) {
+      case 'nearest':
+        moments.sort(
+          (a, b) =>
+            parseFloat(a.distance || '999') - parseFloat(b.distance || '999'),
+        );
+        break;
+      case 'newest':
+        moments.sort(
+          (a, b) =>
+            new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
+        );
+        break;
+      case 'price_low':
+        moments.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case 'price_high':
+        moments.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+    }
+
+    return moments;
+  }, [baseMoments, selectedCategory, sortBy, priceRange]);
+
+  // Handle load more for infinite scroll
+  const handleLoadMore = useCallback(() => {
+    if (hasMore && !loading) {
+      loadMore();
+    }
+  }, [hasMore, loading, loadMore]);
+
+  // Apply filters to hook when category changes
+  useEffect(() => {
+    if (selectedCategory !== 'all') {
+      setFilters({ category: selectedCategory });
+    }
+  }, [selectedCategory, setFilters]);
+
+  const handleMomentPress = useCallback(
+    (moment: Moment) => {
+      navigation.navigate('MomentDetail', { moment });
+    },
+    [navigation],
+  );
+
+  const handleStoryPress = useCallback((user: UserStory) => {
+    const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
+    setCurrentUserIndex(userIndex);
+    setSelectedStoryUser(user);
+    setCurrentStoryIndex(0);
+    setShowStoryViewer(true);
+  }, []);
+
+  const handleLocationSelect = useCallback(
+    (location: string) => {
+      if (
+        selectedLocation !== location &&
+        !recentLocations.includes(selectedLocation)
+      ) {
+        setRecentLocations((prev) => [selectedLocation, ...prev.slice(0, 2)]);
+      }
+      setSelectedLocation(location);
+      setShowLocationModal(false);
+    },
+    [selectedLocation, recentLocations],
+  );
+
+  // Active filter count
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (selectedCategory !== 'all') count++;
+    if (sortBy !== 'nearest') count++;
+    if (maxDistance !== 50) count++;
+    if (priceRange.min !== 0 || priceRange.max !== 500) count++;
+    return count;
+  }, [selectedCategory, sortBy, maxDistance, priceRange]);
+
+  // Memoized render functions
+  const renderStoryItem = useCallback(
+    ({ item }: { item: UserStory }) => (
+      <StoryItem item={item} onPress={handleStoryPress} />
+    ),
+    [handleStoryPress],
+  );
+
+  const renderMomentCard = useCallback(
+    (item: Moment, index: number) => {
+      if (viewMode === 'single') {
+        return <MomentSingleCard moment={item} onPress={handleMomentPress} />;
+      }
+      return (
+        <MomentGridCard
+          moment={item}
+          index={index}
+          onPress={handleMomentPress}
+        />
+      );
+    },
+    [viewMode, handleMomentPress],
+  );
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+
+      {/* Header */}
+      <DiscoverHeader
+        selectedLocation={selectedLocation}
+        onLocationPress={() => setShowLocationModal(true)}
+        onNotificationPress={() =>
+          navigation.navigate('Requests', { initialTab: 'notifications' })
+        }
+        onFilterPress={() => setShowFilterModal(true)}
+        activeFilterCount={activeFilterCount}
+        notificationCount={2}
+      />
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing || loading}
+            onRefresh={onRefresh}
+            tintColor={COLORS.mint}
+          />
+        }
+        onScroll={({ nativeEvent }) => {
+          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+          const paddingToBottom = 50;
+          if (
+            layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - paddingToBottom
+          ) {
+            handleLoadMore();
+          }
+        }}
+        scrollEventThrottle={400}
+      >
+        {/* Stories */}
+        <FlatList
+          data={USER_STORIES}
+          renderItem={renderStoryItem}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.storiesContainer}
+          scrollEnabled={true}
+        />
+
+        {/* Results Bar */}
+        <View style={styles.resultsBar}>
+          <Text style={styles.resultsText}>
+            {loading
+              ? 'Loading...'
+              : `${filteredMoments.length} moments nearby`}
+          </Text>
+          <View style={styles.viewToggle}>
+            <TouchableOpacity
+              style={[
+                styles.viewToggleButton,
+                viewMode === 'single' && styles.viewToggleButtonActive,
+              ]}
+              onPress={() => setViewMode('single')}
+            >
+              <MaterialCommunityIcons
+                name="square-outline"
+                size={18}
+                color={
+                  viewMode === 'single' ? COLORS.white : COLORS.textSecondary
+                }
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.viewToggleButton,
+                viewMode === 'grid' && styles.viewToggleButtonActive,
+              ]}
+              onPress={() => setViewMode('grid')}
+            >
+              <MaterialCommunityIcons
+                name="view-grid-outline"
+                size={18}
+                color={
+                  viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
+                }
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Error State */}
+        {error && !loading && (
+          <View style={styles.errorContainer}>
+            <MaterialCommunityIcons
+              name="alert-circle-outline"
+              size={48}
+              color={COLORS.error}
+            />
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
+              <Text style={styles.retryButtonText}>Try Again</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Loading Skeleton */}
+        {loading && filteredMoments.length === 0 && !error && (
+          <MomentsFeedSkeleton />
+        )}
+
+        {/* Moments List */}
+        {!error &&
+          filteredMoments.length > 0 &&
+          (viewMode === 'single' ? (
+            <View style={styles.singleListContainer}>
+              {filteredMoments.map((moment) => (
+                <MomentSingleCard
+                  key={moment.id}
+                  moment={moment}
+                  onPress={handleMomentPress}
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.gridContainer}>
+              {filteredMoments.map((moment, index) => (
+                <MomentGridCard
+                  key={moment.id}
+                  moment={moment}
+                  index={index}
+                  onPress={handleMomentPress}
+                />
+              ))}
+            </View>
+          ))}
+
+        {/* Empty State */}
+        {!loading && !error && filteredMoments.length === 0 && (
+          <View style={styles.emptyContainer}>
+            <MaterialCommunityIcons
+              name="compass-off-outline"
+              size={64}
+              color={COLORS.gray[300]}
+            />
+            <Text style={styles.emptyTitle}>No moments found</Text>
+            <Text style={styles.emptySubtitle}>
+              Try adjusting your filters or location
+            </Text>
+          </View>
+        )}
+
+        {/* Load More Indicator */}
+        {loading && filteredMoments.length > 0 && (
+          <View style={styles.loadMoreContainer}>
+            <ActivityIndicator size="small" color={COLORS.primary} />
+            <Text style={styles.loadMoreText}>Loading more...</Text>
+          </View>
+        )}
+
+        {/* Bottom Padding */}
+        {/* eslint-disable-next-line react-native/no-inline-styles */}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+
+      {/* Modals - Using extracted components */}
+      <LocationModal
+        visible={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        onLocationSelect={handleLocationSelect}
+        selectedLocation={selectedLocation}
+        recentLocations={recentLocations}
+        popularCities={POPULAR_CITIES}
+        currentLocationName="San Francisco, CA"
+      />
+
+      <FilterModal
+        visible={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        maxDistance={maxDistance}
+        setMaxDistance={setMaxDistance}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
+      />
+
+      <StoryViewer
+        visible={showStoryViewer}
+        user={selectedStoryUser}
+        currentStoryIndex={currentStoryIndex}
+        onClose={closeStoryViewer}
+        onNextStory={goToNextStory}
+        onPreviousStory={goToPreviousStory}
+        onViewMoment={(story) => {
+          closeStoryViewer();
+          // Convert story to moment format for navigation
+          navigation.navigate('MomentDetail', {
+            moment: {
+              id: story.id,
+              title: story.title,
+              imageUrl: story.imageUrl,
+              price: story.price,
+              distance: story.distance,
+              story: story.description,
+              location: { city: story.location, country: '' },
+              user: selectedStoryUser
+                ? {
+                    name: selectedStoryUser.name,
+                    avatar: selectedStoryUser.avatar,
+                  }
+                : undefined,
+              availability: [],
+            } as unknown as Moment,
+          });
+        }}
+        onUserPress={(userId) => {
+          // Handle user profile navigation
+          logger.debug('Navigate to user:', userId);
+        }}
+        isPaused={isPaused}
+        setIsPaused={setIsPaused}
+      />
+
+      {/* Bottom Navigation */}
+      <BottomNav activeTab="Discover" />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+
+  // Results Bar
+  resultsBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  resultsText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  viewToggle: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    padding: 4,
+  },
+  viewToggleButton: {
+    width: 32,
+    height: 28,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewToggleButtonActive: {
+    backgroundColor: COLORS.primary,
+  },
+
+  // Single List Container
+  singleListContainer: {
+    paddingHorizontal: 16,
+  },
+
+  // Grid Container
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+  },
+
+  // Error State
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  errorText: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: 16,
+  },
+  retryButton: {
+    marginTop: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: COLORS.white,
+    fontWeight: '600',
+  },
+
+  // Empty State
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginTop: 16,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+
+  // Load More
+  loadMoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  loadMoreText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+
+  // Stories Container
+  storiesContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    gap: 16,
+  },
+});
+
+export default DiscoverScreen;

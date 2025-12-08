@@ -105,9 +105,18 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 -- Add foreign key for last_message_id after messages table exists
-ALTER TABLE conversations
-ADD CONSTRAINT fk_last_message
-FOREIGN KEY (last_message_id) REFERENCES messages(id) ON DELETE SET NULL;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM pg_constraint 
+        WHERE conname = 'fk_last_message'
+    ) THEN
+        ALTER TABLE conversations
+        ADD CONSTRAINT fk_last_message
+        FOREIGN KEY (last_message_id) REFERENCES messages(id) ON DELETE SET NULL;
+    END IF;
+END $$;
 
 -- ============================================
 -- REVIEWS TABLE

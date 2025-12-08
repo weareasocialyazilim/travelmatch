@@ -1,0 +1,99 @@
+# Maestro Flow: Discover & Match
+# Tests profile discovery and matching functionality
+
+appId: com.travelmatch.app
+---
+
+# Start at discover screen
+- launchApp
+- tapOn: "Discover"
+
+# View first profile
+- assertVisible:
+    id: "profile-card"
+- assertVisible:
+    id: "profile-photo"
+- assertVisible:
+    id: "profile-name"
+- assertVisible:
+    id: "profile-age"
+
+# Check profile details
+- swipe:
+    direction: UP
+- assertVisible: "About"
+- assertVisible: "Interests"
+- assertVisible: "Photos"
+
+# View photo gallery
+- tapOn:
+    id: "profile-photo"
+- assertVisible:
+    id: "photo-gallery"
+- swipe:
+    direction: LEFT
+- swipe:
+    direction: LEFT
+- tapOn:
+    id: "close-gallery"
+
+# Swipe actions
+- scroll:
+    direction: DOWN
+- assertVisible:
+    id: "like-button"
+- assertVisible:
+    id: "super-like-button"
+- assertVisible:
+    id: "skip-button"
+
+# Skip profile
+- tapOn:
+    id: "skip-button"
+- assertVisible:
+    id: "profile-card"
+
+# Like profile (no match)
+- tapOn:
+    id: "like-button"
+- assertNotVisible: "It's a Match!"
+- assertVisible:
+    id: "profile-card"
+
+# Super like profile (creates match)
+- tapOn:
+    id: "super-like-button"
+
+# Match notification
+- assertVisible: "It's a Match!"
+- assertVisible: "Send Message"
+- assertVisible: "Keep Swiping"
+
+# Send initial message
+- tapOn: "Send Message"
+- assertVisible: "Chat"
+- tapOn:
+    id: "message-input"
+- inputText: "Hey! Great to match with you!"
+- tapOn:
+    id: "send-button"
+- assertVisible: "Hey! Great to match with you!"
+
+# Go back to discover
+- tapOn:
+    id: "back-button"
+- tapOn: "Keep Swiping"
+
+# Verify on discover screen
+- assertVisible: "Discover"
+- assertVisible:
+    id: "profile-card"
+
+# Check matches tab
+- tapOn: "Matches"
+- assertVisible: "Matches"
+- assertVisible:
+    id: "match-list"
+- assertVisible: "Test User"  # User we just matched with
+
+# Success!

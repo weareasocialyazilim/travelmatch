@@ -1,0 +1,385 @@
+{
+  "folders": [
+    {
+      "name": "🏠 Root",
+      "path": "."
+    },
+    {
+      "name": "📱 Mobile App",
+      "path": "apps/mobile"
+    },
+    {
+      "name": "⚙️ Admin Panel",
+      "path": "admin"
+    },
+    {
+      "name": "🎨 Design System",
+      "path": "packages/design-system"
+    },
+    {
+      "name": "📦 Shared",
+      "path": "packages/shared"
+    },
+    {
+      "name": "🤖 ML Services",
+      "path": "services/ml"
+    },
+    {
+      "name": "💳 Payment Services",
+      "path": "services/payment"
+    },
+    {
+      "name": "🗄️ Supabase",
+      "path": "supabase"
+    }
+  ],
+  "settings": {
+    // Editor
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "never"
+    },
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.rulers": [80, 120],
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": true,
+    "editor.inlineSuggest.enabled": true,
+
+    // Files
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/node_modules": true,
+      "**/.turbo": true,
+      "**/dist": true,
+      "**/coverage": true,
+      "**/.expo": true,
+      "**/android/app/build": true,
+      "**/ios/build": true
+    },
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/.turbo/**": true,
+      "**/dist/**": true,
+      "**/.expo/**": true
+    },
+
+    // Search
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.turbo": true,
+      "**/coverage": true,
+      "**/.expo": true,
+      "**/android/app/build": true,
+      "**/ios/build": true,
+      "pnpm-lock.yaml": true
+    },
+
+    // TypeScript
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "typescript.suggest.autoImports": true,
+
+    // JavaScript
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "javascript.suggest.autoImports": true,
+
+    // ESLint
+    "eslint.workingDirectories": [
+      "./apps/mobile",
+      "./admin",
+      "./packages/design-system",
+      "./packages/shared",
+      "./services/ml",
+      "./services/payment"
+    ],
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+
+    // Prettier
+    "prettier.requireConfig": false,
+    "prettier.configPath": ".prettierrc",
+
+    // React Native / Expo
+    "react-native-tools.showUserTips": false,
+    "react-native-tools.projectRoot": "${workspaceFolder}/apps/mobile",
+
+    // Git
+    "git.ignoreLimitWarning": true,
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+
+    // Terminal
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.env.osx": {
+      "WORKSPACE_ROOT": "${workspaceFolder}"
+    },
+
+    // Emmet
+    "emmet.includeLanguages": {
+      "typescript": "typescriptreact",
+      "javascript": "javascriptreact"
+    },
+
+    // Security
+    "files.associations": {
+      "*.env.example": "properties",
+      ".env*": "properties"
+    },
+    
+    // Turbo
+    "turbo.useLocalTurbo": true,
+
+    // Testing
+    "jest.autoRun": "off",
+    "jest.showCoverageOnLoad": false,
+
+    // Spell Checker
+    "cSpell.words": [
+      "supabase",
+      "travelmatch",
+      "zustand",
+      "turborepo",
+      "upstash",
+      "IDOR",
+      "GDPR",
+      "datetime",
+      "leveldb"
+    ],
+
+    // Exclude from recommendations
+    "extensions.ignoreRecommendations": false
+  },
+  "extensions": {
+    "recommendations": [
+      // Essential
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "eamodio.gitlens",
+      "github.copilot",
+      
+      // TypeScript & React
+      "dsznajder.es7-react-js-snippets",
+      "styled-components.vscode-styled-components",
+      
+      // React Native & Expo
+      "msjsdiag.vscode-react-native",
+      "expo.vscode-expo-tools",
+      
+      // Database & Supabase
+      "supabase.supabase-vscode",
+      "mtxr.sqltools",
+      
+      // Testing
+      "orta.vscode-jest",
+      "hbenl.vscode-test-explorer",
+      
+      // Utilities
+      "christian-kohler.path-intellisense",
+      "christian-kohler.npm-intellisense",
+      "mikestead.dotenv",
+      "streetsidesoftware.code-spell-checker",
+      
+      // Git
+      "mhutchie.git-graph",
+      "github.vscode-pull-request-github",
+      
+      // Markdown
+      "yzhang.markdown-all-in-one",
+      "bierner.markdown-mermaid",
+      
+      // Performance
+      "wayou.vscode-todo-highlight",
+      "usernamehw.errorlens",
+      
+      // Themes (optional)
+      "github.github-vscode-theme",
+      "pkief.material-icon-theme"
+    ],
+    "unwantedRecommendations": []
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "📱 Debug Mobile (iOS)",
+        "cwd": "${workspaceFolder}/apps/mobile",
+        "type": "reactnative",
+        "request": "launch",
+        "platform": "ios",
+        "sourceMaps": true,
+        "outDir": "${workspaceFolder}/apps/mobile/.expo",
+        "sourceMapPathOverrides": {
+          "webpack:///./*": "${workspaceFolder}/apps/mobile/*"
+        }
+      },
+      {
+        "name": "📱 Debug Mobile (Android)",
+        "cwd": "${workspaceFolder}/apps/mobile",
+        "type": "reactnative",
+        "request": "launch",
+        "platform": "android",
+        "sourceMaps": true,
+        "outDir": "${workspaceFolder}/apps/mobile/.expo"
+      },
+      {
+        "name": "⚙️ Debug Admin Panel",
+        "type": "chrome",
+        "request": "launch",
+        "url": "http://localhost:5173",
+        "webRoot": "${workspaceFolder}/admin",
+        "sourceMaps": true,
+        "sourceMapPathOverrides": {
+          "webpack:///./*": "${workspaceFolder}/admin/*"
+        }
+      },
+      {
+        "name": "🧪 Debug Tests (Mobile)",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/apps/mobile",
+        "runtimeExecutable": "pnpm",
+        "runtimeArgs": ["test", "--", "--runInBand", "--no-cache"],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      },
+      {
+        "name": "🗄️ Attach to Supabase Edge Function",
+        "type": "node",
+        "request": "attach",
+        "port": 9229,
+        "restart": true,
+        "skipFiles": ["<node_internals>/**"],
+        "sourceMaps": true
+      }
+    ],
+    "compounds": [
+      {
+        "name": "🚀 Full Stack (Admin + Mobile)",
+        "configurations": [
+          "⚙️ Debug Admin Panel",
+          "📱 Debug Mobile (iOS)"
+        ],
+        "stopAll": true
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "📦 Install Dependencies",
+        "type": "shell",
+        "command": "pnpm install",
+        "group": "build",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "🏗️ Build All",
+        "type": "shell",
+        "command": "pnpm build",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "🧪 Run Tests",
+        "type": "shell",
+        "command": "pnpm test",
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "🔍 Lint & Type Check",
+        "type": "shell",
+        "command": "pnpm lint && pnpm type-check",
+        "group": "build",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "🗄️ Start Supabase Local",
+        "type": "shell",
+        "command": "pnpm db:start",
+        "isBackground": true,
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "🔧 Setup Environment",
+        "type": "shell",
+        "command": "pnpm setup:env",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "📱 Start Mobile Dev Server",
+        "type": "shell",
+        "command": "pnpm --filter @travelmatch/mobile dev",
+        "isBackground": true,
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "showReuseMessage": false
+        }
+      },
+      {
+        "label": "⚙️ Start Admin Dev Server",
+        "type": "shell",
+        "command": "pnpm --filter travelmatch-admin dev",
+        "isBackground": true,
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "🚀 Start All Dev Servers",
+        "type": "shell",
+        "command": "pnpm dev",
+        "isBackground": true,
+        "dependsOn": ["🗄️ Start Supabase Local"],
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        }
+      }
+    ]
+  }
+}

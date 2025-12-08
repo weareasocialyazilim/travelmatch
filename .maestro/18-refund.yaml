@@ -1,0 +1,43 @@
+appId: com.travelmatch.app
+---
+# Refund Request E2E Test
+# Tests requesting refund for cancelled moments
+
+- launchApp
+- tapOn: "My Requests"
+- tapOn: "Cancelled"
+- assertVisible: "Request Refund"
+
+# Select cancelled moment
+- tapOn:
+    id: "cancelled-moment-0"
+- assertVisible: "Cancellation Details"
+
+# Start refund request
+- tapOn: "Request Refund"
+- assertVisible: "Refund Request"
+- assertVisible: "Amount: $25.00"
+
+# Provide reason
+- tapOn: "Reason for Refund"
+- tapOn: "Host cancelled"
+- tapOn: "Additional Details"
+- inputText: "The host cancelled 2 hours before the scheduled time"
+
+# Upload evidence (optional)
+- tapOn: "Add Evidence"
+- tapOn: "Screenshot"
+# Mock upload
+- assertVisible: "Evidence added"
+
+# Submit request
+- tapOn: "Submit Refund Request"
+
+# Verify submission
+- assertVisible: "Refund Request Submitted"
+- assertVisible: "Request ID"
+- assertVisible: "Processing time: 3-5 business days"
+- tapOn: "Track Request"
+
+# Check refund status
+- assertVisible: "Refund Status: Under Review"

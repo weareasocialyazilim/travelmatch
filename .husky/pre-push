@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run full test suite before push
+echo "🧪 Running full test suite..."
+npm test -- --coverage
+
+# Check if tests passed
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Fix tests before pushing."
+  exit 1
+fi
+
+echo "✅ All tests passed!"

@@ -1,0 +1,15 @@
+{
+  "name": "@travelmatch/chromatic-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chromatic visual regression tests for TravelMatch",
+  "scripts": {
+    "chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN",
+    "chromatic:ci": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes",
+    "test:visual": "pnpm chromatic",
+    "test:visual:ci": "pnpm chromatic:ci"
+  },
+  "devDependencies": {
+    "chromatic": "^11.0.0"
+  }
+}

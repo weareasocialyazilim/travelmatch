@@ -1,0 +1,90 @@
+# Maestro Flow: Complete Onboarding Journey
+# Tests the entire user onboarding experience
+
+appId: com.travelmatch.app
+---
+
+# Launch app
+- launchApp
+
+# Welcome screens
+- assertVisible: "Welcome to TravelMatch"
+- tapOn: "Get Started"
+
+# Sign up screen
+- assertVisible: "Create Account"
+- tapOn: 
+    id: "email-input"
+- inputText: "test-${random}@travelmatch.com"
+- tapOn:
+    id: "password-input"
+- inputText: "SecurePass123!"
+- tapOn:
+    id: "confirm-password-input"
+- inputText: "SecurePass123!"
+- tapOn: "Sign Up"
+
+# Phone verification
+- assertVisible: "Verify Phone"
+- tapOn:
+    id: "phone-input"
+- inputText: "+1234567890"
+- tapOn: "Send Code"
+- assertVisible: "Enter verification code"
+- tapOn:
+    id: "code-input"
+- inputText: "123456"  # Test code
+- tapOn: "Verify"
+
+# Basic profile setup
+- assertVisible: "Tell us about yourself"
+- tapOn:
+    id: "name-input"
+- inputText: "Test User"
+- tapOn:
+    id: "age-picker"
+- tapOn: "25"
+- tapOn:
+    id: "gender-picker"
+- tapOn: "Non-binary"
+- tapOn: "Continue"
+
+# Photo upload
+- assertVisible: "Add your photos"
+- tapOn: "Upload Photo"
+- tapOn: "Choose from library"
+- # Simulate photo selection (mocked in test env)
+- assertVisible: 
+    id: "photo-preview-1"
+- tapOn: "Continue"
+
+# Interests selection
+- assertVisible: "What are you interested in?"
+- tapOn: "Hiking"
+- tapOn: "Photography"
+- tapOn: "Coffee"
+- tapOn: "Travel"
+- tapOn: "Continue"
+
+# Location permissions
+- assertVisible: "Enable location"
+- tapOn: "Allow Location"
+- # System permission dialog handled by OS
+
+# Notification permissions
+- assertVisible: "Stay connected"
+- tapOn: "Enable Notifications"
+- # System permission dialog handled by OS
+
+# Complete onboarding
+- assertVisible: "You're all set!"
+- tapOn: "Start Exploring"
+
+# Verify landed on home screen
+- assertVisible: "Discover"
+- assertVisible: "Moments"
+- assertVisible: "Matches"
+- assertVisible: "Profile"
+
+# Success!
+- assertNotVisible: "Welcome to TravelMatch"

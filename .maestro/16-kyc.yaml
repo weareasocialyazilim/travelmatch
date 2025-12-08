@@ -1,0 +1,49 @@
+appId: com.travelmatch.app
+---
+# KYC Flow E2E Test
+# Tests Know Your Customer verification for payments
+
+- launchApp
+- tapOn: "Wallet"
+- tapOn: "Enable Payments"
+- assertVisible: "KYC Verification Required"
+
+# Start KYC process
+- tapOn: "Start Verification"
+- assertVisible: "Personal Information"
+
+# Step 1: Personal details
+- tapOn: "Full Name"
+- inputText: "John Doe"
+- tapOn: "Date of Birth"
+- inputText: "01/01/1990"
+- tapOn: "Country"
+- tapOn: "United States"
+- tapOn: "Next"
+
+# Step 2: Address
+- tapOn: "Street Address"
+- inputText: "123 Main St"
+- tapOn: "City"
+- inputText: "New York"
+- tapOn: "Postal Code"
+- inputText: "10001"
+- tapOn: "Next"
+
+# Step 3: ID Upload
+- tapOn: "Document Type"
+- tapOn: "Passport"
+- tapOn: "Upload Front"
+# Mock photo upload
+- tapOn: "Upload Back"
+# Mock photo upload
+- tapOn: "Next"
+
+# Step 4: Selfie verification
+- tapOn: "Take Selfie"
+# Mock selfie capture
+- tapOn: "Submit for Review"
+
+# Verify submission
+- assertVisible: "KYC Under Review"
+- assertVisible: "We'll notify you within 24 hours"

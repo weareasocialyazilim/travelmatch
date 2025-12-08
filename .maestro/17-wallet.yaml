@@ -1,0 +1,46 @@
+appId: com.travelmatch.app
+---
+# Wallet Management E2E Test
+# Tests wallet operations: add funds, withdraw, view transactions
+
+- launchApp
+- tapOn: "Wallet"
+- assertVisible: "Balance"
+- assertVisible: "$0.00"
+
+# Add funds
+- tapOn: "Add Funds"
+- tapOn: "Amount"
+- inputText: "50"
+- tapOn: "Payment Method"
+- tapOn: "Credit Card ending in 1234"
+- tapOn: "Add $50"
+
+# Verify transaction
+- assertVisible: "Processing"
+- assertVisible: "Balance: $50.00"
+
+# View transaction history
+- tapOn: "Transaction History"
+- assertVisible: "Added Funds"
+- assertVisible: "$50.00"
+
+# Withdraw funds
+- tapOn: "Back"
+- tapOn: "Withdraw"
+- tapOn: "Amount"
+- inputText: "20"
+- tapOn: "Bank Account"
+- tapOn: "Account ending in 5678"
+- tapOn: "Withdraw $20"
+
+# Confirm withdrawal
+- assertVisible: "Confirm Withdrawal"
+- tapOn: "Confirm"
+- assertVisible: "Withdrawal Initiated"
+- assertVisible: "Balance: $30.00"
+
+# Check updated history
+- tapOn: "Transaction History"
+- assertVisible: "Withdrawal"
+- assertVisible: "-$20.00"

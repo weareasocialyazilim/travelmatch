@@ -1,0 +1,129 @@
+# Maestro Flow: Messaging
+# Tests chat functionality with different message types
+
+appId: com.travelmatch.app
+---
+
+# Navigate to matches
+- launchApp
+- tapOn: "Matches"
+- assertVisible: "Matches"
+
+# Open chat with first match
+- tapOn:
+    id: "match-item-0"
+- assertVisible: "Chat"
+- assertVisible:
+    id: "message-list"
+- assertVisible:
+    id: "message-input"
+
+# Send text message
+- tapOn:
+    id: "message-input"
+- inputText: "Hi! How are you doing?"
+- tapOn:
+    id: "send-button"
+- assertVisible: "Hi! How are you doing?"
+- wait: 500
+
+# Send emoji
+- tapOn:
+    id: "message-input"
+- inputText: "👋 😊"
+- tapOn:
+    id: "send-button"
+- assertVisible: "👋 😊"
+- wait: 500
+
+# Send photo
+- tapOn:
+    id: "attach-button"
+- tapOn: "Photo"
+- tapOn: "Choose from library"
+# Mocked photo selection
+- wait: 1000
+- assertVisible:
+    id: "photo-message"
+- wait: 500
+
+# Send location
+- tapOn:
+    id: "attach-button"
+- tapOn: "Location"
+- tapOn: "Send Current Location"
+- wait: 1000
+- assertVisible:
+    id: "location-message"
+- wait: 500
+
+# Long press message options
+- longPressOn: "Hi! How are you doing?"
+- assertVisible: "Copy"
+- assertVisible: "Delete"
+- assertVisible: "Reply"
+
+# Reply to message
+- tapOn: "Reply"
+- assertVisible:
+    id: "reply-preview"
+- tapOn:
+    id: "message-input"
+- inputText: "This is a reply!"
+- tapOn:
+    id: "send-button"
+- assertVisible: "This is a reply!"
+- assertVisible:
+    id: "replied-to-message"
+
+# Delete message
+- longPressOn: "👋 😊"
+- tapOn: "Delete"
+- tapOn: "Delete for me"
+- assertNotVisible: "👋 😊"
+
+# Scroll message history
+- scroll:
+    direction: DOWN
+- scroll:
+    direction: DOWN
+- scroll:
+    direction: UP
+
+# Typing indicator (simulated)
+- tapOn:
+    id: "message-input"
+- inputText: "Testing typing..."
+# Other user sees typing indicator (tested via integration test)
+
+# Send and verify delivered
+- tapOn:
+    id: "send-button"
+- assertVisible: "Testing typing..."
+- assertVisible:
+    id: "message-status-sent"
+- wait: 1000
+- assertVisible:
+    id: "message-status-delivered"
+
+# View match profile from chat
+- tapOn:
+    id: "chat-header"
+- assertVisible: "Profile"
+- assertVisible:
+    id: "profile-photo"
+- tapOn:
+    id: "back-button"
+
+# Unmatch test (optional - destructive)
+# - tapOn: "Options"
+# - tapOn: "Unmatch"
+# - tapOn: "Confirm"
+# - assertNotVisible: "Chat"
+
+# Go back to matches
+- tapOn:
+    id: "back-button"
+- assertVisible: "Matches"
+
+# Success!

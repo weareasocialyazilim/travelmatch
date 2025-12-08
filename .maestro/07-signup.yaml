@@ -1,0 +1,28 @@
+appId: com.travelmatch.app
+---
+# Signup Flow E2E Test
+# Tests new user registration
+
+- launchApp
+- tapOn: "Sign up"
+- assertVisible: "Create Account"
+
+# Fill registration form
+- tapOn: "Full Name"
+- inputText: "Test User"
+- tapOn: "Email"
+- inputText: "newuser@example.com"
+- tapOn: "Password"
+- inputText: "SecurePass123!"
+- tapOn: "Confirm Password"
+- inputText: "SecurePass123!"
+
+# Accept terms
+- tapOn: "I agree to Terms"
+
+# Submit signup
+- tapOn: "Create Account"
+
+# Verify successful signup
+- assertVisible: "Welcome"
+- assertVisible: "Complete Your Profile"

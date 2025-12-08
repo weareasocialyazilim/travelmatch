@@ -1,0 +1,35 @@
+appId: com.travelmatch.app
+---
+# Message Flow E2E Test
+# Tests direct messaging between users
+
+- launchApp
+- tapOn: "Messages"
+- assertVisible: "Your Messages"
+
+# Start new conversation
+- tapOn: "New Message"
+- tapOn: "Select User"
+- tapOn:
+    id: "user-list-item-0"
+
+# Send message
+- tapOn: "Type a message"
+- inputText: "Hi! Interested in your moment"
+- tapOn: "Send"
+
+# Verify message sent
+- assertVisible: "Hi! Interested in your moment"
+
+# Test typing indicator
+- tapOn: "Type a message"
+- inputText: "Another message"
+- assertVisible: "typing..."
+
+# Send second message
+- tapOn: "Send"
+- assertVisible: "Another message"
+
+# Verify message count
+- tapOn: "Back"
+- assertVisible: "2 messages"

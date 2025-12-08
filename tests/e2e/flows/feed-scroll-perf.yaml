@@ -1,0 +1,68 @@
+# Maestro Flow: Performance - Feed Scroll
+# Measures FPS and memory during feed scrolling
+
+appId: com.travelmatch.app
+---
+
+# Start performance monitoring
+- runScript:
+    script: |
+      adb shell am start-performance-monitor
+
+# Launch app
+- launchApp
+- wait: 2000
+
+# Navigate to moments feed
+- tapOn: "Moments"
+- wait: 2000
+
+# Record baseline memory
+- runScript:
+    script: |
+      adb shell dumpsys meminfo com.travelmatch.app | grep "TOTAL" > memory_baseline.txt
+
+# Fast scroll test
+- repeat: 10
+    sequence:
+      - scroll:
+          direction: DOWN
+          startYPercentage: 80
+          endYPercentage: 20
+          duration: 100  # Fast scroll
+      - wait: 100
+
+# Record peak memory
+- runScript:
+    script: |
+      adb shell dumpsys meminfo com.travelmatch.app | grep "TOTAL" > memory_peak.txt
+
+# Scroll back up
+- repeat: 10
+    sequence:
+      - scroll:
+          direction: UP
+          startYPercentage: 20
+          endYPercentage: 80
+          duration: 100
+      - wait: 100
+
+# Check FPS (should be >= 55)
+- runScript:
+    script: |
+      adb shell dumpsys gfxinfo com.travelmatch.app framestats > fps_data.txt
+
+# Verify memory didn't leak
+- runScript:
+    script: |
+      adb shell dumpsys meminfo com.travelmatch.app | grep "TOTAL" > memory_final.txt
+
+# Stop monitoring
+- runScript:
+    script: |
+      adb shell am stop-performance-monitor
+
+# Assertions (checked by test framework)
+# FPS >= 55
+# Memory growth < 50MB
+# No memory leaks

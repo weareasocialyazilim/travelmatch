@@ -1,5 +1,5 @@
-import React from "react";
-import { AuthPage } from "@refinedev/mui";
+import React from 'react';
+import { AuthPage } from '@refinedev/mui';
 
 export const Login = () => {
   return (
@@ -8,11 +8,11 @@ export const Login = () => {
       title={
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            fontSize: "24px",
-            fontWeight: "bold",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '24px',
+            fontWeight: 'bold',
           }}
         >
           TravelMatch Admin

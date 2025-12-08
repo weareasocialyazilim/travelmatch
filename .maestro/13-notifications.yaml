@@ -1,0 +1,36 @@
+appId: com.travelmatch.app
+---
+# Notification Flow E2E Test
+# Tests notification handling and interactions
+
+- launchApp
+- tapOn: "Notifications"
+- assertVisible: "Notifications"
+
+# Verify unread notifications
+- assertVisible: "3 unread"
+
+# Tap on notification
+- tapOn:
+    id: "notification-0"
+- assertVisible: "Moment Request"
+- assertVisible: "John wants to join your moment"
+
+# Mark as read
+- tapOn: "Mark as read"
+- tapOn: "Back"
+- assertVisible: "2 unread"
+
+# Test notification actions
+- tapOn:
+    id: "notification-1"
+- tapOn: "Accept"
+- assertVisible: "Request Accepted"
+
+# Verify notification removed
+- tapOn: "Back"
+- assertVisible: "1 unread"
+
+# Clear all notifications
+- tapOn: "Clear All"
+- assertVisible: "No notifications"

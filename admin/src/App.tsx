@@ -1,17 +1,25 @@
-import React from "react";
-import { Refine } from "@refinedev/core";
-import { AuthBindings, Authenticated } from "@refinedev/core";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import { notificationProvider, RefineSnackbarProvider, ThemedLayoutV2, ErrorComponent } from "@refinedev/mui";
-import CssBaseline from "@mui/material/CssBaseline";
-import GlobalStyles from "@mui/material/GlobalStyles";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import routerBindings, { NavigateToResource, CatchAllNavigate, UnsavedChangesNotifier } from "@refinedev/react-router-v6";
-import { dataProvider, liveProvider } from "@refinedev/supabase";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
-import { authProvider } from "./authProvider";
-import { Login } from "./pages/login";
+import React from 'react';
+import CssBaseline from '@mui/material/CssBaseline';
+import GlobalStyles from '@mui/material/GlobalStyles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Refine, Authenticated } from '@refinedev/core';
+import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
+import {
+  notificationProvider,
+  RefineSnackbarProvider,
+  ThemedLayoutV2,
+  ErrorComponent,
+} from '@refinedev/mui';
+import routerBindings, {
+  NavigateToResource,
+  CatchAllNavigate,
+  UnsavedChangesNotifier,
+} from '@refinedev/react-router-v6';
+import { dataProvider, liveProvider } from '@refinedev/supabase';
+import { createClient } from '@supabase/supabase-js';
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom';
+import { authProvider } from './authProvider';
+import { Login } from './pages/login';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -23,7 +31,7 @@ const App: React.FC = () => {
       <RefineKbarProvider>
         <ThemeProvider theme={createTheme()}>
           <CssBaseline />
-          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
+          <GlobalStyles styles={{ html: { WebkitFontSmoothing: 'auto' } }} />
           <RefineSnackbarProvider>
             <Refine
               dataProvider={dataProvider(supabaseClient)}
@@ -33,19 +41,19 @@ const App: React.FC = () => {
               notificationProvider={notificationProvider}
               resources={[
                 {
-                  name: "users",
-                  list: "/users",
-                  show: "/users/show/:id",
+                  name: 'users',
+                  list: '/users',
+                  show: '/users/show/:id',
                 },
                 {
-                  name: "moments",
-                  list: "/moments",
-                  show: "/moments/show/:id",
+                  name: 'moments',
+                  list: '/moments',
+                  show: '/moments/show/:id',
                 },
                 {
-                  name: "disputes",
-                  list: "/disputes",
-                  show: "/disputes/show/:id",
+                  name: 'disputes',
+                  list: '/disputes',
+                  show: '/disputes/show/:id',
                 },
               ]}
               options={{
@@ -66,23 +74,35 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route index element={<NavigateToResource resource="users" />} />
+                  <Route
+                    index
+                    element={<NavigateToResource resource="users" />}
+                  />
                   <Route path="/users">
                     <Route index element={<div>User List</div>} />
                     <Route path="show/:id" element={<div>User Details</div>} />
                   </Route>
                   <Route path="/moments">
                     <Route index element={<div>Moments List</div>} />
-                    <Route path="show/:id" element={<div>Moment Details</div>} />
+                    <Route
+                      path="show/:id"
+                      element={<div>Moment Details</div>}
+                    />
                   </Route>
                   <Route path="/disputes">
                     <Route index element={<div>Disputes List</div>} />
-                    <Route path="show/:id" element={<div>Dispute Details</div>} />
+                    <Route
+                      path="show/:id"
+                      element={<div>Dispute Details</div>}
+                    />
                   </Route>
                 </Route>
                 <Route
                   element={
-                    <Authenticated key="authenticated-outer" fallback={<Outlet />}>
+                    <Authenticated
+                      key="authenticated-outer"
+                      fallback={<Outlet />}
+                    >
                       <NavigateToResource />
                     </Authenticated>
                   }
@@ -91,7 +111,10 @@ const App: React.FC = () => {
                 </Route>
                 <Route
                   element={
-                    <Authenticated key="authenticated-error" fallback={<Outlet />}>
+                    <Authenticated
+                      key="authenticated-error"
+                      fallback={<Outlet />}
+                    >
                       <ThemedLayoutV2>
                         <Outlet />
                       </ThemedLayoutV2>

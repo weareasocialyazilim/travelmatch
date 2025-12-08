@@ -1,0 +1,18 @@
+# ZAP Scanning Rules
+# Format: ID	THRESHOLD	[IGNORED]
+
+# Ignore false positives
+10021	OFF	# X-Content-Type-Options header missing (handled by CDN)
+10020	OFF	# X-Frame-Options header missing (SPA doesn't need it)
+
+# High severity issues - FAIL build
+90001	FAIL	# Insecure Communication
+40012	FAIL	# Cross Site Scripting (Reflected)
+40014	FAIL	# Cross Site Scripting (Persistent)
+40018	FAIL	# SQL Injection
+90019	FAIL	# Server Side Code Injection
+
+# Medium severity - WARN only
+10055	WARN	# CSP Header Not Set
+10096	WARN	# Timestamp Disclosure
+10109	WARN	# Modern Web Application

@@ -1,0 +1,41 @@
+appId: com.travelmatch.app
+---
+# Trust Garden Verification E2E Test
+# Tests trust verification process
+
+- launchApp
+- tapOn: "Profile"
+- tapOn: "Trust Garden"
+- assertVisible: "Verification Status"
+- assertVisible: "Not Verified"
+
+# Start verification
+- tapOn: "Get Verified"
+- assertVisible: "Verification Steps"
+
+# Step 1: Email verification
+- assertVisible: "Email"
+- assertVisible: "Verified"
+
+# Step 2: Phone verification
+- tapOn: "Verify Phone"
+- tapOn: "Phone Number"
+- inputText: "+1234567890"
+- tapOn: "Send Code"
+- tapOn: "Verification Code"
+- inputText: "123456"
+- tapOn: "Verify"
+- assertVisible: "Phone Verified"
+
+# Step 3: ID verification
+- tapOn: "Verify ID"
+- tapOn: "Upload ID"
+- tapOn: "Take Photo"
+# Mock ID photo
+- assertVisible: "ID Uploaded"
+- tapOn: "Submit for Review"
+
+# Check verification progress
+- tapOn: "Back"
+- assertVisible: "Verification Pending"
+- assertVisible: "2/3 Complete"

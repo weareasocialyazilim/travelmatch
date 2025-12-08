@@ -1,0 +1,264 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../constants/colors';
+import { TYPOGRAPHY } from '@/theme/typography';
+import { useGiftInbox, type GiftInboxItem } from '../hooks/useGiftInbox';
+import { GiftInboxCard } from '../components/GiftInboxCard';
+import { FilterSortBar, SortFilterModal } from '../components/FilterSortBar';
+import { TopPicksSection } from '../components/TopPicksSection';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
+
+type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
+
+const GiftInboxScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const {
+    refreshing,
+    sortBy,
+    filterBy,
+    showSortModal,
+    showFilterModal,
+    topPicks,
+    newToday,
+    sortedItems,
+    setSortBy,
+    setFilterBy,
+    setShowSortModal,
+    setShowFilterModal,
+    onRefresh,
+    getSortLabel,
+    getFilterLabel,
+  } = useGiftInbox();
+
+  const handleItemPress = (item: GiftInboxItem) => {
+    navigation.navigate('GiftInboxDetail', {
+      senderId: item.sender.id,
+      senderName: item.sender.name,
+      senderAvatar: item.sender.avatar,
+      senderAge: item.sender.age,
+      senderRating: item.sender.rating,
+      senderVerified: item.sender.isVerified,
+      senderTripCount: item.sender.tripCount,
+      senderCity: item.sender.city,
+      gifts: item.gifts,
+      totalAmount: item.totalAmount,
+      canStartChat: item.canStartChat,
+    });
+  };
+
+  const getStatusIcon = (
+    item: GiftInboxItem,
+  ): { icon: IconName; color: string; text: string } => {
+    if (item.canStartChat) {
+      return {
+        icon: 'check-circle',
+        color: COLORS.mint,
+        text: 'Ready to chat',
+      };
+    }
+    const pendingGift = item.gifts.find((g) => g.status === 'pending_proof');
+    if (pendingGift) {
+      return {
+        icon: 'camera-outline',
+        color: COLORS.coral,
+        text: 'Upload proof',
+      };
+    }
+    const verifyingGift = item.gifts.find((g) => g.status === 'verifying');
+    if (verifyingGift) {
+      return {
+        icon: 'timer-sand',
+        color: COLORS.softOrange,
+        text: 'Verifying...',
+      };
+    }
+    return { icon: 'gift-outline', color: COLORS.primary, text: 'Pending' };
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>🎁 Gift Inbox</Text>
+        <TouchableOpacity style={styles.settingsButton}>
+          <MaterialCommunityIcons
+            name="cog-outline"
+            size={24}
+            color={COLORS.text}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Top Picks Section */}
+        <TopPicksSection topPicks={topPicks} onItemPress={handleItemPress} />
+
+        {/* New Today Section */}
+        {newToday.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
+                🆕 New Today ({newToday.length})
+              </Text>
+            </View>
+
+            <View style={styles.inboxList}>
+              {newToday.slice(0, 3).map((item) => (
+                <GiftInboxCard
+                  key={item.id}
+                  item={item}
+                  onPress={() => handleItemPress(item)}
+                  getStatusIcon={getStatusIcon}
+                />
+              ))}
+              {newToday.length > 3 && (
+                <TouchableOpacity style={styles.seeAllButton}>
+                  <Text style={styles.seeAllText}>
+                    See All ({newToday.length})
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={16}
+                    color={COLORS.primary}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* All Gifts Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              📥 All Gifts ({sortedItems.length})
+            </Text>
+          </View>
+
+          <FilterSortBar
+            sortBy={sortBy}
+            filterBy={filterBy}
+            onSortPress={() => setShowSortModal(true)}
+            onFilterPress={() => setShowFilterModal(true)}
+            getSortLabel={getSortLabel}
+            getFilterLabel={getFilterLabel}
+          />
+
+          <View style={styles.inboxList}>
+            {sortedItems.map((item) => (
+              <GiftInboxCard
+                key={item.id}
+                item={item}
+                onPress={() => handleItemPress(item)}
+                getStatusIcon={getStatusIcon}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Sort Modal */}
+      <SortFilterModal
+        visible={showSortModal}
+        title="Sort By"
+        options={['newest', 'highest_amount', 'highest_rating', 'best_match']}
+        selectedValue={sortBy}
+        onClose={() => setShowSortModal(false)}
+        onSelect={(value) => setSortBy(value as any)}
+        getLabel={getSortLabel}
+      />
+
+      {/* Filter Modal */}
+      <SortFilterModal
+        visible={showFilterModal}
+        title="Filter"
+        options={['all', 'thirty_plus', 'verified_only', 'ready_to_chat']}
+        selectedValue={filterBy}
+        onClose={() => setShowFilterModal(false)}
+        onSelect={(value) => setFilterBy(value as any)}
+        getLabel={getFilterLabel}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  headerTitle: {
+    ...TYPOGRAPHY.h2,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  settingsButton: {
+    padding: 8,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 100,
+  },
+  section: {
+    paddingTop: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    ...TYPOGRAPHY.h4,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  inboxList: {
+    paddingHorizontal: 20,
+  },
+  seeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    gap: 4,
+  },
+  seeAllText: {
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+});
+
+export default GiftInboxScreen;

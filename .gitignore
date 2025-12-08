@@ -52,3 +52,5 @@ yarn-error.*
 
 # Test coverage
 coverage/
+.eslintcache
+apps/mobile/.eslintcache

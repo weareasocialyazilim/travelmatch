@@ -34,6 +34,7 @@ A social travel platform connecting travelers through shared experiences and gif
 ### Recent Improvements:
 
 **PHASE 3 Day 1**:
+
 1. ✅ React Hooks Dependencies: 7→0 issues fixed
 2. ✅ console.log Migration: 27→8 (70% reduction, production-safe)
 3. ✅ E2E Testing: 6 critical user flows with Maestro
@@ -41,29 +42,41 @@ A social travel platform connecting travelers through shared experiences and gif
 5. ✅ Code Quality: ESLint warnings -49%, hooks optimized
 
 **PHASE 3 Day 2**:
+
 1. ✅ Sentry Lazy Initialization: -68MB from initial bundle
 2. ✅ Image Optimization Pipeline: Comprehensive utilities + LazyImage component
 3. ✅ Performance Monitoring: TTI tracking implemented
 4. ✅ Advanced Optimizations: Memory efficient, responsive images, caching
 
 **Production Pre-Launch**:
+
 1. ✅ Fixed 15 Critical Bugs: Import errors, syntax errors, type mismatches
 2. ✅ ESLint Improvement: 566→258 problems (-54%)
 3. ✅ Auto-Fixes Applied: 308 formatting and style issues
 4. ✅ All Tests Passing: 77/77 (100%)
 5. ✅ Zero Runtime Crashes: Production ready
 
-**See**: 
+**Security & Quality**:
+
+1. ✅ Logger GDPR Compliance: 33 sensitive patterns auto-redacted
+2. ✅ Pre-commit Hooks: ESLint + Prettier + Jest + TypeScript
+3. ✅ RLS Testing: 30+ security tests, 95% coverage
+4. ✅ Technical Debt Tracking: 36 items documented with priorities
+
+**See**:
+
 - `docs/PHASE_3_DAY_1_SUMMARY.md` - Day 1 detailed report
 - `docs/PHASE_3_DAY_2_SUMMARY.md` - Day 2 detailed report
 - `docs/PRODUCTION_BUG_FIXES.md` - Pre-launch bug fixes
 - `docs/BUNDLE_OPTIMIZATION_RESULTS.md` - Bundle analysis
+- `docs/TECHNICAL_DEBT.md` - Technical debt inventory
+- `CONTRIBUTING.md` - Contribution guidelines
 
 ## 🏁 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - iOS Simulator (macOS) or Android Studio
 - Expo CLI (`npm install -g expo-cli`)
@@ -71,12 +84,14 @@ A social travel platform connecting travelers through shared experiences and gif
 ### Installation
 
 1. Clone the repository
+
    ```sh
    git clone https://github.com/kemalteksalgit/travelmatch.git
    cd travelmatch-new
    ```
 
 2. Install dependencies
+
    ```sh
    npm install
    ```
@@ -113,6 +128,15 @@ npm run lint:fix       # Auto-fix ESLint issues
 npm run format         # Format code with Prettier
 npm run format:check   # Check formatting
 npm run type-check     # Run TypeScript compiler
+npm run validate       # Run all quality checks (lint + type-check + tests)
+npm run validate:hooks # Validate Husky setup
+```
+
+### Database
+
+```sh
+npm run db:test:rls          # Test Row Level Security policies (local)
+npm run db:test:rls:staging  # Test RLS policies (staging)
 ```
 
 ### CI/CD
@@ -161,12 +185,14 @@ travelmatch-new/
 ### Color Constants
 
 All colors are centralized in `/src/constants/`:
+
 - `colors.ts` - Primary color palette
 - `overlays.ts` - Semi-transparent overlays
 - `shadows.ts` - Shadow presets
 - `typography.ts` - Text styles
 
 ### Usage
+
 ```typescript
 import { COLORS } from '@/constants/colors';
 import { OVERLAYS } from '@/constants/overlays';
@@ -180,10 +206,10 @@ import { OVERLAYS } from '@/constants/overlays';
 Multi-level error boundaries are implemented:
 
 ```typescript
-import { 
-  AppErrorBoundary, 
+import {
+  AppErrorBoundary,
   ScreenErrorBoundary,
-  ComponentErrorBoundary 
+  ComponentErrorBoundary
 } from '@/components/ErrorBoundary';
 
 // App level
@@ -204,11 +230,9 @@ WCAG 2.1 AA compliant utilities:
 ```typescript
 import { a11yProps } from '@/utils/accessibility';
 
-<TouchableOpacity 
-  {...a11yProps.button('Submit form', 'Submits the registration form')}
->
+<TouchableOpacity {...a11yProps.button('Submit form', 'Submits the registration form')}>
   <Text>Submit</Text>
-</TouchableOpacity>
+</TouchableOpacity>;
 ```
 
 ## 📝 Migration Scripts
@@ -216,12 +240,14 @@ import { a11yProps } from '@/utils/accessibility';
 Automated code migration tools are available in `/scripts/`:
 
 ### Color Literals Migration
+
 ```sh
 ./scripts/migrate-colors.sh          # Migrate rgba() to OVERLAYS
 ./scripts/migrate-custom-colors.sh   # Migrate hex colors to COLORS
 ```
 
 These scripts:
+
 - Create automatic backups
 - Replace hardcoded colors with constants
 - Auto-add imports
@@ -230,6 +256,7 @@ These scripts:
 ## 🧪 Testing
 
 ### Unit Tests
+
 Test coverage: **77/77 tests passing (100%)**
 
 ```sh
@@ -250,6 +277,7 @@ npm run test:e2e:single .maestro/login-flow.yaml  # Run specific flow
 ```
 
 **Test Coverage:**
+
 - ✅ Authentication (Login/Logout)
 - ✅ Moment Creation & Publishing
 - ✅ Gift Booking & Payment
@@ -273,24 +301,51 @@ GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push/PR:
 ### Pre-commit Hooks
 
 Husky + lint-staged automatically:
+
 - Runs ESLint on staged `.ts/.tsx` files
 - Formats code with Prettier
 - Prevents commits with errors
 
 ## 🤝 Contributing
 
+**Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.**
+
+### Quick Start
+
 1. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-2. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-3. Push to the branch (`git push origin feature/AmazingFeature`)
-4. Open a Pull Request
+2. Make your changes following our [coding standards](CONTRIBUTING.md#coding-standards)
+3. Add tests for new functionality
+4. Run validation: `npm run validate`
+5. Commit your changes (pre-commit hooks will run automatically)
+6. Push to the branch (`git push origin feature/AmazingFeature`)
+7. Open a Pull Request using our [PR template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ### Code Style
 
 - Follow ESLint rules (strict mode)
 - Use TypeScript strict mode
-- Write tests for new features
+- Write tests for new features (minimum 70% coverage)
 - Use design tokens (COLORS, TYPOGRAPHY, etc.)
 - Add accessibility props to interactive elements
+- Never log sensitive data (use `logger` which auto-redacts)
+
+### Technical Debt
+
+We track technical debt using TODO/FIXME comments and GitHub Issues:
+
+- **Current items**: 36 tracked items
+- **Critical**: 4 items (real-time subscriptions, social auth, GDPR compliance)
+- **High**: 8 items (database queries, analytics, profile calculations)
+- **See**: [docs/TECHNICAL_DEBT.md](docs/TECHNICAL_DEBT.md) for full inventory
+
+### Reporting Issues
+
+Use our issue templates:
+
+- [🐛 Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)
+- [✨ Feature Request](.github/ISSUE_TEMPLATE/feature_request.md)
+- [🏗️ Technical Debt](.github/ISSUE_TEMPLATE/technical_debt.md)
+- [📚 Documentation](.github/ISSUE_TEMPLATE/documentation.md)
 
 ## 📄 License
 
@@ -298,7 +353,8 @@ This project is private and proprietary.
 
 ## 📞 Contact
 
-Project Link: [https://github.com/kemalteksalgit/travelmatch](https://github.com/kemalteksalgit/travelmatch)
+Project Link:
+[https://github.com/kemalteksalgit/travelmatch](https://github.com/kemalteksalgit/travelmatch)
 
 ---
 
@@ -315,12 +371,12 @@ Project Link: [https://github.com/kemalteksalgit/travelmatch](https://github.com
 
 ### Metrics
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| ESLint Errors | 340 | 175 | -49% ⬇️ |
-| Test Pass Rate | 95% | 100% | +5% ✅ |
-| Any Types | 56 | 37 | -33% |
-| Color Literals | 143 | 5 | -96% |
+| Metric         | Before | After | Improvement |
+| -------------- | ------ | ----- | ----------- |
+| ESLint Errors  | 340    | 175   | -49% ⬇️     |
+| Test Pass Rate | 95%    | 100%  | +5% ✅      |
+| Any Types      | 56     | 37    | -33%        |
+| Color Literals | 143    | 5     | -96%        |
 
 ## 📚 Reusable Components
 
@@ -373,3 +429,4 @@ A card component for displaying a moment.
 - **Screens:** The app's screens are located in `src/screens`.
 - **Services:** The app's API services are located in `src/services`.
 - **Types:** The app's TypeScript types are located in `src/types`.
+````

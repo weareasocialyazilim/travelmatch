@@ -45,10 +45,15 @@ $$ LANGUAGE plpgsql;
 -- Drop trigger if exists to avoid errors on re-run
 DROP TRIGGER IF EXISTS on_user_update_sensitive ON users;
 
-CREATE TRIGGER on_user_update_sensitive
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'on_user_update_sensitive') THEN
+        CREATE TRIGGER on_user_update_sensitive
   BEFORE UPDATE ON users
   FOR EACH ROW
   EXECUTE FUNCTION prevent_sensitive_updates();
+    END IF;
+END $$;
 
 
 -- ============================================

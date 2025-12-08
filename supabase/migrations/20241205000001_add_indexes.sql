@@ -28,6 +28,12 @@ CREATE INDEX IF NOT EXISTS idx_moments_created_at ON moments(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_moments_is_featured ON moments(is_featured) WHERE is_featured = TRUE;
 CREATE INDEX IF NOT EXISTS idx_moments_active ON moments(status, date) WHERE status = 'active';
 
+-- Composite indexes for common queries (N+1 prevention)
+CREATE INDEX IF NOT EXISTS idx_moments_user_status ON moments(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_moments_status_created ON moments(status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_moments_category_status ON moments(category, status);
+CREATE INDEX IF NOT EXISTS idx_moments_location_status ON moments(location, status) WHERE status = 'active';
+
 -- ============================================
 -- REQUESTS INDEXES
 -- ============================================
@@ -36,6 +42,11 @@ CREATE INDEX IF NOT EXISTS idx_requests_user_id ON requests(user_id);
 CREATE INDEX IF NOT EXISTS idx_requests_status ON requests(status);
 CREATE INDEX IF NOT EXISTS idx_requests_created_at ON requests(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_requests_pending ON requests(moment_id, status) WHERE status = 'pending';
+
+-- Composite indexes for filtering and sorting
+CREATE INDEX IF NOT EXISTS idx_requests_user_status ON requests(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_requests_moment_status ON requests(moment_id, status);
+CREATE INDEX IF NOT EXISTS idx_requests_status_created ON requests(status, created_at DESC);
 
 -- ============================================
 -- CONVERSATIONS INDEXES
@@ -99,3 +110,43 @@ CREATE INDEX IF NOT EXISTS idx_transactions_moment_id ON transactions(moment_id)
 CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);
 CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC);
+
+-- Composite indexes for transaction filtering and reporting
+CREATE INDEX IF NOT EXISTS idx_transactions_user_status ON transactions(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_created ON transactions(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_type_status ON transactions(type, status);
+CREATE INDEX IF NOT EXISTS idx_transactions_status_created ON transactions(status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_moment_status ON transactions(moment_id, status);
+
+-- ============================================
+-- MESSAGES INDEXES (Enhanced)
+-- ============================================
+-- Covering index for message queries with timestamps
+CREATE INDEX IF NOT EXISTS idx_messages_conv_created ON messages(conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_sender_created ON messages(sender_id, created_at DESC);
+
+-- ============================================
+-- REVIEWS INDEXES (Enhanced)
+-- ============================================
+-- Composite indexes for review queries
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewed_rating ON reviews(reviewed_id, rating);
+CREATE INDEX IF NOT EXISTS idx_reviews_moment_rating ON reviews(moment_id, rating);
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewed_created ON reviews(reviewed_id, created_at DESC);
+
+-- ============================================
+-- USERS INDEXES (Enhanced)
+-- ============================================
+-- Performance indexes for user search and filtering
+CREATE INDEX IF NOT EXISTS idx_users_location_verified ON users(location, verified) WHERE verified = TRUE;
+CREATE INDEX IF NOT EXISTS idx_users_rating_verified ON users(rating DESC, verified) WHERE verified = TRUE;
+
+-- ============================================
+-- PERFORMANCE ANALYSIS
+-- ============================================
+-- Use these queries to analyze index usage:
+-- SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read, idx_tup_fetch
+-- FROM pg_stat_user_indexes WHERE schemaname = 'public' ORDER BY idx_scan;
+--
+-- Check index size:
+-- SELECT schemaname, tablename, indexname, pg_size_pretty(pg_relation_size(indexrelid))
+-- FROM pg_stat_user_indexes WHERE schemaname = 'public' ORDER BY pg_relation_size(indexrelid) DESC;

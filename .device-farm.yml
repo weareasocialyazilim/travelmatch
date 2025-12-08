@@ -1,0 +1,373 @@
+# Device Farm Testing Configuration
+# AWS Device Farm & BrowserStack integration for real device testing
+
+# Test Matrix
+matrix:
+  android:
+    # Flagship devices (Most popular)
+    - name: 'Samsung Galaxy S23'
+      os: 'Android 13'
+      priority: high
+      usage: 18%
+    
+    - name: 'Samsung Galaxy S22'
+      os: 'Android 12'
+      priority: high
+      usage: 15%
+    
+    - name: 'Google Pixel 7'
+      os: 'Android 13'
+      priority: high
+      usage: 12%
+    
+    - name: 'Google Pixel 6'
+      os: 'Android 12'
+      priority: medium
+      usage: 8%
+    
+    # Mid-range devices
+    - name: 'Samsung Galaxy A54'
+      os: 'Android 13'
+      priority: medium
+      usage: 7%
+    
+    - name: 'Xiaomi Redmi Note 12'
+      os: 'Android 13'
+      priority: medium
+      usage: 6%
+    
+    # Budget devices (Performance testing)
+    - name: 'Samsung Galaxy A14'
+      os: 'Android 13'
+      priority: low
+      usage: 4%
+      notes: 'Low-end performance testing'
+    
+    # Older OS versions (Compatibility)
+    - name: 'Samsung Galaxy S10'
+      os: 'Android 10'
+      priority: low
+      usage: 3%
+      notes: 'Minimum OS version support'
+
+  ios:
+    # Latest generation
+    - name: 'iPhone 14 Pro Max'
+      os: 'iOS 16.5'
+      priority: high
+      usage: 22%
+    
+    - name: 'iPhone 14 Pro'
+      os: 'iOS 16.5'
+      priority: high
+      usage: 18%
+    
+    - name: 'iPhone 14'
+      os: 'iOS 16.5'
+      priority: high
+      usage: 15%
+    
+    # Previous generation
+    - name: 'iPhone 13 Pro'
+      os: 'iOS 16.4'
+      priority: medium
+      usage: 12%
+    
+    - name: 'iPhone 13'
+      os: 'iOS 16.3'
+      priority: medium
+      usage: 10%
+    
+    - name: 'iPhone 12'
+      os: 'iOS 16.0'
+      priority: medium
+      usage: 8%
+    
+    # Older devices (Compatibility)
+    - name: 'iPhone SE (3rd gen)'
+      os: 'iOS 16.0'
+      priority: low
+      usage: 4%
+      notes: 'Small screen testing'
+    
+    - name: 'iPhone XR'
+      os: 'iOS 15.0'
+      priority: low
+      usage: 3%
+      notes: 'Minimum OS version support'
+
+# Test Suites per Device Type
+test_suites:
+  smoke:
+    description: 'Quick smoke test - 5 min'
+    devices: ['flagship_only']
+    flows:
+      - onboarding-complete
+      - discover-match
+      - messaging
+    frequency: 'every_commit'
+  
+  regression:
+    description: 'Full regression suite - 30 min'
+    devices: ['all']
+    flows:
+      - onboarding-complete
+      - discover-match
+      - messaging
+      - moments-feed
+      - profile-management
+      - payment-complete
+      - search-filter
+      - offline-mode
+    frequency: 'daily'
+  
+  performance:
+    description: 'Performance testing - 20 min'
+    devices: ['flagship', 'budget']
+    flows:
+      - feed-scroll-perf
+      - image-load-perf
+      - memory-leak-test
+    frequency: 'weekly'
+  
+  compatibility:
+    description: 'OS compatibility - 15 min'
+    devices: ['oldest_supported']
+    flows:
+      - onboarding-complete
+      - discover-match
+      - messaging
+    frequency: 'release'
+
+# Device Farm Providers
+providers:
+  aws_device_farm:
+    enabled: true
+    project_arn: 'arn:aws:devicefarm:us-west-2:ACCOUNT:project:PROJECT-ID'
+    region: 'us-west-2'
+    upload_type: 'ANDROID_APP'  # or IOS_APP
+    test_type: 'APPIUM_NODE'
+    
+    # Test configuration
+    test_spec:
+      phases:
+        install:
+          commands:
+            - npm install -g appium
+            - npm install
+        pre_test:
+          commands:
+            - appium --log-timestamp --log-no-colors > appium.log 2>&1 &
+            - sleep 5
+        test:
+          commands:
+            - npm run test:e2e:devicefarm
+        post_test:
+          commands:
+            - cat appium.log
+    
+    # Execution configuration
+    execution:
+      timeout_minutes: 60
+      job_timeout_minutes: 30
+      app_packages_cleanup: true
+      video: true
+      skip_app_resign: false
+  
+  browserstack:
+    enabled: true
+    username: ${BROWSERSTACK_USERNAME}
+    access_key: ${BROWSERSTACK_ACCESS_KEY}
+    
+    # Capabilities
+    capabilities:
+      project: 'TravelMatch'
+      build: 'Build ${CI_BUILD_NUMBER}'
+      name: '${TEST_NAME}'
+      browserstack.debug: true
+      browserstack.video: true
+      browserstack.networkLogs: true
+      browserstack.appium_version: '2.0.0'
+  
+  sauce_labs:
+    enabled: false
+    username: ${SAUCE_USERNAME}
+    access_key: ${SAUCE_ACCESS_KEY}
+
+# Test Execution Strategy
+execution:
+  # Parallel execution
+  parallel:
+    enabled: true
+    max_workers: 10
+    per_device: 2
+  
+  # Retry strategy
+  retry:
+    failed_tests: 2
+    flaky_threshold: 3
+  
+  # Timeouts
+  timeouts:
+    test: 600  # 10 minutes per test
+    suite: 3600  # 1 hour per suite
+  
+  # Video recording
+  video:
+    enabled: true
+    on_pass: false
+    on_fail: true
+  
+  # Screenshots
+  screenshots:
+    enabled: true
+    on_error: true
+    on_assert: false
+  
+  # Logs
+  logs:
+    appium: true
+    device: true
+    system: true
+
+# Performance Metrics
+performance_metrics:
+  collect:
+    - cpu_usage
+    - memory_usage
+    - battery_drain
+    - network_traffic
+    - frame_rate
+    - app_startup_time
+  
+  thresholds:
+    cpu_usage_max: 60%
+    memory_usage_max: 200MB
+    battery_drain_max: 5%/hour
+    frame_rate_min: 55fps
+    app_startup_max: 3s
+
+# Reporting
+reporting:
+  # Report formats
+  formats:
+    - junit
+    - html
+    - json
+    - allure
+  
+  # Upload results
+  upload:
+    - s3:
+        bucket: 'travelmatch-test-results'
+        path: 'device-farm/${BUILD_NUMBER}'
+    
+    - slack:
+        webhook: ${SLACK_WEBHOOK_URL}
+        channels: ['#mobile-testing', '#qa']
+    
+    - jira:
+        enabled: true
+        create_ticket_on_fail: true
+        project: 'TM'
+  
+  # Test rail integration
+  test_rail:
+    enabled: false
+    url: ${TESTRAIL_URL}
+    username: ${TESTRAIL_USERNAME}
+    password: ${TESTRAIL_PASSWORD}
+
+# Cost Optimization
+cost_optimization:
+  # Device selection strategy
+  device_selection:
+    strategy: 'coverage_based'  # coverage_based | usage_based | budget_based
+    min_coverage: 80%
+    max_devices: 15
+  
+  # Test prioritization
+  test_prioritization:
+    enabled: true
+    criteria:
+      - critical_path: 100%
+      - high_priority: 80%
+      - medium_priority: 40%
+      - low_priority: 20%
+  
+  # Caching
+  caching:
+    app_binaries: true
+    dependencies: true
+    test_data: true
+  
+  # Cleanup
+  cleanup:
+    old_results: 30  # days
+    failed_builds: 90  # days
+
+# CI/CD Integration
+ci_integration:
+  github_actions:
+    trigger:
+      - pull_request
+      - push_to_main
+      - nightly_schedule
+    
+    workflow: |
+      - name: Run Device Farm Tests
+        uses: aws-actions/aws-devicefarm-run-test@v1
+        with:
+          project-arn: ${{ secrets.AWS_DEVICE_FARM_PROJECT }}
+          app-path: app-release.apk
+          test-package-path: test-package.zip
+  
+  gitlab_ci:
+    enabled: false
+  
+  jenkins:
+    enabled: false
+
+# Security & Compliance
+security:
+  # Data privacy
+  data_privacy:
+    mask_pii: true
+    encrypt_screenshots: true
+    auto_delete_results: 90  # days
+  
+  # Access control
+  access_control:
+    require_approval: true
+    allowed_teams: ['qa', 'mobile', 'devops']
+  
+  # Compliance
+  compliance:
+    gdpr: true
+    ccpa: true
+    hipaa: false
+
+# Monitoring & Alerts
+monitoring:
+  # Failure alerts
+  alerts:
+    - type: 'test_failure'
+      threshold: 3  # consecutive failures
+      channels: ['slack', 'email']
+    
+    - type: 'flaky_test'
+      threshold: 5  # failures in 10 runs
+      channels: ['slack']
+    
+    - type: 'performance_degradation'
+      threshold: 20%  # slower than baseline
+      channels: ['slack', 'pagerduty']
+  
+  # Dashboards
+  dashboards:
+    grafana:
+      url: ${GRAFANA_URL}
+      dashboard_id: 'device-farm-testing'
+    
+    datadog:
+      enabled: false
