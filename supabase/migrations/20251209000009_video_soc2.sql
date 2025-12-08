@@ -1,0 +1,4 @@
+-- Migration placeholder: 20251209000009_video_soc2.sql
+-- Tables referenced in this migration may not exist yet
+-- This migration has been temporarily disabled for initial setup
+SELECT '20251209000009_video_soc2.sql - skipped (to be applied manually)'::text AS status;

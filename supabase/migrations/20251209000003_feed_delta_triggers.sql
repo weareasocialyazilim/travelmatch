@@ -62,11 +62,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Create trigger on matches table
-DROP TRIGGER IF EXISTS matches_change_tracker ON public.matches;
-CREATE TRIGGER matches_change_tracker
-AFTER INSERT OR UPDATE OR DELETE ON public.matches
-FOR EACH ROW EXECUTE FUNCTION track_match_changes();
+-- Create trigger on matches table (DISABLED - matches table not used)
+-- DROP TRIGGER IF EXISTS matches_change_tracker ON public.matches;
+-- CREATE TRIGGER matches_change_tracker
+-- AFTER INSERT OR UPDATE OR DELETE ON public.matches
+-- FOR EACH ROW EXECUTE FUNCTION track_match_changes();
 
 -- ============================================================================
 -- Trigger Function: Track Message Changes

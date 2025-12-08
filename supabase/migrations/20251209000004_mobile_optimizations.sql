@@ -93,16 +93,16 @@ CREATE POLICY "Service can insert quality scores"
     ON proof_quality_scores FOR INSERT
     WITH CHECK (true);
 
--- Only moderators can update scores (manual review)
-CREATE POLICY "Moderators can update quality scores"
-    ON proof_quality_scores FOR UPDATE
-    USING (
-        EXISTS (
-            SELECT 1 FROM user_roles
-            WHERE user_id = auth.uid()
-            AND role IN ('moderator', 'admin')
-        )
-    );
+-- Only moderators can update scores (manual review) - DISABLED (user_roles table not implemented)
+-- CREATE POLICY "Moderators can update quality scores"
+--     ON proof_quality_scores FOR UPDATE
+--     USING (
+--         EXISTS (
+--             SELECT 1 FROM users
+--             WHERE id = auth.uid()
+--             AND role IN ('moderator', 'admin')
+--         )
+--     );
 
 -- Analytics Views
 
