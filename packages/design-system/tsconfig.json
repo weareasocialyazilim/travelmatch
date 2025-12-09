@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
@@ -8,7 +9,7 @@
     "declarationMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strict": true,
@@ -22,5 +23,5 @@
     "types": ["jest", "@testing-library/jest-native"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/__tests__/**", "**/*.test.tsx"]
+  "exclude": ["node_modules", "dist"]
 }
