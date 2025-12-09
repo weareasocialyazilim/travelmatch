@@ -5,10 +5,10 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 import { LazyImage } from '../LazyImage';
-import { useLazyImage, imageCacheManager } from '../../../utils/imageOptimization';
+import { useLazyImage, imageCacheManager } from '@/utils/imageOptimization';
 
 // Mock dependencies
-jest.mock('../../../utils/imageOptimization', () => ({
+jest.mock('@/utils/imageOptimization', () => ({
   useLazyImage: jest.fn(),
   imageCacheManager: {
     isCached: jest.fn(),

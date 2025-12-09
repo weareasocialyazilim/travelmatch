@@ -60,7 +60,7 @@ jest.mock('@react-native-community/netinfo', () => ({
 }));
 
 // Mock Supabase client globally
-jest.mock('./apps/mobile/src/config/supabase', () => ({
+jest.mock('./src/config/supabase', () => ({
   supabase: {
     auth: {
       getSession: jest.fn(() => Promise.resolve({ data: { session: null }, error: null })),
@@ -95,7 +95,7 @@ jest.mock('./apps/mobile/src/config/supabase', () => ({
 // Mock ThemeContext to avoid async AsyncStorage loading (mobile app only)
 // This mock is only active when running tests from apps/mobile
 try {
-  jest.mock('./apps/mobile/src/context/ThemeContext', () => {
+  jest.mock('./src/context/ThemeContext', () => {
     const React = require('react');
     
     return {

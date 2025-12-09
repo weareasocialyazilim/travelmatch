@@ -12,7 +12,7 @@ jest.mock('react-native-video', () => {
 }, { virtual: true });
 
 // Mock design system tokens
-jest.mock('@travelmatch/design-system/tokens', () => ({
+jest.mock('@travelmatch/design-system', () => ({
   colors: {
     primary: { 500: '#007AFF' },
     neutral: { 0: '#FFFFFF', 100: '#F5F5F5', 200: '#E5E5E5', 300: '#D4D4D4', 900: '#171717' },

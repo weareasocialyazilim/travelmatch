@@ -1,0 +1,309 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormComponents FormInput - Snapshots should match snapshot for basic input 1`] = `
+<RCTView
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Email
+  </RCTText>
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5",
+        "borderRadius": 12,
+        "borderWidth": 1.5,
+        "flexDirection": "row",
+        "minHeight": 52,
+        "paddingHorizontal": 14,
+      }
+    }
+  >
+    <RCTTextInput
+      accessibilityLabel="Email"
+      autoCapitalize="none"
+      autoComplete="off"
+      blurOnSubmit={true}
+      editable={true}
+      keyboardType="default"
+      multiline={false}
+      numberOfLines={1}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholder="Enter email"
+      placeholderTextColor="#9CA3AF"
+      secureTextEntry={false}
+      style={
+        [
+          {
+            "color": "#1A1A1A",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          false,
+          undefined,
+          false,
+        ]
+      }
+      value=""
+    />
+  </RCTView>
+</RCTView>
+`;
+
+exports[`FormComponents FormInput - Snapshots should match snapshot for disabled 1`] = `
+<RCTView
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Email
+  </RCTText>
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "#F3F4F6",
+        "borderColor": "#E5E5E5",
+        "borderRadius": 12,
+        "borderWidth": 1.5,
+        "flexDirection": "row",
+        "minHeight": 52,
+        "opacity": 0.7,
+        "paddingHorizontal": 14,
+      }
+    }
+  >
+    <RCTTextInput
+      accessibilityLabel="Email"
+      autoCapitalize="none"
+      autoComplete="off"
+      blurOnSubmit={true}
+      editable={false}
+      keyboardType="default"
+      multiline={false}
+      numberOfLines={1}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#9CA3AF"
+      secureTextEntry={false}
+      style={
+        [
+          {
+            "color": "#1A1A1A",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          false,
+          undefined,
+          false,
+        ]
+      }
+      value="disabled@example.com"
+    />
+  </RCTView>
+</RCTView>
+`;
+
+exports[`FormComponents FormInput - Snapshots should match snapshot for multiline 1`] = `
+<RCTView
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Description
+  </RCTText>
+  <RCTView
+    style={
+      {
+        "alignItems": "flex-start",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5",
+        "borderRadius": 12,
+        "borderWidth": 1.5,
+        "flexDirection": "row",
+        "minHeight": 100,
+        "paddingHorizontal": 14,
+        "paddingVertical": 12,
+      }
+    }
+  >
+    <RCTTextInput
+      accessibilityLabel="Description"
+      autoCapitalize="none"
+      autoComplete="off"
+      blurOnSubmit={true}
+      editable={true}
+      keyboardType="default"
+      multiline={true}
+      numberOfLines={4}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#9CA3AF"
+      secureTextEntry={false}
+      style={
+        [
+          {
+            "color": "#1A1A1A",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          {
+            "minHeight": 76,
+            "textAlignVertical": "top",
+          },
+          undefined,
+          false,
+        ]
+      }
+      value=""
+    />
+  </RCTView>
+</RCTView>
+`;
+
+exports[`FormComponents FormInput - Snapshots should match snapshot with error 1`] = `
+<RCTView
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Email
+  </RCTText>
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "#FEF2F2",
+        "borderColor": "#EF4444",
+        "borderRadius": 12,
+        "borderWidth": 1.5,
+        "flexDirection": "row",
+        "minHeight": 52,
+        "paddingHorizontal": 14,
+      }
+    }
+  >
+    <RCTTextInput
+      accessibilityLabel="Email"
+      autoCapitalize="none"
+      autoComplete="off"
+      blurOnSubmit={true}
+      editable={true}
+      keyboardType="default"
+      multiline={false}
+      numberOfLines={1}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#9CA3AF"
+      secureTextEntry={false}
+      style={
+        [
+          {
+            "color": "#1A1A1A",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          false,
+          undefined,
+          false,
+        ]
+      }
+      value=""
+    />
+  </RCTView>
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "gap": 4,
+        "marginTop": 6,
+      }
+    }
+  >
+    <RCTText
+      color="#EF4444"
+      name="alert-circle"
+      size={14}
+      testID="RCTText"
+    >
+      alert-circle
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#EF4444",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Required
+    </RCTText>
+  </RCTView>
+</RCTView>
+`;

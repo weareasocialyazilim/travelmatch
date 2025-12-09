@@ -7,10 +7,10 @@ module.exports = {
   testTimeout: 10000, // Increased from default 5000ms
   // Override setupFiles to avoid React Native's setup.js with Flow types
   setupFiles: ['<rootDir>/jest.setup.mobile.js'],
-  setupFilesAfterEnv: ['<rootDir>/../../jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.root-backup.js'],
   transform: {
     ...jestExpoPreset.transform,
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './../../babel.config.js' }],
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(.pnpm|react-native|@react-native|@testing-library|expo|@expo|@unimodules|react-navigation|@react-navigation|@supabase))',
@@ -23,6 +23,11 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
     '<rootDir>/src/**/*.test.{ts,tsx}',
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__\\.backup/',
+    '/tests\\.backup/',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

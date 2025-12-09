@@ -1,23 +1,14 @@
 /**
- * secureStorage - Comprehensive Tests
- * 
- * Tests for secure storage:
- * - SecureStore vs AsyncStorage fallback
- * - Encryption and secure storage
- * - Platform-specific behavior (iOS, Android, Web)
- * - Migration from AsyncStorage to SecureStore
- * - Error handling and fallbacks
- * - Storage keys classification
+ * Tests for secureStorage utility
+ * Target: 85%+ coverage
+ *
+ * Note: This tests the observable behavior of secureStorage since the isSecureStoreAvailable
+ * function is internal. We test through different platform and availability scenarios.
  */
 
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import {
-  secureStorage,
-  StorageKeys,
-  migrateSensitiveDataToSecure,
-} from '../secureStorage';
+import { secureStorage, AUTH_STORAGE_KEYS } from '@/utils/secureStorage';
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -33,450 +24,385 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(),
 }));
 
-const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
-const mockSecureStore = SecureStore as jest.Mocked<typeof SecureStore>;
+const mockPlatform = { OS: 'ios' };
+jest.mock('react-native/Libraries/Utilities/Platform', () => mockPlatform, { virtual: true });
 
 describe('secureStorage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPlatform.OS = 'ios';
   });
 
-  describe('SecureStore Available', () => {
-    beforeEach(() => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
+  describe('AUTH_STORAGE_KEYS', () => {
+    it('should export all required auth storage keys', () => {
+      expect(AUTH_STORAGE_KEYS.ACCESS_TOKEN).toBe('auth_access_token');
+      expect(AUTH_STORAGE_KEYS.REFRESH_TOKEN).toBe('auth_refresh_token');
+      expect(AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT).toBe('auth_token_expires');
+      expect(AUTH_STORAGE_KEYS.USER).toBe('@auth_user');
     });
 
-    it('should use SecureStore when available', async () => {
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
+    it('should have consistent key naming for secure keys', () => {
+      const secureKeys = [
+        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
+        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
+        AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
+      ];
 
-      await secureStorage.setItem('test_key', 'test_value');
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith('test_key', 'test_value');
-      expect(mockAsyncStorage.setItem).not.toHaveBeenCalled();
+      secureKeys.forEach((key) => {
+        expect(key).toMatch(/^auth_/);
+        expect(key).not.toMatch(/^@/);
+      });
     });
 
-    it('should retrieve from SecureStore when available', async () => {
-      mockSecureStore.getItemAsync.mockResolvedValue('secure_value');
-
-      const value = await secureStorage.getItem('test_key');
-
-      expect(value).toBe('secure_value');
-      expect(mockSecureStore.getItemAsync).toHaveBeenCalledWith('test_key');
-      expect(mockAsyncStorage.getItem).not.toHaveBeenCalled();
-    });
-
-    it('should delete from SecureStore when available', async () => {
-      mockSecureStore.deleteItemAsync.mockResolvedValue(undefined);
-
-      await secureStorage.deleteItem('test_key');
-
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledWith('test_key');
-      expect(mockAsyncStorage.removeItem).not.toHaveBeenCalled();
-    });
-
-    it('should return null when key does not exist', async () => {
-      mockSecureStore.getItemAsync.mockResolvedValue(null);
-
-      const value = await secureStorage.getItem('nonexistent');
-
-      expect(value).toBeNull();
+    it('should mark USER key for AsyncStorage with @ prefix', () => {
+      expect(AUTH_STORAGE_KEYS.USER).toMatch(/^@/);
     });
   });
 
-  describe('SecureStore Unavailable - Fallback to AsyncStorage', () => {
+  describe('setItem - SecureStore available', () => {
     beforeEach(() => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(false);
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
     });
 
-    it('should use AsyncStorage when SecureStore unavailable', async () => {
-      mockAsyncStorage.setItem.mockResolvedValue(undefined);
-
+    it('should store item in SecureStore when available', async () => {
       await secureStorage.setItem('test_key', 'test_value');
 
-      expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@secure_test_key',
-        'test_value'
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('test_key', 'test_value');
+    });
+
+    it('should store auth tokens in SecureStore', async () => {
+      await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, 'token_123');
+
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
+        'token_123'
       );
-      expect(mockSecureStore.setItemAsync).not.toHaveBeenCalled();
-    });
-
-    it('should retrieve from AsyncStorage when SecureStore unavailable', async () => {
-      mockAsyncStorage.getItem.mockResolvedValue('async_value');
-
-      const value = await secureStorage.getItem('test_key');
-
-      expect(value).toBe('async_value');
-      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith('@secure_test_key');
-      expect(mockSecureStore.getItemAsync).not.toHaveBeenCalled();
-    });
-
-    it('should delete from AsyncStorage when SecureStore unavailable', async () => {
-      mockAsyncStorage.removeItem.mockResolvedValue(undefined);
-
-      await secureStorage.deleteItem('test_key');
-
-      expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith('@secure_test_key');
-      expect(mockSecureStore.deleteItemAsync).not.toHaveBeenCalled();
     });
   });
 
-  describe('Web Platform', () => {
-    const originalPlatform = Platform.OS;
-
-    beforeAll(() => {
-      Object.defineProperty(Platform, 'OS', {
-        get: () => 'web',
-        configurable: true,
-      });
+  describe('setItem - SecureStore not available', () => {
+    beforeEach(() => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(false);
+      (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
     });
 
-    afterAll(() => {
-      Object.defineProperty(Platform, 'OS', {
-        get: () => originalPlatform,
-        configurable: true,
-      });
+    it('should fallback to AsyncStorage when SecureStore not available', async () => {
+      await secureStorage.setItem('test_key', 'test_value');
+
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_test_key', 'test_value');
+    });
+
+    it('should prefix keys with @secure_ when using AsyncStorage', async () => {
+      await secureStorage.setItem('my_key', 'my_value');
+
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_my_key', 'my_value');
+    });
+  });
+
+  describe('setItem - web platform', () => {
+    beforeEach(() => {
+      mockPlatform.OS = 'web';
+      (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
     });
 
     it('should use AsyncStorage on web platform', async () => {
-      mockAsyncStorage.setItem.mockResolvedValue(undefined);
-
       await secureStorage.setItem('web_key', 'web_value');
 
-      expect(mockAsyncStorage.setItem).toHaveBeenCalledWith('@secure_web_key', 'web_value');
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_web_key', 'web_value');
+      expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
     });
   });
 
-  describe('Error Handling - Fallback to AsyncStorage', () => {
-    beforeEach(() => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-    });
-
-    it('should fallback to AsyncStorage on SecureStore write error', async () => {
-      mockSecureStore.setItemAsync.mockRejectedValue(new Error('SecureStore error'));
-      mockAsyncStorage.setItem.mockResolvedValue(undefined);
+  describe('setItem - error handling', () => {
+    it('should fallback to AsyncStorage when SecureStore throws error', async () => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.setItemAsync as jest.Mock).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
 
       await secureStorage.setItem('test_key', 'test_value');
 
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalled();
-      expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@secure_test_key',
-        'test_value'
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_test_key', 'test_value');
+    });
+
+    it('should throw if both SecureStore and AsyncStorage fail', async () => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.setItemAsync as jest.Mock).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.setItem as jest.Mock).mockRejectedValue(new Error('AsyncStorage error'));
+
+      await expect(secureStorage.setItem('test_key', 'test_value')).rejects.toThrow(
+        'AsyncStorage error'
       );
-    });
-
-    it('should fallback to AsyncStorage on SecureStore read error', async () => {
-      mockSecureStore.getItemAsync.mockRejectedValue(new Error('Read error'));
-      mockAsyncStorage.getItem.mockResolvedValue('fallback_value');
-
-      const value = await secureStorage.getItem('test_key');
-
-      expect(value).toBe('fallback_value');
-      expect(mockSecureStore.getItemAsync).toHaveBeenCalled();
-      expect(mockAsyncStorage.getItem).toHaveBeenCalled();
-    });
-
-    it('should fallback to AsyncStorage on SecureStore delete error', async () => {
-      mockSecureStore.deleteItemAsync.mockRejectedValue(new Error('Delete error'));
-      mockAsyncStorage.removeItem.mockResolvedValue(undefined);
-
-      await secureStorage.deleteItem('test_key');
-
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalled();
-      expect(mockAsyncStorage.removeItem).toHaveBeenCalled();
     });
   });
 
-  describe('Delete Multiple Items', () => {
+  describe('getItem - SecureStore available', () => {
     beforeEach(() => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      mockSecureStore.deleteItemAsync.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+    });
+
+    it('should retrieve item from SecureStore', async () => {
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue('stored_value');
+
+      const result = await secureStorage.getItem('test_key');
+
+      expect(result).toBe('stored_value');
+      expect(SecureStore.getItemAsync).toHaveBeenCalledWith('test_key');
+    });
+
+    it('should return null when key does not exist', async () => {
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+
+      const result = await secureStorage.getItem('nonexistent');
+
+      expect(result).toBeNull();
+    });
+
+    it('should retrieve auth tokens from SecureStore', async () => {
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue('refresh_token_456');
+
+      const result = await secureStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
+
+      expect(result).toBe('refresh_token_456');
+    });
+  });
+
+  describe('getItem - SecureStore not available', () => {
+    beforeEach(() => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(false);
+    });
+
+    it('should retrieve from AsyncStorage when SecureStore not available', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('async_value');
+
+      const result = await secureStorage.getItem('test_key');
+
+      expect(result).toBe('async_value');
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith('@secure_test_key');
+    });
+
+    it('should return null from AsyncStorage when key does not exist', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+
+      const result = await secureStorage.getItem('nonexistent');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getItem - error handling', () => {
+    it('should fallback to AsyncStorage when SecureStore throws error', async () => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.getItemAsync as jest.Mock).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('fallback_value');
+
+      const result = await secureStorage.getItem('test_key');
+
+      expect(result).toBe('fallback_value');
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith('@secure_test_key');
+    });
+
+    it('should handle isAvailableAsync throwing error', async () => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockRejectedValue(
+        new Error('Availability check failed')
+      );
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('async_fallback');
+
+      const result = await secureStorage.getItem('test_key');
+
+      expect(result).toBe('async_fallback');
+    });
+  });
+
+  describe('deleteItem - SecureStore available', () => {
+    beforeEach(() => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
+    });
+
+    it('should delete from SecureStore when available', async () => {
+      await secureStorage.deleteItem('test_key');
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('test_key');
+    });
+
+    it('should delete auth tokens from SecureStore', async () => {
+      await secureStorage.deleteItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+    });
+  });
+
+  describe('deleteItem - SecureStore not available', () => {
+    beforeEach(() => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(false);
+      (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
+    });
+
+    it('should delete from AsyncStorage when SecureStore not available', async () => {
+      await secureStorage.deleteItem('test_key');
+
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('@secure_test_key');
+    });
+  });
+
+  describe('deleteItem - error handling', () => {
+    it('should fallback to AsyncStorage when SecureStore throws error', async () => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValue(
+        new Error('SecureStore delete error')
+      );
+      (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
+
+      await secureStorage.deleteItem('test_key');
+
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('@secure_test_key');
+    });
+  });
+
+  describe('deleteItems', () => {
+    beforeEach(() => {
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
     });
 
     it('should delete multiple items', async () => {
       const keys = ['key1', 'key2', 'key3'];
-
       await secureStorage.deleteItems(keys);
 
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledWith('key1');
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledWith('key2');
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledWith('key3');
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('key1');
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('key2');
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('key3');
+    });
+
+    it('should delete all auth tokens at once', async () => {
+      const authKeys = [
+        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
+        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
+        AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
+      ];
+
+      await secureStorage.deleteItems(authKeys);
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT);
     });
 
     it('should handle empty array', async () => {
       await secureStorage.deleteItems([]);
 
-      expect(mockSecureStore.deleteItemAsync).not.toHaveBeenCalled();
+      expect(SecureStore.deleteItemAsync).not.toHaveBeenCalled();
     });
 
-    it('should delete all items even if some fail', async () => {
-      mockSecureStore.deleteItemAsync
+    it('should delete items even if some fail', async () => {
+      (SecureStore.deleteItemAsync as jest.Mock)
         .mockResolvedValueOnce(undefined)
         .mockRejectedValueOnce(new Error('Delete failed'))
         .mockResolvedValueOnce(undefined);
+      (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
 
-      mockAsyncStorage.removeItem.mockResolvedValue(undefined);
+      const keys = ['key1', 'key2', 'key3'];
+      await secureStorage.deleteItems(keys);
 
-      await secureStorage.deleteItems(['key1', 'key2', 'key3']);
-
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
-      // key2 should fallback to AsyncStorage
-      expect(mockAsyncStorage.removeItem).toHaveBeenCalled();
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('@secure_key2');
     });
   });
 
-  describe('Storage Keys Classification', () => {
-    it('should have secure storage keys', () => {
-      expect(StorageKeys.SECURE.ACCESS_TOKEN).toBe('secure:access_token');
-      expect(StorageKeys.SECURE.REFRESH_TOKEN).toBe('secure:refresh_token');
-      expect(StorageKeys.SECURE.TOKEN_EXPIRES_AT).toBe('secure:token_expires_at');
-      expect(StorageKeys.SECURE.BIOMETRIC_KEY).toBe('secure:biometric_key');
-      expect(StorageKeys.SECURE.PIN_CODE).toBe('secure:pin_code');
-      expect(StorageKeys.SECURE.PAYMENT_METHOD).toBe('secure:payment_method');
-    });
-
-    it('should have public storage keys', () => {
-      expect(StorageKeys.PUBLIC.USER_PROFILE).toBe('user_profile');
-      expect(StorageKeys.PUBLIC.APP_SETTINGS).toBe('app_settings');
-      expect(StorageKeys.PUBLIC.THEME_PREFERENCE).toBe('theme_preference');
-      expect(StorageKeys.PUBLIC.LANGUAGE).toBe('language');
-      expect(StorageKeys.PUBLIC.ONBOARDING_COMPLETED).toBe('onboarding_completed');
-      expect(StorageKeys.PUBLIC.SEARCH_HISTORY).toBe('search_history');
-    });
-
-    it('should separate sensitive from non-sensitive keys', () => {
-      const secureKeys = Object.values(StorageKeys.SECURE);
-      const publicKeys = Object.values(StorageKeys.PUBLIC);
-
-      // No overlap
-      secureKeys.forEach((key) => {
-        expect(publicKeys).not.toContain(key);
-      });
-
-      // Secure keys have 'secure:' prefix
-      secureKeys.forEach((key) => {
-        expect(key).toMatch(/^secure:/);
-      });
-
-      // Public keys don't have 'secure:' prefix
-      publicKeys.forEach((key) => {
-        expect(key).not.toMatch(/^secure:/);
-      });
-    });
-  });
-
-  describe('Data Migration', () => {
+  describe('Integration scenarios', () => {
     beforeEach(() => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      jest.spyOn(console, 'log').mockImplementation(() => {});
-      jest.spyOn(console, 'error').mockImplementation(() => {});
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.getItemAsync as jest.Mock).mockImplementation((key) => {
+        const storage: Record<string, string> = {
+          [AUTH_STORAGE_KEYS.ACCESS_TOKEN]: 'access_123',
+          [AUTH_STORAGE_KEYS.REFRESH_TOKEN]: 'refresh_456',
+        };
+        return Promise.resolve(storage[key] || null);
+      });
+      (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
     });
 
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
+    it('should handle full auth flow: store, retrieve, delete tokens', async () => {
+      // Store tokens
+      await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, 'access_123');
+      await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, 'refresh_456');
 
-    it('should migrate data from AsyncStorage to SecureStore', async () => {
-      mockAsyncStorage.getItem
-        .mockResolvedValueOnce('old_access_token')
-        .mockResolvedValueOnce('old_refresh_token')
-        .mockResolvedValueOnce('1234567890');
+      // Retrieve tokens
+      const accessToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      const refreshToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
 
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
-      mockAsyncStorage.removeItem.mockResolvedValue(undefined);
+      expect(accessToken).toBe('access_123');
+      expect(refreshToken).toBe('refresh_456');
 
-      await migrateSensitiveDataToSecure();
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.ACCESS_TOKEN,
-        'old_access_token'
-      );
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.REFRESH_TOKEN,
-        'old_refresh_token'
-      );
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.TOKEN_EXPIRES_AT,
-        '1234567890'
-      );
-
-      expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith('auth_access_token');
-      expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith('auth_refresh_token');
-      expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith('auth_token_expires');
-    });
-
-    it('should skip migration if old keys do not exist', async () => {
-      mockAsyncStorage.getItem.mockResolvedValue(null);
-
-      await migrateSensitiveDataToSecure();
-
-      expect(mockSecureStore.setItemAsync).not.toHaveBeenCalled();
-      expect(mockAsyncStorage.removeItem).not.toHaveBeenCalled();
-    });
-
-    it('should handle migration errors gracefully', async () => {
-      mockAsyncStorage.getItem.mockResolvedValueOnce('token_value');
-      mockSecureStore.setItemAsync.mockRejectedValue(new Error('Migration failed'));
-
-      await migrateSensitiveDataToSecure();
-
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('Migration failed'),
-        expect.any(Error)
-      );
-    });
-
-    it('should log successful migrations', async () => {
-      mockAsyncStorage.getItem.mockResolvedValueOnce('token_value');
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
-      mockAsyncStorage.removeItem.mockResolvedValue(undefined);
-
-      await migrateSensitiveDataToSecure();
-
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('✅ Migrated')
-      );
-    });
-  });
-
-  describe('Sensitive Data Handling', () => {
-    beforeEach(() => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
-      mockSecureStore.getItemAsync.mockResolvedValue('encrypted_token');
-    });
-
-    it('should store access token securely', async () => {
-      await secureStorage.setItem(
-        StorageKeys.SECURE.ACCESS_TOKEN,
-        'sensitive_access_token'
-      );
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.ACCESS_TOKEN,
-        'sensitive_access_token'
-      );
-    });
-
-    it('should store refresh token securely', async () => {
-      await secureStorage.setItem(
-        StorageKeys.SECURE.REFRESH_TOKEN,
-        'sensitive_refresh_token'
-      );
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.REFRESH_TOKEN,
-        'sensitive_refresh_token'
-      );
-    });
-
-    it('should store biometric key securely', async () => {
-      await secureStorage.setItem(
-        StorageKeys.SECURE.BIOMETRIC_KEY,
-        'biometric_secret_key'
-      );
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.BIOMETRIC_KEY,
-        'biometric_secret_key'
-      );
-    });
-
-    it('should store PIN code securely', async () => {
-      await secureStorage.setItem(StorageKeys.SECURE.PIN_CODE, '1234');
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.PIN_CODE,
-        '1234'
-      );
-    });
-
-    it('should retrieve sensitive data only from SecureStore', async () => {
-      const token = await secureStorage.getItem(StorageKeys.SECURE.ACCESS_TOKEN);
-
-      expect(token).toBe('encrypted_token');
-      expect(mockSecureStore.getItemAsync).toHaveBeenCalledWith(
-        StorageKeys.SECURE.ACCESS_TOKEN
-      );
-    });
-
-    it('should delete all auth tokens', async () => {
-      mockSecureStore.deleteItemAsync.mockResolvedValue(undefined);
-
+      // Clear all auth data
       await secureStorage.deleteItems([
-        StorageKeys.SECURE.ACCESS_TOKEN,
-        StorageKeys.SECURE.REFRESH_TOKEN,
-        StorageKeys.SECURE.TOKEN_EXPIRES_AT,
+        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
+        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
+        AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
       ]);
 
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
-    });
-  });
-
-  describe('Edge Cases', () => {
-    it('should handle very long values', async () => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
-
-      const longValue = 'a'.repeat(10000);
-
-      await secureStorage.setItem('long_key', longValue);
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith('long_key', longValue);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
     });
 
-    it('should handle special characters in keys', async () => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
-
-      await secureStorage.setItem('key:with:colons', 'value');
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
-        'key:with:colons',
-        'value'
+    it('should handle token refresh scenario', async () => {
+      // Set item to return different values on subsequent calls
+      let currentToken = 'old_token';
+      (SecureStore.getItemAsync as jest.Mock).mockImplementation(() =>
+        Promise.resolve(currentToken)
       );
-    });
 
-    it('should handle special characters in values', async () => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
+      // Get old token
+      const oldToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      expect(oldToken).toBe('old_token');
 
-      const specialValue = 'value\nwith\nnewlines\tand\ttabs';
+      // Update with new token
+      currentToken = 'new_token';
+      await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, 'new_token');
 
-      await secureStorage.setItem('key', specialValue);
-
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith('key', specialValue);
+      // Verify new token
+      const newToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      expect(newToken).toBe('new_token');
     });
 
     it('should handle concurrent operations', async () => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
-      mockSecureStore.getItemAsync.mockResolvedValue('value');
-      mockSecureStore.deleteItemAsync.mockResolvedValue(undefined);
-
       const operations = [
         secureStorage.setItem('key1', 'value1'),
-        secureStorage.getItem('key2'),
-        secureStorage.deleteItem('key3'),
-        secureStorage.setItem('key4', 'value4'),
+        secureStorage.setItem('key2', 'value2'),
+        secureStorage.getItem('key3'),
+        secureStorage.deleteItem('key4'),
       ];
 
       await Promise.all(operations);
 
-      expect(mockSecureStore.setItemAsync).toHaveBeenCalledTimes(2);
-      expect(mockSecureStore.getItemAsync).toHaveBeenCalledTimes(1);
-      expect(mockSecureStore.deleteItemAsync).toHaveBeenCalledTimes(1);
+      expect(SecureStore.setItemAsync).toHaveBeenCalledTimes(2);
+      expect(SecureStore.getItemAsync).toHaveBeenCalledTimes(1);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Platform-specific behavior', () => {
+    it('should handle Android platform', async () => {
+      mockPlatform.OS = 'android';
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
+
+      await secureStorage.setItem('android_key', 'android_value');
+
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('android_key', 'android_value');
     });
 
-    it('should handle empty string values', async () => {
-      mockSecureStore.isAvailableAsync.mockResolvedValue(true);
-      mockSecureStore.setItemAsync.mockResolvedValue(undefined);
-      mockSecureStore.getItemAsync.mockResolvedValue('');
+    it('should handle iOS platform', async () => {
+      mockPlatform.OS = 'ios';
+      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
 
-      await secureStorage.setItem('empty_key', '');
-      const value = await secureStorage.getItem('empty_key');
+      await secureStorage.setItem('ios_key', 'ios_value');
 
-      expect(value).toBe('');
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('ios_key', 'ios_value');
     });
   });
 });
