@@ -2,8 +2,49 @@
 
 A social travel platform connecting travelers through shared experiences and gift exchanges.
 
-## 🚀 Tech Stack
+## 🏗️ Monorepo Structure
 
+This is a **Turborepo** monorepo containing multiple applications and shared packages:
+
+```
+travelmatch/
+├── apps/
+│   ├── mobile/          # React Native + Expo mobile app
+│   ├── web/             # Next.js landing page
+│   └── admin/           # React admin panel (Refine)
+├── packages/
+│   ├── shared/          # Shared utilities and types
+│   ├── design-system/   # UI components and tokens
+│   └── monitoring/      # Monitoring utilities
+└── services/
+    ├── ml/              # ML service
+    └── payment/         # Payment service
+```
+
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run all apps in development
+pnpm dev
+
+# Run specific app
+pnpm dev:mobile    # Mobile app (Expo)
+pnpm dev:web       # Web landing page (Next.js)
+pnpm dev:admin     # Admin panel (Refine)
+
+# Build all apps
+pnpm build
+
+# Run tests
+pnpm test
+```
+
+## 🎯 Tech Stack
+
+### Mobile App (`apps/mobile`)
 - **Framework**: React Native 0.81.5 + Expo SDK 54
 - **Language**: TypeScript 5.9.2 (strict mode)
 - **State Management**: Zustand
@@ -11,6 +52,22 @@ A social travel platform connecting travelers through shared experiences and gif
 - **Forms**: React Hook Form + Zod validation
 - **Styling**: React Native StyleSheets with design tokens
 - **Testing**: Jest + React Native Testing Library
+- **E2E**: Maestro
+
+### Web (`apps/web`)
+- **Framework**: Next.js 16 + Turbopack
+- **Styling**: Tailwind CSS
+- **Colors**: Mint (#A6E5C1) & Coral (#FF6F61)
+
+### Admin Panel (`apps/admin`)
+- **Framework**: React + Vite
+- **Admin Framework**: Refine
+- **Backend**: Supabase
+
+### Infrastructure
+- **Monorepo**: Turborepo 2.3+
+- **Package Manager**: pnpm 8.15+
+- **Database**: Supabase (PostgreSQL)
 - **CI/CD**: GitHub Actions
 - **Error Tracking**: Sentry
 - **Code Quality**: ESLint + Prettier

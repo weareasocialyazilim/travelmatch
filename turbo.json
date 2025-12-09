@@ -10,6 +10,11 @@
         ".next/**",
         "!.next/cache/**"
       ],
+      "inputs": [
+        "src/**",
+        "public/**",
+        "package.json"
+      ],
       "env": [
         "VITE_SUPABASE_URL",
         "VITE_SUPABASE_ANON_KEY"
@@ -21,6 +26,13 @@
         "android/app/build/**",
         "ios/build/**",
         ".expo/**"
+      ],
+      "inputs": [
+        "src/**",
+        "app.config.ts",
+        "babel.config.js",
+        "metro.config.js",
+        "package.json"
       ],
       "env": [
         "EXPO_PUBLIC_SUPABASE_URL",
@@ -61,6 +73,12 @@
       "outputs": [
         "dist/**"
       ],
+      "inputs": [
+        "src/**",
+        "index.html",
+        "vite.config.ts",
+        "package.json"
+      ],
       "env": [
         "VITE_SUPABASE_URL",
         "VITE_SUPABASE_ANON_KEY"
@@ -82,6 +100,12 @@
       "outputs": [
         ".next/**",
         "!.next/cache/**"
+      ],
+      "inputs": [
+        "app/**",
+        "public/**",
+        "next.config.ts",
+        "package.json"
       ],
       "env": [
         "NEXT_PUBLIC_SUPABASE_URL",

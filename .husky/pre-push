@@ -3,7 +3,7 @@
 
 # Run full test suite before push
 echo "🧪 Running full test suite..."
-npm test -- --coverage
+pnpm turbo run test
 
 # Check if tests passed
 if [ $? -ne 0 ]; then

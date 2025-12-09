@@ -4,8 +4,8 @@
 # Run lint-staged for code quality checks
 npx lint-staged
 
-# Run type checking
-npm run type-check
+# Run type checking with Turbo (only changed packages)
+pnpm turbo run type-check --filter="[HEAD^1]"
 
 # Check for console.log in production code (excluding tests, stories, mocks)
 echo "🔍 Checking for console.log usage..."
