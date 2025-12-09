@@ -18,7 +18,7 @@ export const PaymentMetadataSchema = z.object({
   stripe_charge_id: z.string().optional(),
   refund_id: z.string().optional(),
   notes: z.string().max(500).optional(),
-}).strict(); // No extra properties allowed
+}).passthrough(); // Allow extra properties for backward compatibility
 
 export type PaymentMetadata = z.infer<typeof PaymentMetadataSchema>;
 

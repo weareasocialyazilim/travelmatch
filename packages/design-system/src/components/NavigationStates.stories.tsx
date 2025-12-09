@@ -4,6 +4,7 @@
  * Interactive examples of all navigation state variations
  */
 
+// @ts-nocheck
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import {

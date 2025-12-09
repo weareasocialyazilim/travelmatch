@@ -11,7 +11,11 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
+import { verifyCodeSchema, type VerifyCodeInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -22,6 +26,18 @@ export const VerifyCodeScreen: React.FC = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(34);
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  const {
+    handleSubmit,
+    formState,
+    setValue,
+  } = useForm<VerifyCodeInput>({
+    resolver: zodResolver(verifyCodeSchema),
+    mode: 'onChange',
+    defaultValues: {
+      code: '',
+    },
+  });
 
   useEffect(() => {
     // Auto-focus first input
@@ -46,6 +62,10 @@ export const VerifyCodeScreen: React.FC = () => {
     newCode[index] = text;
     setCode(newCode);
 
+    // Update form value
+    const fullCode = newCode.join('');
+    setValue('code', fullCode, { shouldValidate: true });
+
     // Auto-focus next input
     if (text && index < 5) {
       inputRefs.current[index + 1]?.focus();
@@ -63,19 +83,15 @@ export const VerifyCodeScreen: React.FC = () => {
     if (timer === 0) {
       setTimer(34);
       setCode(['', '', '', '', '', '']);
+      setValue('code', '');
       inputRefs.current[0]?.focus();
     }
   };
 
-  const handleVerify = () => {
-    const fullCode = code.join('');
-    if (fullCode.length === 6) {
-      // Navigate to success or next screen
-      navigation.navigate('SuccessConfirmation');
-    }
+  const onVerify = (data: VerifyCodeInput) => {
+    // Navigate to success or next screen
+    navigation.navigate('SuccessConfirmation');
   };
-
-  const isCodeComplete = code.every((digit) => digit !== '');
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -155,10 +171,10 @@ export const VerifyCodeScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.verifyButton,
-              !isCodeComplete && styles.verifyButtonDisabled,
+              !canSubmitForm({ formState }) && styles.verifyButtonDisabled,
             ]}
-            onPress={handleVerify}
-            disabled={!isCodeComplete}
+            onPress={handleSubmit(onVerify)}
+            disabled={!canSubmitForm({ formState })}
           >
             <Text style={styles.verifyButtonText}>Verify and continue</Text>
           </TouchableOpacity>

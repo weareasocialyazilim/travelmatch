@@ -9,6 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
@@ -104,20 +105,11 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
   void momentId; // Silence unused variable warning until API integration
 
   const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <View style={styles.emptyIconContainer}>
-        <MaterialCommunityIcons
-          name={'camera' as IconName}
-          size={40}
-          color={COLORS.primary}
-        />
-      </View>
-      <Text style={styles.emptyTitle}>No proofs yet</Text>
-      <Text style={styles.emptyDescription}>
-        Proofs submitted by the traveler will appear here once they are uploaded
-        for verification.
-      </Text>
-    </View>
+    <EmptyState
+      icon="camera"
+      title="No proofs yet"
+      description="Proofs submitted by the traveler will appear here once they are uploaded for verification."
+    />
   );
 
   return (

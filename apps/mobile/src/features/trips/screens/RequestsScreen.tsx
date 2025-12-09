@@ -11,6 +11,7 @@ import { useRequestsScreen } from '../hooks/useRequestsScreen';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { TabType } from '../types/requests.types';
+import { withErrorBoundary } from '../../../components/withErrorBoundary';
 
 type RequestsRouteProp = RouteProp<RootStackParamList, 'Requests'>;
 
@@ -183,4 +184,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RequestsScreen;
+// Wrap with ErrorBoundary for requests/notifications screen
+export default withErrorBoundary(RequestsScreen, { 
+  fallbackType: 'generic',
+  displayName: 'RequestsScreen' 
+});

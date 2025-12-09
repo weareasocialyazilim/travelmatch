@@ -6,12 +6,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: 'travelmatch-new',
   version: '1.0.0',
   orientation: 'portrait',
-  icon: './assets/icon.png',
+  icon: './apps/mobile/assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'travelmatch',
   newArchEnabled: true,
   splash: {
-    image: './assets/splash-icon.png',
+    image: './apps/mobile/assets/splash-icon.png',
     resizeMode: 'contain',
     backgroundColor: '#ffffff',
   },
@@ -40,7 +40,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.travelmatch.app',
     versionCode: 1,
     adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
+      foregroundImage: './apps/mobile/assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
     intentFilters: [
@@ -66,7 +66,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
   },
   web: {
-    favicon: './assets/favicon.png',
+    favicon: './apps/mobile/assets/favicon.png',
   },
   plugins: ['expo-localization', '@sentry/react-native/expo', 'expo-font'],
 });

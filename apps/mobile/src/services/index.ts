@@ -107,3 +107,16 @@ export type { UserProfile as PersonalizationProfile } from './personalization';
 export { cacheService, cache, CACHE_KEYS } from './cacheService';
 export { offlineSyncQueue } from './offlineSyncQueue';
 export type { OfflineAction, OfflineActionType } from './offlineSyncQueue';
+
+export { sessionManager } from './sessionManager';
+export type {
+  SessionTokens,
+  SessionData,
+  SessionState,
+  SessionEvent,
+  SessionEventListener,
+} from './sessionManager';
+
+export { navigationRef, navigate, resetNavigation, goBack } from './navigationService';
+export { apiClient, apiV1Service } from './apiV1Service';
+export type { ApiResponse } from './apiV1Service';

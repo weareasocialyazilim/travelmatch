@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
@@ -17,6 +19,8 @@ import { TYPOGRAPHY as _TYPOGRAPHY } from '@/constants/typography';
 import { logger } from '@/utils/logger';
 import { LoadingState } from '@/components/LoadingState';
 import SocialButton from '@/components/SocialButton';
+import { emailAuthSchema, type EmailAuthInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -25,20 +29,19 @@ type EmailAuthScreenProps = StackScreenProps<RootStackParamList, 'EmailAuth'>;
 export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
   navigation,
 }) => {
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
+  const { control, handleSubmit, formState, watch } = useForm<EmailAuthInput>({
+    resolver: zodResolver(emailAuthSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+    },
+  });
 
-  const handleContinue = () => {
-    if (!email || !validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address');
-      return;
-    }
+  const email = watch('email');
 
+  const handleContinue = async (data: EmailAuthInput) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -101,22 +104,29 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
           </View>
 
           {/* Email Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Email address</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="name@example.com"
-              placeholderTextColor={COLORS.textSecondary}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            {email.length > 0 && !validateEmail(email) && (
-              <Text style={styles.errorText}>Please enter a valid email</Text>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Email address</Text>
+                <TextInput
+                  style={[styles.textInput, error && styles.textInputError]}
+                  placeholder="name@example.com"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                {error && (
+                  <Text style={styles.errorText}>{error.message}</Text>
+                )}
+              </View>
             )}
-          </View>
+          />
         </View>
 
         {/* Bottom Action Bar */}
@@ -124,13 +134,15 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.continueButton,
-              !validateEmail(email) && styles.continueButtonDisabled,
+              (!canSubmitForm({ formState } as any) || loading) && styles.continueButtonDisabled,
             ]}
-            onPress={handleContinue}
-            disabled={!validateEmail(email) || loading}
+            onPress={handleSubmit(handleContinue)}
+            disabled={!canSubmitForm({ formState } as any) || loading}
             activeOpacity={0.8}
           >
-            <Text style={styles.continueButtonText}>Continue</Text>
+            <Text style={styles.continueButtonText}>
+              {loading ? 'Sending...' : 'Continue'}
+            </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -226,6 +238,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
     backgroundColor: COLORS.white,
+  },
+  textInputError: {
+    borderColor: COLORS.error,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
   bottomBar: {
     padding: 16,

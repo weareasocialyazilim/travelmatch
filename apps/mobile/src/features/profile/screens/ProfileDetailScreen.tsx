@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -340,22 +341,11 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
 
         {/* Empty State for Active */}
         {activeTab === 'active' && userMoments.length === 0 && (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <MaterialCommunityIcons
-                name="compass-outline"
-                size={32}
-                color={COLORS.textSecondary}
-              />
-            </View>
-            <View style={styles.emptyTextContainer}>
-              <Text style={styles.emptyTitle}>No active moments yet</Text>
-              <Text style={styles.emptySubtitle}>
-                Check back soon to support {user.name.split(' ')[0]}&apos;s next
-                adventure!
-              </Text>
-            </View>
-          </View>
+          <EmptyState
+            icon="compass-outline"
+            title="No active moments yet"
+            description={`Check back soon to support ${user.name.split(' ')[0]}'s next adventure!`}
+          />
         )}
 
         {/* Past Moments */}
@@ -390,21 +380,11 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
 
         {/* Empty State for Past */}
         {activeTab === 'past' && pastMoments.length === 0 && (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <MaterialCommunityIcons
-                name="history"
-                size={32}
-                color={COLORS.textSecondary}
-              />
-            </View>
-            <View style={styles.emptyTextContainer}>
-              <Text style={styles.emptyTitle}>No past moments</Text>
-              <Text style={styles.emptySubtitle}>
-                Completed moments will appear here
-              </Text>
-            </View>
-          </View>
+          <EmptyState
+            icon="history"
+            title="No past moments"
+            description="Completed moments will appear here"
+          />
         )}
 
         {/* Bottom padding for sticky bar */}

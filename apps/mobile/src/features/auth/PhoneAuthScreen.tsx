@@ -9,6 +9,9 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { phoneAuthSchema, type PhoneAuthInput } from '../../utils/forms/schemas';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,16 +28,27 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
   navigation,
 }) => {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']); // UI state for OTP inputs
   const [loading, setLoading] = useState(false);
   const otpInputs = useRef<(TextInput | null)[]>([]);
 
-  const handleSendOTP = () => {
-    if (phoneNumber.length < 10) {
-      Alert.alert('Invalid Phone', 'Please enter a valid phone number');
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<PhoneAuthInput>({
+    resolver: zodResolver(phoneAuthSchema),
+    defaultValues: {
+      phone: '',
+      otp: '',
+    },
+  });
+
+  const phoneNumber = watch('phone');
+
+  const onSendOTP = (data: PhoneAuthInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -43,12 +57,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
     }, 1000);
   };
 
-  const handleVerifyOTP = () => {
-    const otpCode = otp.join('');
-    if (otpCode.length < 6) {
-      Alert.alert('Invalid OTP', 'Please enter the 6-digit code.');
-      return;
-    }
+  const onVerifyOTP = (data: PhoneAuthInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -64,6 +73,10 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+
+    // Sync to form
+    const fullCode = newOtp.join('');
+    setValue('otp', fullCode, { shouldValidate: true });
 
     // Focus next input
     if (value && index < 5) {
@@ -90,22 +103,32 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
       <View style={styles.inputContainer}>
         <View style={styles.phoneInputWrapper}>
           <Text style={styles.countryCode}>+1</Text>
-          <TextInput
-            style={styles.phoneInput}
-            placeholder="(555) 123-4567"
-            placeholderTextColor={COLORS.textSecondary}
-            keyboardType="phone-pad"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            maxLength={14}
-            autoFocus
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.phoneInput}
+                placeholder="(555) 123-4567"
+                placeholderTextColor={COLORS.textSecondary}
+                keyboardType="phone-pad"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                maxLength={14}
+                autoFocus
+              />
+            )}
           />
         </View>
+        {errors.phone && (
+          <Text style={styles.errorText}>{errors.phone.message}</Text>
+        )}
       </View>
 
       <TouchableOpacity
         style={styles.primaryButton}
-        onPress={handleSendOTP}
+        onPress={handleSubmit(onSendOTP)}
         disabled={loading}
         activeOpacity={0.8}
       >
@@ -152,9 +175,13 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
         ))}
       </View>
 
+      {errors.otp && (
+        <Text style={styles.errorText}>{errors.otp.message}</Text>
+      )}
+
       <TouchableOpacity
         style={styles.primaryButton}
-        onPress={handleVerifyOTP}
+        onPress={handleSubmit(onVerifyOTP)}
         disabled={loading}
         activeOpacity={0.8}
       >
@@ -168,14 +195,18 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
         </LinearGradient>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.resendButton} onPress={handleSendOTP}>
+      <TouchableOpacity style={styles.resendButton} onPress={handleSubmit(onSendOTP)}>
         <Text style={styles.resendText}>Didn&apos;t receive code? </Text>
         <Text style={[styles.resendText, styles.resendLink]}>Resend</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.changeNumberButton}
-        onPress={() => setStep('phone')}
+        onPress={() => {
+          setStep('phone');
+          setOtp(['', '', '', '', '', '']);
+          setValue('otp', '');
+        }}
       >
         <Text style={styles.changeNumberText}>Change Phone Number</Text>
       </TouchableOpacity>
@@ -373,6 +404,13 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '400',
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: LAYOUT.padding,
+    textAlign: 'center',
   },
   subtitle: {
     color: COLORS.textSecondary,

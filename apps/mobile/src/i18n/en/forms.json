@@ -1,0 +1,219 @@
+{
+  "forms": {
+    "validation": {
+      "email": {
+        "required": "Email address is required",
+        "invalid": "Please enter a valid email address"
+      },
+      "password": {
+        "required": "Password is required",
+        "min": "Password must be at least 8 characters",
+        "uppercase": "Password must contain at least one uppercase letter",
+        "lowercase": "Password must contain at least one lowercase letter",
+        "number": "Password must contain at least one number"
+      },
+      "confirmPassword": {
+        "required": "Password confirmation is required",
+        "mismatch": "Passwords do not match"
+      },
+      "currentPassword": {
+        "required": "Current password is required"
+      },
+      "newPassword": {
+        "different": "New password must be different from current password"
+      },
+      "phone": {
+        "required": "Phone number is required",
+        "invalid": "Please enter a valid phone number"
+      },
+      "otp": {
+        "invalid": "Please enter the 6-digit verification code"
+      },
+      "code": {
+        "length": "Code must be 6 characters"
+      },
+      "name": {
+        "min": "Name must be at least 2 characters",
+        "max": "Name must be at most 50 characters"
+      },
+      "username": {
+        "min": "Username must be at least 3 characters",
+        "max": "Username must be at most 30 characters",
+        "invalid": "Username can only contain letters, numbers, and underscores"
+      },
+      "amount": {
+        "required": "Amount is required",
+        "invalid": "Please enter a valid amount",
+        "positive": "Amount must be positive",
+        "max": "Amount cannot exceed 100,000",
+        "maxMoment": "Amount cannot exceed 10,000"
+      },
+      "note": {
+        "max": "Note must be at most 500 characters"
+      },
+      "url": {
+        "invalid": "Please enter a valid URL"
+      },
+      "bio": {
+        "max": "Bio must be at most 500 characters"
+      },
+      "location": {
+        "max": "Location must be at most 100 characters"
+      },
+      "message": {
+        "required": "Message is required",
+        "max": "Message must be at most 1000 characters"
+      },
+      "accountNumber": {
+        "required": "Account number is required",
+        "invalid": "Please enter a valid IBAN"
+      },
+      "cardNumber": {
+        "required": "Card number is required",
+        "invalid": "Please enter a valid card number"
+      },
+      "expiryMonth": {
+        "min": "Month must be between 1-12",
+        "max": "Month must be between 1-12"
+      },
+      "expiryYear": {
+        "min": "Expiry date cannot be in the past"
+      },
+      "cvv": {
+        "invalid": "Please enter a valid CVV (3-4 digits)"
+      },
+      "recipientId": {
+        "invalid": "Invalid recipient ID"
+      },
+      "reason": {
+        "required": "Please select a reason"
+      },
+      "destination": {
+        "required": "Destination is required"
+      },
+      "startDate": {
+        "required": "Start date is required"
+      },
+      "endDate": {
+        "required": "End date is required",
+        "afterStart": "End date must be after start date"
+      },
+      "tripId": {
+        "invalid": "Invalid trip ID"
+      },
+      "caption": {
+        "max": "Caption must be at most 500 characters"
+      },
+      "tags": {
+        "max": "You can add up to 10 tags"
+      },
+      "evidence": {
+        "max": "You can upload up to 3 files"
+      },
+      "confirmation": {
+        "delete": "Please type 'DELETE' to confirm account deletion"
+      },
+      "rating": {
+        "required": "Please provide a rating",
+        "max": "Rating must be between 1-5"
+      },
+      "proofType": {
+        "required": "Please select proof type"
+      },
+      "photos": {
+        "required": "You must add at least one photo",
+        "max": "You can add up to 5 photos"
+      },
+      "description": {
+        "minProof": "Description must be at least 10 characters",
+        "max": "Description must be at most 500 characters"
+      },
+      "dateOfBirth": {
+        "required": "Date of birth is required"
+      },
+      "gender": {
+        "required": "Please select gender"
+      },
+      "nationality": {
+        "required": "Nationality is required"
+      },
+      "address": {
+        "required": "Address is required"
+      },
+      "city": {
+        "required": "City is required"
+      },
+      "postalCode": {
+        "required": "Postal code is required"
+      },
+      "country": {
+        "required": "Country is required"
+      },
+      "documentType": {
+        "required": "Please select document type"
+      },
+      "documentNumber": {
+        "required": "Document number is required"
+      },
+      "expiryDate": {
+        "required": "Expiry date is required"
+      },
+      "subject": {
+        "required": "Subject is required"
+      },
+      "category": {
+        "required": "Please select category"
+      },
+      "trustNote": {
+        "min": "Note must be at least 10 characters",
+        "max": "Note must be at most 500 characters"
+      },
+      "title": {
+        "required": "Title is required",
+        "max": "Title must be at most 100 characters",
+        "minMoment": "Title must be at least 5 characters"
+      },
+      "price": {
+        "required": "Price is required",
+        "invalid": "Please enter a valid price",
+        "positive": "Price must be positive",
+        "max": "Price cannot exceed 100,000"
+      },
+      "details": {
+        "max": "Details must be at most 500 characters"
+      },
+      "interests": {
+        "min": "Please select at least 1 interest",
+        "max": "You can select up to 5 interests"
+      },
+      "story": {
+        "max": "Story must be at most 1000 characters"
+      },
+      "date": {
+        "required": "Please select a date"
+      }
+    },
+    "errors": {
+      "generic": "An error occurred. Please try again.",
+      "network": "Connection error. Please check your internet connection.",
+      "timeout": "Request timed out. Please try again.",
+      "offline": "You are offline. Please check your internet connection.",
+      "validation": "Please fill in all fields correctly.",
+      "unauthorized": "You are not authorized to perform this action.",
+      "notFound": "Requested resource not found.",
+      "conflict": "This action has already been performed.",
+      "serverError": "Server error. Please try again later."
+    },
+    "success": {
+      "login": "Login successful",
+      "register": "Registration successful",
+      "profileUpdated": "Profile updated",
+      "passwordChanged": "Password changed",
+      "emailSent": "Email sent",
+      "saved": "Saved",
+      "submitted": "Submitted",
+      "uploaded": "Uploaded",
+      "deleted": "Deleted"
+    }
+  }
+}

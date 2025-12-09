@@ -9,9 +9,13 @@ import {
   TextInput,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
+import { deleteAccountSchema, type DeleteAccountInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import { useConfirmation } from '../context/ConfirmationContext';
 import { useToast } from '../context/ToastContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -62,13 +66,22 @@ const INFO_ITEMS: InfoItem[] = [
 export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
   navigation,
 }) => {
-  const [confirmationText, setConfirmationText] = useState('');
   const toast = useToast();
   const { showConfirmation } = useConfirmation();
 
-  const isDeleteEnabled = confirmationText.toUpperCase() === 'DELETE';
+  const {
+    control,
+    handleSubmit,
+    formState,
+  } = useForm<DeleteAccountInput>({
+    resolver: zodResolver(deleteAccountSchema),
+    mode: 'onChange',
+    defaultValues: {
+      confirmation: '',
+    },
+  });
 
-  const handleDelete = () => {
+  const onDelete = (data: DeleteAccountInput) => {
     showConfirmation({
       title: 'Delete Account',
       message:
@@ -174,13 +187,28 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
         {/* Confirmation Input */}
         <View style={styles.confirmationContainer}>
           <Text style={styles.confirmationLabel}>Type DELETE to confirm</Text>
-          <TextInput
-            style={styles.confirmationInput}
-            placeholder="DELETE"
-            placeholderTextColor={COLORS.textSecondary}
-            value={confirmationText}
-            onChangeText={setConfirmationText}
-            autoCapitalize="characters"
+          <Controller
+            control={control}
+            name="confirmation"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <>
+                <TextInput
+                  style={[
+                    styles.confirmationInput,
+                    error && styles.confirmationInputError,
+                  ]}
+                  placeholder="DELETE"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="characters"
+                />
+                {error && (
+                  <Text style={styles.errorText}>{error.message}</Text>
+                )}
+              </>
+            )}
           />
         </View>
       </ScrollView>
@@ -190,10 +218,10 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.deleteButton,
-            !isDeleteEnabled && styles.deleteButtonDisabled,
+            !canSubmitForm({ formState }) && styles.deleteButtonDisabled,
           ]}
-          onPress={handleDelete}
-          disabled={!isDeleteEnabled}
+          onPress={handleSubmit(onDelete)}
+          disabled={!canSubmitForm({ formState })}
           activeOpacity={0.8}
         >
           <Text style={styles.deleteButtonText}>Delete my account</Text>
@@ -327,6 +355,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     ...TYPOGRAPHY.bodyLarge,
     color: COLORS.text,
+  },
+  confirmationInputError: {
+    borderColor: COLORS.error,
+  },
+  errorText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.error,
+    marginTop: 4,
   },
   footer: {
     position: 'absolute',

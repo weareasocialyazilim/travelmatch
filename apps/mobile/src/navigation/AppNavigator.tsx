@@ -8,6 +8,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';
 import { lazyLoad } from '../utils/lazyLoad';
+import { navigationRef } from '../services/navigationService';
+import { apiClient } from '../services/apiV1Service';
+import { deepLinkHandler } from '../services/deepLinkHandler';
 
 // Loading fallback for lazy-loaded screens
 const loadingStyle = {
@@ -39,6 +42,10 @@ import {
   ForgotPasswordScreen,
   ChangePasswordScreen,
 } from '../features/auth';
+import SessionExpiredScreen from '../screens/SessionExpiredScreen';
+import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
+import LinkExpiredScreen from '../screens/LinkExpiredScreen';
+import LinkInvalidScreen from '../screens/LinkInvalidScreen';
 
 // ===================================
 // TRIPS FEATURE SCREENS
@@ -410,6 +417,22 @@ const AppNavigator = () => {
     };
     checkOnboarding();
   }, []);
+  
+  // Setup session expired callback for API client
+  useEffect(() => {
+    apiClient.setSessionExpiredCallback(() => {
+      // Navigate to SessionExpired screen when token refresh fails
+      if (navigationRef.isReady()) {
+        // @ts-ignore
+        navigationRef.navigate('SessionExpired');
+      }
+    });
+    
+    // Setup deep link handler with navigation
+    if (navigationRef.current) {
+      deepLinkHandler.setNavigation(navigationRef.current);
+    }
+  }, []);
 
   // Show loading while checking onboarding status
   if (initialRoute === null) {
@@ -432,7 +455,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationErrorBoundary>
-      <NavigationContainer linking={linking}>
+      <NavigationContainer linking={linking} ref={navigationRef}>
         <Suspense fallback={<LoadingFallback />}>
           <Stack.Navigator
             initialRouteName={initialRoute}
@@ -464,6 +487,10 @@ const AppNavigator = () => {
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="SessionExpired" component={SessionExpiredScreen} />
+            <Stack.Screen name="LinkNotFound" component={LinkNotFoundScreen} />
+            <Stack.Screen name="LinkExpired" component={LinkExpiredScreen} />
+            <Stack.Screen name="LinkInvalid" component={LinkInvalidScreen} />
             <Stack.Screen name="PhoneAuth" component={PhoneAuthScreen} />
             <Stack.Screen name="EmailAuth" component={EmailAuthScreen} />
             <Stack.Screen

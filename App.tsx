@@ -12,10 +12,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { ErrorBoundary } from './apps/mobile/src/components/ErrorBoundary';
 import { FeedbackModal } from './src/components/FeedbackModal';
 import { initializeFeatureFlags } from './src/config/featureFlags';
 import { AuthProvider } from './src/context/AuthContext';
+import { BiometricAuthProvider } from './src/context/BiometricAuthContext';
 import { ConfirmationProvider } from './src/context/ConfirmationContext';
 import { NetworkProvider } from './src/context/NetworkContext';
 import { RealtimeProvider } from './src/context/RealtimeContext';
@@ -25,11 +26,17 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { logger } from './src/utils/logger';
 import { validateEnvironment } from './src/config/env.config';
 import { migrateSensitiveDataToSecure } from './src/utils/secureStorage';
+import { initSecurityMonitoring } from './src/utils/securityChecks';
 import './src/config/i18n'; // Initialize i18n
 
 import { messageService } from './src/services/messageService';
 import { cacheService } from './src/services/cacheService';
 import { monitoringService } from './src/services/monitoring';
+import { sessionManager } from './src/services/sessionManager';
+import { pendingTransactionsService } from './apps/mobile/src/services/pendingTransactionsService';
+import { storageMonitor } from './apps/mobile/src/services/storageMonitor';
+import { PendingTransactionsModal } from './apps/mobile/src/components/PendingTransactionsModal';
+import type { PendingPayment, PendingUpload } from './apps/mobile/src/services/pendingTransactionsService';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -43,6 +50,12 @@ try {
   throw error; // Crash app if env is invalid
 }
 
+// Initialize security monitoring (DEV mode only)
+if (__DEV__) {
+  initSecurityMonitoring();
+  logger.info('App', '🛡️ Security monitoring initialized');
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -52,6 +65,9 @@ const styles = StyleSheet.create({
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [_isBackground, setIsBackground] = useState(false);
+  const [showPendingModal, setShowPendingModal] = useState(false);
+  const [pendingPayments, setPendingPayments] = useState<PendingPayment[]>([]);
+  const [pendingUploads, setPendingUploads] = useState<PendingUpload[]>([]);
   const appState = useRef(AppState.currentState);
   const { showFeedback, dismissFeedback, incrementSessionCount } =
     useFeedbackPrompt();
@@ -59,35 +75,49 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // 1. Security Check: Root/Jailbreak Detection
+        // 1. Security Check: Root/Jailbreak Detection (Warning Only)
         const isRooted = await Device.isRootedExperimentalAsync();
         if (isRooted) {
+          logger.warn('App', 'Device is rooted/jailbroken - security risk');
+          // Show warning but don't block (user choice)
           Alert.alert(
-            'Security Risk',
-            'This device appears to be rooted or jailbroken. For your security, TravelMatch cannot run on this device.',
+            'Security Warning',
+            'This device appears to be rooted or jailbroken. This may reduce the security of your data. Continue at your own risk.',
             [
               {
-                text: 'Exit',
-                onPress: () => {
-                  if (Platform.OS === 'android') {
-                    BackHandler.exitApp();
-                  }
-                },
+                text: 'I Understand',
+                style: 'default',
               },
             ],
-            { cancelable: false },
+            { cancelable: true },
           );
-          return; // Stop initialization
+          // Continue with app initialization
         }
-        // 2. Security: Prevent Screen Capture (Android) & Recording
-        void ScreenCapture.preventScreenCaptureAsync();
+        
+        // Note: Screenshot protection is now handled per-screen via useScreenSecurity() hook
+        // Applied to: WithdrawScreen, GiftScreen, PaymentMethodScreen, BankAccountScreen
 
-        // 3. Security: Migrate sensitive data to SecureStore (one-time)
+        // 2. Security: Migrate sensitive data to SecureStore (one-time)
         try {
           await migrateSensitiveDataToSecure();
           logger.info('App', 'Sensitive data migration completed');
         } catch (migrationError) {
           logger.warn('App', 'Data migration failed (may already be migrated)', migrationError);
+        }
+
+        // 3. Session: Initialize and validate stored session
+        const sessionState = await sessionManager.initialize();
+        logger.info('App', `Session state: ${sessionState}`);
+        
+        // If session is expired, try to refresh automatically
+        if (sessionState === 'expired') {
+          logger.info('App', 'Attempting automatic session refresh');
+          const isValid = await sessionManager.isSessionValid();
+          if (!isValid) {
+            logger.warn('App', 'Session refresh failed - user needs to re-login');
+          } else {
+            logger.info('App', 'Session refreshed successfully');
+          }
         }
 
         // 4. Initialize Services
@@ -129,6 +159,21 @@ export default function App() {
         const { initSentry } = await import('./src/config/sentry');
         void initSentry();
 
+        // 5. Initialize Storage Monitor
+        storageMonitor.initialize();
+        logger.info('Storage monitor initialized');
+
+        // 6. Check Pending Transactions (app crash recovery)
+        const { hasPayments, hasUploads } = await pendingTransactionsService.checkPendingOnStartup();
+        if (hasPayments || hasUploads) {
+          logger.info('App', `Found pending transactions - payments: ${hasPayments}, uploads: ${hasUploads}`);
+          const payments = await pendingTransactionsService.getPendingPayments();
+          const uploads = await pendingTransactionsService.getPendingUploads();
+          setPendingPayments(payments);
+          setPendingUploads(uploads);
+          setShowPendingModal(true);
+        }
+
         // Load fonts or other assets here if needed
         // await Font.loadAsync({ ... });
       } catch (e) {
@@ -160,8 +205,43 @@ export default function App() {
       subscription.remove();
       // Cleanup cache service on app shutdown
       cacheService.destroy();
+      // Cleanup storage monitor
+      storageMonitor.destroy();
     };
   }, [incrementSessionCount]);
+
+  const handleResumePayment = useCallback(async (payment: PendingPayment) => {
+    logger.info('App', `Resuming payment: ${payment.id} (${payment.type})`);
+    // TODO: Navigate to payment screen with pre-filled data
+    // For now, just dismiss
+    await pendingTransactionsService.removePendingPayment(payment.id);
+    setPendingPayments(prev => prev.filter(p => p.id !== payment.id));
+  }, []);
+
+  const handleResumeUpload = useCallback(async (upload: PendingUpload) => {
+    logger.info('App', `Retrying upload: ${upload.id} (${upload.type})`);
+    // TODO: Trigger upload service retry
+    // For now, just increment retry count
+    await pendingTransactionsService.incrementUploadRetry(upload.id);
+    const uploads = await pendingTransactionsService.getPendingUploads();
+    setPendingUploads(uploads);
+  }, []);
+
+  const handleDismissPayment = useCallback(async (paymentId: string) => {
+    logger.info('App', `Dismissing payment: ${paymentId}`);
+    await pendingTransactionsService.removePendingPayment(paymentId);
+    setPendingPayments(prev => prev.filter(p => p.id !== paymentId));
+  }, []);
+
+  const handleDismissUpload = useCallback(async (uploadId: string) => {
+    logger.info('App', `Dismissing upload: ${uploadId}`);
+    await pendingTransactionsService.removePendingUpload(uploadId);
+    setPendingUploads(prev => prev.filter(u => u.id !== uploadId));
+  }, []);
+
+  const handleClosePendingModal = useCallback(() => {
+    setShowPendingModal(false);
+  }, []);
 
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
@@ -182,18 +262,30 @@ export default function App() {
         <SafeAreaProvider>
           <NetworkProvider>
             <AuthProvider>
-              <RealtimeProvider>
-                <ToastProvider>
-                  <ConfirmationProvider>
-                    <StatusBar style="auto" />
-                    <AppNavigator />
-                    <FeedbackModal
-                      visible={showFeedback}
-                      onClose={dismissFeedback}
-                    />
-                  </ConfirmationProvider>
-                </ToastProvider>
-              </RealtimeProvider>
+              <BiometricAuthProvider>
+                <RealtimeProvider>
+                  <ToastProvider>
+                    <ConfirmationProvider>
+                      <StatusBar style="auto" />
+                      <AppNavigator />
+                      <FeedbackModal
+                        visible={showFeedback}
+                        onClose={dismissFeedback}
+                      />
+                      <PendingTransactionsModal
+                        visible={showPendingModal}
+                        payments={pendingPayments}
+                        uploads={pendingUploads}
+                        onResumePayment={handleResumePayment}
+                        onResumeUpload={handleResumeUpload}
+                        onDismissPayment={handleDismissPayment}
+                        onDismissUpload={handleDismissUpload}
+                        onClose={handleClosePendingModal}
+                      />
+                    </ConfirmationProvider>
+                  </ToastProvider>
+                </RealtimeProvider>
+              </BiometricAuthProvider>
             </AuthProvider>
           </NetworkProvider>
         </SafeAreaProvider>

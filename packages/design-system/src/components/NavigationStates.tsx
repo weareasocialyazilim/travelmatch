@@ -20,8 +20,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ViewStyle,
-  TextStyle,
 } from 'react-native';
+// @ts-ignore - Expo vector icons may not have type definitions
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // ============================================================================

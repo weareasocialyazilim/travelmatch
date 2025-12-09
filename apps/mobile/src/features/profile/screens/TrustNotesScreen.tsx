@@ -8,6 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -49,21 +50,11 @@ export const TrustNotesScreen: React.FC<TrustNotesScreenProps> = ({
   navigation,
 }) => {
   const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <View style={styles.emptyIconContainer}>
-        <MaterialCommunityIcons
-          name={'forum' as IconName}
-          size={32}
-          color={COLORS.primary}
-        />
-      </View>
-      <View style={styles.emptyTextContainer}>
-        <Text style={styles.emptyTitle}>No notes yet</Text>
-        <Text style={styles.emptyDescription}>
-          Notes from supporters will appear here once they are left.
-        </Text>
-      </View>
-    </View>
+    <EmptyState
+      icon="forum"
+      title="No notes yet"
+      description="Notes from supporters will appear here once they are left."
+    />
   );
 
   return (

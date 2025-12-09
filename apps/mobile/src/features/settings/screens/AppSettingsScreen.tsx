@@ -18,10 +18,14 @@ import { logger } from '../utils/logger';
 import { useAuth } from '../context/AuthContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
+import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { useNetworkStatus } from '../../../context/NetworkContext';
+import { OfflineState } from '../../../components/OfflineState';
 
 const AppSettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, logout } = useAuth();
+  const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
 
   // Notification settings
   const [pushEnabled, setPushEnabled] = useState(true);
@@ -80,6 +84,15 @@ const AppSettingsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Offline Banner */}
+      {!isConnected && (
+        <OfflineState 
+          compact 
+          onRetry={refreshNetwork}
+          message="İnternet bağlantısı yok"
+        />
+      )}
+      
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -679,4 +692,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AppSettingsScreen;
+// Wrap with ErrorBoundary for settings screen
+export default withErrorBoundary(AppSettingsScreen, { 
+  fallbackType: 'generic',
+  displayName: 'AppSettingsScreen' 
+});

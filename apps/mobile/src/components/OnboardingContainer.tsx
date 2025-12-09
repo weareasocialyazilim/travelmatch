@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { COLORS } from '../constants/colors';
-import { OnboardingScreen } from '../screens/OnboardingScreen';
+import { OnboardingScreen } from '../features/auth/screens/OnboardingScreen';
 import { useUIStore } from '../stores/uiStore';
 
 interface OnboardingContainerProps {

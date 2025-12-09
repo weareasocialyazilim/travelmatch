@@ -134,7 +134,7 @@ describe('MomentCard', () => {
 
       const image = getByLabelText('Photo of Coffee in Paris');
       expect(image).toBeTruthy();
-      expect(image.props.source.uri).toBe('https://example.com/image.jpg');
+      expect(image.props.source).toEqual({ uri: 'https://example.com/image.jpg' });
     });
 
     it('should render user avatar', () => {
@@ -148,7 +148,7 @@ describe('MomentCard', () => {
 
       const avatar = getByLabelText("John Doe's avatar");
       expect(avatar).toBeTruthy();
-      expect(avatar.props.source.uri).toBe('https://example.com/avatar.jpg');
+      expect(avatar.props.source).toEqual({ uri: 'https://example.com/avatar.jpg' });
     });
 
     it('should render gift button', () => {
@@ -378,7 +378,7 @@ describe('MomentCard', () => {
       );
 
       const avatar = getByLabelText("John Doe's avatar");
-      expect(avatar.props.source.uri).toBe('https://via.placeholder.com/150');
+      expect(avatar.props.source).toEqual({ uri: 'https://via.placeholder.com/150' });
     });
 
     it('should handle unverified users', () => {

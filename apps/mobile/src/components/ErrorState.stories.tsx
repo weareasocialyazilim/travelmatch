@@ -38,7 +38,7 @@ export const NetworkError: Story = {
 
 export const NotFoundError: Story = {
   args: {
-    message: 'The page you're looking for doesn't exist.',
+    message: "The page you\'re looking for doesn\'t exist.",
     icon: 'map-marker-question-outline',
     onRetry: undefined,
   },
@@ -55,7 +55,7 @@ export const AuthenticationError: Story = {
 
 export const ServerError: Story = {
   args: {
-    message: 'Our servers are experiencing issues. We're working on it!',
+    message: "Our servers are experiencing issues. We\'re working on it!",
     icon: 'server-network-off',
     onRetry: () => console.log('Retry pressed'),
     retryText: 'Try Again',
@@ -64,7 +64,7 @@ export const ServerError: Story = {
 
 export const PermissionDenied: Story = {
   args: {
-    message: 'You don't have permission to view this content.',
+    message: "You don\'t have permission to view this content.",
     icon: 'shield-lock-outline',
     onRetry: undefined,
   },

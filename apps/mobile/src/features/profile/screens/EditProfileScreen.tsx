@@ -18,9 +18,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '../constants/colors';
 import { useAuth } from '../context/AuthContext';
 import { userService } from '../services/userService';
+import { editProfileSchema, type EditProfileInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -46,23 +50,34 @@ const EditProfileScreen = () => {
     };
   }, [user]);
 
-  // Editable state
-  const [avatarUri, setAvatarUri] = useState<string | null>(null);
-  const [name, setName] = useState(originalProfile.name);
-  const [username, setUsername] = useState(originalProfile.username);
-  const [bio, setBio] = useState(originalProfile.bio);
-  const [location, setLocation] = useState(originalProfile.location);
+  // Form state with RHF + Zod
+  const { control, handleSubmit, formState, watch, reset } = useForm<EditProfileInput>({
+    resolver: zodResolver(editProfileSchema),
+    mode: 'onChange',
+    defaultValues: {
+      name: originalProfile.name,
+      username: originalProfile.username,
+      bio: originalProfile.bio,
+      location: originalProfile.location,
+    },
+  });
 
-  // Update state when user data loads
+  // Watch fields for real-time updates
+  const username = watch('username');
+  const bio = watch('bio');
+
+  // Update form when user data loads
   useEffect(() => {
-    setName(originalProfile.name);
-    setUsername(originalProfile.username);
-    setBio(originalProfile.bio);
-    setLocation(originalProfile.location);
-  }, [originalProfile]);
+    reset({
+      name: originalProfile.name,
+      username: originalProfile.username,
+      bio: originalProfile.bio,
+      location: originalProfile.location,
+    });
+  }, [originalProfile, reset]);
 
   // UI state
-  const [isSaving, setIsSaving] = useState(false);
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
     null,
   );
@@ -72,14 +87,8 @@ const EditProfileScreen = () => {
 
   // Check if there are unsaved changes
   const hasChanges = useCallback(() => {
-    return (
-      avatarUri !== null ||
-      name !== originalProfile.name ||
-      username !== originalProfile.username ||
-      bio !== originalProfile.bio ||
-      location !== originalProfile.location
-    );
-  }, [avatarUri, name, username, bio, location, originalProfile]);
+    return avatarUri !== null || formState.isDirty;
+  }, [avatarUri, formState.isDirty]);
 
   // Username availability check (debounced)
   useEffect(() => {
@@ -161,7 +170,7 @@ const EditProfileScreen = () => {
     }
   };
 
-  const handleSave = async () => {
+  const onSubmit = async (data: EditProfileInput) => {
     if (!hasChanges()) return;
 
     if (usernameAvailable === false) {
@@ -169,7 +178,6 @@ const EditProfileScreen = () => {
       return;
     }
 
-    setIsSaving(true);
     try {
       // Upload avatar if changed
       if (avatarUri) {
@@ -178,10 +186,10 @@ const EditProfileScreen = () => {
 
       // Update profile
       await userService.updateProfile({
-        name,
-        username,
-        bio,
-        location,
+        name: data.name,
+        username: data.username,
+        bio: data.bio,
+        location: data.location,
       });
 
       // Refresh user context
@@ -192,10 +200,13 @@ const EditProfileScreen = () => {
       ]);
     } catch (error) {
       Alert.alert('Error', 'Failed to update profile');
-    } finally {
-      setIsSaving(false);
     }
   };
+
+  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+    requireDirty: false,
+    requireValid: true,
+  }) || usernameAvailable === false;
 
   const handleChangeAvatar = () => {
     const options = avatarUri
@@ -266,16 +277,16 @@ const EditProfileScreen = () => {
         <Text style={styles.headerTitle}>Edit Profile</Text>
         <TouchableOpacity
           style={[styles.headerButton, styles.saveButtonContainer]}
-          onPress={handleSave}
-          disabled={isSaving || !hasChanges()}
+          onPress={handleSubmit(onSubmit)}
+          disabled={formState.isSubmitting || isSubmitDisabled}
         >
-          {isSaving ? (
+          {formState.isSubmitting ? (
             <ActivityIndicator size="small" color={COLORS.mint} />
           ) : (
             <Text
               style={[
                 styles.saveText,
-                !hasChanges() && styles.saveTextDisabled,
+                isSubmitDisabled && styles.saveTextDisabled,
               ]}
             >
               Save
@@ -324,13 +335,23 @@ const EditProfileScreen = () => {
               {/* Name */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Display Name</Text>
-                <TextInput
-                  style={styles.textInput}
-                  value={name}
-                  onChangeText={setName}
-                  placeholder="Enter your name"
-                  placeholderTextColor={COLORS.textSecondary}
-                  maxLength={50}
+                <Controller
+                  control={control}
+                  name="name"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <>
+                      <TextInput
+                        style={styles.textInput}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        placeholder="Enter your name"
+                        placeholderTextColor={COLORS.textSecondary}
+                        maxLength={50}
+                      />
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                    </>
+                  )}
                 />
               </View>
 
@@ -339,46 +360,56 @@ const EditProfileScreen = () => {
               {/* Username */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Username</Text>
-                <View style={styles.usernameInputContainer}>
-                  <Text style={styles.usernamePrefix}>@</Text>
-                  <TextInput
-                    style={[styles.textInput, styles.usernameInput]}
-                    value={username}
-                    onChangeText={(text) =>
-                      setUsername(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))
-                    }
-                    placeholder="username"
-                    placeholderTextColor={COLORS.textSecondary}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    maxLength={30}
-                  />
-                  {checkingUsername && (
-                    <ActivityIndicator
-                      size="small"
-                      color={COLORS.textSecondary}
-                    />
+                <Controller
+                  control={control}
+                  name="username"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <>
+                      <View style={styles.usernameInputContainer}>
+                        <Text style={styles.usernamePrefix}>@</Text>
+                        <TextInput
+                          style={[styles.textInput, styles.usernameInput]}
+                          value={value}
+                          onChangeText={(text) =>
+                            onChange(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))
+                          }
+                          onBlur={onBlur}
+                          placeholder="username"
+                          placeholderTextColor={COLORS.textSecondary}
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          maxLength={30}
+                        />
+                        {checkingUsername && (
+                          <ActivityIndicator
+                            size="small"
+                            color={COLORS.textSecondary}
+                          />
+                        )}
+                        {!checkingUsername && usernameAvailable === true && (
+                          <MaterialCommunityIcons
+                            name="check-circle"
+                            size={20}
+                            color={COLORS.mint}
+                          />
+                        )}
+                        {!checkingUsername && usernameAvailable === false && (
+                          <MaterialCommunityIcons
+                            name="close-circle"
+                            size={20}
+                            color={COLORS.coral}
+                          />
+                        )}
+                      </View>
+                      {usernameAvailable === false && (
+                        <Text style={styles.usernameError}>
+                          This username is already taken
+                        </Text>
+                      )}
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                    </>
                   )}
-                  {!checkingUsername && usernameAvailable === true && (
-                    <MaterialCommunityIcons
-                      name="check-circle"
-                      size={20}
-                      color={COLORS.mint}
-                    />
-                  )}
-                  {!checkingUsername && usernameAvailable === false && (
-                    <MaterialCommunityIcons
-                      name="close-circle"
-                      size={20}
-                      color={COLORS.coral}
-                    />
-                  )}
-                </View>
-                {usernameAvailable === false && (
-                  <Text style={styles.usernameError}>
-                    This username is already taken
-                  </Text>
-                )}
+                />
               </View>
 
               <View style={styles.inputDivider} />
@@ -398,15 +429,25 @@ const EditProfileScreen = () => {
                     {bio.length}/{BIO_MAX_LENGTH}
                   </Text>
                 </View>
-                <TextInput
-                  style={[styles.textInput, styles.bioInput]}
-                  value={bio}
-                  onChangeText={(text) => setBio(text.slice(0, BIO_MAX_LENGTH))}
-                  placeholder="Tell us about yourself..."
-                  placeholderTextColor={COLORS.textSecondary}
-                  multiline
-                  numberOfLines={3}
-                  maxLength={BIO_MAX_LENGTH}
+                <Controller
+                  control={control}
+                  name="bio"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <>
+                      <TextInput
+                        style={[styles.textInput, styles.bioInput]}
+                        value={value}
+                        onChangeText={(text) => onChange(text.slice(0, BIO_MAX_LENGTH))}
+                        onBlur={onBlur}
+                        placeholder="Tell us about yourself..."
+                        placeholderTextColor={COLORS.textSecondary}
+                        multiline
+                        numberOfLines={3}
+                        maxLength={BIO_MAX_LENGTH}
+                      />
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                    </>
+                  )}
                 />
               </View>
             </View>
@@ -420,20 +461,30 @@ const EditProfileScreen = () => {
               {/* Location */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Location</Text>
-                <View style={styles.locationInputContainer}>
-                  <MaterialCommunityIcons
-                    name="map-marker"
-                    size={18}
-                    color={COLORS.textSecondary}
-                  />
-                  <TextInput
-                    style={[styles.textInput, styles.locationInput]}
-                    value={location}
-                    onChangeText={setLocation}
-                    placeholder="City, Country"
-                    placeholderTextColor={COLORS.textSecondary}
-                  />
-                </View>
+                <Controller
+                  control={control}
+                  name="location"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <>
+                      <View style={styles.locationInputContainer}>
+                        <MaterialCommunityIcons
+                          name="map-marker"
+                          size={18}
+                          color={COLORS.textSecondary}
+                        />
+                        <TextInput
+                          style={[styles.textInput, styles.locationInput]}
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          placeholder="City, Country"
+                          placeholderTextColor={COLORS.textSecondary}
+                        />
+                      </View>
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                    </>
+                  )}
+                />
               </View>
             </View>
           </View>
@@ -579,7 +630,12 @@ const styles = StyleSheet.create({
   usernameError: {
     fontSize: 12,
     color: COLORS.coral,
-    marginTop: 6,
+    marginTop: 4,
+  },
+  errorText: {
+    fontSize: 12,
+    color: COLORS.coral,
+    marginTop: 4,
   },
 
   // Bio

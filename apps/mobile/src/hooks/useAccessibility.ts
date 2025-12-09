@@ -232,11 +232,79 @@ export const formatTimeForScreenReader = (date: Date): string => {
   });
 };
 
+/**
+ * Combined accessibility hook with all features
+ */
+export const useAccessibility = () => {
+  const isScreenReaderEnabled = useScreenReader();
+  const reduceMotionEnabled = useReduceMotion();
+  const announce = useAccessibilityAnnounce();
+
+  return {
+    isScreenReaderEnabled,
+    reduceMotionEnabled,
+    announce,
+    props: accessibilityProps,
+    formatCurrency: formatCurrencyForScreenReader,
+    formatDate: formatDateForScreenReader,
+    formatTime: formatTimeForScreenReader,
+    MIN_TOUCH_TARGET,
+    isValidTouchTarget,
+  };
+};
+
+/**
+ * Helper to create accessible touchable wrapper
+ */
+export const createAccessibleTouchable = (
+  label: string,
+  role: 'button' | 'link' | 'tab' = 'button',
+  options?: {
+    hint?: string;
+    disabled?: boolean;
+    selected?: boolean;
+  }
+) => ({
+  accessible: true,
+  accessibilityRole: role,
+  accessibilityLabel: label,
+  accessibilityHint: options?.hint,
+  accessibilityState: {
+    disabled: options?.disabled,
+    selected: options?.selected,
+  },
+});
+
+/**
+ * Helper for card/item lists
+ */
+export const createAccessibleCard = (
+  title: string,
+  subtitle?: string,
+  index?: number,
+  total?: number
+) => {
+  let label = title;
+  if (subtitle) label += `, ${subtitle}`;
+  if (index !== undefined && total !== undefined) {
+    label += `, item ${index + 1} of ${total}`;
+  }
+  
+  return {
+    accessible: true,
+    accessibilityLabel: label,
+    accessibilityRole: 'button' as const,
+  };
+};
+
 export default {
   useScreenReader,
   useReduceMotion,
   useAccessibilityAnnounce,
+  useAccessibility,
   accessibilityProps,
+  createAccessibleTouchable,
+  createAccessibleCard,
   MIN_TOUCH_TARGET,
   isValidTouchTarget,
   formatCurrencyForScreenReader,

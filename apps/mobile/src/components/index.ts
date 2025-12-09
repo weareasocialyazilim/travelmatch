@@ -1,5 +1,20 @@
 export { Button } from './ui/Button';
-export { ErrorBoundary } from './ErrorBoundary';
+export { 
+  ErrorBoundary,
+  AppErrorBoundary,
+  NavigationErrorBoundary,
+  ScreenErrorBoundary,
+  ComponentErrorBoundary,
+  type ErrorFallbackType,
+} from './ErrorBoundary';
+export { 
+  withErrorBoundary,
+  withNetworkErrorBoundary,
+  withGenericErrorBoundary,
+  withCriticalErrorBoundary,
+} from './withErrorBoundary';
+export { NetworkGuard, type NetworkGuardProps } from './NetworkGuard';
+export { OfflineState, type OfflineStateProps } from './OfflineState';
 export { FilterPill } from './FilterPill';
 export { default as MomentCard } from './MomentCard';
 export { GiftMomentBottomSheet } from './GiftMomentBottomSheet';
@@ -37,6 +52,8 @@ export { Spinner } from './ui/Spinner';
 
 // Loading States & Skeletons
 export { Skeleton } from './ui/Skeleton';
+export { SkeletonList } from './ui/SkeletonList';
+export type { SkeletonItemType } from './ui/SkeletonList';
 export {
   ChatItemSkeleton,
   MomentCardSkeleton,

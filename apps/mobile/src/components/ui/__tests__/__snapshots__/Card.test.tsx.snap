@@ -47,7 +47,14 @@ exports[`Card Component Snapshots matches snapshot for disabled card 1`] = `
 [
   <RCTPressable
     accessibilityRole="button"
-    onClick={[Function]}
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    onPress={[MockFunction]}
+    role="button"
     style={[Function]}
   >
     <RCTView
@@ -96,7 +103,14 @@ exports[`Card Component Snapshots matches snapshot for pressable card 1`] = `
 [
   <RCTPressable
     accessibilityRole="button"
-    onClick={[Function]}
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    onPress={[MockFunction]}
+    role="button"
     style={[Function]}
   >
     <RCTView

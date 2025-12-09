@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -14,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '../utils/logger';
+import { useBiometric } from '@/context/BiometricAuthContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -27,10 +29,72 @@ interface ActiveSession {
 
 const SecurityScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const {
+    biometricAvailable,
+    biometricEnabled,
+    biometricTypeName,
+    isLoading: isLoadingBiometric,
+    enableBiometric,
+    disableBiometric,
+  } = useBiometric();
 
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [loginAlertsEnabled, setLoginAlertsEnabled] = useState(true);
+
+  const handleBiometricToggle = async (newValue: boolean) => {
+    if (!biometricAvailable) {
+      Alert.alert(
+        'Not Available',
+        'Biometric authentication is not available on this device. Please ensure you have Face ID, Touch ID, or fingerprint authentication set up in your device settings.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    try {
+      if (newValue) {
+        // Enable biometric
+        const success = await enableBiometric();
+        
+        if (success) {
+          Alert.alert(
+            'Enabled',
+            `${biometricTypeName} authentication has been enabled. You can now use it to unlock the app and verify sensitive actions.`,
+            [{ text: 'OK' }]
+          );
+        } else {
+          Alert.alert(
+            'Authentication Failed',
+            `Could not verify your ${biometricTypeName.toLowerCase()}. Please try again.`,
+            [{ text: 'OK' }]
+          );
+        }
+      } else {
+        // Disable biometric
+        Alert.alert(
+          `Disable ${biometricTypeName}`,
+          `Are you sure you want to disable ${biometricTypeName} authentication? You will need to enter your password for future logins.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Disable',
+              style: 'destructive',
+              onPress: async () => {
+                await disableBiometric();
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      logger.error('SecurityScreen', 'Biometric toggle failed', error);
+      Alert.alert(
+        'Error',
+        'Failed to update biometric settings. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
 
   // Mock KYC data
   const kycStatus = {
@@ -271,17 +335,26 @@ const SecurityScreen: React.FC = () => {
                 />
               </View>
               <View style={styles.menuContent}>
-                <Text style={styles.menuLabel}>Biometric Login</Text>
+                <Text style={styles.menuLabel}>
+                  {biometricTypeName} Login
+                </Text>
                 <Text style={styles.menuDesc}>
-                  Use Face ID or Touch ID to sign in
+                  {biometricAvailable
+                    ? `Use ${biometricTypeName.toLowerCase()} to sign in and verify actions`
+                    : 'Not available on this device'}
                 </Text>
               </View>
-              <Switch
-                value={biometricEnabled}
-                onValueChange={setBiometricEnabled}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-              />
+              {isLoadingBiometric ? (
+                <ActivityIndicator size="small" color={COLORS.mint} />
+              ) : (
+                <Switch
+                  value={biometricEnabled}
+                  onValueChange={handleBiometricToggle}
+                  disabled={!biometricAvailable}
+                  trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                  thumbColor={COLORS.white}
+                />
+              )}
             </TouchableOpacity>
 
             <View style={styles.menuDivider} />

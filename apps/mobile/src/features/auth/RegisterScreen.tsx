@@ -12,11 +12,15 @@ import {
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 import { LoadingState } from '@/components/LoadingState';
 import SocialButton from '@/components/SocialButton';
 import { useAuth } from '@/context/AuthContext';
+import { registerSchema, type RegisterInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -26,58 +30,38 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   navigation,
 }) => {
   const { register } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [touched, setTouched] = useState({
-    email: false,
-    password: false,
-    confirmPassword: false,
-  });
 
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
+  const {
+    control,
+    handleSubmit,
+    formState,
+    watch,
+  } = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  const validatePassword = (password: string) => {
-    return password.length >= 8;
-  };
+  const password = watch('password');
+  const email = watch('email');
 
-  const isFormValid = () => {
-    return (
-      validateEmail(email) &&
-      validatePassword(password) &&
-      password === confirmPassword
-    );
-  };
-
-  const handleRegister = async () => {
-    if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address');
-      return;
-    }
-    if (!validatePassword(password)) {
-      Alert.alert('Weak Password', 'Password must be at least 8 characters');
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert('Password Mismatch', 'Passwords do not match');
-      return;
-    }
-
+  const onSubmit = async (data: RegisterInput) => {
     setLoading(true);
     try {
       const result = await register({
-        email,
-        password,
-        name: email.split('@')[0], // Default name from email
+        email: data.email,
+        password: data.password,
+        name: data.email.split('@')[0], // Default name from email
       });
 
       if (result.success) {
@@ -168,128 +152,121 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
           {/* Email Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Email address</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                email.length > 0 && !validateEmail(email) && styles.inputError,
-              ]}
-            >
-              <Icon
-                name="email-outline"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <TextInput
-                style={styles.textInput}
-                placeholder="name@example.com"
-                placeholderTextColor={COLORS.textSecondary}
-                value={email}
-                onChangeText={setEmail}
-                onBlur={() => setTouched({ ...touched, email: true })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                onSubmitEditing={() => passwordRef.current?.focus()}
-                blurOnSubmit={false}
-              />
-            </View>
-            {email.length > 0 && !validateEmail(email) && touched.email && (
-              <Text style={styles.errorText}>Please enter a valid email</Text>
-            )}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                    <Icon
+                      name="email-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="name@example.com"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      onSubmitEditing={() => passwordRef.current?.focus()}
+                      blurOnSubmit={false}
+                    />
+                  </View>
+                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                </>
+              )}
+            />
           </View>
 
           {/* Password Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Password</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                password.length > 0 &&
-                  !validatePassword(password) &&
-                  styles.inputError,
-              ]}
-            >
-              <Icon
-                name="lock-outline"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <TextInput
-                ref={passwordRef}
-                style={styles.textInput}
-                placeholder="Min. 8 characters"
-                placeholderTextColor={COLORS.textSecondary}
-                value={password}
-                onChangeText={setPassword}
-                onBlur={() => setTouched({ ...touched, password: true })}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                returnKeyType="next"
-                onSubmitEditing={() => confirmPasswordRef.current?.focus()}
-                blurOnSubmit={false}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Icon
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={20}
-                  color={COLORS.textSecondary}
-                />
-              </TouchableOpacity>
-            </View>
-            {password.length > 0 &&
-              !validatePassword(password) &&
-              touched.password && (
-                <Text style={styles.errorText}>
-                  Password must be at least 8 characters
-                </Text>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                    <Icon
+                      name="lock-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      ref={passwordRef}
+                      style={styles.textInput}
+                      placeholder="Min. 8 characters"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                      returnKeyType="next"
+                      onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+                      blurOnSubmit={false}
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                      <Icon
+                        name={showPassword ? 'eye-off' : 'eye'}
+                        size={20}
+                        color={COLORS.textSecondary}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                </>
               )}
+            />
           </View>
 
           {/* Confirm Password Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Confirm Password</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                confirmPassword.length > 0 &&
-                  password !== confirmPassword &&
-                  styles.inputError,
-              ]}
-            >
-              <Icon
-                name="lock-check-outline"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <TextInput
-                ref={confirmPasswordRef}
-                style={styles.textInput}
-                placeholder="Re-enter password"
-                placeholderTextColor={COLORS.textSecondary}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                onBlur={() => setTouched({ ...touched, confirmPassword: true })}
-                secureTextEntry={!showConfirmPassword}
-                autoCapitalize="none"
-                returnKeyType="done"
-                onSubmitEditing={handleRegister}
-              />
-              <TouchableOpacity
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                <Icon
-                  name={showConfirmPassword ? 'eye-off' : 'eye'}
-                  size={20}
-                  color={COLORS.textSecondary}
-                />
-              </TouchableOpacity>
-            </View>
-            {confirmPassword.length > 0 &&
-              password !== confirmPassword &&
-              touched.confirmPassword && (
-                <Text style={styles.errorText}>Passwords do not match</Text>
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                    <Icon
+                      name="lock-check-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      ref={confirmPasswordRef}
+                      style={styles.textInput}
+                      placeholder="Re-enter password"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!showConfirmPassword}
+                      autoCapitalize="none"
+                      returnKeyType="done"
+                      onSubmitEditing={handleSubmit(onSubmit)}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      <Icon
+                        name={showConfirmPassword ? 'eye-off' : 'eye'}
+                        size={20}
+                        color={COLORS.textSecondary}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                </>
               )}
+            />
           </View>
 
           {/* Terms */}
@@ -315,10 +292,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             <TouchableOpacity
               style={[
                 styles.registerButton,
-                !isFormValid() && styles.registerButtonDisabled,
+                !canSubmitForm({ formState }) && styles.registerButtonDisabled,
               ]}
-              onPress={handleRegister}
-              disabled={!isFormValid() || loading}
+              onPress={handleSubmit(onSubmit)}
+              disabled={!canSubmitForm({ formState }) || loading}
               activeOpacity={0.8}
             >
               <Text style={styles.registerButtonText}>Create Account</Text>

@@ -345,19 +345,20 @@ class Logger {
 
   info(message: string, ...args: unknown[]): void {
     if (this.shouldLog('info')) {
+      const sanitizedArgs = args.map((arg) => this.sanitizeData(arg));
       if (this.config.jsonFormat && !__DEV__) {
         // eslint-disable-next-line no-console
-        console.info(this.formatJSON('info', message, args));
+        console.info(this.formatJSON('info', message, sanitizedArgs));
       } else {
         // eslint-disable-next-line no-console
-        console.info(this.formatMessage('info', message), ...args);
+        console.info(this.formatMessage('info', message), ...sanitizedArgs);
       }
       this.queueRemoteLog({
         level: 'info',
         message: this.sanitizeMessage(message),
         timestamp: new Date().toISOString(),
         prefix: this.config.prefix,
-        args: args.map((arg) => this.sanitizeData(arg)),
+        args: sanitizedArgs,
       });
     }
   }

@@ -16,6 +16,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { ConfirmGiftModal } from './ConfirmGiftModal';
+import { useScreenSecurity } from '../hooks/useScreenSecurity';
 import type { MomentData } from '../types';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -77,6 +78,9 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
+
+  // Enable screenshot protection when visible
+  useScreenSecurity();
 
   // Pan responder for swipe to dismiss
   const panResponder = useRef(

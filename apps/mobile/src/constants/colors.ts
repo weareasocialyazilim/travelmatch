@@ -1,3 +1,5 @@
+import { TYPOGRAPHY } from '../theme/typography';
+
 export const COLORS = {
   // Primary colors
   primary: '#A6E5C1',

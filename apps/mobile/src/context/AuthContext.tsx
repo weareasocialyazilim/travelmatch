@@ -33,7 +33,7 @@ import React, {
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '../services/supabaseAuthService';
-import { secureStorage, AUTH_STORAGE_KEYS } from '../utils/secureStorage';
+import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '../utils/secureStorage';
 import { logger } from '../utils/logger';
 import type { User } from '../types/index';
 
@@ -147,13 +147,6 @@ interface AuthContextType {
     newPassword: string,
   ) => Promise<{ success: boolean; error?: string }>;
 }
-
-import {
-  AUTH_STORAGE_KEYS,
-  StorageKeys,
-  secureStorage,
-  migrateSensitiveDataToSecure,
-} from '../utils/secureStorage';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

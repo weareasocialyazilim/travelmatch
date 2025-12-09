@@ -18,6 +18,8 @@ import { logger } from '../utils/logger';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { NetworkGuard } from '../../../components/NetworkGuard';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'Chat'>;
 type ChatScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Chat'>;
@@ -37,6 +39,7 @@ const ChatScreen: React.FC = () => {
     showAttachmentSheet,
     showChatOptions,
     isAnyoneTyping,
+    isSending,
     setMessageText,
     setShowAttachmentSheet,
     setShowChatOptions,
@@ -91,8 +94,9 @@ const ChatScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ChatHeader
+    <NetworkGuard>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ChatHeader
         otherUser={otherUser}
         onBack={() => navigation.goBack()}
         onUserPress={() =>
@@ -125,6 +129,7 @@ const ChatScreen: React.FC = () => {
           onSend={handleSend}
           onAttachPress={() => setShowAttachmentSheet(true)}
           isTyping={isAnyoneTyping}
+          isSending={isSending}
         />
       </KeyboardAvoidingView>
 
@@ -144,6 +149,7 @@ const ChatScreen: React.FC = () => {
         targetType="user"
       />
     </SafeAreaView>
+    </NetworkGuard>
   );
 };
 
@@ -162,4 +168,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen;
+// Wrap with ErrorBoundary for critical chat functionality
+export default withErrorBoundary(ChatScreen, { 
+  fallbackType: 'generic',
+  displayName: 'ChatScreen' 
+});

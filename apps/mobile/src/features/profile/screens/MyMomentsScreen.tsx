@@ -12,6 +12,8 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '../constants/colors';
 import { useMoments } from '../hooks/useMoments';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -23,6 +25,7 @@ type TabType = 'active' | 'completed';
 const MyMomentsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<TabType>('active');
+  const { props: a11y } = useAccessibility();
 
   const { myMoments, myMomentsLoading, loadMyMoments } = useMoments();
 
@@ -137,16 +140,32 @@ const MyMomentsScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
+          {...a11y.button('Go back', 'Return to previous screen')}
         >
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
             color={COLORS.text}
+            accessible={false}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Moments</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreateMoment}>
-          <MaterialCommunityIcons name="plus" size={24} color={COLORS.coral} />
+        <Text 
+          style={styles.headerTitle}
+          {...a11y.header('My Moments')}
+        >
+          My Moments
+        </Text>
+        <TouchableOpacity 
+          style={styles.addButton} 
+          onPress={handleCreateMoment}
+          {...a11y.button('Create new moment', 'Add a new travel moment')}
+        >
+          <MaterialCommunityIcons 
+            name="plus" 
+            size={24} 
+            color={COLORS.coral}
+            accessible={false}
+          />
         </TouchableOpacity>
       </View>
 
@@ -155,6 +174,10 @@ const MyMomentsScreen: React.FC = () => {
         <TouchableOpacity
           style={[styles.tab, activeTab === 'active' && styles.activeTab]}
           onPress={() => setActiveTab('active')}
+          {...a11y.tab(
+            `Active moments, ${activeMoments.length} items`,
+            activeTab === 'active'
+          )}
         >
           <Text
             style={[
@@ -168,6 +191,10 @@ const MyMomentsScreen: React.FC = () => {
         <TouchableOpacity
           style={[styles.tab, activeTab === 'completed' && styles.activeTab]}
           onPress={() => setActiveTab('completed')}
+          {...a11y.tab(
+            `Completed moments, ${completedMoments.length} items`,
+            activeTab === 'completed'
+          )}
         >
           <Text
             style={[
@@ -197,40 +224,22 @@ const MyMomentsScreen: React.FC = () => {
             <ActivityIndicator size="large" color={COLORS.coral} />
           </View>
         ) : moments.length === 0 ? (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}>
-              <MaterialCommunityIcons
-                name={
-                  activeTab === 'active' ? 'map-marker-star' : 'check-circle'
-                }
-                size={48}
-                color={COLORS.softGray}
-              />
-            </View>
-            <Text style={styles.emptyTitle}>
-              {activeTab === 'active'
+          <EmptyState
+            illustrationType={activeTab === 'active' ? 'no_moments' : 'no_moments'}
+            icon={activeTab === 'active' ? 'map-marker-star' : 'check-circle'}
+            title={
+              activeTab === 'active'
                 ? 'No active moments'
-                : 'No completed moments yet'}
-            </Text>
-            <Text style={styles.emptySubtitle}>
-              {activeTab === 'active'
+                : 'No completed moments yet'
+            }
+            description={
+              activeTab === 'active'
                 ? 'Create your first moment to start receiving requests'
-                : 'Complete your first moment to see it here'}
-            </Text>
-            {activeTab === 'active' && (
-              <TouchableOpacity
-                style={styles.createButton}
-                onPress={handleCreateMoment}
-              >
-                <MaterialCommunityIcons
-                  name="plus"
-                  size={18}
-                  color={COLORS.white}
-                />
-                <Text style={styles.createButtonText}>Create Moment</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+                : 'Complete your first moment to see it here'
+            }
+            actionLabel={activeTab === 'active' ? 'Create Moment' : undefined}
+            onAction={activeTab === 'active' ? handleCreateMoment : undefined}
+          />
         ) : (
           moments.map((moment) => (
             <TouchableOpacity

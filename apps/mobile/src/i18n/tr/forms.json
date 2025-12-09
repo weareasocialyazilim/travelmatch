@@ -1,0 +1,219 @@
+{
+  "forms": {
+    "validation": {
+      "email": {
+        "required": "E-posta adresi gereklidir",
+        "invalid": "Geçerli bir e-posta adresi girin"
+      },
+      "password": {
+        "required": "Şifre gereklidir",
+        "min": "Şifre en az 8 karakter olmalıdır",
+        "uppercase": "Şifre en az bir büyük harf içermelidir",
+        "lowercase": "Şifre en az bir küçük harf içermelidir",
+        "number": "Şifre en az bir rakam içermelidir"
+      },
+      "confirmPassword": {
+        "required": "Şifre tekrarı gereklidir",
+        "mismatch": "Şifreler eşleşmiyor"
+      },
+      "currentPassword": {
+        "required": "Mevcut şifre gereklidir"
+      },
+      "newPassword": {
+        "different": "Yeni şifre mevcut şifreden farklı olmalıdır"
+      },
+      "phone": {
+        "required": "Telefon numarası gereklidir",
+        "invalid": "Geçerli bir telefon numarası girin"
+      },
+      "otp": {
+        "invalid": "Lütfen 6 haneli doğrulama kodunu girin"
+      },
+      "code": {
+        "length": "Kod 6 karakter olmalıdır"
+      },
+      "name": {
+        "min": "İsim en az 2 karakter olmalıdır",
+        "max": "İsim en fazla 50 karakter olmalıdır"
+      },
+      "username": {
+        "min": "Kullanıcı adı en az 3 karakter olmalıdır",
+        "max": "Kullanıcı adı en fazla 30 karakter olmalıdır",
+        "invalid": "Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir"
+      },
+      "amount": {
+        "required": "Tutar gereklidir",
+        "invalid": "Geçerli bir tutar girin",
+        "positive": "Tutar pozitif olmalıdır",
+        "max": "Tutar 100.000'den fazla olamaz",
+        "maxMoment": "Tutar 10.000'den fazla olamaz"
+      },
+      "note": {
+        "max": "Not en fazla 500 karakter olmalıdır"
+      },
+      "url": {
+        "invalid": "Geçerli bir URL girin"
+      },
+      "bio": {
+        "max": "Biyografi en fazla 500 karakter olmalıdır"
+      },
+      "location": {
+        "max": "Konum en fazla 100 karakter olmalıdır"
+      },
+      "message": {
+        "required": "Mesaj gereklidir",
+        "max": "Mesaj en fazla 1000 karakter olmalıdır"
+      },
+      "accountNumber": {
+        "required": "Hesap numarası gereklidir",
+        "invalid": "Geçerli bir IBAN numarası girin"
+      },
+      "cardNumber": {
+        "required": "Kart numarası gereklidir",
+        "invalid": "Geçerli bir kart numarası girin"
+      },
+      "expiryMonth": {
+        "min": "Ay 1-12 arasında olmalıdır",
+        "max": "Ay 1-12 arasında olmalıdır"
+      },
+      "expiryYear": {
+        "min": "Son kullanma tarihi geçmiş olamaz"
+      },
+      "cvv": {
+        "invalid": "Geçerli bir CVV girin (3-4 rakam)"
+      },
+      "recipientId": {
+        "invalid": "Geçersiz alıcı ID"
+      },
+      "reason": {
+        "required": "Sebep seçiniz"
+      },
+      "destination": {
+        "required": "Hedef gereklidir"
+      },
+      "startDate": {
+        "required": "Başlangıç tarihi gereklidir"
+      },
+      "endDate": {
+        "required": "Bitiş tarihi gereklidir",
+        "afterStart": "Bitiş tarihi başlangıçtan sonra olmalıdır"
+      },
+      "tripId": {
+        "invalid": "Geçersiz seyahat ID"
+      },
+      "caption": {
+        "max": "Açıklama en fazla 500 karakter olmalıdır"
+      },
+      "tags": {
+        "max": "En fazla 10 etiket ekleyebilirsiniz"
+      },
+      "evidence": {
+        "max": "En fazla 3 dosya yükleyebilirsiniz"
+      },
+      "confirmation": {
+        "delete": "Hesabınızı silmek için lütfen 'DELETE' yazın"
+      },
+      "rating": {
+        "required": "Lütfen bir puan verin",
+        "max": "Puan en fazla 5 olabilir"
+      },
+      "proofType": {
+        "required": "Lütfen kanıt türü seçin"
+      },
+      "photos": {
+        "required": "En az bir fotoğraf eklemelisiniz",
+        "max": "En fazla 5 fotoğraf ekleyebilirsiniz"
+      },
+      "description": {
+        "minProof": "Açıklama en az 10 karakter olmalıdır",
+        "max": "Açıklama en fazla 500 karakter olmalıdır"
+      },
+      "dateOfBirth": {
+        "required": "Doğum tarihi gereklidir"
+      },
+      "gender": {
+        "required": "Cinsiyet seçiniz"
+      },
+      "nationality": {
+        "required": "Uyruk gereklidir"
+      },
+      "address": {
+        "required": "Adres gereklidir"
+      },
+      "city": {
+        "required": "Şehir gereklidir"
+      },
+      "postalCode": {
+        "required": "Posta kodu gereklidir"
+      },
+      "country": {
+        "required": "Ülke gereklidir"
+      },
+      "documentType": {
+        "required": "Belge türü seçiniz"
+      },
+      "documentNumber": {
+        "required": "Belge numarası gereklidir"
+      },
+      "expiryDate": {
+        "required": "Son kullanma tarihi gereklidir"
+      },
+      "subject": {
+        "required": "Konu gereklidir"
+      },
+      "category": {
+        "required": "Kategori seçiniz"
+      },
+      "trustNote": {
+        "min": "Not en az 10 karakter olmalıdır",
+        "max": "Not en fazla 500 karakter olmalıdır"
+      },
+      "title": {
+        "required": "Başlık gereklidir",
+        "max": "Başlık en fazla 100 karakter olmalıdır",
+        "minMoment": "Başlık en az 5 karakter olmalıdır"
+      },
+      "price": {
+        "required": "Fiyat gereklidir",
+        "invalid": "Geçerli bir fiyat girin",
+        "positive": "Fiyat pozitif olmalıdır",
+        "max": "Fiyat 100.000'den fazla olamaz"
+      },
+      "details": {
+        "max": "Detaylar en fazla 500 karakter olmalıdır"
+      },
+      "interests": {
+        "min": "En az 1 ilgi alanı seçiniz",
+        "max": "En fazla 5 ilgi alanı seçebilirsiniz"
+      },
+      "story": {
+        "max": "Hikaye en fazla 1000 karakter olmalıdır"
+      },
+      "date": {
+        "required": "Tarih seçiniz"
+      }
+    },
+    "errors": {
+      "generic": "Bir hata oluştu. Lütfen tekrar deneyin.",
+      "network": "Bağlantı hatası. İnternet bağlantınızı kontrol edin.",
+      "timeout": "İşlem zaman aşımına uğradı. Lütfen tekrar deneyin.",
+      "offline": "Çevrimdışısınız. İnternet bağlantınızı kontrol edin.",
+      "validation": "Lütfen tüm alanları doğru şekilde doldurun.",
+      "unauthorized": "Bu işlem için yetkiniz yok.",
+      "notFound": "İstenen kayıt bulunamadı.",
+      "conflict": "Bu işlem zaten yapılmış.",
+      "serverError": "Sunucu hatası. Lütfen daha sonra tekrar deneyin."
+    },
+    "success": {
+      "login": "Giriş başarılı",
+      "register": "Kayıt başarılı",
+      "profileUpdated": "Profil güncellendi",
+      "passwordChanged": "Şifre değiştirildi",
+      "emailSent": "E-posta gönderildi",
+      "saved": "Kaydedildi",
+      "submitted": "Gönderildi",
+      "uploaded": "Yüklendi",
+      "deleted": "Silindi"
+    }
+  }
+}

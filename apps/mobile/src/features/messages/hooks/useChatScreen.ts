@@ -34,6 +34,7 @@ export const useChatScreen = ({
   const [showAttachmentSheet, setShowAttachmentSheet] = useState(false);
   const [showChatOptions, setShowChatOptions] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isSending, setIsSending] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { user: currentUser } = useAuth();
 
@@ -158,26 +159,35 @@ export const useChatScreen = ({
 
   // Handle send message
   const handleSend = useCallback(async () => {
-    if (messageText.trim()) {
+    if (messageText.trim() && !isSending) {
+      setIsSending(true);
       trackInteraction('message_sent', {
         message_length: messageText.length,
         recipient: otherUserName,
       });
 
-      // Send via API if conversationId exists
-      if (conversationId) {
-        await sendMessage({
-          conversationId,
-          content: messageText.trim(),
-          type: 'text',
-        });
-      }
+      try {
+        // Send via API if conversationId exists
+        if (conversationId) {
+          await sendMessage({
+            conversationId,
+            content: messageText.trim(),
+            type: 'text',
+          });
+        }
 
-      stopTyping();
-      setMessageText('');
+        stopTyping();
+        setMessageText('');
+      } catch (error) {
+        logger.error('Failed to send message', error as Error);
+        Alert.alert('Failed to send', 'Please try again');
+      } finally {
+        setIsSending(false);
+      }
     }
   }, [
     messageText,
+    isSending,
     conversationId,
     sendMessage,
     stopTyping,
@@ -239,6 +249,7 @@ export const useChatScreen = ({
     messageText,
     messages,
     isLoading,
+    isSending,
     showAttachmentSheet,
     showChatOptions,
     isAnyoneTyping,

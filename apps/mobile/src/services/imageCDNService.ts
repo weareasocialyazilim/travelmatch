@@ -2,6 +2,11 @@
  * Image CDN Service
  * Cloudflare Images integration for optimized image delivery
  * 
+ * 🔒 SECURITY WARNING:
+ * CLOUDFLARE_IMAGES_TOKEN should NOT be in EXPO_PUBLIC_* variables!
+ * This service should ONLY handle image delivery (reading), not uploads.
+ * Image uploads must be done via Supabase Edge Functions (server-side).
+ * 
  * Features:
  * - Automatic WebP/AVIF conversion
  * - On-the-fly resizing and optimization
@@ -9,16 +14,16 @@
  * - 60-80% faster image loads
  * 
  * Usage:
- * 1. Upload images to Cloudflare CDN
- * 2. Get optimized URLs with ImageVariants
+ * 1. Upload images via server-side API
+ * 2. Get optimized delivery URLs
  * 3. Use responsive srcsets for multi-resolution
  */
 
 import { logger } from '../utils/logger';
 
-// Cloudflare Images Configuration
+// Cloudflare Images Configuration (READ-ONLY)
 const CLOUDFLARE_ACCOUNT_ID = process.env.EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_ID;
-const CLOUDFLARE_IMAGES_TOKEN = process.env.EXPO_PUBLIC_CLOUDFLARE_IMAGES_TOKEN;
+// 🔒 REMOVED: CLOUDFLARE_IMAGES_TOKEN - must be server-side only
 const CLOUDFLARE_DELIVERY_URL = `https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_ID}`;
 
 // Image Variants (predefined sizes)
@@ -46,65 +51,41 @@ export interface ImageUploadOptions {
 }
 
 /**
- * Check if Cloudflare Images is configured
+ * Check if Cloudflare Images is configured for delivery
  */
 export function isCloudflareImagesEnabled(): boolean {
-  return Boolean(CLOUDFLARE_ACCOUNT_ID && CLOUDFLARE_IMAGES_TOKEN);
+  return Boolean(CLOUDFLARE_ACCOUNT_ID);
 }
 
 /**
- * Upload image to Cloudflare Images CDN
+ * 🔒 DEPRECATED: Upload image to Cloudflare Images CDN
+ * 
+ * @deprecated This function exposes sensitive tokens in client code.
+ * Use the server-side upload endpoint instead:
+ * 
+ * ```typescript
+ * // ✅ SECURE: Upload via Supabase Edge Function
+ * const response = await fetch(
+ *   `${SUPABASE_URL}/functions/v1/upload-image`,
+ *   {
+ *     method: 'POST',
+ *     headers: {
+ *       'apikey': SUPABASE_ANON_KEY,
+ *       'Content-Type': 'application/json',
+ *     },
+ *     body: JSON.stringify({ imageUri, options }),
+ *   }
+ * );
+ * ```
  */
 export async function uploadToCloudflare(
   imageUri: string,
   options: ImageUploadOptions = {}
 ): Promise<CloudflareUploadResult> {
-  if (!isCloudflareImagesEnabled()) {
-    throw new Error('Cloudflare Images not configured. Set EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_ID and EXPO_PUBLIC_CLOUDFLARE_IMAGES_TOKEN');
-  }
-
-  try {
-    // Convert URI to Blob
-    const response = await fetch(imageUri);
-    const blob = await response.blob();
-
-    // Create FormData
-    const formData = new FormData();
-    formData.append('file', blob);
-
-    if (options.requireSignedURLs) {
-      formData.append('requireSignedURLs', 'true');
-    }
-
-    if (options.metadata) {
-      formData.append('metadata', JSON.stringify(options.metadata));
-    }
-
-    // Upload to Cloudflare
-    const uploadResponse = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${CLOUDFLARE_IMAGES_TOKEN}`,
-        },
-        body: formData,
-      }
-    );
-
-    if (!uploadResponse.ok) {
-      const error = await uploadResponse.json();
-      throw new Error(`Cloudflare upload failed: ${error.errors?.[0]?.message || 'Unknown error'}`);
-    }
-
-    const result = await uploadResponse.json();
-    logger.info('Cloudflare image uploaded', { id: result.result.id });
-
-    return result.result;
-  } catch (error) {
-    logger.error('Cloudflare upload error', { error });
-    throw error;
-  }
+  throw new Error(
+    '🔒 SECURITY: Image uploads must be done server-side. ' +
+    'Use Supabase Edge Function: /functions/v1/upload-image'
+  );
 }
 
 /**

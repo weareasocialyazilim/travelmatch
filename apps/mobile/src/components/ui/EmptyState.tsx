@@ -16,6 +16,8 @@ interface EmptyStateProps {
   subtitle?: string; // Alias for description to support both props
   actionLabel?: string;
   onAction?: () => void;
+  secondaryActionLabel?: string;
+  onSecondaryAction?: () => void;
   illustration?: React.ReactNode;
   illustrationType?: IllustrationType;
   style?: ViewStyle;
@@ -28,6 +30,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   subtitle,
   actionLabel,
   onAction,
+  secondaryActionLabel,
+  onSecondaryAction,
   illustration,
   illustrationType,
   style,
@@ -60,6 +64,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           variant="primary"
           size="md"
           style={styles.button}
+        />
+      )}
+
+      {secondaryActionLabel && onSecondaryAction && (
+        <Button
+          title={secondaryActionLabel}
+          onPress={onSecondaryAction}
+          variant="secondary"
+          size="md"
+          style={styles.secondaryButton}
         />
       )}
     </View>
@@ -97,5 +111,9 @@ const styles = StyleSheet.create({
   },
   button: {
     minWidth: 120,
+  },
+  secondaryButton: {
+    minWidth: 120,
+    marginTop: spacing.sm,
   },
 });

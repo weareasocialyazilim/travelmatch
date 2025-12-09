@@ -255,48 +255,142 @@ These scripts:
 
 ## 🧪 Testing
 
-### Unit Tests
+### Test Coverage: **1,845+ tests** with **75-85% coverage**
 
-Test coverage: **77/77 tests passing (100%)**
+TravelMatch has comprehensive test coverage across all layers of the application.
 
-```sh
-npm test                    # Run all tests
-npm run test:watch          # Watch mode
-npm run test:coverage       # With coverage report
+#### Test Pyramid
+
+```
+           /\
+          /  \        Manual Tests (Planned)
+         /____\       
+        /      \      E2E: 680 tests (Maestro + React Native)
+       /        \     
+      /          \    
+     /____________\   Integration: 195 tests
+    /              \  
+   /                \ 
+  /                  \
+ /____________________\ Unit: 970 tests
 ```
 
-Test files follow the pattern: `*.test.ts(x)` or `__tests__/*.ts(x)`
-
-### E2E Tests (Maestro)
-
-End-to-end testing with [Maestro](https://maestro.mobile.dev/) for critical user flows:
+#### Quick Commands
 
 ```sh
-npm run test:e2e            # Run all E2E flows
-npm run test:e2e:single .maestro/login-flow.yaml  # Run specific flow
+# Unit & Component Tests
+pnpm test                    # Run all tests
+pnpm test:unit              # Unit tests only (970 tests)
+pnpm test:components        # Component tests (560 tests)
+pnpm test:screens           # Screen tests (120 tests)
+pnpm test:e2e:flows        # Flow tests (270 tests)
+pnpm test:integration       # Integration tests (195 tests)
+
+# Coverage Reports
+pnpm test:coverage:full     # Generate full coverage report
+pnpm test:coverage:check    # Quick coverage summary
+
+# E2E Tests (Maestro)
+pnpm --filter @travelmatch/mobile test:e2e           # Run all Maestro flows
+pnpm --filter @travelmatch/mobile test:e2e:login     # Specific flow
+pnpm --filter @travelmatch/mobile test:e2e:cloud     # Maestro Cloud
 ```
 
-**Test Coverage:**
+#### Test Categories
 
-- ✅ Authentication (Login/Logout)
-- ✅ Moment Creation & Publishing
-- ✅ Gift Booking & Payment
-- ✅ Proof Upload & Verification
-- ✅ Real-time Messaging
-- ✅ Profile & Settings Management
+**1. Unit Tests (970 tests - 85% coverage)**
+- Utility functions
+- Custom hooks
+- Form validation
+- Authentication logic
+- Data transformations
 
-See [.maestro/README.md](.maestro/README.md) for detailed E2E testing documentation.
+**2. Component Tests (560 tests - 75% coverage)**
+- Form components with validation
+- Controlled inputs
+- Optimized lists (infinite scroll, pull-to-refresh)
+- Bottom sheets (gestures, animations)
+- Modals (Alert, Success, Error, Loading, ImagePicker)
+
+**3. Screen Tests (120 tests - 75% coverage)**
+- HomeScreen (feed, search, filters)
+- ProfileScreen (info, edit, settings)
+- DiscoverScreen (categories, map, search)
+
+**4. Flow Tests (270 tests - 75% coverage)**
+- Onboarding (welcome → registration → verification → steps)
+- Profile Management (edit, settings, payments)
+- Moment Creation/Discovery (create, join, share, search)
+
+**5. Integration Tests (195 tests - 75% coverage)**
+- Payment flows
+- Proof verification
+- Chat/messaging
+- Offline scenarios
+
+**6. E2E Tests - Maestro (120 tests - 100% coverage)**
+- Authentication (login, signup, logout)
+- Moment lifecycle
+- Payment processing
+- Profile management
+- Real-time messaging
+
+#### CI/CD Integration
+
+All tests run automatically on every PR and push:
+
+**GitHub Actions Workflows:**
+1. **UI & E2E Component Tests** - 4 parallel jobs + quality gate
+2. **Maestro E2E Tests** - iOS + Android + Cloud
+
+**Branch Protection:**
+- ✅ Tests MUST pass before merge
+- ✅ 7 required status checks
+- ✅ Coverage tracking via Codecov
+- ✅ PR comments on failure
+- ✅ Slack notifications
+
+**Documentation:**
+- [Test Infrastructure Guide](./docs/TEST_INFRASTRUCTURE.md) - Complete testing overview
+- [Test Execution Report](./docs/TEST_EXECUTION_REPORT.md) - Detailed test results
+- [Branch Protection Guide](./.github/BRANCH_PROTECTION.md) - CI/CD configuration
+- [Maestro E2E Guide](./.maestro/README.md) - E2E testing docs
 
 ## 🔄 CI/CD Pipeline
 
-GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push/PR:
+### GitHub Actions Workflows
 
+**1. UI & E2E Component Tests** (`.github/workflows/ui-e2e-tests.yml`)
+- Runs on: PR to main/develop, push to main/develop
+- Jobs:
+  - `unit-component-tests` (20 min)
+  - `integration-tests` (20 min)
+  - `e2e-flow-tests` (30 min)
+  - `screen-tests` (20 min)
+  - `test-quality-gate` (blocking)
+  - `notify-results` (PR comment + Slack)
+
+**2. Maestro E2E Tests** (`.github/workflows/e2e-tests.yml`)
+- Runs on: PR to main/develop, push to main, nightly 2 AM
+- Jobs:
+  - `e2e-ios` - iPhone 14 Pro simulator (45 min)
+  - `e2e-android` - Pixel 6 emulator (45 min)
+  - `e2e-cloud` - Maestro Cloud (main only)
+  - `notify` - Slack on failure
+
+**3. Original CI Pipeline** (`.github/workflows/ci.yml`)
 1. **Lint & Type Check** - ESLint + TypeScript validation
 2. **Unit Tests** - Jest with coverage reporting
 3. **Build Check** - TypeScript compilation
 4. **Security Audit** - npm audit
 5. **E2E Tests** - Maestro critical flows (iOS)
 6. **Quality Gate** - Combined validation
+
+**Merge Requirements:**
+- ✅ All status checks pass
+- ✅ Branch up to date
+- ✅ Required reviewers approve
+- ❌ Tests failing = merge blocked
 
 ### Pre-commit Hooks
 

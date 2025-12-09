@@ -12,6 +12,9 @@ import {
   ActionSheetIOS,
   Platform,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { proofSchema, type ProofInput } from '../../../utils/forms/schemas';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -78,15 +81,37 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   navigation,
 }) => {
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
-  const [proof, setProof] = useState<Partial<ProofUpload>>({
-    photos: [],
-    title: '',
-    description: '',
-  });
   const [loading, setLoading] = useState(false);
 
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<ProofInput>({
+    resolver: zodResolver(proofSchema),
+    mode: 'onChange',
+    defaultValues: {
+      type: undefined,
+      photos: [],
+      title: '',
+      description: '',
+      ticket: '',
+      location: null,
+      amount: undefined,
+      receiver: '',
+    },
+  });
+
+  const proofType = watch('type');
+  const photos = watch('photos');
+  const title = watch('title');
+  const description = watch('description');
+  const location = watch('location');
+
   const handleSelectType = (type: ProofType) => {
-    setProof({ ...proof, type });
+    setValue('type', type);
     setCurrentStep('upload');
   };
 
@@ -129,10 +154,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           });
 
       if (!result.canceled && result.assets[0]) {
-        setProof({
-          ...proof,
-          photos: [...(proof.photos || []), result.assets[0].uri],
-        });
+        setValue('photos', [...photos, result.assets[0].uri]);
       }
     };
 
@@ -165,7 +187,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
-        setProof({ ...proof, ticket: asset.uri });
+        setValue('ticket', asset.uri);
         logger.info('Ticket added', { uri: asset.uri });
       }
     } catch (error) {
@@ -195,13 +217,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
             }`.trim()
           : 'Current Location';
 
-        setProof({
-          ...proof,
-          location: {
-            lat: location.coords.latitude,
-            lng: location.coords.longitude,
-            name: locationName,
-          },
+        setValue('location', {
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+          name: locationName,
         });
 
         Alert.alert('Location Set', locationName);
@@ -221,10 +240,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           if (buttonIndex === 2) {
             Alert.prompt('Enter Location', 'Type the location name', (text) => {
               if (text) {
-                setProof({
-                  ...proof,
-                  location: { lat: 0, lng: 0, name: text },
-                });
+                setValue('location', { lat: 0, lng: 0, name: text });
               }
             });
           }
@@ -240,13 +256,13 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
   const handleNext = () => {
     if (currentStep === 'upload') {
-      if (!proof.photos || proof.photos.length === 0) {
+      if (!photos || photos.length === 0) {
         Alert.alert('Photo Required', 'Please add at least one photo as proof');
         return;
       }
       setCurrentStep('details');
     } else if (currentStep === 'details') {
-      if (!proof.title || proof.title.trim() === '') {
+      if (!title || title.trim() === '') {
         Alert.alert('Title Required', 'Please add a title for your proof');
         return;
       }
@@ -255,13 +271,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   };
 
   const handleRemovePhoto = (photoUri: string) => {
-    setProof({
-      ...proof,
-      photos: (proof.photos || []).filter((p) => p !== photoUri),
-    });
+    setValue('photos', photos.filter((p) => p !== photoUri));
   };
 
-  const handleSubmit = () => {
+  const onSubmit = (data: ProofInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -319,7 +332,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
             <Icon name="camera-plus" size={32} color={COLORS.primary} />
             <Text style={styles.addPhotoText}>Add Photo</Text>
           </TouchableOpacity>
-          {proof.photos?.map((photo) => (
+          {photos?.map((photo) => (
             <View key={photo} style={styles.photoPreview}>
               <Image source={{ uri: photo }} style={styles.photoImage} />
               <TouchableOpacity
@@ -331,6 +344,9 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
             </View>
           ))}
         </ScrollView>
+        {errors.photos && (
+          <Text style={styles.errorText}>{errors.photos.message}</Text>
+        )}
       </View>
 
       {/* Ticket/Receipt */}
@@ -351,7 +367,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         >
           <Icon name="map-marker" size={24} color={COLORS.primary} />
           <Text style={styles.uploadButtonText}>
-            {proof.location ? proof.location.name : 'Add Location'}
+            {location ? location.name : 'Add Location'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -379,44 +395,68 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       {/* Title */}
       <View style={styles.inputSection}>
         <Text style={styles.inputLabel}>Title *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="e.g., Coffee for a stranger"
-          placeholderTextColor={COLORS.textSecondary}
-          value={proof.title}
-          onChangeText={(text) => setProof({ ...proof, title: text })}
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="e.g., Coffee for a stranger"
+              placeholderTextColor={COLORS.textSecondary}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
+        {errors.title && (
+          <Text style={styles.errorText}>{errors.title.message}</Text>
+        )}
       </View>
 
       {/* Description */}
       <View style={styles.inputSection}>
         <Text style={styles.inputLabel}>Description *</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Share the story behind your gesture..."
-          placeholderTextColor={COLORS.textSecondary}
-          value={proof.description}
-          onChangeText={(text) => setProof({ ...proof, description: text })}
-          multiline
-          numberOfLines={4}
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Share the story behind your gesture..."
+              placeholderTextColor={COLORS.textSecondary}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              multiline
+              numberOfLines={4}
+            />
+          )}
         />
+        {errors.description && (
+          <Text style={styles.errorText}>{errors.description.message}</Text>
+        )}
       </View>
 
       {/* Amount (for micro-kindness) */}
-      {proof.type === 'micro-kindness' && (
+      {proofType === 'micro-kindness' && (
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Amount (Optional)</Text>
           <View style={styles.amountInput}>
             <Text style={styles.currency}>$</Text>
-            <TextInput
-              style={[styles.input, styles.amountValue]}
-              placeholder="0.00"
-              placeholderTextColor={COLORS.textSecondary}
-              keyboardType="decimal-pad"
-              value={proof.amount?.toString()}
-              onChangeText={(text) =>
-                setProof({ ...proof, amount: parseFloat(text) })
-              }
+            <Controller
+              control={control}
+              name="amount"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={[styles.input, styles.amountValue]}
+                  placeholder="0.00"
+                  placeholderTextColor={COLORS.textSecondary}
+                  keyboardType="decimal-pad"
+                  value={value?.toString() || ''}
+                  onChangeText={(text) => onChange(parseFloat(text) || undefined)}
+                />
+              )}
             />
           </View>
         </View>
@@ -425,12 +465,19 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       {/* Receiver */}
       <View style={styles.inputSection}>
         <Text style={styles.inputLabel}>Receiver (Optional)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Name or username of the receiver"
-          placeholderTextColor={COLORS.textSecondary}
-          value={proof.receiver}
-          onChangeText={(text) => setProof({ ...proof, receiver: text })}
+        <Controller
+          control={control}
+          name="receiver"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Name or username of the receiver"
+              placeholderTextColor={COLORS.textSecondary}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
       </View>
 
@@ -458,24 +505,24 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         <View style={styles.reviewSection}>
           <Text style={styles.reviewLabel}>Type</Text>
           <Text style={styles.reviewValue}>
-            {PROOF_TYPES.find((t) => t.id === proof.type)?.name}
+            {PROOF_TYPES.find((t) => t.id === proofType)?.name}
           </Text>
         </View>
 
         <View style={styles.reviewSection}>
           <Text style={styles.reviewLabel}>Title</Text>
-          <Text style={styles.reviewValue}>{proof.title}</Text>
+          <Text style={styles.reviewValue}>{title}</Text>
         </View>
 
         <View style={styles.reviewSection}>
           <Text style={styles.reviewLabel}>Description</Text>
-          <Text style={styles.reviewValue}>{proof.description}</Text>
+          <Text style={styles.reviewValue}>{description}</Text>
         </View>
 
-        {proof.location && (
+        {location && (
           <View style={styles.reviewSection}>
             <Text style={styles.reviewLabel}>Location</Text>
-            <Text style={styles.reviewValue}>{proof.location.name}</Text>
+            <Text style={styles.reviewValue}>{location.name}</Text>
           </View>
         )}
 
@@ -489,7 +536,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         <View style={styles.reviewSection}>
           <Text style={styles.reviewLabel}>Photos</Text>
           <Text style={styles.reviewValue}>
-            {proof.photos?.length || 0} photos
+            {photos?.length || 0} photos
           </Text>
         </View>
       </View>
@@ -503,9 +550,9 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       </View>
 
       <TouchableOpacity
-        style={styles.submitButton}
-        onPress={handleSubmit}
-        disabled={loading}
+        style={[styles.submitButton, (loading || !isValid) && styles.submitButtonDisabled]}
+        onPress={handleSubmit(onSubmit)}
+        disabled={loading || !isValid}
       >
         <LinearGradient
           colors={[COLORS.primary, COLORS.accent]}
@@ -513,15 +560,31 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Text style={styles.buttonText}>Submit Proof</Text>
+          <Text style={styles.buttonText}>
+            {loading ? 'Uploading Proof...' : 'Submit Proof'}
+          </Text>
         </LinearGradient>
       </TouchableOpacity>
+      {!loading && (
+        <Text style={styles.uploadHint}>
+          This may take a moment to upload your photos. Please don't close the screen.
+        </Text>
+      )}
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {loading && <LoadingState type="overlay" message="Submitting..." />}
+      {loading && (
+        <>
+          <LoadingState type="overlay" message="Uploading your proof..." />
+          <View style={styles.loadingWarning}>
+            <Text style={styles.loadingWarningText}>
+              Please don't close the screen while uploading.
+            </Text>
+          </View>
+        </>
+      )}
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -818,5 +881,38 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 8,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  uploadHint: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: LAYOUT.padding,
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  loadingWarning: {
+    position: 'absolute',
+    bottom: 40,
+    left: LAYOUT.padding * 2,
+    right: LAYOUT.padding * 2,
+    backgroundColor: COLORS.warning + '20',
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    borderWidth: 1,
+    borderColor: COLORS.warning,
+    zIndex: 1000,
+  },
+  loadingWarningText: {
+    fontSize: 13,
+    color: COLORS.warning,
+    textAlign: 'center',
+    fontWeight: '600',
   },
 });

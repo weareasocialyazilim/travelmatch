@@ -13,7 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MessagesListSkeleton, ErrorState, EmptyState } from '../components';
+import { ErrorState, EmptyState, SkeletonList } from '../components';
 import { FadeInView as _FadeInView } from '../components/AnimatedComponents';
 import BottomNav from '../components/BottomNav';
 import { COLORS } from '../constants/colors';
@@ -24,6 +24,8 @@ import type { MessageEvent } from '../context/RealtimeContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { Conversation } from '../services/messageService';
 import type { NavigationProp } from '@react-navigation/native';
+import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { NetworkGuard } from '../../../components/NetworkGuard';
 
 // Format time ago
 const formatTimeAgo = (dateString: string): string => {
@@ -259,7 +261,7 @@ const MessagesScreen: React.FC = () => {
             />
           </View>
         </View>
-        <MessagesListSkeleton />
+        <SkeletonList type="chat" count={6} show={isLoading} minDisplayTime={300} />
         <BottomNav activeTab="Messages" messagesBadge={0} />
       </SafeAreaView>
     );
@@ -280,9 +282,17 @@ const MessagesScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Search Bar - No title header */}
-      <View style={styles.searchContainer}>
+    <NetworkGuard 
+      offlineMessage={
+        conversations.length > 0
+          ? "Son yüklenen mesajları gösteriyorsunuz"
+          : "Mesajları görmek için internet bağlantısı gerekli"
+      }
+      onRetry={refreshConversations}
+    >
+      <SafeAreaView style={styles.container} edges={['top']}>
+        {/* Search Bar - No title header */}
+        <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
           <MaterialCommunityIcons
             name="magnify"
@@ -324,6 +334,7 @@ const MessagesScreen: React.FC = () => {
 
       <BottomNav activeTab="Messages" messagesBadge={totalUnreadCount} />
     </SafeAreaView>
+    </NetworkGuard>
   );
 };
 
@@ -495,4 +506,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MessagesScreen;
+// Wrap with ErrorBoundary for critical messaging functionality
+export default withErrorBoundary(MessagesScreen, { 
+  fallbackType: 'generic',
+  displayName: 'MessagesScreen' 
+});

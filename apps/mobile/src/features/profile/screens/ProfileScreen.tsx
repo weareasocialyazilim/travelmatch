@@ -12,6 +12,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EmptyState } from '@/components/ui/EmptyState';
 import BottomNav from '../components/BottomNav';
 import {
   ProfileHeaderSection,
@@ -30,9 +31,13 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { UserProfile } from '../services/userService';
 import type { Moment } from '../types';
 import type { NavigationProp } from '@react-navigation/native';
+import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { useNetworkStatus } from '../../../context/NetworkContext';
+import { OfflineState } from '../../../components/OfflineState';
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
 
   // Get user from auth context
@@ -225,6 +230,15 @@ const ProfileScreen: React.FC = () => {
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={styles.container} edges={['top']}>
+        {/* Offline Banner */}
+        {!isConnected && (
+          <OfflineState 
+            compact 
+            onRetry={refreshNetwork}
+            message="İnternet bağlantısı yok"
+          />
+        )}
+        
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerSpacer} />
@@ -321,26 +335,27 @@ const ProfileScreen: React.FC = () => {
                 contentContainerStyle={styles.momentsContent}
               />
             ) : (
-              <View style={styles.emptyState}>
-                <MaterialCommunityIcons
-                  name={activeTab === 'active' ? 'map-marker-plus' : 'history'}
-                  size={48}
-                  color={COLORS.softGray}
-                />
-                <Text style={styles.emptyText}>
-                  {activeTab === 'active'
+              <EmptyState
+                icon={activeTab === 'active' ? 'map-marker-plus' : 'history'}
+                title={
+                  activeTab === 'active'
                     ? 'No active moments yet'
-                    : 'No past moments'}
-                </Text>
-                {activeTab === 'active' && (
-                  <TouchableOpacity
-                    style={styles.createButton}
-                    onPress={() => navigation.navigate('CreateMoment')}
-                  >
-                    <Text style={styles.createButtonText}>Create Moment</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+                    : 'No past moments'
+                }
+                description={
+                  activeTab === 'active'
+                    ? 'Create your first moment to start your journey'
+                    : 'Completed moments will appear here'
+                }
+                actionLabel={
+                  activeTab === 'active' && isConnected ? 'Create Moment' : undefined
+                }
+                onAction={
+                  activeTab === 'active' && isConnected
+                    ? () => navigation.navigate('CreateMoment')
+                    : undefined
+                }
+              />
             )}
           </View>
 
@@ -437,6 +452,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mint,
     borderRadius: 20,
   },
+  createButtonDisabled: {
+    backgroundColor: COLORS.softGray,
+    opacity: 0.6,
+  },
   createButtonText: {
     fontSize: 14,
     fontWeight: '600',
@@ -448,4 +467,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+// Wrap with ErrorBoundary for profile screen
+export default withErrorBoundary(ProfileScreen, { 
+  fallbackType: 'generic',
+  displayName: 'ProfileScreen' 
+});

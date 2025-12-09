@@ -13,12 +13,16 @@ import {
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
-import { showErrorAlert, validateEmail, validateRequired, AppErrorCode, AppError } from '@/utils/friendlyErrorHandler';
+import { showErrorAlert, AppErrorCode, AppError } from '@/utils/friendlyErrorHandler';
 import { LoadingState } from '@/components/LoadingState';
 import SocialButton from '@/components/SocialButton';
 import { useAuth } from '@/context/AuthContext';
+import { loginSchema, type LoginInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -27,28 +31,26 @@ type LoginScreenProps = StackScreenProps<RootStackParamList, 'Login'>;
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { login } = useAuth();
   const { t } = useTranslation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const isFormValid = () => {
-    try {
-      return email.length > 0 && password.length > 0 && validateEmail(email);
-    } catch {
-      return false;
-    }
-  };
+  const {
+    control,
+    handleSubmit,
+    formState,
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const handleLogin = async () => {
+  const onSubmit = async (data: LoginInput) => {
     setLoading(true);
     try {
-      // Validate inputs with friendly errors
-      validateRequired(email, 'Email');
-      validateEmail(email);
-      validateRequired(password, 'Password');
-
-      const result = await login({ email, password });
+      const result = await login({ email: data.email, password: data.password });
 
       if (result.success) {
         navigation.reset({
@@ -65,7 +67,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     } catch (error) {
       logger.error('Login error:', error);
       showErrorAlert(error, t, {
-        onRetry: handleLogin,
+        onRetry: () => handleSubmit(onSubmit)(),
       });
     } finally {
       setLoading(false);
@@ -146,36 +148,40 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <Text style={styles.inputLabel} nativeID="email-label">
               Email address
             </Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                email.length > 0 && !validateEmail(email) && styles.inputError,
-              ]}
-            >
-              <Icon
-                name="email-outline"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <TextInput
-                style={styles.textInput}
-                placeholder="name@example.com"
-                placeholderTextColor={COLORS.textSecondary}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                accessibilityLabel="Email address"
-                accessibilityHint="Enter your email address"
-                accessibilityLabelledBy="email-label"
-              />
-            </View>
-            {email.length > 0 && !validateEmail(email) && (
-              <Text style={styles.errorText} accessibilityLiveRegion="polite">
-                Please enter a valid email
-              </Text>
-            )}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                    <Icon
+                      name="email-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="name@example.com"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      accessibilityLabel="Email address"
+                      accessibilityHint="Enter your email address"
+                      accessibilityLabelledBy="email-label"
+                    />
+                  </View>
+                  {error && (
+                    <Text style={styles.errorText} accessibilityLiveRegion="polite">
+                      {error.message}
+                    </Text>
+                  )}
+                </>
+              )}
+            />
           </View>
 
           {/* Password Input */}
@@ -183,38 +189,48 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <Text style={styles.inputLabel} nativeID="password-label">
               Password
             </Text>
-            <View style={styles.inputWrapper}>
-              <Icon
-                name="lock-outline"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <TextInput
-                style={styles.textInput}
-                placeholder="Enter your password"
-                placeholderTextColor={COLORS.textSecondary}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                accessibilityLabel="Password"
-                accessibilityHint="Enter your password"
-                accessibilityLabelledBy="password-label"
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                accessibilityRole="button"
-                accessibilityLabel={
-                  showPassword ? 'Hide password' : 'Show password'
-                }
-              >
-                <Icon
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={20}
-                  color={COLORS.textSecondary}
-                />
-              </TouchableOpacity>
-            </View>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                    <Icon
+                      name="lock-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="Enter your password"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                      accessibilityLabel="Password"
+                      accessibilityHint="Enter your password"
+                      accessibilityLabelledBy="password-label"
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        showPassword ? 'Hide password' : 'Show password'
+                      }
+                    >
+                      <Icon
+                        name={showPassword ? 'eye-off' : 'eye'}
+                        size={20}
+                        color={COLORS.textSecondary}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                </>
+              )}
+            />
           </View>
 
           {/* Forgot Password */}
@@ -233,14 +249,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <TouchableOpacity
             style={[
               styles.loginButton,
-              !isFormValid() && styles.loginButtonDisabled,
+              !canSubmitForm({ formState }) && styles.loginButtonDisabled,
             ]}
-            onPress={handleLogin}
-            disabled={!isFormValid() || loading}
+            onPress={handleSubmit(onSubmit)}
+            disabled={!canSubmitForm({ formState }) || loading}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel="Log in to your account"
-            accessibilityState={{ disabled: !isFormValid() || loading }}
+            accessibilityState={{ disabled: !canSubmitForm({ formState }) || loading }}
           >
             <Text style={styles.loginButtonText}>Log In</Text>
           </TouchableOpacity>

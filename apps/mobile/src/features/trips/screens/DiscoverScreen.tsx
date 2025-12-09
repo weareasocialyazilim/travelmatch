@@ -12,6 +12,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EmptyState } from '@/components/ui/EmptyState';
 import BottomNav from '../components/BottomNav';
 import {
   StoryViewer,
@@ -24,10 +25,15 @@ import {
 } from '../components/discover';
 import MomentSingleCard from '../components/discover/cards/MomentSingleCard';
 import MomentGridCard from '../components/discover/cards/MomentGridCard';
-import { MomentsFeedSkeleton } from '../components/ui/SkeletonLoaders';
+import { SkeletonList } from '../../../components/ui/SkeletonList';
 import { COLORS } from '../constants/colors';
 import { useMoments } from '../hooks/useMoments';
+import { useAccessibility } from '@/hooks/useAccessibility';
 import { logger } from '../utils/logger';
+import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { useNetworkStatus } from '../../../context/NetworkContext';
+import { OfflineState } from '../../../components/OfflineState';
+import { NetworkGuard } from '../../../components/NetworkGuard';
 
 // Import modular components
 import type {
@@ -41,6 +47,8 @@ import type { NavigationProp } from '@react-navigation/native';
 
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
+  const { props: a11y, announce } = useAccessibility();
 
   // Use moments hook for data fetching
   const {
@@ -265,6 +273,15 @@ const DiscoverScreen = () => {
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
 
+      {/* Offline Banner at top */}
+      {!isConnected && (
+        <OfflineState 
+          compact 
+          onRetry={refreshNetwork}
+          message="İnternet bağlantısı yok"
+        />
+      )}
+
       {/* Header */}
       <DiscoverHeader
         selectedLocation={selectedLocation}
@@ -277,7 +294,15 @@ const DiscoverScreen = () => {
         notificationCount={2}
       />
 
-      <ScrollView
+      <NetworkGuard
+        offlineMessage={
+          apiMoments.length > 0
+            ? "Son yüklenen moment'ları gösteriyorsunuz"
+            : "Moment'ları yüklemek için internet bağlantısı gerekli"
+        }
+        onRetry={onRefresh}
+      >
+        <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -324,6 +349,12 @@ const DiscoverScreen = () => {
                 viewMode === 'single' && styles.viewToggleButtonActive,
               ]}
               onPress={() => setViewMode('single')}
+              {...a11y.button(
+                'Single column view',
+                'Display moments in a single column',
+                false
+              )}
+              accessibilityState={{ selected: viewMode === 'single' }}
             >
               <MaterialCommunityIcons
                 name="square-outline"
@@ -331,6 +362,7 @@ const DiscoverScreen = () => {
                 color={
                   viewMode === 'single' ? COLORS.white : COLORS.textSecondary
                 }
+                accessible={false}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -339,6 +371,12 @@ const DiscoverScreen = () => {
                 viewMode === 'grid' && styles.viewToggleButtonActive,
               ]}
               onPress={() => setViewMode('grid')}
+              {...a11y.button(
+                'Grid view',
+                'Display moments in a grid layout',
+                false
+              )}
+              accessibilityState={{ selected: viewMode === 'grid' }}
             >
               <MaterialCommunityIcons
                 name="view-grid-outline"
@@ -346,6 +384,7 @@ const DiscoverScreen = () => {
                 color={
                   viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
                 }
+                accessible={false}
               />
             </TouchableOpacity>
           </View>
@@ -358,9 +397,19 @@ const DiscoverScreen = () => {
               name="alert-circle-outline"
               size={48}
               color={COLORS.error}
+              accessible={false}
             />
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
+            <Text 
+              style={styles.errorText}
+              {...a11y.alert(error)}
+            >
+              {error}
+            </Text>
+            <TouchableOpacity 
+              style={styles.retryButton} 
+              onPress={onRefresh}
+              {...a11y.button('Try Again', 'Reload moments')}
+            >
               <Text style={styles.retryButtonText}>Try Again</Text>
             </TouchableOpacity>
           </View>
@@ -368,7 +417,7 @@ const DiscoverScreen = () => {
 
         {/* Loading Skeleton */}
         {loading && filteredMoments.length === 0 && !error && (
-          <MomentsFeedSkeleton />
+          <SkeletonList type="moment" count={4} show={loading} minDisplayTime={400} />
         )}
 
         {/* Moments List */}
@@ -399,17 +448,13 @@ const DiscoverScreen = () => {
 
         {/* Empty State */}
         {!loading && !error && filteredMoments.length === 0 && (
-          <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons
-              name="compass-off-outline"
-              size={64}
-              color={COLORS.gray[300]}
-            />
-            <Text style={styles.emptyTitle}>No moments found</Text>
-            <Text style={styles.emptySubtitle}>
-              Try adjusting your filters or location
-            </Text>
-          </View>
+          <EmptyState
+            icon="compass-off-outline"
+            title="No moments found"
+            description="Try adjusting your filters or location"
+            actionLabel="Clear Filters"
+            onAction={clearFilters}
+          />
         )}
 
         {/* Load More Indicator */}
@@ -424,6 +469,7 @@ const DiscoverScreen = () => {
         {/* eslint-disable-next-line react-native/no-inline-styles */}
         <View style={{ height: 100 }} />
       </ScrollView>
+      </NetworkGuard>
 
       {/* Modals - Using extracted components */}
       <LocationModal
@@ -608,4 +654,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DiscoverScreen;
+// Wrap with ErrorBoundary for critical home screen
+export default withErrorBoundary(DiscoverScreen, { 
+  fallbackType: 'generic',
+  displayName: 'DiscoverScreen' 
+});

@@ -20,10 +20,14 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { RADII } from '@/constants/radii';
 import { SPACING } from '@/constants/spacing';
 import { useHaptics } from '@/hooks/useHaptics';
 import { analytics } from '@/services/analytics';
+import { feedbackSchema, type FeedbackInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import { COLORS } from '../constants/colors';
 
 interface FeedbackModalProps {
@@ -55,12 +59,29 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   subtitle = 'Help us improve your experience',
   categories = DEFAULT_CATEGORIES,
 }) => {
-  const [rating, setRating] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { impact } = useHaptics();
+
+  const {
+    control,
+    handleSubmit,
+    formState,
+    setValue,
+    watch,
+    reset,
+  } = useForm<FeedbackInput>({
+    resolver: zodResolver(feedbackSchema),
+    mode: 'onChange',
+    defaultValues: {
+      rating: 0,
+      category: '',
+      comment: '',
+    },
+  });
+
+  const rating = watch('rating');
+  const category = watch('category');
 
   // Fade animation
   const opacity = useSharedValue(0);
@@ -78,30 +99,25 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   }, [visible]);
 
   const handleRatingPress = (value: number) => {
-    setRating(value);
+    setValue('rating', value);
     void impact('light');
   };
 
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
+  const handleCategorySelect = (cat: string) => {
+    setValue('category', cat);
     void impact('light');
   };
 
-  const handleSubmit = () => {
-    if (rating === 0) {
-      void impact('warning');
-      return;
-    }
-
+  const onSubmitFeedback = (data: FeedbackInput) => {
     setIsSubmitting(true);
     void impact('medium');
 
     // Track feedback event using trackEvent for custom event names
     analytics.trackEvent('feedback_submitted', {
-      rating,
-      category: selectedCategory,
-      hasComment: comment.length > 0,
-      commentLength: comment.length,
+      rating: data.rating,
+      category: data.category,
+      hasComment: (data.comment?.length || 0) > 0,
+      commentLength: data.comment?.length || 0,
       screen: 'app',
       timestamp: Date.now(),
     });
@@ -109,23 +125,19 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     // Call parent handler
     if (onSubmit) {
       onSubmit({
-        rating,
-        comment,
-        category: selectedCategory,
+        rating: data.rating,
+        comment: data.comment || '',
+        category: data.category,
       });
     }
 
     // Reset and close
     setTimeout(() => {
-      setRating(0);
-      setSelectedCategory('');
-      setComment('');
+      reset();
       setIsSubmitting(false);
       onClose();
     }, 500);
   };
-
-  const canSubmit = rating > 0 && !isSubmitting;
 
   return (
     <Modal
@@ -185,23 +197,23 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
           <View style={styles.section}>
             <Text style={styles.label}>Category (optional)</Text>
             <View style={styles.categoriesContainer}>
-              {categories.map((category) => (
+              {categories.map((cat) => (
                 <TouchableOpacity
-                  key={category}
-                  onPress={() => handleCategorySelect(category)}
+                  key={cat}
+                  onPress={() => handleCategorySelect(cat)}
                   style={[
                     styles.categoryPill,
-                    selectedCategory === category && styles.categoryPillActive,
+                    category === cat && styles.categoryPillActive,
                   ]}
                 >
                   <Text
                     style={[
                       styles.categoryText,
-                      selectedCategory === category &&
+                      category === cat &&
                         styles.categoryTextActive,
                     ]}
                   >
-                    {category}
+                    {cat}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -211,27 +223,36 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
           {/* Comment */}
           <View style={styles.section}>
             <Text style={styles.label}>Additional comments (optional)</Text>
-            <TextInput
-              style={styles.textInput}
-              multiline
-              numberOfLines={4}
-              placeholder="Tell us more about your experience..."
-              placeholderTextColor={COLORS.textTertiary}
-              value={comment}
-              onChangeText={setComment}
-              maxLength={500}
+            <Controller
+              control={control}
+              name="comment"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <>
+                  <TextInput
+                    style={styles.textInput}
+                    multiline
+                    numberOfLines={4}
+                    placeholder="Tell us more about your experience..."
+                    placeholderTextColor={COLORS.textTertiary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    maxLength={500}
+                  />
+                  <Text style={styles.charCount}>{(value?.length || 0)}/500</Text>
+                </>
+              )}
             />
-            <Text style={styles.charCount}>{comment.length}/500</Text>
           </View>
 
           {/* Submit Button */}
           <TouchableOpacity
             style={[
               styles.submitButton,
-              !canSubmit && styles.submitButtonDisabled,
+              !canSubmitForm({ formState }) && styles.submitButtonDisabled,
             ]}
-            onPress={handleSubmit}
-            disabled={!canSubmit}
+            onPress={handleSubmit(onSubmitFeedback)}
+            disabled={!canSubmitForm({ formState }) || isSubmitting}
           >
             <Text style={styles.submitButtonText}>
               {isSubmitting ? 'Submitting...' : 'Submit Feedback'}

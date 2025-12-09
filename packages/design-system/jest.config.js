@@ -4,7 +4,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|react-native-.*|@react-navigation)/)',
+    'node_modules/(?!(react-native|@react-native|@react-native\\+js-polyfills|react-native-.*|@react-navigation)/)',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

@@ -12,6 +12,8 @@ import {
   // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,6 +21,8 @@ import { useTranslation } from 'react-i18next';
 import { LoadingState } from '../components/LoadingState';
 import { COLORS } from '../constants/colors';
 import { showErrorAlert, AppError, AppErrorCode } from '../utils/friendlyErrorHandler';
+import { completeProfileSchema, type CompleteProfileInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -46,12 +50,22 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   navigation,
 }) => {
   const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [bio, setBio] = useState('');
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [avatar, setAvatar] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const { control, handleSubmit, formState, setValue, watch } = useForm<CompleteProfileInput>({
+    resolver: zodResolver(completeProfileSchema),
+    mode: 'onChange',
+    defaultValues: {
+      fullName: '',
+      username: '',
+      bio: '',
+      avatar: '',
+      interests: [],
+    },
+  });
+
+  const interests = watch('interests');
+  const bio = watch('bio');
 
   const pickImage = async (useCamera: boolean) => {
     try {
@@ -70,7 +84,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
           quality: 0.8,
         });
         if (!result.canceled && result.assets[0]) {
-          setAvatar(result.assets[0].uri);
+          setValue('avatar', result.assets[0].uri);
         }
       } else {
         const { status } =
@@ -88,7 +102,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
           quality: 0.8,
         });
         if (!result.canceled && result.assets[0]) {
-          setAvatar(result.assets[0].uri);
+          setValue('avatar', result.assets[0].uri);
         }
       }
     } catch (error) {
@@ -118,57 +132,24 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   };
 
   const toggleInterest = (interestId: string) => {
-    if (selectedInterests.includes(interestId)) {
-      setSelectedInterests(selectedInterests.filter((id) => id !== interestId));
+    if (interests.includes(interestId)) {
+      setValue('interests', interests.filter((id) => id !== interestId));
     } else {
-      if (selectedInterests.length < 5) {
-        setSelectedInterests([...selectedInterests, interestId]);
+      if (interests.length < 5) {
+        setValue('interests', [...interests, interestId]);
       } else {
         Alert.alert('Maximum Reached', 'You can select up to 5 interests');
       }
     }
   };
 
-  const handleComplete = () => {
-    try {
-      if (!name.trim()) {
-        throw new AppError(
-          AppErrorCode.VALIDATION_REQUIRED_FIELD,
-          'Name is required',
-          { field: 'name' },
-        );
-      }
-      if (!username.trim()) {
-        throw new AppError(
-          AppErrorCode.VALIDATION_REQUIRED_FIELD,
-          'Username is required',
-          { field: 'username' },
-        );
-      }
-      if (username.trim().length < 3) {
-        throw new AppError(
-          AppErrorCode.VALIDATION_REQUIRED_FIELD,
-          'Username must be at least 3 characters',
-          { field: 'username', minLength: 3 },
-        );
-      }
-      if (selectedInterests.length === 0) {
-        throw new AppError(
-          AppErrorCode.VALIDATION_REQUIRED_FIELD,
-          'Please select at least one interest',
-          { field: 'interests' },
-        );
-      }
-
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-        navigation.replace('Discover');
-      }, 1500);
-    } catch (error) {
-      showErrorAlert(error, t);
-    }
+  const handleComplete = (data: CompleteProfileInput) => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setLoading(false);
+      navigation.replace('Discover');
+    }, 1500);
   };
 
   const handleSkip = () => {
@@ -227,8 +208,8 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
             onPress={handleSelectAvatar}
             activeOpacity={0.8}
           >
-            {avatar ? (
-              <Image source={{ uri: avatar }} style={styles.avatar} />
+            {watch('avatar') ? (
+              <Image source={{ uri: watch('avatar') }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <Icon
@@ -243,68 +224,93 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         </View>
 
         {/* Name Input */}
-        <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Full Name *</Text>
-          <View style={styles.inputWrapper}>
-            <Icon name="account" size={20} color={COLORS.textSecondary} />
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your name"
-              placeholderTextColor={COLORS.textSecondary}
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-            />
-          </View>
-        </View>
+        <Controller
+          control={control}
+          name="fullName"
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>Full Name *</Text>
+              <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
+                <Icon name="account" size={20} color={COLORS.textSecondary} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your name"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="words"
+                />
+              </View>
+              {error && (
+                <Text style={styles.errorText}>{error.message}</Text>
+              )}
+            </View>
+          )}
+        />
 
         {/* Username Input */}
-        <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Username *</Text>
-          <View style={styles.inputWrapper}>
-            <Icon name="at" size={20} color={COLORS.textSecondary} />
-            <TextInput
-              style={styles.input}
-              placeholder="Choose a username"
-              placeholderTextColor={COLORS.textSecondary}
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-            />
-          </View>
-          {username.length > 0 && username.length < 3 && (
-            <Text style={styles.errorText}>
-              Username must be at least 3 characters
-            </Text>
+        <Controller
+          control={control}
+          name="username"
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>Username *</Text>
+              <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
+                <Icon name="at" size={20} color={COLORS.textSecondary} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Choose a username"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="none"
+                />
+              </View>
+              {error && (
+                <Text style={styles.errorText}>{error.message}</Text>
+              )}
+            </View>
           )}
-        </View>
+        />
 
         {/* Bio Input */}
-        <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Bio (Optional)</Text>
-          <View style={[styles.inputWrapper, styles.bioWrapper]}>
-            <TextInput
-              style={[styles.input, styles.bioInput]}
-              placeholder="Tell us about yourself..."
-              placeholderTextColor={COLORS.textSecondary}
-              value={bio}
-              onChangeText={setBio}
-              multiline
-              maxLength={150}
-            />
-          </View>
-          <Text style={styles.charCount}>{bio.length}/150</Text>
-        </View>
+        <Controller
+          control={control}
+          name="bio"
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>Bio (Optional)</Text>
+              <View style={[styles.inputWrapper, styles.bioWrapper, error && styles.inputWrapperError]}>
+                <TextInput
+                  style={[styles.input, styles.bioInput]}
+                  placeholder="Tell us about yourself..."
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  multiline
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.charCount}>{value?.length || 0}/150</Text>
+              {error && (
+                <Text style={styles.errorText}>{error.message}</Text>
+              )}
+            </View>
+          )}
+        />
 
         {/* Interests */}
         <View style={styles.interestsSection}>
           <Text style={styles.sectionTitle}>Select Your Interests *</Text>
           <Text style={styles.sectionSubtitle}>
-            Choose up to 5 interests (Selected: {selectedInterests.length}/5)
+            Choose up to 5 interests (Selected: {interests.length}/5)
           </Text>
           <View style={styles.interestsGrid}>
             {INTERESTS.map((interest) => {
-              const isSelected = selectedInterests.includes(interest.id);
+              const isSelected = interests.includes(interest.id);
               return (
                 <TouchableOpacity
                   key={interest.id}
@@ -332,24 +338,22 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
               );
             })}
           </View>
+          {formState.errors.interests && (
+            <Text style={styles.errorText}>
+              {formState.errors.interests.message}
+            </Text>
+          )}
         </View>
 
         {/* Complete Button */}
         <TouchableOpacity
           style={[
             styles.completeButton,
-            (!name.trim() ||
-              !username.trim() ||
-              selectedInterests.length === 0) &&
+            (!canSubmitForm({ formState } as any) || loading) &&
               styles.completeButtonDisabled,
           ]}
-          onPress={handleComplete}
-          disabled={
-            loading ||
-            !name.trim() ||
-            !username.trim() ||
-            selectedInterests.length === 0
-          }
+          onPress={handleSubmit(handleComplete)}
+          disabled={!canSubmitForm({ formState } as any) || loading}
           activeOpacity={0.8}
         >
           <Text style={styles.buttonText}>Complete Profile</Text>
@@ -473,6 +477,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 14,
     gap: 10,
+  },
+  inputWrapperError: {
+    borderColor: COLORS.error,
   },
   input: {
     color: COLORS.text,

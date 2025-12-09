@@ -11,6 +11,11 @@ export { useRequests } from './useRequests';
 export { usePayments } from './usePayments';
 export { useReviews } from './useReviews';
 export { useNetwork } from './useNetwork';
+export { 
+  useOfflineSupabase, 
+  withOfflineCheck, 
+  OfflineError,
+} from './useOfflineSupabase';
 export {
   useOfflineData,
   useOfflineMutation,

@@ -16,6 +16,9 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { sendGiftSchema, type SendGiftInput } from '../../../utils/forms/schemas';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '../components/LoadingState';
@@ -89,13 +92,27 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   const [_selectedRecipient, _setSelectedRecipient] = useState<string>(
     recipientId || '',
   );
-  const [recipientEmail, setRecipientEmail] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
   const [selectedPayment, setSelectedPayment] = useState<string>(
     PAYMENT_METHODS[0].id,
   );
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [submittedData, setSubmittedData] = useState<SendGiftInput | null>(null);
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<SendGiftInput>({
+    resolver: zodResolver(sendGiftSchema),
+    defaultValues: {
+      recipientEmail: '',
+      message: '',
+    },
+  });
+
+  const message = watch('message');
 
   const { trackMount, trackInteraction } = useScreenPerformance(
     'UnifiedGiftFlowScreen',
@@ -119,20 +136,16 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   );
 
   // Handle gift purchase
-  const handlePurchase = useCallback(() => {
-    if (!recipientEmail) {
-      alert('Please enter recipient email');
-      return;
-    }
-
+  const onPurchase = useCallback((data: SendGiftInput) => {
     setLoading(true);
+    setSubmittedData(data);
     void impact('medium');
 
     trackEvent('gift_purchase_started', {
       momentId: moment.id,
       price: moment.price,
       paymentMethod: selectedPayment,
-      hasMessage: !!message,
+      hasMessage: !!data.message,
     });
 
     // Simulate API call
@@ -153,10 +166,8 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
       });
     }, 2000);
   }, [
-    recipientEmail,
     moment,
     selectedPayment,
-    message,
     impact,
     trackEvent,
     trackInteraction,
@@ -179,7 +190,14 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   // Loading state
   if (loading) {
     return (
-      <LoadingState type="overlay" message="Processing your gift purchase..." />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <LoadingState type="overlay" message="Processing your gift..." />
+        <View style={styles.loadingWarning}>
+          <Text style={styles.loadingWarningText}>
+            This may take a few seconds. Please don't close the screen.
+          </Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -194,7 +212,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
 
           <Text style={styles.successTitle}>Gift Sent! 🎁</Text>
           <Text style={styles.successSubtitle}>
-            Your gift has been sent to {recipientEmail}
+            Your gift has been sent to {submittedData?.recipientEmail}
           </Text>
 
           {/* Gift Preview */}
@@ -207,14 +225,14 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
           </View>
 
           {/* Message Preview */}
-          {message && (
+          {submittedData?.message && (
             <View style={styles.messagePreview}>
               <Icon
                 name="message-text"
                 size={20}
                 color={COLORS.textSecondary}
               />
-              <Text style={styles.messageText}>{message}</Text>
+              <Text style={styles.messageText}>{submittedData.message}</Text>
             </View>
           )}
 
@@ -277,32 +295,52 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
           {/* Recipient Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Send to</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Recipient's email"
-              placeholderTextColor={COLORS.textTertiary}
-              value={recipientEmail}
-              onChangeText={setRecipientEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="recipientEmail"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Recipient's email"
+                  placeholderTextColor={COLORS.textTertiary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              )}
             />
+            {errors.recipientEmail && (
+              <Text style={styles.errorText}>{errors.recipientEmail.message}</Text>
+            )}
           </View>
 
           {/* Message Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Personal message (optional)</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Add a personal message..."
-              placeholderTextColor={COLORS.textTertiary}
-              value={message}
-              onChangeText={setMessage}
-              multiline
-              numberOfLines={3}
-              maxLength={200}
-              textAlignVertical="top"
+            <Controller
+              control={control}
+              name="message"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Add a personal message..."
+                  placeholderTextColor={COLORS.textTertiary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  multiline
+                  numberOfLines={3}
+                  maxLength={200}
+                  textAlignVertical="top"
+                />
+              )}
             />
-            <Text style={styles.charCount}>{message.length}/200</Text>
+            <Text style={styles.charCount}>{(message || '').length}/200</Text>
+            {errors.message && (
+              <Text style={styles.errorText}>{errors.message.message}</Text>
+            )}
           </View>
 
           {/* Payment Method Section */}
@@ -363,15 +401,20 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.purchaseButton,
-              !recipientEmail && styles.purchaseButtonDisabled,
+              (!recipientEmail || loading) && styles.purchaseButtonDisabled,
             ]}
-            onPress={handlePurchase}
-            disabled={!recipientEmail}
+            onPress={handleSubmit(onPurchase)}
+            disabled={!recipientEmail || loading}
           >
             <Text style={styles.purchaseButtonText}>
-              Send Gift • ${moment.price}
+              {loading ? 'Sending Gift...' : `Send Gift • $${moment.price}`}
             </Text>
           </TouchableOpacity>
+          {recipientEmail && (
+            <Text style={styles.paymentHint}>
+              Secure payment processing. Your information is protected.
+            </Text>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -656,5 +699,33 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
     color: COLORS.text,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+  },
+  loadingWarning: {
+    position: 'absolute',
+    bottom: 40,
+    left: SPACING.lg,
+    right: SPACING.lg,
+    backgroundColor: COLORS.warning + '20',
+    borderRadius: RADII.md,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.warning,
+  },
+  loadingWarningText: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.warning,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  paymentHint: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
   },
 });

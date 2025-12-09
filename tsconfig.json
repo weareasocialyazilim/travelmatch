@@ -1,33 +1,24 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    // Enhanced Type Safety - Added
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
-    "noUncheckedIndexedAccess": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["apps/mobile/src/*"],
-      "@/components/*": ["apps/mobile/src/components/*"],
-      "@/screens/*": ["apps/mobile/src/screens/*"],
-      "@/features/*": ["apps/mobile/src/features/*"],
-      "@/hooks/*": ["apps/mobile/src/hooks/*"],
-      "@/utils/*": ["apps/mobile/src/utils/*"],
-      "@/services/*": ["apps/mobile/src/services/*"],
-      "@/stores/*": ["apps/mobile/src/stores/*"],
-      "@/constants/*": ["apps/mobile/src/constants/*"],
-      "@/types/*": ["apps/mobile/src/types/*"],
-      "@/config/*": ["apps/mobile/src/config/*"],
-      "@/theme/*": ["apps/mobile/src/theme/*"],
-      "@/navigation/*": ["apps/mobile/src/navigation/*"]
-    }
+    "noUncheckedIndexedAccess": true
   },
   "exclude": [
     "node_modules",
@@ -36,6 +27,9 @@
     "**/*.test.tsx",
     "**/__mocks__/**",
     "**/*.stories.ts",
-    "**/*.stories.tsx"
+    "**/*.stories.tsx",
+    "dist",
+    "build",
+    "supabase/functions/**"
   ]
 }

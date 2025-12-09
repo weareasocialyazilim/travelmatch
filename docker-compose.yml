@@ -440,44 +440,45 @@ services:
     # Scale workers with: docker-compose up --scale job-worker=5 -d
 
   # ============================================================================
-  # ML Service (Machine Learning Inference)
+  # ML Service (Machine Learning Inference) - DISABLED FOR NOW
   # ============================================================================
+  # Uncomment when ready to use ML features
   
-  ml-service:
-    build:
-      context: ./services/ml-service
-      dockerfile: Dockerfile
-    container_name: travelmatch-ml-service
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    environment:
-      ML_SERVICE_PORT: 8000
-      ML_WORKERS: 4
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      REDIS_URL: redis://redis:6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      SUPABASE_URL: ${SUPABASE_URL:-http://kong:8000}
-      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU}
-      MODEL_STORAGE: local
-      MODEL_PATH: /models
-      ENABLE_GPU: false
-      BATCH_SIZE: 32
-      CACHE_TTL: 3600
-    volumes:
-      - ./services/ml-service:/app
-      - ml-models:/models
-    networks:
-      - travelmatch-network
-    depends_on:
-      - redis
-      - postgres
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+  # ml-service:
+  #   build:
+  #     context: ./services/ml-service
+  #     dockerfile: Dockerfile
+  #   container_name: travelmatch-ml-service
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     ML_SERVICE_PORT: 8000
+  #     ML_WORKERS: 4
+  #     LOG_LEVEL: ${LOG_LEVEL:-info}
+  #     REDIS_URL: redis://redis:6379
+  #     REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+  #     SUPABASE_URL: ${SUPABASE_URL:-http://kong:8000}
+  #     SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU}
+  #     MODEL_STORAGE: local
+  #     MODEL_PATH: /models
+  #     ENABLE_GPU: false
+  #     BATCH_SIZE: 32
+  #     CACHE_TTL: 3600
+  #   volumes:
+  #     - ./services/ml-service:/app
+  #     - ml-models:/models
+  #   networks:
+  #     - travelmatch-network
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 60s
 
 # ==============================================================================
 # Volumes (Persistent Data)

@@ -17,11 +17,14 @@ export const formatName = (name: string): string => {
  * Get initials from name
  */
 export const getInitials = (name: string): string => {
-  const words = name.trim().split(' ');
-  if (words.length === 1) {
-    return words[0].charAt(0).toUpperCase();
+  const words = name.trim().split(' ').filter(w => w.length > 0);
+  if (words.length === 0) {
+    return '';
   }
-  return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+  if (words.length === 1) {
+    return words[0]!.charAt(0).toUpperCase();
+  }
+  return (words[0]!.charAt(0) + words[words.length - 1]!.charAt(0)).toUpperCase();
 };
 
 /**

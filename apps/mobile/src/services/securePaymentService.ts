@@ -251,10 +251,21 @@ class SecurePaymentService {
         return cached;
       }
 
-      // Build query
+      // Build query with JOIN to fetch related data (prevents N+1)
       let query = supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          *,
+          request:requests!request_id(
+            id,
+            status,
+            moment:moments!moment_id(
+              id,
+              title,
+              price
+            )
+          )
+        `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 

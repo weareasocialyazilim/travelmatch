@@ -9,10 +9,14 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 import { COLORS } from '../constants/colors';
+import { editMomentSchema, type EditMomentInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -36,10 +40,17 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
 }) => {
   const { momentId } = route.params || {};
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const { control, handleSubmit, formState, setValue } = useForm<EditMomentInput>({
+    resolver: zodResolver(editMomentSchema),
+    mode: 'onChange',
+    defaultValues: {
+      title: '',
+      description: '',
+      price: 0,
+    },
+  });
 
   useEffect(() => {
     const fetchMoment = async () => {
@@ -53,9 +64,9 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
 
         if (error) throw error;
         if (data) {
-          setTitle(data.title);
-          setDescription(data.description || '');
-          setPrice(data.price?.toString() || '');
+          setValue('title', data.title);
+          setValue('description', data.description || '');
+          setValue('price', data.price || 0);
         }
       } catch (error) {
         logger.error('Error fetching moment', error as Error);
@@ -63,22 +74,17 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
       }
     };
     fetchMoment();
-  }, [momentId]);
+  }, [momentId, setValue]);
 
-  const handleSave = async () => {
-    if (!title || !price) {
-      Alert.alert('Error', 'Please fill in all required fields');
-      return;
-    }
-
+  const handleSave = async (data: EditMomentInput) => {
     setLoading(true);
     try {
       const { error } = await supabase
         .from('moments')
         .update({
-          title,
-          description,
-          price: parseFloat(price),
+          title: data.title,
+          description: data.description,
+          price: data.price,
           updated_at: new Date().toISOString(),
         })
         .eq('id', momentId);
@@ -120,62 +126,101 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
         showsVerticalScrollIndicator={false}
       >
         {/* Title Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Title</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter moment title"
-            placeholderTextColor={COLORS.textSecondary}
-            value={title}
-            onChangeText={setTitle}
-          />
-        </View>
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Title</Text>
+              <TextInput
+                style={[styles.input, error && styles.inputError]}
+                placeholder="Enter moment title"
+                placeholderTextColor={COLORS.textSecondary}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+              />
+              {error && (
+                <Text style={styles.errorText}>{error.message}</Text>
+              )}
+            </View>
+          )}
+        />
 
         {/* Description Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Tell us about this moment"
-            placeholderTextColor={COLORS.textSecondary}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={6}
-            textAlignVertical="top"
-          />
-        </View>
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Description</Text>
+              <TextInput
+                style={[styles.input, styles.textArea, error && styles.inputError]}
+                placeholder="Tell us about this moment"
+                placeholderTextColor={COLORS.textSecondary}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+              />
+              {error && (
+                <Text style={styles.errorText}>{error.message}</Text>
+              )}
+            </View>
+          )}
+        />
 
         {/* Price Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Price</Text>
-          <View style={styles.priceInputWrapper}>
-            <MaterialCommunityIcons
-              name={'currency-usd' as IconName}
-              size={20}
-              color={COLORS.textSecondary}
-              style={styles.priceIcon}
-            />
-            <TextInput
-              style={[styles.input, styles.priceInput]}
-              placeholder="0.00"
-              placeholderTextColor={COLORS.textSecondary}
-              value={price}
-              onChangeText={setPrice}
-              keyboardType="decimal-pad"
-            />
-          </View>
-        </View>
+        <Controller
+          control={control}
+          name="price"
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Price</Text>
+              <View style={styles.priceInputWrapper}>
+                <MaterialCommunityIcons
+                  name={'currency-usd' as IconName}
+                  size={20}
+                  color={COLORS.textSecondary}
+                  style={styles.priceIcon}
+                />
+                <TextInput
+                  style={[styles.input, styles.priceInput, error && styles.inputError]}
+                  placeholder="0.00"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value.toString()}
+                  onChangeText={(text) => {
+                    const num = parseFloat(text);
+                    onChange(isNaN(num) ? 0 : num);
+                  }}
+                  onBlur={onBlur}
+                  keyboardType="decimal-pad"
+                />
+              </View>
+              {error && (
+                <Text style={styles.errorText}>{error.message}</Text>
+              )}
+            </View>
+          )}
+        />
       </ScrollView>
 
       {/* Sticky Save Button */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleSave}
+          style={[
+            styles.saveButton,
+            (loading || !canSubmitForm({ formState } as any)) && styles.saveButtonDisabled,
+          ]}
+          onPress={handleSubmit(handleSave)}
+          disabled={loading || !canSubmitForm({ formState } as any)}
           activeOpacity={0.8}
         >
-          <Text style={styles.saveButtonText}>Save changes</Text>
+          <Text style={styles.saveButtonText}>
+            {loading ? 'Saving...' : 'Save changes'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -231,6 +276,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
   },
+  inputError: {
+    borderColor: COLORS.error,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+  },
   textArea: {
     height: 120,
     paddingTop: 16,
@@ -262,6 +316,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  saveButtonDisabled: {
+    opacity: 0.5,
   },
   saveButtonText: {
     fontSize: 16,

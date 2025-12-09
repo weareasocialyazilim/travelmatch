@@ -9,8 +9,12 @@ import {
   TextInput,
   type ViewStyle,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
+import { reportSchema, type ReportInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -83,13 +87,21 @@ export function BaseReportScreen<T extends string = string>({
   radioPosition = 'right',
   testID = 'base-report-screen',
 }: BaseReportScreenProps<T>): React.JSX.Element {
-  const [selectedReason, setSelectedReason] = useState<T | null>(null);
-  const [additionalDetails, setAdditionalDetails] = useState('');
+  const { control, handleSubmit, formState, setValue, watch } = useForm<ReportInput>({
+    resolver: zodResolver(reportSchema),
+    mode: 'onChange',
+    defaultValues: {
+      reason: '',
+      details: '',
+    },
+  });
 
-  const handleSubmit = useCallback(() => {
-    if (!selectedReason) return;
-    onSubmit(selectedReason, additionalDetails);
-  }, [selectedReason, additionalDetails, onSubmit]);
+  const selectedReason = watch('reason') as T | '';
+
+  const onFormSubmit = useCallback((data: ReportInput) => {
+    if (!data.reason) return;
+    onSubmit(data.reason as T, data.details || '');
+  }, [onSubmit]);
 
   const renderRadio = (isSelected: boolean) => (
     <View style={[styles.radio, isSelected && styles.radioSelected]}>
@@ -142,7 +154,7 @@ export function BaseReportScreen<T extends string = string>({
                   styles.optionItem,
                   isSelected && styles.optionItemSelected,
                 ]}
-                onPress={() => setSelectedReason(option.id)}
+                onPress={() => setValue('reason', option.id)}
                 activeOpacity={0.7}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: isSelected }}
@@ -157,20 +169,30 @@ export function BaseReportScreen<T extends string = string>({
         </View>
 
         {/* Additional Details */}
-        <View style={styles.textFieldContainer}>
-          <Text style={styles.textFieldLabel}>{detailsLabel}</Text>
-          <TextInput
-            style={styles.textArea}
-            placeholder={detailsPlaceholder}
-            placeholderTextColor={COLORS.textSecondary}
-            multiline
-            numberOfLines={6}
-            textAlignVertical="top"
-            value={additionalDetails}
-            onChangeText={setAdditionalDetails}
-            testID={`${testID}-details-input`}
-          />
-        </View>
+        <Controller
+          control={control}
+          name="details"
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            <View style={styles.textFieldContainer}>
+              <Text style={styles.textFieldLabel}>{detailsLabel}</Text>
+              <TextInput
+                style={[styles.textArea, error && styles.textAreaError]}
+                placeholder={detailsPlaceholder}
+                placeholderTextColor={COLORS.textSecondary}
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                testID={`${testID}-details-input`}
+              />
+              {error && (
+                <Text style={styles.errorText}>{error.message}</Text>
+              )}
+            </View>
+          )}
+        />
       </ScrollView>
 
       {/* Sticky Footer */}
@@ -188,14 +210,14 @@ export function BaseReportScreen<T extends string = string>({
         <TouchableOpacity
           style={[
             styles.submitButton,
-            !selectedReason && styles.submitButtonDisabled,
+            !canSubmitForm({ formState } as any) && styles.submitButtonDisabled,
           ]}
-          onPress={handleSubmit}
-          disabled={!selectedReason}
+          onPress={handleSubmit(onFormSubmit)}
+          disabled={!canSubmitForm({ formState } as any)}
           activeOpacity={0.7}
           accessibilityLabel={submitButtonText}
           accessibilityRole="button"
-          accessibilityState={{ disabled: !selectedReason }}
+          accessibilityState={{ disabled: !canSubmitForm({ formState } as any) }}
           testID={`${testID}-submit-button`}
         >
           <Text style={styles.submitButtonText}>{submitButtonText}</Text>
@@ -327,6 +349,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
     minHeight: 144,
+  },
+  textAreaError: {
+    borderColor: COLORS.error,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
   footer: {
     position: 'absolute',

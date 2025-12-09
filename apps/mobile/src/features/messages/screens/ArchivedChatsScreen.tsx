@@ -11,6 +11,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -179,18 +180,13 @@ export const ArchivedChatsScreen: React.FC = () => {
             {archivedChats.map(renderChat)}
           </>
         ) : (
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons
-              name="archive-off-outline"
-              size={64}
-              color={COLORS.textTertiary}
-            />
-            <Text style={styles.emptyTitle}>No archived chats</Text>
-            <Text style={styles.emptySubtitle}>
-              Chats you archive will appear here. Long press on a chat to
-              archive it.
-            </Text>
-          </View>
+          <EmptyState
+            icon="archive-off-outline"
+            title="No archived chats"
+            description="Chats you archive will appear here. Long press on a chat to archive it."
+            actionLabel="Go to Messages"
+            onAction={() => navigation.navigate('Messages')}
+          />
         )}
       </ScrollView>
     </SafeAreaView>

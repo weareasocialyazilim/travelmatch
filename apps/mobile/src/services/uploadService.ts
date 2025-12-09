@@ -8,11 +8,15 @@
  * - Malicious filename detection
  * - MIME type verification
  * - Rate limiting preparation
+ * - Crash recovery with pending transactions
+ * - Low storage detection and warnings
  */
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { uploadFile as supabaseUploadFile } from './supabaseStorageService';
 import type { StorageBucket } from './supabaseStorageService';
+import { pendingTransactionsService, TransactionStatus } from './pendingTransactionsService';
+import { storageMonitor, StorageLevel } from './storageMonitor';
 
 // Security Constants
 const ALLOWED_IMAGE_TYPES = [
@@ -336,6 +340,8 @@ export const uploadImage = async (
   uri: string,
   options: UploadOptions = {},
 ): Promise<UploadResult> => {
+  let uploadId: string | undefined;
+  
   try {
     const {
       data: { user },
@@ -365,6 +371,58 @@ export const uploadImage = async (
       bucket,
     });
 
+    // === EDGE CASE 1: Check storage availability ===
+    const storageInfo = await storageMonitor.getStorageInfo();
+    
+    if (storageInfo.level === StorageLevel.CRITICAL) {
+      logger.error('Upload blocked: Critical storage level', {
+        freeSpace: storageMonitor.formatBytes(storageInfo.freeSpace),
+        fileSize: storageMonitor.formatBytes(fileInfo.size),
+      });
+      throw new Error(
+        `Not enough storage space. Free: ${storageMonitor.formatBytes(storageInfo.freeSpace)}, ` +
+        `Need: ${storageMonitor.formatBytes(fileInfo.size * 1.5)}`
+      );
+    }
+
+    const canUpload = await storageMonitor.canUpload(fileInfo.size);
+    if (!canUpload) {
+      logger.warn('Upload blocked: Insufficient storage for processing', {
+        freeSpace: storageMonitor.formatBytes(storageInfo.freeSpace),
+        fileSize: storageMonitor.formatBytes(fileInfo.size),
+        required: storageMonitor.formatBytes(fileInfo.size * 1.5),
+      });
+      throw new Error(
+        `Insufficient storage. Free up at least ${storageMonitor.formatBytes(fileInfo.size * 1.5)}`
+      );
+    }
+
+    if (storageInfo.level === StorageLevel.LOW) {
+      logger.warn('Upload proceeding with low storage warning', {
+        freeSpace: storageMonitor.formatBytes(storageInfo.freeSpace),
+        level: storageInfo.level,
+      });
+    }
+
+    // === EDGE CASE 2: Add to pending transactions (crash recovery) ===
+    uploadId = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    await pendingTransactionsService.addPendingUpload({
+      id: uploadId,
+      type: bucket as 'proof' | 'moment' | 'avatar' | 'message',
+      localUri: uri,
+      bucket,
+      fileName: fileInfo.name,
+      fileSize: fileInfo.size,
+      mimeType: fileInfo.type,
+      status: TransactionStatus.INITIATED,
+      progress: 0,
+      retryCount: 0,
+      createdAt: Date.now(),
+    });
+
+    logger.info('Upload tracked in pending transactions', { uploadId, bucket });
+
     // Track upload attempt (pending)
     await trackUploadAttempt(user.id, bucket, fileInfo, 'pending');
 
@@ -377,6 +435,7 @@ export const uploadImage = async (
     if (!typeValidation.valid) {
       logger.warn('File type validation failed:', typeValidation.error);
       await trackUploadAttempt(user.id, bucket, fileInfo, 'failed');
+      await pendingTransactionsService.updateUploadProgress(uploadId, 0, TransactionStatus.FAILED);
       throw new Error(typeValidation.error);
     }
 
@@ -385,6 +444,7 @@ export const uploadImage = async (
     if (!sizeValidation.valid) {
       logger.warn('File size validation failed:', sizeValidation.error);
       await trackUploadAttempt(user.id, bucket, fileInfo, 'failed');
+      await pendingTransactionsService.updateUploadProgress(uploadId, 0, TransactionStatus.FAILED);
       throw new Error(sizeValidation.error);
     }
 
@@ -402,6 +462,9 @@ export const uploadImage = async (
       type: fileInfo.type,
     });
 
+    // Update status: uploading
+    await pendingTransactionsService.updateUploadProgress(uploadId, 10, TransactionStatus.UPLOADING);
+
     // TODO: Implement client-side compression if needed before upload
     // For now, we upload directly
 
@@ -409,18 +472,24 @@ export const uploadImage = async (
 
     if (error) {
       await trackUploadAttempt(user.id, bucket, fileInfo, 'failed');
+      await pendingTransactionsService.updateUploadProgress(uploadId, 0, TransactionStatus.FAILED);
       throw error;
     }
     if (!url || !path) {
       await trackUploadAttempt(user.id, bucket, fileInfo, 'failed');
+      await pendingTransactionsService.updateUploadProgress(uploadId, 0, TransactionStatus.FAILED);
       throw new Error('Upload failed');
     }
 
     // Track successful upload
     await trackUploadAttempt(user.id, bucket, fileInfo, 'completed');
+    
+    // === EDGE CASE 3: Mark upload as completed (auto-cleanup) ===
+    await pendingTransactionsService.updateUploadProgress(uploadId, 100, TransactionStatus.COMPLETED);
 
     // Log successful upload (without sensitive data)
     logger.info('File uploaded successfully', {
+      uploadId,
       bucket,
       size: fileInfo.size,
       path: path.substring(0, 50), // Truncate path for security
@@ -436,6 +505,13 @@ export const uploadImage = async (
     };
   } catch (error) {
     logger.error('Upload image error:', error);
+    
+    // Mark as failed and increment retry count
+    if (uploadId) {
+      await pendingTransactionsService.incrementUploadRetry(uploadId);
+      logger.info('Upload retry count incremented', { uploadId });
+    }
+    
     throw error;
   }
 };

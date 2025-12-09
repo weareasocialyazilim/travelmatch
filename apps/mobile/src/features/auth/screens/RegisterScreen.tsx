@@ -2,27 +2,17 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useAuth } from '../hooks/useAuth';
-
-const registerSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
-
-type RegisterFormData = z.infer<typeof registerSchema>;
+import { registerSchema, type RegisterInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 
 export const RegisterScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   
-  const { control, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
+  const { control, handleSubmit, formState } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
+    mode: 'onChange',
     defaultValues: {
       email: '',
       password: '',
@@ -31,7 +21,7 @@ export const RegisterScreen: React.FC = () => {
     },
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const onSubmit = async (data: RegisterInput) => {
     try {
       setIsLoading(true);
       await register(data.email, data.password, data.fullName);
@@ -51,18 +41,19 @@ export const RegisterScreen: React.FC = () => {
       <Controller
         control={control}
         name="fullName"
-        render={({ field: { onChange, value } }) => (
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
           <View style={styles.inputContainer}>
             <TextInput
-              style={[styles.input, errors.fullName && styles.inputError]}
+              style={[styles.input, error && styles.inputError]}
               placeholder="Full Name"
               value={value}
               onChangeText={onChange}
+              onBlur={onBlur}
               autoCapitalize="words"
               editable={!isLoading}
             />
-            {errors.fullName && (
-              <Text style={styles.errorText}>{errors.fullName.message}</Text>
+            {error && (
+              <Text style={styles.errorText}>{error.message}</Text>
             )}
           </View>
         )}
@@ -71,19 +62,20 @@ export const RegisterScreen: React.FC = () => {
       <Controller
         control={control}
         name="email"
-        render={({ field: { onChange, value } }) => (
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
           <View style={styles.inputContainer}>
             <TextInput
-              style={[styles.input, errors.email && styles.inputError]}
+              style={[styles.input, error && styles.inputError]}
               placeholder="Email"
               value={value}
               onChangeText={onChange}
+              onBlur={onBlur}
               keyboardType="email-address"
               autoCapitalize="none"
               editable={!isLoading}
             />
-            {errors.email && (
-              <Text style={styles.errorText}>{errors.email.message}</Text>
+            {error && (
+              <Text style={styles.errorText}>{error.message}</Text>
             )}
           </View>
         )}
@@ -92,18 +84,19 @@ export const RegisterScreen: React.FC = () => {
       <Controller
         control={control}
         name="password"
-        render={({ field: { onChange, value } }) => (
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
           <View style={styles.inputContainer}>
             <TextInput
-              style={[styles.input, errors.password && styles.inputError]}
+              style={[styles.input, error && styles.inputError]}
               placeholder="Password"
               value={value}
               onChangeText={onChange}
+              onBlur={onBlur}
               secureTextEntry
               editable={!isLoading}
             />
-            {errors.password && (
-              <Text style={styles.errorText}>{errors.password.message}</Text>
+            {error && (
+              <Text style={styles.errorText}>{error.message}</Text>
             )}
           </View>
         )}
@@ -112,27 +105,28 @@ export const RegisterScreen: React.FC = () => {
       <Controller
         control={control}
         name="confirmPassword"
-        render={({ field: { onChange, value } }) => (
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
           <View style={styles.inputContainer}>
             <TextInput
-              style={[styles.input, errors.confirmPassword && styles.inputError]}
+              style={[styles.input, error && styles.inputError]}
               placeholder="Confirm Password"
               value={value}
               onChangeText={onChange}
+              onBlur={onBlur}
               secureTextEntry
               editable={!isLoading}
             />
-            {errors.confirmPassword && (
-              <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>
+            {error && (
+              <Text style={styles.errorText}>{error.message}</Text>
             )}
           </View>
         )}
       />
 
       <TouchableOpacity
-        style={[styles.button, isLoading && styles.buttonDisabled]}
+        style={[styles.button, (isLoading || !canSubmitForm({ formState } as any)) && styles.buttonDisabled]}
         onPress={handleSubmit(onSubmit)}
-        disabled={isLoading}
+        disabled={isLoading || !canSubmitForm({ formState } as any)}
       >
         <Text style={styles.buttonText}>
           {isLoading ? 'Creating Account...' : 'Sign Up'}

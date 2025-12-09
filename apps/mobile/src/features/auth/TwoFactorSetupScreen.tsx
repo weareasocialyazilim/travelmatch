@@ -10,7 +10,11 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
+import { twoFactorSetupSchema, type TwoFactorSetupInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -23,9 +27,20 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
   navigation,
 }) => {
   const [step, setStep] = useState<'intro' | 'verify' | 'success'>('intro');
-  const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [secretKey, setSecretKey] = useState<string | null>(null);
+
+  const {
+    control,
+    handleSubmit,
+    formState,
+  } = useForm<TwoFactorSetupInput>({
+    resolver: zodResolver(twoFactorSetupSchema),
+    mode: 'onChange',
+    defaultValues: {
+      verificationCode: '',
+    },
+  });
 
   const handleSendCode = async () => {
     setIsLoading(true);
@@ -48,17 +63,12 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
     }
   };
 
-  const handleVerify = () => {
-    if (verificationCode.length !== 6) {
-      Alert.alert('Invalid Code', 'Please enter a 6-digit code');
-      return;
-    }
-
+  const onVerify = (data: TwoFactorSetupInput) => {
     setIsLoading(true);
     // Simulate verification
     setTimeout(() => {
       setIsLoading(false);
-      if (verificationCode === '123456') {
+      if (data.verificationCode === '123456') {
         setStep('success');
       } else {
         Alert.alert('Invalid Code', 'Please check your code and try again');
@@ -145,23 +155,33 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
         Enter the 6-digit code sent to your phone number ending in ***1234
       </Text>
 
-      <TextInput
-        style={styles.codeInput}
-        value={verificationCode}
-        onChangeText={setVerificationCode}
-        placeholder="000000"
-        placeholderTextColor={COLORS.textTertiary}
-        keyboardType="number-pad"
-        maxLength={6}
-        textAlign="center"
+      <Controller
+        control={control}
+        name="verificationCode"
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          <>
+            <TextInput
+              style={[styles.codeInput, error && styles.codeInputError]}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder="000000"
+              placeholderTextColor={COLORS.textTertiary}
+              keyboardType="number-pad"
+              maxLength={6}
+              textAlign="center"
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </>
+        )}
       />
 
       <Text style={styles.hint}>Demo: Enter 123456 to verify</Text>
 
       <TouchableOpacity
         style={styles.primaryButton}
-        onPress={handleVerify}
-        disabled={isLoading || verificationCode.length !== 6}
+        onPress={handleSubmit(onVerify)}
+        disabled={isLoading || !canSubmitForm({ formState })}
         activeOpacity={0.8}
       >
         <Text style={styles.primaryButtonText}>
@@ -336,6 +356,15 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     letterSpacing: 8,
     marginBottom: 16,
+  },
+  codeInputError: {
+    borderColor: COLORS.error,
+  },
+  errorText: {
+    fontSize: 14,
+    color: COLORS.error,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   hint: {
     fontSize: 14,

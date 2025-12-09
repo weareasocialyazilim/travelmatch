@@ -12,9 +12,13 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '../config/supabase';
 import { COLORS } from '../constants/colors';
 import { logger } from '../utils/logger';
+import { disputeSchema, type DisputeFormData } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
@@ -28,9 +32,25 @@ export const DisputeFlowScreen: React.FC = () => {
   const { type, id, details } = route.params || {};
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [reason, setReason] = useState('');
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState,
+    watch,
+    setValue,
+  } = useForm<DisputeFormData>({
+    resolver: zodResolver(disputeSchema),
+    mode: 'onChange',
+    defaultValues: {
+      reason: '',
+      evidence: [],
+    },
+  });
+
+  const reason = watch('reason');
+  const evidence = watch('evidence') || [];
 
   if (!type || !id) {
     return (
@@ -50,10 +70,10 @@ export const DisputeFlowScreen: React.FC = () => {
 
   const handleFileUpload = () => {
     // Mock file upload for now - in real app use DocumentPicker
-    if (uploadedFiles.length < 3) {
-      setUploadedFiles([
-        ...uploadedFiles,
-        `evidence_${uploadedFiles.length + 1}.jpg`,
+    if (evidence.length < 3) {
+      setValue('evidence', [
+        ...evidence,
+        `evidence_${evidence.length + 1}.jpg`,
       ]);
     } else {
       Alert.alert('Limit Reached', 'You can only upload up to 3 files.');
@@ -61,10 +81,10 @@ export const DisputeFlowScreen: React.FC = () => {
   };
 
   const handleRemoveFile = (index: number) => {
-    setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+    setValue('evidence', evidence.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async () => {
+  const onSubmit = async (formData: DisputeFormData) => {
     setLoading(true);
     try {
       const _table =
@@ -77,8 +97,8 @@ export const DisputeFlowScreen: React.FC = () => {
         .from('disputes') // Assuming a unified disputes table or separate ones
         .insert({
           [foreignKey]: id,
-          reason,
-          evidence: uploadedFiles,
+          reason: formData.reason,
+          evidence: formData.evidence || [],
           status: 'pending',
           type: type,
         });
@@ -114,14 +134,24 @@ export const DisputeFlowScreen: React.FC = () => {
       )}
 
       <Text style={styles.label}>Why are you disputing this?</Text>
-      <TextInput
-        style={styles.textArea}
-        placeholder="Please provide a detailed explanation..."
-        multiline
-        numberOfLines={6}
-        value={reason}
-        onChangeText={setReason}
-        maxLength={1000}
+      <Controller
+        control={control}
+        name="reason"
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          <>
+            <TextInput
+              style={[styles.textArea, error && styles.inputError]}
+              placeholder="Please provide a detailed explanation..."
+              multiline
+              numberOfLines={6}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              maxLength={1000}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </>
+        )}
       />
       <Text style={styles.charCount}>{reason.length}/1000</Text>
 
@@ -143,7 +173,7 @@ export const DisputeFlowScreen: React.FC = () => {
       </Text>
 
       <View style={styles.uploadArea}>
-        {uploadedFiles.map((file, index) => (
+        {evidence.map((file, index) => (
           <View key={index} style={styles.fileItem}>
             <MaterialCommunityIcons
               name="file-document-outline"
@@ -198,8 +228,8 @@ export const DisputeFlowScreen: React.FC = () => {
 
         <Text style={styles.reviewLabel}>Evidence:</Text>
         <Text style={styles.reviewValue}>
-          {uploadedFiles.length > 0
-            ? `${uploadedFiles.length} files attached`
+          {evidence.length > 0
+            ? `${evidence.length} files attached`
             : 'No files attached'}
         </Text>
       </View>
@@ -212,9 +242,12 @@ export const DisputeFlowScreen: React.FC = () => {
           <Text style={styles.secondaryButtonText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit}
-          disabled={loading}
+          style={[
+            styles.button,
+            !canSubmitForm({ formState }) && styles.buttonDisabled,
+          ]}
+          onPress={handleSubmit(onSubmit)}
+          disabled={!canSubmitForm({ formState }) || loading}
         >
           {loading ? (
             <ActivityIndicator color="#FFF" />
@@ -328,6 +361,14 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  inputError: {
+    borderColor: COLORS.error,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 14,
+    marginTop: 4,
   },
   charCount: {
     textAlign: 'right',

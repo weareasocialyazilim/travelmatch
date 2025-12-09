@@ -72,6 +72,28 @@
     "admin#type-check": {
       "outputs": []
     },
+    "web#dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"]
+    },
+    "web#build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      ]
+    },
+    "web#lint": {
+      "outputs": []
+    },
+    "web#type-check": {
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "persistent": true

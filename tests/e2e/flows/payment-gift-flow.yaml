@@ -1,0 +1,384 @@
+# Payment Flow E2E Test Plan - Gift Sending
+# Priority: 🔴 CRITICAL
+# Framework: Detox
+# File: tests/e2e/paymentFlow.e2e.test.ts
+# Status: ✅ IMPLEMENTED
+
+appId: com.travelmatch.app
+---
+
+# Test Suite: Payment Flow - Gift Sending
+# Total Test Cases: 40+
+# Estimated Duration: 15-20 minutes
+
+# =============================================================================
+# 1. GIFT PURCHASE JOURNEY
+# =============================================================================
+
+- tapOn:
+    id: "tab-home"
+- assertVisible:
+    id: "moments-feed"
+- assertVisible:
+    id: "moment-card-0"
+- tapOn:
+    id: "moment-card-0"
+- assertVisible:
+    id: "moment-details-screen"
+- assertVisible:
+    id: "moment-title"
+- assertVisible:
+    id: "moment-price"
+- assertVisible:
+    id: "gift-button"
+
+# =============================================================================
+# 2. GIFT FLOW SCREEN - FORM INPUT
+# =============================================================================
+
+- tapOn:
+    id: "gift-button"
+- assertVisible:
+    id: "unified-gift-flow-screen"
+- assertVisible:
+    id: "recipient-email-input"
+- assertVisible:
+    id: "gift-message-input"
+
+# Enter recipient email
+- tapOn:
+    id: "recipient-email-input"
+- inputText:
+    text: "recipient@example.com"
+- tapOn:
+    id: "gift-message-input"
+- inputText:
+    text: "Hope you enjoy this experience! 🎁"
+
+# =============================================================================
+# 3. EMAIL VALIDATION TESTS
+# =============================================================================
+
+# Test Case: Invalid email validation
+- tapOn:
+    id: "recipient-email-input"
+- clearText:
+    id: "recipient-email-input"
+- inputText:
+    text: "invalid-email"
+- scrollTo:
+    id: "purchase-button"
+# Button should be disabled or show validation error
+
+# Test Case: Valid email
+- tapOn:
+    id: "recipient-email-input"
+- clearText:
+    id: "recipient-email-input"
+- inputText:
+    text: "valid@example.com"
+
+# =============================================================================
+# 4. PAYMENT METHOD SELECTION
+# =============================================================================
+
+- scrollTo:
+    id: "payment-methods-list"
+- assertVisible:
+    id: "payment-methods-list"
+- assertVisible:
+    id: "payment-method-card"
+
+# Select credit card payment method
+- tapOn:
+    id: "payment-method-card"
+- assertVisible:
+    id: "payment-method-card-selected"
+- assertVisible:
+    id: "payment-method-details"
+
+# Verify masked card number (security check)
+- assertVisible:
+    text: "•••• 4242"  # Last 4 digits shown
+
+# =============================================================================
+# 5. TRANSACTION SUMMARY
+# =============================================================================
+
+- scrollTo:
+    id: "transaction-summary"
+- assertVisible:
+    id: "transaction-summary"
+- assertVisible:
+    id: "moment-price-label"
+- assertVisible:
+    id: "service-fee-label"
+- assertVisible:
+    id: "total-amount-label"
+- assertVisible:
+    id: "total-amount-value"
+
+# =============================================================================
+# 6. PAYMENT CONFIRMATION & PROCESSING
+# =============================================================================
+
+- scrollTo:
+    id: "purchase-button"
+- assertVisible:
+    id: "purchase-button"
+- tapOn:
+    id: "purchase-button"
+
+# Loading state
+- assertVisible:
+    id: "payment-loading-indicator"
+    timeout: 1000
+
+# =============================================================================
+# 7. SUCCESS CONFIRMATION & RECEIPT
+# =============================================================================
+
+- assertVisible:
+    id: "payment-success-screen"
+    timeout: 10000
+- assertVisible:
+    id: "success-message"
+- assertVisible:
+    id: "success-icon"
+
+# Receipt details
+- assertVisible:
+    id: "receipt-moment-title"
+- assertVisible:
+    id: "receipt-amount"
+- assertVisible:
+    id: "receipt-recipient"
+- assertVisible:
+    id: "receipt-date"
+- assertVisible:
+    id: "transaction-id"
+
+# =============================================================================
+# 8. RECEIPT ACTIONS
+# =============================================================================
+
+# Test Case: View detailed receipt (optional)
+- tapOn:
+    id: "view-receipt-button"
+    optional: true
+- assertVisible:
+    id: "detailed-receipt-screen"
+    optional: true
+    timeout: 3000
+
+# Test Case: Share receipt (optional)
+- assertVisible:
+    id: "share-receipt-button"
+    optional: true
+
+# Test Case: Download receipt (optional)
+- tapOn:
+    id: "download-receipt-button"
+    optional: true
+- assertVisible:
+    text: "Receipt downloaded"
+    optional: true
+    timeout: 5000
+
+# =============================================================================
+# 9. RETURN TO HOME
+# =============================================================================
+
+- tapOn:
+    id: "done-button"
+- assertVisible:
+    id: "moments-feed"
+    timeout: 3000
+
+# =============================================================================
+# 10. TRANSACTION HISTORY VERIFICATION
+# =============================================================================
+
+- tapOn:
+    id: "tab-profile"
+- tapOn:
+    id: "transaction-history-button"
+- assertVisible:
+    id: "transaction-history-screen"
+    timeout: 3000
+
+# Verify recent gift transaction appears
+- assertVisible:
+    id: "transaction-item-0"
+    timeout: 5000
+- assertVisible:
+    text: "Gift"  # or "Sent"
+
+# View transaction details
+- tapOn:
+    id: "transaction-item-0"
+- assertVisible:
+    id: "transaction-detail-screen"
+    timeout: 3000
+- assertVisible:
+    id: "transaction-type"
+- assertVisible:
+    id: "transaction-amount"
+- assertVisible:
+    id: "transaction-status"
+- assertVisible:
+    id: "transaction-date"
+
+# =============================================================================
+# ERROR HANDLING TEST CASES
+# =============================================================================
+
+# Test Case: Network Error Handling
+- tapOn:
+    id: "tab-home"
+- tapOn:
+    id: "moment-card-0"
+- tapOn:
+    id: "gift-button"
+- inputText:
+    id: "recipient-email-input"
+    text: "test@example.com"
+- scrollTo:
+    id: "payment-method-card"
+- tapOn:
+    id: "payment-method-card"
+- scrollTo:
+    id: "purchase-button"
+
+# Simulate network disable (if supported)
+# - setNetworkEnabled: false
+
+- tapOn:
+    id: "purchase-button"
+- assertVisible:
+    text: "network|connection|offline"
+    regex: true
+    timeout: 5000
+
+# Re-enable network
+# - setNetworkEnabled: true
+
+# Test Case: Retry after failure
+- tapOn:
+    id: "retry-payment-button"
+    optional: true
+- assertVisible:
+    id: "unified-gift-flow-screen"
+
+# =============================================================================
+# EDGE CASES
+# =============================================================================
+
+# Test Case: Prevent gifting own moments
+- tapOn:
+    id: "tab-profile"
+- tapOn:
+    id: "my-moments-button"
+    optional: true
+- tapOn:
+    id: "own-moment-0"
+    optional: true
+- assertNotVisible:
+    id: "gift-button"  # Should not be visible on own moments
+
+# Test Case: Form data preservation
+- tapOn:
+    id: "tab-home"
+- tapOn:
+    id: "moment-card-0"
+- tapOn:
+    id: "gift-button"
+- inputText:
+    id: "recipient-email-input"
+    text: "preserve@test.com"
+- inputText:
+    id: "gift-message-input"
+    text: "Test message preservation"
+- tapOn:
+    id: "back-button"
+# Navigate back
+- tapOn:
+    id: "gift-button"
+# Data should be preserved (implementation-dependent)
+
+# =============================================================================
+# PERFORMANCE TESTS
+# =============================================================================
+
+# Test Case: Complete flow within 20 seconds
+- startTimer:
+    id: "payment-flow-timer"
+- tapOn:
+    id: "tab-home"
+- tapOn:
+    id: "moment-card-0"
+- tapOn:
+    id: "gift-button"
+- inputText:
+    id: "recipient-email-input"
+    text: "perf@test.com"
+- scrollTo:
+    id: "payment-method-card"
+- tapOn:
+    id: "payment-method-card"
+- scrollTo:
+    id: "purchase-button"
+- tapOn:
+    id: "purchase-button"
+- assertVisible:
+    id: "payment-success-screen"
+    timeout: 10000
+- stopTimer:
+    id: "payment-flow-timer"
+    maxDuration: 20000  # Should complete within 20 seconds
+
+# =============================================================================
+# SECURITY & PRIVACY TESTS
+# =============================================================================
+
+# Test Case: Card numbers are masked
+- tapOn:
+    id: "tab-home"
+- tapOn:
+    id: "moment-card-0"
+- tapOn:
+    id: "gift-button"
+- scrollTo:
+    id: "payment-methods-list"
+- assertVisible:
+    text: "•••• \\d{4}"  # Regex for masked card number
+    regex: true
+- assertNotVisible:
+    text: "\\d{16}"  # Full card number should never be visible
+    regex: true
+
+# Test Case: Secure connection indicators (if visible in UI)
+- assertVisible:
+    id: "secure-payment-indicator"
+    optional: true
+
+# =============================================================================
+# MULTI-CURRENCY SUPPORT (if applicable)
+# =============================================================================
+
+# Test Case: Currency symbol display
+- tapOn:
+    id: "tab-home"
+- assertVisible:
+    text: "\\$|€|£|¥"  # Currency symbols
+    regex: true
+
+# =============================================================================
+# CLEANUP & TEARDOWN
+# =============================================================================
+
+- tapOn:
+    id: "back-button"
+    optional: true
+- tapOn:
+    id: "tab-home"

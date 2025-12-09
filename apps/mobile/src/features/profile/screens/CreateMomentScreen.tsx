@@ -16,6 +16,9 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createMomentSchema, type CreateMomentInput } from '../../../utils/forms/schemas';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -45,34 +48,37 @@ const CreateMomentScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { createMoment } = useMoments();
 
-  // Form state
-  const [photo, setPhoto] = useState<string>('');
-  const [title, setTitle] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [place, setPlace] = useState<Place | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  // UI-specific state (not in form)
+  const [photo, setPhoto] = useState<string>(''); // Managed by PhotoSection
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [amount, setAmount] = useState('');
-  const [story, setStory] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form validation
-  const isFormValid = useMemo(() => {
-    const amountNum = parseFloat(amount) || 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const selected = new Date(selectedDate);
-    selected.setHours(0, 0, 0, 0);
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<CreateMomentInput>({
+    resolver: zodResolver(createMomentSchema),
+    mode: 'onChange',
+    defaultValues: {
+      title: '',
+      category: '',
+      amount: 0,
+      date: new Date(),
+      story: '',
+      photo: '',
+      place: null,
+    },
+  });
 
-    return !!(
-      title.trim() &&
-      selectedCategory &&
-      amount &&
-      amountNum > 0 &&
-      amountNum <= 10000 &&
-      selected >= today
-    );
-  }, [title, selectedCategory, amount, selectedDate]);
+  const title = watch('title');
+  const selectedCategory = watch('category');
+  const amount = watch('amount');
+  const selectedDate = watch('date');
+  const story = watch('story');
+  const place = watch('place');
 
   // Payment hint text
   const paymentHint = useMemo(() => {
@@ -86,62 +92,29 @@ const CreateMomentScreen: React.FC = () => {
   }, [amount]);
 
   // Handle publish
-  const handlePublish = useCallback(async () => {
-    // Validation
-    if (!title.trim()) {
-      Alert.alert('Title required', STRINGS.ERRORS.TITLE_REQUIRED);
-      return;
-    }
-    if (title.trim().length < 5) {
-      Alert.alert('Title too short', 'Title must be at least 5 characters');
-      return;
-    }
-    if (!selectedCategory) {
-      Alert.alert('Category required', STRINGS.ERRORS.CATEGORY_REQUIRED);
-      return;
-    }
-
-    const amountNum = parseFloat(amount) || 0;
-    if (!amount || amountNum <= 0) {
-      Alert.alert('Amount required', STRINGS.ERRORS.AMOUNT_REQUIRED);
-      return;
-    }
-    if (amountNum > 10000) {
-      Alert.alert('Amount too high', 'Maximum amount is $10,000');
-      return;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const selected = new Date(selectedDate);
-    selected.setHours(0, 0, 0, 0);
-    if (selected < today) {
-      Alert.alert('Invalid Date', 'Please select today or a future date');
-      return;
-    }
-
+  const onPublish = useCallback(async (data: CreateMomentInput) => {
     setIsSubmitting(true);
 
     try {
-      const categoryObj = CATEGORIES.find((c) => c.id === selectedCategory);
+      const categoryObj = CATEGORIES.find((c) => c.id === data.category);
 
       const momentData = {
-        title: title.trim(),
-        story: story.trim() || undefined,
-        price: amountNum,
+        title: data.title.trim(),
+        story: data.story?.trim() || undefined,
+        price: data.amount,
         category: {
-          id: selectedCategory,
-          label: categoryObj?.label || selectedCategory,
-          emoji: getCategoryEmoji(selectedCategory),
+          id: data.category,
+          label: categoryObj?.label || data.category,
+          emoji: getCategoryEmoji(data.category),
         },
-        location: place
+        location: data.place
           ? {
-              name: place.name,
-              city: place.address.split(',')[0]?.trim() || place.name,
-              country: place.address.split(',')[1]?.trim() || '',
+              name: data.place.name,
+              city: data.place.address.split(',')[0]?.trim() || data.place.name,
+              country: data.place.address.split(',')[1]?.trim() || '',
             }
           : undefined,
-        date: selectedDate.toISOString(),
+        date: data.date.toISOString(),
         imageUrl: photo || undefined,
         availability: 'Available',
       };
@@ -177,17 +150,7 @@ const CreateMomentScreen: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [
-    title,
-    selectedCategory,
-    amount,
-    selectedDate,
-    story,
-    place,
-    photo,
-    createMoment,
-    navigation,
-  ]);
+  }, [createMoment, navigation]);
 
   // Handlers
   const handleDatePress = useCallback(() => setShowDatePicker(true), []);
@@ -227,30 +190,51 @@ const CreateMomentScreen: React.FC = () => {
           keyboardShouldPersistTaps="handled"
         >
           {/* Photo Section */}
-          <PhotoSection photo={photo} onPhotoSelected={setPhoto} />
+          <PhotoSection photo={photo} onPhotoSelected={(uri) => {
+            setPhoto(uri);
+            setValue('photo', uri);
+          }} />
 
           {/* Title Input */}
-          <TitleInput title={title} onTitleChange={setTitle} />
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, value } }) => (
+              <TitleInput title={value} onTitleChange={onChange} />
+            )}
+          />
+          {errors.title && (
+            <Text style={styles.errorText}>{errors.title.message}</Text>
+          )}
 
           {/* Category Selector */}
           <CategorySelector
             selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            onSelectCategory={(category) => setValue('category', category)}
           />
+          {errors.category && (
+            <Text style={styles.errorText}>{errors.category.message}</Text>
+          )}
 
           {/* Details Section */}
           <DetailsSection
             place={place}
             selectedDate={selectedDate}
             amount={amount}
-            onPlaceChange={setPlace}
+            onPlaceChange={(p) => setValue('place', p)}
             onDatePress={handleDatePress}
-            onAmountChange={setAmount}
+            onAmountChange={(a) => setValue('amount', parseFloat(a) || 0)}
             onNavigateToPlaceSearch={handleNavigateToPlaceSearch}
           />
+          {errors.amount && (
+            <Text style={styles.errorText}>{errors.amount.message}</Text>
+          )}
+          {errors.date && (
+            <Text style={styles.errorText}>{errors.date.message}</Text>
+          )}
 
           {/* Story Section */}
-          <StorySection story={story} onStoryChange={setStory} />
+          <StorySection story={story || ''} onStoryChange={(s) => setValue('story', s)} />
 
           {/* Live Preview */}
           <MomentPreview
@@ -272,14 +256,14 @@ const CreateMomentScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.publishButton,
-              (!isFormValid || isSubmitting) && styles.publishButtonDisabled,
+              (!isValid || isSubmitting) && styles.publishButtonDisabled,
             ]}
-            onPress={handlePublish}
+            onPress={handleSubmit(onPublish)}
             activeOpacity={0.8}
-            disabled={!isFormValid || isSubmitting}
+            disabled={!isValid || isSubmitting}
             accessibilityRole="button"
             accessibilityLabel="Publish moment"
-            accessibilityState={{ disabled: !isFormValid || isSubmitting }}
+            accessibilityState={{ disabled: !isValid || isSubmitting }}
           >
             {isSubmitting ? (
               <ActivityIndicator size="small" color={COLORS.text} />
@@ -325,7 +309,7 @@ const CreateMomentScreen: React.FC = () => {
                   minimumDate={new Date()}
                   maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
                   onChange={(_event, date) => {
-                    if (date) setSelectedDate(date);
+                    if (date) setValue('date', date);
                   }}
                   textColor={COLORS.text}
                 />
@@ -341,7 +325,7 @@ const CreateMomentScreen: React.FC = () => {
             maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
             onChange={(_event, date) => {
               setShowDatePicker(false);
-              if (date) setSelectedDate(date);
+              if (date) setValue('date', date);
             }}
           />
         ))}
@@ -437,6 +421,12 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 17,
     fontWeight: '600',
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginHorizontal: LAYOUT.padding,
   },
 });
 

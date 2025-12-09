@@ -12,10 +12,14 @@ import {
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { LAYOUT } from '../constants/layout';
 import { VALUES } from '../constants/values';
+import { contactSupportSchema, type ContactSupportInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -30,9 +34,35 @@ interface SupportOption {
 type SupportScreenProps = StackScreenProps<RootStackParamList, 'Support'>;
 
 export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
+  const { control, handleSubmit, formState, watch } = useForm<ContactSupportInput>({
+    resolver: zodResolver(contactSupportSchema),
+    mode: 'onChange',
+    defaultValues: {
+      subject: '',
+      message: '',
+      category: 'general',
+    },
+  });
+
+  const message = watch('message');
   const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (data: ContactSupportInput) => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      Alert.alert(
+        'Success',
+        'Your support request has been submitted. We will get back to you within 24 hours.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }],
+      );
+    }, 1500);
+  };
+
+  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+    requireDirty: false,
+    requireValid: true,
+  });
 
   const handleEmailSupport = () => {
     Linking.openURL('mailto:support@travelmatch.com?subject=Support Request');
@@ -46,23 +76,6 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
 
   const handleCallSupport = () => {
     Linking.openURL('tel:+905551234567');
-  };
-
-  const handleSubmit = () => {
-    if (!subject.trim() || !message.trim()) {
-      Alert.alert('Required Fields', 'Please fill in all fields');
-      return;
-    }
-
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert(
-        'Success',
-        'Your support request has been submitted. We will get back to you within 24 hours.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }],
-      );
-    }, 1500);
   };
 
   const supportOptions: SupportOption[] = [
@@ -167,37 +180,57 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
             <View style={styles.formCard}>
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Subject</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="What do you need help with?"
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={subject}
-                  onChangeText={setSubject}
+                <Controller
+                  control={control}
+                  name="subject"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="What do you need help with?"
+                        placeholderTextColor={COLORS.textSecondary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                      />
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                    </>
+                  )}
                 />
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Message</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder="Describe your issue in detail..."
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={message}
-                  onChangeText={setMessage}
-                  multiline
-                  numberOfLines={6}
-                  textAlignVertical="top"
+                <Controller
+                  control={control}
+                  name="message"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <>
+                      <TextInput
+                        style={[styles.input, styles.textArea]}
+                        placeholder="Describe your issue in detail..."
+                        placeholderTextColor={COLORS.textSecondary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        multiline
+                        numberOfLines={6}
+                        textAlignVertical="top"
+                      />
+                      <Text style={styles.charCount}>{value.length}/500</Text>
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                    </>
+                  )}
                 />
-                <Text style={styles.charCount}>{message.length}/500</Text>
               </View>
 
               <TouchableOpacity
                 style={[
                   styles.submitButton,
-                  loading && styles.submitButtonDisabled,
+                  (loading || isSubmitDisabled) && styles.submitButtonDisabled,
                 ]}
-                onPress={handleSubmit}
-                disabled={loading}
+                onPress={handleSubmit(onSubmit)}
+                disabled={loading || isSubmitDisabled}
                 activeOpacity={0.8}
               >
                 <LinearGradient
@@ -480,5 +513,10 @@ const styles = StyleSheet.create({
   textArea: {
     height: 120,
     paddingTop: 12,
+  },
+  errorText: {
+    fontSize: 12,
+    color: COLORS.coral,
+    marginTop: 4,
   },
 });

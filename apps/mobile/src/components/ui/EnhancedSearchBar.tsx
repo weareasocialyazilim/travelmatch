@@ -138,7 +138,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
             { backgroundColor: COLORS.white, borderColor: COLORS.border },
           ]}
         >
-          <View style={styles.suggestionsHeader}
+          <View style={styles.suggestionsHeader}>
             <Text style={[styles.suggestionsTitle, { color: COLORS.text }]}>
               {t('common.search')} History
             </Text>

@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-nativ
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { logger } from '../utils/logger';
+import { useNetworkStatus } from '../../../context/NetworkContext';
 
 interface ChatInputBarProps {
   messageText: string;
@@ -10,6 +11,7 @@ interface ChatInputBarProps {
   onSend: () => void;
   onAttachPress: () => void;
   isTyping: boolean;
+  isSending?: boolean;
 }
 
 export const ChatInputBar: React.FC<ChatInputBarProps> = ({
@@ -18,7 +20,10 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   onSend,
   onAttachPress,
   isTyping,
+  isSending = false,
 }) => {
+  const { isConnected } = useNetworkStatus();
+  
   return (
     <View style={styles.inputBar}>
       <View style={styles.inputContainer}>
@@ -29,6 +34,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
               logger.debug('Attach button pressed - opening attachment sheet');
               onAttachPress();
             }}
+            disabled={!isConnected}
             activeOpacity={0.6}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             accessibilityLabel="Attach file"
@@ -38,12 +44,16 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             <MaterialCommunityIcons
               name="plus-circle"
               size={24}
-              color={COLORS.textSecondary}
+              color={isConnected ? COLORS.textSecondary : COLORS.softGray}
             />
           </TouchableOpacity>
           <TextInput
             style={styles.input}
-            placeholder="Thank them or ask a question..."
+            placeholder={
+              isConnected 
+                ? "Thank them or ask a question..." 
+                : "Offline - Cannot send"
+            }
             placeholderTextColor={COLORS.textSecondary}
             value={messageText}
             onChangeText={onTextChange}
@@ -51,26 +61,38 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             returnKeyType="send"
             onSubmitEditing={onSend}
             blurOnSubmit={false}
-            editable={true}
+            editable={isConnected}
             contextMenuHidden={false}
             accessibilityLabel="Message input"
             accessibilityHint="Type your message here"
           />
-          {isTyping && (
+          {isTyping && isConnected && (
             <Text style={styles.typingIndicator}>typing...</Text>
           )}
         </View>
         <TouchableOpacity
-          style={styles.sendButton}
+          style={[
+            styles.sendButton,
+            (!isConnected || isSending) && styles.sendButtonDisabled,
+          ]}
           onPress={onSend}
-          accessibilityLabel="Send message"
+          disabled={!isConnected || isSending}
+          accessibilityLabel={isSending ? "Sending message" : "Send message"}
           accessibilityRole="button"
         >
-          <MaterialCommunityIcons
-            name="send"
-            size={24}
-            color={COLORS.white}
-          />
+          {isSending ? (
+            <MaterialCommunityIcons
+              name="loading"
+              size={24}
+              color={COLORS.white}
+            />
+          ) : (
+            <MaterialCommunityIcons
+              name="send"
+              size={24}
+              color={COLORS.white}
+            />
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -125,5 +147,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: COLORS.softGray,
+    opacity: 0.5,
   },
 });

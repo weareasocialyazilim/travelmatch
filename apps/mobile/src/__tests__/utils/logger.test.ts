@@ -13,7 +13,7 @@ jest.mock('@sentry/react-native', () => ({
 }));
 
 // Mock console methods
-const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+const mockConsoleInfo = jest.spyOn(console, 'log').mockImplementation();
 const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation();
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation();
 const mockConsoleGroup = jest.spyOn(console, 'group').mockImplementation();
@@ -32,7 +32,7 @@ describe('logger.ts', () => {
 
   afterAll(() => {
     global.__DEV__ = originalDEV;
-    mockConsoleLog.mockRestore();
+    mockConsoleInfo.mockRestore();
     mockConsoleWarn.mockRestore();
     mockConsoleError.mockRestore();
     mockConsoleGroup.mockRestore();
@@ -48,8 +48,8 @@ describe('logger.ts', () => {
       const testLogger = new Logger({ enableInProduction: true });
       testLogger.info('User data', { password: 'secret123' });
       
-      expect(mockConsoleLog).toHaveBeenCalled();
-      const loggedCall = mockConsoleLog.mock.calls[0][0];
+      expect(mockConsoleInfo).toHaveBeenCalled();
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('[REDACTED]');
       expect(loggedCall).not.toContain('secret123');
     });
@@ -64,7 +64,7 @@ describe('logger.ts', () => {
       };
       testLogger.info('Sensitive data', sensitiveData);
       
-      const loggedCall = mockConsoleLog.mock.calls[0][0];
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).not.toContain('secret123');
       expect(loggedCall).not.toContain('abc123');
       expect(loggedCall).not.toContain('key123');
@@ -84,7 +84,7 @@ describe('logger.ts', () => {
       };
       testLogger.info('Nested data', nestedData);
       
-      const loggedCall = mockConsoleLog.mock.calls[0][0];
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).not.toContain('secret');
       expect(loggedCall).not.toContain('key123');
       expect(loggedCall).toContain('John'); // Non-sensitive data preserved
@@ -98,7 +98,7 @@ describe('logger.ts', () => {
       ];
       testLogger.info('Array data', arrayData);
       
-      const loggedCall = mockConsoleLog.mock.calls[0][0];
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).not.toContain('secret1');
       expect(loggedCall).not.toContain('token123');
     });
@@ -112,7 +112,7 @@ describe('logger.ts', () => {
       };
       testLogger.info('User data', data);
       
-      const loggedCall = mockConsoleLog.mock.calls[0][0];
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('john_doe');
       expect(loggedCall).toContain('30');
       expect(loggedCall).toContain('dark');
@@ -126,64 +126,64 @@ describe('logger.ts', () => {
     it('should redact JWT tokens', () => {
       const message = 'Auth token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('[JWT_REDACTED]');
-      expect(loggedMessage).not.toContain('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('[JWT_REDACTED]');
+      expect(loggedCall).not.toContain('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9');
     });
 
     it('should redact Bearer tokens', () => {
       const message = 'Authorization: Bearer abc123.def456.ghi789';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('Bearer [REDACTED]');
-      expect(loggedMessage).not.toContain('abc123.def456.ghi789');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('Bearer [REDACTED]');
+      expect(loggedCall).not.toContain('abc123.def456.ghi789');
     });
 
     it('should redact email addresses', () => {
       const message = 'User email is john.doe@example.com';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('[EMAIL_REDACTED]');
-      expect(loggedMessage).not.toContain('john.doe@example.com');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('[EMAIL_REDACTED]');
+      expect(loggedCall).not.toContain('john.doe@example.com');
     });
 
     it('should redact phone numbers', () => {
       const message = 'Contact: +1234567890123';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('[PHONE_REDACTED]');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('[PHONE_REDACTED]');
     });
 
     it('should redact credit card numbers', () => {
       const message = 'Card: 1234 5678 9012 3456';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('[CARD_REDACTED]');
-      expect(loggedMessage).not.toContain('1234 5678 9012 3456');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('[CARD_REDACTED]');
+      expect(loggedCall).not.toContain('1234 5678 9012 3456');
     });
 
     it('should redact credit cards with dashes', () => {
       const message = 'Card: 1234-5678-9012-3456';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('[CARD_REDACTED]');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('[CARD_REDACTED]');
     });
 
     it('should redact API keys', () => {
       const message = 'API Key: sk_live_abcdefghijklmnopqrstuvwxyz123456';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('[KEY_REDACTED]');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('[KEY_REDACTED]');
     });
 
     it('should handle multiple PII patterns in one string', () => {
       const message = 'User john@example.com with phone +1234567890 and token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.test';
       logger.info(message);
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('[EMAIL_REDACTED]');
-      expect(loggedMessage).toContain('[PHONE_REDACTED]');
-      expect(loggedMessage).toContain('[JWT_REDACTED]');
-      expect(loggedMessage).not.toContain('john@example.com');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('[EMAIL_REDACTED]');
+      expect(loggedCall).toContain('[PHONE_REDACTED]');
+      expect(loggedCall).toContain('[JWT_REDACTED]');
+      expect(loggedCall).not.toContain('john@example.com');
     });
   });
 
@@ -193,34 +193,34 @@ describe('logger.ts', () => {
   describe('log levels', () => {
     it('should log debug messages in dev mode', () => {
       logger.debug('Debug message');
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        expect.stringContaining('[TravelMatch] [DEBUG]'),
-        expect.stringContaining('Debug message')
-      );
+      expect(mockConsoleInfo).toHaveBeenCalled();
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
+      expect(loggedCall).toContain('[TravelMatch] [DEBUG]');
+      expect(loggedCall).toContain('Debug message');
     });
 
     it('should log info messages', () => {
       logger.info('Info message');
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        expect.stringContaining('[TravelMatch] [INFO]'),
-        expect.stringContaining('Info message')
-      );
+      expect(mockConsoleInfo).toHaveBeenCalled();
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
+      expect(loggedCall).toContain('[TravelMatch] [INFO]');
+      expect(loggedCall).toContain('Info message');
     });
 
     it('should log warn messages', () => {
       logger.warn('Warning message');
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        expect.stringContaining('[TravelMatch] [WARN]'),
-        expect.stringContaining('Warning message')
-      );
+      expect(mockConsoleWarn).toHaveBeenCalled();
+      const loggedCall = mockConsoleWarn.mock.calls[0][0];
+      expect(loggedCall).toContain('[TravelMatch] [WARN]');
+      expect(loggedCall).toContain('Warning message');
     });
 
     it('should log error messages', () => {
       logger.error('Error message');
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('[TravelMatch] [ERROR]'),
-        expect.stringContaining('Error message')
-      );
+      expect(mockConsoleError).toHaveBeenCalled();
+      const loggedCall = mockConsoleError.mock.calls[0][0];
+      expect(loggedCall).toContain('[TravelMatch] [ERROR]');
+      expect(loggedCall).toContain('Error message');
     });
 
     it('should respect minimum log level', () => {
@@ -230,10 +230,10 @@ describe('logger.ts', () => {
       customLogger.warn('Warning message');
       
       // Debug and info should not be logged
-      const debugCalls = mockConsoleLog.mock.calls.filter(call => 
+      const debugCalls = mockConsoleInfo.mock.calls.filter(call => 
         call[0]?.includes('[DEBUG]')
       );
-      const infoCalls = mockConsoleLog.mock.calls.filter(call => 
+      const infoCalls = mockConsoleInfo.mock.calls.filter(call => 
         call[0]?.includes('[INFO]')
       );
       
@@ -257,13 +257,13 @@ describe('logger.ts', () => {
     it('should allow changing log level dynamically', () => {
       const customLogger = new Logger({ minLevel: 'debug' });
       customLogger.debug('Debug 1');
-      expect(mockConsoleLog).toHaveBeenCalled();
+      expect(mockConsoleInfo).toHaveBeenCalled();
       
-      mockConsoleLog.mockClear();
+      mockConsoleInfo.mockClear();
       customLogger.setMinLevel('error');
       customLogger.debug('Debug 2');
       
-      const debugCalls = mockConsoleLog.mock.calls.filter(call => 
+      const debugCalls = mockConsoleInfo.mock.calls.filter(call => 
         call[0]?.includes('Debug 2')
       );
       expect(debugCalls.length).toBe(0);
@@ -279,7 +279,7 @@ describe('logger.ts', () => {
       const prodLogger = new Logger();
       prodLogger.debug('Production message');
       
-      const calls = mockConsoleLog.mock.calls.filter(call => 
+      const calls = mockConsoleInfo.mock.calls.filter(call => 
         call[0]?.includes('Production message')
       );
       expect(calls.length).toBe(0);
@@ -289,7 +289,9 @@ describe('logger.ts', () => {
       global.__DEV__ = false;
       const prodLogger = new Logger({ enableInProduction: true, jsonFormat: false });
       prodLogger.info('Production message');
-      expect(mockConsoleLog).toHaveBeenCalled();
+      expect(mockConsoleInfo).toHaveBeenCalled();
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
+      expect(loggedCall).toContain('Production message');
     });
 
     it('should use JSON format in production when enabled', () => {
@@ -300,9 +302,9 @@ describe('logger.ts', () => {
       });
       prodLogger.info('Test message', { key: 'value' });
       
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       // Should be JSON format
-      expect(() => JSON.parse(loggedMessage)).not.toThrow();
+      expect(() => JSON.parse(loggedCall)).not.toThrow();
     });
   });
 
@@ -323,11 +325,10 @@ describe('logger.ts', () => {
       logger.time('test-operation');
       logger.timeEnd('test-operation');
       
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        expect.stringContaining('[TravelMatch] [INFO]'),
-        expect.stringContaining('test-operation'),
-        expect.stringContaining('ms')
-      );
+      expect(mockConsoleInfo).toHaveBeenCalled();
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
+      expect(loggedCall).toContain('test-operation');
+      expect(loggedCall).toContain('ms');
     });
 
     it('should handle timeEnd without time', () => {
@@ -385,7 +386,7 @@ describe('logger.ts', () => {
       ];
       logger.data('Users', data);
       
-      expect(mockConsoleLog).toHaveBeenCalledWith(
+      expect(mockConsoleInfo).toHaveBeenCalledWith(
         expect.stringContaining('[TravelMatch] [INFO]'),
         expect.stringContaining('Users')
       );
@@ -413,8 +414,8 @@ describe('logger.ts', () => {
       const contextLogger = logger.withContext({ userId: 'user-123' });
       contextLogger.info('User action');
       
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).toContain('user-123');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).toContain('user-123');
     });
 
     it('should sanitize context data', () => {
@@ -424,8 +425,8 @@ describe('logger.ts', () => {
       });
       contextLogger.info('Action');
       
-      const loggedMessage = mockConsoleLog.mock.calls[0][1];
-      expect(loggedMessage).not.toContain('secret');
+      const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
+      expect(loggedCall).not.toContain('secret');
     });
 
     it('should support multiple log levels with context', () => {
@@ -435,7 +436,7 @@ describe('logger.ts', () => {
       contextLogger.warn('Warn');
       contextLogger.error('Error');
       
-      expect(mockConsoleLog).toHaveBeenCalled();
+      expect(mockConsoleInfo).toHaveBeenCalled();
       expect(mockConsoleWarn).toHaveBeenCalled();
       expect(mockConsoleError).toHaveBeenCalled();
     });
@@ -451,7 +452,7 @@ describe('logger.ts', () => {
       
       childLogger.info('Test message');
       
-      expect(mockConsoleLog).toHaveBeenCalledWith(
+      expect(mockConsoleInfo).toHaveBeenCalledWith(
         expect.stringContaining('[Parent]'),
         expect.stringContaining('[Child]')
       );
@@ -468,7 +469,7 @@ describe('logger.ts', () => {
       childLogger.warn('Warning message');
       
       // Debug should not be logged due to minLevel
-      const debugCalls = mockConsoleLog.mock.calls.filter(call => 
+      const debugCalls = mockConsoleInfo.mock.calls.filter(call => 
         call[0]?.includes('Debug message')
       );
       expect(debugCalls.length).toBe(0);
@@ -570,23 +571,21 @@ describe('logger.ts', () => {
   // ========================================
   describe('custom prefixes', () => {
     it('should use custom prefix', () => {
-      const customLogger = new Logger({ prefix: '[Custom]' });
+      const customLogger = new Logger({ prefix: '[Custom]', enableInProduction: true });
       customLogger.info('Test message');
       
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        expect.stringContaining('[Custom]'),
-        expect.anything()
-      );
+      expect(mockConsoleInfo).toHaveBeenCalled();
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
+      expect(loggedCall).toContain('[Custom]');
     });
 
     it('should use default prefix if not provided', () => {
-      const defaultLogger = new Logger();
+      const defaultLogger = new Logger({ enableInProduction: true });
       defaultLogger.info('Test message');
       
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        expect.stringContaining('[TravelMatch]'),
-        expect.anything()
-      );
+      expect(mockConsoleInfo).toHaveBeenCalled();
+      const loggedCall = mockConsoleInfo.mock.calls[0][0];
+      expect(loggedCall).toContain('[TravelMatch]');
     });
   });
 
@@ -615,16 +614,16 @@ describe('logger.ts', () => {
       logger.error('Error occurred', error);
       
       expect(mockConsoleError).toHaveBeenCalled();
-      const loggedMessage = mockConsoleError.mock.calls[0][1];
-      expect(loggedMessage).toContain('Test error');
+      const loggedCall = mockConsoleError.mock.calls[0][1];
+      expect(loggedCall).toContain('Test error');
     });
 
     it('should log error stack traces', () => {
       const error = new Error('Test error');
       logger.error('Error with stack', error);
       
-      const loggedMessage = mockConsoleError.mock.calls[0][1];
-      expect(loggedMessage).toBeDefined();
+      const loggedCall = mockConsoleError.mock.calls[0][1];
+      expect(loggedCall).toBeDefined();
     });
   });
 
@@ -648,7 +647,7 @@ describe('logger.ts', () => {
       // Note: The actual logger.ts may throw or return [Circular] 
       // depending on implementation. We just verify it doesn't hang.
       logger.info('Circular data', circular);
-      expect(mockConsoleLog).toHaveBeenCalled();
+      expect(mockConsoleInfo).toHaveBeenCalled();
     });
 
     it('should handle empty strings', () => {
@@ -664,7 +663,7 @@ describe('logger.ts', () => {
       global.__DEV__ = true;
       const specialChars = '🚀 Special chars: @#$%^&*()';
       logger.info(specialChars);
-      expect(mockConsoleLog).toHaveBeenCalled();
+      expect(mockConsoleInfo).toHaveBeenCalled();
     });
   });
 });

@@ -11,8 +11,12 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { LoadingState } from '@/components/LoadingState';
 import { COLORS } from '@/constants/colors';
+import { forgotPasswordSchema, type ForgotPasswordInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -24,21 +28,19 @@ type ForgotPasswordScreenProps = StackScreenProps<
 export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   navigation,
 }) => {
-  const [email, setEmail] = useState('');
+  const { control, handleSubmit, formState, watch } = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(forgotPasswordSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+    },
+  });
+
+  const email = watch('email');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
-  const handleSendResetLink = () => {
-    if (!email || !validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address');
-      return;
-    }
-
+  const onSubmit = async (data: ForgotPasswordInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -46,6 +48,11 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
       setSent(true);
     }, 1500);
   };
+
+  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+    requireDirty: false,
+    requireValid: true,
+  });
 
   const handleResend = () => {
     setLoading(true);
@@ -161,24 +168,34 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
           {/* Email Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Email address</Text>
-            <View style={styles.inputWrapper}>
-              <MaterialCommunityIcons
-                name="email-outline"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <TextInput
-                style={styles.textInput}
-                placeholder="name@example.com"
-                placeholderTextColor={COLORS.textTertiary}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                autoFocus
-              />
-            </View>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <View style={styles.inputWrapper}>
+                    <MaterialCommunityIcons
+                      name="email-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="name@example.com"
+                      placeholderTextColor={COLORS.textTertiary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      autoFocus
+                    />
+                  </View>
+                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                </>
+              )}
+            />
           </View>
         </View>
 
@@ -188,11 +205,11 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
             testID="send-reset-link-button"
             style={[
               styles.primaryButton,
-              !validateEmail(email) && styles.primaryButtonDisabled,
+              isSubmitDisabled && styles.primaryButtonDisabled,
             ]}
-            onPress={handleSendResetLink}
-            disabled={!validateEmail(email) || loading}
-            accessibilityState={{ disabled: !validateEmail(email) || loading }}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitDisabled || loading}
+            accessibilityState={{ disabled: isSubmitDisabled || loading }}
             accessibilityRole="button"
             activeOpacity={0.8}
           >
@@ -332,6 +349,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: COLORS.text,
+  },
+  errorText: {
+    fontSize: 12,
+    color: COLORS.coral,
+    marginTop: 4,
   },
   bottomBar: {
     padding: 24,

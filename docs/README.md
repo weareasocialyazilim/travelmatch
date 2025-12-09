@@ -24,7 +24,19 @@
 
 ### 🔒 Security
 
-- **[RLS Testing](RLS_TESTING.md)** ⭐ - Row Level Security testing (consolidated)
+**Database Security (Week 1 Complete ✅):**
+- **[DB Security Overview](DB_SECURITY_OVERVIEW.md)** ⭐ - Complete database security status & patterns
+- **[Quick Reference](DB_SECURITY_QUICK_REF.md)** 🎯 - Fast lookup guide
+- **[Week 1 Complete](DB_SECURITY_WEEK1_COMPLETE.md)** 🎉 - Final Week 1 summary
+- **[DB Security Plan](DB_SECURITY_PERFORMANCE_PLAN.md)** - 4-week security improvement plan
+- **[Week 1 Summary](DB_SECURITY_WEEK1_SUMMARY.md)** - Week 1 completion report
+- **[Week 1 Verification](DB_SECURITY_WEEK1_VERIFICATION.md)** - Verification checklist
+- **[View Analysis](DB_VIEW_ANALYSIS.md)** - Security definer view fixes
+- **[RLS Disabled Tables](DB_RLS_DISABLED_TABLES.md)** - RLS implementation analysis
+- **[Errors Resolved](DB_SECURITY_ERRORS_RESOLVED.md)** - Success summary
+
+**Application Security:**
+- **[RLS Testing](RLS_TESTING.md)** - Row Level Security testing
 - **[IDOR Protection](IDOR_PROTECTION.md)** - Authorization security
 - **[OAuth Setup](OAUTH_SETUP_GUIDE.md)** - Social authentication
 - **[Environment Security](ENVIRONMENT_SECURITY.md)** - Secrets management

@@ -1,0 +1,310 @@
+name: UI & E2E Component Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/mobile/src/**'
+      - 'packages/**'
+      - 'apps/mobile/src/__tests__/**'
+      - 'tests/e2e/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Cancel in-progress runs for same workflow + branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-component-tests:
+    name: Unit & Component Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Run unit tests
+        run: pnpm test:unit -- --coverage --maxWorkers=2
+        env:
+          CI: true
+          NODE_ENV: test
+          
+      - name: Run component tests
+        run: pnpm test:components -- --coverage --maxWorkers=2
+        env:
+          CI: true
+          NODE_ENV: test
+          
+      - name: Upload coverage reports
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unit-component
+          name: unit-component-coverage
+          
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Run integration tests
+        run: pnpm test:integration -- --coverage --maxWorkers=2
+        env:
+          CI: true
+          NODE_ENV: test
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          
+      - name: Upload coverage reports
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: integration
+          name: integration-coverage
+          
+  e2e-flow-tests:
+    name: E2E Flow Tests (React Native)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Run E2E flow tests
+        run: pnpm test:e2e:flows -- --coverage --maxWorkers=1
+        env:
+          CI: true
+          NODE_ENV: test
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-flow-test-results
+          path: |
+            test-results/
+            coverage/
+            
+      - name: Upload coverage reports
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: e2e-flows
+          name: e2e-flows-coverage
+          
+  screen-tests:
+    name: Screen Component Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Run screen tests
+        run: pnpm test:screens -- --coverage --maxWorkers=2
+        env:
+          CI: true
+          NODE_ENV: test
+          
+      - name: Upload coverage reports
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: screens
+          name: screen-coverage
+          
+  test-quality-gate:
+    name: Test Quality Gate
+    needs: [unit-component-tests, integration-tests, e2e-flow-tests, screen-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.unit-component-tests.result }}" != "success" ] || \
+             [ "${{ needs.integration-tests.result }}" != "success" ] || \
+             [ "${{ needs.e2e-flow-tests.result }}" != "success" ] || \
+             [ "${{ needs.screen-tests.result }}" != "success" ]; then
+            echo "❌ One or more test suites failed"
+            echo "Unit/Component: ${{ needs.unit-component-tests.result }}"
+            echo "Integration: ${{ needs.integration-tests.result }}"
+            echo "E2E Flows: ${{ needs.e2e-flow-tests.result }}"
+            echo "Screens: ${{ needs.screen-tests.result }}"
+            exit 1
+          else
+            echo "✅ All test suites passed"
+          fi
+          
+  notify-results:
+    name: Notify Test Results
+    needs: [test-quality-gate]
+    runs-on: ubuntu-latest
+    if: failure() && github.event_name == 'pull_request'
+    
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Test Quality Gate')
+            );
+            
+            const body = `## ❌ Test Quality Gate Failed
+            
+            One or more test suites failed. Please review the workflow logs:
+            
+            **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            ### Test Suite Status:
+            - Unit/Component Tests: ${{ needs.unit-component-tests.result }}
+            - Integration Tests: ${{ needs.integration-tests.result }}
+            - E2E Flow Tests: ${{ needs.e2e-flow-tests.result }}
+            - Screen Tests: ${{ needs.screen-tests.result }}
+            
+            🚫 **This PR cannot be merged until all tests pass.**
+            `;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+            
+      - name: Send Slack notification
+        if: github.event_name == 'push'
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "⚠️ Tests Failed on ${{ github.ref }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ Test suite failed on *${{ github.ref }}*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n${{ github.sha }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Workflow"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

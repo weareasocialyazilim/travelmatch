@@ -10,6 +10,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseDb } from '@/services/supabaseDbService';
 import { useAuth } from '@/context/AuthContext';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Undo2, Trash2 } from 'lucide-react-native';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
@@ -97,15 +98,13 @@ export function DeletedMomentsScreen() {
           </View>
         )}
         ListEmptyComponent={
-          <View className="p-12 items-center justify-center">
-            <Trash2 size={64} color="#9ca3af" />
-            <Text className="text-xl font-semibold text-muted-foreground mt-6">
-              No deleted moments
-            </Text>
-            <Text className="text-sm text-muted-foreground mt-2 text-center">
-              Deleted moments will appear here and can be restored within 90 days
-            </Text>
-          </View>
+          <EmptyState
+            icon="delete-empty-outline"
+            title="No deleted moments"
+            description="Deleted moments will appear here and can be restored within 90 days"
+            actionLabel="My Moments"
+            onAction={() => navigation.navigate('MyMoments' as never)}
+          />
         }
         contentContainerStyle={{
           flexGrow: 1,

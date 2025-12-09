@@ -18,11 +18,17 @@ import { FilterSortBar, SortFilterModal } from '../components/FilterSortBar';
 import { TopPicksSection } from '../components/TopPicksSection';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
+import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { useNetworkStatus } from '../../../context/NetworkContext';
+import { OfflineState } from '../../../components/OfflineState';
+import { NetworkGuard } from '../../../components/NetworkGuard';
+import { SkeletonList } from '../../../components/ui/SkeletonList';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const GiftInboxScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
 
   const {
     refreshing,
@@ -33,6 +39,7 @@ const GiftInboxScreen: React.FC = () => {
     topPicks,
     newToday,
     sortedItems,
+    loading,
     setSortBy,
     setFilterBy,
     setShowSortModal,
@@ -89,6 +96,15 @@ const GiftInboxScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Offline Banner */}
+      {!isConnected && (
+        <OfflineState 
+          compact 
+          onRetry={refreshNetwork}
+          message="İnternet bağlantısı yok"
+        />
+      )}
+      
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>🎁 Gift Inbox</Text>
@@ -101,7 +117,18 @@ const GiftInboxScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
+      <NetworkGuard
+        offlineMessage={
+          sortedItems.length > 0
+            ? "Son yüklenen hediye mesajlarını gösteriyorsunuz"
+            : "Hediye kutusunu görmek için internet bağlantısı gerekli"
+        }
+        onRetry={onRefresh}
+      >
+        {loading && sortedItems.length === 0 ? (
+          <SkeletonList type="gift" count={5} show={loading} minDisplayTime={500} />
+        ) : (
+        <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -175,6 +202,8 @@ const GiftInboxScreen: React.FC = () => {
           </View>
         </View>
       </ScrollView>
+        )}
+      </NetworkGuard>
 
       {/* Sort Modal */}
       <SortFilterModal
@@ -261,4 +290,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GiftInboxScreen;
+// Wrap with ErrorBoundary for gift inbox screen
+export default withErrorBoundary(GiftInboxScreen, { 
+  fallbackType: 'generic',
+  displayName: 'GiftInboxScreen' 
+});

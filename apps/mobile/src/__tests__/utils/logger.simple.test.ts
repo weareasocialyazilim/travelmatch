@@ -11,6 +11,8 @@ const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
 const mockConsoleInfo = jest.spyOn(console, 'info').mockImplementation();
 const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation();
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation();
+const mockConsoleTime = jest.spyOn(console, 'time').mockImplementation();
+const mockConsoleTimeEnd = jest.spyOn(console, 'timeEnd').mockImplementation();
 
 // Save original __DEV__
 const originalDEV = global.__DEV__;
@@ -18,8 +20,14 @@ const originalDEV = global.__DEV__;
 describe('logger.ts - simplified', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Ensure __DEV__ is false so we can control logging via enableInProduction
-    global.__DEV__ = false;
+    jest.clearAllTimers();
+    // Ensure __DEV__ is true for tests
+    global.__DEV__ = true;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.clearAllTimers();
   });
 
   afterAll(() => {
@@ -28,6 +36,8 @@ describe('logger.ts - simplified', () => {
     mockConsoleInfo.mockRestore();
     mockConsoleWarn.mockRestore();
     mockConsoleError.mockRestore();
+    mockConsoleTime.mockRestore();
+    mockConsoleTimeEnd.mockRestore();
   });
 
   describe('basic logging', () => {
@@ -39,7 +49,8 @@ describe('logger.ts - simplified', () => {
     it('should log with production flag', () => {
       const logger = new Logger({ enableInProduction: true, jsonFormat: false });
       logger.info('test');
-      expect(mockConsoleLog).toHaveBeenCalled();
+      // Logger uses console.info for info level
+      expect(mockConsoleInfo).toHaveBeenCalled();
     });
 
     it('should log warnings', () => {
@@ -60,16 +71,17 @@ describe('logger.ts - simplified', () => {
       const logger = new Logger({ enableInProduction: true, jsonFormat: false });
       logger.info('data', { password: 'secret123' });
       
-      const logOutput = mockConsoleLog.mock.calls[0][0];
-      expect(logOutput).not.toContain('secret123');
-      expect(logOutput).toContain('[REDACTED]');
+      // Args are passed as second parameter to console.info
+      const logArgs = mockConsoleInfo.mock.calls[0][1];
+      expect(JSON.stringify(logArgs)).not.toContain('secret123');
+      expect(JSON.stringify(logArgs)).toContain('[REDACTED]');
     });
 
     it('should redact tokens', () => {
       const logger = new Logger({ enableInProduction: true, jsonFormat: false });
       logger.info('data', { token: 'abc123', apiKey: 'xyz789' });
       
-      const logOutput = mockConsoleLog.mock.calls[0][0];
+      const logOutput = mockConsoleInfo.mock.calls[0][0];
       expect(logOutput).not.toContain('abc123');
       expect(logOutput).not.toContain('xyz789');
     });
@@ -84,9 +96,10 @@ describe('logger.ts - simplified', () => {
       };
       logger.info('nested', data);
       
-      const logOutput = mockConsoleLog.mock.calls[0][0];
-      expect(logOutput).toContain('John');
-      expect(logOutput).not.toContain('secret');
+      // Args are passed as second parameter to console.info
+      const logArgs = mockConsoleInfo.mock.calls[0][1];
+      expect(JSON.stringify(logArgs)).toContain('John');
+      expect(JSON.stringify(logArgs)).not.toContain('secret');
     });
 
     it('should redact JWT tokens in strings', () => {
@@ -94,7 +107,7 @@ describe('logger.ts - simplified', () => {
       const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.test';
       logger.info(`Token: ${jwt}`);
       
-      const logOutput = mockConsoleLog.mock.calls[0][0];
+      const logOutput = mockConsoleInfo.mock.calls[0][0];
       expect(logOutput).toContain('[JWT_REDACTED]');
       expect(logOutput).not.toContain('eyJhbGci');
     });
@@ -103,7 +116,7 @@ describe('logger.ts - simplified', () => {
       const logger = new Logger({ enableInProduction: true, jsonFormat: false });
       logger.info('Email: john@example.com');
       
-      const logOutput = mockConsoleLog.mock.calls[0][0];
+      const logOutput = mockConsoleInfo.mock.calls[0][0];
       expect(logOutput).toContain('[EMAIL_REDACTED]');
       expect(logOutput).not.toContain('john@example.com');
     });
@@ -160,7 +173,7 @@ describe('logger.ts - simplified', () => {
       const child = parent.child('[Child]');
       
       child.info('test');
-      const logOutput = mockConsoleLog.mock.calls[0][0];
+      const logOutput = mockConsoleInfo.mock.calls[0][0];
       expect(logOutput).toContain('[Parent]');
       expect(logOutput).toContain('[Child]');
     });
@@ -190,8 +203,9 @@ describe('logger.ts - simplified', () => {
       const contextLogger = logger.withContext({ userId: '123' });
       
       contextLogger.info('action');
-      const logOutput = mockConsoleLog.mock.calls[0][0];
-      expect(logOutput).toContain('123');
+      // Context is in args
+      const logArgs = mockConsoleInfo.mock.calls[0][1];
+      expect(JSON.stringify(logArgs)).toContain('123');
     });
 
     it('should sanitize context data', () => {
@@ -199,7 +213,7 @@ describe('logger.ts - simplified', () => {
       const contextLogger = logger.withContext({ password: 'secret' });
       
       contextLogger.info('action');
-      const logOutput = mockConsoleLog.mock.calls[0][0];
+      const logOutput = mockConsoleInfo.mock.calls[0][0];
       expect(logOutput).not.toContain('secret');
     });
   });
@@ -238,7 +252,7 @@ describe('logger.ts - simplified', () => {
       });
       
       logger.info('test');
-      const logOutput = mockConsoleLog.mock.calls[0][0];
+      const logOutput = mockConsoleInfo.mock.calls[0][0];
       expect(logOutput).toContain('[CustomApp]');
     });
 

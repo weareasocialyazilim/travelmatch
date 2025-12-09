@@ -1,5 +1,8 @@
 require('react-native-gesture-handler/jestSetup');
 
+// Set global __DEV__ for React Native
+global.__DEV__ = true;
+
 // Suppress React act() warnings from provider initialization (Phase 1 fix)
 const originalError = console.error;
 console.error = (...args) => {
@@ -41,6 +44,19 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 jest.mock('expo-file-system', () => ({
   getInfoAsync: jest.fn(),
   readAsStringAsync: jest.fn(),
+}));
+
+// Mock NetInfo for network tests
+jest.mock('@react-native-community/netinfo', () => ({
+  __esModule: true,
+  default: {
+    fetch: jest.fn(() => Promise.resolve({
+      type: 'wifi',
+      isConnected: true,
+      isInternetReachable: true,
+    })),
+    addEventListener: jest.fn(() => jest.fn()),
+  },
 }));
 
 // Mock Supabase client globally
@@ -110,6 +126,17 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
+// Mock expo-modules-core for EventEmitter
+jest.mock('expo-modules-core', () => ({
+  EventEmitter: class EventEmitter {
+    addListener() { return { remove: jest.fn() }; }
+    removeAllListeners() {}
+    removeSubscription() {}
+  },
+  NativeModulesProxy: {},
+  requireNativeViewManager: jest.fn(),
+}));
+
 // Mock Expo Vector Icons
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
@@ -128,3 +155,118 @@ jest.mock('@expo/vector-icons', () => {
     Entypo: MockIcon,
   };
 });
+
+// Mock expo-font
+jest.mock('expo-font', () => ({
+  isLoaded: jest.fn(() => true),
+  loadAsync: jest.fn(() => Promise.resolve()),
+}));
+
+// Mock Sentry for all tests
+jest.mock('@sentry/react-native', () => ({
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  setContext: jest.fn(),
+  setExtra: jest.fn(),
+  setTag: jest.fn(),
+  setUser: jest.fn(),
+  addBreadcrumb: jest.fn(),
+  init: jest.fn(),
+}));
+
+// Mock Reanimated
+jest.mock('react-native-reanimated', () => {
+  const View = require('react-native').View;
+  return {
+    default: {
+      View,
+      call: () => {},
+    },
+    View,
+    useSharedValue: jest.fn((val) => ({ value: val })),
+    useAnimatedStyle: jest.fn((cb) => cb()),
+    withSpring: jest.fn((val) => val),
+    withTiming: jest.fn((val) => val),
+    withDelay: jest.fn((_, val) => val),
+    withSequence: jest.fn((...args) => args[args.length - 1]),
+    withRepeat: jest.fn((val) => val),
+    Easing: {
+      linear: jest.fn(),
+      ease: jest.fn(),
+      quad: jest.fn(),
+      bezier: jest.fn(),
+    },
+    interpolate: jest.fn((val) => val),
+    Extrapolation: {
+      CLAMP: 'clamp',
+      EXTEND: 'extend',
+      IDENTITY: 'identity',
+    },
+    runOnJS: jest.fn((fn) => fn),
+    useDerivedValue: jest.fn((cb) => ({ value: cb() })),
+    useAnimatedGestureHandler: jest.fn(() => ({})),
+    useAnimatedScrollHandler: jest.fn(() => ({})),
+    createAnimatedComponent: (Component) => Component,
+  };
+});
+
+// Mock console.time and console.timeEnd for logger tests
+global.console.time = jest.fn();
+global.console.timeEnd = jest.fn();
+
+// Mock React Native Platform
+jest.mock('react-native/Libraries/Utilities/Platform', () => ({
+  OS: 'ios',
+  select: jest.fn((obj) => obj.ios || obj.default),
+  Version: '14.0',
+}));
+
+// Mock React Native Dimensions
+jest.mock('react-native/Libraries/Utilities/Dimensions', () => ({
+  get: jest.fn(() => ({ width: 390, height: 844, scale: 3, fontScale: 1 })),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+}));
+
+// Mock React Native Appearance
+jest.mock('react-native/Libraries/Utilities/Appearance', () => ({
+  getColorScheme: jest.fn(() => 'light'),
+  addChangeListener: jest.fn(),
+  removeChangeListener: jest.fn(),
+}));
+
+// Mock React Native Alert
+global.alert = jest.fn();
+
+// Mock React Native Keyboard
+jest.mock('react-native/Libraries/Components/Keyboard/Keyboard', () => ({
+  addListener: jest.fn(() => ({ remove: jest.fn() })),
+  removeListener: jest.fn(),
+  dismiss: jest.fn(),
+}));
+
+// Mock InteractionManager
+jest.mock('react-native/Libraries/Interaction/InteractionManager', () => ({
+  runAfterInteractions: jest.fn((callback) => {
+    callback();
+    return { cancel: jest.fn() };
+  }),
+  createInteractionHandle: jest.fn(),
+  clearInteractionHandle: jest.fn(),
+}));
+
+// Mock Linking
+jest.mock('react-native/Libraries/Linking/Linking', () => ({
+  openURL: jest.fn(() => Promise.resolve()),
+  sendIntent: jest.fn(() => Promise.resolve()),
+  canOpenURL: jest.fn(() => Promise.resolve(true)),
+  getInitialURL: jest.fn(() => Promise.resolve(null)),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+}));
+
+// Mock Clipboard
+jest.mock('react-native/Libraries/Components/Clipboard/Clipboard', () => ({
+  setString: jest.fn(),
+  getString: jest.fn(() => Promise.resolve('')),
+}));

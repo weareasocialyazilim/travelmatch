@@ -10,9 +10,13 @@ import {
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { refundRequestSchema, type RefundRequestInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -45,27 +49,22 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
   route,
 }) => {
   const { transactionId } = route.params;
-  const [selectedReason, setSelectedReason] = useState<string | null>(null);
-  const [details, setDetails] = useState('');
+  
+  const { control, handleSubmit, formState, watch, setValue } = useForm<RefundRequestInput>({
+    resolver: zodResolver(refundRequestSchema),
+    mode: 'onChange',
+    defaultValues: {
+      reason: '',
+      description: '',
+      amount: 0,
+    },
+  });
+
+  const reason = watch('reason');
+  const description = watch('description');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    if (!selectedReason) {
-      Alert.alert(
-        'Select Reason',
-        'Please select a reason for your refund request',
-      );
-      return;
-    }
-
-    if (!details.trim()) {
-      Alert.alert(
-        'Add Details',
-        'Please provide details about your refund request',
-      );
-      return;
-    }
-
+  const onSubmit = async (data: RefundRequestInput) => {
     setIsSubmitting(true);
 
     // Mock API call - gerçek uygulamada backend'e gönderilecek
@@ -83,6 +82,11 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
       );
     }, 1500);
   };
+
+  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+    requireDirty: false,
+    requireValid: true,
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -132,40 +136,49 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
         {/* Reason Selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Reason for Refund</Text>
-          <View style={styles.reasonsList}>
-            {REFUND_REASONS.map((reason) => (
-              <TouchableOpacity
-                key={reason.id}
-                style={[
-                  styles.reasonCard,
-                  selectedReason === reason.id && styles.reasonCardSelected,
-                ]}
-                onPress={() => setSelectedReason(reason.id)}
-                activeOpacity={0.7}
-              >
-                <Icon
-                  name={reason.icon}
-                  size={24}
-                  color={
-                    selectedReason === reason.id
-                      ? COLORS.mint
-                      : COLORS.textSecondary
-                  }
-                />
-                <Text
-                  style={[
-                    styles.reasonLabel,
-                    selectedReason === reason.id && styles.reasonLabelSelected,
-                  ]}
-                >
-                  {reason.label}
-                </Text>
-                {selectedReason === reason.id && (
-                  <Icon name="check-circle" size={20} color={COLORS.mint} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Controller
+            control={control}
+            name="reason"
+            render={({ field: { value }, fieldState: { error } }) => (
+              <>
+                <View style={styles.reasonsList}>
+                  {REFUND_REASONS.map((reasonOption) => (
+                    <TouchableOpacity
+                      key={reasonOption.id}
+                      style={[
+                        styles.reasonCard,
+                        value === reasonOption.id && styles.reasonCardSelected,
+                      ]}
+                      onPress={() => setValue('reason', reasonOption.id)}
+                      activeOpacity={0.7}
+                    >
+                      <Icon
+                        name={reasonOption.icon}
+                        size={24}
+                        color={
+                          value === reasonOption.id
+                            ? COLORS.mint
+                            : COLORS.textSecondary
+                        }
+                      />
+                      <Text
+                        style={[
+                          styles.reasonLabel,
+                          value === reasonOption.id && styles.reasonLabelSelected,
+                        ]}
+                      >
+                        {reasonOption.label}
+                      </Text>
+                      {value === reasonOption.id && (
+                        <Icon name="check-circle" size={20} color={COLORS.mint} />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                {error && <Text style={styles.errorText}>{error.message}</Text>}
+              </>
+            )}
+          />
         </View>
 
         {/* Details Input */}
@@ -174,20 +187,30 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
           <Text style={styles.sectionSubtitle}>
             Please explain your situation in detail (minimum 20 characters)
           </Text>
-          <View style={styles.textAreaContainer}>
-            <TextInput
-              style={styles.textArea}
-              placeholder="Describe your issue here..."
-              placeholderTextColor={COLORS.textSecondary}
-              value={details}
-              onChangeText={setDetails}
-              multiline
-              numberOfLines={6}
-              textAlignVertical="top"
-              maxLength={500}
-            />
-            <Text style={styles.charCount}>{details.length}/500</Text>
-          </View>
+          <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <>
+                <View style={styles.textAreaContainer}>
+                  <TextInput
+                    style={styles.textArea}
+                    placeholder="Describe your issue here..."
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    multiline
+                    numberOfLines={6}
+                    textAlignVertical="top"
+                    maxLength={500}
+                  />
+                  <Text style={styles.charCount}>{value.length}/500</Text>
+                </View>
+                {error && <Text style={styles.errorText}>{error.message}</Text>}
+              </>
+            )}
+          />
         </View>
 
         {/* Policy Link */}
@@ -215,10 +238,10 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.submitButton,
-            isSubmitting && styles.submitButtonDisabled,
+            (isSubmitting || isSubmitDisabled) && styles.submitButtonDisabled,
           ]}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
+          onPress={handleSubmit(onSubmit)}
+          disabled={isSubmitting || isSubmitDisabled}
           activeOpacity={0.8}
         >
           {isSubmitting ? (
@@ -429,6 +452,11 @@ const styles = StyleSheet.create({
     flex: 1,
     ...TYPOGRAPHY.caption,
     lineHeight: 19,
+  },
+  errorText: {
+    fontSize: 12,
+    color: COLORS.coral,
+    marginTop: 8,
   },
 });
 

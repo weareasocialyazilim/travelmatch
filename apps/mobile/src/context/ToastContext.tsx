@@ -17,7 +17,6 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
 import { spacing } from '../constants/spacing';
-import { TYPOGRAPHY } from '../constants/typography';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 

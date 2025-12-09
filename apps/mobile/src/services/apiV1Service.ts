@@ -3,10 +3,17 @@
  * 
  * Wrapper for calling the new API v1 endpoints
  * Gradually migrate from direct edge function calls to v1 API
+ * 
+ * FEATURES:
+ * - Offline handling: Checks network before making requests
+ * - Auto token refresh: Refreshes expired tokens on 401
+ * - Session management: Clears session on refresh failure
  */
 
+import NetInfo from '@react-native-community/netinfo';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
+import { sessionManager } from './sessionManager';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const API_BASE_URL = `${SUPABASE_URL}/functions/v1/api/v1`;
@@ -22,15 +29,51 @@ export interface ApiResponse<T> {
 }
 
 /**
- * API v1 Client
+ * Network-aware API Client with automatic token refresh
+ * - Checks connection before making requests
+ * - Intercepts 401 responses and refreshes token
+ * - Retries failed request with new token
+ * - Clears session if refresh fails
  */
 class ApiClient {
-  private async getHeaders(): Promise<HeadersInit> {
-    const { data: { session } } = await supabase.auth.getSession();
+  private sessionExpiredCallback: (() => void) | null = null;
+  
+  /**
+   * Set callback for session expired events
+   * Used to trigger navigation to session expired screen
+   */
+  setSessionExpiredCallback(callback: () => void) {
+    this.sessionExpiredCallback = callback;
+  }
+  
+  /**
+   * Check if device is online
+   * Returns false if offline, preventing unnecessary requests
+   */
+  private async checkNetwork(): Promise<boolean> {
+    try {
+      const netState = await NetInfo.fetch();
+      const isConnected = netState.isConnected && netState.isInternetReachable !== false;
+      
+      if (!isConnected) {
+        logger.warn('[API v1] Offline - request blocked');
+      }
+      
+      return isConnected;
+    } catch (error) {
+      // If NetInfo fails, assume connected (fail-open)
+      logger.error('[API v1] NetInfo check failed, assuming online:', error);
+      return true;
+    }
+  }
+
+  private async getHeaders(useToken?: string): Promise<HeadersInit> {
+    // Use provided token or get from session manager
+    const token = useToken || await sessionManager.getValidToken();
     
     return {
       'Content-Type': 'application/json',
-      'Authorization': session?.access_token ? `Bearer ${session.access_token}` : '',
+      'Authorization': token ? `Bearer ${token}` : '',
       'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
     };
   }
@@ -39,12 +82,25 @@ class ApiClient {
     method: string,
     path: string,
     body?: any,
+    isRetry = false,
   ): Promise<ApiResponse<T>> {
     try {
+      // OFFLINE CHECK - Return early if no connection
+      const isOnline = await this.checkNetwork();
+      if (!isOnline) {
+        return {
+          success: false,
+          error: {
+            code: 'NETWORK_ERROR',
+            message: 'İnternet bağlantısı yok. Lütfen bağlantınızı kontrol edin.',
+          },
+        };
+      }
+
       const headers = await this.getHeaders();
       const url = `${API_BASE_URL}${path}`;
 
-      logger.info(`[API v1] ${method} ${path}`);
+      logger.info(`[API v1] ${method} ${path}${isRetry ? ' (retry)' : ''}`);
 
       const response = await fetch(url, {
         method,
@@ -53,6 +109,38 @@ class ApiClient {
       });
 
       const data = await response.json();
+
+      // ============================================
+      // 401 UNAUTHORIZED - Token expired/invalid
+      // ============================================
+      if (response.status === 401 && !isRetry) {
+        logger.warn('[API v1] 401 Unauthorized - attempting token refresh');
+        
+        // Try to refresh token
+        const newToken = await sessionManager.getValidToken();
+        
+        if (newToken) {
+          // Retry request with new token
+          logger.info('[API v1] Token refreshed, retrying request');
+          return this.request<T>(method, path, body, true);
+        } else {
+          // Refresh failed - session expired
+          logger.error('[API v1] Token refresh failed - session expired');
+          
+          // Trigger session expired callback
+          if (this.sessionExpiredCallback) {
+            this.sessionExpiredCallback();
+          }
+          
+          return {
+            success: false,
+            error: {
+              code: 'SESSION_EXPIRED',
+              message: 'Oturumunuz sona erdi. Lütfen tekrar giriş yapın.',
+            },
+          };
+        }
+      }
 
       if (!response.ok) {
         logger.error(`[API v1] Error ${response.status}:`, data);
@@ -69,11 +157,18 @@ class ApiClient {
       return data as ApiResponse<T>;
     } catch (error) {
       logger.error('[API v1] Request failed:', error);
+      
+      // Better error messaging for network errors
+      const isNetworkError = error instanceof TypeError && 
+        (error.message.includes('Network') || error.message.includes('fetch'));
+      
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: error instanceof Error ? error.message : 'Network error',
+          code: isNetworkError ? 'NETWORK_ERROR' : 'REQUEST_ERROR',
+          message: isNetworkError 
+            ? 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.'
+            : (error instanceof Error ? error.message : 'Request failed'),
         },
       };
     }

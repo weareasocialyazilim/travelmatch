@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
@@ -13,63 +12,38 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
+import { changePasswordSchema, type ChangePasswordInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
 const ChangePasswordScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { control, handleSubmit, formState, watch } = useForm<ChangePasswordInput>({
+    resolver: zodResolver(changePasswordSchema),
+    mode: 'onChange',
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
 
-  const validatePassword = (password: string): boolean => {
-    // At least 8 characters, one uppercase, one lowercase, one number
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-    return regex.test(password);
-  };
+  const newPassword = watch('newPassword');
+  const confirmPassword = watch('confirmPassword');
 
-  const handleChangePassword = async () => {
-    // Validation
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'New passwords do not match');
-      return;
-    }
-
-    if (!validatePassword(newPassword)) {
-      Alert.alert(
-        'Weak Password',
-        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.',
-      );
-      return;
-    }
-
-    if (currentPassword === newPassword) {
-      Alert.alert(
-        'Error',
-        'New password must be different from current password',
-      );
-      return;
-    }
-
-    setIsLoading(true);
-
+  const onSubmit = async (data: ChangePasswordInput) => {
     try {
       // Real API call for password change
       const { apiClient } = await import('../utils/api');
       await apiClient.post('/auth/change-password', {
-        currentPassword,
-        newPassword,
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
       });
 
       Alert.alert('Success', 'Your password has been changed successfully.', [
@@ -84,42 +58,18 @@ const ChangePasswordScreen: React.FC = () => {
           ? error.message
           : 'Failed to change password. Please try again.';
       Alert.alert('Error', message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const renderPasswordInput = (
-    label: string,
-    value: string,
-    onChange: (text: string) => void,
-    showPassword: boolean,
-    toggleShow: () => void,
-    placeholder: string,
-  ) => (
-    <View style={styles.inputContainer}>
-      <Text style={styles.inputLabel}>{label}</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          value={value}
-          onChangeText={onChange}
-          placeholder={placeholder}
-          placeholderTextColor={COLORS.textSecondary}
-          secureTextEntry={!showPassword}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        <TouchableOpacity style={styles.eyeButton} onPress={toggleShow}>
-          <MaterialCommunityIcons
-            name={showPassword ? 'eye-off' : 'eye'}
-            size={20}
-            color={COLORS.textSecondary}
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+    requireDirty: false,
+    requireValid: true,
+  });
+
+  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+    requireDirty: false,
+    requireValid: true,
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -162,33 +112,59 @@ const ChangePasswordScreen: React.FC = () => {
             </Text>
           </View>
 
-          {/* Password Fields */}
-          {renderPasswordInput(
-            'Current Password',
-            currentPassword,
-            setCurrentPassword,
-            showCurrentPassword,
-            () => setShowCurrentPassword(!showCurrentPassword),
-            'Enter current password',
-          )}
+          {/* Current Password */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Current Password</Text>
+            <Controller
+              control={control}
+              name="currentPassword"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <PasswordInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Enter current password"
+                  error={error?.message}
+                />
+              )}
+            />
+          </View>
 
-          {renderPasswordInput(
-            'New Password',
-            newPassword,
-            setNewPassword,
-            showNewPassword,
-            () => setShowNewPassword(!showNewPassword),
-            'Enter new password',
-          )}
+          {/* New Password */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>New Password</Text>
+            <Controller
+              control={control}
+              name="newPassword"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <PasswordInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Enter new password"
+                  error={error?.message}
+                />
+              )}
+            />
+          </View>
 
-          {renderPasswordInput(
-            'Confirm New Password',
-            confirmPassword,
-            setConfirmPassword,
-            showConfirmPassword,
-            () => setShowConfirmPassword(!showConfirmPassword),
-            'Confirm new password',
-          )}
+          {/* Confirm New Password */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Confirm New Password</Text>
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <PasswordInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Confirm new password"
+                  error={error?.message}
+                />
+              )}
+            />
+          </View>
 
           {/* Password Match Indicator */}
           {confirmPassword.length > 0 && (
@@ -307,13 +283,13 @@ const ChangePasswordScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.changeButton,
-              isLoading && styles.changeButtonDisabled,
+              isSubmitDisabled && styles.changeButtonDisabled,
             ]}
-            onPress={handleChangePassword}
-            disabled={isLoading}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitDisabled}
           >
             <Text style={styles.changeButtonText}>
-              {isLoading ? 'Changing Password...' : 'Change Password'}
+              {formState.isSubmitting ? 'Changing Password...' : 'Change Password'}
             </Text>
           </TouchableOpacity>
 

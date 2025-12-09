@@ -189,24 +189,41 @@ export class VideoService {
       throw new Error('Video not found');
     }
 
-    // Use OpenAI Whisper for transcription
+    // 🔒 SECURITY: Transcription must be done server-side
+    // OpenAI API keys should NEVER be exposed in client code
+    // Call Supabase Edge Function instead
     const audioUrl = `https://customer-${this.streamAccountId}.cloudflarestream.com/${videoId}/downloads/default.mp4`;
 
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        file: audioUrl,
-        model: 'whisper-1',
-        response_format: 'vtt', // WebVTT format
-        language,
-      }),
-    });
+    // Get auth token from SecureStore for authenticated request
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (!session) {
+      throw new Error('Authentication required for transcription');
+    }
 
-    const vttContent = await response.text();
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/transcribe-video`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          videoId,
+          audioUrl,
+          language,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Transcription failed');
+    }
+
+    const result = await response.json();
+    const vttContent = result.data.text;
 
     // Save captions
     const captionsFile = new File([vttContent], `${videoId}-${language}.vtt`, {

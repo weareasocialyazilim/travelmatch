@@ -8,9 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { resetPasswordSchema, type ResetPasswordInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -22,10 +26,20 @@ type SetPasswordScreenProps = StackScreenProps<
 export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
   navigation,
 }) => {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { control, handleSubmit, formState, watch } = useForm<ResetPasswordInput>({
+    resolver: zodResolver(resetPasswordSchema),
+    mode: 'onChange',
+    defaultValues: {
+      password: '',
+      confirmPassword: '',
+    },
+  });
+
+  const newPassword = watch('password');
+  const confirmPassword = watch('confirmPassword');
 
   // Password validation
   const hasMinLength = newPassword.length >= 8;
@@ -52,11 +66,9 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
     strengthColor = COLORS.success;
   }
 
-  const handleSetPassword = () => {
-    if (allValid) {
-      // Navigate to success or home
-      navigation.navigate('CompleteProfile');
-    }
+  const handleSetPassword = (data: ResetPasswordInput) => {
+    // Navigate to success or home
+    navigation.navigate('CompleteProfile');
   };
 
   return (
@@ -87,56 +99,76 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
           </Text>
 
           {/* New Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>New password</Text>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Enter your new password"
-                placeholderTextColor={COLORS.textSecondary}
-                value={newPassword}
-                onChangeText={setNewPassword}
-                secureTextEntry={!showNewPassword}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowNewPassword(!showNewPassword)}
-              >
-                <Icon
-                  name={showNewPassword ? 'eye-off' : 'eye'}
-                  size={20}
-                  color={COLORS.textSecondary}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>New password</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={[styles.textInput, error && styles.textInputError]}
+                    placeholder="Enter your new password"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    secureTextEntry={!showNewPassword}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    <Icon
+                      name={showNewPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {error && (
+                  <Text style={styles.errorText}>{error.message}</Text>
+                )}
+              </View>
+            )}
+          />
 
           {/* Confirm Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Confirm new password</Text>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Re-enter your password"
-                placeholderTextColor={COLORS.textSecondary}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry={!showConfirmPassword}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                <Icon
-                  name={showConfirmPassword ? 'eye-off' : 'eye'}
-                  size={20}
-                  color={COLORS.textSecondary}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Confirm new password</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={[styles.textInput, error && styles.textInputError]}
+                    placeholder="Re-enter your password"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    secureTextEntry={!showConfirmPassword}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    <Icon
+                      name={showConfirmPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {error && (
+                  <Text style={styles.errorText}>{error.message}</Text>
+                )}
+              </View>
+            )}
+          />
 
           {/* Password Strength Indicator */}
           <View style={styles.strengthContainer}>
@@ -189,10 +221,10 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.setPasswordButton,
-              !allValid && styles.setPasswordButtonDisabled,
+              !canSubmitForm({ formState } as any) && styles.setPasswordButtonDisabled,
             ]}
-            onPress={handleSetPassword}
-            disabled={!allValid}
+            onPress={handleSubmit(handleSetPassword)}
+            disabled={!canSubmitForm({ formState } as any)}
             activeOpacity={0.8}
           >
             <Text style={styles.setPasswordButtonText}>Set Password</Text>
@@ -281,6 +313,15 @@ const styles = StyleSheet.create({
     borderRightWidth: 0,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
+  },
+  textInputError: {
+    borderColor: COLORS.error,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
   eyeButton: {
     height: 56,
