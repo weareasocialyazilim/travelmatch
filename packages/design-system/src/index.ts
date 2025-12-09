@@ -1,6 +1,6 @@
 /**
  * Design System Package
- * 
+ *
  * Exports all components and tokens
  */
 

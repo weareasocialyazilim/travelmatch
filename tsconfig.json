@@ -4,7 +4,7 @@
     "lib": ["ES2020", "DOM"],
     "jsx": "react",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -18,18 +18,11 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
-  "exclude": [
-    "node_modules",
-    "**/__tests__/**",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/__mocks__/**",
-    "**/*.stories.ts",
-    "**/*.stories.tsx",
-    "dist",
-    "build",
-    "supabase/functions/**"
-  ]
+  "exclude": ["node_modules", "dist", "build", "supabase/functions/**", ".next", ".expo", "android", "ios"]
 }

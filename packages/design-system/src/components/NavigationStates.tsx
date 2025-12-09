@@ -1,9 +1,9 @@
 /**
  * Navigation States Component Library
- * 
+ *
  * Reusable components for empty states, offline states, and error states
  * Used across navigation screens for consistent UX
- * 
+ *
  * Features:
  * - Empty state variations (no data, no results, no matches)
  * - Offline state with auto-retry
@@ -13,15 +13,15 @@
  */
 
 import React, { useCallback } from 'react';
+import type { ViewStyle } from 'react-native';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  ViewStyle,
 } from 'react-native';
-// @ts-ignore - Expo vector icons may not have type definitions
+// @ts-expect-error - Expo vector icons may not have type definitions
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // ============================================================================
@@ -123,7 +123,10 @@ const TYPOGRAPHY = {
 // EMPTY STATE CONFIGURATIONS
 // ============================================================================
 
-export const EMPTY_STATE_CONFIGS: Record<NavigationStateType, EmptyStateConfig> = {
+export const EMPTY_STATE_CONFIGS: Record<
+  NavigationStateType,
+  EmptyStateConfig
+> = {
   empty: {
     icon: 'inbox-outline',
     title: 'Nothing here yet',
@@ -226,7 +229,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       {illustration ? (
         illustration
       ) : (
-        <View style={[styles.iconContainer, compact && styles.iconContainerCompact]}>
+        <View
+          style={[styles.iconContainer, compact && styles.iconContainerCompact]}
+        >
           <MaterialCommunityIcons
             name={icon}
             size={compact ? 32 : 48}
@@ -235,7 +240,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         </View>
       )}
 
-      <Text style={[styles.title, compact && styles.titleCompact]}>{title}</Text>
+      <Text style={[styles.title, compact && styles.titleCompact]}>
+        {title}
+      </Text>
       <Text style={[styles.description, compact && styles.descriptionCompact]}>
         {description}
       </Text>
@@ -260,7 +267,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               activeOpacity={0.8}
               testID={`${testID}-secondary-action`}
             >
-              <Text style={styles.secondaryButtonText}>{secondaryActionLabel}</Text>
+              <Text style={styles.secondaryButtonText}>
+                {secondaryActionLabel}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -295,9 +304,16 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
 
   if (showBanner) {
     return (
-      <View style={[styles.bannerContainer, style]} testID={testID || 'offline-banner'}>
+      <View
+        style={[styles.bannerContainer, style]}
+        testID={testID || 'offline-banner'}
+      >
         <View style={styles.bannerContent}>
-          <MaterialCommunityIcons name="wifi-off" size={18} color={COLORS.white} />
+          <MaterialCommunityIcons
+            name="wifi-off"
+            size={18}
+            color={COLORS.white}
+          />
           <Text style={styles.bannerMessage}>{message}</Text>
         </View>
 
@@ -323,11 +339,17 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
   return (
     <View style={[styles.container, style]} testID={testID || 'offline-state'}>
       <View style={styles.offlineIconContainer}>
-        <MaterialCommunityIcons name="wifi-off" size={48} color={COLORS.offline} />
+        <MaterialCommunityIcons
+          name="wifi-off"
+          size={48}
+          color={COLORS.offline}
+        />
       </View>
 
       <Text style={styles.title}>{message}</Text>
-      <Text style={styles.description}>Check your internet connection and try again</Text>
+      <Text style={styles.description}>
+        Check your internet connection and try again
+      </Text>
 
       {onRetry && (
         <TouchableOpacity
@@ -341,7 +363,11 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
             <ActivityIndicator size="small" color={COLORS.white} />
           ) : (
             <>
-              <MaterialCommunityIcons name="refresh" size={20} color={COLORS.white} />
+              <MaterialCommunityIcons
+                name="refresh"
+                size={20}
+                color={COLORS.white}
+              />
               <Text style={styles.primaryButtonText}>Try Again</Text>
             </>
           )}
@@ -378,7 +404,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   }, [onRetry]);
 
   const errorMessage =
-    description || (typeof error === 'string' ? error : error?.message || 'Please try again');
+    description ||
+    (typeof error === 'string' ? error : error?.message || 'Please try again');
 
   return (
     <View style={[styles.container, style]} testID={testID || 'error-state'}>
@@ -406,7 +433,11 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
               <ActivityIndicator size="small" color={COLORS.white} />
             ) : (
               <>
-                <MaterialCommunityIcons name="refresh" size={20} color={COLORS.white} />
+                <MaterialCommunityIcons
+                  name="refresh"
+                  size={20}
+                  color={COLORS.white}
+                />
                 <Text style={styles.primaryButtonText}>Try Again</Text>
               </>
             )}
@@ -420,7 +451,11 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             activeOpacity={0.8}
             testID={`${testID}-report`}
           >
-            <MaterialCommunityIcons name="bug-outline" size={20} color={COLORS.primary} />
+            <MaterialCommunityIcons
+              name="bug-outline"
+              size={20}
+              color={COLORS.primary}
+            />
             <Text style={styles.secondaryButtonText}>Report Issue</Text>
           </TouchableOpacity>
         )}

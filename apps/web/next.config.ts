@@ -6,18 +6,6 @@ const nextConfig: NextConfig = {
   
   // Production optimizations
   output: 'standalone',
-  
-  // Turbopack (Next.js 15+)
-  experimental: {
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
-  },
 };
 
 export default nextConfig;

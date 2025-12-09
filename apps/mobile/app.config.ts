@@ -2,8 +2,8 @@ import type { ExpoConfig, ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'travelmatch-new',
-  slug: 'travelmatch-new',
+  name: 'TravelMatch',
+  slug: 'travelmatch',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -69,4 +69,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     favicon: './assets/favicon.png',
   },
   plugins: ['expo-localization', '@sentry/react-native/expo', 'expo-font'],
+  extra: {
+    eas: {
+      projectId: '9721cfe0-b554-463f-af2b-ab2147d98172',
+    },
+  },
 });

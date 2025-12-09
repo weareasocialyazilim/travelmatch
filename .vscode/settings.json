@@ -24,6 +24,13 @@
     "**/.DS_Store": true,
     "**/node_modules": true,
     "**/.turbo": true
-},
-"python.analysis.typeCheckingMode": "strict"
+  },
+  
+  // Python
+  "python.analysis.typeCheckingMode": "strict",
+  
+  // GitHub Actions
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+  }
 }

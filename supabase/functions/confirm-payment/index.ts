@@ -33,12 +33,6 @@ type ConfirmPaymentRequest = z.infer<typeof ConfirmPaymentSchema>;
 
 // Rate limiter: 100 requests per 15 minutes for payment confirmation
 const confirmLimiter = createRateLimiter(RateLimitPresets.api);
-    return false;
-  }
-
-  userLimit.count++;
-  return true;
-}
 
 async function logAudit(
   supabase: any,

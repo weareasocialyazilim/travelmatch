@@ -1,12 +1,11 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
-    "lib": [
-      "ES2020"
-    ],
+    "lib": ["ES2020"],
     "jsx": "react-native",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -21,65 +20,24 @@
     "strictPropertyInitialization": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
-    "types": [
-      "jest"
-    ],
+    "types": ["jest"],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@/components/*": [
-        "src/components/*"
-      ],
-      "@/screens/*": [
-        "src/screens/*"
-      ],
-      "@/features/*": [
-        "src/features/*"
-      ],
-      "@/hooks/*": [
-        "src/hooks/*"
-      ],
-      "@/utils/*": [
-        "src/utils/*"
-      ],
-      "@/services/*": [
-        "src/services/*"
-      ],
-      "@/stores/*": [
-        "src/stores/*"
-      ],
-      "@/constants/*": [
-        "src/constants/*"
-      ],
-      "@/types/*": [
-        "src/types/*"
-      ],
-      "@/config/*": [
-        "src/config/*"
-      ],
-      "@/theme/*": [
-        "src/theme/*"
-      ],
-      "@/navigation/*": [
-        "src/navigation/*"
-      ]
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/screens/*": ["src/screens/*"],
+      "@/features/*": ["src/features/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/services/*": ["src/services/*"],
+      "@/stores/*": ["src/stores/*"],
+      "@/constants/*": ["src/constants/*"],
+      "@/types/*": ["src/types/*"],
+      "@/config/*": ["src/config/*"],
+      "@/theme/*": ["src/theme/*"],
+      "@/navigation/*": ["src/navigation/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "index.ts",
-    "App.tsx"
-  ],
-  "exclude": [
-    "node_modules",
-    "android",
-    "ios",
-    ".expo",
-    "**/__tests__/**",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ],
-  "extends": "expo/tsconfig.base"
+  "include": ["src/**/*", "index.ts", "App.tsx"],
+  "exclude": ["node_modules", "android", "ios", ".expo"]
 }
