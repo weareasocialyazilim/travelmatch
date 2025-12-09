@@ -17,7 +17,7 @@ import { biometricAuth, BiometricType } from '../../services/biometricAuth';
 import { logger } from '../../utils/logger';
 
 // Mock dependencies
-jest.mock('../../../services/biometricAuth', () => ({
+jest.mock('../../services/biometricAuth', () => ({
   biometricAuth: {
     initialize: jest.fn(),
     getCapabilities: jest.fn(),
@@ -37,7 +37,7 @@ jest.mock('../../../services/biometricAuth', () => ({
   },
 }));
 
-jest.mock('../../../utils/logger', () => ({
+jest.mock('../../utils/logger', () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn(),

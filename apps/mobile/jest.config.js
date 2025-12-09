@@ -10,7 +10,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/../../jest.setup.js'],
   transform: {
     ...jestExpoPreset.transform,
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './../../babel.config.js' }],
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(.pnpm|react-native|@react-native|@testing-library|expo|@expo|@unimodules|react-navigation|@react-navigation|@supabase))',
@@ -23,6 +23,11 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
     '<rootDir>/src/**/*.test.{ts,tsx}',
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__\\.backup/',
+    '/tests\\.backup/',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

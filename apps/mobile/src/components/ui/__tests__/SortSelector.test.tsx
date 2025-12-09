@@ -14,12 +14,12 @@ const mockUseSearchStore = jest.fn(() => ({
   setSortBy: mockSetSortBy,
 }));
 
-jest.mock('../../../stores/searchStore', () => ({
+jest.mock('@/stores/searchStore', () => ({
   useSearchStore: () => mockUseSearchStore(),
 }));
 
 // Mock useTranslation
-jest.mock('../../../hooks/useTranslation', () => ({
+jest.mock('@/hooks/useTranslation', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 

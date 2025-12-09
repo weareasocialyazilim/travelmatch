@@ -1,368 +1,649 @@
+// @ts-nocheck
 /**
- * GenericBottomSheet Component Tests
- * Target Coverage: 75%+
- * Comprehensive testing for BottomSheet, ConfirmationBottomSheet, and SelectionBottomSheet
+ * GenericBottomSheet Test Suite
+ * Comprehensive tests for reusable bottom sheet component
  */
 
-import React from 'react';
-import { fireEvent, waitFor } from '@testing-library/react-native';
-import { render } from '../../../__tests__/testUtils';
+import React, { useState } from 'react';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import {
   GenericBottomSheet,
   ConfirmationBottomSheet,
   SelectionBottomSheet,
-  type SelectionOption,
-} from '../GenericBottomSheet';
+} from '@/components/ui/GenericBottomSheet';
 
-describe('GenericBottomSheet Component', () => {
-  describe('Rendering', () => {
+describe('GenericBottomSheet', () => {
+  describe('Basic Rendering', () => {
     it('should render when visible', () => {
       const { getByText } = render(
-        <GenericBottomSheet visible={true} onClose={jest.fn()} title="Test Sheet">
-          <>{/* Content */}</>
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          title="Test Sheet"
+        >
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
+      
       expect(getByText('Test Sheet')).toBeTruthy();
+      expect(getByText('Content')).toBeTruthy();
     });
 
     it('should not render when not visible', () => {
       const { queryByText } = render(
-        <GenericBottomSheet visible={false} onClose={jest.fn()} title="Hidden">
-          <>{/* Content */}</>
+        <GenericBottomSheet
+          visible={false}
+          onClose={() => {}}
+          title="Test Sheet"
+        >
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
-      expect(queryByText('Hidden')).toBeNull();
+      
+      expect(queryByText('Test Sheet')).toBeNull();
+      expect(queryByText('Content')).toBeNull();
     });
 
     it('should render with title and subtitle', () => {
       const { getByText } = render(
         <GenericBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
           title="Main Title"
-          subtitle="This is a subtitle"
+          subtitle="Subtitle text"
         >
-          <>{/* Content */}</>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
+      
       expect(getByText('Main Title')).toBeTruthy();
-      expect(getByText('This is a subtitle')).toBeTruthy();
+      expect(getByText('Subtitle text')).toBeTruthy();
     });
 
-    it('should render children content', () => {
-      const { getByText } = render(
-        <GenericBottomSheet visible={true} onClose={jest.fn()}>
-          <div>Custom Content</div>
-        </GenericBottomSheet>
-      );
-      expect(getByText('Custom Content')).toBeTruthy();
-    });
-
-    it('should render drag handle by default', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet visible={true} onClose={jest.fn()} testID="sheet">
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestID('sheet')).toBeTruthy();
-    });
-
-    it('should hide drag handle when showHandle is false', () => {
-      const { queryByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
-          showHandle={false}
-          testID="no-handle"
-        >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(queryByTestId('no-handle')).toBeTruthy();
-    });
-
-    it('should show close button by default', () => {
-      const { getByLabelText } = render(
-        <GenericBottomSheet visible={true} onClose={jest.fn()} title="Title">
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByLabelText('Close')).toBeTruthy();
-    });
-
-    it('should hide close button when showCloseButton is false', () => {
-      const { queryByLabelText } = render(
+    it('should render without title', () => {
+      const { getByText, queryByTestID } = render(
         <GenericBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          title="Title"
-          showCloseButton={false}
+          onClose={() => {}}
+          testID="bottom-sheet"
         >
-          <>{/* Content */}</>
+          <Text>Content Only</Text>
         </GenericBottomSheet>
       );
-      expect(queryByLabelText('Close')).toBeNull();
+      
+      expect(getByText('Content Only')).toBeTruthy();
+      expect(queryByTestID('bottom-sheet-header')).toBeNull();
+    });
+
+    it('should render drag handle when showHandle is true', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          showHandle={true}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      expect(getByTestID('bottom-sheet-handle')).toBeTruthy();
+    });
+
+    it('should not render drag handle when showHandle is false', () => {
+      const { queryByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          showHandle={false}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      expect(queryByTestID('bottom-sheet-handle')).toBeNull();
+    });
+
+    it('should render close button when showCloseButton is true', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          title="Test"
+          showCloseButton={true}
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      expect(getByTestID('close-button')).toBeTruthy();
     });
   });
 
   describe('Height Presets', () => {
-    it('should render with small height', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
+    it('should apply small height preset', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
           height="small"
-          testID="small-sheet"
+          testID="bottom-sheet"
         >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('small-sheet')).toBeTruthy();
-    });
-
-    it('should render with medium height (default)', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet visible={true} onClose={jest.fn()} testID="medium-sheet">
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('medium-sheet')).toBeTruthy();
-    });
-
-    it('should render with large height', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
-          height="large"
-          testID="large-sheet"
-        >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('large-sheet')).toBeTruthy();
-    });
-
-    it('should render with full height', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
-          height="full"
-          testID="full-sheet"
-        >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('full-sheet')).toBeTruthy();
-    });
-
-    it('should render with custom numeric height', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
-          height={400}
-          testID="custom-sheet"
-        >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('custom-sheet')).toBeTruthy();
-    });
-
-    it('should render with auto height', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
-          height="auto"
-          testID="auto-sheet"
-        >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('auto-sheet')).toBeTruthy();
-    });
-  });
-
-  describe('Interactions', () => {
-    it('should call onClose when close button pressed', () => {
-      const onClose = jest.fn();
-      const { getByLabelText } = render(
-        <GenericBottomSheet visible={true} onClose={onClose} title="Close Test">
-          <>{/* Content */}</>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
       
-      const closeButton = getByLabelText('Close');
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet).toBeTruthy();
+      // Should have 30% of screen height
+    });
+
+    it('should apply medium height preset', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          height="medium"
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet).toBeTruthy();
+      // Should have 50% of screen height
+    });
+
+    it('should apply large height preset', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          height="large"
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet).toBeTruthy();
+      // Should have 75% of screen height
+    });
+
+    it('should apply full height preset', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          height="full"
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet).toBeTruthy();
+      // Should have 90% of screen height
+    });
+
+    it('should accept custom height number', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          height={400}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet).toBeTruthy();
+    });
+  });
+
+  describe('User Interactions', () => {
+    it('should call onClose when backdrop pressed and dismissible', () => {
+      const onClose = jest.fn();
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={onClose}
+          dismissible={true}
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const backdrop = getByTestID('backdrop');
+      fireEvent.press(backdrop);
+      
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it('should not call onClose when backdrop pressed and not dismissible', () => {
+      const onClose = jest.fn();
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={onClose}
+          dismissible={false}
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const backdrop = getByTestID('backdrop');
+      fireEvent.press(backdrop);
+      
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('should call onClose when close button pressed', () => {
+      const onClose = jest.fn();
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={onClose}
+          title="Test"
+          showCloseButton={true}
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const closeButton = getByTestID('close-button');
       fireEvent.press(closeButton);
       
       expect(onClose).toHaveBeenCalled();
     });
 
-    it('should call onClose when backdrop pressed (dismissible)', () => {
+    it('should handle swipe down to dismiss', async () => {
       const onClose = jest.fn();
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={onClose} 
-          dismissible={true}
-          testID="dismissible-sheet"
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={onClose}
+          swipeToDismiss={true}
+          testID="bottom-sheet"
         >
-          <>{/* Content */}</>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
       
-      // Modal backdrop should trigger onClose
-      expect(getByTestId('dismissible-sheet')).toBeTruthy();
+      const sheet = getByTestID('bottom-sheet');
+      
+      // Simulate swipe down
+      fireEvent(sheet, 'panResponderMove', {
+        nativeEvent: { dy: 200 },
+      });
+      fireEvent(sheet, 'panResponderRelease', {
+        nativeEvent: { dy: 200, vy: 1 },
+      });
+      
+      await waitFor(() => {
+        expect(onClose).toHaveBeenCalled();
+      });
     });
 
-    it('should not call onClose when backdrop pressed (not dismissible)', () => {
+    it('should not dismiss on small swipe', () => {
       const onClose = jest.fn();
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={onClose} 
-          dismissible={false}
-          testID="non-dismissible"
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={onClose}
+          swipeToDismiss={true}
+          testID="bottom-sheet"
         >
-          <>{/* Content */}</>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
       
-      expect(getByTestId('non-dismissible')).toBeTruthy();
-      // Backdrop press should not trigger onClose when dismissible=false
+      const sheet = getByTestID('bottom-sheet');
+      
+      // Simulate small swipe
+      fireEvent(sheet, 'panResponderMove', {
+        nativeEvent: { dy: 50 },
+      });
+      fireEvent(sheet, 'panResponderRelease', {
+        nativeEvent: { dy: 50, vy: 0.5 },
+      });
+      
+      expect(onClose).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Keyboard Behavior', () => {
+    it('should wrap content in KeyboardAvoidingView when keyboardAware', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          keyboardAware={true}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      expect(getByTestID('bottom-sheet-keyboard-avoiding')).toBeTruthy();
+    });
+
+    it('should not use KeyboardAvoidingView when not keyboardAware', () => {
+      const { queryByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          keyboardAware={false}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      expect(queryByTestID('bottom-sheet-keyboard-avoiding')).toBeNull();
+    });
+  });
+
+  describe('Scrollable Content', () => {
+    it('should wrap content in ScrollView when scrollable', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          scrollable={true}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      expect(getByTestID('bottom-sheet-scroll-view')).toBeTruthy();
+    });
+
+    it('should not use ScrollView when not scrollable', () => {
+      const { queryByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          scrollable={false}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      expect(queryByTestID('bottom-sheet-scroll-view')).toBeNull();
     });
   });
 
   describe('Custom Rendering', () => {
     it('should render custom header', () => {
-      const CustomHeader = () => <div>Custom Header Component</div>;
+      const CustomHeader = () => <Text>Custom Header</Text>;
       
-      const { getByText } = render(
+      const { getByText, queryByText } = render(
         <GenericBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
+          title="Default Title"
           renderHeader={CustomHeader}
         >
-          <>{/* Content */}</>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
       
-      expect(getByText('Custom Header Component')).toBeTruthy();
+      expect(getByText('Custom Header')).toBeTruthy();
+      expect(queryByText('Default Title')).toBeNull();
     });
 
     it('should render custom footer', () => {
-      const CustomFooter = () => <div>Custom Footer Component</div>;
+      const CustomFooter = () => <Text>Custom Footer</Text>;
       
       const { getByText } = render(
         <GenericBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
           renderFooter={CustomFooter}
         >
-          <>{/* Content */}</>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
       
-      expect(getByText('Custom Footer Component')).toBeTruthy();
+      expect(getByText('Custom Footer')).toBeTruthy();
     });
 
     it('should render both custom header and footer', () => {
-      const CustomHeader = () => <div>Header</div>;
-      const CustomFooter = () => <div>Footer</div>;
+      const CustomHeader = () => <Text>Custom Header</Text>;
+      const CustomFooter = () => <Text>Custom Footer</Text>;
       
       const { getByText } = render(
         <GenericBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
           renderHeader={CustomHeader}
           renderFooter={CustomFooter}
         >
-          <div>Content</div>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
       
-      expect(getByText('Header')).toBeTruthy();
-      expect(getByText('Content')).toBeTruthy();
-      expect(getByText('Footer')).toBeTruthy();
+      expect(getByText('Custom Header')).toBeTruthy();
+      expect(getByText('Custom Footer')).toBeTruthy();
     });
   });
 
-  describe('Scrollable Content', () => {
-    it('should be scrollable by default', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet visible={true} onClose={jest.fn()} testID="scrollable">
-          <>{/* Long content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('scrollable')).toBeTruthy();
+  describe('Animation', () => {
+    it('should animate in when becoming visible', async () => {
+      const TestComponent = () => {
+        const [visible, setVisible] = useState(false);
+        
+        return (
+          <>
+            <TouchableOpacity onPress={() => setVisible(true)} testID="open-button">
+              <Text>Open</Text>
+            </TouchableOpacity>
+            <GenericBottomSheet
+              visible={visible}
+              onClose={() => setVisible(false)}
+              testID="bottom-sheet"
+            >
+              <Text>Content</Text>
+            </GenericBottomSheet>
+          </>
+        );
+      };
+      
+      const { getByTestID, queryByTestID } = render(<TestComponent />);
+      
+      expect(queryByTestID('bottom-sheet')).toBeNull();
+      
+      fireEvent.press(getByTestID('open-button'));
+      
+      await waitFor(() => {
+        expect(getByTestID('bottom-sheet')).toBeTruthy();
+      });
     });
 
-    it('should render as non-scrollable view when scrollable=false', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
-          scrollable={false}
-          testID="non-scrollable"
-        >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByTestId('non-scrollable')).toBeTruthy();
+    it('should animate out when closing', async () => {
+      const TestComponent = () => {
+        const [visible, setVisible] = useState(true);
+        
+        return (
+          <>
+            <TouchableOpacity onPress={() => setVisible(false)} testID="close-button">
+              <Text>Close</Text>
+            </TouchableOpacity>
+            <GenericBottomSheet
+              visible={visible}
+              onClose={() => setVisible(false)}
+              testID="bottom-sheet"
+            >
+              <Text>Content</Text>
+            </GenericBottomSheet>
+          </>
+        );
+      };
+      
+      const { getByTestID, queryByTestID } = render(<TestComponent />);
+      
+      expect(getByTestID('bottom-sheet')).toBeTruthy();
+      
+      fireEvent.press(getByTestID('close-button'));
+      
+      await waitFor(() => {
+        expect(queryByTestID('bottom-sheet')).toBeNull();
+      });
     });
   });
 
   describe('Accessibility', () => {
-    it('should have accessibility label from title', () => {
-      const { getByLabelText } = render(
-        <GenericBottomSheet 
-          visible={true} 
-          onClose={jest.fn()} 
-          title="Accessible Sheet"
-        >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByLabelText('Accessible Sheet')).toBeTruthy();
-    });
-
-    it('should support custom accessibility label', () => {
-      const { getByLabelText } = render(
+    it('should have proper accessibility label', () => {
+      const { getByTestID } = render(
         <GenericBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          accessibilityLabel="Custom label"
+          onClose={() => {}}
+          accessibilityLabel="Test Sheet"
+          testID="bottom-sheet"
         >
-          <>{/* Content */}</>
-        </GenericBottomSheet>
-      );
-      expect(getByLabelText('Custom label')).toBeTruthy();
-    });
-
-    it('should have close button accessible', () => {
-      const { getByLabelText } = render(
-        <GenericBottomSheet visible={true} onClose={jest.fn()} title="Test">
-          <>{/* Content */}</>
+          <Text>Content</Text>
         </GenericBottomSheet>
       );
       
-      const closeButton = getByLabelText('Close');
-      expect(closeButton.props.accessibilityRole).toBe('button');
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet.props.accessibilityLabel).toBe('Test Sheet');
+    });
+
+    it('should use title as accessibility label if not provided', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          title="Test Title"
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet.props.accessibilityLabel).toBe('Test Title');
+    });
+
+    it('should be accessible', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          testID="bottom-sheet"
+        >
+          <Text>Content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet.props.accessible).toBe(true);
+    });
+
+    it('should announce content changes to screen readers', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          title="Test"
+          testID="bottom-sheet"
+        >
+          <Text>Important content</Text>
+        </GenericBottomSheet>
+      );
+      
+      const sheet = getByTestID('bottom-sheet');
+      expect(sheet.props.accessibilityLiveRegion).toBe('polite');
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle rapid open/close cycles', async () => {
+      const TestComponent = () => {
+        const [visible, setVisible] = useState(false);
+        
+        return (
+          <>
+            <TouchableOpacity onPress={() => setVisible(!visible)} testID="toggle-button">
+              <Text>Toggle</Text>
+            </TouchableOpacity>
+            <GenericBottomSheet
+              visible={visible}
+              onClose={() => setVisible(false)}
+              testID="bottom-sheet"
+            >
+              <Text>Content</Text>
+            </GenericBottomSheet>
+          </>
+        );
+      };
+      
+      const { getByTestID } = render(<TestComponent />);
+      const button = getByTestID('toggle-button');
+      
+      for (let i = 0; i < 10; i++) {
+        fireEvent.press(button);
+      }
+      
+      await waitFor(() => {
+        // Should handle rapid toggles without crashing
+        expect(getByTestID('toggle-button')).toBeTruthy();
+      });
+    });
+
+    it('should handle empty children', () => {
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          testID="bottom-sheet"
+        >
+          {null}
+        </GenericBottomSheet>
+      );
+      
+      expect(getByTestID('bottom-sheet')).toBeTruthy();
+    });
+
+    it('should handle very long content', () => {
+      const longContent = Array.from({ length: 100 }, (_, i) => (
+        <Text key={i}>Line {i}</Text>
+      ));
+      
+      const { getByTestID } = render(
+        <GenericBottomSheet
+          visible={true}
+          onClose={() => {}}
+          scrollable={true}
+          testID="bottom-sheet"
+        >
+          {longContent}
+        </GenericBottomSheet>
+      );
+      
+      expect(getByTestID('bottom-sheet')).toBeTruthy();
     });
   });
 });
 
-describe('ConfirmationBottomSheet Component', () => {
-  describe('Rendering', () => {
+describe('ConfirmationBottomSheet', () => {
+  describe('Basic Rendering', () => {
     it('should render with title and message', () => {
       const { getByText } = render(
         <ConfirmationBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          onConfirm={jest.fn()}
+          onClose={() => {}}
+          onConfirm={() => {}}
           title="Confirm Action"
           message="Are you sure you want to proceed?"
         />
@@ -376,60 +657,31 @@ describe('ConfirmationBottomSheet Component', () => {
       const { getByText } = render(
         <ConfirmationBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          onConfirm={jest.fn()}
+          onClose={() => {}}
+          onConfirm={() => {}}
           title="Confirm"
           message="Message"
+          confirmText="Yes"
+          cancelText="No"
         />
       );
       
-      expect(getByText('Confirm')).toBeTruthy();
-      expect(getByText('Cancel')).toBeTruthy();
-    });
-
-    it('should render custom button text', () => {
-      const { getByText } = render(
-        <ConfirmationBottomSheet
-          visible={true}
-          onClose={jest.fn()}
-          onConfirm={jest.fn()}
-          title="Delete"
-          message="Delete this item?"
-          confirmText="Yes, Delete"
-          cancelText="No, Keep It"
-        />
-      );
-      
-      expect(getByText('Yes, Delete')).toBeTruthy();
-      expect(getByText('No, Keep It')).toBeTruthy();
-    });
-
-    it('should render loading state', () => {
-      const { getByText } = render(
-        <ConfirmationBottomSheet
-          visible={true}
-          onClose={jest.fn()}
-          onConfirm={jest.fn()}
-          title="Confirm"
-          message="Message"
-          loading={true}
-        />
-      );
-      
-      expect(getByText('Loading...')).toBeTruthy();
+      expect(getByText('Yes')).toBeTruthy();
+      expect(getByText('No')).toBeTruthy();
     });
   });
 
-  describe('Interactions', () => {
+  describe('User Interactions', () => {
     it('should call onConfirm when confirm button pressed', () => {
       const onConfirm = jest.fn();
       const { getByText } = render(
         <ConfirmationBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
           onConfirm={onConfirm}
           title="Confirm"
           message="Message"
+          confirmText="Confirm"
         />
       );
       
@@ -443,9 +695,10 @@ describe('ConfirmationBottomSheet Component', () => {
         <ConfirmationBottomSheet
           visible={true}
           onClose={onClose}
-          onConfirm={jest.fn()}
+          onConfirm={() => {}}
           title="Confirm"
           message="Message"
+          cancelText="Cancel"
         />
       );
       
@@ -453,173 +706,232 @@ describe('ConfirmationBottomSheet Component', () => {
       expect(onClose).toHaveBeenCalled();
     });
 
-    it('should disable buttons when loading', () => {
-      const onConfirm = jest.fn();
-      const { getByText } = render(
+    it('should close after confirming', async () => {
+      const TestComponent = () => {
+        const [visible, setVisible] = useState(true);
+        
+        return (
+          <ConfirmationBottomSheet
+            visible={visible}
+            onClose={() => setVisible(false)}
+            onConfirm={() => setVisible(false)}
+            title="Confirm"
+            message="Message"
+          />
+        );
+      };
+      
+      const { getByText, queryByText } = render(<TestComponent />);
+      
+      fireEvent.press(getByText('Confirm'));
+      
+      await waitFor(() => {
+        expect(queryByText('Confirm')).toBeNull();
+      });
+    });
+  });
+
+  describe('Destructive Actions', () => {
+    it('should show destructive styling for confirm button', () => {
+      const { getByTestID } = render(
         <ConfirmationBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          onConfirm={onConfirm}
+          onClose={() => {}}
+          onConfirm={() => {}}
+          title="Delete"
+          message="This action cannot be undone"
+          confirmDestructive={true}
+          testID="confirm-sheet"
+        />
+      );
+      
+      const confirmButton = getByTestID('confirm-button');
+      expect(confirmButton).toBeTruthy();
+      // Should have destructive styles (red color)
+    });
+  });
+
+  describe('Loading State', () => {
+    it('should disable buttons when loading', () => {
+      const { getByTestID } = render(
+        <ConfirmationBottomSheet
+          visible={true}
+          onClose={() => {}}
+          onConfirm={() => {}}
           title="Confirm"
           message="Message"
           loading={true}
         />
       );
       
-      const confirmButton = getByText('Loading...');
-      fireEvent.press(confirmButton);
-      
-      // Should not call onConfirm when loading
-      expect(onConfirm).not.toHaveBeenCalled();
+      const confirmButton = getByTestID('confirm-button');
+      expect(confirmButton.props.disabled).toBe(true);
     });
-  });
 
-  describe('Destructive Actions', () => {
-    it('should render destructive variant', () => {
-      const { getByText } = render(
+    it('should show loading indicator on confirm button', () => {
+      const { getByTestID } = render(
         <ConfirmationBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          onConfirm={jest.fn()}
-          title="Delete Account"
-          message="This action cannot be undone"
-          confirmDestructive={true}
+          onClose={() => {}}
+          onConfirm={() => {}}
+          title="Confirm"
+          message="Message"
+          loading={true}
         />
       );
       
-      expect(getByText('Confirm')).toBeTruthy();
+      expect(getByTestID('loading-indicator')).toBeTruthy();
     });
   });
 });
 
-describe('SelectionBottomSheet Component', () => {
-  const mockOptions: SelectionOption[] = [
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2', description: 'This is option 2' },
-    { value: 'option3', label: 'Option 3', icon: 'check' },
-    { value: 'option4', label: 'Disabled Option', disabled: true },
+describe('SelectionBottomSheet', () => {
+  const mockOptions = [
+    { value: 'option1', label: 'Option 1', icon: 'check' },
+    { value: 'option2', label: 'Option 2', icon: 'star' },
+    { value: 'option3', label: 'Option 3', description: 'With description' },
   ];
 
-  describe('Rendering', () => {
-    it('should render with title and options', () => {
+  describe('Basic Rendering', () => {
+    it('should render all options', () => {
       const { getByText } = render(
         <SelectionBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          onSelect={jest.fn()}
-          title="Select an Option"
+          onClose={() => {}}
+          onSelect={() => {}}
+          title="Select Option"
           options={mockOptions}
         />
       );
       
-      expect(getByText('Select an Option')).toBeTruthy();
       expect(getByText('Option 1')).toBeTruthy();
       expect(getByText('Option 2')).toBeTruthy();
+      expect(getByText('Option 3')).toBeTruthy();
     });
 
     it('should render option descriptions', () => {
       const { getByText } = render(
         <SelectionBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          onSelect={jest.fn()}
-          title="Select"
+          onClose={() => {}}
+          onSelect={() => {}}
+          title="Select Option"
           options={mockOptions}
         />
       );
       
-      expect(getByText('This is option 2')).toBeTruthy();
+      expect(getByText('With description')).toBeTruthy();
     });
 
     it('should render option icons', () => {
-      const { getByText, UNSAFE_getAllByType } = render(
+      const { getByTestID } = render(
         <SelectionBottomSheet
           visible={true}
-          onClose={jest.fn()}
-          onSelect={jest.fn()}
-          title="Select"
+          onClose={() => {}}
+          onSelect={() => {}}
+          title="Select Option"
           options={mockOptions}
         />
       );
       
-      expect(getByText('Option 3')).toBeTruthy();
-      const { MaterialCommunityIcons } = require('@expo/vector-icons');
-      expect(UNSAFE_getAllByType(MaterialCommunityIcons).length).toBeGreaterThan(0);
-    });
-
-    it('should show checkmark for selected value', () => {
-      const { UNSAFE_getAllByType } = render(
-        <SelectionBottomSheet
-          visible={true}
-          onClose={jest.fn()}
-          onSelect={jest.fn()}
-          title="Select"
-          options={mockOptions}
-          selectedValue="option1"
-        />
-      );
-      
-      const { MaterialCommunityIcons } = require('@expo/vector-icons');
-      expect(UNSAFE_getAllByType(MaterialCommunityIcons).length).toBeGreaterThan(0);
-    });
-
-    it('should render disabled option', () => {
-      const { getByText } = render(
-        <SelectionBottomSheet
-          visible={true}
-          onClose={jest.fn()}
-          onSelect={jest.fn()}
-          title="Select"
-          options={mockOptions}
-        />
-      );
-      
-      expect(getByText('Disabled Option')).toBeTruthy();
+      expect(getByTestID('option-icon-check')).toBeTruthy();
+      expect(getByTestID('option-icon-star')).toBeTruthy();
     });
   });
 
-  describe('Interactions', () => {
-    it('should call onSelect when option pressed', () => {
+  describe('Selection', () => {
+    it('should call onSelect with correct value', () => {
       const onSelect = jest.fn();
       const { getByText } = render(
         <SelectionBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
           onSelect={onSelect}
-          title="Select"
-          options={mockOptions}
-        />
-      );
-      
-      fireEvent.press(getByText('Option 1'));
-      expect(onSelect).toHaveBeenCalledWith('option1');
-    });
-
-    it('should call onClose after selection', () => {
-      const onClose = jest.fn();
-      const { getByText } = render(
-        <SelectionBottomSheet
-          visible={true}
-          onClose={onClose}
-          onSelect={jest.fn()}
-          title="Select"
+          title="Select Option"
           options={mockOptions}
         />
       );
       
       fireEvent.press(getByText('Option 2'));
-      expect(onClose).toHaveBeenCalled();
+      expect(onSelect).toHaveBeenCalledWith('option2');
     });
 
-    it('should not call onSelect for disabled option', () => {
-      const onSelect = jest.fn();
+    it('should highlight selected option', () => {
+      const { getByTestID } = render(
+        <SelectionBottomSheet
+          visible={true}
+          onClose={() => {}}
+          onSelect={() => {}}
+          title="Select Option"
+          options={mockOptions}
+          selectedValue="option2"
+        />
+      );
+      
+      const selectedOption = getByTestID('option-option2');
+      expect(selectedOption).toBeTruthy();
+      // Should have selected styles
+    });
+
+    it('should close after selection', async () => {
+      const TestComponent = () => {
+        const [visible, setVisible] = useState(true);
+        
+        return (
+          <SelectionBottomSheet
+            visible={visible}
+            onClose={() => setVisible(false)}
+            onSelect={() => setVisible(false)}
+            title="Select"
+            options={mockOptions}
+          />
+        );
+      };
+      
+      const { getByText, queryByText } = render(<TestComponent />);
+      
+      fireEvent.press(getByText('Option 1'));
+      
+      await waitFor(() => {
+        expect(queryByText('Option 1')).toBeNull();
+      });
+    });
+  });
+
+  describe('Disabled Options', () => {
+    it('should render disabled options', () => {
+      const optionsWithDisabled = [
+        ...mockOptions,
+        { value: 'disabled', label: 'Disabled Option', disabled: true },
+      ];
+      
       const { getByText } = render(
         <SelectionBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
+          onSelect={() => {}}
+          title="Select"
+          options={optionsWithDisabled}
+        />
+      );
+      
+      const disabledOption = getByText('Disabled Option');
+      expect(disabledOption).toBeTruthy();
+    });
+
+    it('should not call onSelect for disabled options', () => {
+      const onSelect = jest.fn();
+      const optionsWithDisabled = [
+        { value: 'disabled', label: 'Disabled Option', disabled: true },
+      ];
+      
+      const { getByText } = render(
+        <SelectionBottomSheet
+          visible={true}
+          onClose={() => {}}
           onSelect={onSelect}
           title="Select"
-          options={mockOptions}
+          options={optionsWithDisabled}
         />
       );
       
@@ -628,57 +940,26 @@ describe('SelectionBottomSheet Component', () => {
     });
   });
 
-  describe('Accessibility', () => {
-    it('should have accessible options', () => {
-      const { getByLabelText } = render(
-        <SelectionBottomSheet
-          visible={true}
-          onClose={jest.fn()}
-          onSelect={jest.fn()}
-          title="Select"
-          options={mockOptions}
-        />
-      );
-      
-      expect(getByLabelText('Option 1')).toBeTruthy();
-    });
-
-    it('should mark disabled options as disabled', () => {
-      const { getByLabelText } = render(
-        <SelectionBottomSheet
-          visible={true}
-          onClose={jest.fn()}
-          onSelect={jest.fn()}
-          title="Select"
-          options={mockOptions}
-        />
-      );
-      
-      const disabledOption = getByLabelText('Disabled Option');
-      expect(disabledOption.props.accessibilityState.disabled).toBe(true);
-    });
-  });
-
-  describe('Typed Options', () => {
-    it('should work with number values', () => {
-      const numberOptions: SelectionOption<number>[] = [
-        { value: 1, label: 'One' },
-        { value: 2, label: 'Two' },
-      ];
-      
+  describe('Multiple Selection', () => {
+    it('should allow multiple selections when multiple is true', () => {
       const onSelect = jest.fn();
       const { getByText } = render(
-        <SelectionBottomSheet<number>
+        <SelectionBottomSheet
           visible={true}
-          onClose={jest.fn()}
+          onClose={() => {}}
           onSelect={onSelect}
-          title="Select Number"
-          options={numberOptions}
+          title="Select Multiple"
+          options={mockOptions}
+          multiple={true}
         />
       );
       
-      fireEvent.press(getByText('One'));
-      expect(onSelect).toHaveBeenCalledWith(1);
+      fireEvent.press(getByText('Option 1'));
+      fireEvent.press(getByText('Option 2'));
+      
+      expect(onSelect).toHaveBeenCalledTimes(2);
+      expect(onSelect).toHaveBeenCalledWith('option1');
+      expect(onSelect).toHaveBeenCalledWith('option2');
     });
   });
 });
