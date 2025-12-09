@@ -5,6 +5,9 @@
   "description": "TravelMatch Monorepo - Social travel platform",
   "scripts": {
     "dev": "turbo run dev",
+    "dev:mobile": "pnpm --filter @travelmatch/mobile dev",
+    "dev:web": "pnpm --filter @travelmatch/web dev",
+    "dev:admin": "pnpm --filter @travelmatch/admin dev",
     "build": "turbo run build",
     "build:analyze": "ANALYZE=true turbo run build",
     "test": "turbo run test",
