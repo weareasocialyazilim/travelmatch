@@ -35,6 +35,8 @@ COPY --from=deps /app/apps/admin/node_modules ./apps/admin/node_modules
 COPY --from=deps /app/packages/shared ./packages/shared
 
 COPY apps/admin ./apps/admin
+COPY packages/shared/package.json ./packages/shared/package.json
+COPY packages/shared/tsconfig.json ./packages/shared/tsconfig.json
 COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./

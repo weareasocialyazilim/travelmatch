@@ -39,6 +39,8 @@ COPY --from=deps /app/packages/shared ./packages/shared
 
 # Copy source code
 COPY apps/web ./apps/web
+COPY packages/shared/package.json ./packages/shared/package.json
+COPY packages/shared/tsconfig.json ./packages/shared/tsconfig.json
 COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
