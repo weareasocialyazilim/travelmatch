@@ -4,15 +4,13 @@ import {
   AppState,
   Platform,
   Alert,
-  BackHandler,
 } from 'react-native';
 import * as Device from 'expo-device';
-import * as ScreenCapture from 'expo-screen-capture';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ErrorBoundary } from './apps/mobile/src/components/ErrorBoundary';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { FeedbackModal } from './src/components/FeedbackModal';
 import { initializeFeatureFlags } from './src/config/featureFlags';
 import { AuthProvider } from './src/context/AuthContext';
@@ -31,12 +29,11 @@ import './src/config/i18n'; // Initialize i18n
 
 import { messageService } from './src/services/messageService';
 import { cacheService } from './src/services/cacheService';
-import { monitoringService } from './src/services/monitoring';
 import { sessionManager } from './src/services/sessionManager';
-import { pendingTransactionsService } from './apps/mobile/src/services/pendingTransactionsService';
-import { storageMonitor } from './apps/mobile/src/services/storageMonitor';
-import { PendingTransactionsModal } from './apps/mobile/src/components/PendingTransactionsModal';
-import type { PendingPayment, PendingUpload } from './apps/mobile/src/services/pendingTransactionsService';
+import { pendingTransactionsService } from './src/services/pendingTransactionsService';
+import { storageMonitor } from './src/services/storageMonitor';
+import { PendingTransactionsModal } from './src/components/PendingTransactionsModal';
+import type { PendingPayment, PendingUpload } from './src/services/pendingTransactionsService';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -127,26 +124,26 @@ export default function App() {
         await cacheService.initialize();
         logger.info('CacheService initialized with 50MB limit');
 
-        // Initialize monitoring service (Datadog RUM)
-        if (process.env.DD_APP_ID && process.env.DD_CLIENT_TOKEN) {
-          await monitoringService.initialize({
-            applicationId: process.env.DD_APP_ID,
-            clientToken: process.env.DD_CLIENT_TOKEN,
-            env: __DEV__ ? 'development' : 'production',
-            serviceName: 'travelmatch-mobile',
-            version: '1.0.0',
-            enabled: !__DEV__, // Only enable in production
-          });
-          
-          // Add global context
-          monitoringService.addGlobalContext({
-            platform: Platform.OS,
-            device_model: Device.modelName || 'unknown',
-            os_version: Platform.Version,
-          });
-          
-          logger.info('Monitoring service initialized');
-        }
+        // TODO: Initialize monitoring service (Datadog RUM) when service is implemented
+        // if (process.env.DD_APP_ID && process.env.DD_CLIENT_TOKEN) {
+        //   await monitoringService.initialize({
+        //     applicationId: process.env.DD_APP_ID,
+        //     clientToken: process.env.DD_CLIENT_TOKEN,
+        //     env: __DEV__ ? 'development' : 'production',
+        //     serviceName: 'travelmatch-mobile',
+        //     version: '1.0.0',
+        //     enabled: !__DEV__, // Only enable in production
+        //   });
+        //   
+        //   // Add global context
+        //   monitoringService.addGlobalContext({
+        //     platform: Platform.OS,
+        //     device_model: Device.modelName || 'unknown',
+        //     os_version: Platform.Version,
+        //   });
+        //   
+        //   logger.info('Monitoring service initialized');
+        // }
 
         // Increment session count
         incrementSessionCount();

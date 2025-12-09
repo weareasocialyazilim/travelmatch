@@ -1,30 +1,29 @@
 /**
  * Navigation States Component Tests
- * 
+ *
  * Complete test coverage for EmptyState, OfflineState, ErrorState, LoadingState
  */
 
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import {
   EmptyState,
   OfflineState,
   ErrorState,
   LoadingState,
-  type EmptyStateType,
 } from '../NavigationStates';
 
 describe('NavigationStates', () => {
   describe('EmptyState', () => {
     it('should render with default empty type', () => {
       const { getByText } = render(<EmptyState />);
-      
+
       expect(getByText('No Content')).toBeTruthy();
       expect(getByText('There is no content to display')).toBeTruthy();
     });
 
     it('should render all empty state types', () => {
-      const types: EmptyStateType[] = [
+      const types = [
         'empty',
         'no-results',
         'no-matches',
@@ -34,8 +33,10 @@ describe('NavigationStates', () => {
         'no-favorites',
       ];
 
-      types.forEach(type => {
-        const { getByTestId } = render(<EmptyState type={type} testID={`empty-${type}`} />);
+      types.forEach((type) => {
+        const { getByTestId } = render(
+          <EmptyState type={type} testID={`empty-${type}`} />,
+        );
         expect(getByTestId(`empty-${type}`)).toBeTruthy();
       });
     });
@@ -45,7 +46,7 @@ describe('NavigationStates', () => {
       const customMessage = 'Custom message text';
 
       const { getByText } = render(
-        <EmptyState title={customTitle} message={customMessage} />
+        <EmptyState title={customTitle} message={customMessage} />,
       );
 
       expect(getByText(customTitle)).toBeTruthy();
@@ -57,7 +58,7 @@ describe('NavigationStates', () => {
       const onAction = jest.fn();
 
       const { getByText } = render(
-        <EmptyState actionLabel={actionLabel} onAction={onAction} />
+        <EmptyState actionLabel={actionLabel} onAction={onAction} />,
       );
 
       const button = getByText(actionLabel);
@@ -76,7 +77,7 @@ describe('NavigationStates', () => {
           onAction={primaryAction}
           secondaryActionLabel="Secondary"
           onSecondaryAction={secondaryAction}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Primary'));
@@ -88,7 +89,7 @@ describe('NavigationStates', () => {
 
     it('should render in compact mode', () => {
       const { getByTestId } = render(
-        <EmptyState compact testID="compact-empty" />
+        <EmptyState compact testID="compact-empty" />,
       );
 
       expect(getByTestId('compact-empty')).toBeTruthy();
@@ -96,16 +97,14 @@ describe('NavigationStates', () => {
 
     it('should render custom icon', () => {
       const { getByTestId } = render(
-        <EmptyState icon="custom-icon" testID="icon-empty" />
+        <EmptyState icon="custom-icon" testID="icon-empty" />,
       );
 
       expect(getByTestId('icon-empty')).toBeTruthy();
     });
 
     it('should not render action when no onAction provided', () => {
-      const { queryByText } = render(
-        <EmptyState actionLabel="Action" />
-      );
+      const { queryByText } = render(<EmptyState actionLabel="Action" />);
 
       expect(queryByText('Action')).toBeNull();
     });
@@ -150,7 +149,7 @@ describe('NavigationStates', () => {
 
     it('should render in compact mode', () => {
       const { getByTestId } = render(
-        <OfflineState compact testID="compact-offline" />
+        <OfflineState compact testID="compact-offline" />,
       );
 
       expect(getByTestId('compact-offline')).toBeTruthy();
@@ -220,7 +219,7 @@ describe('NavigationStates', () => {
 
     it('should render in compact mode', () => {
       const { getByTestId } = render(
-        <ErrorState compact testID="compact-error" />
+        <ErrorState compact testID="compact-error" />,
       );
 
       expect(getByTestId('compact-error')).toBeTruthy();
@@ -231,7 +230,7 @@ describe('NavigationStates', () => {
       const onReport = jest.fn();
 
       const { getByText } = render(
-        <ErrorState onRetry={onRetry} onReport={onReport} />
+        <ErrorState onRetry={onRetry} onReport={onReport} />,
       );
 
       fireEvent.press(getByText('Try Again'));
@@ -271,7 +270,7 @@ describe('NavigationStates', () => {
 
     it('should render in compact mode', () => {
       const { getByTestId } = render(
-        <LoadingState compact testID="compact-loading" />
+        <LoadingState compact testID="compact-loading" />,
       );
 
       expect(getByTestId('compact-loading')).toBeTruthy();
@@ -279,7 +278,7 @@ describe('NavigationStates', () => {
 
     it('should render with custom size', () => {
       const { getByTestId } = render(
-        <LoadingState size="large" testID="large-loading" />
+        <LoadingState size="large" testID="large-loading" />,
       );
 
       expect(getByTestId('large-loading')).toBeTruthy();
@@ -289,7 +288,7 @@ describe('NavigationStates', () => {
       const customColor = '#FF0000';
 
       const { getByTestId } = render(
-        <LoadingState color={customColor} testID="colored-loading" />
+        <LoadingState color={customColor} testID="colored-loading" />,
       );
 
       expect(getByTestId('colored-loading')).toBeTruthy();
@@ -299,7 +298,7 @@ describe('NavigationStates', () => {
   describe('Accessibility', () => {
     it('EmptyState should have accessible label', () => {
       const { getByLabelText } = render(
-        <EmptyState accessibilityLabel="Empty state" />
+        <EmptyState accessibilityLabel="Empty state" />,
       );
 
       expect(getByLabelText('Empty state')).toBeTruthy();
@@ -307,7 +306,7 @@ describe('NavigationStates', () => {
 
     it('OfflineState should have accessible label', () => {
       const { getByLabelText } = render(
-        <OfflineState accessibilityLabel="Offline state" />
+        <OfflineState accessibilityLabel="Offline state" />,
       );
 
       expect(getByLabelText('Offline state')).toBeTruthy();
@@ -315,7 +314,7 @@ describe('NavigationStates', () => {
 
     it('ErrorState should have accessible label', () => {
       const { getByLabelText } = render(
-        <ErrorState accessibilityLabel="Error state" />
+        <ErrorState accessibilityLabel="Error state" />,
       );
 
       expect(getByLabelText('Error state')).toBeTruthy();
@@ -323,7 +322,7 @@ describe('NavigationStates', () => {
 
     it('LoadingState should have accessible label', () => {
       const { getByLabelText } = render(
-        <LoadingState accessibilityLabel="Loading state" />
+        <LoadingState accessibilityLabel="Loading state" />,
       );
 
       expect(getByLabelText('Loading state')).toBeTruthy();
@@ -331,7 +330,7 @@ describe('NavigationStates', () => {
 
     it('Action buttons should have accessible roles', () => {
       const { getByRole } = render(
-        <EmptyState actionLabel="Action" onAction={() => {}} />
+        <EmptyState actionLabel="Action" onAction={() => {}} />,
       );
 
       expect(getByRole('button')).toBeTruthy();
@@ -363,7 +362,7 @@ describe('NavigationStates', () => {
       const onAction = jest.fn();
 
       const { getByText } = render(
-        <EmptyState actionLabel="Click" onAction={onAction} />
+        <EmptyState actionLabel="Click" onAction={onAction} />,
       );
 
       const button = getByText('Click');
@@ -380,7 +379,7 @@ describe('NavigationStates', () => {
       const customStyle = { backgroundColor: 'red' };
 
       const { getByTestId } = render(
-        <EmptyState style={customStyle} testID="styled-empty" />
+        <EmptyState style={customStyle} testID="styled-empty" />,
       );
 
       expect(getByTestId('styled-empty')).toBeTruthy();
@@ -388,7 +387,7 @@ describe('NavigationStates', () => {
 
     it('should render different sizes in compact mode', () => {
       const { rerender, getByTestId } = render(
-        <LoadingState compact={false} testID="normal" />
+        <LoadingState compact={false} testID="normal" />,
       );
       expect(getByTestId('normal')).toBeTruthy();
 
@@ -405,7 +404,7 @@ describe('NavigationStates', () => {
         <EmptyState
           actionLabel="Go Back"
           onAction={() => mockNavigate('Home')}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Go Back'));
@@ -413,9 +412,7 @@ describe('NavigationStates', () => {
     });
 
     it('should work in list empty component', () => {
-      const { getByText } = render(
-        <EmptyState type="no-results" />
-      );
+      const { getByText } = render(<EmptyState type="no-results" />);
 
       expect(getByText(/no results/i)).toBeTruthy();
     });
@@ -423,9 +420,7 @@ describe('NavigationStates', () => {
     it('should work with retry logic', async () => {
       const mockRetry = jest.fn().mockResolvedValue(true);
 
-      const { getByText } = render(
-        <ErrorState onRetry={mockRetry} />
-      );
+      const { getByText } = render(<ErrorState onRetry={mockRetry} />);
 
       fireEvent.press(getByText('Try Again'));
       expect(mockRetry).toHaveBeenCalled();

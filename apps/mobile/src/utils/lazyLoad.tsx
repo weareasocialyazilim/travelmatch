@@ -96,7 +96,9 @@ export function lazyLoadMultiple<
   };
 
   for (const key in imports) {
-    result[key] = lazy(imports[key]);
+    if (imports[key]) {
+      result[key] = lazy(imports[key]);
+    }
   }
 
   return result;
