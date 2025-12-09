@@ -1,9 +1,9 @@
 # ==========================================
 # Stage 1: Dependencies (Monorepo-aware)
 # ==========================================
-FROM node:18.20.0-alpine AS deps
+FROM node:20-alpine AS deps
 
-RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 
@@ -18,14 +18,15 @@ COPY packages/shared ./packages/shared
 # Copy admin app
 COPY apps/admin/package.json ./apps/admin/
 
-RUN pnpm install --frozen-lockfile --filter @travelmatch/admin...
+# Install ALL dependencies (including root + workspace)
+RUN pnpm install --frozen-lockfile
 
 # ==========================================
 # Stage 2: Builder
 # ==========================================
-FROM node:18.20.0-alpine AS builder
+FROM node:20-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 

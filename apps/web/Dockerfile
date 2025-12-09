@@ -1,10 +1,10 @@
 # ==========================================
 # Stage 1: Dependencies (Monorepo-aware)
 # ==========================================
-FROM node:18.20.0-alpine AS deps
+FROM node:20-alpine AS deps
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 
@@ -20,15 +20,15 @@ COPY packages/shared ./packages/shared
 # Copy web app
 COPY apps/web/package.json ./apps/web/
 
-# Install dependencies (frozen lockfile for production)
-RUN pnpm install --frozen-lockfile --filter @travelmatch/web...
+# Install ALL dependencies (including root + workspace)
+RUN pnpm install --frozen-lockfile
 
 # ==========================================
 # Stage 2: Builder
 # ==========================================
-FROM node:18.20.0-alpine AS builder
+FROM node:20-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 
@@ -50,7 +50,7 @@ RUN pnpm turbo run build --filter=@travelmatch/web
 # ==========================================
 # Stage 3: Runner (Production)
 # ==========================================
-FROM node:18.20.0-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
