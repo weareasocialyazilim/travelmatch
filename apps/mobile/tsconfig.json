@@ -1,5 +1,4 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "target": "ES2020",
     "lib": [
@@ -82,6 +81,5 @@
     "**/__tests__/**",
     "**/*.test.ts",
     "**/*.test.tsx"
-  ],
-  "extends": "expo/tsconfig.base"
+  ]
 }
