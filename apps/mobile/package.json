@@ -69,7 +69,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.67.0",
     "react-i18next": "^16.3.5",
-    "react-native": "0.76.5",
+    "react-native": "0.82.1",
     "react-native-device-info": "^15.0.1",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-maps": "1.18.0",
