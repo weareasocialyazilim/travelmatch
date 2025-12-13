@@ -43,6 +43,7 @@
     "@sentry/react-native": "~7.2.0",
     "@shopify/flash-list": "^1.6.3",
     "@supabase/supabase-js": "^2.86.2",
+    "posthog-react-native": "^3.3.8",
     "@travelmatch/design-system": "workspace:*",
     "@travelmatch/shared": "workspace:*",
     "axios": "^1.13.2",
