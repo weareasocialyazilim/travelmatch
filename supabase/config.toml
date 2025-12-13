@@ -32,8 +32,14 @@ file_size_limit = "50MiB"
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
+site_url = "https://travelmatch.app"
+additional_redirect_urls = [
+  "https://travelmatch.app",
+  "https://www.travelmatch.app",
+  "travelmatch://",
+  "exp://192.168.*",
+  "http://localhost:3000"
+]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
