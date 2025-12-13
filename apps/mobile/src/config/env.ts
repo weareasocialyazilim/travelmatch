@@ -10,7 +10,7 @@ import { logger } from '../utils/logger';
  * Environment Schema
  */
 const envSchema = z.object({
-  API_URL: z.string().url().optional().default('http://localhost:3000/api'),
+  API_URL: z.string().url().optional(), // ✅ FIXED: Removed localhost fallback - will use Supabase Functions URL
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),

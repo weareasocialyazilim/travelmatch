@@ -37,7 +37,13 @@ export enum ProofType {
 
 // ML service client
 class AIQualityScorer {
-  private mlServiceUrl = process.env.EXPO_PUBLIC_ML_SERVICE_URL || 'http://localhost:8001';
+  private mlServiceUrl = process.env.EXPO_PUBLIC_ML_SERVICE_URL;
+
+  constructor() {
+    if (!this.mlServiceUrl) {
+      throw new Error('❌ EXPO_PUBLIC_ML_SERVICE_URL is required. Set it in your .env file.');
+    }
+  }
 
   /**
    * Score profile proof photo
