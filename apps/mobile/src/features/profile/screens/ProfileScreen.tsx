@@ -5,10 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  FlatList,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -325,13 +325,12 @@ const ProfileScreen: React.FC = () => {
                 <ActivityIndicator size="large" color={COLORS.coral} />
               </View>
             ) : displayedMoments.length > 0 ? (
-              <FlatList
+              <FlashList
                 data={displayedMoments}
                 renderItem={renderMomentCard}
-                keyExtractor={(item) => item.id}
+                estimatedItemSize={250}
                 numColumns={2}
                 scrollEnabled={false}
-                columnWrapperStyle={styles.momentRow}
                 contentContainerStyle={styles.momentsContent}
               />
             ) : (

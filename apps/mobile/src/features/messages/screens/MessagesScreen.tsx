@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   RefreshControl,
   Image,
   TextInput,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -319,10 +319,10 @@ const MessagesScreen: React.FC = () => {
       </View>
 
       {/* Chat List */}
-      <FlatList
+      <FlashList
         data={filteredChats}
         renderItem={renderChatItem}
-        keyExtractor={(item) => item.id}
+        estimatedItemSize={90}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={

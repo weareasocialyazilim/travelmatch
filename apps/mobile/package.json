@@ -41,6 +41,7 @@
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/stack": "^6.3.0",
     "@sentry/react-native": "~7.2.0",
+    "@shopify/flash-list": "^1.6.3",
     "@supabase/supabase-js": "^2.86.2",
     "@travelmatch/design-system": "workspace:*",
     "@travelmatch/shared": "workspace:*",
