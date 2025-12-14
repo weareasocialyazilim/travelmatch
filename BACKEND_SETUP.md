@@ -46,6 +46,23 @@ supabase db push
 
 #### 3. Environment Variables Tamamla
 
+**⚡ RECOMMENDED: Infisical Kullan (Centralized Secrets)**
+
+See `INFISICAL_SETUP.md` for full setup guide.
+
+**Quick Start:**
+```bash
+# Install CLI
+brew install infisical/get-cli/infisical
+
+# Pull secrets
+cd apps/mobile
+infisical login
+infisical export --env=prod --format=dotenv > .env.production
+```
+
+**Alternative: Manual .env (Legacy)**
+
 **Mobile App (.env.production):**
 ```bash
 # Mapbox (Al: https://account.mapbox.com/)

@@ -31,7 +31,11 @@
     "prebuild": "expo prebuild",
     "build:ios": "eas build --platform ios",
     "build:android": "eas build --platform android",
-    "build:all": "eas build --platform all"
+    "build:all": "eas build --platform all",
+    "secrets:pull": "infisical export --env=dev --format=dotenv > .env",
+    "secrets:pull:prod": "infisical export --env=prod --format=dotenv > .env.production",
+    "dev:secure": "infisical run --env=dev -- pnpm dev",
+    "build:secure": "infisical run --env=prod -- pnpm build:all"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",

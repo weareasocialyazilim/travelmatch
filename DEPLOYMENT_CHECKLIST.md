@@ -159,7 +159,32 @@ SELECT * FROM cron.job WHERE jobname = 'refund-expired-escrow';
 
 ---
 
-### Step 2: Configure Environment Variables (3 minutes)
+### Step 2: Configure Secrets (5 minutes)
+
+**⚡ RECOMMENDED: Use Infisical (Centralized Secrets Management)**
+
+Infisical provides centralized secret management instead of manual .env files:
+- ✅ Automatic syncing across team
+- ✅ Audit logs and versioning
+- ✅ CI/CD integration
+- ✅ No accidental secret commits
+
+**Quick Start:**
+```bash
+# 1. Install Infisical CLI
+brew install infisical/get-cli/infisical
+
+# 2. Login and pull secrets
+cd apps/mobile
+infisical login
+infisical export --env=prod --format=dotenv > .env.production
+```
+
+**Full Setup Guide:** See `INFISICAL_SETUP.md`
+
+---
+
+**Alternative: Manual .env (Legacy)**
 
 **File:** `apps/mobile/.env.production`
 
@@ -335,6 +360,7 @@ https://bjikxgtbptrvawkguypv.supabase.co
 
 **Documentation:**
 - Backend Setup: `/BACKEND_SETUP.md`
+- Infisical Setup: `/INFISICAL_SETUP.md`
 - Audit Report: (in commit messages)
 - Titan Master Plan: v2.0
 
