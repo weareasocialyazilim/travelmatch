@@ -165,6 +165,7 @@ const PaymentMethodsScreen = () => {
 
           {/* Add Card Button */}
           <TouchableOpacity
+            testID="add-card-button"
             style={styles.addCardButton}
             onPress={handleAddCard}
             activeOpacity={0.7}

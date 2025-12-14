@@ -71,6 +71,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
           )}
         </View>
         <TouchableOpacity
+          testID="send-message-button"
           style={[
             styles.sendButton,
             (!isConnected || isSending) && styles.sendButtonDisabled,

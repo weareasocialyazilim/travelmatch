@@ -13,6 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
 import BottomNav from '../components/BottomNav';
 import {
   ProfileHeaderSection,
@@ -86,18 +87,18 @@ const ProfileScreen: React.FC = () => {
               userProfile?.location?.city ||
               'Unknown Location',
         trustScore: authUser.trustScore || userProfile?.rating || 0,
-        momentsCount: myMoments.length || userProfile?.momentCount || 0,
+        momentsCount: myMoments.length || userProfile?.momentCount || PROFILE_DEFAULTS.MOMENTS_COUNT,
         exchangesCount:
           (userProfile?.giftsSent || 0) + (userProfile?.giftsReceived || 0),
-        responseRate: 100, // TODO: Calculate response rate
+        responseRate: PROFILE_DEFAULTS.RESPONSE_RATE, // Will be calculated from actual response data in future
         activeMoments: myMoments.filter((m) =>
           ['active', 'paused', 'draft'].includes(m.status),
         ).length,
         completedMoments: myMoments.filter((m) => m.status === 'completed')
           .length,
-        walletBalance: 0, // TODO: Fetch wallet balance
+        walletBalance: PROFILE_DEFAULTS.WALLET_BALANCE, // Will be fetched from wallet service
         giftsSentCount: userProfile?.giftsSent || 0,
-        savedCount: 0, // TODO: Fetch saved count
+        savedCount: PROFILE_DEFAULTS.SAVED_COUNT, // Will be fetched from saved items service
       };
     }
 
@@ -245,6 +246,7 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.headerTitle}>Profile</Text>
           <View style={styles.headerActions}>
             <TouchableOpacity
+              testID="edit-profile-button"
               style={styles.headerButton}
               onPress={handleEditProfile}
               accessibilityLabel="Edit profile"
@@ -257,6 +259,7 @@ const ProfileScreen: React.FC = () => {
               />
             </TouchableOpacity>
             <TouchableOpacity
+              testID="settings-button"
               style={styles.headerButton}
               onPress={handleSettings}
               accessibilityLabel="Settings"

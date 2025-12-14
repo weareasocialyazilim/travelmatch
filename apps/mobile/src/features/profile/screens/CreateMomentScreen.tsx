@@ -254,6 +254,7 @@ const CreateMomentScreen: React.FC = () => {
         <View style={styles.publishSection}>
           <Text style={styles.publishHint}>{paymentHint}</Text>
           <TouchableOpacity
+            testID="create-moment-button"
             style={[
               styles.publishButton,
               (!isValid || isSubmitting) && styles.publishButtonDisabled,

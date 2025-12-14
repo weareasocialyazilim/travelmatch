@@ -164,6 +164,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             </View>
           </View>
           <TouchableOpacity
+            testID="change-payment-method-button"
             style={styles.changeButton}
             onPress={() => navigation.navigate('PaymentMethods')}
             activeOpacity={0.7}
@@ -229,13 +230,14 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           Payouts typically arrive in 1-3 business days
         </Text>
         <TouchableOpacity
+          testID="withdraw-button"
           style={[styles.confirmButton, (isSubmitDisabled || isSubmitting) && styles.confirmButtonDisabled]}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitDisabled || isSubmitting}
           {...a11y.button(
             isSubmitting ? 'Processing withdrawal' : 'Confirm withdraw',
-            biometricEnabled 
-              ? `This will require ${biometricTypeName} verification` 
+            biometricEnabled
+              ? `This will require ${biometricTypeName} verification`
               : 'Process withdrawal to your bank account',
             isSubmitDisabled || isSubmitting
           )}

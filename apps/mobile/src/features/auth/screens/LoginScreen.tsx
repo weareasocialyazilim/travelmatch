@@ -138,6 +138,7 @@ export const LoginScreen: React.FC = () => {
       />
 
       <TouchableOpacity
+        testID="login-button"
         style={[styles.button, (isLoading || !canSubmitForm({ formState } as any)) && styles.buttonDisabled]}
         onPress={handleSubmit(onSubmit)}
         disabled={isLoading || !canSubmitForm({ formState } as any)}
@@ -161,6 +162,7 @@ export const LoginScreen: React.FC = () => {
           </View>
 
           <TouchableOpacity
+            testID="biometric-login-button"
             style={styles.biometricButton}
             onPress={handleBiometricLogin}
             disabled={isBiometricLoading || isLoading}

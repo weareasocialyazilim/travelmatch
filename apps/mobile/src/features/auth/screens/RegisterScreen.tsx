@@ -126,6 +126,7 @@ const [isLoading, setIsLoading] = useState(false);
       />
 
       <TouchableOpacity
+        testID="register-button"
         style={[styles.button, (isLoading || !canSubmitForm({ formState } as any)) && styles.buttonDisabled]}
         onPress={handleSubmit(onSubmit)}
         disabled={isLoading || !canSubmitForm({ formState } as any)}

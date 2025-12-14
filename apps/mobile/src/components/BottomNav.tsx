@@ -37,6 +37,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
     <View style={styles.bottomNav}>
       {/* Discover Tab */}
       <TouchableOpacity
+        testID="nav-discover-tab"
         style={styles.navItem}
         onPress={() => handleTabPress('Discover')}
         accessibilityRole="tab"
@@ -62,6 +63,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
 
       {/* Requests Tab */}
       <TouchableOpacity
+        testID="nav-requests-tab"
         style={styles.navItem}
         onPress={() => handleTabPress('Requests')}
         accessibilityRole="tab"
@@ -96,6 +98,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
 
       {/* Create/+ Tab */}
       <TouchableOpacity
+        testID="nav-create-tab"
         style={styles.navItem}
         onPress={() => handleTabPress('CreateMoment')}
         accessibilityRole="tab"
@@ -110,6 +113,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
 
       {/* Messages Tab */}
       <TouchableOpacity
+        testID="nav-messages-tab"
         style={styles.navItem}
         onPress={() => handleTabPress('Messages')}
         accessibilityRole="tab"
@@ -144,6 +148,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
 
       {/* Profile Tab */}
       <TouchableOpacity
+        testID="nav-profile-tab"
         style={styles.navItem}
         onPress={() => handleTabPress('Profile')}
         accessibilityRole="tab"
