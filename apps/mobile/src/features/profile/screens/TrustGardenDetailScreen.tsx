@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { TRUST_GARDEN_DEFAULTS } from '@/constants/defaultValues';
 import { useAuth } from '../context/AuthContext';
 import { userService } from '../services/userService';
 import { logger } from '../utils/logger';
@@ -112,8 +113,8 @@ const TrustGardenDetailScreen: React.FC = () => {
       name: 'Response Rate',
       description: 'Reply to requests promptly',
       icon: 'message-reply',
-      value: 95, // TODO: Calculate real response rate
-      maxValue: 100,
+      value: TRUST_GARDEN_DEFAULTS.RESPONSE_RATE_PERCENTAGE, // Will be calculated from actual response data
+      maxValue: TRUST_GARDEN_DEFAULTS.MAX_SCORE,
       tips: [
         'Reply within 2 hours',
         'Accept or decline requests quickly',

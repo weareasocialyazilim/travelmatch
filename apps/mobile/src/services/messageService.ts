@@ -486,17 +486,57 @@ export const messageService = {
   /**
    * Delete a message (soft delete)
    */
-  deleteMessage: (_conversationId: string, _messageId: string) => {
-    // TODO: Implement soft delete in DB service
-    return { success: true };
+  deleteMessage: async (conversationId: string, messageId: string) => {
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: (await supabase.auth.getUser()).data.user?.id
+        })
+        .eq('id', messageId)
+        .eq('conversation_id', conversationId);
+
+      if (error) {
+        logger.error('Failed to delete message', error);
+        return { success: false, error: error.message };
+      }
+
+      logger.info('Message soft deleted', { messageId, conversationId });
+      return { success: true };
+    } catch (error) {
+      logger.error('Error deleting message', error as Error);
+      return { success: false, error: 'Failed to delete message' };
+    }
   },
 
   /**
    * Get unread count
    */
-  getUnreadCount: () => {
-    // TODO: Implement unread count query
-    return { unreadCount: 0 };
+  getUnreadCount: async () => {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        return { unreadCount: 0 };
+      }
+
+      const { count, error } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .is('deleted_at', null)
+        .neq('sender_id', user.id) // Don't count own messages
+        .is('read_at', null);
+
+      if (error) {
+        logger.error('Failed to get unread count', error);
+        return { unreadCount: 0 };
+      }
+
+      return { unreadCount: count ?? 0 };
+    } catch (error) {
+      logger.error('Error getting unread count', error as Error);
+      return { unreadCount: 0 };
+    }
   },
 
   /**
