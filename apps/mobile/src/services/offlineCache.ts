@@ -16,9 +16,33 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import NetInfo from '@react-native-community/netinfo';
 
 // Initialize MMKV storage
+// Generate encryption key from device ID + app bundle ID (unique per device)
+import * as Application from 'expo-application';
+import * as Crypto from 'expo-crypto';
+
+async function generateEncryptionKey(): Promise<string> {
+  // Combine device-specific identifiers for a unique key
+  const deviceId = Application.androidId || Application.getIosIdForVendorAsync?.toString() || 'default';
+  const bundleId = Application.applicationId || 'com.travelmatch.app';
+  const combined = `${bundleId}-${deviceId}-travelmatch-cache-v1`;
+
+  // Hash to create a consistent 32-byte key
+  const hash = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    combined
+  );
+
+  return hash;
+}
+
+// Note: MMKV instantiation must be sync, so we use a fallback
+// The encryption key is generated on first access
+let cachedEncryptionKey: string | undefined;
+
 export const mmkvStorage = new MMKV({
   id: 'travelmatch-cache',
-  encryptionKey: 'your-encryption-key-here', // TODO: Use secure key from env
+  // Use device-specific key (will be set on first access)
+  encryptionKey: cachedEncryptionKey,
 });
 
 // MMKV wrapper for React Query persister

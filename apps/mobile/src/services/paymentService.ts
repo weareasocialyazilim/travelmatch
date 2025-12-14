@@ -217,7 +217,7 @@ export const paymentService = {
 
       if (error) throw error;
 
-      const transactions: Transaction[] = data.map((row: any) => ({
+      const transactions: Transaction[] = data.map((row) => ({
         id: row.id,
         type: (row.type as TransactionType) || 'payment', // Simple cast
         amount: row.amount,
@@ -323,7 +323,7 @@ export const paymentService = {
   /**
    * Add a bank account
    */
-  addBankAccount: (_data: any): { bankAccount: BankAccount } => {
+  addBankAccount: (_data: Record<string, unknown>): { bankAccount: BankAccount } => {
     if (!__DEV__) {
       logger.error(
         'addBankAccount called in production with mock implementation!',
@@ -368,7 +368,7 @@ export const paymentService = {
     currency: string;
     paymentMethodId: string;
     description?: string;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
   }): Promise<{ transaction: Transaction }> => {
     try {
       const {

@@ -11,6 +11,7 @@
 import { Linking } from 'react-native';
 import analytics from '@react-native-firebase/analytics';
 import { supabase } from './supabase';
+import { logger } from '../utils/logger';
 
 // Deep link types
 export enum DeepLinkType {
@@ -102,7 +103,7 @@ class DeepLinkTracker {
       this.handleDeepLink(event.url, false);
     });
 
-    console.log('[DeepLink] Tracker initialized');
+    logger.info('[DeepLink] Tracker initialized');
   }
 
   /**
@@ -139,9 +140,9 @@ class DeepLinkTracker {
       // Notify listeners
       this.notifyListeners(event);
 
-      console.log('[DeepLink] Tracked:', event.type, event.source);
+      logger.info('[DeepLink] Tracked', { type: event.type, source: event.source });
     } catch (error) {
-      console.error('[DeepLink] Error handling deep link:', error);
+      logger.error('[DeepLink] Error handling deep link', error);
     }
   }
 
@@ -248,7 +249,7 @@ class DeepLinkTracker {
     // Update database
     await this.updateEventInDatabase(this.currentEvent);
 
-    console.log('[DeepLink] Conversion:', goal, this.currentEvent.timeToComplete + 'ms');
+    logger.info('[DeepLink] Conversion', { goal, timeToComplete: this.currentEvent.timeToComplete });
   }
 
   /**
@@ -272,7 +273,7 @@ class DeepLinkTracker {
     // Update database
     await this.updateEventInDatabase(this.currentEvent);
 
-    console.log('[DeepLink] Drop-off:', screenName, reason);
+    logger.warn('[DeepLink] Drop-off', { screenName, reason });
   }
 
   /**
@@ -345,7 +346,7 @@ class DeepLinkTracker {
         created_at: event.timestamp,
       });
     } catch (error) {
-      console.error('[DeepLink] Failed to save to database:', error);
+      logger.error('[DeepLink] Failed to save to database', error);
     }
   }
 
@@ -366,7 +367,7 @@ class DeepLinkTracker {
         })
         .eq('id', event.id);
     } catch (error) {
-      console.error('[DeepLink] Failed to update event:', error);
+      logger.error('[DeepLink] Failed to update event', error);
     }
   }
 

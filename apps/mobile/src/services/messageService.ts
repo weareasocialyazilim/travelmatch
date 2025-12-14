@@ -142,7 +142,7 @@ export const messageService = {
 
       // Collect all other user IDs
       const otherUserIds = new Set<string>();
-      data.forEach((row: any) => {
+      data.forEach((row) => {
         const otherId = row.participant_ids.find(
           (id: string) => id !== user.id,
         );
@@ -162,7 +162,7 @@ export const messageService = {
       const userMap = new Map(users?.map((u) => [u.id, u]));
 
       // Map DB rows to UI Conversation type
-      const conversations: Conversation[] = data.map((row: any) => {
+      const conversations: Conversation[] = data.map((row) => {
         const otherUserId =
           row.participant_ids.find((id: string) => id !== user.id) || 'unknown';
 
@@ -306,7 +306,7 @@ export const messageService = {
       );
       if (error) throw error;
 
-      const messages: Message[] = data.map((row: any) => ({
+      const messages: Message[] = data.map((row) => ({
         id: row.id,
         conversationId: row.conversation_id,
         senderId: row.sender_id,
@@ -420,7 +420,7 @@ export const messageService = {
 
       // Decrypt messages
       const decryptedMessages = await Promise.all(
-        data.map(async (msg: any) => {
+        data.map(async (msg) => {
           let content = msg.content;
 
           // Try to decrypt if it has a nonce and is text
