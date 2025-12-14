@@ -10,6 +10,7 @@
  */
 
 import { supabase } from './supabase';
+import { logger } from '../utils/logger';
 
 // Quality score breakdown
 export interface QualityScore {
@@ -54,7 +55,7 @@ class AIQualityScorer {
     userId: string
   ): Promise<QualityScore> {
     try {
-      console.log('[AI Quality] Scoring proof:', proofType);
+      logger.info('[AI Quality] Scoring proof:', { proofType });
 
       // Upload image to Supabase Storage first
       const imageUrl = await this.uploadImage(imageUri, userId);
@@ -81,11 +82,11 @@ class AIQualityScorer {
       // Save score to database
       await this.saveScore(userId, proofType, score, imageUrl);
 
-      console.log('[AI Quality] Score:', score.overall);
+      logger.info('[AI Quality] Score:', { overall: score.overall });
 
       return score;
     } catch (error) {
-      console.error('[AI Quality] Scoring failed:', error);
+      logger.error('[AI Quality] Scoring failed:', error);
       
       // Return fallback score (manual review required)
       return this.fallbackScore();
@@ -116,7 +117,7 @@ class AIQualityScorer {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[AI Quality] Failed to get history:', error);
+      logger.error('[AI Quality] Failed to get history:', error);
       return [];
     }
 

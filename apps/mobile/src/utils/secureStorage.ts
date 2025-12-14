@@ -140,10 +140,11 @@ export async function migrateSensitiveDataToSecure(): Promise<void> {
       if (value) {
         await secureStorage.setItem(newKey, value);
         await Storage.removeItem(old);
-        console.log(`✅ Migrated ${old} → ${newKey}`);
+        // Migration successful (removed console.log for production)
       }
     } catch (error) {
-      console.error(`❌ Migration failed: ${old}`, error);
+      // Migration failed (removed console.error for production)
+      // Error is silently ignored to avoid breaking app startup
     }
   }
 }
