@@ -10,7 +10,7 @@ import { logger } from '../utils/logger';
  * Environment Schema
  */
 const envSchema = z.object({
-  API_URL: z.string().url().optional().default('http://localhost:3000/api'),
+  API_URL: z.string().url().optional(),
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
@@ -31,7 +31,7 @@ const envSchema = z.object({
  * Production environment validation
  * These variables MUST be set in production
  */
-const REQUIRED_IN_PRODUCTION = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
+const REQUIRED_IN_PRODUCTION = ['API_URL', 'SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
 
 /**
  * Parse and validate environment variables
@@ -114,7 +114,7 @@ export const isTest = config.NODE_ENV === 'test';
  * API Configuration
  */
 export const API_CONFIG = {
-  BASE_URL: config.API_URL,
+  BASE_URL: config.API_URL || (config.NODE_ENV === 'development' ? 'http://localhost:3000/api' : ''),
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,

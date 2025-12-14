@@ -148,13 +148,13 @@ export const LoginScreen: React.FC = () => {
       />
 
       <TouchableOpacity
-        style={[styles.button, (isLoading || !canSubmitForm({ formState } as any)) && styles.buttonDisabled]}
+        style={[styles.button, (isLoading || !canSubmitForm({ formState })) && styles.buttonDisabled]}
         onPress={handleSubmit(onSubmit)}
-        disabled={isLoading || !canSubmitForm({ formState } as any)}
+        disabled={isLoading || !canSubmitForm({ formState })}
         {...a11y.button(
           isLoading ? 'Signing in' : 'Sign In',
           'Sign in with your email and password',
-          isLoading || !canSubmitForm({ formState } as any)
+          isLoading || !canSubmitForm({ formState })
         )}
       >
         <Text style={styles.buttonText}>

@@ -7,6 +7,7 @@
 import React from 'react';
 import * as Sentry from '@sentry/react-native';
 import { BrowserTracing } from '@sentry/tracing';
+import { logger } from '../utils/logger';
 
 interface PerformanceMetrics {
   fcp?: number; // First Contentful Paint
@@ -171,6 +172,7 @@ class PerformanceMonitor {
     // Log in development
     if (process.env.NODE_ENV === 'development') {
       const status = threshold && value <= threshold ? '✅' : '❌';
+      // eslint-disable-next-line no-console
       console.log(`${status} ${name}: ${Math.round(value)}ms (threshold: ${threshold}ms)`);
     }
   }
@@ -191,7 +193,7 @@ class PerformanceMonitor {
     });
 
     // Log warning
-    console.warn('⚠️ Performance budget exceeded:', violation);
+    logger.warn('⚠️ Performance budget exceeded:', violation);
   }
 
   // Track custom metrics

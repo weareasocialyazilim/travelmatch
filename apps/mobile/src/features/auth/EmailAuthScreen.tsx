@@ -134,10 +134,10 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.continueButton,
-              (!canSubmitForm({ formState } as any) || loading) && styles.continueButtonDisabled,
+              (!canSubmitForm({ formState }) || loading) && styles.continueButtonDisabled,
             ]}
             onPress={handleSubmit(handleContinue)}
-            disabled={!canSubmitForm({ formState } as any) || loading}
+            disabled={!canSubmitForm({ formState }) || loading}
             activeOpacity={0.8}
           >
             <Text style={styles.continueButtonText}>

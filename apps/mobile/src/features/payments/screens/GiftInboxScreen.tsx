@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix navigation param types (GiftInboxDetail expects stricter Gift type with required fields)
 import React from 'react';
 import {
   View,
@@ -13,10 +12,10 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { useGiftInbox, type GiftInboxItem } from '@/hooks/useGiftInbox';
-import { GiftInboxCard } from '@/components/GiftInboxCard';
-import { FilterSortBar, SortFilterModal } from '@/components/FilterSortBar';
-import { TopPicksSection } from '@/components/TopPicksSection';
+import { useGiftInbox, type GiftInboxItem, type SortOption, type FilterOption } from '@/hooks/useGiftInbox';
+import { GiftInboxCard } from '../components/GiftInboxCard';
+import { FilterSortBar, SortFilterModal } from '../components/FilterSortBar';
+import { TopPicksSection } from '../components/TopPicksSection';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
@@ -55,14 +54,23 @@ const GiftInboxScreen: React.FC = () => {
       senderId: item.sender.id,
       senderName: item.sender.name,
       senderAvatar: item.sender.avatar,
-      senderAge: item.sender.age,
-      senderRating: item.sender.rating,
+      senderAge: item.sender.age ?? 0,
+      senderRating: item.sender.rating ?? 0,
       senderVerified: item.sender.isVerified,
-      senderTripCount: item.sender.tripCount,
-      senderCity: item.sender.city,
-      gifts: item.gifts,
+      senderTripCount: item.sender.tripCount ?? 0,
+      senderCity: item.sender.city ?? '',
+      gifts: item.gifts.map(g => ({
+        id: g.id,
+        momentTitle: g.momentTitle ?? '',
+        momentEmoji: g.momentEmoji ?? '🎁',
+        amount: g.amount,
+        message: g.message ?? '',
+        paymentType: (g.paymentType ?? 'direct') as 'direct' | 'half_escrow' | 'full_escrow',
+        status: (g.status ?? 'received') as 'received' | 'pending_proof' | 'verifying' | 'verified' | 'failed',
+        createdAt: g.createdAt,
+      })),
       totalAmount: item.totalAmount,
-      canStartChat: item.canStartChat,
+      canStartChat: item.canStartChat ?? false,
     });
   };
 
@@ -213,7 +221,7 @@ const GiftInboxScreen: React.FC = () => {
         options={['newest', 'highest_amount', 'highest_rating', 'best_match']}
         selectedValue={sortBy}
         onClose={() => setShowSortModal(false)}
-        onSelect={(value) => setSortBy(value as any)}
+        onSelect={(value) => setSortBy(value as SortOption)}
         getLabel={getSortLabel}
       />
 
@@ -224,7 +232,7 @@ const GiftInboxScreen: React.FC = () => {
         options={['all', 'thirty_plus', 'verified_only', 'ready_to_chat']}
         selectedValue={filterBy}
         onClose={() => setShowFilterModal(false)}
-        onSelect={(value) => setFilterBy(value as any)}
+        onSelect={(value) => setFilterBy(value as FilterOption)}
         getLabel={getFilterLabel}
       />
     </SafeAreaView>

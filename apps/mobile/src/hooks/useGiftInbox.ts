@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
+import { logger } from '@/utils/logger';
 
 export interface GiftSender {
   id: string;
@@ -48,8 +49,8 @@ export interface GiftInboxItem {
   momentTitle?: string;
 }
 
-export type SortOption = 'date' | 'amount' | 'status' | 'sender';
-export type FilterOption = 'all' | 'pending' | 'accepted' | 'rejected' | 'expired';
+export type SortOption = 'newest' | 'highest_amount' | 'highest_rating' | 'best_match' | 'date' | 'amount' | 'status' | 'sender';
+export type FilterOption = 'all' | 'pending' | 'accepted' | 'rejected' | 'expired' | 'thirty_plus' | 'verified_only' | 'ready_to_chat';
 export type SortField = 'date' | 'amount' | 'status';
 export type SortOrder = 'asc' | 'desc';
 
@@ -95,12 +96,12 @@ export function useGiftInbox() {
 
   const acceptGift = useCallback(async (giftId: string) => {
     // TODO: Implement accept gift API call
-    console.log('Accept gift:', giftId);
+    logger.debug('Accept gift action', { giftId });
   }, []);
 
   const rejectGift = useCallback(async (giftId: string) => {
     // TODO: Implement reject gift API call
-    console.log('Reject gift:', giftId);
+    logger.debug('Reject gift action', { giftId });
   }, []);
 
   const sortedItems = useMemo(() => {
@@ -132,7 +133,7 @@ export function useGiftInbox() {
   const newToday = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return gifts.filter(g => new Date(g.createdAt) >= today).length;
+    return gifts.filter(g => new Date(g.createdAt) >= today);
   }, [gifts]);
 
   const getSortLabel = useCallback((sort: SortOption): string => {
@@ -141,6 +142,10 @@ export function useGiftInbox() {
       case 'amount': return 'Amount';
       case 'status': return 'Status';
       case 'sender': return 'Sender';
+      case 'newest': return 'Newest';
+      case 'highest_amount': return 'Highest Amount';
+      case 'highest_rating': return 'Highest Rating';
+      case 'best_match': return 'Best Match';
       default: return 'Date';
     }
   }, []);
@@ -152,6 +157,9 @@ export function useGiftInbox() {
       case 'accepted': return 'Accepted';
       case 'rejected': return 'Rejected';
       case 'expired': return 'Expired';
+      case 'thirty_plus': return '30+';
+      case 'verified_only': return 'Verified Only';
+      case 'ready_to_chat': return 'Ready to Chat';
       default: return 'All';
     }
   }, []);

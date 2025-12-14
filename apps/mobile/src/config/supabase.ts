@@ -39,6 +39,11 @@ const SupabaseStorage = {
 };
 
 /**
+ * Export Supabase URL for Edge Functions
+ */
+export const SUPABASE_EDGE_URL = SUPABASE_URL;
+
+/**
  * Supabase client instance
  * Configured with SecureStore for session persistence in React Native
  */

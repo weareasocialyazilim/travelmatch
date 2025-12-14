@@ -225,11 +225,14 @@ export function getApiUrl(): string {
 export function validateEnvironment(): void {
   try {
     parseEnv();
-    if (isDevelopment) {
+    if (isDevelopment && __DEV__) {
+      // eslint-disable-next-line no-console
       console.log('✅ Environment validation passed');
+      // eslint-disable-next-line no-console
       console.log(`📱 Running in ${env.APP_ENV} mode`);
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
     throw error;
   }

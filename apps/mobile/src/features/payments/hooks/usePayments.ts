@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix API mismatch between hook and paymentsApi (withdraw expects 2 args, createSubscription/submitKYC signature mismatch)
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { paymentsApi } from '@/services/paymentsApi';
 
@@ -64,7 +63,7 @@ export function usePaymentMethods() {
  */
 export function useCreatePaymentIntent() {
   return useMutation({
-    mutationFn: (data: CreatePaymentIntentDto) => paymentsApi.createPaymentIntent(data),
+    mutationFn: (data: CreatePaymentIntentDto) => paymentsApi.createPaymentIntent(data.amount, data.currency),
   });
 }
 
@@ -77,7 +76,7 @@ export function useWithdraw() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (amount: number) => paymentsApi.withdraw(amount),
+    mutationFn: ({ amount, paymentMethodId }: { amount: number; paymentMethodId: string }) => paymentsApi.withdraw(amount, paymentMethodId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -106,7 +105,7 @@ export function useSubmitKYC() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (documents: FormData) => paymentsApi.submitKYC(documents),
+    mutationFn: (documents: Record<string, string>) => paymentsApi.submitKYC(documents),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kyc-status'] });
     },
@@ -134,7 +133,7 @@ export function useCreateSubscription() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (planId: string) => paymentsApi.createSubscription(planId),
+    mutationFn: ({ planId, paymentMethodId }: { planId: string; paymentMethodId: string }) => paymentsApi.createSubscription(planId, paymentMethodId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscription'] });
     },

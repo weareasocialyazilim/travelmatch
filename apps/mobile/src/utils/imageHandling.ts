@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Image Handling Utilities
  * Image picker, compression, upload ve caching
@@ -196,7 +195,7 @@ export function calculateResizeDimensions(
  * Cache directory for images
  */
 const getImageCacheDir = () => {
-  const cacheDir = ExpoFileSystem.cacheDirectory;
+  const cacheDir = FileSystem.cacheDirectory;
   if (!cacheDir) {
     throw new Error('Cache directory not available');
   }

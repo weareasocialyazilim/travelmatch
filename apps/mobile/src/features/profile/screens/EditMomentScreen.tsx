@@ -212,10 +212,10 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.saveButton,
-            (loading || !canSubmitForm({ formState } as any)) && styles.saveButtonDisabled,
+            (loading || !canSubmitForm({ formState })) && styles.saveButtonDisabled,
           ]}
           onPress={handleSubmit(handleSave)}
-          disabled={loading || !canSubmitForm({ formState } as any)}
+          disabled={loading || !canSubmitForm({ formState })}
           activeOpacity={0.8}
         >
           <Text style={styles.saveButtonText}>

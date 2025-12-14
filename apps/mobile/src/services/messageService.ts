@@ -1,4 +1,3 @@
-// @ts-nocheck - Duplicate method declarations need cleanup
 /**
  * Message Service
  * Real-time messaging operations backed by Supabase
@@ -266,26 +265,26 @@ export const messageService = {
 
       if (!user) throw new Error('Not authenticated');
 
-      const { data: message, error } = await dbMessagesService.create({
+      const { data: message, error } = await dbMessagesService.send({
         conversation_id: data.conversationId,
         sender_id: user.id,
         content: data.content,
-        type: data.type,
-        image_url: data.imageUrl,
-        location: data.location,
+        type: data.type === 'location' ? 'system' : data.type,
+        read_at: null,
       });
 
       if (error) throw error;
+      if (!message) throw new Error('Failed to send message');
 
+      const msgData = message as any;
       return {
-        id: message.id,
-        conversationId: message.conversation_id,
-        senderId: message.sender_id,
-        content: message.content,
-        type: message.type as MessageType,
-        imageUrl: message.image_url,
-        location: message.location,
-        createdAt: message.created_at,
+        id: msgData.id,
+        conversationId: msgData.conversation_id,
+        senderId: msgData.sender_id,
+        content: msgData.content,
+        type: msgData.type as MessageType,
+        location: msgData.location,
+        createdAt: msgData.created_at,
         status: 'sent' as MessageStatus,
       };
     } catch (error) {
@@ -293,48 +292,11 @@ export const messageService = {
       throw error;
     }
   },
-  getMessages: async (
-    conversationId: string,
-    params?: { page?: number; pageSize?: number; before?: string },
-  ): Promise<MessagesResponse> => {
-    try {
-      const { data, count, error } = await dbMessagesService.listByConversation(
-        conversationId,
-        {
-          limit: params?.pageSize,
-          before: params?.before,
-        },
-      );
-      if (error) throw error;
-
-      const messages: Message[] = data.map((row: any) => ({
-        id: row.id,
-        conversationId: row.conversation_id,
-        senderId: row.sender_id,
-        content: row.content,
-        type: 'text', // Default for now
-        createdAt: row.created_at,
-        readAt: row.read_at,
-        status: row.read_at ? 'read' : 'delivered',
-      }));
-
-      return {
-        messages,
-        total: count,
-        page: params?.page || 1,
-        pageSize: params?.pageSize || 20,
-        hasMore: data.length === (params?.pageSize || 20),
-      };
-    } catch (error) {
-      logger.error('Get messages error:', error);
-      return { messages: [], total: 0, page: 1, pageSize: 20, hasMore: false };
-    }
-  },
 
   /**
-   * Send a message
+   * Send an encrypted message (advanced)
    */
-  sendMessage: async (data: SendMessageRequest): Promise<Message> => {
+  sendEncryptedMessage: async (data: SendMessageRequest): Promise<Message> => {
     try {
       const {
         data: { user },
@@ -370,31 +332,27 @@ export const messageService = {
         nonce = encrypted.nonce;
       }
 
-      const { data: message, error } = await dbMessagesService.create({
+      const { data: message, error } = await dbMessagesService.send({
         conversation_id: data.conversationId,
         sender_id: user.id,
         content: encryptedContent,
-        // @ts-ignore
-        nonce: nonce,
-        type: data.type,
-        metadata: {
-          imageUrl: data.imageUrl,
-          location: data.location,
-        },
+        type: data.type === 'location' ? 'system' : data.type,
+        read_at: null,
       });
 
       if (error) throw error;
       if (!message) throw new Error('Failed to create message');
 
+      const msgData = message as any;
       return {
-        id: message.id,
-        conversationId: message.conversation_id,
-        senderId: message.sender_id,
+        id: msgData.id,
+        conversationId: msgData.conversation_id,
+        senderId: msgData.sender_id,
         content: data.content, // Return original content for UI
-        type: message.type as MessageType,
-        imageUrl: message.metadata?.imageUrl,
-        location: message.metadata?.location,
-        createdAt: message.created_at,
+        type: msgData.type as MessageType,
+        imageUrl: msgData.metadata?.imageUrl,
+        location: msgData.metadata?.location,
+        createdAt: msgData.created_at,
         status: 'sent' as MessageStatus,
       };
     } catch (error) {
@@ -411,10 +369,9 @@ export const messageService = {
     params?: { page?: number; pageSize?: number },
   ): Promise<MessagesResponse> => {
     try {
-      const { data, count, error } = await dbMessagesService.list(
+      const { data, count, error } = await dbMessagesService.listByConversation(
         conversationId,
-        params?.page || 1,
-        params?.pageSize || 20,
+        { limit: params?.pageSize || 20 },
       );
 
       if (error) throw error;
@@ -457,7 +414,7 @@ export const messageService = {
             location: msg.metadata?.location,
             createdAt: msg.created_at,
             readAt: msg.read_at,
-            status: msg.read_at ? 'read' : 'delivered',
+            status: (msg.read_at ? 'read' : 'delivered') as MessageStatus,
           };
         }),
       );

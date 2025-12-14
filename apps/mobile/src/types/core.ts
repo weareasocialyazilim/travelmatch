@@ -11,11 +11,14 @@ export interface UserLocation {
 export interface User {
   id: string;
   name: string;
+  username?: string;
   age?: number;
   email?: string;
   phoneNumber?: string;
   photoUrl?: string;
+  profilePhoto?: string; // Alternative photo field
   avatar?: string;
+  avatarUrl?: string; // Alternative avatar field
   bio?: string;
   role: Role;
   type?: 'traveler' | 'local';

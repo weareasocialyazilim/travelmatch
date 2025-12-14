@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -123,7 +122,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
                 setActiveImageIndex(index);
               }}
             >
-              {proof.images.map((image, index) => (
+              {proof.images.map((image: string, index: number) => (
                 <Image
                   key={index}
                   source={{ uri: image }}
@@ -136,7 +135,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
             {/* Image Indicators */}
             {proof.images.length > 1 && (
               <View style={styles.imageIndicators}>
-                {proof.images.map((_, index) => (
+                {proof.images.map((_: string, index: number) => (
                   <View
                     key={index}
                     style={[
@@ -197,7 +196,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
             >
               {proof.type
                 .split('-')
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(' ')}
             </Text>
           </View>

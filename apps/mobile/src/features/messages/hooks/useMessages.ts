@@ -1,7 +1,6 @@
-// @ts-nocheck - TODO: Fix API mismatch between hook and messageService (getConversation, createConversation, deleteConversation don't exist)
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { messageService as messagesApi } from '@/services/messageService';
+import { messageService as messagesApi, type SendMessageRequest } from '@/services/messageService';
 import { supabase } from '@/config/supabase';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
@@ -14,19 +13,6 @@ export function useConversations() {
   return useQuery({
     queryKey: ['conversations'],
     queryFn: () => messagesApi.getConversations(),
-  });
-}
-
-/**
- * useConversation Hook
- * 
- * Tek bir konuşma detayı
- */
-export function useConversation(conversationId: string) {
-  return useQuery({
-    queryKey: ['conversation', conversationId],
-    queryFn: () => messagesApi.getConversation(conversationId),
-    enabled: !!conversationId,
   });
 }
 
@@ -90,8 +76,8 @@ export function useSendMessage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ conversationId, content }: { conversationId: string; content: string }) =>
-      messagesApi.sendMessage(conversationId, content),
+    mutationFn: (data: Omit<SendMessageRequest, 'type'> & { type?: SendMessageRequest['type'] }) =>
+      messagesApi.sendMessage({ ...data, type: data.type ?? 'text' }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['messages', variables.conversationId] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
@@ -100,15 +86,16 @@ export function useSendMessage() {
 }
 
 /**
- * useCreateConversation Hook
+ * useGetOrCreateConversation Hook
  * 
- * Yeni konuşma başlat
+ * Yeni konuşma başlat veya mevcut olanı getir
  */
-export function useCreateConversation() {
+export function useGetOrCreateConversation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (recipientId: string) => messagesApi.createConversation(recipientId),
+    mutationFn: ({ userId, momentId }: { userId: string; momentId?: string }) => 
+      messagesApi.getOrCreateConversation(userId, momentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     },
@@ -124,23 +111,7 @@ export function useArchiveConversation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (conversationId: string) => messagesApi.archiveConversation(conversationId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-    },
-  });
-}
-
-/**
- * useDeleteConversation Hook
- * 
- * Konuşmayı sil
- */
-export function useDeleteConversation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (conversationId: string) => messagesApi.deleteConversation(conversationId),
+    mutationFn: async (conversationId: string) => messagesApi.archiveConversation(conversationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     },
@@ -156,9 +127,9 @@ export function useMarkAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (conversationId: string) => messagesApi.markAsRead(conversationId),
+    mutationFn: async (conversationId: string) => messagesApi.markAsRead(conversationId),
     onSuccess: (_, conversationId) => {
-      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] });
+      queryClient.invalidateQueries({ queryKey: ['messages', conversationId] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     },
   });

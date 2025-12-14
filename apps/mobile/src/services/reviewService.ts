@@ -307,6 +307,218 @@ export const reviewService = {
     // TODO: Implement query to find completed requests where I haven't left a review yet
     return { pendingReviews: [] };
   },
+
+  /**
+   * Get my review statistics
+   */
+  getMyReviewStats: async (): Promise<{ stats: ReviewStats }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { stats } = await reviewService.getReviews({ userId: user.id });
+      return { stats };
+    } catch (error) {
+      logger.error('Get my review stats error:', error);
+      return {
+        stats: {
+          averageRating: 0,
+          totalReviews: 0,
+          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        },
+      };
+    }
+  },
+
+  /**
+   * Get reviews for a specific user
+   */
+  getUserReviews: async (
+    userId: string,
+    filters?: ReviewFilters,
+  ): Promise<{ reviews: Review[]; stats: ReviewStats; total: number }> => {
+    return reviewService.getReviews({ ...filters, userId });
+  },
+
+  /**
+   * Get reviews for a specific moment
+   */
+  getMomentReviews: async (
+    momentId: string,
+    filters?: ReviewFilters,
+  ): Promise<{ reviews: Review[]; stats: ReviewStats; total: number }> => {
+    return reviewService.getReviews({ ...filters, momentId });
+  },
+
+  /**
+   * Update an existing review
+   */
+  updateReview: async (
+    reviewId: string,
+    data: { rating?: number; comment?: string },
+  ): Promise<{ review: Review }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: updated, error } = await supabase
+        .from('reviews')
+        .update({
+          rating: data.rating,
+          comment: data.comment,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', reviewId)
+        .eq('reviewer_id', user.id) // Ensure only owner can update
+        .select('*, reviewer:users(*), moment:moments(*)')
+        .single();
+
+      if (error) throw error;
+      if (!updated) throw new Error('Review not found');
+
+      const review: Review = {
+        id: updated.id,
+        rating: updated.rating,
+        comment: updated.comment || '',
+        reviewerId: updated.reviewer_id,
+        reviewerName: (updated as any).reviewer?.full_name || 'User',
+        reviewerAvatar: (updated as any).reviewer?.avatar_url || '',
+        revieweeId: updated.reviewed_id,
+        revieweeName: '',
+        momentId: updated.moment_id,
+        momentTitle: (updated as any).moment?.title || '',
+        requestId: '',
+        createdAt: updated.created_at,
+        isVerified: true,
+        isEdited: true,
+      };
+
+      return { review };
+    } catch (error) {
+      logger.error('Update review error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete a review
+   */
+  deleteReview: async (reviewId: string): Promise<void> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', reviewId)
+        .eq('reviewer_id', user.id); // Ensure only owner can delete
+
+      if (error) throw error;
+    } catch (error) {
+      logger.error('Delete review error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Respond to a review (for reviewed users)
+   */
+  respondToReview: async (
+    reviewId: string,
+    text: string,
+  ): Promise<{ review: Review }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Check if user is the reviewed person
+      const { data: existingReview, error: fetchError } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('id', reviewId)
+        .eq('reviewed_id', user.id)
+        .single();
+
+      if (fetchError || !existingReview) {
+        throw new Error('Review not found or not authorized');
+      }
+
+      // Note: Response field may need to be added to the reviews table
+      // For now, we'll store it but the schema may need updating
+      const { data: updated, error } = await supabase
+        .from('reviews')
+        .update({
+          response: text,
+          response_at: new Date().toISOString(),
+        } as any)
+        .eq('id', reviewId)
+        .select('*, reviewer:users(*), moment:moments(*)')
+        .single();
+
+      if (error) throw error;
+
+      const review: Review = {
+        id: updated!.id,
+        rating: updated!.rating,
+        comment: updated!.comment || '',
+        reviewerId: updated!.reviewer_id,
+        reviewerName: (updated as any)?.reviewer?.full_name || 'User',
+        reviewerAvatar: (updated as any)?.reviewer?.avatar_url || '',
+        revieweeId: updated!.reviewed_id,
+        revieweeName: '',
+        momentId: updated!.moment_id,
+        momentTitle: (updated as any)?.moment?.title || '',
+        requestId: '',
+        createdAt: updated!.created_at,
+        isVerified: true,
+        isEdited: false,
+        response: {
+          text,
+          createdAt: new Date().toISOString(),
+        },
+      };
+
+      return { review };
+    } catch (error) {
+      logger.error('Respond to review error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Report a review
+   */
+  reportReview: async (reviewId: string, reason: string): Promise<void> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Insert into reports table (assuming it exists)
+      const { error } = await supabase.from('reports').insert({
+        reporter_id: user.id,
+        target_type: 'review',
+        target_id: reviewId,
+        reason,
+        status: 'pending',
+      } as any);
+
+      if (error) throw error;
+    } catch (error) {
+      logger.error('Report review error:', error);
+      throw error;
+    }
+  },
 };
 
 // Utility functions

@@ -1,5 +1,4 @@
-// @ts-nocheck - TODO: Fix context types - useConfirmation missing showConfirmation, useToast missing success/error/info methods
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -68,7 +67,7 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
   navigation,
 }) => {
   const toast = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { confirm } = useConfirmation();
 
   const {
     control,
@@ -82,43 +81,49 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
     },
   });
 
-  const onDelete = (data: DeleteAccountInput) => {
-    showConfirmation({
+  const onDelete = async (_data: DeleteAccountInput) => {
+    const confirmed = await confirm({
       title: 'Delete Account',
       message:
         'Are you absolutely sure? This action cannot be undone. All your data, moments, and messages will be permanently deleted.',
-      type: 'danger',
-      icon: 'alert-circle',
+      destructive: true,
       confirmText: 'Yes, Delete',
       cancelText: 'Cancel',
-      onConfirm: async () => {
-        try {
-          // Real API call for KVKK/GDPR compliant account deletion
-          const { deleteAccount } = await import(
-            '../services/supabaseAuthService'
-          );
-          const { error } = await deleteAccount();
-
-          if (error) throw error;
-
-          logger.info('[Account] Deletion request submitted');
-          toast.success(
-            'Account scheduled for deletion. You will receive a confirmation email within 24 hours.',
-          );
-          navigation.navigate('Welcome');
-        } catch (error) {
-          logger.error('[Account] Deletion failed', error as Error);
-          toast.error('Failed to delete account. Please contact support.');
-        }
-      },
-      onCancel: () => {
-        toast.info('Account deletion cancelled');
-      },
     });
+
+    if (confirmed) {
+      try {
+        // Real API call for KVKK/GDPR compliant account deletion
+        const { deleteAccount } = await import(
+          '../services/supabaseAuthService'
+        );
+        const { error } = await deleteAccount();
+
+        if (error) throw error;
+
+        logger.info('[Account] Deletion request submitted');
+        toast.showToast({
+          message: 'Account scheduled for deletion. You will receive a confirmation email within 24 hours.',
+          type: 'success',
+        });
+        navigation.navigate('Welcome');
+      } catch (error) {
+        logger.error('[Account] Deletion failed', error as Error);
+        toast.showToast({
+          message: 'Failed to delete account. Please contact support.',
+          type: 'error',
+        });
+      }
+    } else {
+      toast.showToast({
+        message: 'Account deletion cancelled',
+        type: 'info',
+      });
+    }
   };
 
   const handleKeepAccount = () => {
-    toast.success('Great! Your account is safe.');
+    toast.showToast({ message: 'Great! Your account is safe.', type: 'success' });
     navigation.goBack();
   };
 

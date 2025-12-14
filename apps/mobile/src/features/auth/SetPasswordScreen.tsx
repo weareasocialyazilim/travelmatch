@@ -221,10 +221,10 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.setPasswordButton,
-              !canSubmitForm({ formState } as any) && styles.setPasswordButtonDisabled,
+              !canSubmitForm({ formState }) && styles.setPasswordButtonDisabled,
             ]}
             onPress={handleSubmit(handleSetPassword)}
-            disabled={!canSubmitForm({ formState } as any)}
+            disabled={!canSubmitForm({ formState })}
             activeOpacity={0.8}
           >
             <Text style={styles.setPasswordButtonText}>Set Password</Text>

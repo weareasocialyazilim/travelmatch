@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Secure Payment Service (Client-Side)
  * 
@@ -12,7 +11,7 @@
  * - Type-safe payment operations
  */
 
-import { supabase } from '../config/supabase';
+import { supabase, SUPABASE_EDGE_URL } from '../config/supabase';
 import { logger } from '../utils/logger';
 import {
   cacheInvalidationService,
@@ -65,7 +64,7 @@ export interface ConfirmPaymentParams {
 }
 
 class SecurePaymentService {
-  private readonly EDGE_FUNCTION_BASE = `${supabase.supabaseUrl}/functions/v1`;
+  private readonly EDGE_FUNCTION_BASE = `${SUPABASE_EDGE_URL}/functions/v1`;
 
   /**
    * Get authorization header for Edge Function calls
@@ -200,7 +199,13 @@ class SecurePaymentService {
       const cached = await getCachedWallet(user.id);
       if (cached) {
         logger.info('Wallet balance from cache');
-        return cached;
+        // Convert WalletData to WalletBalance
+        const cachedData = cached as any;
+        return {
+          available: cachedData.balance || 0,
+          pending: cachedData.pendingBalance || 0,
+          currency: cachedData.currency || 'USD',
+        };
       }
 
       // Fetch from database
@@ -213,13 +218,17 @@ class SecurePaymentService {
       if (error) throw error;
 
       const balance: WalletBalance = {
-        available: data.balance || 0,
+        available: (data as any).balance || 0,
         pending: 0,
-        currency: data.currency || 'USD',
+        currency: (data as any).currency || 'USD',
       };
 
-      // Cache the result
-      await setCachedWallet(user.id, balance);
+      // Cache the result - convert to WalletData format
+      await setCachedWallet(user.id, {
+        balance: balance.available,
+        currency: balance.currency,
+        pendingBalance: balance.pending,
+      });
 
       return balance;
     } catch (error) {
@@ -247,9 +256,9 @@ class SecurePaymentService {
       
       // Try cache first
       const cached = await getCachedTransactions(cacheKey);
-      if (cached) {
+      if (cached && Array.isArray(cached) && cached.length > 0) {
         logger.info('Transactions from cache');
-        return cached;
+        return cached as Transaction[];
       }
 
       // Build query with JOIN to fetch related data (prevents N+1)

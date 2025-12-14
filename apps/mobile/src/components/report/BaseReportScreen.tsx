@@ -210,14 +210,14 @@ export function BaseReportScreen<T extends string = string>({
         <TouchableOpacity
           style={[
             styles.submitButton,
-            !canSubmitForm({ formState } as any) && styles.submitButtonDisabled,
+            !canSubmitForm({ formState }) && styles.submitButtonDisabled,
           ]}
           onPress={handleSubmit(onFormSubmit)}
-          disabled={!canSubmitForm({ formState } as any)}
+          disabled={!canSubmitForm({ formState })}
           activeOpacity={0.7}
           accessibilityLabel={submitButtonText}
           accessibilityRole="button"
-          accessibilityState={{ disabled: !canSubmitForm({ formState } as any) }}
+          accessibilityState={{ disabled: !canSubmitForm({ formState }) }}
           testID={`${testID}-submit-button`}
         >
           <Text style={styles.submitButtonText}>{submitButtonText}</Text>

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState } from 'react';
 import {
   View,
@@ -115,7 +114,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
   };
 
   const handleUploadProof = (_giftId: string) => {
-    navigation.navigate('ProofUpload');
+    navigation.navigate('ProofFlow');
   };
 
   const getGiftStatusInfo = (

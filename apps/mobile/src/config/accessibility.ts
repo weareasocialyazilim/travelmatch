@@ -234,7 +234,10 @@ export const a11yUtils = {
     // React Native uses AccessibilityInfo.announceForAccessibility
     // Import AccessibilityInfo from react-native to use this
     // AccessibilityInfo.announceForAccessibility(message);
-    console.log('[Accessibility Announce]:', message);
+    if (__DEV__) {
+      // eslint-disable-next-line no-console
+      console.log('[Accessibility Announce]:', message);
+    }
   },
 
   /**

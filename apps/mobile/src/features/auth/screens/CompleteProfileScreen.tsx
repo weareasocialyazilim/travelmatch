@@ -349,11 +349,11 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.completeButton,
-            (!canSubmitForm({ formState } as any) || loading) &&
+            (!canSubmitForm({ formState }) || loading) &&
               styles.completeButtonDisabled,
           ]}
           onPress={handleSubmit(handleComplete)}
-          disabled={!canSubmitForm({ formState } as any) || loading}
+          disabled={!canSubmitForm({ formState }) || loading}
           activeOpacity={0.8}
         >
           <Text style={styles.buttonText}>Complete Profile</Text>

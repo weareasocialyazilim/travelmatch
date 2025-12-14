@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Native Web Crypto API Migration Plan
  * 
@@ -24,11 +23,9 @@ import { logger } from '../utils/logger';
 declare global {
   interface Window {
     crypto: Crypto;
+    CompressionStream: unknown;
+    DecompressionStream: unknown;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const CompressionStream: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const DecompressionStream: any;
 }
 
 // Platform check - these APIs only work on web
@@ -261,7 +258,7 @@ export async function decryptData(
     const decrypted = await crypto.subtle.decrypt(
       {
         name: 'AES-GCM',
-        iv: iv,
+        iv: iv as BufferSource,
       },
       key,
       encryptedData,
@@ -427,17 +424,17 @@ export const tweetnaclMigrationGuide = {
  * Performance comparison
  */
 export async function benchmarkCompression(data: string) {
-  console.log('🔬 Compression Benchmark\n');
+  logger.debug('🔬 Compression Benchmark\n');
   
   // Native API
   const nativeStart = performance.now();
   const nativeCompressed = await compressData(data);
   const nativeDuration = performance.now() - nativeStart;
   
-  console.log('Native CompressionStream API:');
-  console.log(`  Duration: ${nativeDuration.toFixed(2)}ms`);
-  console.log(`  Size: ${nativeCompressed.size} bytes`);
-  console.log(`  Ratio: ${(nativeCompressed.size / data.length * 100).toFixed(2)}%\n`);
+  logger.debug('Native CompressionStream API:');
+  logger.debug(`  Duration: ${nativeDuration.toFixed(2)}ms`);
+  logger.debug(`  Size: ${nativeCompressed.size} bytes`);
+  logger.debug(`  Ratio: ${(nativeCompressed.size / data.length * 100).toFixed(2)}%\n`);
   
   return {
     native: { duration: nativeDuration, size: nativeCompressed.size },

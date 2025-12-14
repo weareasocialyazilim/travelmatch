@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   View,
@@ -30,7 +29,8 @@ import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { UserProfile } from '@/services/userService';
-import type { Moment } from '../types';
+import type { Moment } from '@/hooks/useMoments';
+import type { Moment as DomainMoment } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
@@ -184,37 +184,40 @@ const ProfileScreen: React.FC = () => {
 
   const handleMomentPress = useCallback(
     (moment: Moment) => {
-      const locationStr =
-        typeof moment.location === 'string'
-          ? moment.location
-          : `${moment.location?.city || ''}, ${moment.location?.country || ''}`;
+      const categoryObj = typeof moment.category === 'string' 
+        ? { id: moment.category, label: moment.category, emoji: '✨' }
+        : moment.category || { id: 'other', label: 'Other', emoji: '✨' };
+
+      const locationObj = typeof moment.location === 'string'
+        ? { city: moment.location, country: '' }
+        : { city: moment.location?.city || '', country: moment.location?.country || '' };
+
+      const domainMoment: DomainMoment = {
+        id: moment.id,
+        title: moment.title,
+        story: moment.description || `Experience ${moment.title}`,
+        imageUrl:
+          moment.images?.[0] || 'https://ui-avatars.com/api/?name=Moment',
+        image:
+          moment.images?.[0] || 'https://ui-avatars.com/api/?name=Moment',
+        price: moment.pricePerGuest ?? 0,
+        location: locationObj,
+        category: categoryObj,
+        availability: moment.status === 'active' ? 'Available' : 'Completed',
+        user: {
+          id: 'current-user',
+          name: userData.name,
+          avatar: userData.avatarUrl,
+          isVerified: userData.isVerified,
+          location: userData.location,
+          type: 'traveler',
+          travelDays: 0,
+        },
+        giftCount: 0,
+      };
 
       navigation.navigate('MomentDetail', {
-        moment: {
-          ...moment,
-          story: moment.description || `Experience ${moment.title}`,
-          imageUrl:
-            moment.images?.[0] || 'https://ui-avatars.com/api/?name=Moment',
-          image:
-            moment.images?.[0] || 'https://ui-avatars.com/api/?name=Moment',
-          price: moment.pricePerGuest,
-          availability: moment.status === 'active' ? 'Available' : 'Completed',
-          user: {
-            id: 'current-user',
-            name: userData.name,
-            avatar: userData.avatarUrl,
-            isVerified: userData.isVerified,
-            location: userData.location,
-            type: 'traveler',
-            travelDays: 0,
-          },
-          giftCount: 0,
-          category: {
-            id: moment.category,
-            label: moment.category,
-            emoji: '✨',
-          },
-        },
+        moment: domainMoment,
         isOwner: true,
       });
     },

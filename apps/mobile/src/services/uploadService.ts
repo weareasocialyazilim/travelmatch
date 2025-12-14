@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Upload Service
  * Image and file upload operations using Supabase Storage
@@ -375,7 +374,9 @@ export const uploadImage = async (
     // === EDGE CASE 1: Check storage availability ===
     const storageInfo = await storageMonitor.getStorageInfo();
     
-    if (storageInfo.level === StorageLevel.CRITICAL) {
+    if (!storageInfo) {
+      logger.warn('Could not get storage info, proceeding with upload');
+    } else if (storageInfo.level === StorageLevel.CRITICAL) {
       logger.error('Upload blocked: Critical storage level', {
         freeSpace: storageMonitor.formatBytes(storageInfo.freeSpace),
         fileSize: storageMonitor.formatBytes(fileInfo.size),
@@ -389,7 +390,7 @@ export const uploadImage = async (
     const canUpload = await storageMonitor.canUpload(fileInfo.size);
     if (!canUpload) {
       logger.warn('Upload blocked: Insufficient storage for processing', {
-        freeSpace: storageMonitor.formatBytes(storageInfo.freeSpace),
+        freeSpace: storageMonitor.formatBytes(storageInfo?.freeSpace ?? 0),
         fileSize: storageMonitor.formatBytes(fileInfo.size),
         required: storageMonitor.formatBytes(fileInfo.size * 1.5),
       });
@@ -398,7 +399,7 @@ export const uploadImage = async (
       );
     }
 
-    if (storageInfo.level === StorageLevel.LOW) {
+    if (storageInfo?.level === StorageLevel.LOW) {
       logger.warn('Upload proceeding with low storage warning', {
         freeSpace: storageMonitor.formatBytes(storageInfo.freeSpace),
         level: storageInfo.level,
@@ -418,8 +419,6 @@ export const uploadImage = async (
       mimeType: fileInfo.type,
       status: TransactionStatus.INITIATED,
       progress: 0,
-      retryCount: 0,
-      createdAt: Date.now(),
     });
 
     logger.info('Upload tracked in pending transactions', { uploadId, bucket });

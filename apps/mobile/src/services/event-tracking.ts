@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import { supabase } from '@/config/supabase';
 import Anthropic from '@anthropic-ai/sdk';
 import { logger } from '@/utils/logger';

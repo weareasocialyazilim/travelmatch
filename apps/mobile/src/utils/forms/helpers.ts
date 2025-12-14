@@ -34,6 +34,15 @@ export function getFormState<T extends FieldValues>(
 }
 
 /**
+ * Minimal FormState interface for canSubmitForm
+ */
+export interface MinimalFormState {
+  isSubmitting: boolean;
+  isValid: boolean;
+  isDirty: boolean;
+}
+
+/**
  * Check if form can be submitted
  * Common validation for submit button state
  * 
@@ -41,7 +50,7 @@ export function getFormState<T extends FieldValues>(
  * @param options - Options for validation
  */
 export function canSubmitForm<T extends FieldValues>(
-  form: UseFormReturn<T> | { formState: UseFormReturn<T>['formState'] },
+  form: UseFormReturn<T> | { formState: MinimalFormState },
   options: {
     requireDirty?: boolean;
     requireValid?: boolean;
@@ -370,6 +379,7 @@ export function debugFormState<T extends FieldValues>(
   label = 'Form State'
 ) {
   if (__DEV__) {
+    // eslint-disable-next-line no-console
     console.log(`[${label}]`, {
       values: form.getValues(),
       errors: form.formState.errors,
@@ -395,6 +405,7 @@ export function useFormDebug<T extends FieldValues>(
   const values = form.watch();
   
   if (__DEV__) {
+    // eslint-disable-next-line no-console
     console.log('[Form Watch]', values);
   }
 }

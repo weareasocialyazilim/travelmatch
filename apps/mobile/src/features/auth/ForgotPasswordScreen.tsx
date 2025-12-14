@@ -49,7 +49,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
     }, 1500);
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+  const isSubmitDisabled = !canSubmitForm({ formState }, {
     requireDirty: false,
     requireValid: true,
   });

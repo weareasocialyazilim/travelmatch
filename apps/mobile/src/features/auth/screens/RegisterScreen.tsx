@@ -124,9 +124,9 @@ export const RegisterScreen: React.FC = () => {
       />
 
       <TouchableOpacity
-        style={[styles.button, (isLoading || !canSubmitForm({ formState } as any)) && styles.buttonDisabled]}
+        style={[styles.button, (isLoading || !canSubmitForm({ formState })) && styles.buttonDisabled]}
         onPress={handleSubmit(onSubmit)}
-        disabled={isLoading || !canSubmitForm({ formState } as any)}
+        disabled={isLoading || !canSubmitForm({ formState })}
       >
         <Text style={styles.buttonText}>
           {isLoading ? 'Creating Account...' : 'Sign Up'}

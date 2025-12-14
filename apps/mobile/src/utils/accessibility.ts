@@ -53,7 +53,7 @@ export const a11yProps = {
   /**
    * Header accessibility props
    */
-  header: (level: 1 | 2 | 3 = 1) => ({
+  header: (level: 1 | 2 | 3 = 1, _label?: string) => ({
     accessible: true,
     accessibilityRole: ROLES.header,
     // Note: React Native doesn't fully support aria-level yet,

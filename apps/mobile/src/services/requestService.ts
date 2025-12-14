@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Request Service
  * Gift requests, bookings, and related operations
@@ -83,6 +82,7 @@ export interface RequestFilters {
   status?: RequestStatus;
   type?: RequestType;
   role?: 'requester' | 'host';
+  momentId?: string;
   page?: number;
   pageSize?: number;
 }
@@ -473,8 +473,10 @@ export const getStatusLabel = (status: RequestStatus): string => {
       return 'Completed';
     case 'expired':
       return 'Expired';
-    default:
-      return status.charAt(0).toUpperCase() + status.slice(1);
+    default: {
+      const s = status as string;
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
   }
 };
 

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix Plan/SubscriptionPlan type mismatch (color, icon fields)
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -42,15 +41,14 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       _setLoading(true);
       const { data } = await subscriptionsService.getPlans();
       if (data && data.length > 0) {
-        const mappedPlans: Plan[] = data.map((p: any) => ({
+        const mappedPlans: Plan[] = data.map((p: { id: string; name: string; price: number; currency?: string; interval: 'month' | 'year'; features?: Array<{ text: string; included: boolean }>; is_popular?: boolean }) => ({
           id: p.id,
           name: p.name,
           price: p.price,
+          currency: p.currency || 'USD',
           interval: p.interval,
-          features: p.features,
+          features: p.features || [],
           popular: p.is_popular,
-          color: p.color,
-          icon: p.icon,
         }));
         _setPlans(mappedPlans);
       }
@@ -68,6 +66,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const isSelected = selectedPlan === plan.id;
     const displayPrice =
       billingInterval === 'year' ? plan.price * 10 : plan.price;
+    const planColor = plan.popular ? COLORS.primary : COLORS.mint;
 
     return (
       <TouchableOpacity
@@ -82,8 +81,8 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           </View>
         )}
 
-        <View style={[styles.planIcon, { backgroundColor: plan.color }]}>
-          <Icon name={plan.icon} size={32} color={COLORS.white} />
+        <View style={[styles.planIcon, { backgroundColor: planColor }]}>
+          <Icon name="crown" size={32} color={COLORS.white} />
         </View>
 
         <Text style={styles.planName}>{plan.name}</Text>
@@ -101,8 +100,8 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         <View style={styles.featuresContainer}>
           {plan.features.map((feature, index) => (
             <View key={index} style={styles.featureRow}>
-              <Icon name="check-circle" size={16} color={COLORS.success} />
-              <Text style={styles.featureText}>{feature}</Text>
+              <Icon name={feature.included ? "check-circle" : "close-circle"} size={16} color={feature.included ? COLORS.success : COLORS.textSecondary} />
+              <Text style={[styles.featureText, !feature.included && styles.featureDisabled]}>{feature.text}</Text>
             </View>
           ))}
         </View>
@@ -121,7 +120,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
           ) : (
             <LinearGradient
-              colors={[plan.color, plan.color + '80']}
+              colors={[planColor, planColor + '80']}
               style={styles.subscribeGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -278,6 +277,10 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     marginLeft: LAYOUT.padding,
+  },
+  featureDisabled: {
+    color: COLORS.textSecondary,
+    textDecorationLine: 'line-through',
   },
   featuresContainer: {
     marginBottom: LAYOUT.padding * 2,

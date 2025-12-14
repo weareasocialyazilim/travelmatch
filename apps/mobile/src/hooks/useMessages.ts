@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix Message type - missing 'message' property
 /**
  * useMessages Hook
  * Real-time messaging with conversations and messages
@@ -179,7 +178,7 @@ export const useMessages = (): UseMessagesReturn => {
   const sendMessage = useCallback(
     async (data: SendMessageRequest): Promise<Message | null> => {
       try {
-        const response = await retryWithErrorHandling(
+        const newMessage = await retryWithErrorHandling(
           () => messageService.sendMessage(data),
           { 
             context: 'sendMessage', 
@@ -187,7 +186,6 @@ export const useMessages = (): UseMessagesReturn => {
             baseDelay: 1000
           }
         );
-        const newMessage = response.message;
 
         if (!mountedRef.current) return newMessage;
 

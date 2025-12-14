@@ -1,12 +1,15 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Supabase Storage Service
  * File upload/download operations for TravelMatch
  */
 
-import { File, Paths } from 'expo-file-system';
+import * as FileSystem from 'expo-file-system';
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 import { logger } from '../utils/logger';
+
+// File and Paths from expo-file-system SDK 54
+const File = (FileSystem as any).File;
+const Paths = (FileSystem as any).Paths;
 
 // ArrayBuffer to Base64 conversion
 const encode = (buffer: ArrayBuffer): string => {

@@ -7,6 +7,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
+import { logger } from './logger';
 
 // Check if SecureStore is available
 const isSecureStoreAvailable = async (): Promise<boolean> => {
@@ -140,10 +141,10 @@ export async function migrateSensitiveDataToSecure(): Promise<void> {
       if (value) {
         await secureStorage.setItem(newKey, value);
         await AsyncStorage.removeItem(old);
-        console.log(`✅ Migrated ${old} → ${newKey}`);
+        logger.info(`Migrated secure storage: ${old} → ${newKey}`);
       }
     } catch (error) {
-      console.error(`❌ Migration failed: ${old}`, error);
+      logger.error(`Migration failed: ${old}`, error);
     }
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState } from 'react';
 import {
   View,
@@ -81,7 +80,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
     setIsSubmitting(false);
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+  const isSubmitDisabled = !canSubmitForm({ formState }, {
     requireDirty: false,
     requireValid: true,
   });
@@ -180,13 +179,12 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           control={control}
           name="amount"
           render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-            <View>
+            <View style={styles.inputWrapper}>
               <ControlledInput
                 name="amount"
                 control={control}
                 placeholder="$0.00"
                 keyboardType="decimal-pad"
-                containerStyle={styles.inputContainer}
               />
             </View>
           )}
@@ -197,14 +195,13 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           control={control}
           name="note"
           render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-            <View>
+            <View style={styles.inputWrapper}>
               <ControlledInput
                 name="note"
                 control={control}
                 placeholder="Note (optional)"
                 multiline
                 numberOfLines={3}
-                containerStyle={styles.inputContainer}
               />
             </View>
           )}
@@ -328,6 +325,10 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     color: COLORS.text,
+  },
+  inputWrapper: {
+    marginHorizontal: 16,
+    marginBottom: 16,
   },
   sectionTitle: {
     ...TYPOGRAPHY.h4,

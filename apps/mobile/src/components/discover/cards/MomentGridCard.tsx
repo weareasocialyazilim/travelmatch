@@ -8,16 +8,22 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../../constants/colors';
-import type { Moment } from '../../../types';
+import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
 interface MomentGridCardProps {
-  moment: Moment;
+  moment: HookMoment;
   index: number;
-  onPress: (moment: Moment) => void;
+  onPress: (moment: HookMoment) => void;
 }
 
 const MomentGridCard: React.FC<MomentGridCardProps> = memo(
   ({ moment, index, onPress }) => {
+    const imageUrl = moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
+    const hostAvatar = moment.hostAvatar || 'https://via.placeholder.com/24';
+    const hostName = moment.hostName || 'Anonymous';
+    const price = moment.price ?? moment.pricePerGuest ?? 0;
+    const locationCity = typeof moment.location === 'string' ? moment.location : moment.location?.city || 'Unknown';
+    
     return (
       <View style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}>
         <TouchableOpacity
@@ -25,19 +31,17 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
           onPress={() => onPress(moment)}
           activeOpacity={0.95}
         >
-          <Image source={{ uri: moment.imageUrl }} style={styles.gridImage} />
+          <Image source={{ uri: imageUrl }} style={styles.gridImage} />
           <View style={styles.gridContent}>
             <View style={styles.gridCreatorRow}>
               <Image
-                source={{
-                  uri: moment.user?.avatar || 'https://via.placeholder.com/24',
-                }}
+                source={{ uri: hostAvatar }}
                 style={styles.gridAvatar}
               />
               <Text style={styles.gridCreatorName} numberOfLines={1}>
-                {moment.user?.name?.split(' ')[0] || 'Anon'}
+                {hostName.split(' ')[0]}
               </Text>
-              {moment.user?.isVerified && (
+              {moment.hostRating > 4.5 && (
                 <MaterialCommunityIcons
                   name="check-decagram"
                   size={10}
@@ -48,9 +52,9 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
             <Text style={styles.gridTitle} numberOfLines={2}>
               {moment.title}
             </Text>
-            {moment.story && (
+            {moment.description && (
               <Text style={styles.gridStory} numberOfLines={1}>
-                {moment.story}
+                {moment.description}
               </Text>
             )}
             <View style={styles.gridFooter}>
@@ -61,10 +65,10 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
                   color={COLORS.textSecondary}
                 />
                 <Text style={styles.gridDistance}>
-                  {moment.distance || '?'} km
+                  {locationCity}
                 </Text>
               </View>
-              <Text style={styles.gridPrice}>${moment.price}</Text>
+              <Text style={styles.gridPrice}>${price}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -73,8 +77,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
   },
   (prevProps, nextProps) =>
     prevProps.moment.id === nextProps.moment.id &&
-    prevProps.moment.price === nextProps.moment.price &&
-    prevProps.moment.distance === nextProps.moment.distance &&
+    prevProps.moment.pricePerGuest === nextProps.moment.pricePerGuest &&
     prevProps.index === nextProps.index,
 );
 

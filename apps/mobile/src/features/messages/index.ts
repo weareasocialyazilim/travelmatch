@@ -8,13 +8,11 @@ export { default as ArchivedChatsScreen } from './screens/ArchivedChatsScreen';
 // Hooks
 export {
   useConversations,
-  useConversation,
   useMessages,
   useRealtimeMessages,
   useSendMessage,
-  useCreateConversation,
+  useGetOrCreateConversation,
   useArchiveConversation,
-  useDeleteConversation,
   useMarkAsRead
 } from './hooks/useMessages';
 

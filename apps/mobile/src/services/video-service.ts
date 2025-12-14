@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix Supabase database schema type errors
 /**
  * Video Content Infrastructure
  * Optimized video delivery with accessibility features
@@ -132,7 +131,7 @@ export class VideoService {
       description: metadata.description,
       status: 'processing',
       created_at: new Date().toISOString(),
-    });
+    } as any);
 
     return {
       videoId,
@@ -172,7 +171,7 @@ export class VideoService {
         video_id: videoId,
         language,
         created_at: new Date().toISOString(),
-      });
+      } as any);
   }
 
   /**
@@ -257,7 +256,7 @@ export class VideoService {
         language,
         content: transcript,
         created_at: new Date().toISOString(),
-      });
+      } as any);
 
     return transcript;
   }
@@ -322,7 +321,7 @@ export class VideoService {
 
     // Check file type
     const extension = file.name.split('.').pop()?.toLowerCase();
-    if (!extension || !VIDEO_CONFIG.formats.input.includes(extension)) {
+    if (!extension || !(VIDEO_CONFIG.formats.input as readonly string[]).includes(extension)) {
       throw new Error(`Unsupported format. Supported: ${VIDEO_CONFIG.formats.input.join(', ')}`);
     }
   }

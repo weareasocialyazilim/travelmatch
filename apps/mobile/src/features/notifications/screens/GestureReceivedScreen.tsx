@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React from 'react';
 import {
   View,
@@ -122,7 +121,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
   };
 
   const handleUploadProof = () => {
-    navigation.navigate('ProofUpload');
+    navigation.navigate('ProofFlow');
   };
 
   const handleViewBalance = () => {

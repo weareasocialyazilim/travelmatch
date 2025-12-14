@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Generic Bottom Sheet Component
  * Reusable bottom sheet with customizable content, animations, and gestures

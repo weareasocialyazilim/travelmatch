@@ -6,11 +6,17 @@
  */
 
 import React from 'react';
+import type { NavigationProp } from '@react-navigation/native';
 import { ScreenErrorBoundary, type ErrorFallbackType } from './ErrorBoundary';
 
 interface WithErrorBoundaryOptions {
   fallbackType?: ErrorFallbackType;
   displayName?: string;
+}
+
+/** Props that may include navigation */
+interface MaybeNavigationProps {
+  navigation?: NavigationProp<ReactNavigation.RootParamList>;
 }
 
 /**
@@ -24,7 +30,7 @@ export function withErrorBoundary<P extends object>(
 
   const WrappedComponent: React.FC<P> = (props: P) => {
     // Extract navigation from props if available
-    const navigation = (props as any).navigation;
+    const navigation = (props as P & MaybeNavigationProps).navigation;
 
     return (
       <ScreenErrorBoundary fallbackType={fallbackType} navigation={navigation}>

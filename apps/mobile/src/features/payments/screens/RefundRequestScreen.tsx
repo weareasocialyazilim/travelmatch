@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState } from 'react';
 import {
   View,
@@ -25,18 +24,17 @@ type IconName = React.ComponentProps<typeof Icon>['name'];
 
 const REFUND_REASONS: { id: string; label: string; icon: IconName }[] = [
   {
-    id: 'not_delivered',
+    id: 'not_received',
     label: 'Gesture not delivered',
-    icon: 'package-variant-closed-remove',
+    icon: 'package-variant-closed',
   },
-  { id: 'no_proof', label: 'No proof provided', icon: 'image-off' },
+  { id: 'not_as_described', label: 'Not as described', icon: 'image-off' },
   {
-    id: 'different',
-    label: 'Different from description',
+    id: 'damaged',
+    label: 'Damaged item',
     icon: 'alert-circle',
   },
-  { id: 'quality', label: 'Quality issues', icon: 'star-off' },
-  { id: 'duplicate', label: 'Duplicate payment', icon: 'content-copy' },
+  { id: 'wrong_item', label: 'Wrong item', icon: 'swap-horizontal' },
   { id: 'other', label: 'Other reason', icon: 'dots-horizontal' },
 ];
 
@@ -55,7 +53,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
     resolver: zodResolver(refundRequestSchema),
     mode: 'onChange',
     defaultValues: {
-      reason: '',
+      reason: undefined,
       description: '',
       amount: 0,
     },
@@ -84,7 +82,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
     }, 1500);
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+  const isSubmitDisabled = !canSubmitForm({ formState }, {
     requireDirty: false,
     requireValid: true,
   });
@@ -150,7 +148,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
                         styles.reasonCard,
                         value === reasonOption.id && styles.reasonCardSelected,
                       ]}
-                      onPress={() => setValue('reason', reasonOption.id)}
+                      onPress={() => setValue('reason', reasonOption.id as RefundRequestInput['reason'])}
                       activeOpacity={0.7}
                     >
                       <Icon

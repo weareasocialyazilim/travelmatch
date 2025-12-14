@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Unified Gift Flow Screen
  * Single screen replacing modal chain for smoother UX
@@ -114,6 +113,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   });
 
   const message = watch('message');
+  const recipientEmail = watch('recipientEmail');
 
   const { trackMount, trackInteraction } = useScreenPerformance(
     'UnifiedGiftFlowScreen',

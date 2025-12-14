@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import { supabase } from '@/config/supabase';
 import { logAuditEvent } from '@/config/soc2-compliance';
 
@@ -378,7 +377,7 @@ export class ViralLoopEngine {
       .order(columnMap[metric], { ascending: false })
       .limit(limit);
 
-    return (data || []).map((row, index) => ({
+    return ((data as any[]) || []).map((row, index) => ({
       userId: row.user_id,
       username: row.users.username,
       avatar: row.users.avatar,
@@ -453,10 +452,10 @@ export class ViralLoopEngine {
       .order('created_at', { ascending: false })
       .limit(limit);
 
-    return (activities || []).map(activity => ({
+    return ((activities as any[]) || []).map(activity => ({
       friendId: activity.user_id,
-      friendName: activity.users.username,
-      friendAvatar: activity.users.avatar,
+      friendName: activity.users?.[0]?.username || activity.users?.username,
+      friendAvatar: activity.users?.[0]?.avatar || activity.users?.avatar,
       activity: this.formatActivityString(activity.activity_type, activity.metadata),
       timestamp: activity.created_at,
     }));

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState } from 'react';
 import {
   View,
@@ -18,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/config/supabase';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
-import { disputeSchema, type DisputeFormData } from '@/utils/forms';
+import { disputeSchema, type DisputeInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
@@ -41,7 +40,7 @@ export const DisputeFlowScreen: React.FC = () => {
     formState,
     watch,
     setValue,
-  } = useForm<DisputeFormData>({
+  } = useForm<DisputeInput>({
     resolver: zodResolver(disputeSchema),
     mode: 'onChange',
     defaultValues: {
@@ -82,10 +81,10 @@ export const DisputeFlowScreen: React.FC = () => {
   };
 
   const handleRemoveFile = (index: number) => {
-    setValue('evidence', evidence.filter((_, i) => i !== index));
+    setValue('evidence', evidence.filter((_: string, i: number) => i !== index));
   };
 
-  const onSubmit = async (formData: DisputeFormData) => {
+  const onSubmit = async (formData: DisputeInput) => {
     setLoading(true);
     try {
       const _table =
@@ -174,7 +173,7 @@ export const DisputeFlowScreen: React.FC = () => {
       </Text>
 
       <View style={styles.uploadArea}>
-        {evidence.map((file, index) => (
+        {evidence.map((file: string, index: number) => (
           <View key={index} style={styles.fileItem}>
             <MaterialCommunityIcons
               name="file-document-outline"

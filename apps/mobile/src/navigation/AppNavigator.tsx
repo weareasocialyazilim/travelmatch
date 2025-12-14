@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 // Note: import/order disabled because lazyLoad imports are grouped by feature, not alphabetically
 import React, { Suspense, useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
@@ -256,7 +255,7 @@ export type RootStackParamList = {
   ProofDetail: { proofId: string };
 
   // Approval & Matching
-  ReceiverApproval: { momentTitle: string; totalAmount: number };
+  ReceiverApproval: { momentTitle: string; totalAmount: number; momentId: string };
   MatchConfirmation: { selectedGivers: SelectedGiver[] };
 
   // Communication
@@ -366,6 +365,7 @@ export type RootStackParamList = {
 
   // Wallet & Settings
   Wallet: undefined;
+  TransactionHistory: undefined;
   Settings: undefined;
   NotificationDetail: { notificationId: string };
   EditProfile: undefined;
@@ -394,6 +394,13 @@ export type RootStackParamList = {
   // Contact: undefined;
   // Footer pages
   Safety: undefined;
+
+  // Deep Link Error Screens
+  LinkInvalid: { message?: string };
+  LinkExpired: { message?: string };
+  LinkNotFound: { message?: string };
+  SessionExpired: undefined;
+  PaymentFailed: { transactionId?: string; error?: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();

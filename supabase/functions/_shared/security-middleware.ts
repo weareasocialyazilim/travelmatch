@@ -13,8 +13,42 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+/**
+ * Allowed origins for CORS
+ */
+const ALLOWED_ORIGINS = [
+  'https://travelmatch.app',
+  'https://www.travelmatch.app',
+  'https://api.travelmatch.app',
+  'https://staging.travelmatch.app',
+  /^https:\/\/travelmatch-.*\.vercel\.app$/,
+  ...(Deno.env.get('DENO_ENV') !== 'production'
+    ? ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8081']
+    : []),
+];
+
+function isOriginAllowed(origin: string | null): boolean {
+  if (!origin) return false;
+  return ALLOWED_ORIGINS.some((allowed) => 
+    typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
+  );
+}
+
+export function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = isOriginAllowed(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin as string,
+    'Access-Control-Allow-Headers':
+      'authorization, x-client-info, apikey, content-type, stripe-signature',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
+    'Access-Control-Allow-Credentials': 'true',
+    'Vary': 'Origin',
+  };
+}
+
+/** @deprecated Use getCorsHeaders(origin) instead */
 export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0] as string,
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, apikey, content-type, stripe-signature',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',

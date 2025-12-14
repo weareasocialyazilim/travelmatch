@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -326,6 +325,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: LAYOUT.padding,
   },
+  actions: {
+    marginTop: LAYOUT.padding * 2,
+  },
+  amount: {
+    color: COLORS.text,
+    fontSize: 36,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding / 2,
+  },
   amountCard: {
     alignItems: 'center',
     backgroundColor: COLORS.white,
@@ -347,12 +355,25 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginBottom: LAYOUT.padding,
   },
+  avatar: {
+    borderRadius: 24,
+    height: 48,
+    width: 48,
+  },
   backButton: {
     padding: LAYOUT.padding / 2,
   },
   container: {
     backgroundColor: COLORS.background,
     flex: 1,
+  },
+  content: {
+    flex: 1,
+  },
+  date: {
+    color: COLORS.textSecondary,
+    ...TYPOGRAPHY.bodySmall,
+    marginTop: LAYOUT.padding / 2,
   },
   descriptionValue: {
     textAlign: 'left',
@@ -384,6 +405,11 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding * 1.5,
     ...VALUES.shadow,
   },
+  divider: {
+    backgroundColor: COLORS.border,
+    height: 1,
+    marginVertical: LAYOUT.padding,
+  },
   header: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -397,15 +423,19 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   helpButton: {
-    backgroundColor: COLORS.info,
-    borderRadius: VALUES.borderRadius / 2,
-    paddingHorizontal: LAYOUT.padding * 1.5,
-    paddingVertical: LAYOUT.padding / 2,
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding,
   },
   helpButtonText: {
-    color: COLORS.white,
-    ...TYPOGRAPHY.caption,
-    fontWeight: '700',
+    color: COLORS.primary,
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    marginLeft: LAYOUT.padding / 2,
   },
   helpCard: {
     alignItems: 'center',
@@ -429,6 +459,11 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '700',
     marginBottom: LAYOUT.padding / 4,
+  },
+  label: {
+    color: COLORS.textSecondary,
+    ...TYPOGRAPHY.bodySmall,
+    flex: 1,
   },
   participantAvatar: {
     borderRadius: 20,
@@ -464,6 +499,19 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
   },
+  paymentMethodContainer: {
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    padding: LAYOUT.padding,
+  },
+  paymentMethodText: {
+    color: COLORS.text,
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '500',
+    marginLeft: LAYOUT.padding,
+  },
   proofCard: {
     alignItems: 'center',
     backgroundColor: COLORS.white,
@@ -487,6 +535,33 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: LAYOUT.padding / 4,
   },
+  recipientContainer: {
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: VALUES.borderRadius,
+    flexDirection: 'row',
+    padding: LAYOUT.padding,
+  },
+  recipientId: {
+    color: COLORS.textSecondary,
+    ...TYPOGRAPHY.caption,
+    marginTop: 2,
+  },
+  recipientInfo: {
+    flex: 1,
+    marginLeft: LAYOUT.padding,
+  },
+  recipientName: {
+    color: COLORS.text,
+    ...TYPOGRAPHY.bodyLarge,
+    fontWeight: '600',
+  },
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: LAYOUT.padding / 2,
+  },
   scrollContent: {
     paddingBottom: LAYOUT.padding * 4,
     paddingHorizontal: LAYOUT.padding * 2,
@@ -506,6 +581,9 @@ const styles = StyleSheet.create({
   shareButton: {
     padding: LAYOUT.padding / 2,
   },
+  spacer: {
+    width: 40,
+  },
   statusBadge: {
     alignItems: 'center',
     borderRadius: VALUES.borderRadius / 2,
@@ -514,17 +592,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: LAYOUT.padding,
     paddingVertical: LAYOUT.padding / 2,
   },
+  statusCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    marginBottom: LAYOUT.padding * 2,
+    padding: LAYOUT.padding * 2,
+    ...VALUES.shadow,
+  },
+  statusIconContainer: {
+    alignItems: 'center',
+    borderRadius: 40,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: LAYOUT.padding,
+    width: 80,
+  },
   statusText: {
-    color: COLORS.white,
-    ...TYPOGRAPHY.caption,
+    ...TYPOGRAPHY.bodySmall,
     fontWeight: '700',
-    marginLeft: LAYOUT.padding / 2,
+    marginTop: LAYOUT.padding / 2,
+  },
+  totalLabel: {
+    color: COLORS.text,
+    ...TYPOGRAPHY.bodyLarge,
+    fontWeight: '700',
+  },
+  totalValue: {
+    color: COLORS.text,
+    ...TYPOGRAPHY.bodyLarge,
+    fontWeight: '800',
   },
   transactionTitle: {
     color: COLORS.text,
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  value: {
+    color: COLORS.text,
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    textAlign: 'right',
   },
 });
 

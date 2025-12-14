@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix API mismatch - many reviewService methods don't exist (getMyReviewStats, getUserReviews, getMomentReviews, updateReview, deleteReview, respondToReview, reportReview)
 /**
  * useReviews Hook
  * Review management and statistics
@@ -21,7 +20,7 @@ interface PendingReview {
   userName: string;
   userAvatar: string;
   completedAt: string;
-  expiresAt: string;
+  expiresAt?: string;
 }
 
 interface UseReviewsReturn {

@@ -12,6 +12,8 @@ export {
   SkeletonCard,
   SkeletonListItem,
 } from './SkeletonLoader';
+export { SkeletonList } from './SkeletonList';
+export type { SkeletonItemType } from './SkeletonList';
 
 // Form Components
 export { PasswordInput } from './PasswordInput';

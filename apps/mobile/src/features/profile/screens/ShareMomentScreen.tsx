@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
@@ -158,7 +157,7 @@ export const ShareMomentScreen: React.FC = () => {
   const handleShareToTelegram = useCallback(() => {
     const telegramUrl = `tg://msg_url?url=${encodeURIComponent(
       shareUrl,
-    )}&text=${encodeURIComponent(moment.title)}`;
+    )}&text=${encodeURIComponent(displayMoment.title)}`;
     Linking.canOpenURL(telegramUrl).then((supported) => {
       if (supported) {
         Linking.openURL(telegramUrl);
@@ -166,11 +165,11 @@ export const ShareMomentScreen: React.FC = () => {
         Linking.openURL(
           `https://t.me/share/url?url=${encodeURIComponent(
             shareUrl,
-          )}&text=${encodeURIComponent(moment.title)}`,
+          )}&text=${encodeURIComponent(displayMoment.title)}`,
         );
       }
     });
-  }, [shareUrl, moment.title]);
+  }, [shareUrl, displayMoment.title]);
 
   const shareOptions: ShareOption[] = [
     {
@@ -235,14 +234,14 @@ export const ShareMomentScreen: React.FC = () => {
       <View style={styles.previewSection}>
         <View style={styles.previewCard}>
           <Image
-            source={{ uri: moment.imageUrl }}
+            source={{ uri: displayMoment.images?.[0] || 'https://via.placeholder.com/400' }}
             style={styles.previewImage}
           />
           <View style={styles.previewInfo}>
             <Text style={styles.previewTitle} numberOfLines={2}>
-              {moment.title}
+              {displayMoment.title}
             </Text>
-            <Text style={styles.previewPrice}>${moment.price}</Text>
+            <Text style={styles.previewPrice}>${displayMoment.pricePerGuest}</Text>
           </View>
         </View>
       </View>

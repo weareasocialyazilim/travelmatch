@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
@@ -35,19 +34,18 @@ const EditProfileScreen = () => {
 
   // Original profile data from auth context
   const originalProfile = useMemo(() => {
-    const userAny = user as any;
     return {
       avatarUrl:
-        userAny?.profilePhoto ||
-        userAny?.avatarUrl ||
+        user?.profilePhoto ||
+        user?.avatarUrl ||
         'https://via.placeholder.com/150',
       name: user?.name || '',
-      username: userAny?.username || '',
-      bio: userAny?.bio || '',
+      username: user?.username || '',
+      bio: user?.bio || '',
       location:
         typeof user?.location === 'string'
           ? user.location
-          : userAny?.location?.city || '',
+          : (user?.location as { city?: string })?.city || '',
     };
   }, [user]);
 
@@ -56,7 +54,7 @@ const EditProfileScreen = () => {
     resolver: zodResolver(editProfileSchema),
     mode: 'onChange',
     defaultValues: {
-      name: originalProfile.name,
+      fullName: originalProfile.name,
       username: originalProfile.username,
       bio: originalProfile.bio,
       location: originalProfile.location,
@@ -70,7 +68,7 @@ const EditProfileScreen = () => {
   // Update form when user data loads
   useEffect(() => {
     reset({
-      name: originalProfile.name,
+      fullName: originalProfile.name,
       username: originalProfile.username,
       bio: originalProfile.bio,
       location: originalProfile.location,
@@ -98,7 +96,7 @@ const EditProfileScreen = () => {
       return;
     }
 
-    if (username.length < 3) {
+    if (!username || username.length < 3) {
       setUsernameAvailable(null);
       return;
     }
@@ -187,10 +185,10 @@ const EditProfileScreen = () => {
 
       // Update profile
       await userService.updateProfile({
-        name: data.name,
+        fullName: data.fullName,
         username: data.username,
         bio: data.bio,
-        location: data.location,
+        location: data.location ? { city: data.location, country: '' } : undefined,
       });
 
       // Refresh user context
@@ -204,7 +202,7 @@ const EditProfileScreen = () => {
     }
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+  const isSubmitDisabled = !canSubmitForm({ formState }, {
     requireDirty: false,
     requireValid: true,
   }) || usernameAvailable === false;
@@ -338,7 +336,7 @@ const EditProfileScreen = () => {
                 <Text style={styles.inputLabel}>Display Name</Text>
                 <Controller
                   control={control}
-                  name="name"
+                  name="fullName"
                   render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                     <>
                       <TextInput
@@ -422,12 +420,12 @@ const EditProfileScreen = () => {
                   <Text
                     style={[
                       styles.charCount,
-                      bio.length > BIO_MAX_LENGTH * 0.9 &&
+                      (bio?.length ?? 0) > BIO_MAX_LENGTH * 0.9 &&
                         styles.charCountWarning,
-                      bio.length >= BIO_MAX_LENGTH && styles.charCountError,
+                      (bio?.length ?? 0) >= BIO_MAX_LENGTH && styles.charCountError,
                     ]}
                   >
-                    {bio.length}/{BIO_MAX_LENGTH}
+                    {bio?.length ?? 0}/{BIO_MAX_LENGTH}
                   </Text>
                 </View>
                 <Controller

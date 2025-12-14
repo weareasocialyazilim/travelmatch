@@ -395,6 +395,102 @@ export const paymentService = {
       throw error;
     }
   },
+
+  /**
+   * Get wallet balance (alias for getBalance for hook compatibility)
+   */
+  getWalletBalance: async (): Promise<{
+    available: number;
+    pending: number;
+    currency: string;
+  }> => {
+    return paymentService.getBalance();
+  },
+
+  /**
+   * Set a card as the default payment method
+   */
+  setDefaultCard: (cardId: string): { success: boolean } => {
+    if (!__DEV__) {
+      logger.error('setDefaultCard called in production with mock implementation!');
+      throw new Error('Payment methods not configured for production');
+    }
+    MOCK_CARDS = MOCK_CARDS.map((c) => ({
+      ...c,
+      isDefault: c.id === cardId,
+    }));
+    return { success: true };
+  },
+
+  /**
+   * Request a withdrawal (convenience wrapper for withdrawFunds)
+   */
+  requestWithdrawal: async (
+    amount: number,
+    bankAccountId: string,
+  ): Promise<{ transaction: Transaction }> => {
+    return paymentService.withdrawFunds({
+      amount,
+      currency: 'USD',
+      bankAccountId,
+    });
+  },
+
+  /**
+   * Get withdrawal limits
+   */
+  getWithdrawalLimits: (): {
+    minAmount: number;
+    maxAmount: number;
+    dailyLimit: number;
+    remainingDaily: number;
+  } => {
+    // Return mock limits for now
+    return {
+      minAmount: 10,
+      maxAmount: 10000,
+      dailyLimit: 5000,
+      remainingDaily: 5000,
+    };
+  },
+
+  /**
+   * Create a payment intent for Stripe
+   */
+  createPaymentIntent: async (
+    _momentId: string,
+    amount: number,
+  ): Promise<PaymentIntent> => {
+    // In production, this would call Stripe API
+    if (!__DEV__) {
+      logger.error('createPaymentIntent called in production with mock implementation!');
+      throw new Error('Payment intents not configured for production');
+    }
+    const id = `pi_${Date.now()}`;
+    return {
+      id,
+      paymentIntentId: id,
+      clientSecret: `${id}_secret_mock`,
+      amount,
+      currency: 'usd',
+      status: 'pending',
+    };
+  },
+
+  /**
+   * Confirm a payment intent
+   */
+  confirmPayment: async (
+    _paymentIntentId: string,
+    _paymentMethodId?: string,
+  ): Promise<{ success: boolean }> => {
+    // In production, this would confirm via Stripe
+    if (!__DEV__) {
+      logger.error('confirmPayment called in production with mock implementation!');
+      throw new Error('Payment confirmation not configured for production');
+    }
+    return { success: true };
+  },
 };
 
 export default paymentService;

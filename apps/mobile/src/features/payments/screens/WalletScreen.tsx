@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,

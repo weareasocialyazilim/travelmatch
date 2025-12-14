@@ -46,22 +46,22 @@ module.exports = {
   // Coverage thresholds - fail CI if coverage drops below these values
   coverageThreshold: {
     global: {
-      branches: 60,
-      functions: 65,
-      lines: 65,
-      statements: 65,
+      branches: 65,
+      functions: 75,
+      lines: 75,
+      statements: 75,
     },
     './src/services/**/*.ts': {
       branches: 70,
-      functions: 75,
-      lines: 75,
-      statements: 75,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
     './src/utils/**/*.ts': {
       branches: 70,
-      functions: 75,
-      lines: 75,
-      statements: 75,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
 };

@@ -9,6 +9,9 @@ export type {
   MomentUser,
   MomentLocation,
   User,
+  Proof,
+  ProofType,
+  ProofStatus,
 } from '@/types';
 
 // UserProfile is an alias for User in this context

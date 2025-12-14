@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Image Cache Manager
  * 
@@ -24,7 +23,6 @@
 
 import React from 'react';
 import * as FileSystem from 'expo-file-system';
-import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { logger } from '../utils/logger';
@@ -117,7 +115,9 @@ class MemoryCache {
   set(key: string, data: string, size: number): void {
     // Evict if needed
     while (this.currentSize + size > this.maxSize && this.cache.size > 0) {
-      const oldestKey = this.cache.keys().next().value;
+      const oldestKeyResult = this.cache.keys().next();
+      if (oldestKeyResult.done || oldestKeyResult.value === undefined) break;
+      const oldestKey = oldestKeyResult.value;
       const oldest = this.cache.get(oldestKey);
       if (oldest) {
         this.currentSize -= oldest.size;
@@ -215,7 +215,7 @@ class ImageCacheManager {
   ): Promise<string> {
     await this.ensureInitialized();
 
-    const cacheKey = this.getCacheKey(uri, options?.variant);
+    const cacheKey = await this.getCacheKey(uri, options?.variant);
     this.totalRequests++;
 
     // 1. Check memory cache
@@ -306,7 +306,7 @@ class ImageCacheManager {
       const mediumUrl = getImageUrl(result.id, 'medium');
 
       // Cache locally
-      const cacheKey = this.getCacheKey(mediumUrl, 'medium');
+      const cacheKey = await this.getCacheKey(mediumUrl, 'medium');
       const localUri = await this.fetchAndCache(mediumUrl, cacheKey);
 
       // Prefetch other variants
@@ -408,9 +408,14 @@ class ImageCacheManager {
     }
   }
 
-  private getCacheKey(uri: string, variant?: ImageVariant): string {
+  private async getCacheKey(uri: string, variant?: ImageVariant): Promise<string> {
     const key = variant ? `${uri}:${variant}` : uri;
-    return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.MD5, key);
+    // Simple hash function (djb2)
+    let hash = 5381;
+    for (let i = 0; i < key.length; i++) {
+      hash = ((hash << 5) + hash) + key.charCodeAt(i);
+    }
+    return Math.abs(hash).toString(16);
   }
 
   private async fetchAndCache(url: string, cacheKey: string): Promise<string> {
@@ -492,7 +497,7 @@ class ImageCacheManager {
     Promise.all(
       toPrefetch.map(async (variant) => {
         const url = getImageUrl(cloudflareId, variant);
-        const cacheKey = this.getCacheKey(url, variant);
+        const cacheKey = await this.getCacheKey(url, variant);
         try {
           await this.fetchAndCache(url, cacheKey);
         } catch (error) {

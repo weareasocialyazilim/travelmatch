@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Animated, Alert, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -241,8 +240,9 @@ const MomentDetailScreen: React.FC = () => {
     navigation.navigate('ReceiverApproval', {
       momentTitle: moment.title,
       totalAmount: moment.price,
+      momentId: moment.id,
     });
-  }, [moment.price, moment.title, navigation]);
+  }, [moment.price, moment.title, moment.id, navigation]);
 
   const handleEdit = useCallback(() => {
     navigation.navigate('EditMoment', { momentId: moment.id });

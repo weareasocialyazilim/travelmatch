@@ -11,6 +11,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '../utils/logger';
 
 // Video processing configuration
 export const VIDEO_CONFIG = {
@@ -423,7 +424,7 @@ export async function handleMuxWebhook(
       await handleUploadComplete(data as { id: string });
       break;
     default:
-      console.log(`Unhandled webhook type: ${type}`);
+      logger.debug(`Unhandled webhook type: ${type}`);
   }
 }
 
@@ -481,5 +482,5 @@ async function handleAssetError(data: {
 }
 
 async function handleUploadComplete(data: { id: string }): Promise<void> {
-  console.log('Upload complete for asset:', data.id);
+  logger.debug('Upload complete for asset:', data.id);
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix API mismatch - getWalletBalance, setDefaultCard, requestWithdrawal, createPaymentIntent, confirmPayment, getWithdrawalLimits don't exist on paymentService
 /**
  * usePayments Hook
  *
@@ -36,6 +35,7 @@ import type {
   WalletBalance,
   TransactionType,
   PaymentStatus,
+  PaymentIntent,
 } from '../services/paymentService';
 
 /**
@@ -143,20 +143,6 @@ interface WithdrawalLimits {
   remainingDaily: number;
 }
 
-/**
- * Payment intent for Stripe payments
- */
-interface PaymentIntent {
-  /** Stripe payment intent ID */
-  id: string;
-  /** Client secret for confirming the payment */
-  clientSecret: string;
-  /** Payment amount in cents */
-  amount: number;
-  /** Three-letter currency code */
-  currency: string;
-}
-
 /** Number of transactions per page */
 const PAGE_SIZE = 20;
 
@@ -199,7 +185,11 @@ export const usePayments = (): UsePaymentsReturn => {
         () => paymentService.getWalletBalance(),
         { context: 'refreshBalance', maxRetries: 2 }
       );
-      setBalance(response.balance);
+      setBalance({
+        available: response.available,
+        pending: response.pending,
+        currency: response.currency,
+      });
     } catch (error) {
       const standardizedError = ErrorHandler.handle(error, 'refreshBalance');
       logger.error('Failed to fetch balance:', standardizedError);
@@ -267,7 +257,7 @@ export const usePayments = (): UsePaymentsReturn => {
   /**
    * Fetch payment methods
    */
-  const refreshPaymentMethods = useCallback(() => {
+  const refreshPaymentMethods = useCallback(async (): Promise<void> => {
     try {
       setPaymentMethodsLoading(true);
       const response = paymentService.getPaymentMethods();
@@ -283,7 +273,7 @@ export const usePayments = (): UsePaymentsReturn => {
   /**
    * Add a card
    */
-  const addCard = useCallback((tokenId: string): PaymentCard | null => {
+  const addCard = useCallback(async (tokenId: string): Promise<PaymentCard | null> => {
     try {
       const response = paymentService.addCard(tokenId);
       setCards((prev) => [...prev, response.card]);
@@ -297,7 +287,7 @@ export const usePayments = (): UsePaymentsReturn => {
   /**
    * Remove a card
    */
-  const removeCard = useCallback((cardId: string): boolean => {
+  const removeCard = useCallback(async (cardId: string): Promise<boolean> => {
     try {
       paymentService.removeCard(cardId);
       setCards((prev) => prev.filter((c) => c.id !== cardId));
@@ -331,7 +321,7 @@ export const usePayments = (): UsePaymentsReturn => {
    * Add bank account
    */
   const addBankAccount = useCallback(
-    (data: BankAccountData): BankAccount | null => {
+    async (data: BankAccountData): Promise<BankAccount | null> => {
       try {
         const response = paymentService.addBankAccount(data);
         setBankAccounts((prev) => [...prev, response.bankAccount]);
@@ -347,7 +337,7 @@ export const usePayments = (): UsePaymentsReturn => {
   /**
    * Remove bank account
    */
-  const removeBankAccount = useCallback((accountId: string): boolean => {
+  const removeBankAccount = useCallback(async (accountId: string): Promise<boolean> => {
     try {
       paymentService.removeBankAccount(accountId);
       setBankAccounts((prev) => prev.filter((a) => a.id !== accountId));
@@ -367,13 +357,13 @@ export const usePayments = (): UsePaymentsReturn => {
       bankAccountId: string,
     ): Promise<Transaction | null> => {
       try {
-        const response = await paymentService.requestWithdrawal({
+        const response = await paymentService.requestWithdrawal(
           amount,
           bankAccountId,
-        });
+        );
 
         // Update balance
-        refreshBalance();
+        void refreshBalance();
 
         // Add to transactions
         setTransactions((prev) => [response.transaction, ...prev]);
@@ -393,11 +383,11 @@ export const usePayments = (): UsePaymentsReturn => {
   const createPaymentIntent = useCallback(
     async (momentId: string, amount: number): Promise<PaymentIntent | null> => {
       try {
-        const response = await paymentService.createPaymentIntent({
+        const paymentIntent = await paymentService.createPaymentIntent(
           momentId,
           amount,
-        });
-        return response.paymentIntent;
+        );
+        return paymentIntent;
       } catch (error) {
         logger.error('Failed to create payment intent:', error);
         return null;
@@ -421,9 +411,8 @@ export const usePayments = (): UsePaymentsReturn => {
         );
 
         if (response.success) {
-          // Refresh balance and add transaction
-          refreshBalance();
-          setTransactions((prev) => [response.transaction, ...prev]);
+          // Refresh balance after successful payment
+          void refreshBalance();
         }
 
         return response.success;

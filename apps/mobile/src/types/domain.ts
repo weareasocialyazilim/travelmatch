@@ -178,14 +178,20 @@ export interface Moment {
   story: string;
   imageUrl: string;
   image?: string;
+  images?: string[]; // Multiple images support
   price: number;
+  pricePerGuest?: number; // Alternative price field from some APIs
   location: MomentLocation;
   availability: string;
   place?: string;
   giftCount?: number;
   distance?: string;
-  status?: 'active' | 'pending' | 'completed'; // Owner view status
+  status?: 'active' | 'pending' | 'completed' | 'paused' | 'draft' | 'deleted'; // Owner view status
   date?: string; // Display date for moment
+  completedDate?: string; // For completed moments
+  rating?: number; // Rating for completed moments
+  requestCount?: number; // Number of requests for active moments
+  description?: string; // Full description
   category?: {
     id: string;
     label: string;

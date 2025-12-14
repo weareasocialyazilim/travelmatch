@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * CreateMomentScreen
  * Refactored - uses modular sub-components
@@ -83,7 +82,7 @@ const CreateMomentScreen: React.FC = () => {
 
   // Payment hint text
   const paymentHint = useMemo(() => {
-    const amountNum = parseFloat(amount) || 0;
+    const amountNum = amount || 0;
     if (amountNum <= 0) return 'Enter amount to see payment terms';
     if (amountNum <= VALUES.ESCROW_DIRECT_MAX)
       return 'Direct payment • Instant transfer';
@@ -219,9 +218,9 @@ const CreateMomentScreen: React.FC = () => {
 
           {/* Details Section */}
           <DetailsSection
-            place={place}
+            place={place ?? null}
             selectedDate={selectedDate}
-            amount={amount}
+            amount={String(amount || '')}
             onPlaceChange={(p) => setValue('place', p)}
             onDatePress={handleDatePress}
             onAmountChange={(a) => setValue('amount', parseFloat(a) || 0)}
@@ -241,10 +240,10 @@ const CreateMomentScreen: React.FC = () => {
           <MomentPreview
             photo={photo}
             title={title}
-            story={story}
-            place={place}
+            story={story || ''}
+            place={place ?? null}
             selectedDate={selectedDate}
-            amount={amount}
+            amount={String(amount || '')}
           />
 
           {/* Bottom Spacing */}

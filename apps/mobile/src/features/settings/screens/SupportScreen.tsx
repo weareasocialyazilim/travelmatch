@@ -59,7 +59,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
     }, 1500);
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+  const isSubmitDisabled = !canSubmitForm({ formState }, {
     requireDirty: false,
     requireValid: true,
   });

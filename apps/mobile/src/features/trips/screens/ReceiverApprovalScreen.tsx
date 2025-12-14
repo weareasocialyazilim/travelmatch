@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState } from 'react';
 import {
   Image,
@@ -17,6 +16,8 @@ import { COLORS } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
 import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
 interface GiverSlot {
   id: string;
@@ -28,15 +29,15 @@ interface GiverSlot {
   };
 }
 
-export const ReceiverApprovalScreen: React.FC<{
-  navigation: {
-    navigate: (route: string, params: { [key: string]: unknown }) => void;
-    goBack: () => void;
-  };
-  route: {
-    params: { momentTitle: string; totalAmount: number; momentId: string };
-  };
-}> = ({ navigation, route }) => {
+type ReceiverApprovalScreenProps = StackScreenProps<
+  RootStackParamList,
+  'ReceiverApproval'
+>;
+
+export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
+  navigation,
+  route,
+}) => {
   const [slots, setSlots] = useState<GiverSlot[]>([]);
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -369,6 +370,13 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: LAYOUT.padding * 6,
+  },
+  emptyStateText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '400',
+    textAlign: 'center',
+    marginTop: 8,
   },
   emptySubtitle: {
     color: COLORS.textSecondary,

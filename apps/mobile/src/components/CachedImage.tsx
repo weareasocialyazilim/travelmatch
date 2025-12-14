@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Cached Image Component
  * 
@@ -48,7 +47,7 @@ type ImageState = 'idle' | 'loading' | 'success' | 'error';
 
 type ImageType = 'default' | 'avatar' | 'moment' | 'trip' | 'gift' | 'profile';
 
-export interface CachedImageProps extends Omit<ImageProps, 'source'> {
+export interface CachedImageProps extends Omit<ImageProps, 'source' | 'onError' | 'onLoadStart' | 'onLoadEnd'> {
   source: { uri: string };
   type?: ImageType;
   cloudflareId?: string;

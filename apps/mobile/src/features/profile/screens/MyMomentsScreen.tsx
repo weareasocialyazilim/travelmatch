@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
@@ -250,7 +249,7 @@ const MyMomentsScreen: React.FC = () => {
               activeOpacity={0.7}
             >
               <Image
-                source={{ uri: moment.image }}
+                source={{ uri: moment.image || moment.images?.[0] }}
                 style={styles.momentImage}
               />
               <View style={styles.momentContent}>
@@ -267,11 +266,11 @@ const MyMomentsScreen: React.FC = () => {
                     color={COLORS.textSecondary}
                   />
                   <Text style={styles.momentLocationText}>
-                    {moment.location}
+                    {typeof moment.location === 'string' ? moment.location : `${moment.location.city}, ${moment.location.country}`}
                   </Text>
                 </View>
                 <View style={styles.momentFooter}>
-                  <Text style={styles.momentPrice}>${moment.price}</Text>
+                  <Text style={styles.momentPrice}>${moment.price ?? moment.pricePerGuest}</Text>
                   {moment.status === 'completed' && moment.rating && (
                     <View style={styles.ratingContainer}>
                       <MaterialCommunityIcons
@@ -311,7 +310,7 @@ const MyMomentsScreen: React.FC = () => {
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Total earned</Text>
               <Text style={styles.summaryValueHighlight}>
-                ${completedMoments.reduce((sum, m) => sum + m.price, 0)}
+                ${completedMoments.reduce((sum, m) => sum + (m.price ?? m.pricePerGuest ?? 0), 0)}
               </Text>
             </View>
           </View>

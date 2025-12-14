@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix TYPOGRAPHY type - uses h2, h3, h4, body, label, caption but settings TYPOGRAPHY doesn't have these
 import React from 'react';
 import {
   View,
@@ -11,8 +10,8 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
-import { RADII } from '../constants/radii';
-import { SPACING } from '../constants/spacing';
+import { RADII as radii } from '../constants/radii';
+import { SPACING as spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -341,7 +340,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: spacing.lg,
-    paddingBottom: spacing.xxl,
+    paddingBottom: spacing['3xl'],
   },
   heroSection: {
     alignItems: 'center',

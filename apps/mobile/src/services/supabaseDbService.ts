@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * Supabase Database Service
  * CRUD operations for TravelMatch entities
@@ -786,7 +785,7 @@ export const requestsService = {
     momentId?: string;
     userId?: string;
     status?: string;
-  }): Promise<ListResult<Tables['requests']['Row']>> {
+  }): Promise<ListResult<any>> {
     if (!isSupabaseConfigured()) {
       return {
         data: [],
@@ -868,7 +867,7 @@ export const requestsService = {
 
   async updateStatus(
     id: string,
-    status: 'accepted' | 'rejected' | 'cancelled',
+    status: 'accepted' | 'rejected' | 'cancelled' | 'completed',
   ): Promise<DbResult<Tables['requests']['Row']>> {
     try {
       const { data, error } = await supabase
@@ -1070,6 +1069,24 @@ export const conversationsService = {
       return { data: null, error: error as Error };
     }
   },
+
+  async getById(
+    conversationId: string,
+  ): Promise<DbResult<Tables['conversations']['Row']>> {
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('id', conversationId)
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      logger.error('[DB] Get conversation by ID error:', error);
+      return { data: null, error: error as Error };
+    }
+  },
 };
 
 /**
@@ -1220,13 +1237,15 @@ export const notificationsService = {
 
 /**
  * Moderation Service (Reports & Blocks)
+ * Note: reports and blocks tables not in generated types yet
  */
 export const moderationService = {
   // Reports
   async createReport(
-    report: Tables['reports']['Insert'],
-  ): Promise<DbResult<Tables['reports']['Row']>> {
+    report: any,
+  ): Promise<DbResult<any>> {
     try {
+      
       const { data, error } = await supabase
         .from('reports')
         .insert(report)
@@ -1243,8 +1262,9 @@ export const moderationService = {
 
   async listReports(
     userId: string,
-  ): Promise<ListResult<Tables['reports']['Row']>> {
+  ): Promise<ListResult<any>> {
     try {
+      
       const { data, count, error } = await supabase
         .from('reports')
         .select('*', { count: 'exact' })
@@ -1261,9 +1281,10 @@ export const moderationService = {
 
   // Blocks
   async blockUser(
-    block: Tables['blocks']['Insert'],
-  ): Promise<DbResult<Tables['blocks']['Row']>> {
+    block: any,
+  ): Promise<DbResult<any>> {
     try {
+      
       const { data, error } = await supabase
         .from('blocks')
         .insert(block)
@@ -1283,6 +1304,7 @@ export const moderationService = {
     blockedId: string,
   ): Promise<{ error: Error | null }> {
     try {
+      
       const { error } = await supabase
         .from('blocks')
         .delete()
@@ -1299,8 +1321,9 @@ export const moderationService = {
 
   async listBlockedUsers(
     userId: string,
-  ): Promise<ListResult<Tables['blocks']['Row']>> {
+  ): Promise<ListResult<any>> {
     try {
+      
       const { data, count, error } = await supabase
         .from('blocks')
         .select('*, blocked:users!blocked_id(*)', { count: 'exact' })
@@ -1328,7 +1351,7 @@ export const transactionsService = {
       startDate?: string;
       endDate?: string;
     },
-  ): Promise<ListResult<Tables['transactions']['Row']>> {
+  ): Promise<ListResult<any>> {
     if (!isSupabaseConfigured()) {
       return {
         data: [],
@@ -1338,6 +1361,7 @@ export const transactionsService = {
     }
 
     try {
+      
       let query = supabase
         .from('transactions')
         .select('*', { count: 'exact' })
@@ -1370,7 +1394,7 @@ export const transactionsService = {
     }
   },
 
-  async get(id: string): Promise<DbResult<Tables['transactions']['Row']>> {
+  async get(id: string): Promise<DbResult<any>> {
     try {
       // Get current user for ownership verification
       const { data: { user } } = await supabase.auth.getUser();
@@ -1379,6 +1403,7 @@ export const transactionsService = {
         throw new Error('Unauthorized: User not authenticated');
       }
 
+      
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
@@ -1406,9 +1431,10 @@ export const transactionsService = {
   },
 
   async create(
-    transaction: Tables['transactions']['Insert'],
-  ): Promise<DbResult<Tables['transactions']['Row']>> {
+    transaction: any,
+  ): Promise<DbResult<any>> {
     try {
+      
       const { data, error } = await supabase
         .from('transactions')
         .insert(transaction)

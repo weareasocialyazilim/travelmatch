@@ -13,14 +13,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { RootStackParamList } from '@/navigation/types';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 
+type LinkInvalidRouteProp = RouteProp<RootStackParamList, 'LinkInvalid'>;
+
 const LinkInvalidScreen: React.FC = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const message = (route.params as any)?.message || 'Link geçersiz';
+  const route = useRoute<LinkInvalidRouteProp>();
+  const message = route.params?.message || 'Link geçersiz';
 
   const handleGoHome = () => {
     navigation.reset({

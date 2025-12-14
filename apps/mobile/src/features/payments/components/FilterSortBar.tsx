@@ -59,17 +59,17 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
   );
 };
 
-interface SortFilterModalProps {
+interface SortFilterModalProps<T extends string> {
   visible: boolean;
   title: string;
-  options: readonly string[];
-  selectedValue: string;
+  options: readonly T[];
+  selectedValue: T;
   onClose: () => void;
-  onSelect: (value: string) => void;
-  getLabel: (value: string) => string;
+  onSelect: (value: T) => void;
+  getLabel: (value: T) => string;
 }
 
-export const SortFilterModal: React.FC<SortFilterModalProps> = ({
+export function SortFilterModal<T extends string>({
   visible,
   title,
   options,
@@ -77,7 +77,7 @@ export const SortFilterModal: React.FC<SortFilterModalProps> = ({
   onClose,
   onSelect,
   getLabel,
-}) => {
+}: SortFilterModalProps<T>) {
   if (!visible) return null;
 
   return (

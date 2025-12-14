@@ -246,13 +246,12 @@ const DataPrivacyScreen = () => {
       if (error) throw error;
 
       // Navigate to consent history screen or show modal
-      console.log('Consent history:', data);
       Alert.alert(
         'Consent History',
         `You have ${data.length} consent records. View them in the app.`
       );
     } catch (error) {
-      console.error('Error fetching consent history:', error);
+      logger.error('Error fetching consent history:', error);
     }
   };
 

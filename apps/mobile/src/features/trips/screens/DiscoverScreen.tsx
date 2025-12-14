@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
@@ -9,6 +8,7 @@ import {
   RefreshControl,
   StatusBar,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -43,7 +43,8 @@ import type {
   PriceRange,
 } from '@/components/discover/types';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
-import type { Moment } from '../types';
+import type { Moment } from '@/hooks/useMoments';
+import type { Moment as DomainMoment } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
 
 const DiscoverScreen = () => {
@@ -156,16 +157,17 @@ const DiscoverScreen = () => {
 
   // Filter and sort moments
   const filteredMoments = useMemo(() => {
-    let moments = [...baseMoments] as Moment[];
+    let moments = [...baseMoments];
 
     if (selectedCategory !== 'all') {
-      moments = moments.filter(
-        (m) => m.category?.id?.toLowerCase() === selectedCategory,
-      );
+      moments = moments.filter((m) => {
+        const categoryId = typeof m.category === 'string' ? m.category : m.category?.id;
+        return categoryId?.toLowerCase() === selectedCategory;
+      });
     }
 
     moments = moments.filter((m) => {
-      const price = m.price || 0;
+      const price = m.price || m.pricePerGuest || 0;
       return price >= priceRange.min && price <= priceRange.max;
     });
 
@@ -209,7 +211,8 @@ const DiscoverScreen = () => {
 
   const handleMomentPress = useCallback(
     (moment: Moment) => {
-      navigation.navigate('MomentDetail', { moment });
+      // Cast to any to bridge hook Moment and domain Moment types
+      navigation.navigate('MomentDetail', { moment: moment as unknown as import('@/types').Moment });
     },
     [navigation],
   );
@@ -245,6 +248,14 @@ const DiscoverScreen = () => {
     if (priceRange.min !== 0 || priceRange.max !== 500) count++;
     return count;
   }, [selectedCategory, sortBy, maxDistance, priceRange]);
+
+  // Clear all filters
+  const clearFilters = useCallback(() => {
+    setSelectedCategory('all');
+    setSortBy('nearest');
+    setMaxDistance(50);
+    setPriceRange({ min: 0, max: 500 });
+  }, []);
 
   // Memoized render functions
   const renderStoryItem = useCallback(
@@ -285,14 +296,12 @@ const DiscoverScreen = () => {
 
       {/* Header */}
       <DiscoverHeader
-        selectedLocation={selectedLocation}
+        location={selectedLocation}
+        viewMode={viewMode}
+        activeFiltersCount={activeFilterCount}
         onLocationPress={() => setShowLocationModal(true)}
-        onNotificationPress={() =>
-          navigation.navigate('Requests', { initialTab: 'notifications' })
-        }
         onFilterPress={() => setShowFilterModal(true)}
-        activeFilterCount={activeFilterCount}
-        notificationCount={2}
+        onViewModeToggle={() => setViewMode(viewMode === 'single' ? 'grid' : 'single')}
       />
 
       <NetworkGuard
@@ -506,23 +515,39 @@ const DiscoverScreen = () => {
         onViewMoment={(story) => {
           closeStoryViewer();
           // Convert story to moment format for navigation
+          const domainMoment: DomainMoment = {
+            id: story.id,
+            title: story.title,
+            imageUrl: story.imageUrl,
+            image: story.imageUrl,
+            price: story.price,
+            story: story.description,
+            location: { city: story.location, country: '' },
+            category: { id: 'experience', label: 'Experience', emoji: '✨' },
+            user: selectedStoryUser
+              ? {
+                  id: selectedStoryUser.id || '',
+                  name: selectedStoryUser.name,
+                  avatar: selectedStoryUser.avatar,
+                  isVerified: false,
+                  location: '',
+                  type: 'traveler',
+                  travelDays: 0,
+                }
+              : {
+                  id: '',
+                  name: 'Unknown',
+                  avatar: '',
+                  isVerified: false,
+                  location: '',
+                  type: 'traveler',
+                  travelDays: 0,
+                },
+            availability: 'Available',
+            giftCount: 0,
+          };
           navigation.navigate('MomentDetail', {
-            moment: {
-              id: story.id,
-              title: story.title,
-              imageUrl: story.imageUrl,
-              price: story.price,
-              distance: story.distance,
-              story: story.description,
-              location: { city: story.location, country: '' },
-              user: selectedStoryUser
-                ? {
-                    name: selectedStoryUser.name,
-                    avatar: selectedStoryUser.avatar,
-                  }
-                : undefined,
-              availability: [],
-            } as unknown as Moment,
+            moment: domainMoment,
           });
         }}
         onUserPress={(userId) => {

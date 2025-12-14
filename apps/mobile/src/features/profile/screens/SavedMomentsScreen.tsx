@@ -43,13 +43,18 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
 
   // Extract unique categories from saved moments
   const filterOptions = useMemo(() => {
-    const categories = new Set(savedMoments.map((m) => m.category));
+    const categories = new Set(savedMoments.map((m) => {
+      return typeof m.category === 'string' ? m.category : m.category?.label || 'Other';
+    }));
     return ['All', ...Array.from(categories)];
   }, [savedMoments]);
 
   const filteredMoments = useMemo(() => {
     if (selectedFilter === 'All') return savedMoments;
-    return savedMoments.filter((m) => m.category === selectedFilter);
+    return savedMoments.filter((m) => {
+      const categoryLabel = typeof m.category === 'string' ? m.category : m.category?.label || 'Other';
+      return categoryLabel === selectedFilter;
+    });
   }, [savedMoments, selectedFilter]);
 
   const handleUnsave = async (id: string) => {
@@ -57,6 +62,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
   };
 
   const handleMomentPress = (moment: Moment) => {
+    const categoryLabel = typeof moment.category === 'string' ? moment.category : moment.category?.label || 'Other';
     navigation.navigate('MomentDetail', {
       moment: {
         ...moment,
@@ -75,7 +81,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
           travelDays: 0,
         },
         giftCount: 0,
-        category: moment.category || 'Other',
+        category: categoryLabel,
       } as any,
     });
   };
@@ -204,7 +210,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
                       {typeof moment.location === 'string'
                         ? moment.location
                         : moment.location?.city}{' '}
-                      • ${moment.pricePerGuest} • {moment.category}
+                      • ${moment.pricePerGuest} • {typeof moment.category === 'string' ? moment.category : moment.category?.label || 'Other'}
                     </Text>
                   </View>
                 </View>

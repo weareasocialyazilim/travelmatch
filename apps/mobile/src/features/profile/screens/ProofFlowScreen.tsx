@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React, { useState } from 'react';
 import {
   View,
@@ -110,6 +109,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   const title = watch('title');
   const description = watch('description');
   const location = watch('location');
+  const amount = watch('amount');
 
   const handleSelectType = (type: ProofType) => {
     setValue('type', type);
@@ -527,10 +527,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           </View>
         )}
 
-        {proof.amount && (
+        {amount && (
           <View style={styles.reviewSection}>
             <Text style={styles.reviewLabel}>Amount</Text>
-            <Text style={styles.reviewValue}>${proof.amount}</Text>
+            <Text style={styles.reviewValue}>${amount}</Text>
           </View>
         )}
 

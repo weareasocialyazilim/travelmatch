@@ -62,7 +62,7 @@ const ChangePasswordScreen: React.FC = () => {
     }
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
+  const isSubmitDisabled = !canSubmitForm({ formState }, {
     requireDirty: false,
     requireValid: true,
   });

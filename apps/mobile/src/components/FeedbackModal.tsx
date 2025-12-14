@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 /**
  * In-App Feedback Modal
  * Collects user feedback with rating and comments

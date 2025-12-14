@@ -8,36 +8,40 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../../constants/colors';
-import type { Moment } from '../../../types';
+import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
 interface MomentSingleCardProps {
-  moment: Moment;
-  onPress: (moment: Moment) => void;
+  moment: HookMoment;
+  onPress: (moment: HookMoment) => void;
 }
 
 const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
   ({ moment, onPress }) => {
+    const imageUrl = moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
+    const hostAvatar = moment.hostAvatar || 'https://via.placeholder.com/40';
+    const hostName = moment.hostName || 'Anonymous';
+    const price = moment.price ?? moment.pricePerGuest ?? 0;
+    const locationCity = typeof moment.location === 'string' ? moment.location : moment.location?.city || 'Unknown';
+    
     return (
       <TouchableOpacity
         style={styles.singleCard}
         onPress={() => onPress(moment)}
         activeOpacity={0.95}
       >
-        <Image source={{ uri: moment.imageUrl }} style={styles.singleImage} />
+        <Image source={{ uri: imageUrl }} style={styles.singleImage} />
         <View style={styles.singleContent}>
           <View style={styles.creatorRow}>
             <Image
-              source={{
-                uri: moment.user?.avatar || 'https://via.placeholder.com/40',
-              }}
+              source={{ uri: hostAvatar }}
               style={styles.creatorAvatar}
             />
             <View style={styles.creatorInfo}>
               <View style={styles.creatorNameRow}>
                 <Text style={styles.creatorName}>
-                  {moment.user?.name || 'Anonymous'}
+                  {hostName}
                 </Text>
-                {moment.user?.isVerified && (
+                {moment.hostRating > 4.5 && (
                   <MaterialCommunityIcons
                     name="check-decagram"
                     size={14}
@@ -50,9 +54,9 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
           <Text style={styles.singleTitle} numberOfLines={2}>
             {moment.title}
           </Text>
-          {moment.story && (
+          {moment.description && (
             <Text style={styles.storyDescription} numberOfLines={2}>
-              {moment.story}
+              {moment.description}
             </Text>
           )}
           <View style={styles.locationDistanceRow}>
@@ -62,22 +66,17 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
               color={COLORS.textSecondary}
             />
             <Text style={styles.locationText}>
-              {moment.location?.city || 'Unknown'}
-            </Text>
-            <Text style={styles.dotSeparator}>•</Text>
-            <Text style={styles.distanceText}>
-              {moment.distance || '?'} km away
+              {locationCity}
             </Text>
           </View>
-          <Text style={styles.priceValue}>${moment.price}</Text>
+          <Text style={styles.priceValue}>${price}</Text>
         </View>
       </TouchableOpacity>
     );
   },
   (prevProps, nextProps) =>
     prevProps.moment.id === nextProps.moment.id &&
-    prevProps.moment.price === nextProps.moment.price &&
-    prevProps.moment.distance === nextProps.moment.distance,
+    prevProps.moment.pricePerGuest === nextProps.moment.pricePerGuest,
 );
 
 MomentSingleCard.displayName = 'MomentSingleCard';

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type errors
 import React from 'react';
 import {
   View,
@@ -637,5 +636,3 @@ const EscrowStatusScreenWithErrorBoundary = (props: EscrowStatusScreenProps) => 
 );
 
 export default EscrowStatusScreenWithErrorBoundary;
-
-export default EscrowStatusScreen;

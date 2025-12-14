@@ -13,6 +13,7 @@ import React from 'react';
 import { Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { queryClient } from '../services/offlineCache';
+import { logger } from '../utils/logger';
 
 // Preload queue
 interface PreloadItem {
@@ -62,7 +63,7 @@ class ImagePreloader {
       }))
     );
 
-    console.log('[Preload] Prefetched', uris.length, 'moment images');
+    logger.debug('[Preload] Prefetched', uris.length, 'moment images');
   }
 
   /**
@@ -74,7 +75,7 @@ class ImagePreloader {
 
     // Check if already cached
     if (queryClient.getQueryData(queryKey)) {
-      console.log('[Preload] Page', nextPage, 'already cached');
+      logger.debug('[Preload] Page', nextPage, 'already cached');
       return;
     }
 
@@ -94,9 +95,9 @@ class ImagePreloader {
         await this.prefetchMomentsImages(data.moments);
       }
 
-      console.log('[Preload] Prefetched page', nextPage);
+      logger.debug('[Preload] Prefetched page', nextPage);
     } catch (error) {
-      console.error('[Preload] Failed to prefetch page', nextPage, error);
+      logger.error('[Preload] Failed to prefetch page', nextPage, error);
     }
   }
 
@@ -137,7 +138,7 @@ class ImagePreloader {
           this.processQueue(); // Process next item
         })
         .catch((error) => {
-          console.error('[Preload] Failed to preload:', item.uri, error);
+          logger.error('[Preload] Failed to preload:', item.uri, error);
           this.preloading.delete(item.uri);
           this.processQueue(); // Process next item
         });
@@ -153,7 +154,7 @@ class ImagePreloader {
     return new Promise((resolve, reject) => {
       Image.prefetch(uri)
         .then(() => {
-          console.log('[Preload] Loaded:', uri);
+          logger.debug('[Preload] Loaded:', uri);
           resolve();
         })
         .catch(reject);
