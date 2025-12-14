@@ -19,6 +19,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '../../constants/colors';
 import { STRINGS } from '../../constants/strings';
+import { useToast } from '@/context/ToastContext';
 
 interface PhotoSectionProps {
   photo: string;
@@ -27,6 +28,8 @@ interface PhotoSectionProps {
 
 const PhotoSection: React.FC<PhotoSectionProps> = memo(
   ({ photo, onPhotoSelected }) => {
+    const { showToast } = useToast();
+
     const pickImage = () => {
       const showPicker = async (useCamera: boolean) => {
         try {
@@ -34,20 +37,14 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
             const { status } =
               await ImagePicker.requestCameraPermissionsAsync();
             if (status !== 'granted') {
-              Alert.alert(
-                STRINGS.LABELS.PERMISSION_NEEDED,
-                'Camera permission is required',
-              );
+              showToast('Camera permission is required', 'warning');
               return;
             }
           } else {
             const { status } =
               await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
-              Alert.alert(
-                STRINGS.LABELS.PERMISSION_NEEDED,
-                STRINGS.ERRORS.PHOTO_PERMISSION,
-              );
+              showToast(STRINGS.ERRORS.PHOTO_PERMISSION, 'warning');
               return;
             }
           }
@@ -70,7 +67,7 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
             onPhotoSelected(result.assets[0].uri);
           }
         } catch (error) {
-          Alert.alert('Error', STRINGS.ERRORS.PHOTO_SELECT);
+          showToast(STRINGS.ERRORS.PHOTO_SELECT, 'error');
         }
       };
 

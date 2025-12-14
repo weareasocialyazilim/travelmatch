@@ -5,14 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native';
+  Image,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface HiddenItem {
   id: string;
@@ -24,7 +24,9 @@ interface HiddenItem {
 }
 
 export const HiddenItemsScreen: React.FC = () => {
-  const navigation = useNavigation();
+    const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
+const navigation = useNavigation();
 
   const [hiddenItems, setHiddenItems] = useState<HiddenItem[]>([]);
 
@@ -42,7 +44,7 @@ export const HiddenItemsScreen: React.FC = () => {
         text: 'Unhide',
         onPress: () => {
           setHiddenItems((prev) => prev.filter((item) => item.id !== id));
-          Alert.alert('Done', 'Item has been restored to your inbox.');
+          showToast('Item has been restored to your inbox.', 'success');
         },
       },
     ]);
@@ -56,7 +58,7 @@ export const HiddenItemsScreen: React.FC = () => {
         style: 'destructive',
         onPress: () => {
           setHiddenItems((prev) => prev.filter((item) => item.id !== id));
-          Alert.alert('Deleted', 'Item has been permanently deleted.');
+          showToast('Item has been permanently deleted.', 'info');
         },
       },
     ]);

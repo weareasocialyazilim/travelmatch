@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
   ScrollView,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
 import { twoFactorSetupSchema, type TwoFactorSetupInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -26,6 +26,7 @@ type TwoFactorSetupScreenProps = StackScreenProps<
 export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
   navigation,
 }) => {
+  const { showToast } = useToast();
   const [step, setStep] = useState<'intro' | 'verify' | 'success'>('intro');
   const [isLoading, setIsLoading] = useState(false);
   const [secretKey, setSecretKey] = useState<string | null>(null);
@@ -52,12 +53,9 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       // For now, we simulate a delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setStep('verify');
-      Alert.alert(
-        'Code Sent',
-        'A verification code has been sent to your phone',
-      );
+      showToast('A verification code has been sent to your phone', 'success');
     } catch (error) {
-      Alert.alert('Error', 'Failed to send verification code');
+      showToast('Failed to send verification code', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +69,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       if (data.verificationCode === '123456') {
         setStep('success');
       } else {
-        Alert.alert('Invalid Code', 'Please check your code and try again');
+        showToast('Please check your code and try again', 'error');
       }
     }, 1000);
   };
@@ -191,7 +189,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
 
       <TouchableOpacity
         style={styles.secondaryButton}
-        onPress={() => Alert.alert('Code Resent', 'A new code has been sent')}
+        onPress={() => showToast('A new code has been sent', 'success')}
         activeOpacity={0.7}
       >
         <Text style={styles.secondaryButtonText}>Resend Code</Text>

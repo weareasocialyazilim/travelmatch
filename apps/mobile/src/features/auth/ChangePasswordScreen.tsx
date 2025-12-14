@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,11 +17,13 @@ import { COLORS } from '@/constants/colors';
 import { changePasswordSchema, type ChangePasswordInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { PasswordInput } from '@/components/ui/PasswordInput';
+import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
 const ChangePasswordScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { showToast } = useToast();
 
   const { control, handleSubmit, formState, watch } = useForm<ChangePasswordInput>({
     resolver: zodResolver(changePasswordSchema),
@@ -46,18 +47,14 @@ const ChangePasswordScreen: React.FC = () => {
         newPassword: data.newPassword,
       });
 
-      Alert.alert('Success', 'Your password has been changed successfully.', [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ]);
+      showToast('Your password has been changed successfully.', 'success');
+      setTimeout(() => navigation.goBack(), 1000);
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
           : 'Failed to change password. Please try again.';
-      Alert.alert('Error', message);
+      showToast(message, 'error');
     }
   };
 
@@ -297,10 +294,7 @@ const ChangePasswordScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.forgotButton}
             onPress={() =>
-              Alert.alert(
-                'Forgot Password',
-                'Password reset link will be sent to your email.',
-              )
+              showToast('Password reset link will be sent to your email.', 'info')
             }
           >
             <Text style={styles.forgotButtonText}>

@@ -3,7 +3,6 @@ import {
   StyleSheet,
   AppState,
   Platform,
-  Alert,
 } from 'react-native';
 import * as Device from 'expo-device';
 import * as SplashScreen from 'expo-splash-screen';
@@ -76,20 +75,8 @@ export default function App() {
         // 1. Security Check: Root/Jailbreak Detection (Warning Only)
         const isRooted = await Device.isRootedExperimentalAsync();
         if (isRooted) {
-          logger.warn('App', 'Device is rooted/jailbroken - security risk');
-          // Show warning but don't block (user choice)
-          Alert.alert(
-            'Security Warning',
-            'This device appears to be rooted or jailbroken. This may reduce the security of your data. Continue at your own risk.',
-            [
-              {
-                text: 'I Understand',
-                style: 'default',
-              },
-            ],
-            { cancelable: true },
-          );
-          // Continue with app initialization
+          logger.warn('App', 'Device is rooted/jailbroken - security risk. Data security may be compromised.');
+          // Continue with app initialization - warning logged
         }
         
         // Note: Screenshot protection is now handled per-screen via useScreenSecurity() hook

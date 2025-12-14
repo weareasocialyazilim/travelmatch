@@ -7,7 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -19,6 +18,7 @@ import { COLORS } from '../constants/colors';
 import { logger } from '../utils/logger';
 import { disputeSchema, type DisputeFormData } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
@@ -30,6 +30,7 @@ export const DisputeFlowScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<DisputeFlowRouteProp>();
   const { type, id, details } = route.params || {};
+  const { showToast } = useToast();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
@@ -76,7 +77,7 @@ export const DisputeFlowScreen: React.FC = () => {
         `evidence_${evidence.length + 1}.jpg`,
       ]);
     } else {
-      Alert.alert('Limit Reached', 'You can only upload up to 3 files.');
+      showToast('You can only upload up to 3 files.', 'warning');
     }
   };
 
@@ -114,7 +115,7 @@ export const DisputeFlowScreen: React.FC = () => {
       navigation.navigate('Success', { type: 'dispute' });
     } catch (error) {
       logger.error('Error submitting dispute', error as Error);
-      Alert.alert('Error', 'Failed to submit dispute. Please try again.');
+      showToast('Failed to submit dispute. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

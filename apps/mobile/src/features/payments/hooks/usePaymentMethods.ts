@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Platform, Alert, Linking } from 'react-native';
+import { Platform, Linking } from 'react-native';
 import { logger } from '@/utils/logger';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import type { SavedCard, Wallet, WalletSettings } from '../types/payment-methods.types';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 export const usePaymentMethods = () => {
-  const { trackMount, trackInteraction } = useScreenPerformance('PaymentMethodsScreen');
+    const { showToast } = useToast();
+const { trackMount, trackInteraction } = useScreenPerformance('PaymentMethodsScreen');
 
   const [savedCards, setSavedCards] = useState<SavedCard[]>([
     { id: '1', brand: 'Visa', lastFour: '1234', isDefault: true },

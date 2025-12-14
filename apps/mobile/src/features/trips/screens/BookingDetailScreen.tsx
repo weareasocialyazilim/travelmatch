@@ -7,13 +7,14 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp, RouteProp } from '@react-navigation/native';
 
@@ -59,6 +60,8 @@ export const BookingDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<BookingDetailScreenProps>();
   const { bookingId } = route.params;
+  const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
 
   const [booking, setBooking] = useState<BookingData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -117,36 +120,26 @@ export const BookingDetailScreen: React.FC = () => {
   };
 
   const handleCancelBooking = () => {
-    Alert.alert(
-      'Cancel Booking',
-      'Are you sure you want to cancel this booking? This action cannot be undone.',
-      [
-        { text: 'Keep Booking', style: 'cancel' },
-        {
-          text: 'Cancel Booking',
-          style: 'destructive',
-          onPress: () => {
-            // Handle cancellation
-            Alert.alert(
-              'Booking Cancelled',
-              'Your booking has been cancelled.',
-            );
-            navigation.goBack();
-          },
-        },
-      ],
-    );
+    showConfirmation({
+      title: 'Cancel Booking',
+      message: 'Are you sure you want to cancel this booking? This action cannot be undone.',
+      type: 'danger',
+      icon: 'close-circle',
+      confirmText: 'Cancel Booking',
+      cancelText: 'Keep Booking',
+      onConfirm: () => {
+        showToast('Your booking has been cancelled.', 'info');
+        navigation.goBack();
+      },
+    });
   };
 
   const handleAddToCalendar = () => {
-    Alert.alert(
-      'Add to Calendar',
-      'This booking has been added to your calendar.',
-    );
+    showToast('This booking has been added to your calendar.', 'success');
   };
 
   const handleGetDirections = () => {
-    Alert.alert('Directions', 'Opening maps for directions...');
+    showToast('Opening maps for directions...', 'info');
   };
 
   if (loading) {

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../hooks/useAuth';
 import { registerSchema, type RegisterInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
 
 export const RegisterScreen: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(false);
+    const { showToast } = useToast();
+const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   
   const { control, handleSubmit, formState } = useForm<RegisterInput>({

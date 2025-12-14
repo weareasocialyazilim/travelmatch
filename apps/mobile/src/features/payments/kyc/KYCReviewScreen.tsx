@@ -5,9 +5,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+  ActivityIndicator,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
@@ -22,6 +20,7 @@ import { KYCProgressBar } from './KYCProgressBar';
 import { kycStyles } from './styles';
 import type { VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
 
 type RouteParams = {
   KYCReview: { data: VerificationData };
@@ -51,7 +50,7 @@ const KYCReviewScreen: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       navigation.navigate('KYCPending');
     } catch {
-      Alert.alert('Error', 'Failed to submit verification. Please try again.');
+      showToast('Failed to submit verification. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

@@ -6,9 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  SafeAreaView,
-  Alert,
-} from 'react-native';
+  SafeAreaView,} from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -20,6 +18,7 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -35,7 +34,8 @@ interface EditMomentScreenProps {
 }
 
 export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
-  navigation,
+    const { showToast } = useToast();
+navigation,
   route,
 }) => {
   const { momentId } = route.params || {};
@@ -70,7 +70,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
         }
       } catch (error) {
         logger.error('Error fetching moment', error as Error);
-        Alert.alert('Error', 'Failed to load moment details');
+        showToast('Failed to load moment details', 'error');
       }
     };
     fetchMoment();
@@ -95,7 +95,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
       navigation.goBack();
     } catch (error) {
       logger.error('Error updating moment', error as Error);
-      Alert.alert('Error', 'Failed to update moment');
+      showToast('Failed to update moment', 'error');
     } finally {
       setLoading(false);
     }

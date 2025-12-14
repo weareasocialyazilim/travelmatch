@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Alert } from 'react-native';
+import {} from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTypingIndicator } from '../context/RealtimeContext';
 import { useMessages } from '../hooks/useMessages';
 import { useScreenPerformance } from '../hooks/useScreenPerformance';
 import { logger } from '../utils/logger';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 export interface Message {
   id: string;
@@ -24,7 +26,8 @@ interface UseChatScreenParams {
 }
 
 export const useChatScreen = ({
-  conversationId,
+    const { showToast } = useToast();
+conversationId,
   otherUserId,
   otherUserName,
   isSender = true,
@@ -180,7 +183,7 @@ export const useChatScreen = ({
         setMessageText('');
       } catch (error) {
         logger.error('Failed to send message', error as Error);
-        Alert.alert('Failed to send', 'Please try again');
+        showToast('Please try again', 'error');
       } finally {
         setIsSending(false);
       }

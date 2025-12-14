@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -11,6 +10,7 @@ import {
   Platform,
   // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
+  Alert,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,6 +23,8 @@ import { COLORS } from '../constants/colors';
 import { showErrorAlert, AppError, AppErrorCode } from '../utils/friendlyErrorHandler';
 import { completeProfileSchema, type CompleteProfileInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -50,6 +52,8 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   navigation,
 }) => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
   const [loading, setLoading] = useState(false);
 
   const { control, handleSubmit, formState, setValue, watch } = useForm<CompleteProfileInput>({
@@ -138,7 +142,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
       if (interests.length < 5) {
         setValue('interests', [...interests, interestId]);
       } else {
-        Alert.alert('Maximum Reached', 'You can select up to 5 interests');
+        showToast('You can select up to 5 interests', 'warning');
       }
     }
   };
@@ -153,17 +157,12 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   };
 
   const handleSkip = () => {
-    Alert.alert(
-      'Skip Profile Setup?',
-      'You can complete your profile later from Settings.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Skip',
-          onPress: () => navigation.replace('Discover'),
-        },
-      ],
-    );
+    showConfirmation({
+      title: 'Skip Profile Setup?',
+      message: 'You can complete your profile later from Settings.',
+      type: 'warning',
+      onConfirm: () => navigation.replace('Discover'),
+    });
   };
 
   return (

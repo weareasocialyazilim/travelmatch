@@ -4,9 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Share,
-  Alert,
-  Image,
+  Share,  Image,
   Clipboard,
   Linking,
 } from 'react-native';
@@ -18,6 +16,7 @@ import { useMoments } from '../hooks/useMoments';
 import type { Moment } from '../hooks/useMoments';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp, RouteProp } from '@react-navigation/native';
+import { useToast } from '@/context/ToastContext';
 
 type ShareMomentScreenProps = RouteProp<RootStackParamList, 'ShareMoment'>;
 
@@ -30,7 +29,8 @@ interface ShareOption {
 }
 
 export const ShareMomentScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const { showToast } = useToast();
+const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<ShareMomentScreenProps>();
   const { momentId } = route.params;
   const { getMoment } = useMoments();
@@ -86,7 +86,7 @@ export const ShareMomentScreen: React.FC = () => {
         title: displayMoment.title,
       });
     } catch (error) {
-      Alert.alert('Error', 'Could not share this moment');
+      showToast('Could not share this moment', 'error');
     }
   }, [shareMessage, shareUrl, displayMoment.title]);
 
@@ -117,7 +117,7 @@ export const ShareMomentScreen: React.FC = () => {
   }, [shareMessage]);
 
   const handleShareToInstagram = useCallback(() => {
-    Alert.alert('Instagram', 'Opening Instagram to share...');
+    showToast('Opening Instagram to share...', 'info');
     // In production, would use Instagram API
   }, []);
 
@@ -315,7 +315,7 @@ export const ShareMomentScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.qrButton}
           onPress={() =>
-            Alert.alert('QR Code', 'QR code would be displayed here')
+            showToast('QR code would be displayed here', 'info')
           }
         >
           <MaterialCommunityIcons

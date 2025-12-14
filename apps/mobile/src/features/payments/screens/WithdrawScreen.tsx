@@ -7,9 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+  ActivityIndicator,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +22,7 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import { ControlledInput } from '@/components/ui/ControlledInput';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
 
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 

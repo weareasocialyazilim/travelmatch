@@ -5,9 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
-  Alert,
-} from 'react-native';
+  SafeAreaView,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../constants/colors';
@@ -15,6 +13,8 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '../utils/logger';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -54,7 +54,9 @@ const MOCK_BLOCKED_USERS: BlockedUser[] = __DEV__
 const STORAGE_KEY = '@blocked_users';
 
 export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
-  navigation,
+    const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
+navigation,
 }) => {
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
 

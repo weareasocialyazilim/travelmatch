@@ -13,7 +13,6 @@ import {
   Image,
   ActivityIndicator,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
@@ -26,6 +25,7 @@ import {
   validateImageFile,
   formatBytes,
 } from '../../utils/imageHandling';
+import { useToast } from '@/context/ToastContext';
 import type { ImageAsset } from '../../utils/imageHandling';
 
 interface ImagePickerProps {
@@ -48,6 +48,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   allowMultiple = false,
   showPreview = true,
 }) => {
+  const { showToast } = useToast();
   const [selectedImages, setSelectedImages] = useState<ImageAsset[]>([]);
   const { isUploading, progress, uploadImage } = useImageUpload();
 
@@ -61,7 +62,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
       if (image) {
         const validation = validateImageFile(image, { maxSizeMB });
         if (!validation.valid) {
-          Alert.alert('Invalid Image', validation.error);
+          showToast(validation.error || 'Invalid image', 'error');
           return;
         }
 
@@ -72,7 +73,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to pick image from camera');
+      showToast('Failed to pick image from camera', 'error');
     }
   };
 
@@ -93,7 +94,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           if (validation.valid) {
             validImages.push(image);
           } else {
-            Alert.alert('Invalid Image', validation.error);
+            showToast(validation.error || 'Invalid image', 'error');
           }
         }
 
@@ -104,7 +105,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to pick image from gallery');
+      showToast('Failed to pick image from gallery', 'error');
     }
   };
 

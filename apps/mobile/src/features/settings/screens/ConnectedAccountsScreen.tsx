@@ -4,9 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+  TouchableOpacity,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,6 +12,8 @@ import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface SocialAccount {
   id: string;

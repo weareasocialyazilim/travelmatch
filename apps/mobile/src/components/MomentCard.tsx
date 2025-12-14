@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   Share,
-  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
@@ -17,6 +16,7 @@ import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePressScale } from '../utils/animations';
+import { useToast } from '@/context/ToastContext';
 import type { Moment } from '../types';
 
 interface MomentCardProps {
@@ -28,6 +28,7 @@ interface MomentCardProps {
 
 const MomentCard: React.FC<MomentCardProps> = memo(
   ({ moment, onPress, onGiftPress, onSharePress }) => {
+    const { showToast } = useToast();
     const { impact } = useHaptics();
     const {
       animatedStyle: cardScale,
@@ -71,11 +72,11 @@ const MomentCard: React.FC<MomentCardProps> = memo(
           });
         } catch (error) {
           if ((error as Error).message !== 'User did not share') {
-            Alert.alert('Error', 'Could not share this moment');
+            showToast('Could not share this moment', 'error');
           }
         }
       },
-      [moment, onSharePress, impact],
+      [moment, onSharePress, impact, showToast],
     );
 
     const handleMaybeLater = useCallback(

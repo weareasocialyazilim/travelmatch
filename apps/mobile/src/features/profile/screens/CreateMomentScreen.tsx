@@ -10,9 +10,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
-  Alert,
-  KeyboardAvoidingView,
+  Platform,  KeyboardAvoidingView,
   ActivityIndicator,
   Modal,
 } from 'react-native';
@@ -41,6 +39,8 @@ import { VALUES } from '../constants/values';
 import { useMoments } from '../hooks';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 // Import sub-components
 
@@ -143,10 +143,10 @@ const CreateMomentScreen: React.FC = () => {
           { text: 'OK', onPress: () => navigation.goBack() },
         ]);
       } else {
-        Alert.alert('Error', 'Could not create moment. Please try again.');
+        showToast('Could not create moment. Please try again.', 'error');
       }
     } catch {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      showToast('Something went wrong. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -156,7 +156,7 @@ const CreateMomentScreen: React.FC = () => {
   const handleDatePress = useCallback(() => setShowDatePicker(true), []);
   const handleNavigateToPlaceSearch = useCallback(() => {
     // TODO: Implement proper place selection (Google Places or similar)
-    Alert.alert('Not implemented', 'Place selection coming soon');
+    showToast('Place selection coming soon', 'info');
   }, []);
 
   return (
