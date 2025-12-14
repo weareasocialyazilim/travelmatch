@@ -21,7 +21,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-// @ts-expect-error - Expo vector icons may not have type definitions
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // ============================================================================

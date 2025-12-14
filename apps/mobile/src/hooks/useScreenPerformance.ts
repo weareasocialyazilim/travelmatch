@@ -1,10 +1,11 @@
 /**
  * useScreenPerformance Hook
  * Track screen mount time, render performance, and user interactions
- * Integrates with performance monitoring service
+ * Integrates with PostHog analytics service
  */
 
 import { useEffect, useCallback, useRef } from 'react';
+import PostHog from 'posthog-react-native';
 import { logger } from '../utils/logger';
 
 interface PerformanceMetrics {
@@ -35,7 +36,13 @@ export const useScreenPerformance = (screenName: string) => {
 
     logger.debug(`[Performance] ${screenName} mounted in ${mountDuration}ms`);
 
-    // TODO: Send to analytics/monitoring service
+    // Send to PostHog analytics
+    PostHog.capture('screen_performance', {
+      screen_name: screenName,
+      mount_time_ms: mountDuration,
+      metric_type: 'mount',
+    });
+
     if (typeof global.performance !== 'undefined') {
       // eslint-disable-next-line no-console
       logger.debug(`📊 [Performance] ${screenName}:`, {
@@ -60,8 +67,13 @@ export const useScreenPerformance = (screenName: string) => {
         metadata,
       );
 
-      // TODO: Send to analytics service
-      // eslint-disable-next-line no-console
+      // Send to PostHog analytics
+      PostHog.capture('user_interaction', {
+        screen_name: screenName,
+        interaction_name: interactionName,
+        ...metadata,
+      });
+
       logger.debug(`🎯 [Interaction] ${screenName} - ${interactionName}:`, {
         metadata,
         timestamp: new Date().toISOString(),
