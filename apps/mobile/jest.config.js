@@ -43,4 +43,12 @@ module.exports = {
     '/coverage/',
     '/.expo/',
   ],
+  coverageThreshold: {
+    global: {
+      statements: 80,
+      branches: 70,
+      functions: 75,
+      lines: 80,
+    },
+  },
 };
