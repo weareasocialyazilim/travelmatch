@@ -91,7 +91,13 @@ OPENAI_API_KEY=sk-...
 
 # Resend (Email service)
 RESEND_API_KEY=re_...
+
+# Cloudflare (Image CDN - 60-80% faster image loads)
+CLOUDFLARE_ACCOUNT_ID=your-account-id
+CLOUDFLARE_IMAGES_TOKEN=cf_...
 ```
+
+**Setup Guide:** See `CLOUDFLARE_SETUP.md`
 
 ---
 

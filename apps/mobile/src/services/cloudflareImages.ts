@@ -1,25 +1,26 @@
 /**
  * Cloudflare Images Service
- * 
+ *
  * Automatic WebP pipeline for image optimization
- * 
+ *
  * Features:
  * - Automatic format conversion (JPEG/PNG → WebP)
  * - Responsive image variants (thumbnail, small, medium, large)
  * - CDN delivery via Cloudflare
  * - Lazy loading support
  * - Performance monitoring
- * 
+ *
  * Setup:
  * 1. Create Cloudflare Images account
  * 2. Get API token and account ID
  * 3. Set environment variables:
  *    - CLOUDFLARE_ACCOUNT_ID
  *    - CLOUDFLARE_IMAGES_TOKEN
- * 
+ *
  * @see https://developers.cloudflare.com/images/
  */
 
+import React from 'react';
 import { logger } from '../utils/logger';
 
 // Environment variables

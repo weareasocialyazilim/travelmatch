@@ -223,7 +223,13 @@ OPENAI_API_KEY=sk-...
 
 # Resend (REQUIRED for emails)
 RESEND_API_KEY=re_...
+
+# Cloudflare (RECOMMENDED for 60-80% faster images)
+CLOUDFLARE_ACCOUNT_ID=your-account-id
+CLOUDFLARE_IMAGES_TOKEN=cf_...
 ```
+
+**Setup Guide:** See `CLOUDFLARE_SETUP.md`
 
 ---
 
@@ -361,6 +367,7 @@ https://bjikxgtbptrvawkguypv.supabase.co
 **Documentation:**
 - Backend Setup: `/BACKEND_SETUP.md`
 - Infisical Setup: `/INFISICAL_SETUP.md`
+- Cloudflare Setup: `/CLOUDFLARE_SETUP.md`
 - Audit Report: (in commit messages)
 - Titan Master Plan: v2.0
 
