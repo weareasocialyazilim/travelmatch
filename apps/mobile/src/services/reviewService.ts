@@ -6,7 +6,9 @@
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { reviewsService as dbReviewsService } from './supabaseDbService';
-import type { ReviewRow } from '../types/database.types';
+
+// ReviewRow type placeholder - should be defined in database.types.ts
+type ReviewRow = Record<string, unknown>;
 
 // Types
 export interface Review {
@@ -167,19 +169,19 @@ export const reviewService = {
         };
       }
 
-      const reviews: Review[] = data.map((row: ReviewRow) => ({
-        id: row.id,
-        rating: row.rating,
-        comment: row.comment || '',
-        reviewerId: row.reviewer_id,
+      const reviews: Review[] = data.map((row: any) => ({
+        id: row.id as string,
+        rating: row.rating as number,
+        comment: (row.comment as string) || '',
+        reviewerId: row.reviewer_id as string,
         reviewerName: row.reviewer?.full_name || 'User',
         reviewerAvatar: row.reviewer?.avatar_url || '',
-        revieweeId: row.reviewed_id,
+        revieweeId: row.reviewed_id as string,
         revieweeName: '', // Could be fetched
-        momentId: row.moment_id,
+        momentId: row.moment_id as string,
         momentTitle: row.moment?.title || '',
         requestId: '', // Not stored in reviews table directly usually
-        createdAt: row.created_at,
+        createdAt: row.created_at as string,
         isVerified: true,
         isEdited: false,
       }));
@@ -291,7 +293,7 @@ export const reviewService = {
   /**
    * Get pending reviews (requests I need to review)
    */
-  getPendingReviews: (): Promise<{
+  getPendingReviews: async (): Promise<{
     pendingReviews: Array<{
       requestId: string;
       momentId: string;

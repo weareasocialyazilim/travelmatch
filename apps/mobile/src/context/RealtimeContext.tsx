@@ -124,8 +124,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const { user, isAuthenticated } = useAuth();
 
-  const { user, isAuthenticated } = useAuth();
-
   // State
   const [connectionState, setConnectionState] =
     useState<ConnectionState>('disconnected');

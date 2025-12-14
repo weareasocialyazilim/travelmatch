@@ -64,9 +64,9 @@ const getCacheKey = (key: string): string => `${CACHE_PREFIX}${key}`;
 class CacheService {
   private memoryCache: Map<string, CacheItem<unknown>> = new Map();
   private accessOrder: string[] = []; // LRU tracking
-  private currentSize: number = 0; // Total cache size in bytes
+  private currentSize = 0; // Total cache size in bytes
   private cleanupInterval: NodeJS.Timeout | null = null;
-  private isInitialized: boolean = false;
+  private isInitialized = false;
 
   /**
    * Initialize cache service (call on app start)
@@ -191,7 +191,7 @@ class CacheService {
     const now = Date.now();
 
     // Try memory cache first
-    let memoryItem = this.memoryCache.get(key) as CacheItem<T> | undefined;
+    const memoryItem = this.memoryCache.get(key) as CacheItem<T> | undefined;
     if (memoryItem) {
       if (now >= memoryItem.expiresAt) {
         await this.remove(key);

@@ -12,9 +12,9 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
-import { COLORS } from '../constants/colors';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
+import { COLORS } from '@/constants/colors';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');

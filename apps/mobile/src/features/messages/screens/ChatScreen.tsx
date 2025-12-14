@@ -5,17 +5,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatHeader } from '../components/ChatHeader';
 import { MessageBubble } from '../components/MessageBubble';
 import { ChatInputBar } from '../components/ChatInputBar';
-import { ChatAttachmentBottomSheet } from '../components/ChatAttachmentBottomSheet';
-import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
-import { COLORS } from '../constants/colors';
+import { ChatAttachmentBottomSheet } from '@/components/ChatAttachmentBottomSheet';
+import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
+import { COLORS } from '@/constants/colors';
 import { useChatScreen, type Message } from '../hooks/useChatScreen';
 import {
   CHAT_LIST_CONFIG,
   ITEM_HEIGHTS,
   createGetItemLayout,
-} from '../utils/listOptimization';
-import { logger } from '../utils/logger';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+} from '@/utils/listOptimization';
+import { logger } from '@/utils/logger';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
@@ -144,7 +144,7 @@ const ChatScreen: React.FC = () => {
         visible={showChatOptions}
         onClose={() => setShowChatOptions(false)}
         onSubmit={(action, reason, details) =>
-          handleChatAction(action, reason, details, navigation)
+          handleChatAction(action, reason ?? '', details ?? '', navigation)
         }
         targetType="user"
       />

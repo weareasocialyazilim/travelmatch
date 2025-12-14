@@ -10,13 +10,13 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LoadingState } from '../components/LoadingState';
-import { COLORS } from '../constants/colors';
-import { radii } from '../constants/radii';
+import { LoadingState } from '@/components/LoadingState';
+import { COLORS } from '@/constants/colors';
+import { RADII } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type MatchConfirmationScreenRouteProp = RouteProp<
@@ -79,19 +79,20 @@ const MatchConfirmationScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   avatar: {
-    borderRadius: radii.full,
+    borderRadius: RADII.full,
     height: 50,
-    marginRight: spacing.md,
+    marginRight: SPACING.md,
     width: 50,
   },
   confirmButton: {
     alignItems: 'center',
     backgroundColor: COLORS.primary,
-    borderRadius: radii.md,
-    padding: spacing.md,
+    borderRadius: RADII.md,
+    padding: SPACING.md,
   },
   confirmButtonText: {
-    ...TYPOGRAPHY.h3,
+    fontSize: TYPOGRAPHY.fontSizes['2xl'],
+    fontWeight: TYPOGRAPHY.fontWeights.semibold,
     color: COLORS.white,
   },
   container: {
@@ -102,26 +103,26 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopColor: COLORS.border,
     borderTopWidth: 1,
-    padding: spacing.md,
+    padding: SPACING.md,
   },
   giverAmount: {
-    ...TYPOGRAPHY.bodySmall,
+    fontSize: TYPOGRAPHY.fontSizes.sm,
     color: COLORS.textSecondary,
   },
   giverCard: {
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    borderRadius: radii.md,
+    borderRadius: RADII.md,
     flexDirection: 'row',
-    marginBottom: spacing.md,
-    padding: spacing.md,
+    marginBottom: SPACING.md,
+    padding: SPACING.md,
     ...SHADOWS.sm,
   },
   giverInfo: {
     flex: 1,
   },
   giverName: {
-    ...TYPOGRAPHY.body,
+    fontSize: TYPOGRAPHY.fontSizes.lg,
     fontWeight: '600',
   },
   header: {
@@ -129,17 +130,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: spacing.md,
+    padding: SPACING.md,
     ...SHADOWS.sm,
   },
   headerRight: {
     width: 24,
   },
   headerTitle: {
-    ...TYPOGRAPHY.h3,
+    fontSize: TYPOGRAPHY.fontSizes['2xl'],
+    fontWeight: TYPOGRAPHY.fontWeights.semibold,
   },
   listContent: {
-    padding: spacing.md,
+    padding: SPACING.md,
   },
 });
 

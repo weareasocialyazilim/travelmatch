@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { logger } from '@/utils/logger';
-import { BaseReportScreen, ReportSummaryCard } from '../components/report';
-import { COLORS } from '../constants/colors';
-import type { ReportOption } from '../components/report';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { BaseReportScreen, ReportSummaryCard } from '@/components/report';
+import { COLORS } from '@/constants/colors';
+import type { ReportOption } from '@/components/report';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 

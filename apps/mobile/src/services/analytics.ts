@@ -43,6 +43,13 @@ class AnalyticsService {
   }
 
   /**
+   * Alias for trackScreen
+   */
+  public screen(screenName: string, properties?: Record<string, any>) {
+    this.trackScreen(screenName, properties);
+  }
+
+  /**
    * Identify a user
    * @param userId User ID
    * @param traits User traits

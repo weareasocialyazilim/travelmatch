@@ -1,0 +1,177 @@
+/**
+ * RequestCard Component
+ * Displays a request item in the requests list
+ */
+
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS } from '@/constants/colors';
+
+export type RequestStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
+
+export interface RequestCardProps {
+  id: string;
+  userAvatar?: string;
+  userName: string;
+  momentTitle: string;
+  status: RequestStatus;
+  date: string;
+  message?: string;
+  onAccept?: () => void;
+  onReject?: () => void;
+  onPress?: () => void;
+}
+
+export const RequestCard: React.FC<RequestCardProps> = ({
+  userAvatar,
+  userName,
+  momentTitle,
+  status,
+  date,
+  message,
+  onAccept,
+  onReject,
+  onPress,
+}) => {
+  const statusConfig = {
+    pending: { color: COLORS.warning, label: 'Pending', icon: 'clock-outline' as const },
+    accepted: { color: COLORS.success, label: 'Accepted', icon: 'check-circle' as const },
+    rejected: { color: COLORS.error, label: 'Rejected', icon: 'close-circle' as const },
+    completed: { color: COLORS.info, label: 'Completed', icon: 'check-all' as const },
+    cancelled: { color: COLORS.textSecondary, label: 'Cancelled', icon: 'cancel' as const },
+  };
+
+  const config = statusConfig[status];
+
+  return (
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+      <View style={styles.header}>
+        <Image
+          source={{ uri: userAvatar || 'https://via.placeholder.com/48' }}
+          style={styles.avatar}
+        />
+        <View style={styles.headerInfo}>
+          <Text style={styles.userName}>{userName}</Text>
+          <Text style={styles.momentTitle} numberOfLines={1}>
+            {momentTitle}
+          </Text>
+        </View>
+        <View style={[styles.statusBadge, { backgroundColor: config.color + '20' }]}>
+          <MaterialCommunityIcons name={config.icon} size={14} color={config.color} />
+          <Text style={[styles.statusText, { color: config.color }]}>{config.label}</Text>
+        </View>
+      </View>
+
+      {message && (
+        <Text style={styles.message} numberOfLines={2}>
+          {message}
+        </Text>
+      )}
+
+      <View style={styles.footer}>
+        <Text style={styles.date}>{date}</Text>
+        {status === 'pending' && (
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.rejectButton} onPress={onReject}>
+              <MaterialCommunityIcons name="close" size={18} color={COLORS.error} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.acceptButton} onPress={onAccept}>
+              <MaterialCommunityIcons name="check" size={18} color={COLORS.white} />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  headerInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  momentTitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  message: {
+    fontSize: 14,
+    color: COLORS.textPrimary,
+    marginTop: 12,
+    lineHeight: 20,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  date: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  rejectButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.error + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  acceptButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.success,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+
+export default RequestCard;

@@ -11,14 +11,14 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { logger } from '../utils/logger';
+import { logger } from '@/utils/logger';
 import {
   requestService,
   GiftRequest as _GiftRequest,
-} from '../services/requestService';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+} from '@/services/requestService';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;

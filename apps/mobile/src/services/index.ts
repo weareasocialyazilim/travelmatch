@@ -56,13 +56,7 @@ export type {
   NotificationType,
 } from './notificationService';
 
-export {
-  paymentService,
-  formatCurrency,
-  getTransactionTypeLabel,
-  getTransactionIcon,
-  isPositiveTransaction,
-} from './paymentService';
+export { paymentService } from './paymentService';
 export type {
   PaymentCard,
   BankAccount,
@@ -73,6 +67,9 @@ export type {
   PaymentMethod,
   TransactionType,
 } from './paymentService';
+
+// Re-export currency helpers from utils for backward compatibility
+export { formatCurrency } from '../utils/helpers';
 
 export {
   reviewService,

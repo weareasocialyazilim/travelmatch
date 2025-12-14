@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import type { UserStory } from './constants';
+import type { UserStory } from './types';
 
 interface StoriesRowProps {
   stories: UserStory[];

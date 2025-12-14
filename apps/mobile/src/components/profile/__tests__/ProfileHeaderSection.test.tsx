@@ -5,7 +5,7 @@
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
 import { render, mockUser } from '../../../__tests__/testUtils';
-import { ProfileHeaderSection } from '../../../../components/profile/ProfileHeaderSection';
+import { ProfileHeaderSection } from '../ProfileHeaderSection';
 
 describe('ProfileHeaderSection Component', () => {
   const mockOnEditPress = jest.fn();

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * HomeScreen Test Suite
  * Comprehensive tests for main home screen

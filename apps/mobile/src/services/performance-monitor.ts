@@ -99,7 +99,7 @@ class PerformanceMonitor {
 
       // Cumulative Layout Shift (CLS)
       let clsValue = 0;
-      let clsEntries: PerformanceEntry[] = [];
+      const clsEntries: PerformanceEntry[] = [];
       new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           // LayoutShift has hadRecentInput and value properties

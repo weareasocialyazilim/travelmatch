@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { logger } from '../utils/logger';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { logger } from '@/utils/logger';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

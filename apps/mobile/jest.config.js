@@ -43,4 +43,25 @@ module.exports = {
     '/coverage/',
     '/.expo/',
   ],
+  // Coverage thresholds - fail CI if coverage drops below these values
+  coverageThreshold: {
+    global: {
+      branches: 60,
+      functions: 65,
+      lines: 65,
+      statements: 65,
+    },
+    './src/services/**/*.ts': {
+      branches: 70,
+      functions: 75,
+      lines: 75,
+      statements: 75,
+    },
+    './src/utils/**/*.ts': {
+      branches: 70,
+      functions: 75,
+      lines: 75,
+      statements: 75,
+    },
+  },
 };

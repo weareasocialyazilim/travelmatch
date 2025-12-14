@@ -294,7 +294,7 @@ export function decodeCursor(cursor: string): {
  * const { data } = await paginatedQuery;
  * ```
  */
-export function applyCursorToQuery<T>(
+export function applyCursorToQuery<T extends Record<string, unknown>>(
   query: SupabaseQuery<T>,
   cursor: string | null,
   limit: number,

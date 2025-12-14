@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Profile Management Flow Test Suite
  * Comprehensive tests for profile editing and settings

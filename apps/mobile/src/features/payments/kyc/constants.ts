@@ -41,7 +41,16 @@ export const NEXT_STEPS: NextStep[] = [
   },
 ];
 
-export const INITIAL_VERIFICATION_DATA = {
+export const INITIAL_VERIFICATION_DATA: {
+  fullName: string;
+  dateOfBirth: string;
+  country: string;
+  documentType: string | null;
+  documentFront: string | null;
+  documentBack: string | null;
+  selfie: string | null;
+  confirmed: boolean;
+} = {
   fullName: 'John Doe',
   dateOfBirth: '1990-01-15',
   country: 'United States',

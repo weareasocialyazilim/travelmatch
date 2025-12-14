@@ -36,19 +36,23 @@ export function getFormState<T extends FieldValues>(
 /**
  * Check if form can be submitted
  * Common validation for submit button state
+ * 
+ * @param form - Either a full UseFormReturn object or an object with just { formState }
+ * @param options - Options for validation
  */
 export function canSubmitForm<T extends FieldValues>(
-  form: UseFormReturn<T>,
+  form: UseFormReturn<T> | { formState: UseFormReturn<T>['formState'] },
   options: {
     requireDirty?: boolean;
     requireValid?: boolean;
   } = {}
 ): boolean {
   const { requireDirty = true, requireValid = true } = options;
+  const formState = 'formState' in form ? form.formState : form;
 
-  if (form.formState.isSubmitting) return false;
-  if (requireValid && !form.formState.isValid) return false;
-  if (requireDirty && !form.formState.isDirty) return false;
+  if (formState.isSubmitting) return false;
+  if (requireValid && !formState.isValid) return false;
+  if (requireDirty && !formState.isDirty) return false;
 
   return true;
 }

@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import type { GiftInboxItem } from '../hooks/useGiftInbox';
+import type { GiftInboxItem } from '@/hooks/useGiftInbox';
 
 interface GiftInboxCardProps {
   item: GiftInboxItem;

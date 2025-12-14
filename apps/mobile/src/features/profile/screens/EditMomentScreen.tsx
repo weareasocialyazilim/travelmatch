@@ -14,10 +14,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { editMomentSchema, type EditMomentInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 

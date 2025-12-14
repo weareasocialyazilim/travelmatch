@@ -113,7 +113,7 @@ export const standardizeError = (
   error: unknown,
   context?: string,
 ): StandardizedError => {
-  const code = getErrorCode(error);
+  const code = getErrorCode(error) as ErrorCode;
   const message = getErrorMessage(error);
   const userMessage =
     USER_FRIENDLY_MESSAGES[code] ||

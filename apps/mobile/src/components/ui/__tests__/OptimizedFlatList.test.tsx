@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * OptimizedFlatList Test Suite
  * Tests for performance-optimized list component

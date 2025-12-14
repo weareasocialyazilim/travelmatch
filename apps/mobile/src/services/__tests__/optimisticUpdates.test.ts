@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Optimistic UI Updates - Comprehensive Tests
  * 

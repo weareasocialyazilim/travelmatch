@@ -11,12 +11,12 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LanguageSelectionBottomSheet } from '../components/LanguageSelectionBottomSheet';
-import { COLORS } from '../constants/colors';
+import { LanguageSelectionBottomSheet } from '@/components/LanguageSelectionBottomSheet';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { logger } from '../utils/logger';
-import { useAuth } from '../context/AuthContext';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { logger } from '@/utils/logger';
+import { useAuth } from '@/context/AuthContext';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';

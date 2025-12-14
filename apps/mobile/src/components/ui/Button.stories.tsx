@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { View } from 'react-native';
-import Button from '../Button';
+import { Button } from './Button';
 
 const meta = {
   title: 'Components/Button',

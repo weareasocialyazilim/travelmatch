@@ -88,7 +88,7 @@ export const getAccessibleFontSize = (baseSize: number): number => {
 /**
  * Responsive typography helpers
  */
-export const getResponsiveFontSize = (baseSize: number, scale: number = 1): number => {
+export const getResponsiveFontSize = (baseSize: number, scale = 1): number => {
   return Math.round(baseSize * scale);
 };
 
@@ -109,7 +109,7 @@ type TypographyStyle = TextStyle & {
   minContrastRatio?: number; // WCAG contrast requirement
 };
 
-export const createTypography = (isDark: boolean = false) => {
+export const createTypography = (isDark = false) => {
   const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
 
   return {
@@ -414,7 +414,7 @@ export const TypographyAccessibility = {
   meetsContrastRequirement: (
     foreground: string,
     background: string,
-    minimumRatio: number = 4.5
+    minimumRatio = 4.5
   ): boolean => {
     // Implementation would require color contrast calculation
     // For now, return true as colors.ts should ensure compliance

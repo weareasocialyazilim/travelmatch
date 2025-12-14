@@ -52,8 +52,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
     },
   });
 
-  const password = watch('password');
-  const email = watch('email');
+  const _password = watch('password');
+  const _email = watch('email');
 
   const onSubmit = async (data: RegisterInput) => {
     setLoading(true);

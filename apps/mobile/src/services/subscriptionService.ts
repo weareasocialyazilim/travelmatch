@@ -11,8 +11,8 @@
  */
 
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import { supabase } from '../config/supabaseClient';
-import { logger } from '../utils/logger';
+import { supabase } from '@/config/supabase';
+import { logger } from '@/utils/logger';
 
 /**
  * Subscription event types
@@ -32,7 +32,7 @@ export type SubscriptionStatus =
 /**
  * Subscription configuration
  */
-export interface SubscriptionConfig<T = any> {
+export interface SubscriptionConfig<T extends Record<string, unknown> = Record<string, unknown>> {
   table: string;
   event?: SubscriptionEvent;
   filter?: string; // e.g., "user_id=eq.123"
@@ -54,7 +54,7 @@ export interface SubscriptionConfig<T = any> {
 export interface Subscription {
   id: string;
   channel: RealtimeChannel | null;
-  config: SubscriptionConfig;
+  config: SubscriptionConfig<Record<string, unknown>>;
   status: SubscriptionStatus;
   reconnectAttempts: number;
   createdAt: Date;
@@ -72,7 +72,7 @@ class SubscriptionManager {
   /**
    * Create and start a new subscription
    */
-  subscribe<T = any>(
+  subscribe<T extends Record<string, unknown> = Record<string, unknown>>(
     id: string,
     config: SubscriptionConfig<T>
   ): Subscription {
@@ -92,7 +92,7 @@ class SubscriptionManager {
         maxReconnectAttempts: 5,
         reconnectDelay: 3000,
         ...config,
-      },
+      } as SubscriptionConfig<Record<string, unknown>>,
       status: 'IDLE',
       reconnectAttempts: 0,
       createdAt: new Date(),
@@ -118,7 +118,7 @@ class SubscriptionManager {
       const channel = supabase.channel(channelName);
 
       // Build filter string
-      let filterStr = config.filter || '';
+      const filterStr = config.filter || '';
       
       // Subscribe to postgres changes
       const postgresChanges = channel.on(
@@ -356,7 +356,7 @@ export const subscriptionManager = new SubscriptionManager();
  * React Hook-friendly subscription helper
  * Use this in components with useEffect
  */
-export const createSubscription = <T = any>(
+export const createSubscription = <T extends Record<string, unknown> = Record<string, unknown>>(
   id: string,
   config: SubscriptionConfig<T>
 ): (() => void) => {

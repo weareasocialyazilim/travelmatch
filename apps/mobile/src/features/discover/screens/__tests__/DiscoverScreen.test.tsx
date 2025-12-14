@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * DiscoverScreen Test Suite
  * Tests for moment discovery and search

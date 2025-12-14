@@ -5,15 +5,28 @@ import { useRoute } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
 import BottomNav from '@/components/BottomNav';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { RequestCard } from '../components/RequestCard';
-import { NotificationCard } from '../components/NotificationCard';
-import { useRequestsScreen } from '../hooks/useRequestsScreen';
+import { RequestCard } from '@/components/RequestCard';
+import { NotificationCard } from '@/components/NotificationCard';
+import { useRequestsScreen } from '@/hooks/useRequestsScreen';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { TabType } from '../types/requests.types';
+import type { NotificationType } from '@/components/NotificationCard';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 
 type RequestsRouteProp = RouteProp<RootStackParamList, 'Requests'>;
+
+// Map hook notification types to NotificationCard types
+const mapNotificationType = (type: string): NotificationType => {
+  const typeMap: Record<string, NotificationType> = {
+    new_request: 'gift_received',
+    accepted: 'request_accepted',
+    completed: 'request_accepted',
+    review: 'new_review',
+    payment: 'system',
+  };
+  return typeMap[type] || 'system';
+};
 
 const RequestsScreen = () => {
   const route = useRoute<RequestsRouteProp>();
@@ -91,9 +104,15 @@ const RequestsScreen = () => {
               requests.map((request) => (
                 <RequestCard
                   key={request.id}
-                  item={request}
-                  onAccept={handleAccept}
-                  onDecline={handleDecline}
+                  id={request.id}
+                  userAvatar={request.person.avatar}
+                  userName={request.person.name}
+                  momentTitle={request.momentTitle}
+                  status="pending"
+                  date={request.timeAgo}
+                  message={request.message}
+                  onAccept={() => handleAccept(request)}
+                  onReject={() => handleDecline(request)}
                 />
               ))
             ) : (
@@ -107,8 +126,14 @@ const RequestsScreen = () => {
             notifications.map((notification) => (
               <NotificationCard
                 key={notification.id}
-                item={notification}
-                onPress={handleNotificationPress}
+                id={notification.id}
+                type={mapNotificationType(notification.type)}
+                title={notification.title}
+                message={notification.body}
+                timestamp={notification.timeAgo}
+                read={notification.isRead}
+                avatar={notification.avatar}
+                onPress={() => handleNotificationPress(notification)}
               />
             ))
           ) : (
@@ -121,7 +146,7 @@ const RequestsScreen = () => {
         </ScrollView>
       </SafeAreaView>
 
-      <BottomNav activeTab="Trips" />
+      <BottomNav activeTab="Requests" />
     </View>
   );
 };

@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import { LoginScreen } from '@/screens/LoginScreen';
+import { LoginScreen } from '@/features/auth/screens/LoginScreen';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/utils/logger';
 import * as friendlyErrorHandler from '@/utils/friendlyErrorHandler';

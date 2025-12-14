@@ -86,7 +86,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
     try {
       setLoading(true);
 
-      await moderationService.submitReport({
+      await moderationService.createReport({
         targetType,
         targetId,
         reason: selectedReason,
@@ -108,10 +108,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({
     onClose();
   };
 
-  const reasons = Object.entries(REPORT_REASONS) as [
-    ReportReason,
-    { label: string; description: string },
-  ][];
+  // REPORT_REASONS is an array of { label, value }
+  const reasons = REPORT_REASONS;
 
   return (
     <Modal
@@ -141,14 +139,14 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
           {/* Reason Selection */}
           <View style={styles.reasonsContainer}>
-            {reasons.map(([key, { label, description: desc }]) => (
+            {reasons.map(({ label, value }) => (
               <TouchableOpacity
-                key={key}
+                key={value}
                 style={[
                   styles.reasonItem,
-                  selectedReason === key && styles.reasonItemSelected,
+                  selectedReason === value && styles.reasonItemSelected,
                 ]}
-                onPress={() => setSelectedReason(key)}
+                onPress={() => setSelectedReason(value)}
                 activeOpacity={0.7}
               >
                 <View style={styles.reasonContent}>
@@ -156,16 +154,15 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                     <View
                       style={[
                         styles.radio,
-                        selectedReason === key && styles.radioSelected,
+                        selectedReason === value && styles.radioSelected,
                       ]}
                     >
-                      {selectedReason === key && (
+                      {selectedReason === value && (
                         <View style={styles.radioInner} />
                       )}
                     </View>
                     <Text style={styles.reasonLabel}>{label}</Text>
                   </View>
-                  <Text style={styles.reasonDescription}>{desc}</Text>
                 </View>
               </TouchableOpacity>
             ))}

@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import PropTypes from 'prop-types';
 import { COLORS } from '../constants/colors';
 import { useHaptics } from '../hooks/useHaptics';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -169,16 +168,6 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
     </View>
   );
 });
-
-BottomNav.propTypes = {
-  activeTab: PropTypes.oneOf([
-    'Discover',
-    'Requests',
-    'Create',
-    'Messages',
-    'Profile',
-  ]).isRequired,
-};
 
 const styles = StyleSheet.create({
   badge: {

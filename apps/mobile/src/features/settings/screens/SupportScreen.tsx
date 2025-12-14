@@ -14,13 +14,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { LAYOUT } from '../constants/layout';
-import { VALUES } from '../constants/values';
+import { LAYOUT } from '@/constants/layout';
+import { VALUES } from '@/constants/values';
 import { contactSupportSchema, type ContactSupportInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 interface SupportOption {
@@ -40,7 +40,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
     defaultValues: {
       subject: '',
       message: '',
-      category: 'general',
+      category: 'other',
     },
   });
 

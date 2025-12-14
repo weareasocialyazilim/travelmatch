@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Alert } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { useTypingIndicator } from '../context/RealtimeContext';
-import { useMessages } from '../hooks/useMessages';
-import { useScreenPerformance } from '../hooks/useScreenPerformance';
-import { logger } from '../utils/logger';
+import { useAuth } from '@/context/AuthContext';
+import { useTypingIndicator } from '@/context/RealtimeContext';
+import { useMessages } from '@/hooks/useMessages';
+import { useScreenPerformance } from '@/hooks/useScreenPerformance';
+import { logger } from '@/utils/logger';
 
 export interface Message {
   id: string;

@@ -218,7 +218,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       <View style={styles.backupCodeContainer}>
         <Text style={styles.backupCodeLabel}>Backup Code</Text>
         <Text style={styles.backupCode}>{secretKey || 'Not generated'}</Text>
-        <Text style={styles.backupHint}>
+        <Text style={styles.backupCodeHint}>
           Save this code in a safe place. You can use it to recover your account
           if you lose access to your phone.
         </Text>

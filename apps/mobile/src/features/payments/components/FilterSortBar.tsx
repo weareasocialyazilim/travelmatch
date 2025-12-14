@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import type { SortOption, FilterOption } from '../hooks/useGiftInbox';
+import type { SortOption, FilterOption } from '@/hooks/useGiftInbox';
 
 interface FilterSortBarProps {
   sortBy: SortOption;

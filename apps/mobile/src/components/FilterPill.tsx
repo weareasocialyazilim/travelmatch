@@ -68,16 +68,6 @@ export const FilterPill: React.FC<FilterPillProps> = React.memo(
   },
 );
 
-FilterPill.propTypes = {
-  filter: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    icon: PropTypes.string,
-  }).isRequired,
-  isSelected: PropTypes.bool.isRequired,
-  onPress: PropTypes.func.isRequired,
-};
-
 FilterPill.displayName = 'FilterPill';
 
 const styles = StyleSheet.create({

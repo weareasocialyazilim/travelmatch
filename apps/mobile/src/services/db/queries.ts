@@ -384,7 +384,7 @@ export const videoQueries = {
 /**
  * Batch fetch users by IDs (prevents N+1)
  */
-export const batchFetchUsers = async (userIds: string[]) => {
+export const batchFetchUsers = async (userIds: string[]): Promise<{ data: Array<{id: string; name: string; avatar: string; verified: boolean; rating: number}> | null; error: Error | null }> => {
   if (userIds.length === 0) return { data: [], error: null };
 
   return supabase
@@ -396,7 +396,7 @@ export const batchFetchUsers = async (userIds: string[]) => {
 /**
  * Batch fetch moments by IDs (prevents N+1)
  */
-export const batchFetchMoments = async (momentIds: string[]) => {
+export const batchFetchMoments = async (momentIds: string[]): Promise<{ data: unknown[] | null; error: Error | null }> => {
   if (momentIds.length === 0) return { data: [], error: null };
 
   return supabase

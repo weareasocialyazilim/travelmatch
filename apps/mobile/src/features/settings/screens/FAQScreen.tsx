@@ -10,12 +10,12 @@ import {
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EmptyState } from '../components/ui/EmptyState';
-import { COLORS } from '../constants/colors';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { LAYOUT } from '../constants/layout';
-import { VALUES } from '../constants/values';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { LAYOUT } from '@/constants/layout';
+import { VALUES } from '@/constants/values';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 interface FAQItem {

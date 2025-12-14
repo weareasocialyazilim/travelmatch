@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { kycStyles } from './styles';
 
 interface KYCHeaderProps {

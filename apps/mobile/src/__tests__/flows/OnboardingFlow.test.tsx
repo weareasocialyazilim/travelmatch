@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Onboarding Flow Test Suite
  * Enhanced comprehensive tests for user onboarding

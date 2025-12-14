@@ -136,34 +136,16 @@ export function getResponsiveSrcSet(
 }
 
 /**
- * Delete image from Cloudflare
+ * 🔒 DEPRECATED: Delete image from Cloudflare Images CDN
+ * 
+ * @deprecated This function requires sensitive tokens that must be server-side only.
+ * Use the server-side delete endpoint instead via Supabase Edge Function.
  */
-export async function deleteFromCloudflare(imageId: string): Promise<void> {
-  if (!isCloudflareImagesEnabled()) {
-    throw new Error('Cloudflare Images not configured');
-  }
-
-  try {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${imageId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${CLOUDFLARE_IMAGES_TOKEN}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Cloudflare delete failed: ${error.errors?.[0]?.message || 'Unknown error'}`);
-    }
-
-    logger.info('Cloudflare image deleted', { id: imageId });
-  } catch (error) {
-    logger.error('Cloudflare delete error', { error });
-    throw error;
-  }
+export async function deleteFromCloudflare(_imageId: string): Promise<void> {
+  throw new Error(
+    '🔒 SECURITY: Image deletion must be done server-side. ' +
+    'Use Supabase Edge Function: /functions/v1/delete-image'
+  );
 }
 
 /**
@@ -193,7 +175,7 @@ export async function uploadImageWithCDN(
 
   // Fallback to Supabase Storage
   const { uploadFile } = await import('./supabaseStorageService');
-  const { url, error } = await uploadFile(bucket as any, imageUri);
+  const { url, error } = await uploadFile(bucket as any, imageUri, 'image');
 
   if (error) {
     throw error;

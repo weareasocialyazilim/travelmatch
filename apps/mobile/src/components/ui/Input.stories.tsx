@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { View } from 'react-native';
-import Input from '../Input';
+import { Input } from './Input';
 
 const meta = {
   title: 'Components/Input',

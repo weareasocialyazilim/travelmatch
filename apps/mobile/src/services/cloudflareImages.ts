@@ -20,6 +20,7 @@
  * @see https://developers.cloudflare.com/images/
  */
 
+import React from 'react';
 import { logger } from '../utils/logger';
 
 // Environment variables
@@ -274,8 +275,8 @@ export function useCloudflareUpload() {
  */
 export async function optimizeBeforeUpload(
   imageUri: string,
-  maxWidth: number = 2560,
-  quality: number = 0.8,
+  maxWidth = 2560,
+  quality = 0.8,
 ): Promise<Blob> {
   // For React Native with expo-image-manipulator
   const { manipulateAsync, SaveFormat } = await import('expo-image-manipulator');

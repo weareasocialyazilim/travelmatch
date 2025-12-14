@@ -18,12 +18,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
-import { AddCardBottomSheet } from '../components/AddCardBottomSheet';
-import BottomNav from '../components/BottomNav';
-import { ScreenErrorBoundary } from '../components/ErrorBoundary';
-import { RemoveCardModal } from '../components/RemoveCardModal';
-import { useScreenPerformance } from '../hooks/useScreenPerformance';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { AddCardBottomSheet } from '@/components/AddCardBottomSheet';
+import BottomNav from '@/components/BottomNav';
+import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { RemoveCardModal } from '@/components/RemoveCardModal';
+import { useScreenPerformance } from '@/hooks/useScreenPerformance';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
 interface Wallet {

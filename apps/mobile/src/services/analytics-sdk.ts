@@ -12,8 +12,8 @@ import DeviceInfo from 'react-native-device-info';
 import NetInfo from '@react-native-community/netinfo';
 
 let sessionId: string | null = null;
-let sessionStartTime: number = 0;
-let lastActiveTime: number = 0;
+let sessionStartTime = 0;
+let lastActiveTime = 0;
 
 /**
  * Initialize analytics
@@ -137,9 +137,8 @@ async function getNetworkInfo() {
   const netInfo = await NetInfo.fetch();
   
   return {
-    type: netInfo.type,
-    connected: netInfo.isConnected,
     wifi: netInfo.type === 'wifi',
+    bluetooth: false, // Not available via NetInfo
   };
 }
 
@@ -241,7 +240,7 @@ export function useEventOnMount(
  */
 export function useInteractionTracking(
   element: string,
-  action: string = 'clicked'
+  action = 'clicked'
 ) {
   return () => {
     trackEvent(`${element}_${action}`, {
@@ -351,7 +350,7 @@ export const Analytics = {
     trackEvent('error', { error_type: errorType, message, stack }),
   
   // Performance
-  performance: (metric: string, value: number, unit: string = 'ms') =>
+  performance: (metric: string, value: number, unit = 'ms') =>
     trackEvent('performance_metric', { metric, value, unit }),
 };
 

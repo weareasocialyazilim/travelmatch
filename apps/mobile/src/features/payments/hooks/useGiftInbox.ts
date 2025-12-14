@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { logger } from '../utils/logger';
-import { requestService } from '../services/requestService';
+import { logger } from '@/utils/logger';
+import { requestService } from '@/services/requestService';
 
 export interface GiftSender {
   id: string;

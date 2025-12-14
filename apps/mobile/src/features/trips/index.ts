@@ -8,10 +8,10 @@
 export { default as DiscoverScreen } from './screens/DiscoverScreen';
 export { default as BookingDetailScreen } from './screens/BookingDetailScreen';
 export { default as EscrowStatusScreen } from './screens/EscrowStatusScreen';
-export { default as HowEscrowWorksScreen } from './screens/HowEscrowWorksScreen';
+export { HowEscrowWorksScreen } from './screens/HowEscrowWorksScreen';
 export { default as MatchConfirmationScreen } from './screens/MatchConfirmationScreen';
-export { default as ReceiverApprovalScreen } from './screens/ReceiverApprovalScreen';
-export { default as DisputeFlowScreen } from './screens/DisputeFlowScreen';
+export { ReceiverApprovalScreen } from './screens/ReceiverApprovalScreen';
+export { DisputeFlowScreen } from './screens/DisputeFlowScreen';
 export { default as RequestsScreen } from './screens/RequestsScreen';
 
 // Hooks

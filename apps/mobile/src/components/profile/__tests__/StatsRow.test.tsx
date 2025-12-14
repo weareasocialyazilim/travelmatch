@@ -5,7 +5,7 @@
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
 import { render } from '../../../__tests__/testUtils';
-import { StatsRow } from '../../../../components/profile/StatsRow';
+import { StatsRow } from '../StatsRow';
 
 describe('StatsRow Component', () => {
   const mockHandlers = {

@@ -80,7 +80,7 @@ interface VideoUploadOptions {
   onProgress?: (progress: number) => void;
 }
 
-interface VideoMetadata {
+export interface VideoMetadata {
   id: string;
   playbackId: string;
   status: 'uploading' | 'processing' | 'ready' | 'error';
@@ -143,7 +143,8 @@ function validateVideoFile(file: File): { valid: boolean; error?: string } {
 
   // Check file format
   const extension = file.name.split('.').pop()?.toLowerCase();
-  if (!extension || !VIDEO_CONFIG.allowedFormats.includes(extension)) {
+  const allowedFormat = extension as typeof VIDEO_CONFIG.allowedFormats[number] | undefined;
+  if (!extension || !VIDEO_CONFIG.allowedFormats.includes(allowedFormat!)) {
     return {
       valid: false,
       error: `Invalid format. Allowed: ${VIDEO_CONFIG.allowedFormats.join(', ')}`,
@@ -273,10 +274,16 @@ async function pollForAsset(
 /**
  * Save video metadata to database
  */
-async function saveVideoMetadata(data: any): Promise<VideoMetadata> {
+async function saveVideoMetadata(data: {
+  id: string;
+  playbackId: string;
+  userId: string;
+  momentId: string;
+  status: string;
+}): Promise<VideoMetadata> {
   const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_KEY!
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_KEY || ''
   );
 
   const { data: video, error } = await supabase
@@ -293,21 +300,22 @@ async function saveVideoMetadata(data: any): Promise<VideoMetadata> {
     .single();
 
   if (error) throw error;
+  if (!video) throw new Error('Failed to save video metadata');
 
   return {
-    id: video.id,
-    playbackId: video.playback_id,
-    status: video.status,
-    duration: video.duration || 0,
-    width: video.width || 0,
-    height: video.height || 0,
-    size: video.size || 0,
-    thumbnails: video.thumbnails || [],
+    id: video.id as string,
+    playbackId: video.playback_id as string as string,
+    status: video.status as VideoMetadata['status'],
+    duration: (video.duration as number) || 0,
+    width: (video.width as number) || 0,
+    height: (video.height as number) || 0,
+    size: (video.size as number) || 0,
+    thumbnails: (video.thumbnails as string[]) || [],
     streamingUrls: {
       hls: `https://stream.mux.com/${video.playback_id}.m3u8`,
       dash: `https://stream.mux.com/${video.playback_id}.mpd`,
     },
-    createdAt: video.created_at,
+    createdAt: video.created_at as string,
   };
 }
 
@@ -359,8 +367,8 @@ export async function deleteVideo(assetId: string): Promise<void> {
 
   // Delete from database
   const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_KEY!
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_KEY || ''
   );
 
   await supabase.from('videos').delete().eq('id', assetId);
@@ -392,7 +400,10 @@ export async function getVideoAnalytics(assetId: string) {
 /**
  * Webhook handler for Mux events
  */
-export async function handleMuxWebhook(payload: any, signature: string): Promise<void> {
+export async function handleMuxWebhook(
+  payload: { type: string; data: Record<string, unknown> },
+  signature: string
+): Promise<void> {
   // Verify webhook signature
   const isValid = verifyMuxSignature(payload, signature);
   if (!isValid) {
@@ -403,20 +414,24 @@ export async function handleMuxWebhook(payload: any, signature: string): Promise
 
   switch (type) {
     case 'video.asset.ready':
-      await handleAssetReady(data);
+      await handleAssetReady(data as Parameters<typeof handleAssetReady>[0]);
       break;
     case 'video.asset.errored':
-      await handleAssetError(data);
+      await handleAssetError(data as Parameters<typeof handleAssetError>[0]);
       break;
     case 'video.upload.asset_created':
-      await handleUploadComplete(data);
+      await handleUploadComplete(data as { id: string });
       break;
     default:
       console.log(`Unhandled webhook type: ${type}`);
   }
 }
 
-function verifyMuxSignature(payload: any, signature: string): boolean {
+function verifyMuxSignature(
+  payload: { type: string; data: Record<string, unknown> },
+  signature: string
+): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const crypto = require('crypto');
   const hmac = crypto.createHmac('sha256', MUX_CONFIG.webhookSecret);
   hmac.update(JSON.stringify(payload));
@@ -424,10 +439,15 @@ function verifyMuxSignature(payload: any, signature: string): boolean {
   return signature === expectedSignature;
 }
 
-async function handleAssetReady(data: any): Promise<void> {
+async function handleAssetReady(data: {
+  id: string;
+  duration: number;
+  tracks: Array<{ max_width?: number; max_height?: number }>;
+  playback_ids: Array<{ id: string }>;
+}): Promise<void> {
   const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_KEY!
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_KEY || ''
   );
 
   await supabase
@@ -442,10 +462,13 @@ async function handleAssetReady(data: any): Promise<void> {
     .eq('id', data.id);
 }
 
-async function handleAssetError(data: any): Promise<void> {
+async function handleAssetError(data: {
+  id: string;
+  errors?: Array<{ messages?: string[] }>;
+}): Promise<void> {
   const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_KEY!
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_KEY || ''
   );
 
   await supabase
@@ -457,6 +480,6 @@ async function handleAssetError(data: any): Promise<void> {
     .eq('id', data.id);
 }
 
-async function handleUploadComplete(data: any): Promise<void> {
+async function handleUploadComplete(data: { id: string }): Promise<void> {
   console.log('Upload complete for asset:', data.id);
 }

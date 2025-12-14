@@ -1,6 +1,6 @@
 // Shared styles for KYC screens
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 
 export const kycStyles = StyleSheet.create({

@@ -15,21 +15,21 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChatAttachmentBottomSheet } from '../components/ChatAttachmentBottomSheet';
-import { ReportBlockBottomSheet } from '../components/ReportBlockBottomSheet';
-import { COLORS } from '../constants/colors';
+import { ChatAttachmentBottomSheet } from '@/components/ChatAttachmentBottomSheet';
+import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { useAuth } from '../context/AuthContext';
-import { useTypingIndicator } from '../context/RealtimeContext';
-import { useMessages } from '../hooks/useMessages';
-import { useScreenPerformance } from '../hooks/useScreenPerformance';
+import { useAuth } from '@/context/AuthContext';
+import { useTypingIndicator } from '@/context/RealtimeContext';
+import { useMessages } from '@/hooks/useMessages';
+import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import {
   CHAT_LIST_CONFIG,
   ITEM_HEIGHTS,
   createGetItemLayout,
-} from '../utils/listOptimization';
-import { logger } from '../utils/logger';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+} from '@/utils/listOptimization';
+import { logger } from '@/utils/logger';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 

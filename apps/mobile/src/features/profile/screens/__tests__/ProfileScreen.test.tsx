@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ProfileScreen Test Suite
  * Tests for user profile screen
@@ -8,7 +7,7 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import ProfileScreen from '@/screens/ProfileScreen';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 
 jest.mock('@/hooks/useAuth');

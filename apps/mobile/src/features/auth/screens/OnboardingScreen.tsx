@@ -28,11 +28,11 @@ interface OnboardingPage {
 
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
-import { useAnalytics } from '../hooks/useAnalytics';
-import { useOnboarding } from '../hooks/useOnboarding';
-import { HORIZONTAL_LIST_CONFIG } from '../utils/listOptimization';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { COLORS } from '@/constants/colors';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { HORIZONTAL_LIST_CONFIG } from '@/utils/listOptimization';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import { logger } from '@/utils/logger';
 
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
@@ -59,25 +59,25 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       id: '1',
       title: t('onboarding.page1.title'),
       description: t('onboarding.page1.description'),
-      image: require('../../assets/icon.png') as ImageSourcePropType,
+      image: require('../../../../assets/icon.png') as ImageSourcePropType,
     },
     {
       id: '2',
       title: t('onboarding.page2.title'),
       description: t('onboarding.page2.description'),
-      image: require('../../assets/icon.png') as ImageSourcePropType,
+      image: require('../../../../assets/icon.png') as ImageSourcePropType,
     },
     {
       id: '3',
       title: t('onboarding.page3.title'),
       description: t('onboarding.page3.description'),
-      image: require('../../assets/icon.png') as ImageSourcePropType,
+      image: require('../../../../assets/icon.png') as ImageSourcePropType,
     },
     {
       id: '4',
       title: t('onboarding.page4.title'),
       description: t('onboarding.page4.description'),
-      image: require('../../assets/icon.png') as ImageSourcePropType,
+      image: require('../../../../assets/icon.png') as ImageSourcePropType,
     },
   ];
 

@@ -42,7 +42,7 @@ export function usePushNotifications() {
         // Using type assertions for dynamic navigation from push notifications
         if (data.type === 'booking' && data.bookingId) {
           (
-            navigation as {
+            navigation as unknown as {
               navigate: (screen: string, params?: unknown) => void;
             }
           ).navigate('BookingDetail', {
@@ -51,7 +51,7 @@ export function usePushNotifications() {
         } else if (data.type === 'message' && data.userId) {
           // Chat requires otherUser object - create minimal user for navigation
           (
-            navigation as {
+            navigation as unknown as {
               navigate: (screen: string, params?: unknown) => void;
             }
           ).navigate('Chat', {
@@ -65,7 +65,7 @@ export function usePushNotifications() {
           // MomentDetail requires full moment - navigate to a loading screen
           // that fetches the moment by ID
           (
-            navigation as {
+            navigation as unknown as {
               navigate: (screen: string, params?: unknown) => void;
             }
           ).navigate('MomentPreview', {
@@ -73,7 +73,7 @@ export function usePushNotifications() {
           });
         } else if (data.screen) {
           (
-            navigation as {
+            navigation as unknown as {
               navigate: (screen: string, params?: unknown) => void;
             }
           ).navigate(data.screen as string);
@@ -136,6 +136,11 @@ export function usePushNotifications() {
     };
   }, [handleNotificationNavigation]);
 
+  const clearBadge = useCallback(async () => {
+    setBadgeCountState(0);
+    await setBadgeCount(0);
+  }, []);
+
   const requestPermissions = async () => {
     const token = await registerForPushNotifications();
     if (token) {
@@ -145,10 +150,12 @@ export function usePushNotifications() {
       });
       // Send token to backend
       try {
-        const { registerPushToken } = await import(
+        const { registerPushToken, updatePushTokenPreferences } = await import(
           '../services/pushTokenService'
         );
-        await registerPushToken(token, {
+        await registerPushToken(token);
+        // Update preferences separately
+        await updatePushTokenPreferences(token, {
           enabled: true,
           channels: {
             messages: true,

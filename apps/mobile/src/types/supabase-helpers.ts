@@ -28,11 +28,8 @@ export interface PaginationResult<T> {
  * Supabase Query Type Helper
  * Provides type-safe query building
  */
-export type SupabaseQuery<T> = PostgrestFilterBuilder<
-  any, // Database schema
-  Record<string, any>, // Record type
-  T // Result type
->;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SupabaseQuery<T extends Record<string, unknown> = Record<string, unknown>> = PostgrestFilterBuilder<any, any, T, any, any>;
 
 /**
  * Generic Service Response
@@ -77,7 +74,7 @@ export class ValidationError extends Error {
 /**
  * Type-safe cursor pagination helper
  */
-export function withCursorPagination<T>(
+export function withCursorPagination<T extends Record<string, unknown>>(
   query: SupabaseQuery<T>,
   options: PaginationOptions & { cursor?: string }
 ): SupabaseQuery<T> {
@@ -95,7 +92,7 @@ export function withCursorPagination<T>(
 /**
  * Type-safe offset pagination helper
  */
-export function withOffsetPagination<T>(
+export function withOffsetPagination<T extends Record<string, unknown>>(
   query: SupabaseQuery<T>,
   options: PaginationOptions & { page?: number }
 ): SupabaseQuery<T> {

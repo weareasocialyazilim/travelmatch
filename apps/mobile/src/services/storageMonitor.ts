@@ -38,7 +38,7 @@ export interface StorageInfo {
 
 class StorageMonitorService {
   private checkInterval: NodeJS.Timeout | null = null;
-  private lastWarningTime: number = 0;
+  private lastWarningTime = 0;
   private readonly WARNING_COOLDOWN = 30 * 60 * 1000; // 30 minutes
 
   /**

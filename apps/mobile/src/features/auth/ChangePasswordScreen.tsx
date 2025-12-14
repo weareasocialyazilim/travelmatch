@@ -39,12 +39,13 @@ const ChangePasswordScreen: React.FC = () => {
 
   const onSubmit = async (data: ChangePasswordInput) => {
     try {
-      // Real API call for password change
-      const { apiClient } = await import('../utils/api');
-      await apiClient.post('/auth/change-password', {
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
+      // Real API call for password change via Supabase
+      const { supabase } = await import('@/config/supabase');
+      const { error } = await supabase.auth.updateUser({
+        password: data.newPassword,
       });
+      
+      if (error) throw error;
 
       Alert.alert('Success', 'Your password has been changed successfully.', [
         {
@@ -60,11 +61,6 @@ const ChangePasswordScreen: React.FC = () => {
       Alert.alert('Error', message);
     }
   };
-
-  const isSubmitDisabled = !canSubmitForm({ formState } as any, {
-    requireDirty: false,
-    requireValid: true,
-  });
 
   const isSubmitDisabled = !canSubmitForm({ formState } as any, {
     requireDirty: false,

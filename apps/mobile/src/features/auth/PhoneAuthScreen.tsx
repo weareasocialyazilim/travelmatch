@@ -15,11 +15,11 @@ import { phoneAuthSchema, type PhoneAuthInput } from '../../utils/forms/schemas'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LoadingState } from '../components/LoadingState';
-import { COLORS, CARD_SHADOW } from '../constants/colors';
-import { LAYOUT } from '../constants/layout';
-import { VALUES } from '../constants/values';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import { LoadingState } from '@/components/LoadingState';
+import { COLORS, CARD_SHADOW } from '@/constants/colors';
+import { LAYOUT } from '@/constants/layout';
+import { VALUES } from '@/constants/values';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type PhoneAuthScreenProps = StackScreenProps<RootStackParamList, 'PhoneAuth'>;

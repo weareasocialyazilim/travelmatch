@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { supabase } from '@/services/api/supabaseClient';
+import { supabase } from '@/config/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';

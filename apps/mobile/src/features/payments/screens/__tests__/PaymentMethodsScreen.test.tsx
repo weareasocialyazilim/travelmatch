@@ -1047,7 +1047,7 @@ describe('PaymentMethodsScreen', () => {
         const { getAllByText } = render(<PaymentMethodsScreen />);
 
         // Initially no card selected
-        let props = mockRemoveCardModal.mock.calls[0][0];
+        const props = mockRemoveCardModal.mock.calls[0][0];
         expect(props.cardLast4).toBeUndefined();
 
         // Select a card

@@ -87,7 +87,7 @@ export function parseDeepLink(url: string): {
     // Add more mappings
   };
 
-  const screenName = screenMap[screen];
+  const screenName = screen ? screenMap[screen] : undefined;
   if (!screenName) return {};
 
   // Extract params

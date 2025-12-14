@@ -1,4 +1,4 @@
-import { supabase } from '@/services/api/supabaseClient';
+import { supabase } from '@/config/supabase';
 
 /**
  * Auth API Service

@@ -56,7 +56,7 @@ export const useSearchStore = create<SearchState>()(
     persist(
       (set, get) => ({
         // Search history
-        searchHistory: [],
+        searchHistory: [] as string[],
         addToHistory: (query: string) => {
           if (!query.trim()) return;
 

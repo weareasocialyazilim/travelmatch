@@ -88,7 +88,7 @@ export const VerifyCodeScreen: React.FC = () => {
     }
   };
 
-  const onVerify = (data: VerifyCodeInput) => {
+  const onVerify = (_data: VerifyCodeInput) => {
     // Navigate to success or next screen
     navigation.navigate('SuccessConfirmation');
   };

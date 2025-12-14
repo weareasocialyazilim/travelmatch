@@ -11,12 +11,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LoadingState } from '../components/LoadingState';
-import { EmptyState } from '../components/ui/EmptyState';
-import { COLORS } from '../constants/colors';
-import { useMoments } from '../hooks/useMoments';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import type { Moment } from '../types';
+import { LoadingState } from '@/components/LoadingState';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { COLORS } from '@/constants/colors';
+import { useMoments, type Moment } from '@/hooks/useMoments';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -76,12 +75,8 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
           travelDays: 0,
         },
         giftCount: 0,
-        category: {
-          id: moment.category,
-          label: moment.category,
-          emoji: '✨',
-        },
-      },
+        category: moment.category || 'Other',
+      } as any,
     });
   };
 

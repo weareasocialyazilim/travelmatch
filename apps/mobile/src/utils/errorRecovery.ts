@@ -289,6 +289,7 @@ class NetworkQueueClass {
 
     while (this.queue.length > 0) {
       const op = this.queue[0];
+      if (!op) break;
 
       try {
         await op.operation();

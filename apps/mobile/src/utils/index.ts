@@ -3,7 +3,6 @@
  * Export all utility modules
  */
 
-export * from './api';
 export * from './appErrors';
 export * from './logger';
 export * from './secureStorage';

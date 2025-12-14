@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 
 const { height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -40,7 +40,7 @@ export const WelcomeScreen: React.FC<{
           <View style={styles.illustrationContainer}>
             <Image
               // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
-              source={require('../../assets/icon.png')}
+              source={require('../../../../assets/icon.png')}
               style={styles.illustration}
               resizeMode="contain"
             />

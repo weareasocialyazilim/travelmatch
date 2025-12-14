@@ -12,14 +12,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
-import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
-import { TYPOGRAPHY } from '../../constants/typography';
-import { useTranslation } from '../../hooks/useTranslation';
-import { useSearchStore } from '../../stores/searchStore';
-import Button from '../Button';
-import type { SearchFilters } from '../../stores/searchStore';
+import { COLORS } from '@/constants/colors';
+import { radii } from '@/constants/radii';
+import { spacing } from '@/constants/spacing';
+import { TYPOGRAPHY } from '@/constants/typography';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useSearchStore } from '@/stores/searchStore';
+import { Button } from './Button';
+import type { SearchFilters } from '@/stores/searchStore';
 
 interface FilterPanelProps {
   onApply: (filters: SearchFilters) => void;

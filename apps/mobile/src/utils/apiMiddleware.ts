@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { AppError, ErrorCode } from './errors';
+import { AppError, ErrorCode } from './appErrors';
 import { logger } from './logger';
 import { checkRateLimit, RATE_LIMIT_CONFIGS } from './rateLimiter';
 import { sanitizeInput } from './security';

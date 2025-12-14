@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Modal Test Suite
  * Comprehensive tests for modal component variants

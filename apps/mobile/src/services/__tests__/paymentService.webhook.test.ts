@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Payment Service - Webhook Failure Edge Cases
  * 

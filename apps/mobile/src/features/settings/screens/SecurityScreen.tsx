@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,11 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { logger } from '../utils/logger';
+import { logger } from '@/utils/logger';
 import { useBiometric } from '@/context/BiometricAuthContext';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
 interface ActiveSession {
@@ -320,7 +320,7 @@ const SecurityScreen: React.FC = () => {
 
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => setBiometricEnabled(!biometricEnabled)}
+              onPress={() => handleBiometricToggle(!biometricEnabled)}
             >
               <View
                 style={[

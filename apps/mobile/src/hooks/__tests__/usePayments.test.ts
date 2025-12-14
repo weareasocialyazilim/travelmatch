@@ -412,7 +412,7 @@ describe('usePayments', () => {
 
       mockPaymentService.removeCard.mockReturnValue(undefined);
 
-      let success: boolean = false;
+      let success = false;
       act(() => {
         success = result.current.removeCard('card_1');
       });
@@ -432,7 +432,7 @@ describe('usePayments', () => {
         throw new Error('Card not found');
       });
 
-      let success: boolean = false;
+      let success = false;
       act(() => {
         success = result.current.removeCard('card_invalid');
       });
@@ -496,7 +496,7 @@ describe('usePayments', () => {
         new Error('Card not found')
       );
 
-      let success: boolean = true;
+      let success = true;
       await act(async () => {
         success = await result.current.setDefaultCard('card_invalid');
       });
@@ -589,7 +589,7 @@ describe('usePayments', () => {
 
       mockPaymentService.removeBankAccount.mockReturnValue(undefined);
 
-      let success: boolean = false;
+      let success = false;
       act(() => {
         success = result.current.removeBankAccount('ba_1');
       });
@@ -609,7 +609,7 @@ describe('usePayments', () => {
         throw new Error('Account not found');
       });
 
-      let success: boolean = false;
+      let success = false;
       act(() => {
         success = result.current.removeBankAccount('ba_invalid');
       });
@@ -761,7 +761,7 @@ describe('usePayments', () => {
         transaction: paymentTransaction,
       });
 
-      let success: boolean = false;
+      let success = false;
       await act(async () => {
         success = await result.current.confirmPayment('pi_123', 'pm_card_123');
       });
@@ -783,7 +783,7 @@ describe('usePayments', () => {
         transaction: null,
       });
 
-      let success: boolean = true;
+      let success = true;
       await act(async () => {
         success = await result.current.confirmPayment('pi_123');
       });
@@ -802,7 +802,7 @@ describe('usePayments', () => {
         new Error('Payment declined')
       );
 
-      let success: boolean = true;
+      let success = true;
       await act(async () => {
         success = await result.current.confirmPayment('pi_123');
       });

@@ -9,6 +9,7 @@
  * - Use native fast image for caching
  */
 
+import React from 'react';
 import { Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { queryClient } from '../services/offlineCache';

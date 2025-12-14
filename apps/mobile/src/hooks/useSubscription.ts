@@ -16,7 +16,7 @@ import { logger } from '../utils/logger';
 /**
  * Hook options
  */
-interface UseSubscriptionOptions<T> extends Omit<SubscriptionConfig<T>, 'table'> {
+interface UseSubscriptionOptions<T extends Record<string, unknown>> extends Omit<SubscriptionConfig<T>, 'table'> {
   enabled?: boolean; // Whether subscription is active
   table: string;
 }
@@ -44,7 +44,7 @@ interface UseSubscriptionResult {
  *   enabled: !!userId,
  * });
  */
-export const useSubscription = <T = any>(
+export const useSubscription = <T extends Record<string, unknown> = Record<string, unknown>>(
   id: string,
   options: UseSubscriptionOptions<T>
 ): UseSubscriptionResult => {
@@ -124,13 +124,13 @@ export const useUserMomentsSubscription = (
     filter: userId ? `user_id=eq.${userId}` : undefined,
     enabled: !!userId,
     onInsert: (payload) => {
-      handlers.onInsert?.(payload.new);
+      handlers.onInsert?.(payload.new as Record<string, unknown>);
     },
     onUpdate: (payload) => {
-      handlers.onUpdate?.(payload.new);
+      handlers.onUpdate?.(payload.new as Record<string, unknown>);
     },
     onDelete: (payload) => {
-      handlers.onDelete?.(payload.old.id);
+      handlers.onDelete?.((payload.old as Record<string, unknown>)?.id as string);
     },
   });
 };
@@ -193,9 +193,11 @@ export const useNotificationsSubscription = (
       handlers.onNewNotification?.(payload.new);
     },
     onUpdate: (payload) => {
-      if (payload.new.read && !payload.old.read) {
+      const newRecord = payload.new as Record<string, unknown>;
+      const oldRecord = payload.old as Record<string, unknown>;
+      if (newRecord?.read && !oldRecord?.read) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
-        handlers.onNotificationRead?.(payload.new.id);
+        handlers.onNotificationRead?.(newRecord?.id as string);
       }
     },
   });
@@ -230,14 +232,16 @@ export const useBookingRequestsSubscription = (
     filter: userId ? `host_id=eq.${userId}` : undefined,
     enabled: !!userId,
     onInsert: (payload) => {
-      if (payload.new.status === 'pending') {
+      const newRecord = payload.new as Record<string, unknown>;
+      if (newRecord?.status === 'pending') {
         setPendingRequests((prev) => [...prev, payload.new]);
         handlers.onNewRequest?.(payload.new);
       }
     },
     onUpdate: (payload) => {
+      const newRecord = payload.new as Record<string, unknown>;
       setPendingRequests((prev) =>
-        prev.filter((req) => req.id !== payload.new.id)
+        prev.filter((req) => req.id !== newRecord?.id)
       );
       handlers.onRequestUpdate?.(payload.new);
     },
@@ -264,8 +268,9 @@ export const useUserPresence = (userId: string | null) => {
     filter: userId ? `user_id=eq.${userId}` : undefined,
     enabled: !!userId,
     onChange: (payload) => {
-      setIsOnline(payload.new.is_online);
-      setLastSeen(new Date(payload.new.last_seen));
+      const newRecord = payload.new as Record<string, unknown>;
+      setIsOnline(newRecord?.is_online as boolean);
+      setLastSeen(new Date(newRecord?.last_seen as string));
     },
   });
 
@@ -318,7 +323,7 @@ export const useMultipleSubscriptions = (
  *   filter: `user_id=eq.${userId}`,
  * });
  */
-export const useRealtimeData = <T = any>({
+export const useRealtimeData = <T extends Record<string, unknown> = Record<string, unknown>>({
   table,
   filter,
   initialData,

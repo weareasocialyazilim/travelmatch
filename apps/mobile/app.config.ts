@@ -17,7 +17,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.kemalteksal.travelmatchnew',
+    bundleIdentifier: 'com.travelmatch.app',
     buildNumber: '1',
     associatedDomains: ['applinks:travelmatch.app'],
     config: {
@@ -25,8 +25,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
-        'TravelMatch needs your location to verify your travel moments and show you relevant experiences nearby.',
-      NSLocationAlwaysAndWhenInUseUsageDescription:
         'TravelMatch needs your location to verify your travel moments and show you relevant experiences nearby.',
       NSCameraUsageDescription:
         'TravelMatch needs access to your camera to let you take photos of your travel moments for verification.',

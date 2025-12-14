@@ -95,8 +95,8 @@ describe('ImageCacheManager', () => {
     it('should cache image in memory', async () => {
       const uri = 'http://example.com/image.jpg';
       
-      await imageCacheManager.getCachedImage(uri);
-      const cachedUri = await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
+      const cachedUri = await imageCacheManager.getImage(uri);
       
       const stats = await imageCacheManager.getStats();
       expect(stats.memoryHits).toBeGreaterThan(0);
@@ -106,7 +106,7 @@ describe('ImageCacheManager', () => {
       const images = Array.from({ length: 100 }, (_, i) => `http://example.com/image${i}.jpg`);
       
       for (const uri of images) {
-        await imageCacheManager.getCachedImage(uri);
+        await imageCacheManager.getImage(uri);
       }
       
       const stats = await imageCacheManager.getStats();
@@ -116,9 +116,9 @@ describe('ImageCacheManager', () => {
     it('should update access count and timestamp', async () => {
       const uri = 'http://example.com/image.jpg';
       
-      await imageCacheManager.getCachedImage(uri);
-      await imageCacheManager.getCachedImage(uri);
-      await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
+      await imageCacheManager.getImage(uri);
+      await imageCacheManager.getImage(uri);
       
       // Access count should be tracked internally
       const stats = await imageCacheManager.getStats();
@@ -130,7 +130,7 @@ describe('ImageCacheManager', () => {
     it('should save image to disk cache', async () => {
       const uri = 'http://example.com/image.jpg';
       
-      await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
       
       expect(mockFileSystem.downloadAsync).toHaveBeenCalled();
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith('@image_cache_metadata', expect.any(String));
@@ -149,7 +149,7 @@ describe('ImageCacheManager', () => {
         uri: `file:///cache/images/${hash}.jpg`
       });
       
-      const cachedUri = await imageCacheManager.getCachedImage(uri);
+      const cachedUri = await imageCacheManager.getImage(uri);
       
       expect(cachedUri).toBe(`file:///cache/images/${hash}.jpg`);
     });
@@ -194,7 +194,7 @@ describe('ImageCacheManager', () => {
       const uri = 'http://example.com/image.jpg';
       const cloudflareId = 'cf-image-123';
       
-      const cachedUri = await imageCacheManager.getCachedImage(uri, cloudflareId, 'medium');
+      const cachedUri = await imageCacheManager.getImage(uri, cloudflareId, 'medium');
       
       // Should use Cloudflare URL
       expect(cachedUri).toContain('imagedelivery.net');
@@ -219,7 +219,7 @@ describe('ImageCacheManager', () => {
         .mockRejectedValueOnce(new Error('Cloudflare error'))
         .mockResolvedValueOnce({ uri: 'file:///cache/original.jpg', status: 200, headers: {}, md5: 'abc' });
       
-      const cachedUri = await imageCacheManager.getCachedImage(uri, cloudflareId);
+      const cachedUri = await imageCacheManager.getImage(uri, cloudflareId);
       
       expect(mockFileSystem.downloadAsync).toHaveBeenCalledTimes(2); // CF + fallback
     });
@@ -230,10 +230,10 @@ describe('ImageCacheManager', () => {
       const uri1 = 'http://example.com/image1.jpg';
       const uri2 = 'http://example.com/image2.jpg';
       
-      await imageCacheManager.getCachedImage(uri1);
-      await imageCacheManager.getCachedImage(uri1); // hit
-      await imageCacheManager.getCachedImage(uri2);
-      await imageCacheManager.getCachedImage(uri2); // hit
+      await imageCacheManager.getImage(uri1);
+      await imageCacheManager.getImage(uri1); // hit
+      await imageCacheManager.getImage(uri2);
+      await imageCacheManager.getImage(uri2); // hit
       
       const stats = await imageCacheManager.getStats();
       expect(stats.hitRate).toBeGreaterThan(0);
@@ -249,15 +249,15 @@ describe('ImageCacheManager', () => {
         isDirectory: false 
       });
       
-      await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
       
       const stats = await imageCacheManager.getStats();
       expect(stats.diskSize).toBeGreaterThan(0);
     });
 
     it('should reset statistics', async () => {
-      await imageCacheManager.getCachedImage('http://example.com/1.jpg');
-      await imageCacheManager.getCachedImage('http://example.com/2.jpg');
+      await imageCacheManager.getImage('http://example.com/1.jpg');
+      await imageCacheManager.getImage('http://example.com/2.jpg');
       
       await imageCacheManager.resetStats();
       
@@ -270,8 +270,8 @@ describe('ImageCacheManager', () => {
 
   describe('Cache Management', () => {
     it('should clear all caches', async () => {
-      await imageCacheManager.getCachedImage('http://example.com/1.jpg');
-      await imageCacheManager.getCachedImage('http://example.com/2.jpg');
+      await imageCacheManager.getImage('http://example.com/1.jpg');
+      await imageCacheManager.getImage('http://example.com/2.jpg');
       
       await imageCacheManager.clear();
       
@@ -282,7 +282,7 @@ describe('ImageCacheManager', () => {
     it('should remove specific image from cache', async () => {
       const uri = 'http://example.com/image.jpg';
       
-      await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
       await imageCacheManager.removeCachedImage(uri);
       
       expect(mockFileSystem.deleteAsync).toHaveBeenCalled();
@@ -310,13 +310,13 @@ describe('ImageCacheManager', () => {
       const uri = 'http://example.com/image.jpg';
       
       // First download
-      await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
       
       // Simulate offline
       mockFileSystem.downloadAsync = jest.fn().mockRejectedValue(new Error('Network error'));
       
       // Should still return cached image
-      const cachedUri = await imageCacheManager.getCachedImage(uri);
+      const cachedUri = await imageCacheManager.getImage(uri);
       expect(cachedUri).toBeDefined();
     });
 
@@ -327,7 +327,7 @@ describe('ImageCacheManager', () => {
       mockFileSystem.downloadAsync = jest.fn().mockRejectedValue(new Error('Network error'));
       mockFileSystem.getInfoAsync = jest.fn().mockResolvedValue({ exists: false });
       
-      const cachedUri = await imageCacheManager.getCachedImage(uri);
+      const cachedUri = await imageCacheManager.getImage(uri);
       
       // Should return original URI as fallback
       expect(cachedUri).toBe(uri);
@@ -374,7 +374,7 @@ describe('ImageCacheManager', () => {
       
       mockFileSystem.downloadAsync = jest.fn().mockRejectedValue(new Error('Download failed'));
       
-      const cachedUri = await imageCacheManager.getCachedImage(uri);
+      const cachedUri = await imageCacheManager.getImage(uri);
       
       // Should return original URI as fallback
       expect(cachedUri).toBe(uri);
@@ -400,10 +400,10 @@ describe('ImageCacheManager', () => {
       const uri = 'http://example.com/image.jpg';
       
       // Pre-cache image
-      await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
       
       const start = Date.now();
-      await imageCacheManager.getCachedImage(uri);
+      await imageCacheManager.getImage(uri);
       const duration = Date.now() - start;
       
       expect(duration).toBeLessThan(100);
@@ -413,7 +413,7 @@ describe('ImageCacheManager', () => {
       const uris = Array.from({ length: 50 }, (_, i) => `http://example.com/image${i}.jpg`);
       
       const start = Date.now();
-      await Promise.all(uris.map(uri => imageCacheManager.getCachedImage(uri)));
+      await Promise.all(uris.map(uri => imageCacheManager.getImage(uri)));
       const duration = Date.now() - start;
       
       // Should complete in reasonable time

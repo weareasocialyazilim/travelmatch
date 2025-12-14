@@ -23,7 +23,7 @@ export const useFavoritesStore = create<FavoritesState>()(
     persist(
       (set, get) => ({
         // Initial State
-        favoriteIds: [],
+        favoriteIds: [] as string[],
 
         // Add Favorite
         addFavorite: (momentId) =>

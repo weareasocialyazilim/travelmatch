@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
-import { logger } from '../utils/logger';
+import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 
 interface ChatInputBarProps {

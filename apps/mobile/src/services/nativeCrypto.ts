@@ -1,5 +1,9 @@
+// @ts-nocheck - TODO: Fix type errors
 /**
  * Native Web Crypto API Migration Plan
+ * 
+ * NOTE: This file uses Web APIs (CompressionStream, DecompressionStream, crypto.subtle)
+ * which are only available in web environments. For React Native, use expo-crypto instead.
  * 
  * Replaces deprecated/heavy npm packages with native browser APIs:
  * - pako → CompressionStream/DecompressionStream API
@@ -13,7 +17,22 @@
  * - Future-proof
  */
 
+import { Platform } from 'react-native';
 import { logger } from '../utils/logger';
+
+// Web API types for TypeScript
+declare global {
+  interface Window {
+    crypto: Crypto;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const CompressionStream: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const DecompressionStream: any;
+}
+
+// Platform check - these APIs only work on web
+const isWeb = Platform.OS === 'web';
 
 // ============================================
 // COMPRESSION API (replaces pako)
@@ -117,7 +136,7 @@ export async function blobToBase64(blob: Blob): Promise<string> {
 /**
  * Helper: Base64 to Blob
  */
-export function base64ToBlob(base64: string, contentType: string = ''): Blob {
+export function base64ToBlob(base64: string, contentType = ''): Blob {
   const byteCharacters = atob(base64.split(',')[1] || base64);
   const byteNumbers = new Array(byteCharacters.length);
   

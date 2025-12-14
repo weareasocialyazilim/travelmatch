@@ -35,7 +35,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '../services/supabaseAuthService';
 import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '../utils/secureStorage';
 import { logger } from '../utils/logger';
-import type { User } from '../types/index';
+import type { User, KYCStatus, Role } from '../types/index';
+
+/**
+ * Helper to create a valid User object with defaults
+ */
+const createUser = (data: {
+  id: string;
+  email?: string;
+  name?: string;
+  avatar?: string;
+}): User => ({
+  id: data.id,
+  email: data.email || '',
+  name: data.name || '',
+  avatar: data.avatar,
+  role: 'Traveler' as Role,
+  kyc: 'Unverified' as KYCStatus,
+  location: { lat: 0, lng: 0 },
+});
 
 /**
  * Authentication tokens stored securely
@@ -333,12 +351,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (error) throw error;
       if (!authUser || !session) throw new Error('Login failed');
 
-      const user: User = {
+      const newUser = createUser({
         id: authUser.id,
         email: authUser.email || '',
         name: authUser.user_metadata?.name || '',
         avatar: authUser.user_metadata?.avatar_url,
-      };
+      });
 
       const newTokens: AuthTokens = {
         accessToken: session.access_token,
@@ -347,7 +365,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       };
 
       await saveTokens(newTokens);
-      await saveUser(user);
+      await saveUser(newUser);
       setAuthState('authenticated');
 
       return { success: true };
@@ -376,12 +394,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (!authUser) throw new Error('Registration failed');
 
       if (session) {
-        const user: User = {
+        const newUser = createUser({
           id: authUser.id,
           email: authUser.email || '',
           name: authUser.user_metadata?.name || '',
           avatar: authUser.user_metadata?.avatar_url,
-        };
+        });
 
         const newTokens: AuthTokens = {
           accessToken: session.access_token,
@@ -390,7 +408,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         };
 
         await saveTokens(newTokens);
-        await saveUser(user);
+        await saveUser(newUser);
         setAuthState('authenticated');
       }
 
@@ -485,12 +503,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         return;
       }
 
-      const user: User = {
+      const newUser = createUser({
         id: authUser.id,
         email: authUser.email || '',
         name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
         avatar: authUser.user_metadata?.avatar_url,
-      };
+      });
 
       const newTokens: AuthTokens = {
         accessToken: session.access_token,
@@ -498,8 +516,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         expiresAt: (session.expires_at || 0) * 1000,
       };
 
-      await Promise.all([saveUser(user), saveTokens(newTokens)]);
-      setUser(user);
+      await Promise.all([saveUser(newUser), saveTokens(newTokens)]);
+      setUser(newUser);
       setAuthState('authenticated');
 
       logger.info('[Auth] OAuth login successful');
@@ -516,13 +534,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const authUser = await authService.getCurrentUser();
       if (authUser) {
-        const user: User = {
+        const refreshedUser = createUser({
           id: authUser.id,
           email: authUser.email || '',
           name: authUser.user_metadata?.name || '',
           avatar: authUser.user_metadata?.avatar_url,
-        };
-        await saveUser(user);
+        });
+        await saveUser(refreshedUser);
       }
     } catch {
       // Silent fail - user data will be refreshed on next successful request
@@ -560,11 +578,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
    * Reset password with token
    */
   const resetPassword = async (
-    token: string,
+    _token: string,
     newPassword: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      await api.post('/auth/reset-password', { token, newPassword });
+      const { error } = await authService.updatePassword(newPassword);
+      if (error) throw error;
       return { success: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Reset failed';
@@ -576,14 +595,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
    * Change password (when logged in)
    */
   const changePassword = async (
-    currentPassword: string,
+    _currentPassword: string,
     newPassword: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      await api.post('/users/me/change-password', {
-        currentPassword,
-        newPassword,
-      });
+      // Note: Supabase doesn't verify current password, just updates to new
+      const { error } = await authService.updatePassword(newPassword);
+      if (error) throw error;
       return { success: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Change failed';

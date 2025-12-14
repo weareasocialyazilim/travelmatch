@@ -7,6 +7,7 @@ import Animated, {
   withSpring,
   interpolate,
   Extrapolate,
+  runOnJS,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
@@ -34,20 +35,25 @@ export default function SwipeableCard({
       translateX.value = event.translationX;
       translateY.value = event.translationY;
     })
-    .onEnd((event) => {
+    .onEnd(() => {
+      'worklet';
       const shouldDismiss = Math.abs(translateX.value) > threshold;
 
       if (shouldDismiss) {
+        const swipedRight = translateX.value > 0;
         // Animate card off screen
         translateX.value = withSpring(
-          translateX.value > 0 ? SCREEN_WIDTH : -SCREEN_WIDTH,
+          swipedRight ? SCREEN_WIDTH : -SCREEN_WIDTH,
           { damping: 20, stiffness: 90 },
-          () => {
+          (finished) => {
+            'worklet';
             // Callback after animation
-            if (translateX.value > 0 && onSwipeRight) {
-              onSwipeRight();
-            } else if (translateX.value < 0 && onSwipeLeft) {
-              onSwipeLeft();
+            if (finished) {
+              if (swipedRight && onSwipeRight) {
+                runOnJS(onSwipeRight)();
+              } else if (!swipedRight && onSwipeLeft) {
+                runOnJS(onSwipeLeft)();
+              }
             }
           }
         );
@@ -78,7 +84,7 @@ export default function SwipeableCard({
         { translateX: translateX.value },
         { translateY: translateY.value },
         { rotate: `${rotate}deg` },
-      ],
+      ] as const,
       opacity,
     };
   });
@@ -133,12 +139,16 @@ export function DismissibleCard({ children, onDismiss }: { children: React.React
         translateY.value = event.translationY;
       }
     })
-    .onEnd((event) => {
+    .onEnd(() => {
+      'worklet';
       if (translateY.value > 100) {
         // Animate out
         translateY.value = withTiming(500, { duration: 300 });
-        height.value = withTiming(0, { duration: 300 }, () => {
-          onDismiss();
+        height.value = withTiming(0, { duration: 300 }, (finished) => {
+          'worklet';
+          if (finished) {
+            runOnJS(onDismiss)();
+          }
         });
       } else {
         // Return to position

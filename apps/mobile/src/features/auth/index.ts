@@ -1,8 +1,8 @@
 // Auth Feature Exports
 // Core screens
-export { default as WelcomeScreen } from './screens/WelcomeScreen';
-export { default as OnboardingScreen } from './screens/OnboardingScreen';
-export { default as CompleteProfileScreen } from './screens/CompleteProfileScreen';
+export { WelcomeScreen } from './screens/WelcomeScreen';
+export { OnboardingScreen } from './screens/OnboardingScreen';
+export { CompleteProfileScreen } from './screens/CompleteProfileScreen';
 
 // Auth flow screens
 export { PhoneAuthScreen } from './screens/PhoneAuthScreen';

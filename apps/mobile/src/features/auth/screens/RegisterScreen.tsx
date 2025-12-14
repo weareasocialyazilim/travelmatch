@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { registerSchema, type RegisterInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 
@@ -24,7 +24,7 @@ export const RegisterScreen: React.FC = () => {
   const onSubmit = async (data: RegisterInput) => {
     try {
       setIsLoading(true);
-      await register(data.email, data.password, data.fullName);
+      await register({ email: data.email, password: data.password, name: data.fullName ?? data.email.split('@')[0] });
       // Navigation handled by auth state change
     } catch (error) {
       Alert.alert('Registration Failed', error instanceof Error ? error.message : 'Please try again');

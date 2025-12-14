@@ -118,7 +118,7 @@ export const useSlide = (
     transform: [
       { translateX: translateX.value },
       { translateY: translateY.value },
-    ],
+    ] as const,
   }));
 
   const slideIn = () => {

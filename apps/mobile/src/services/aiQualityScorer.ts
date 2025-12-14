@@ -9,6 +9,7 @@
  * - Auto-reject low quality submissions
  */
 
+import React from 'react';
 import { supabase } from './supabase';
 
 // Quality score breakdown
@@ -37,7 +38,14 @@ export enum ProofType {
 
 // ML service client
 class AIQualityScorer {
-  private mlServiceUrl = process.env.EXPO_PUBLIC_ML_SERVICE_URL || 'http://localhost:8001';
+  private mlServiceUrl = process.env.EXPO_PUBLIC_ML_SERVICE_URL;
+
+  private getMlServiceUrl(): string {
+    if (!this.mlServiceUrl) {
+      throw new Error('ML Service URL not configured. Set EXPO_PUBLIC_ML_SERVICE_URL environment variable.');
+    }
+    return this.mlServiceUrl;
+  }
 
   /**
    * Score profile proof photo
@@ -54,7 +62,7 @@ class AIQualityScorer {
       const imageUrl = await this.uploadImage(imageUri, userId);
 
       // Call ML service for scoring
-      const response = await fetch(`${this.mlServiceUrl}/api/score-proof`, {
+      const response = await fetch(`${this.getMlServiceUrl()}/api/score-proof`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

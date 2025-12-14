@@ -46,8 +46,8 @@ const clientEnvSchema = z.object({
   // Feature Flags
   ENABLE_ANALYTICS: z
     .string()
-    .transform((val) => val === 'true')
-    .default('false'),
+    .default('false')
+    .transform((val) => val === 'true'),
 });
 
 /**

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * GenericBottomSheet Test Suite
  * Comprehensive tests for reusable bottom sheet component

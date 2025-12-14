@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityInd
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { useBiometric } from '@/context/BiometricAuthContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
@@ -29,7 +29,7 @@ export const LoginScreen: React.FC = () => {
   const onSubmit = async (data: LoginInput) => {
     try {
       setIsLoading(true);
-      await login(data.email, data.password);
+      await login({ email: data.email, password: data.password });
       // Navigation handled by auth state change
     } catch (error) {
       Alert.alert('Login Failed', error instanceof Error ? error.message : 'Please try again');
@@ -109,7 +109,7 @@ export const LoginScreen: React.FC = () => {
             {error && (
               <Text 
                 style={styles.errorText}
-                {...a11y.alert(error.message)}
+                {...a11y.alert(error.message ?? 'Invalid email')}
               >
                 {error.message}
               </Text>
@@ -138,7 +138,7 @@ export const LoginScreen: React.FC = () => {
             {error && (
               <Text 
                 style={styles.errorText}
-                {...a11y.alert(error.message)}
+                {...a11y.alert(error.message ?? 'Invalid password')}
               >
                 {error.message}
               </Text>

@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { NEXT_STEPS } from './constants';
 import { kycStyles } from './styles';
 

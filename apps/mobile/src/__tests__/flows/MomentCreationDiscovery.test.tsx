@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Moment Creation and Discovery Flow Test Suite  
  * Comprehensive tests for creating and discovering moments

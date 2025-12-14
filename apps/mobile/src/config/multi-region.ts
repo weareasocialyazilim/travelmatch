@@ -142,8 +142,10 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 // Cloudflare Workers edge function
+// Note: This code is designed to run in Cloudflare Workers environment
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const edgeHandler = {
-  async fetch(request: Request, env: any): Promise<Response> {
+  async fetch(request: Request, _env: Record<string, unknown>): Promise<Response> {
     const url = new URL(request.url);
 
     // Determine cache strategy based on path
@@ -158,7 +160,8 @@ export const edgeHandler = {
 
     // Check cache first
     const cacheKey = strategy.cacheKey(request);
-    const cache = caches.default;
+    // caches.default is Cloudflare Workers API
+    const cache = (caches as unknown as { default: Cache }).default;
     let response = await cache.match(cacheKey);
 
     if (!response) {

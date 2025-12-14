@@ -53,7 +53,7 @@ class ApiClient {
   private async checkNetwork(): Promise<boolean> {
     try {
       const netState = await NetInfo.fetch();
-      const isConnected = netState.isConnected && netState.isInternetReachable !== false;
+      const isConnected = netState.isConnected === true && netState.isInternetReachable !== false;
       
       if (!isConnected) {
         logger.warn('[API v1] Offline - request blocked');

@@ -9,7 +9,7 @@
  * - Smart routing based on user location
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Region configurations
 export const SUPABASE_REGIONS = {
@@ -50,7 +50,8 @@ export const SUPABASE_REGIONS = {
 type RegionKey = keyof typeof SUPABASE_REGIONS;
 
 // Connection pool for each region
-const connectionPools = new Map<RegionKey, ReturnType<typeof createClient>>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const connectionPools = new Map<RegionKey, SupabaseClient<any, 'public', any>>();
 
 // Health check status
 interface HealthStatus {
@@ -65,7 +66,8 @@ const healthStatus = new Map<RegionKey, HealthStatus>();
 /**
  * Get Supabase client for specific region
  */
-export function getRegionalClient(region: RegionKey) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getRegionalClient(region: RegionKey): SupabaseClient<any, 'public', any> {
   if (!connectionPools.has(region)) {
     const config = SUPABASE_REGIONS[region];
     const client = createClient(config.url, config.key, {
@@ -133,10 +135,11 @@ export async function getOptimalClient(userLocation?: { lat: number; lon: number
 /**
  * Get client by country code
  */
-export function getClientByCountry(countryCode: string): ReturnType<typeof createClient> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getClientByCountry(countryCode: string): SupabaseClient<any, 'public', any> {
   // Find region that serves this country
   for (const [region, config] of Object.entries(SUPABASE_REGIONS)) {
-    if (config.serves.includes(countryCode)) {
+    if ((config.serves as readonly string[]).includes(countryCode)) {
       return getRegionalClient(region as RegionKey);
     }
   }
@@ -203,7 +206,7 @@ async function getHealthyRegions(): Promise<RegionKey[]> {
 
   // Get healthy regions sorted by priority
   const healthy = Array.from(healthStatus.entries())
-    .filter(([_, status]) => status.healthy)
+    .filter(([, status]) => status.healthy)
     .map(([region]) => region)
     .sort((a, b) => SUPABASE_REGIONS[a].priority - SUPABASE_REGIONS[b].priority);
 
@@ -234,7 +237,8 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
  * Retries with fallback regions if primary fails
  */
 export async function withFailover<T>(
-  operation: (client: ReturnType<typeof createClient>) => Promise<T>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  operation: (client: SupabaseClient<any, 'public', any>) => Promise<T>,
   userLocation?: { lat: number; lon: number }
 ): Promise<T> {
   const healthyRegions = await getHealthyRegions();

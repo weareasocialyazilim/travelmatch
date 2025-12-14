@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ControlledInput Test Suite
  * Tests for React Hook Form integrated input component

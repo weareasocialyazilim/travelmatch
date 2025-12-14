@@ -5,7 +5,14 @@
 export * from './spacing';
 export * from './radii';
 export * from './strings';
-export * from './colors';
+// Re-export colors explicitly to avoid duplicate names with typography
+export { 
+  COLORS,
+  FONT_SIZES,
+  LINE_HEIGHTS,
+  TYPOGRAPHY_EXTENDED,
+  CARD_SHADOW
+} from './colors';
 export * from './shadows';
 export * from './typography';
 export * from './layout';
