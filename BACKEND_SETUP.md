@@ -48,9 +48,9 @@ supabase db push
 
 **Mobile App (.env.production):**
 ```bash
-# Google Maps (Al: https://console.cloud.google.com/)
-EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS=AIza...
-EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID=AIza...
+# Mapbox (Al: https://account.mapbox.com/)
+EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN=pk.eyJ1...
+EXPO_PUBLIC_MAPBOX_SECRET_TOKEN=sk.eyJ1...
 
 # PostHog Analytics (Al: https://posthog.com/)
 EXPO_PUBLIC_POSTHOG_API_KEY=phc_...
@@ -252,10 +252,10 @@ supabase test db
 **Workaround:** Manual SQL query daily
 **Fix:** Enable pg_cron (see checklist above)
 
-### 2. Google Maps API Keys Missing
+### 2. Mapbox Tokens Missing
 **Impact:** Maps won't load
 **Workaround:** Disable map features
-**Fix:** Add API keys to .env.production
+**Fix:** Add Mapbox tokens to .env.production
 
 ### 3. PostHog Analytics Not Configured
 **Impact:** No product analytics

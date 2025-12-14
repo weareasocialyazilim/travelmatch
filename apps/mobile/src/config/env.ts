@@ -21,7 +21,7 @@ const envSchema = z.object({
   MAX_UPLOAD_SIZE: z.number().default(10485760), // 10MB
   SOCKET_URL: z.string().url().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  GOOGLE_MAPS_API_KEY: z.string().optional(),
+  MAPBOX_PUBLIC_TOKEN: z.string().optional(),
   // Supabase configuration
   SUPABASE_URL: z.string().url().optional(),
   SUPABASE_ANON_KEY: z.string().optional(),
@@ -54,7 +54,7 @@ function getEnvVars() {
     STRIPE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_STRIPE_KEY as
       | string
       | undefined,
-    GOOGLE_MAPS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY as
+    MAPBOX_PUBLIC_TOKEN: process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN as
       | string
       | undefined,
     SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined,
@@ -137,7 +137,7 @@ export const FEATURES = {
   LOGGING: config.ENABLE_LOGGING,
   SOCKET_ENABLED: !!config.SOCKET_URL,
   PAYMENTS_ENABLED: !!config.STRIPE_PUBLISHABLE_KEY,
-  MAPS_ENABLED: !!config.GOOGLE_MAPS_API_KEY,
+  MAPS_ENABLED: !!config.MAPBOX_PUBLIC_TOKEN,
   SUPABASE_ENABLED: !!config.SUPABASE_URL && !!config.SUPABASE_ANON_KEY,
 } as const;
 

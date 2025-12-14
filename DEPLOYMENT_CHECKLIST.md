@@ -165,9 +165,9 @@ SELECT * FROM cron.job WHERE jobname = 'refund-expired-escrow';
 
 **REQUIRED (App won't work without these):**
 ```bash
-# Google Maps (Get from: https://console.cloud.google.com/)
-EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS=AIza...your-key...
-EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID=AIza...your-key...
+# Mapbox (Get from: https://account.mapbox.com/)
+EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN=pk.eyJ1...your-token...
+EXPO_PUBLIC_MAPBOX_SECRET_TOKEN=sk.eyJ1...your-secret...
 
 # PostHog Analytics (Get from: https://posthog.com/)
 EXPO_PUBLIC_POSTHOG_API_KEY=phc_...your-key...
@@ -287,10 +287,10 @@ WHERE tablename = 'users';
 **Workaround:** Manually run refund query daily
 **Fix:** Upload and run `20251213000004_enable_pg_cron.sql`
 
-### Issue #2: Google Maps Not Loading
+### Issue #2: Mapbox Not Loading
 **Symptom:** Map shows blank/gray tiles
 **Workaround:** Disable map features temporarily
-**Fix:** Add API keys to `.env.production`
+**Fix:** Add Mapbox tokens to `.env.production`
 
 ### Issue #3: No Analytics Data
 **Symptom:** PostHog dashboard shows no events
@@ -317,7 +317,7 @@ WHERE tablename = 'users';
 
 - [ ] **Step 1:** Upload 5 migrations to Supabase ✅
 - [ ] **Step 2:** Verify pg_cron is running ✅
-- [ ] **Step 3:** Add Google Maps API keys ⚠️ REQUIRED
+- [ ] **Step 3:** Add Mapbox tokens ⚠️ REQUIRED
 - [ ] **Step 4:** Add PostHog API key ⚠️ REQUIRED
 - [ ] **Step 5:** Add Sentry DSN (recommended) 🟡
 - [ ] **Step 6:** Configure Supabase Secrets (Stripe, OpenAI, Resend) ⚠️
