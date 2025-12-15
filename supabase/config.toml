@@ -1,7 +1,7 @@
 # Supabase Project Configuration
 # See: https://supabase.com/docs/guides/cli/config
 
-project_id = "isvstmzuyxuwptrrhkyi"
+project_id = "bjikxgtbptrvawkguypv"
 
 [api]
 enabled = true
@@ -32,13 +32,15 @@ file_size_limit = "50MiB"
 
 [auth]
 enabled = true
+# Production site URL (primary domain)
 site_url = "https://travelmatch.app"
+# Redirect URLs for OAuth callbacks and deep links
 additional_redirect_urls = [
-  "https://travelmatch.app",
   "https://www.travelmatch.app",
-  "travelmatch://",
-  "exp://192.168.*",
-  "http://localhost:3000"
+  "https://staging.travelmatch.app",
+  "travelmatch://",  # Mobile app deep link
+  "exp://localhost:8081",  # Expo development (remove before production deploy)
+  "http://localhost:3000"  # Local development (remove before production deploy)
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true

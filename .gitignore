@@ -72,3 +72,24 @@ supabase/.temp/
 # Infisical local cache
 .infisical/
 .infisical.json
+
+# ============================================
+# CLEANUP: Temporary and backup files
+# ============================================
+*.backup
+*.backup.*
+*.old
+*.tmp
+*~
+*.bak
+.*.swp
+.*.swo
+
+# OS-specific
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
