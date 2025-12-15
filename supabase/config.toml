@@ -59,10 +59,21 @@ enable_signup = false
 enable_confirmations = false
 
 [auth.external.apple]
-enabled = false
+enabled = true
+# Apple Sign In credentials configured via Supabase Dashboard:
+# - Service ID (client_id)
+# - Team ID
+# - Key ID
+# - Private Key (.p8 file contents)
+# See: https://supabase.com/docs/guides/auth/social-login/auth-apple
 
 [auth.external.google]
-enabled = false
+enabled = true
+# Google OAuth credentials configured via Supabase Dashboard:
+# - Client ID
+# - Client Secret
+# See: https://supabase.com/docs/guides/auth/social-login/auth-google
 
 [functions]
+# Edge Functions configuration
 # verify_jwt = false
