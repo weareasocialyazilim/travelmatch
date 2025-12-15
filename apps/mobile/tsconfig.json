@@ -54,9 +54,10 @@
     "src/services/event-tracking.ts",
     "src/services/viral-loop-engine.ts",
     "src/services/performance-monitor.ts",
-    "src/features/payments/screens/GiftInboxScreen.tsx",
-    "src/features/payments/screens/TransactionDetailScreen.tsx",
-    "src/features/payments/screens/PaymentMethodsScreen.tsx",
+    // ✅ FIXED: Payment screens now strict-mode compliant (2025-12-15)
+    // "src/features/payments/screens/GiftInboxScreen.tsx",
+    // "src/features/payments/screens/TransactionDetailScreen.tsx",
+    // "src/features/payments/screens/PaymentMethodsScreen.tsx",
     "src/features/settings/screens/SafetyScreen.tsx",
     "src/features/profile/screens/DeletedMomentsScreen.tsx",
     "src/features/profile/screens/EditProfileScreen.tsx",

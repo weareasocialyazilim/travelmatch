@@ -32,8 +32,16 @@ file_size_limit = "50MiB"
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
+# Production site URL (primary domain)
+site_url = "https://travelmatch.app"
+# Redirect URLs for OAuth callbacks and deep links
+additional_redirect_urls = [
+  "https://www.travelmatch.app",
+  "https://staging.travelmatch.app",
+  "travelmatch://",  # Mobile app deep link
+  "exp://localhost:8081",  # Expo development (remove before production deploy)
+  "http://localhost:3000"  # Local development (remove before production deploy)
+]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10

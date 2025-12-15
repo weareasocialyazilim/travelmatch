@@ -2,6 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { createHash } from 'https://deno.land/std@0.168.0/hash/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,15 @@ const KycSchema = z.object({
 
 // Rate limiter: 5 requests per 15 minutes (KYC is sensitive)
 const kycLimiter = createRateLimiter(RateLimitPresets.auth);
+
+/**
+ * Hash document number for audit logging (PII protection)
+ */
+function hashDocumentNumber(documentNumber: string): string {
+  const hash = createHash('sha256');
+  hash.update(documentNumber);
+  return hash.toString('hex').substring(0, 16); // First 16 chars
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -72,13 +82,27 @@ serve(async (req) => {
     const json = await req.json();
     const data = KycSchema.parse(json);
 
-    console.log(`Processing KYC for user ${user.id}`, data);
+    // Audit log KYC attempt (instead of console.log)
+    await supabaseAdmin.from('audit_logs').insert({
+      user_id: user.id,
+      action: 'kyc_verification_attempt',
+      metadata: {
+        document_type: data.documentType,
+        document_number_hash: hashDocumentNumber(data.documentNumber),
+      },
+    });
 
-    // Mock Verification Logic (e.g. Onfido, Stripe Identity)
-    // In reality, this would call an external API and might be async (webhook based)
-    // For this demo, we'll auto-verify after a "check"
+    // ⚠️ PRODUCTION TODO: Replace mock with real KYC provider
+    // Options:
+    // 1. Onfido: https://documentation.onfido.com/
+    // 2. Stripe Identity: https://stripe.com/docs/identity
+    // 3. Jumio: https://www.jumio.com/
+    //
+    // Example (Onfido):
+    // const onfidoResult = await verifyWithOnfido(data);
+    // const isValid = onfidoResult.status === 'complete';
 
-    const isValid = true; // Mock result
+    const isValid = true; // ⚠️ MOCK - Replace before production launch
 
     if (isValid) {
       const { error } = await supabaseAdmin

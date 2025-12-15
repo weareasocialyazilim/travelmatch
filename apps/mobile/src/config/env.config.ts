@@ -226,14 +226,16 @@ export function validateEnvironment(): void {
   try {
     parseEnv();
     if (isDevelopment && __DEV__) {
-      // eslint-disable-next-line no-console
+      // Development only - safe to use console for env validation
+      // Production: This code path never executes
       console.log('✅ Environment validation passed');
-      // eslint-disable-next-line no-console
       console.log(`📱 Running in ${env.APP_ENV} mode`);
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+    // CRITICAL: Always throw env errors (blocks app startup)
+    if (__DEV__) {
+      console.error('❌ Environment validation failed:', error);
+    }
     throw error;
   }
 }
