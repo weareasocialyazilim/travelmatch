@@ -63,6 +63,9 @@ export interface Moment {
   description: string;
   price: number;
   imageUrl: string;
+  imageCloudflareId?: string; // Cloudflare Images CDN ID
+  imageBlurHash?: string; // BlurHash placeholder for instant loading
+  image?: string; // Legacy field for backwards compatibility
   location: string;
   category: string;
   createdAt: string;
@@ -97,6 +100,8 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
+  avatarCloudflareId?: string; // Cloudflare Images CDN ID for avatar
+  avatarBlurHash?: string; // BlurHash placeholder for avatar
   bio?: string;
   location?: string;
   verified: boolean;
@@ -215,6 +220,8 @@ export interface Proof {
   momentId: string;
   userId: string;
   imageUrl: string;
+  imageCloudflareId?: string; // Cloudflare Images CDN ID
+  imageBlurHash?: string; // BlurHash placeholder
   status: 'pending' | 'approved' | 'rejected';
   submittedAt: string;
   reviewedAt?: string;
@@ -245,6 +252,20 @@ export interface FeatureFlag {
 }
 
 export type FeatureFlagsResponse = ApiResponse<Record<string, FeatureFlag>>;
+
+/**
+ * Uploaded Image response (from upload-image Edge Function)
+ */
+export interface UploadedImage {
+  id: string; // Cloudflare Images ID
+  filename: string;
+  url: string;
+  variants: string[];
+  uploaded: string;
+  blurHash?: string; // BlurHash placeholder
+}
+
+export type UploadImageResponse = ApiResponse<UploadedImage>;
 
 /**
  * Generic success response
