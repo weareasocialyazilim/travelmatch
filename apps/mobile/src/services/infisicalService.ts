@@ -46,7 +46,6 @@ export const SECRET_KEYS = {
   CACHE_ENCRYPTION_KEY: 'CACHE_ENCRYPTION_KEY',
   
   // Analytics (public keys only)
-  POSTHOG_API_KEY: 'POSTHOG_API_KEY',
   SENTRY_DSN: 'SENTRY_DSN',
   
   // Feature flags
