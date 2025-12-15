@@ -397,26 +397,10 @@ export const userService = {
 
     if (error) throw error;
 
-    // If authenticated, fetch my relationships to check status
+    // NOTE: Follow system not implemented - platform does not have social follow features
+    // Returning empty relationships for backward compatibility
     const myFollowingIds: Set<string> = new Set();
     const myFollowerIds: Set<string> = new Set();
-
-    if (currentUser) {
-      const { data: following } = await supabase
-        .from('follows')
-        .select('following_id')
-        .eq('follower_id', currentUser.id);
-
-      const { data: followers } = await supabase
-        .from('follows')
-        .select('follower_id')
-        .eq('following_id', currentUser.id);
-
-      if (following)
-        (following as FollowRow[]).forEach((f) => myFollowingIds.add(f.following_id));
-      if (followers)
-        (followers as FollowRow[]).forEach((f) => myFollowerIds.add(f.follower_id));
-    }
 
     const allFollowers = ((data as UserRow[]) || []).map((follower) => ({
       id: follower.id,
@@ -451,26 +435,10 @@ export const userService = {
 
     if (error) throw error;
 
-    // If authenticated, fetch my relationships to check status
+    // NOTE: Follow system not implemented - platform does not have social follow features
+    // Returning empty relationships for backward compatibility
     const myFollowingIds: Set<string> = new Set();
     const myFollowerIds: Set<string> = new Set();
-
-    if (currentUser) {
-      const { data: following } = await supabase
-        .from('follows')
-        .select('following_id')
-        .eq('follower_id', currentUser.id);
-
-      const { data: followers } = await supabase
-        .from('follows')
-        .select('follower_id')
-        .eq('following_id', currentUser.id);
-
-      if (following)
-        (following as FollowRow[]).forEach((f) => myFollowingIds.add(f.following_id));
-      if (followers)
-        (followers as FollowRow[]).forEach((f) => myFollowerIds.add(f.follower_id));
-    }
 
     const allFollowing = ((data as UserRow[]) || []).map((followingUser) => ({
       id: followingUser.id,

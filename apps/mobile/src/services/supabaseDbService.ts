@@ -35,13 +35,12 @@ export const usersService = {
 
     try {
       // SECURITY: Explicit column selection for user data
+      // NOTE: Follow counts removed - platform does not have follow system
       const { data, error } = await supabase
         .from('users')
         .select(`
           id, email, name, avatar_url, bio, location, public_key, created_at, updated_at,
           moments_count:moments!user_id(count),
-          followers_count:follows!following_id(count),
-          following_count:follows!follower_id(count),
           reviews_count:reviews!reviewed_user_id(count)
         `)
         .eq('id', id)
@@ -75,93 +74,39 @@ export const usersService = {
     }
   },
 
+  // NOTE: Follow system removed - TravelMatch does not have social follow features
+  // Platform focuses on local travel moment matching, not social following
   async follow(
-    followerId: string,
-    followingId: string,
+    _followerId: string,
+    _followingId: string,
   ): Promise<{ error: Error | null }> {
-    try {
-      const { error } = await supabase
-        .from('follows')
-        .insert({ follower_id: followerId, following_id: followingId });
-
-      if (error) throw error;
-      return { error: null };
-    } catch (error) {
-      logger.error('[DB] Follow user error:', error);
-      return { error: error as Error };
-    }
+    logger.warn('[DB] Follow system not implemented - platform does not support follows');
+    return { error: new Error('Follow system not available') };
   },
 
   async unfollow(
-    followerId: string,
-    followingId: string,
+    _followerId: string,
+    _followingId: string,
   ): Promise<{ error: Error | null }> {
-    try {
-      const { error } = await supabase
-        .from('follows')
-        .delete()
-        .eq('follower_id', followerId)
-        .eq('following_id', followingId);
-
-      if (error) throw error;
-      return { error: null };
-    } catch (error) {
-      logger.error('[DB] Unfollow user error:', error);
-      return { error: error as Error };
-    }
+    logger.warn('[DB] Follow system not implemented - platform does not support follows');
+    return { error: new Error('Follow system not available') };
   },
 
-  async getFollowers(userId: string): Promise<ListResult<any>> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('follower:users(*)', { count: 'exact' })
-        .eq('following_id', userId);
-
-      if (error) throw error;
-
-      const followers = data?.map((item: any) => item.follower) || [];
-      return { data: followers, count: count || 0, error: null };
-    } catch (error) {
-      logger.error('[DB] Get followers error:', error);
-      return { data: [], count: 0, error: error as Error };
-    }
+  async getFollowers(_userId: string): Promise<ListResult<any>> {
+    logger.warn('[DB] Follow system not implemented - platform does not support follows');
+    return { data: [], count: 0, error: null };
   },
 
-  async getFollowing(userId: string): Promise<ListResult<any>> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('following:users(*)', { count: 'exact' })
-        .eq('follower_id', userId);
-
-      if (error) throw error;
-
-      const following = data?.map((item: any) => item.following) || [];
-      return { data: following, count: count || 0, error: null };
-    } catch (error) {
-      logger.error('[DB] Get following error:', error);
-      return { data: [], count: 0, error: error as Error };
-    }
+  async getFollowing(_userId: string): Promise<ListResult<any>> {
+    logger.warn('[DB] Follow system not implemented - platform does not support follows');
+    return { data: [], count: 0, error: null };
   },
 
   async checkFollowStatus(
-    followerId: string,
-    followingId: string,
+    _followerId: string,
+    _followingId: string,
   ): Promise<{ isFollowing: boolean; error: Error | null }> {
-    try {
-      const { count, error } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact', head: true })
-        .eq('follower_id', followerId)
-        .eq('following_id', followingId);
-
-      if (error) throw error;
-      return { isFollowing: (count || 0) > 0, error: null };
-    } catch (error) {
-      logger.error('[DB] Check follow status error:', error);
-      return { isFollowing: false, error: error as Error };
-    }
+    return { isFollowing: false, error: null };
   },
 
   async search(

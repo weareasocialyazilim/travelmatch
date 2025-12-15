@@ -25,7 +25,7 @@ import { validateEnvironment, env } from './src/config/env.config';
 import { migrateSensitiveDataToSecure } from './src/utils/secureStorage';
 import { initSecurityMonitoring } from './src/utils/securityChecks';
 import './src/config/i18n'; // Initialize i18n
-import PostHog from 'posthog-react-native';
+// PostHog removed - using Sentry for error tracking only
 
 import { messageService } from './src/services/messageService';
 import { cacheService } from './src/services/cacheService';
