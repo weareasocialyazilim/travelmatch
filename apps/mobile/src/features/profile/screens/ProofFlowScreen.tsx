@@ -9,6 +9,7 @@ import {
   Image,  // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
   Platform,
+  Alert,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -78,10 +79,10 @@ const PROOF_TYPES: {
 type ProofFlowScreenProps = StackScreenProps<RootStackParamList, 'ProofFlow'>;
 
 export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
-    const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
-navigation,
+  navigation,
 }) => {
+  const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [loading, setLoading] = useState(false);
 

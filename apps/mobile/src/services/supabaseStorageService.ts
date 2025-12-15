@@ -7,9 +7,22 @@ import * as FileSystem from 'expo-file-system';
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 import { logger } from '../utils/logger';
 
-// File and Paths from expo-file-system SDK 54
-const File = (FileSystem as any).File;
-const Paths = (FileSystem as any).Paths;
+// Type assertion for File and Paths from expo-file-system SDK 54
+// These are new APIs that may not be in the type definitions yet
+interface ExpoFileSystemExtended {
+  File: new (path: string) => {
+    readAsStringAsync: () => Promise<string>;
+    downloadFromUrlAsync: (url: string) => Promise<void>;
+  };
+  Paths: {
+    cache: string;
+    document: string;
+  };
+}
+
+const FileSystemExtended = FileSystem as typeof FileSystem & ExpoFileSystemExtended;
+const File = FileSystemExtended.File;
+const Paths = FileSystemExtended.Paths;
 
 // ArrayBuffer to Base64 conversion
 const encode = (buffer: ArrayBuffer): string => {

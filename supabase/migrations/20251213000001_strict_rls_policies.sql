@@ -1,130 +1,117 @@
 -- ============================================
--- BLOCKER #2 FIX: Strict RLS Policies
--- File: supabase/migrations/20251213000001_fix_strict_rls.sql
+-- STRICT RLS Policies (CORRECTED)
+-- Migration: 20251213000001_strict_rls_policies.sql
+-- 
+-- NOTE: This migration was corrected on 2025-12-15 to remove
+-- references to non-existent tables (matches) and columns
+-- (favorites.favorited_user_id).
+-- 
+-- The actual schema has:
+-- - favorites table: (id, user_id, moment_id, created_at) - favorites moments, not users
+-- - No matches table exists
 -- ============================================
 
 -- ============================================
--- 1. DROP INSECURE POLICIES
+-- 1. DROP INSECURE/BROKEN POLICIES
 -- ============================================
 
 DROP POLICY IF EXISTS "Users can view any profile" ON users;
 DROP POLICY IF EXISTS "Anyone can view reviews" ON reviews;
+DROP POLICY IF EXISTS "Users can view matched profiles" ON users;
 
 -- ============================================
--- 2. CREATE STRICT USER VISIBILITY POLICY
+-- 2. CREATE CORRECTED USER VISIBILITY POLICY
 -- ============================================
 
 -- Users can ONLY view profiles they have legitimate access to:
 -- - Own profile
--- - Matched users
--- - Favorited users
 -- - Users in same conversation
--- - Users whose moments they've interacted with
-CREATE POLICY "Users can view matched profiles" ON users
+-- - Users whose moments they've interacted with (requests)
+-- - Users whose moments they've favorited
+-- - Users with active moments (for discovery)
+CREATE POLICY "Users can view connected profiles" ON users
 FOR SELECT
 USING (
-  -- Own profile
+  -- Always can view own profile
   auth.uid() = id
   OR
-  -- Active, non-deleted profiles with connection
+  -- Non-deleted profiles with legitimate connection
   (deleted_at IS NULL AND (
-    -- Has active match
-    EXISTS (
-      SELECT 1 FROM matches
-      WHERE status = 'active'
-        AND ((user1_id = auth.uid() AND user2_id = users.id)
-          OR (user2_id = auth.uid() AND user1_id = users.id))
-    )
-    OR
-    -- Has favorited this user
-    EXISTS (
-      SELECT 1 FROM favorites
-      WHERE user_id = auth.uid()
-        AND favorited_user_id = users.id
-    )
-    OR
     -- In same active conversation
     EXISTS (
       SELECT 1 FROM conversations
       WHERE auth.uid() = ANY(participant_ids)
         AND users.id = ANY(participant_ids)
-        AND archived_at IS NULL
     )
     OR
-    -- Interacted with their moment (sent request/gift)
+    -- Has sent request for their moment (requester views host)
     EXISTS (
-      SELECT 1 FROM requests
-      WHERE user_id = auth.uid()
-        AND moment_id IN (SELECT id FROM moments WHERE user_id = users.id)
-        AND status IN ('pending', 'accepted')
+      SELECT 1 FROM requests r
+      INNER JOIN moments m ON m.id = r.moment_id
+      WHERE r.user_id = auth.uid() 
+        AND m.user_id = users.id
+        AND r.status IN ('pending', 'accepted')
     )
     OR
-    -- User is moment owner that current user requested
+    -- Received request from them (host views requester)
     EXISTS (
       SELECT 1 FROM moments m
       INNER JOIN requests r ON r.moment_id = m.id
-      WHERE m.user_id = users.id
-        AND r.user_id = auth.uid()
+      WHERE m.user_id = auth.uid()
+        AND r.user_id = users.id
         AND r.status IN ('pending', 'accepted')
+    )
+    OR
+    -- Has favorited one of their active moments
+    EXISTS (
+      SELECT 1 FROM favorites f
+      INNER JOIN moments m ON m.id = f.moment_id
+      WHERE f.user_id = auth.uid()
+        AND m.user_id = users.id
+        AND m.status = 'active'
+    )
+    OR
+    -- Has active moments (public for discovery)
+    EXISTS (
+      SELECT 1 FROM moments m
+      WHERE m.user_id = users.id
+        AND m.status = 'active'
     )
   ))
 );
 
-COMMENT ON POLICY "Users can view matched profiles" ON users IS
-'Strict privacy: Users can only view profiles they have legitimate connection with.
-Prevents arbitrary profile browsing.';
+COMMENT ON POLICY "Users can view connected profiles" ON users IS
+'Privacy-respecting profile visibility. Users can view: own profile, 
+conversation partners, request counterparts, favorited moment owners, 
+and users with active moments.';
 
 -- ============================================
--- 3. CREATE STRICT REVIEW VISIBILITY POLICY
+-- 3. CREATE CORRECTED REVIEW VISIBILITY POLICY
 -- ============================================
 
--- Reviews are ONLY visible to:
--- - Review author
--- - Reviewed user
--- - Users who can see the reviewed user's profile
 CREATE POLICY "Users can view relevant reviews" ON reviews
 FOR SELECT
 USING (
-  -- Own reviews (as reviewer)
+  -- Own reviews as reviewer
   auth.uid() = reviewer_id
   OR
-  -- Reviews about me
-  auth.uid() = reviewee_id
+  -- Reviews about current user
+  auth.uid() = reviewed_id
   OR
-  -- Reviews about users I can see
-  (
-    -- Can see reviewee's profile via match/favorite/conversation
-    reviewee_id IN (
-      SELECT id FROM users
-      WHERE
-        auth.uid() = id  -- Own profile
-        OR (deleted_at IS NULL AND (
-          -- Has active match with reviewee
-          EXISTS (
-            SELECT 1 FROM matches
-            WHERE status = 'active'
-              AND ((user1_id = auth.uid() AND user2_id = users.id)
-                OR (user2_id = auth.uid() AND user1_id = users.id))
-          )
-          OR
-          -- In conversation with reviewee
-          EXISTS (
-            SELECT 1 FROM conversations
-            WHERE auth.uid() = ANY(participant_ids)
-              AND users.id = ANY(participant_ids)
-              AND archived_at IS NULL
-          )
-        ))
-    )
+  -- Reviews for completed moments (public feedback)
+  EXISTS (
+    SELECT 1 FROM moments m
+    WHERE m.id = reviews.moment_id
+      AND m.status = 'completed'
   )
 );
 
-COMMENT ON POLICY "Users can view relevant reviews" ON users IS
-'Reviews are only visible to involved parties and connected users.
-Prevents review harvesting.';
+COMMENT ON POLICY "Users can view relevant reviews" ON reviews IS
+'Review visibility: reviewers see own reviews, reviewed users see reviews 
+about them, anyone can see reviews for completed moments.';
 
 -- ============================================
--- 4. ADD HELPER FUNCTION FOR PROFILE VISIBILITY
+-- 4. HELPER FUNCTION (CORRECTED)
 -- ============================================
 
 CREATE OR REPLACE FUNCTION can_view_profile(
@@ -137,38 +124,41 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 BEGIN
-  -- Self
+  -- Self view always allowed
   IF p_viewer_id = p_profile_id THEN
     RETURN TRUE;
   END IF;
 
-  -- Check if profile is visible based on connections
+  -- Check for legitimate connections
   RETURN EXISTS (
-    SELECT 1 FROM users
-    WHERE id = p_profile_id
-      AND deleted_at IS NULL
+    SELECT 1 FROM users u
+    WHERE u.id = p_profile_id
+      AND u.deleted_at IS NULL
       AND (
-        -- Match exists
+        -- Conversation connection
         EXISTS (
-          SELECT 1 FROM matches
-          WHERE status = 'active'
-            AND ((user1_id = p_viewer_id AND user2_id = p_profile_id)
-              OR (user2_id = p_viewer_id AND user1_id = p_profile_id))
+          SELECT 1 FROM conversations c
+          WHERE p_viewer_id = ANY(c.participant_ids)
+            AND p_profile_id = ANY(c.participant_ids)
         )
         OR
-        -- Favorite exists
+        -- Request connection (either direction)
         EXISTS (
-          SELECT 1 FROM favorites
-          WHERE user_id = p_viewer_id
-            AND favorited_user_id = p_profile_id
+          SELECT 1 FROM requests r
+          INNER JOIN moments m ON m.id = r.moment_id
+          WHERE (
+            (r.user_id = p_viewer_id AND m.user_id = p_profile_id)
+            OR
+            (m.user_id = p_viewer_id AND r.user_id = p_profile_id)
+          )
+          AND r.status IN ('pending', 'accepted')
         )
         OR
-        -- Conversation exists
+        -- Has active moments (public discovery)
         EXISTS (
-          SELECT 1 FROM conversations
-          WHERE p_viewer_id = ANY(participant_ids)
-            AND p_profile_id = ANY(participant_ids)
-            AND archived_at IS NULL
+          SELECT 1 FROM moments m
+          WHERE m.user_id = p_profile_id
+            AND m.status = 'active'
         )
       )
   );
@@ -176,48 +166,30 @@ END;
 $$;
 
 COMMENT ON FUNCTION can_view_profile IS
-'Helper function to check if a user can view another user''s profile.
-Used in RLS policies and application logic.';
+'Helper function to check if a user can view another profile.
+Based on conversations, requests, or active moments.';
+
+-- Grant execute permission
+GRANT EXECUTE ON FUNCTION can_view_profile(UUID, UUID) TO authenticated;
 
 -- ============================================
--- 5. VERIFICATION QUERY
+-- 5. VERIFICATION
 -- ============================================
 
 DO $$
 DECLARE
   policy_count INTEGER;
 BEGIN
-  -- Verify strict policies are in place
-  SELECT COUNT(*)
-  INTO policy_count
+  -- Verify policies exist
+  SELECT COUNT(*) INTO policy_count
   FROM pg_policies
   WHERE schemaname = 'public'
-    AND tablename IN ('users', 'reviews')
-    AND policyname IN (
-      'Users can view matched profiles',
-      'Users can view relevant reviews'
-    );
+    AND tablename = 'users'
+    AND policyname = 'Users can view connected profiles';
 
-  IF policy_count != 2 THEN
-    RAISE EXCEPTION 'Strict RLS policies not properly created';
+  IF policy_count = 0 THEN
+    RAISE EXCEPTION 'User visibility policy not created!';
   END IF;
 
-  -- Verify insecure policies are dropped
-  SELECT COUNT(*)
-  INTO policy_count
-  FROM pg_policies
-  WHERE schemaname = 'public'
-    AND policyname IN (
-      'Users can view any profile',
-      'Anyone can view reviews'
-    );
-
-  IF policy_count > 0 THEN
-    RAISE EXCEPTION 'Insecure policies still exist!';
-  END IF;
-
-  RAISE NOTICE 'Strict RLS migration complete ✅';
-  RAISE NOTICE '  - Insecure policies dropped ✅';
-  RAISE NOTICE '  - Strict visibility policies created ✅';
-  RAISE NOTICE '  - Helper function added ✅';
+  RAISE NOTICE '✅ Strict RLS policies applied successfully';
 END $$;

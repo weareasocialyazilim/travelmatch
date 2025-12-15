@@ -11,6 +11,7 @@ import {
   ActionSheetIOS,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -31,6 +32,7 @@ import { useConfirmation } from '@/context/ConfirmationContext';
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, refreshUser } = useAuth();
+  const { showToast } = useToast();
 
   // Original profile data from auth context
   const originalProfile = useMemo(() => {

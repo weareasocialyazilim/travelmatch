@@ -1,6 +1,8 @@
 /**
  * React Hooks for Real-time Subscriptions
  * Easy-to-use hooks for managing Supabase real-time subscriptions in components
+ * 
+ * Type-safe implementation using database.types.ts
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -12,6 +14,14 @@ import {
   Subscriptions,
 } from '../services/subscriptionService';
 import { logger } from '../utils/logger';
+import { Database } from '../types/database.types';
+
+// Type-safe table row types from database schema
+type Tables = Database['public']['Tables'];
+type MomentRow = Tables['moments']['Row'];
+type MessageRow = Tables['messages']['Row'];
+type NotificationRow = Tables['notifications']['Row'];
+type RequestRow = Tables['requests']['Row'];
 
 /**
  * Hook options
@@ -114,8 +124,8 @@ export const useSubscription = <T extends Record<string, unknown> = Record<strin
 export const useUserMomentsSubscription = (
   userId: string | null,
   handlers: {
-    onInsert?: (moment: any) => void;
-    onUpdate?: (moment: any) => void;
+    onInsert?: (moment: MomentRow) => void;
+    onUpdate?: (moment: MomentRow) => void;
     onDelete?: (momentId: string) => void;
   } = {}
 ) => {
@@ -124,13 +134,13 @@ export const useUserMomentsSubscription = (
     filter: userId ? `user_id=eq.${userId}` : undefined,
     enabled: !!userId,
     onInsert: (payload) => {
-      handlers.onInsert?.(payload.new as Record<string, unknown>);
+      handlers.onInsert?.(payload.new as MomentRow);
     },
     onUpdate: (payload) => {
-      handlers.onUpdate?.(payload.new as Record<string, unknown>);
+      handlers.onUpdate?.(payload.new as MomentRow);
     },
     onDelete: (payload) => {
-      handlers.onDelete?.((payload.old as Record<string, unknown>)?.id as string);
+      handlers.onDelete?.((payload.old as Partial<MomentRow>)?.id ?? '');
     },
   });
 };
@@ -148,8 +158,8 @@ export const useUserMomentsSubscription = (
 export const useChatMessagesSubscription = (
   chatId: string | null,
   handlers: {
-    onNewMessage?: (message: any) => void;
-    onMessageUpdate?: (message: any) => void;
+    onNewMessage?: (message: MessageRow) => void;
+    onMessageUpdate?: (message: MessageRow) => void;
   } = {}
 ) => {
   return useSubscription(`chat-messages-${chatId}`, {
@@ -157,10 +167,10 @@ export const useChatMessagesSubscription = (
     filter: chatId ? `chat_id=eq.${chatId}` : undefined,
     enabled: !!chatId,
     onInsert: (payload) => {
-      handlers.onNewMessage?.(payload.new);
+      handlers.onNewMessage?.(payload.new as MessageRow);
     },
     onUpdate: (payload) => {
-      handlers.onMessageUpdate?.(payload.new);
+      handlers.onMessageUpdate?.(payload.new as MessageRow);
     },
   });
 };
@@ -178,7 +188,7 @@ export const useChatMessagesSubscription = (
 export const useNotificationsSubscription = (
   userId: string | null,
   handlers: {
-    onNewNotification?: (notification: any) => void;
+    onNewNotification?: (notification: NotificationRow) => void;
     onNotificationRead?: (notificationId: string) => void;
   } = {}
 ) => {
@@ -190,14 +200,14 @@ export const useNotificationsSubscription = (
     enabled: !!userId,
     onInsert: (payload) => {
       setUnreadCount((prev) => prev + 1);
-      handlers.onNewNotification?.(payload.new);
+      handlers.onNewNotification?.(payload.new as NotificationRow);
     },
     onUpdate: (payload) => {
-      const newRecord = payload.new as Record<string, unknown>;
-      const oldRecord = payload.old as Record<string, unknown>;
+      const newRecord = payload.new as Partial<NotificationRow>;
+      const oldRecord = payload.old as Partial<NotificationRow>;
       if (newRecord?.read && !oldRecord?.read) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
-        handlers.onNotificationRead?.(newRecord?.id as string);
+        handlers.onNotificationRead?.(newRecord?.id ?? '');
       }
     },
   });
@@ -221,29 +231,29 @@ export const useNotificationsSubscription = (
 export const useBookingRequestsSubscription = (
   userId: string | null,
   handlers: {
-    onNewRequest?: (request: any) => void;
-    onRequestUpdate?: (request: any) => void;
+    onNewRequest?: (request: RequestRow) => void;
+    onRequestUpdate?: (request: RequestRow) => void;
   } = {}
 ) => {
-  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<RequestRow[]>([]);
 
   const result = useSubscription(`booking-requests-${userId}`, {
     table: 'exchanges',
     filter: userId ? `host_id=eq.${userId}` : undefined,
     enabled: !!userId,
     onInsert: (payload) => {
-      const newRecord = payload.new as Record<string, unknown>;
+      const newRecord = payload.new as Partial<RequestRow>;
       if (newRecord?.status === 'pending') {
-        setPendingRequests((prev) => [...prev, payload.new]);
-        handlers.onNewRequest?.(payload.new);
+        setPendingRequests((prev) => [...prev, payload.new as RequestRow]);
+        handlers.onNewRequest?.(payload.new as RequestRow);
       }
     },
     onUpdate: (payload) => {
-      const newRecord = payload.new as Record<string, unknown>;
+      const newRecord = payload.new as Partial<RequestRow>;
       setPendingRequests((prev) =>
         prev.filter((req) => req.id !== newRecord?.id)
       );
-      handlers.onRequestUpdate?.(payload.new);
+      handlers.onRequestUpdate?.(payload.new as RequestRow);
     },
   });
 
@@ -252,6 +262,13 @@ export const useBookingRequestsSubscription = (
     pendingRequests,
   };
 };
+
+// User presence type (not in generated types as it may be a custom table)
+interface UserPresenceRecord {
+  user_id: string;
+  is_online: boolean;
+  last_seen: string;
+}
 
 /**
  * Hook for tracking user presence
@@ -268,9 +285,9 @@ export const useUserPresence = (userId: string | null) => {
     filter: userId ? `user_id=eq.${userId}` : undefined,
     enabled: !!userId,
     onChange: (payload) => {
-      const newRecord = payload.new as Record<string, unknown>;
-      setIsOnline(newRecord?.is_online as boolean);
-      setLastSeen(new Date(newRecord?.last_seen as string));
+      const newRecord = payload.new as Partial<UserPresenceRecord>;
+      setIsOnline(newRecord?.is_online ?? false);
+      setLastSeen(newRecord?.last_seen ? new Date(newRecord.last_seen) : null);
     },
   });
 
@@ -291,8 +308,8 @@ export const useUserPresence = (userId: string | null) => {
  *   { id: 'messages', table: 'messages', onInsert: handleNewMessage },
  * ]);
  */
-export const useMultipleSubscriptions = (
-  subscriptions: Array<{ id: string } & UseSubscriptionOptions<any>>
+export const useMultipleSubscriptions = <T extends Record<string, unknown> = Record<string, unknown>>(
+  subscriptions: Array<{ id: string } & UseSubscriptionOptions<T>>
 ) => {
   const results = subscriptions.map((sub) => {
     const { id, ...config } = sub;
@@ -346,14 +363,20 @@ export const useRealtimeData = <T extends Record<string, unknown> = Record<strin
     },
     onUpdate: (payload) => {
       setData((prev) =>
-        prev.map((item: any) =>
-          item.id === (payload.new as any).id ? (payload.new as T) : item
-        )
+        prev.map((item) => {
+          const itemWithId = item as T & { id?: string };
+          const newData = payload.new as T & { id?: string };
+          return itemWithId.id === newData.id ? (payload.new as T) : item;
+        })
       );
     },
     onDelete: (payload) => {
       setData((prev) =>
-        prev.filter((item: any) => item.id !== (payload.old as any).id)
+        prev.filter((item) => {
+          const itemWithId = item as T & { id?: string };
+          const oldData = payload.old as Partial<T> & { id?: string };
+          return itemWithId.id !== oldData.id;
+        })
       );
     },
   });

@@ -5,7 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,} from 'react-native';
+  TextInput,
+  Alert,
+} from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
@@ -44,11 +46,11 @@ type RefundRequestScreenProps = StackScreenProps<
 >;
 
 export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
-    const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
-navigation,
+  navigation,
   route,
 }) => {
+  const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
   const { transactionId } = route.params;
   
   const { control, handleSubmit, formState, watch, setValue } = useForm<RefundRequestInput>({

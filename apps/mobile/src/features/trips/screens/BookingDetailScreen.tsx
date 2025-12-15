@@ -11,11 +11,11 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp, RouteProp } from '@react-navigation/native';
 
 type BookingDetailScreenProps = RouteProp<RootStackParamList, 'BookingDetail'>;

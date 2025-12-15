@@ -36,7 +36,16 @@ import type {
   TransactionType,
   PaymentStatus,
   PaymentIntent,
+  WithdrawalLimits,
 } from '../services/paymentService';
+
+// Bank account data for adding new accounts
+interface BankAccountData {
+  accountHolderName: string;
+  routingNumber: string;
+  accountNumber: string;
+  accountType: 'checking' | 'savings';
+}
 
 /**
  * Return type for the usePayments hook
@@ -127,20 +136,6 @@ interface BankAccountData {
   accountHolderName: string;
   /** Type of bank account */
   accountType: 'checking' | 'savings';
-}
-
-/**
- * Withdrawal limits information
- */
-interface WithdrawalLimits {
-  /** Minimum withdrawal amount */
-  minAmount: number;
-  /** Maximum withdrawal amount */
-  maxAmount: number;
-  /** Daily withdrawal limit */
-  dailyLimit: number;
-  /** Remaining daily limit */
-  remainingDaily: number;
 }
 
 /** Number of transactions per page */
@@ -323,7 +318,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const addBankAccount = useCallback(
     async (data: BankAccountData): Promise<BankAccount | null> => {
       try {
-        const response = paymentService.addBankAccount(data);
+        const response = paymentService.addBankAccount(data as unknown as Record<string, unknown>);
         setBankAccounts((prev) => [...prev, response.bankAccount]);
         return response.bankAccount;
       } catch (error) {

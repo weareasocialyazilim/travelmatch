@@ -175,7 +175,7 @@ export async function uploadImageWithCDN(
 
   // Fallback to Supabase Storage
   const { uploadFile } = await import('./supabaseStorageService');
-  const { url, error } = await uploadFile(bucket as any, imageUri, 'image');
+  const { url, error } = await uploadFile(bucket as 'avatars' | 'moments' | 'proofs' | 'messages', imageUri, 'image');
 
   if (error) {
     throw error;

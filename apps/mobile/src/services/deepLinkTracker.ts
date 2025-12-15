@@ -8,6 +8,7 @@
  * - A/B testing (different deep link strategies)
  */
 
+import React from 'react';
 import { Linking } from 'react-native';
 import analytics from '@react-native-firebase/analytics';
 import { supabase } from './supabase';

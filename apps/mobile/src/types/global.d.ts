@@ -130,16 +130,8 @@ declare module 'expo-sharing' {
   ): Promise<void>;
 }
 
-// Expo Crypto module
-declare module 'expo-crypto' {
-  export function digestStringAsync(
-    algorithm: 'SHA-256' | 'SHA-384' | 'SHA-512' | 'MD5',
-    data: string,
-    options?: { encoding: 'hex' | 'base64' }
-  ): Promise<string>;
-  
-  export function getRandomBytesAsync(byteCount: number): Promise<Uint8Array>;
-}
+// Note: expo-crypto types are provided by the package itself
+// Removed manual declaration to use official types
 
 // React Native Fast Image
 declare module 'react-native-fast-image' {

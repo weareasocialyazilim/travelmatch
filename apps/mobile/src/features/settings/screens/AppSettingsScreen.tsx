@@ -5,7 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,} from 'react-native';
+  Switch,
+  Alert,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,6 +28,7 @@ const AppSettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, logout } = useAuth();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
+  const { showToast } = useToast();
 
   // Notification settings
   const [pushEnabled, setPushEnabled] = useState(true);

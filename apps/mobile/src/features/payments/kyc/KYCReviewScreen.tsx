@@ -37,6 +37,7 @@ const KYCReviewScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProp<RouteParams, 'KYCReview'>>();
   const { data } = route.params;
+  const { showToast } = useToast();
 
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);

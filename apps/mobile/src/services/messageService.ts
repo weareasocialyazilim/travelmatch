@@ -159,6 +159,23 @@ export const messageService = {
         logger.error('Error fetching conversation participants:', usersError);
       }
 
+      // Fetch last messages for conversations
+      const lastMessageIds = data
+        .map((row) => row.last_message_id)
+        .filter((id): id is string => id !== null);
+
+      let lastMessagesMap = new Map<string, { content: string }>();
+      if (lastMessageIds.length > 0) {
+        const { data: lastMessages } = await supabase
+          .from('messages')
+          .select('id, content')
+          .in('id', lastMessageIds);
+        
+        if (lastMessages) {
+          lastMessagesMap = new Map(lastMessages.map((m) => [m.id, { content: m.content }]));
+        }
+      }
+
       const userMap = new Map(users?.map((u) => [u.id, u]));
 
       // Map DB rows to UI Conversation type
@@ -167,6 +184,7 @@ export const messageService = {
           row.participant_ids.find((id: string) => id !== user.id) || 'unknown';
 
         const otherUser = userMap.get(otherUserId);
+        const lastMessage = row.last_message_id ? lastMessagesMap.get(row.last_message_id) : null;
 
         return {
           id: row.id,
@@ -174,10 +192,10 @@ export const messageService = {
           participantName: otherUser?.name || 'Unknown User',
           participantAvatar: otherUser?.avatar || '',
           participantVerified: otherUser?.is_verified || false,
-          lastMessage: row.last_message?.content || '',
+          lastMessage: lastMessage?.content || '',
           lastMessageAt: row.updated_at,
           unreadCount: 0, // Needs calculation
-          momentId: row.moment_id,
+          momentId: undefined, // Would need separate join
         };
       });
 
@@ -265,121 +283,12 @@ export const messageService = {
 
       if (!user) throw new Error('Not authenticated');
 
-      const { data: message, error } = await dbMessagesService.create({
+      const { data: message, error } = await dbMessagesService.send({
         conversation_id: data.conversationId,
         sender_id: user.id,
         content: data.content,
-        type: data.type,
-        image_url: data.imageUrl,
-        location: data.location,
-      });
-
-      if (error) throw error;
-
-      return {
-        id: message.id,
-        conversationId: message.conversation_id,
-        senderId: message.sender_id,
-        content: message.content,
-        type: message.type as MessageType,
-        imageUrl: message.image_url,
-        location: message.location,
-        createdAt: message.created_at,
-        status: 'sent' as MessageStatus,
-      };
-    } catch (error) {
-      logger.error('Send message error:', error);
-      throw error;
-    }
-  },
-  getMessages: async (
-    conversationId: string,
-    params?: { page?: number; pageSize?: number; before?: string },
-  ): Promise<MessagesResponse> => {
-    try {
-      const { data, count, error } = await dbMessagesService.listByConversation(
-        conversationId,
-        {
-          limit: params?.pageSize,
-          before: params?.before,
-        },
-      );
-      if (error) throw error;
-
-      const messages: Message[] = data.map((row) => ({
-        id: row.id,
-        conversationId: row.conversation_id,
-        senderId: row.sender_id,
-        content: row.content,
-        type: 'text', // Default for now
-        createdAt: row.created_at,
-        readAt: row.read_at,
-        status: row.read_at ? 'read' : 'delivered',
-      }));
-
-      return {
-        messages,
-        total: count,
-        page: params?.page || 1,
-        pageSize: params?.pageSize || 20,
-        hasMore: data.length === (params?.pageSize || 20),
-      };
-    } catch (error) {
-      logger.error('Get messages error:', error);
-      return { messages: [], total: 0, page: 1, pageSize: 20, hasMore: false };
-    }
-  },
-
-  /**
-   * Send a message
-   */
-  sendMessage: async (data: SendMessageRequest): Promise<Message> => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      // Get conversation to find recipient
-      const { data: conversation } = await conversationsService.getById(
-        data.conversationId,
-      );
-      if (!conversation) throw new Error('Conversation not found');
-
-      const recipientId = conversation.participant_ids.find(
-        (id: string) => id !== user.id,
-      );
-      if (!recipientId) throw new Error('Recipient not found');
-
-      // Get recipient's public key
-      const { data: recipient } = await usersService.getById(recipientId);
-      // @ts-ignore
-      const recipientPublicKey = recipient?.public_key;
-
-      let encryptedContent = data.content;
-      let nonce = null;
-
-      // Encrypt if recipient has a public key and it's a text message
-      if (recipientPublicKey && data.type === 'text') {
-        const encrypted = await encryptionService.encrypt(
-          data.content,
-          recipientPublicKey,
-        );
-        encryptedContent = encrypted.message;
-        nonce = encrypted.nonce;
-      }
-
-      const { data: message, error } = await dbMessagesService.create({
-        conversation_id: data.conversationId,
-        sender_id: user.id,
-        content: encryptedContent,
-        // @ts-ignore
-        nonce: nonce,
-        type: data.type,
-        metadata: {
-          imageUrl: data.imageUrl,
-          location: data.location,
-        },
+        type: data.type === 'location' ? 'text' : data.type, // Map location to text for DB
+        read_at: null,
       });
 
       if (error) throw error;
@@ -389,15 +298,15 @@ export const messageService = {
         id: message.id,
         conversationId: message.conversation_id,
         senderId: message.sender_id,
-        content: data.content, // Return original content for UI
-        type: message.type as MessageType,
-        imageUrl: message.metadata?.imageUrl,
-        location: message.metadata?.location,
+        content: message.content,
+        type: data.type as Message['type'], // Use original type for UI
+        imageUrl: data.imageUrl,
+        location: data.location,
         createdAt: message.created_at,
         status: 'sent' as MessageStatus,
       };
     } catch (error) {
-      logger.error('[Message] Send message error:', error);
+      logger.error('Send message error:', error);
       throw error;
     }
   },
@@ -410,21 +319,21 @@ export const messageService = {
     params?: { page?: number; pageSize?: number },
   ): Promise<MessagesResponse> => {
     try {
-      const { data, count, error } = await dbMessagesService.list(
+      const { data, count, error } = await dbMessagesService.listByConversation(
         conversationId,
-        params?.page || 1,
-        params?.pageSize || 20,
+        { limit: params?.pageSize || 20 },
       );
 
       if (error) throw error;
 
       // Decrypt messages
-      const decryptedMessages = await Promise.all(
+      const decryptedMessages: Message[] = await Promise.all(
         data.map(async (msg) => {
           let content = msg.content;
 
           // Try to decrypt if it has a nonce and is text
-          if (msg.nonce && msg.type === 'text') {
+          const msgNonce = (msg as { nonce?: string }).nonce;
+          if (msgNonce && msg.type === 'text') {
             try {
               // We need the sender's public key
               const { data: sender } = await usersService.getById(
@@ -435,7 +344,7 @@ export const messageService = {
                 // @ts-ignore
                 content = await encryptionService.decrypt(
                   msg.content,
-                  msg.nonce,
+                  msgNonce,
                   // @ts-ignore
                   sender.public_key,
                 );
@@ -446,17 +355,19 @@ export const messageService = {
             }
           }
 
+          const msgType = msg.type === 'system' ? 'system' : msg.type === 'image' ? 'image' : 'text';
+
           return {
             id: msg.id,
             conversationId: msg.conversation_id,
             senderId: msg.sender_id,
             content,
-            type: msg.type,
-            imageUrl: msg.metadata?.imageUrl,
-            location: msg.metadata?.location,
+            type: msgType as Message['type'],
+            imageUrl: undefined,
+            location: undefined,
             createdAt: msg.created_at,
-            readAt: msg.read_at,
-            status: msg.read_at ? 'read' : 'delivered',
+            readAt: msg.read_at || undefined,
+            status: (msg.read_at ? 'read' : 'delivered') as Message['status'],
           };
         }),
       );

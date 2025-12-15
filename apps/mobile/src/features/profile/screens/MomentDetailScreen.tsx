@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Animated, StyleSheet, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { GiftMomentBottomSheet } from '@/components/GiftMomentBottomSheet';
 import { GiftSuccessModal } from '@/components/GiftSuccessModal';
@@ -41,6 +41,7 @@ const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 const MomentDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<MomentDetailRouteProp>();
+  const { showToast } = useToast();
   const {
     moment,
     isOwner = false,

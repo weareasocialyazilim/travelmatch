@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
-import BottomNav from '../components/BottomNav';
+import BottomNav from '@/components/BottomNav';
 import {
   ProfileHeaderSection,
   StatsRow,
@@ -22,17 +22,16 @@ import {
   QuickLinks,
   ProfileMomentCard,
   MomentsTabs,
-} from '../components/profile';
-import { COLORS } from '../constants/colors';
-import { useAuth } from '../context/AuthContext';
-import { useMoments } from '../hooks/useMoments';
-import { userService } from '../services/userService';
-import { logger } from '../utils/logger';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import type { UserProfile } from '../services/userService';
-import type { Moment } from '../types';
+} from '@/components/profile';
+import { COLORS } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
+import { useMoments, type Moment } from '@/hooks/useMoments';
+import { userService } from '@/services/userService';
+import { logger } from '@/utils/logger';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { UserProfile } from '@/services/userService';
 import type { NavigationProp } from '@react-navigation/native';
-import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 
@@ -184,14 +183,20 @@ const ProfileScreen: React.FC = () => {
 
   const handleMomentPress = useCallback(
     (moment: Moment) => {
-      const locationStr =
-        typeof moment.location === 'string'
-          ? moment.location
-          : `${moment.location?.city || ''}, ${moment.location?.country || ''}`;
+      // Handle location which can be string or object
+      const locationObj = typeof moment.location === 'string'
+        ? { city: moment.location, country: '' }
+        : moment.location;
+
+      // Handle category which can be string or object
+      const categoryObj = typeof moment.category === 'string'
+        ? { id: moment.category, label: moment.category, emoji: '✨' }
+        : moment.category;
 
       navigation.navigate('MomentDetail', {
         moment: {
           ...moment,
+          location: locationObj,
           story: moment.description || `Experience ${moment.title}`,
           imageUrl:
             moment.images?.[0] || 'https://ui-avatars.com/api/?name=Moment',
@@ -209,11 +214,7 @@ const ProfileScreen: React.FC = () => {
             travelDays: 0,
           },
           giftCount: 0,
-          category: {
-            id: moment.category,
-            label: moment.category,
-            emoji: '✨',
-          },
+          category: categoryObj,
         },
         isOwner: true,
       });
@@ -334,7 +335,7 @@ const ProfileScreen: React.FC = () => {
                 estimatedItemSize={250}
                 numColumns={2}
                 scrollEnabled={false}
-                contentContainerStyle={styles.momentsContent}
+                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
               />
             ) : (
               <EmptyState

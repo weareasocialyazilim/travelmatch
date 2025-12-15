@@ -62,7 +62,21 @@ export type SessionEvent =
   | 'session_cleared'
   | 'refresh_failed';
 
-export type SessionEventListener = (event: SessionEvent, data?: any) => void;
+/**
+ * Session event data types
+ */
+export interface SessionEventData {
+  session_created: SessionData;
+  session_refreshed: SessionTokens;
+  session_expired: { reason: string };
+  session_cleared: undefined;
+  refresh_failed: { error: Error };
+}
+
+export type SessionEventListener<E extends SessionEvent = SessionEvent> = (
+  event: E, 
+  data?: E extends keyof SessionEventData ? SessionEventData[E] : unknown
+) => void;
 
 /**
  * Singleton Session Manager
@@ -374,7 +388,10 @@ class SessionManager {
   /**
    * Emit event to all listeners
    */
-  private emit(event: SessionEvent, data?: any): void {
+  private emit<E extends SessionEvent>(
+    event: E, 
+    data?: E extends keyof SessionEventData ? SessionEventData[E] : unknown
+  ): void {
     this.listeners.forEach((listener) => {
       try {
         listener(event, data);

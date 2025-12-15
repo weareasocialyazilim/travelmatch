@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -29,6 +30,7 @@ interface ActiveSession {
 
 const SecurityScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { showToast } = useToast();
   const {
     biometricAvailable,
     biometricEnabled,

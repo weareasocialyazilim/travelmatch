@@ -9,6 +9,7 @@ import {
   TouchableOpacity,  ActivityIndicator,
   Share,
   Platform,
+  Alert,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -30,6 +31,7 @@ interface ConsentSettings {
 
 const DataPrivacyScreen = () => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [consents, setConsents] = useState<ConsentSettings>({
     gdprConsent: false,

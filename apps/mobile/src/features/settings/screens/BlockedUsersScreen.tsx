@@ -5,7 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,} from 'react-native';
+  SafeAreaView,
+  Alert,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '@/constants/colors';
@@ -54,10 +56,10 @@ const MOCK_BLOCKED_USERS: BlockedUser[] = __DEV__
 const STORAGE_KEY = '@blocked_users';
 
 export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
-    const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
-navigation,
+  navigation,
 }) => {
+  const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
 
   // Load blocked users on mount

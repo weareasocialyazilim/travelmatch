@@ -283,8 +283,8 @@ async function saveVideoMetadata(data: {
   status: string;
 }): Promise<VideoMetadata> {
   const supabase = createClient(
-    process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_KEY || ''
+    process.env.EXPO_PUBLIC_SUPABASE_URL || '',
+    process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ''
   );
 
   const { data: video, error } = await supabase
@@ -368,8 +368,8 @@ export async function deleteVideo(assetId: string): Promise<void> {
 
   // Delete from database
   const supabase = createClient(
-    process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_KEY || ''
+    process.env.EXPO_PUBLIC_SUPABASE_URL || '',
+    process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ''
   );
 
   await supabase.from('videos').delete().eq('id', assetId);
@@ -447,8 +447,8 @@ async function handleAssetReady(data: {
   playback_ids: Array<{ id: string }>;
 }): Promise<void> {
   const supabase = createClient(
-    process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_KEY || ''
+    process.env.EXPO_PUBLIC_SUPABASE_URL || '',
+    process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ''
   );
 
   await supabase
@@ -468,8 +468,8 @@ async function handleAssetError(data: {
   errors?: Array<{ messages?: string[] }>;
 }): Promise<void> {
   const supabase = createClient(
-    process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_KEY || ''
+    process.env.EXPO_PUBLIC_SUPABASE_URL || '',
+    process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ''
   );
 
   await supabase

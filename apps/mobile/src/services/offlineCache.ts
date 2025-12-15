@@ -14,6 +14,7 @@ import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import NetInfo from '@react-native-community/netinfo';
+import { logger } from '../utils/logger';
 
 // Initialize MMKV storage
 // Generate encryption key from device ID + app bundle ID (unique per device)
@@ -22,7 +23,22 @@ import * as Crypto from 'expo-crypto';
 
 async function generateEncryptionKey(): Promise<string> {
   // Combine device-specific identifiers for a unique key
-  const deviceId = Application.androidId || Application.getIosIdForVendorAsync?.toString() || 'default';
+  // Note: These are async calls in newer expo versions
+  let deviceId = 'default';
+  try {
+    // For Android
+    const androidId = await Application.getAndroidId();
+    if (androidId) deviceId = androidId;
+  } catch {
+    try {
+      // For iOS
+      const iosId = await Application.getIosIdForVendorAsync();
+      if (iosId) deviceId = iosId;
+    } catch {
+      // Fallback
+      deviceId = 'default-device';
+    }
+  }
   const bundleId = Application.applicationId || 'com.travelmatch.app';
   const combined = `${bundleId}-${deviceId}-travelmatch-cache-v1`;
 
@@ -70,31 +86,31 @@ const CACHE_CONFIG = {
   // User profile (cache for 5 minutes, keep stale for 1 hour)
   profile: {
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 60 * 60 * 1000, // 1 hour (formerly cacheTime)
   },
   
   // Moments feed (cache for 1 minute, keep stale for 10 minutes)
   moments: {
     staleTime: 1 * 60 * 1000, // 1 minute
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   },
   
   // Matches (cache for 2 minutes, keep stale for 30 minutes)
   matches: {
     staleTime: 2 * 60 * 1000, // 2 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   },
   
   // Messages (cache for 30 seconds, keep stale for 5 minutes)
   messages: {
     staleTime: 30 * 1000, // 30 seconds
-    cacheTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   },
   
   // Static data (cache for 1 hour, keep stale for 24 hours)
   static: {
     staleTime: 60 * 60 * 1000, // 1 hour
-    cacheTime: 24 * 60 * 60 * 1000, // 24 hours
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
   },
 };
 
@@ -106,9 +122,9 @@ export const queryClient = new QueryClient({
       networkMode: 'offlineFirst',
       
       // Retry with exponential backoff
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: Error & { status?: number }) => {
         // Don't retry on 4xx errors
-        if (error?.status >= 400 && error?.status < 500) {
+        if (error?.status && error.status >= 400 && error.status < 500) {
           return false;
         }
         // Retry up to 3 times for network errors
@@ -118,7 +134,7 @@ export const queryClient = new QueryClient({
       
       // Default cache times
       staleTime: CACHE_CONFIG.moments.staleTime,
-      cacheTime: CACHE_CONFIG.moments.cacheTime,
+      gcTime: CACHE_CONFIG.moments.gcTime,
       
       // Refetch on window focus (when app comes to foreground)
       refetchOnWindowFocus: true,
@@ -141,19 +157,19 @@ export const queryClient = new QueryClient({
   
   queryCache: new QueryCache({
     onError: (error, query) => {
-      console.error('[Cache] Query error:', query.queryKey, error);
+      logger.error('[Cache] Query error', { queryKey: query.queryKey, error });
     },
     onSuccess: (data, query) => {
-      console.log('[Cache] Query success:', query.queryKey);
+      logger.debug('[Cache] Query success', { queryKey: query.queryKey });
     },
   }),
   
   mutationCache: new MutationCache({
     onError: (error, variables, context, mutation) => {
-      console.error('[Cache] Mutation error:', mutation.options.mutationKey, error);
+      logger.error('[Cache] Mutation error', { mutationKey: mutation.options.mutationKey, error });
     },
     onSuccess: (data, variables, context, mutation) => {
-      console.log('[Cache] Mutation success:', mutation.options.mutationKey);
+      logger.debug('[Cache] Mutation success', { mutationKey: mutation.options.mutationKey });
     },
   }),
 });
@@ -165,11 +181,11 @@ NetInfo.addEventListener((state) => {
   const wasOnline = isOnline;
   isOnline = state.isConnected ?? false;
   
-  console.log('[Network] Status changed:', isOnline ? 'Online' : 'Offline');
+  logger.info('[Network] Status changed', { isOnline });
   
   // When coming back online, refetch all active queries
   if (!wasOnline && isOnline) {
-    console.log('[Network] Reconnected - refetching queries');
+    logger.info('[Network] Reconnected - refetching queries');
     queryClient.refetchQueries({ type: 'active' });
   }
 });
@@ -180,7 +196,7 @@ export const cacheUtils = {
    * Prefetch data for offline use
    */
   async prefetchForOffline(userId: string) {
-    console.log('[Cache] Prefetching data for offline use...');
+    logger.debug('[Cache] Prefetching data for offline use...', { userId });
     
     // Prefetch user profile
     await queryClient.prefetchQuery({
@@ -198,14 +214,14 @@ export const cacheUtils = {
       queryKey: ['matches'],
     });
     
-    console.log('[Cache] Prefetch complete');
+    logger.debug('[Cache] Prefetch complete');
   },
   
   /**
    * Clear all cache
    */
   clearAll() {
-    console.log('[Cache] Clearing all cache...');
+    logger.debug('[Cache] Clearing all cache...');
     queryClient.clear();
     mmkvStorage.clearAll();
   },
@@ -214,7 +230,7 @@ export const cacheUtils = {
    * Clear specific cache by key pattern
    */
   clearByPattern(pattern: string[]) {
-    console.log('[Cache] Clearing cache:', pattern);
+    logger.debug('[Cache] Clearing cache by pattern', { pattern });
     queryClient.removeQueries({ queryKey: pattern });
   },
   
@@ -283,7 +299,7 @@ export function optimisticUpdate<T>(
   queryKey: string[],
   updater: (old: T | undefined) => T,
   options?: {
-    onError?: (error: any, previousData: T | undefined) => void;
+    onError?: (error: Error, previousData: T | undefined) => void;
   }
 ) {
   // Save previous data for rollback

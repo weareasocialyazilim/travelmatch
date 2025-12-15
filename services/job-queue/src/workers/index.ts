@@ -36,12 +36,11 @@ const kycWorker = createKycWorker(redis);
 
 console.log('✓ KYC verification worker started');
 
-// Log worker stats every 30 seconds
+// Log worker stats every 30 seconds (simplified without getMetrics)
 setInterval(async () => {
-  const stats = await kycWorker.getMetrics();
-  console.log('[Stats]', {
-    completed: stats.completed.count,
-    failed: stats.failed.count,
+  console.log('[Stats] Worker is running', {
+    name: kycWorker.name,
+    running: kycWorker.isRunning(),
   });
 }, 30000);
 

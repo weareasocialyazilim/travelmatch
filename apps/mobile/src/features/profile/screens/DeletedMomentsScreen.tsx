@@ -5,15 +5,24 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  StyleSheet,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabaseDb } from '@/services/supabaseDbService';
+import supabaseDb from '@/services/supabaseDbService';
 import { useAuth } from '@/context/AuthContext';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Undo2, Trash2 } from 'lucide-react-native';
+import { Undo2 } from 'lucide-react-native';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
+import { COLORS } from '@/constants/colors';
+
+interface DeletedMoment {
+  id: string;
+  title: string;
+  description: string;
+  deleted_at: string;
+}
 
 export function DeletedMomentsScreen() {
   const navigation = useNavigation();
@@ -25,7 +34,7 @@ export function DeletedMomentsScreen() {
     queryFn: async () => {
       const result = await supabaseDb.moments.getDeleted(user!.id);
       if (result.error) throw result.error;
-      return result.data;
+      return result.data as DeletedMoment[];
     },
     enabled: !!user?.id,
   });
@@ -44,18 +53,18 @@ export function DeletedMomentsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="p-4 border-b border-border bg-card">
-        <Text className="text-2xl font-bold text-foreground">Deleted Moments</Text>
-        <Text className="text-sm text-muted-foreground mt-1">
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Deleted Moments</Text>
+        <Text style={styles.headerSubtitle}>
           Items are kept for 90 days before permanent deletion
         </Text>
       </View>
@@ -67,34 +76,31 @@ export function DeletedMomentsScreen() {
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
-        renderItem={({ item }) => (
-          <View className="p-4 border-b border-border bg-card/50">
-            <View className="flex-row justify-between items-start">
-              {/* Moment Info */}
-              <View className="flex-1 pr-4">
-                <Text className="text-lg font-semibold text-foreground">
-                  {item.title}
+        renderItem={({ item }: { item: DeletedMoment }) => (
+          <View style={styles.momentItem}>
+            <View style={styles.momentInfo}>
+              <Text style={styles.momentTitle}>
+                {item.title}
+              </Text>
+              <Text style={styles.momentDescription} numberOfLines={2}>
+                {item.description}
+              </Text>
+              <View style={styles.deletedInfo}>
+                <Text style={styles.deletedText}>
+                  Deleted {formatDistanceToNow(new Date(item.deleted_at))} ago
                 </Text>
-                <Text className="text-sm text-muted-foreground mt-1" numberOfLines={2}>
-                  {item.description}
-                </Text>
-                <View className="flex-row items-center mt-2">
-                  <Text className="text-xs text-destructive">
-                    Deleted {formatDistanceToNow(new Date(item.deleted_at))} ago
-                  </Text>
-                </View>
               </View>
-
-              {/* Restore Button */}
-              <TouchableOpacity
-                onPress={() => restoreMutation.mutate(item.id)}
-                disabled={restoreMutation.isPending}
-                className="px-4 py-2 bg-primary rounded-lg flex-row items-center gap-2"
-              >
-                <Undo2 size={16} color="white" />
-                <Text className="text-white font-semibold text-sm">Restore</Text>
-              </TouchableOpacity>
             </View>
+
+            {/* Restore Button */}
+            <TouchableOpacity
+              onPress={() => restoreMutation.mutate(item.id)}
+              disabled={restoreMutation.isPending}
+              style={styles.restoreButton}
+            >
+              <Undo2 size={16} color="white" />
+              <Text style={styles.restoreButtonText}>Restore</Text>
+            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={
@@ -107,9 +113,84 @@ export function DeletedMomentsScreen() {
           />
         }
         contentContainerStyle={{
-          flexGrow: 1,
+          paddingBottom: 16,
         }}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  header: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.card,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  momentItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.cardBackground,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  momentInfo: {
+    flex: 1,
+    paddingRight: 16,
+  },
+  momentTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  momentDescription: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  deletedInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  deletedText: {
+    fontSize: 12,
+    color: COLORS.error,
+  },
+  restoreButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  restoreButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+});

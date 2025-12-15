@@ -9,13 +9,13 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { TRUST_GARDEN_DEFAULTS } from '@/constants/defaultValues';
-import { useAuth } from '../context/AuthContext';
-import { userService } from '../services/userService';
-import { logger } from '../utils/logger';
-import type { RootStackParamList } from '../navigation/AppNavigator';
-import type { UserProfile } from '../services/userService';
+import { useAuth } from '@/context/AuthContext';
+import { userService } from '@/services/userService';
+import { logger } from '@/utils/logger';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { UserProfile } from '@/services/userService';
 import type { NavigationProp } from '@react-navigation/native';
 
 interface TrustFactor {

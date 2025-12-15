@@ -9,6 +9,8 @@
  * - Auto-reject low quality submissions
  */
 
+import React from 'react';
+
 import { supabase } from './supabase';
 import { logger } from '../utils/logger';
 

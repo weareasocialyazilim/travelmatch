@@ -13,13 +13,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '../config/supabase';
-import { COLORS } from '../constants/colors';
-import { logger } from '../utils/logger';
-import { disputeSchema, type DisputeFormData } from '@/utils/forms';
+import { supabase } from '@/config/supabase';
+import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
+import { disputeSchema, type DisputeInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type _IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -41,7 +41,7 @@ export const DisputeFlowScreen: React.FC = () => {
     formState,
     watch,
     setValue,
-  } = useForm<DisputeFormData>({
+  } = useForm<DisputeInput>({
     resolver: zodResolver(disputeSchema),
     mode: 'onChange',
     defaultValues: {
@@ -85,7 +85,7 @@ export const DisputeFlowScreen: React.FC = () => {
     setValue('evidence', evidence.filter((_, i) => i !== index));
   };
 
-  const onSubmit = async (formData: DisputeFormData) => {
+  const onSubmit = async (formData: DisputeInput) => {
     setLoading(true);
     try {
       const _table =
@@ -467,10 +467,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: COLORS.error,
-    marginBottom: 20,
   },
 });

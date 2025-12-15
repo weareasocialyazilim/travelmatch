@@ -7,7 +7,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ActivityIndicator,} from 'react-native';
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

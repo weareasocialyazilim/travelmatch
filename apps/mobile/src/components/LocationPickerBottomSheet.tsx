@@ -8,8 +8,11 @@ import {
   TextInput,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
+import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
 import { COLORS } from '../constants/colors';
+
+// Initialize Mapbox - access token should be set in env
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '');
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -117,22 +120,24 @@ export const LocationPickerBottomSheet: React.FC<
 
         {/* Map */}
         <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: selectedLocation.latitude,
-              longitude: selectedLocation.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-              }}
-              title={selectedLocation.name}
+          <MapView style={styles.map}>
+            <Camera
+              zoomLevel={14}
+              centerCoordinate={[selectedLocation.longitude, selectedLocation.latitude]}
             />
+            <PointAnnotation
+              id="selected-location"
+              coordinate={[selectedLocation.longitude, selectedLocation.latitude]}
+              title={selectedLocation.name}
+            >
+              <View style={styles.markerContainer}>
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={32}
+                  color={COLORS.primary}
+                />
+              </View>
+            </PointAnnotation>
           </MapView>
         </View>
 
@@ -261,5 +266,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.white,
+  },
+  markerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -5,7 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,} from 'react-native';
+  Image,
+  Alert,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
@@ -24,11 +26,11 @@ type GiftInboxDetailScreenProps = StackScreenProps<
 >;
 
 export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
-    const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
-navigation,
+  navigation,
   route,
 }) => {
+  const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
   const {
     senderId,
     senderName,

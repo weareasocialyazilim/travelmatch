@@ -6,7 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Linking,} from 'react-native';
+  Linking,
+  Alert,
+} from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';

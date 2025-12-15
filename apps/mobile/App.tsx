@@ -118,25 +118,24 @@ export default function App() {
 
         if (posthogApiKey && env.ENABLE_ANALYTICS) {
           try {
-            await PostHog.initAsync(posthogApiKey, {
+            // PostHog v3+ uses class-based initialization
+            const posthogClient = new PostHog(posthogApiKey, {
               host: posthogHost,
-              captureApplicationLifecycleEvents: true,
-              captureDeepLinks: true,
-              enableSessionReplay: false, // Enable if needed (beta feature)
-              autocapture: {
-                captureScreens: true,
-                captureTouches: true,
-                captureLifecycleEvents: true,
-              },
+              captureNativeAppLifecycleEvents: true,
+              enableSessionReplay: false,
             });
 
-            // Set global properties
-            PostHog.register({
-              platform: Platform.OS,
-              device_model: Device.modelName || 'unknown',
-              os_version: String(Platform.Version),
-              app_version: '1.0.0',
-              app_env: env.APP_ENV,
+            await posthogClient.ready();
+
+            // Set super properties
+            posthogClient.capture('$set', {
+              $set: {
+                platform: Platform.OS,
+                device_model: Device.modelName || 'unknown',
+                os_version: String(Platform.Version),
+                app_version: '1.0.0',
+                app_env: env.APP_ENV,
+              },
             });
 
             logger.info('PostHog initialized successfully');

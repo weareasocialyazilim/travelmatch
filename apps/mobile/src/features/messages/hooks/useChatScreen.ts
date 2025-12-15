@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import {} from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { useTypingIndicator } from '../context/RealtimeContext';
-import { useMessages } from '../hooks/useMessages';
-import { useScreenPerformance } from '../hooks/useScreenPerformance';
-import { logger } from '../utils/logger';
+import { Alert } from 'react-native';
+import { useAuth } from '@/context/AuthContext';
+import { useTypingIndicator } from '@/context/RealtimeContext';
+import { useMessages } from '@/hooks/useMessages';
+import { useScreenPerformance } from '@/hooks/useScreenPerformance';
+import { logger } from '@/utils/logger';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
 
@@ -26,13 +26,13 @@ interface UseChatScreenParams {
 }
 
 export const useChatScreen = ({
-    const { showToast } = useToast();
-conversationId,
+  conversationId,
   otherUserId,
   otherUserName,
   isSender = true,
   proofStatus = 'verified',
 }: UseChatScreenParams) => {
+  const { showToast } = useToast();
   const [messageText, setMessageText] = useState('');
   const [showAttachmentSheet, setShowAttachmentSheet] = useState(false);
   const [showChatOptions, setShowChatOptions] = useState(false);

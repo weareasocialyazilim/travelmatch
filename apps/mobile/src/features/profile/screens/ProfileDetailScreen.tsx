@@ -6,7 +6,9 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Dimensions,} from 'react-native';
+  Dimensions,
+  Alert,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -25,11 +27,11 @@ type ProfileDetailScreenProps = StackScreenProps<
 >;
 
 export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
-    const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
-navigation,
+  navigation,
   route,
 }) => {
+  const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
   const { userId } = route.params;
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
   const [showReportSheet, setShowReportSheet] = useState(false);

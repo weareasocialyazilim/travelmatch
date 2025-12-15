@@ -7,6 +7,7 @@ import {
   Share,  Image,
   Clipboard,
   Linking,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';

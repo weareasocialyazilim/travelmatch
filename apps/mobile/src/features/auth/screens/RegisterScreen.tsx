@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { registerSchema, type RegisterInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 
 export const RegisterScreen: React.FC = () => {
-    const { showToast } = useToast();
-const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   
   const { control, handleSubmit, formState } = useForm<RegisterInput>({
@@ -26,7 +26,7 @@ const [isLoading, setIsLoading] = useState(false);
   const onSubmit = async (data: RegisterInput) => {
     try {
       setIsLoading(true);
-      await register(data.email, data.password, data.fullName);
+      await register({ email: data.email, password: data.password, name: data.fullName });
       // Navigation handled by auth state change
     } catch (error) {
       Alert.alert('Registration Failed', error instanceof Error ? error.message : 'Please try again');

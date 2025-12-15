@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
+import type { Json } from '../types/database.types';
 
 const PUSH_TOKEN_KEY = '@push_token';
 
@@ -116,7 +117,7 @@ export const updatePushTokenPreferences = async (
     // For now, we assume notification_preferences column handles this
     const { error } = await supabase
       .from('users')
-      .update({ notification_preferences: preferences as any })
+      .update({ notification_preferences: preferences as Json })
       .eq('id', user.id);
 
     if (error) throw error;

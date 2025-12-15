@@ -90,11 +90,11 @@ export interface DeepLinkResult {
   success: boolean;
   type?: DeepLinkType;
   screen?: string;
-  params?: Record<string, any>;
+  params?: Record<string, string | number | boolean>;
   error?: {
     code: DeepLinkError;
     message: string;
-    details?: any;
+    details?: Record<string, unknown>;
   };
 }
 

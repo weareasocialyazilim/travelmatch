@@ -10,9 +10,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,  KeyboardAvoidingView,
+  Platform,
+  KeyboardAvoidingView,
   ActivityIndicator,
   Modal,
+  Alert,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -47,6 +49,7 @@ import { useConfirmation } from '@/context/ConfirmationContext';
 const CreateMomentScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { createMoment } = useMoments();
+  const { showToast } = useToast();
 
   // UI-specific state (not in form)
   const [photo, setPhoto] = useState<string>(''); // Managed by PhotoSection

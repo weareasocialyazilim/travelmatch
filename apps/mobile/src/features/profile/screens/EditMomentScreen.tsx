@@ -34,10 +34,10 @@ interface EditMomentScreenProps {
 }
 
 export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
-    const { showToast } = useToast();
-navigation,
+  navigation,
   route,
 }) => {
+  const { showToast } = useToast();
   const { momentId } = route.params || {};
 
   const [loading, setLoading] = useState(false);

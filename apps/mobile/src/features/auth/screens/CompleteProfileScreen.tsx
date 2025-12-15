@@ -18,14 +18,14 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { LoadingState } from '../components/LoadingState';
-import { COLORS } from '../constants/colors';
-import { showErrorAlert, AppError, AppErrorCode } from '../utils/friendlyErrorHandler';
+import { LoadingState } from '@/components/LoadingState';
+import { COLORS } from '@/constants/colors';
+import { showErrorAlert, AppError, AppErrorCode } from '@/utils/friendlyErrorHandler';
 import { completeProfileSchema, type CompleteProfileInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof Icon>['name'];

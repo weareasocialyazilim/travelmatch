@@ -39,8 +39,6 @@ additional_redirect_urls = [
   "https://www.travelmatch.app",
   "https://staging.travelmatch.app",
   "travelmatch://",  # Mobile app deep link
-  "exp://localhost:8081",  # Expo development (remove before production deploy)
-  "http://localhost:3000"  # Local development (remove before production deploy)
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true

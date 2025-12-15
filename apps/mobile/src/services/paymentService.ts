@@ -80,11 +80,12 @@ export interface WalletBalance {
 
 export interface PaymentIntent {
   id: string;
-  paymentIntentId: string;
+  paymentIntentId?: string;
   amount: number;
   currency: string;
-  status: PaymentStatus;
+  status: PaymentStatus | 'requires_payment_method' | 'requires_confirmation' | 'succeeded' | 'cancelled';
   clientSecret?: string;
+  momentId?: string;
 }
 
 // ============================================
@@ -97,6 +98,17 @@ export interface EscrowDecision {
   mode: EscrowMode;
   useEscrow: boolean;
   reason: string;
+}
+
+export interface WithdrawalLimits {
+  minAmount: number;
+  maxAmount: number;
+  dailyLimit: number;
+  weeklyLimit: number;
+  monthlyLimit: number;
+  remainingDaily: number;
+  remainingWeekly: number;
+  remainingMonthly: number;
 }
 
 export interface EscrowTransaction {
@@ -354,6 +366,125 @@ export const paymentService = {
     }
     MOCK_BANKS = MOCK_BANKS.filter((b) => b.id !== bankAccountId);
     return { success: true };
+  },
+
+  /**
+   * Alias for getBalance (for compatibility)
+   */
+  getWalletBalance: async (): Promise<{
+    available: number;
+    pending: number;
+    currency: string;
+  }> => {
+    return paymentService.getBalance();
+  },
+
+  /**
+   * Set default card
+   */
+  setDefaultCard: async (cardId: string): Promise<{ success: boolean }> => {
+    if (!__DEV__) {
+      logger.error('setDefaultCard called in production with mock implementation!');
+      throw new Error('Payment methods not configured for production');
+    }
+    MOCK_CARDS = MOCK_CARDS.map((c) => ({ ...c, isDefault: c.id === cardId }));
+    return { success: true };
+  },
+
+  /**
+   * Request withdrawal
+   */
+  requestWithdrawal: async (
+    amount: number,
+    bankAccountId: string,
+  ): Promise<{ transaction: Transaction }> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // In production, this would call a payment gateway
+      const transaction: Transaction = {
+        id: `txn_${Date.now()}`,
+        type: 'withdrawal',
+        amount: -amount,
+        status: 'pending',
+        description: `Withdrawal to bank account ${bankAccountId.slice(-4)}`,
+        date: new Date().toISOString(),
+        currency: 'USD',
+      };
+
+      logger.info('Withdrawal requested:', { amount, bankAccountId });
+      return { transaction };
+    } catch (error) {
+      logger.error('Request withdrawal error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create payment intent
+   */
+  createPaymentIntent: async (
+    momentId: string,
+    amount: number,
+  ): Promise<PaymentIntent> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // In production, this would create a Stripe PaymentIntent
+      const paymentIntent: PaymentIntent = {
+        id: `pi_${Date.now()}`,
+        amount,
+        currency: 'USD',
+        status: 'requires_payment_method',
+        clientSecret: `secret_${Date.now()}`,
+        momentId,
+      };
+
+      return paymentIntent;
+    } catch (error) {
+      logger.error('Create payment intent error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Confirm payment
+   */
+  confirmPayment: async (
+    paymentIntentId: string,
+    _paymentMethodId?: string,
+  ): Promise<{ success: boolean }> => {
+    try {
+      logger.info('Payment confirmed:', { paymentIntentId });
+      return { success: true };
+    } catch (error) {
+      logger.error('Confirm payment error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get withdrawal limits
+   */
+  getWithdrawalLimits: async (): Promise<WithdrawalLimits> => {
+    try {
+      // In production, this would fetch from backend based on user verification level
+      return {
+        minAmount: 10,
+        maxAmount: 10000,
+        dailyLimit: 5000,
+        weeklyLimit: 20000,
+        monthlyLimit: 50000,
+        remainingDaily: 5000,
+        remainingWeekly: 20000,
+        remainingMonthly: 50000,
+      };
+    } catch (error) {
+      logger.error('Get withdrawal limits error:', error);
+      throw error;
+    }
   },
 
   // --- Actions ---
