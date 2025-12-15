@@ -1041,12 +1041,14 @@ export type Database = {
           notification_preferences: Json | null
           phone: string | null
           privacy_settings: Json | null
+          public_key: string | null
           push_token: string | null
           rating: number | null
           review_count: number | null
           stripe_customer_id: string | null
           updated_at: string | null
           verified: boolean | null
+          verified_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -1068,12 +1070,14 @@ export type Database = {
           notification_preferences?: Json | null
           phone?: string | null
           privacy_settings?: Json | null
+          public_key?: string | null
           push_token?: string | null
           rating?: number | null
           review_count?: number | null
           stripe_customer_id?: string | null
           updated_at?: string | null
           verified?: boolean | null
+          verified_at?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -1095,9 +1099,10 @@ export type Database = {
           notification_preferences?: Json | null
           phone?: string | null
           privacy_settings?: Json | null
+          public_key?: string | null
           push_token?: string | null
           rating?: number | null
-          review_count?: number | null
+          review_count?: string | null
           stripe_customer_id?: string | null
           updated_at?: string | null
           verified?: boolean | null

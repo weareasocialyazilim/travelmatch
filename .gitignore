@@ -59,3 +59,16 @@ yarn-error.*
 coverage/
 .eslintcache
 apps/mobile/.eslintcache
+# ============================================
+# SECURITY: Environment files with secrets
+# ============================================
+# Docker environment with hardcoded keys (local dev only)
+.env.docker
+.env.docker.local
+
+# Supabase local config
+supabase/.temp/
+
+# Infisical local cache
+.infisical/
+.infisical.json

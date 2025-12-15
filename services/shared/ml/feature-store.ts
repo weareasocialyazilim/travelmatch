@@ -81,10 +81,10 @@ export interface MomentFeatures {
 export async function extractUserFeatures(
   userId: string
 ): Promise<UserFeatures> {
-  // Get user profile
+  // Get user profile - SECURITY: explicit column selection
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, created_at, kyc_status, trust_score, last_active_at')
     .eq('id', userId)
     .single();
 
@@ -140,9 +140,10 @@ export async function extractUserFeatures(
 export async function extractMomentFeatures(
   momentId: string
 ): Promise<MomentFeatures> {
+  // SECURITY: explicit column selection
   const { data: moment } = await supabase
     .from('moments')
-    .select('*')
+    .select('id, category, total_amount, currency, created_at')
     .eq('id', momentId)
     .single();
 

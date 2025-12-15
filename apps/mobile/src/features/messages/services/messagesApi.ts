@@ -96,9 +96,17 @@ export const messagesApi = {
     if (!user) throw new Error('User not authenticated');
 
     // Check if conversation already exists
+    // SECURITY: Explicit column selection - never use select('*')
     const { data: existing } = await supabase
       .from('conversations')
-      .select('*')
+      .select(`
+        id,
+        participant1_id,
+        participant2_id,
+        created_at,
+        updated_at,
+        last_message_at
+      `)
       .or(
         `and(participant1_id.eq.${user.id},participant2_id.eq.${recipientId}),` +
         `and(participant1_id.eq.${recipientId},participant2_id.eq.${user.id})`

@@ -149,9 +149,25 @@ export const tripsApi = {
    * Kullanıcının trip'lerini getir
    */
   getMyTrips: async (userId: string) => {
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('trips')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        title,
+        description,
+        destination,
+        start_date,
+        end_date,
+        status,
+        max_participants,
+        price,
+        currency,
+        image_url,
+        created_at,
+        updated_at
+      `)
       .eq('user_id', userId)
       .is('deleted_at', null)
       .order('created_at', { ascending: false });

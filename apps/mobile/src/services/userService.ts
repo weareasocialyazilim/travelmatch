@@ -121,11 +121,10 @@ export const userService = {
       // 2. Check remote key
       const { data: profile } = await dbUsersService.getById(user.id);
 
-      // @ts-ignore - public_key might not be in types yet
+      // Upload public key if not already set
       if (profile && !profile.public_key) {
         logger.info('[User] Uploading public key');
         await dbUsersService.update(user.id, {
-          // @ts-ignore
           public_key: keys.publicKey,
         });
       }
@@ -146,9 +145,32 @@ export const userService = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
+    // SECURITY: Only select public profile fields - never expose sensitive data like balance, kyc_status
     const { data: profile, error } = await supabase
       .from('users')
-      .select('*')
+      .select(`
+        id,
+        username,
+        name,
+        full_name,
+        email,
+        avatar_url,
+        bio,
+        location,
+        verified,
+        rating,
+        review_count,
+        joined_at,
+        languages,
+        interests,
+        instagram,
+        twitter,
+        website,
+        public_key,
+        notification_preferences,
+        created_at,
+        updated_at
+      `)
       .eq('id', user.id)
       .single();
 
@@ -164,9 +186,27 @@ export const userService = {
    * Get user profile by ID
    */
   getUserById: async (userId: string): Promise<{ user: UserProfile }> => {
+    // SECURITY: Only select public profile fields
     const { data: profile, error } = await supabase
       .from('users')
-      .select('*')
+      .select(`
+        id,
+        username,
+        name,
+        full_name,
+        avatar_url,
+        bio,
+        location,
+        verified,
+        rating,
+        review_count,
+        joined_at,
+        languages,
+        interests,
+        instagram,
+        twitter,
+        website
+      `)
       .eq('id', userId)
       .single();
 
@@ -184,9 +224,27 @@ export const userService = {
   getUserByUsername: async (
     username: string,
   ): Promise<{ user: UserProfile }> => {
+    // SECURITY: Only select public profile fields
     const { data: profile, error } = await supabase
       .from('users')
-      .select('*')
+      .select(`
+        id,
+        username,
+        name,
+        full_name,
+        avatar_url,
+        bio,
+        location,
+        verified,
+        rating,
+        review_count,
+        joined_at,
+        languages,
+        interests,
+        instagram,
+        twitter,
+        website
+      `)
       .eq('username', username)
       .single();
 

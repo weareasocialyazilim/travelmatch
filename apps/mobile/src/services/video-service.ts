@@ -13,6 +13,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '../utils/logger';
 
 // Video configuration
 export const VIDEO_CONFIG = {
@@ -60,23 +61,45 @@ export const VIDEO_CONFIG = {
   },
 } as const;
 
-// Video processing service (using Cloudflare Stream or similar)
+// Video processing service (using Cloudflare Stream via Edge Functions)
+// SECURITY: All sensitive operations are handled server-side via Edge Functions
+// The client NEVER has access to service_role key or Cloudflare API keys
+
+// Import supabase type from config
+import type { supabase as SupabaseInstance } from '../config/supabase';
+
 export class VideoService {
-  private supabase: ReturnType<typeof createClient>;
-  private streamApiKey: string;
+  private supabaseUrl: string;
+  private supabaseAnonKey: string;
   private streamAccountId: string;
+  private supabaseClient: typeof SupabaseInstance | null = null;
 
   constructor() {
-    this.supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_KEY!
-    );
-    this.streamApiKey = process.env.CLOUDFLARE_STREAM_API_KEY!;
-    this.streamAccountId = process.env.CLOUDFLARE_STREAM_ACCOUNT_ID!;
+    // SECURITY FIX: Only use ANON key on client - service operations go through Edge Functions
+    this.supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
+    this.supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
+    this.streamAccountId = process.env.EXPO_PUBLIC_CLOUDFLARE_STREAM_ACCOUNT_ID ?? '';
+    
+    if (!this.supabaseUrl || !this.supabaseAnonKey) {
+      // Use logger instead of console for production safety
+      logger.warn('[VideoService] Missing Supabase configuration');
+    }
+  }
+
+  /**
+   * Get authenticated Supabase client for user operations
+   */
+  private async getAuthenticatedClient(): Promise<NonNullable<typeof SupabaseInstance>> {
+    if (!this.supabaseClient) {
+      const { supabase } = await import('../config/supabase');
+      this.supabaseClient = supabase;
+    }
+    return this.supabaseClient!;
   }
 
   /**
    * Upload and process video
+   * SECURITY: Upload is handled via Edge Function - no direct Cloudflare API access from client
    */
   async uploadVideo(
     file: File,
@@ -92,96 +115,133 @@ export class VideoService {
     thumbnailUrl: string;
     status: string;
   }> {
-    // Validate file
+    // Validate file client-side first
     this.validateVideo(file);
 
-    // Upload to Cloudflare Stream
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('meta', JSON.stringify({
-      name: metadata.title,
-      requireSignedURLs: false,
-      allowedOrigins: ['travelmatch.app'],
-    }));
+    // Get user session for authenticated request
+    const supabase = await this.getAuthenticatedClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      throw new Error('Authentication required for video upload');
+    }
 
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${this.streamAccountId}/stream`,
+    // Step 1: Request upload URL from Edge Function
+    const uploadUrlResponse = await fetch(
+      `${this.supabaseUrl}/functions/v1/video-processing/upload`,
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.streamApiKey}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': this.supabaseAnonKey,
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify({
+          momentId: metadata.momentId,
+          title: metadata.title,
+          description: metadata.description,
+          uploadUrl: 'request', // Indicates we need an upload URL
+        }),
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.statusText}`);
+    if (!uploadUrlResponse.ok) {
+      const error = await uploadUrlResponse.json();
+      throw new Error(error.error || 'Failed to get upload URL');
     }
 
-    const result = await response.json();
-    const videoId = result.result.uid;
+    const { data: uploadData } = await uploadUrlResponse.json();
 
-    // Save to database
-    await this.supabase.from('videos').insert({
-      id: videoId,
-      moment_id: metadata.momentId,
-      user_id: metadata.userId,
-      title: metadata.title,
-      description: metadata.description,
-      status: 'processing',
-      created_at: new Date().toISOString(),
-    } as any);
+    // Step 2: Upload file directly to Cloudflare using the signed URL
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const uploadResponse = await fetch(uploadData.uploadUrl, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Video upload failed');
+    }
 
     return {
-      videoId,
-      playbackUrl: `https://customer-${this.streamAccountId}.cloudflarestream.com/${videoId}/manifest/video.m3u8`,
-      thumbnailUrl: `https://customer-${this.streamAccountId}.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`,
+      videoId: uploadData.videoId,
+      playbackUrl: '', // Will be available after processing
+      thumbnailUrl: '', // Will be available after processing
       status: 'processing',
     };
   }
 
   /**
    * Add captions/subtitles to video
+   * Note: Caption upload is handled via transcribe-video Edge Function
    */
   async addCaptions(
     videoId: string,
     language: string,
     captionsFile: File
   ): Promise<void> {
-    // Upload captions (WebVTT format)
-    const formData = new FormData();
-    formData.append('file', captionsFile);
+    const supabase = await this.getAuthenticatedClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      throw new Error('Authentication required');
+    }
 
-    await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${this.streamAccountId}/stream/${videoId}/captions/${language}`,
+    // Convert file to base64 for API transmission
+    const reader = new FileReader();
+    const captionsContent = await new Promise<string>((resolve, reject) => {
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsText(captionsFile);
+    });
+
+    // Upload captions via Edge Function
+    const response = await fetch(
+      `${this.supabaseUrl}/functions/v1/transcribe-video`,
       {
-        method: 'PUT',
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.streamApiKey}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': this.supabaseAnonKey,
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify({
+          videoId,
+          language,
+          captionsContent,
+          action: 'add-captions',
+        }),
       }
     );
 
-    // Update database
-    await this.supabase
-      .from('video_captions')
-      .insert({
-        video_id: videoId,
-        language,
-        created_at: new Date().toISOString(),
-      } as any);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to add captions');
+    }
   }
 
   /**
    * Generate captions automatically using AI
    */
   async generateCaptions(videoId: string, language = 'en'): Promise<string> {
+    const supabase = await this.getAuthenticatedClient();
+    
     // Get video URL
-    const { data: video } = await this.supabase
+    // SECURITY: Explicit column selection - never use select('*')
+    const { data: video } = await supabase
       .from('videos')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        stream_uid,
+        status,
+        duration,
+        thumbnail_url,
+        playback_url,
+        created_at
+      `)
       .eq('id', videoId)
       .single();
 
@@ -195,7 +255,7 @@ export class VideoService {
     const audioUrl = `https://customer-${this.streamAccountId}.cloudflarestream.com/${videoId}/downloads/default.mp4`;
 
     // Get auth token from SecureStore for authenticated request
-    const { data: { session } } = await this.supabase.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       throw new Error('Authentication required for transcription');
     }
@@ -248,21 +308,23 @@ export class VideoService {
       .filter(line => line.trim().length > 0)
       .join(' ');
 
-    // Save transcript
-    await this.supabase
+    // Save transcript via authenticated client
+    const supabase = await this.getAuthenticatedClient();
+    await supabase
       .from('video_transcripts')
       .insert({
         video_id: videoId,
         language,
         content: transcript,
         created_at: new Date().toISOString(),
-      } as any);
+      });
 
     return transcript;
   }
 
   /**
    * Get video analytics
+   * SECURITY: Analytics are fetched via Edge Function - no direct Cloudflare API access
    */
   async getAnalytics(videoId: string): Promise<{
     views: number;
@@ -270,44 +332,66 @@ export class VideoService {
     avgWatchTime: number;
     completionRate: number;
   }> {
+    const supabase = await this.getAuthenticatedClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      throw new Error('Authentication required');
+    }
+
     const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${this.streamAccountId}/stream/analytics/views?videoUID=${videoId}`,
+      `${this.supabaseUrl}/functions/v1/video-processing/analytics?videoId=${videoId}`,
       {
         headers: {
-          'Authorization': `Bearer ${this.streamApiKey}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': this.supabaseAnonKey,
         },
       }
     );
 
+    if (!response.ok) {
+      return { views: 0, watchTime: 0, avgWatchTime: 0, completionRate: 0 };
+    }
+
     const result = await response.json();
     
     return {
-      views: result.result.totalViews || 0,
-      watchTime: result.result.totalTimeViewedMinutes || 0,
-      avgWatchTime: result.result.avgTimeViewedMinutes || 0,
-      completionRate: result.result.completionRate || 0,
+      views: result.data?.views || 0,
+      watchTime: result.data?.watchTime || 0,
+      avgWatchTime: result.data?.avgWatchTime || 0,
+      completionRate: result.data?.completionRate || 0,
     };
   }
 
   /**
    * Delete video
+   * SECURITY: Deletion is handled via Edge Function with proper authorization
    */
   async deleteVideo(videoId: string): Promise<void> {
-    // Delete from Cloudflare Stream
-    await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${this.streamAccountId}/stream/${videoId}`,
+    const supabase = await this.getAuthenticatedClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await fetch(
+      `${this.supabaseUrl}/functions/v1/video-processing/delete`,
       {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.streamApiKey}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': this.supabaseAnonKey,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ videoId }),
       }
     );
 
-    // Delete from database
-    await this.supabase.from('videos').delete().eq('id', videoId);
-    await this.supabase.from('video_captions').delete().eq('video_id', videoId);
-    await this.supabase.from('video_transcripts').delete().eq('video_id', videoId);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete video');
+    }
   }
 
   /**

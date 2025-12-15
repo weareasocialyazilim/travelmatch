@@ -226,15 +226,24 @@ export class AdvancedAnalytics {
     const stickiness = mau ? (dau || 0) / mau : 0;
 
     // Viral metrics
+    // SECURITY: Explicit column selection - never use select('*')
     const { data: viralMetrics } = await supabase
       .from('user_viral_metrics')
-      .select('*')
+      .select(`
+        user_id,
+        k_factor,
+        invite_conversion_rate,
+        share_rate,
+        referrals_sent,
+        referrals_converted,
+        updated_at
+      `)
       .gte('updated_at', startDate.toISOString());
 
-    const kFactor = viralMetrics?.reduce((sum, m) => sum + m.k_factor, 0) / (viralMetrics?.length || 1);
+    const kFactor = (viralMetrics?.reduce((sum, m) => sum + (m.k_factor ?? 0), 0) ?? 0) / (viralMetrics?.length || 1);
     const viralCoefficient = kFactor; // Simplified
-    const referralConversionRate = viralMetrics?.reduce((sum, m) => sum + m.invite_conversion_rate, 0) / (viralMetrics?.length || 1);
-    const shareRate = viralMetrics?.reduce((sum, m) => sum + m.share_rate, 0) / (viralMetrics?.length || 1);
+    const referralConversionRate = (viralMetrics?.reduce((sum, m) => sum + (m.invite_conversion_rate ?? 0), 0) ?? 0) / (viralMetrics?.length || 1);
+    const shareRate = (viralMetrics?.reduce((sum, m) => sum + (m.share_rate ?? 0), 0) ?? 0) / (viralMetrics?.length || 1);
 
     // Revenue metrics
     const { data: revenueData } = await supabase.rpc('calculate_revenue_metrics', {
@@ -648,9 +657,20 @@ Return ONLY a JSON array of insights with this structure:
     factors: Array<{ factor: string; impact: number }>;
   }> {
     // Get user engagement data
+    // SECURITY: Explicit column selection - never use select('*')
     const { data: userMetrics } = await supabase
       .from('user_engagement_metrics')
-      .select('*')
+      .select(`
+        user_id,
+        last_session_at,
+        avg_sessions_per_week,
+        moments_created,
+        matches_made,
+        trips_completed,
+        messages_sent,
+        is_premium,
+        updated_at
+      `)
       .eq('user_id', userId)
       .single();
 

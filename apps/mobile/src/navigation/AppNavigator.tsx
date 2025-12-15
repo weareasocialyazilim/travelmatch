@@ -432,8 +432,8 @@ const AppNavigator = () => {
     apiClient.setSessionExpiredCallback(() => {
       // Navigate to SessionExpired screen when token refresh fails
       if (navigationRef.isReady()) {
-        // @ts-ignore
-        navigationRef.navigate('SessionExpired');
+        // Type assertion required for dynamic navigation from outside component
+        (navigationRef.navigate as (name: string) => void)('SessionExpired');
       }
     });
     

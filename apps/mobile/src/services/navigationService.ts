@@ -5,17 +5,21 @@
  * Used by services (like apiClient) to trigger navigation on events
  */
 
-import { createNavigationContainerRef } from '@react-navigation/native';
+import { createNavigationContainerRef, CommonActions } from '@react-navigation/native';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 
-export const navigationRef = createNavigationContainerRef();
+export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 /**
  * Navigate to a screen from anywhere
  */
-export function navigate(name: string, params?: any) {
+export function navigate<T extends keyof RootStackParamList>(
+  name: T,
+  params?: RootStackParamList[T]
+) {
   if (navigationRef.isReady()) {
-    // @ts-ignore - Dynamic route navigation
-    navigationRef.navigate(name, params);
+    // Type assertion for generic screen navigation outside components
+    (navigationRef.navigate as unknown as (name: string, params?: object) => void)(name as string, params);
   }
 }
 

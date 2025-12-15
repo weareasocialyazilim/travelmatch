@@ -247,9 +247,19 @@ export class EventTrackingEngine {
     properties?: Record<string, any>;
     limit?: number;
   }): Promise<any[]> {
+    // SECURITY: Explicit column selection - never use select('*')
     let query = supabase
       .from('events')
-      .select('*')
+      .select(`
+        id,
+        event_name,
+        user_id,
+        session_id,
+        timestamp,
+        properties,
+        device_info,
+        created_at
+      `)
       .order('timestamp', { ascending: false });
 
     if (params.events) {
@@ -584,9 +594,20 @@ export class EventTrackingEngine {
    * Analyze A/B test results
    */
   async analyzeABTest(testId: string): Promise<ABTest['results']> {
+    // SECURITY: Explicit column selection - never use select('*')
     const { data: test } = await supabase
       .from('ab_tests')
-      .select('*')
+      .select(`
+        id,
+        name,
+        description,
+        variants,
+        target_event,
+        status,
+        start_date,
+        end_date,
+        created_at
+      `)
       .eq('id', testId)
       .single();
 

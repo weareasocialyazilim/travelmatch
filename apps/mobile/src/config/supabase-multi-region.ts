@@ -157,8 +157,8 @@ export async function checkRegionHealth(region: RegionKey): Promise<HealthStatus
   try {
     const client = getRegionalClient(region);
     
-    // Simple health check query
-    const { error } = await client.from('_health').select('*').limit(1);
+    // Simple health check query - explicit column selection for security
+    const { error } = await client.from('_health').select('id').limit(1);
     
     const latency = Date.now() - startTime;
     

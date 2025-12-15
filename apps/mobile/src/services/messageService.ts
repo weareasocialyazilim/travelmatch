@@ -316,7 +316,6 @@ export const messageService = {
 
       // Get recipient's public key
       const { data: recipient } = await usersService.getById(recipientId);
-      // @ts-ignore
       const recipientPublicKey = recipient?.public_key;
 
       let encryptedContent = data.content;
@@ -388,13 +387,10 @@ export const messageService = {
               const { data: sender } = await usersService.getById(
                 msg.sender_id,
               );
-              // @ts-ignore
               if (sender?.public_key) {
-                // @ts-ignore
                 content = await encryptionService.decrypt(
                   msg.content,
                   msg.nonce,
-                  // @ts-ignore
                   sender.public_key,
                 );
               }

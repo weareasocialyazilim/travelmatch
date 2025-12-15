@@ -112,9 +112,16 @@ class AIQualityScorer {
    * Get score history for user
    */
   async getScoreHistory(userId: string): Promise<QualityScore[]> {
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('proof_quality_scores')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        proof_type,
+        score,
+        created_at
+      `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 

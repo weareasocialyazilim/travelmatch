@@ -381,9 +381,22 @@ class SecurePaymentService {
    */
   async getMomentPayments(momentId: string): Promise<Transaction[]> {
     try {
+      // SECURITY: Only select required transaction fields - never use select('*')
       const { data, error } = await supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          id,
+          type,
+          amount,
+          currency,
+          status,
+          description,
+          created_at,
+          metadata,
+          moment_id,
+          sender_id,
+          receiver_id
+        `)
         .eq('moment_id', momentId)
         .order('created_at', { ascending: false });
 

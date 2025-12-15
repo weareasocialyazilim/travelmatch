@@ -16,10 +16,36 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import NetInfo from '@react-native-community/netinfo';
 import { logger } from '../utils/logger';
 
-// Initialize MMKV storage
+/**
+ * Get encryption key for MMKV cache
+ * SECURITY: Key must come from environment variables managed by Infisical
+ * In production, this MUST be set via EXPO_PUBLIC_CACHE_ENCRYPTION_KEY
+ */
+function getCacheEncryptionKey(): string {
+  const key = process.env.EXPO_PUBLIC_CACHE_ENCRYPTION_KEY;
+  
+  if (key && key.length >= 16) {
+    return key;
+  }
+  
+  // Development fallback only - NOT secure for production
+  if (__DEV__) {
+    logger.warn('[OfflineCache] Using development fallback encryption key - NOT FOR PRODUCTION');
+    // Generate a consistent dev key based on device/app info
+    return 'dev-travelmatch-cache-key-2025';
+  }
+  
+  // Production without key - throw error
+  throw new Error(
+    'CRITICAL: EXPO_PUBLIC_CACHE_ENCRYPTION_KEY is not set. ' +
+    'Configure this secret in Infisical before deploying to production.'
+  );
+}
+
+// Initialize MMKV storage with secure encryption key
 export const mmkvStorage = new MMKV({
   id: 'travelmatch-cache',
-  encryptionKey: 'your-encryption-key-here', // TODO: Use secure key from env
+  encryptionKey: getCacheEncryptionKey(),
 });
 
 // MMKV wrapper for React Query persister
@@ -202,7 +228,7 @@ export const cacheUtils = {
     const allKeys = mmkvStorage.getAllKeys();
     let totalSize = 0;
     
-    allKeys.forEach((key) => {
+    allKeys.forEach((key: string) => {
       const value = mmkvStorage.getString(key);
       if (value) {
         totalSize += new Blob([value]).size;

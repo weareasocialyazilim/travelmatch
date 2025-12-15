@@ -441,9 +441,20 @@ export const reviewService = {
       if (!user) throw new Error('Not authenticated');
 
       // Check if user is the reviewed person
+      // SECURITY: Explicit column selection - never use select('*')
       const { data: existingReview, error: fetchError } = await supabase
         .from('reviews')
-        .select('*')
+        .select(`
+          id,
+          reviewer_id,
+          reviewed_id,
+          rating,
+          comment,
+          moment_id,
+          created_at,
+          response,
+          response_at
+        `)
         .eq('id', reviewId)
         .eq('reviewed_id', user.id)
         .single();

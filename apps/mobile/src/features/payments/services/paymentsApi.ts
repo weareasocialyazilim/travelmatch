@@ -20,9 +20,18 @@ export const paymentsApi = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('wallets')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        balance,
+        currency,
+        status,
+        created_at,
+        updated_at
+      `)
       .eq('user_id', user.id)
       .single();
 
@@ -37,9 +46,20 @@ export const paymentsApi = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('transactions')
-      .select('*')
+      .select(`
+        id,
+        type,
+        amount,
+        currency,
+        status,
+        description,
+        created_at,
+        metadata,
+        moment_id
+      `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -51,9 +71,22 @@ export const paymentsApi = {
    * Transaction detayı
    */
   getTransactionById: async (transactionId: string) => {
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('transactions')
-      .select('*')
+      .select(`
+        id,
+        type,
+        amount,
+        currency,
+        status,
+        description,
+        created_at,
+        metadata,
+        moment_id,
+        sender_id,
+        receiver_id
+      `)
       .eq('id', transactionId)
       .single();
 
@@ -68,9 +101,22 @@ export const paymentsApi = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // SECURITY: Explicit column selection
     const { data, error } = await supabase
       .from('payment_methods')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        type,
+        provider,
+        last_four,
+        brand,
+        exp_month,
+        exp_year,
+        is_default,
+        is_active,
+        created_at
+      `)
       .eq('user_id', user.id)
       .eq('is_active', true);
 
@@ -112,9 +158,21 @@ export const paymentsApi = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // SECURITY: Explicit column selection
     const { data, error } = await supabase
       .from('kyc_verifications')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        status,
+        verification_type,
+        document_type,
+        submitted_at,
+        verified_at,
+        rejection_reason,
+        created_at,
+        updated_at
+      `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)

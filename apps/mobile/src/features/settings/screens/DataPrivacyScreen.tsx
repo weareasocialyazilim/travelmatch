@@ -237,9 +237,18 @@ const DataPrivacyScreen = () => {
 
   const handleViewConsentHistory = async () => {
     try {
+      // SECURITY: Explicit column selection
       const { data, error } = await supabase
         .from('consent_history')
-        .select('*')
+        .select(`
+          id,
+          user_id,
+          consent_type,
+          consent_given,
+          ip_address,
+          user_agent,
+          created_at
+        `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 

@@ -19,6 +19,7 @@
 import { z } from 'zod';
 import { Linking } from 'react-native';
 import type { NavigationContainerRef } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import { logger } from '../utils/logger';
 import { sessionManager } from '../services/sessionManager';
 
@@ -412,8 +413,11 @@ class DeepLinkHandler {
       const navigationResult = this.mapToScreen(parsed.type, validation.data);
       
       if (this.navigation && this.navigation.isReady()) {
-        // @ts-ignore
-        this.navigation.navigate(navigationResult.screen, navigationResult.params);
+        // Type assertion for dynamic screen navigation from deep link mapping
+        (this.navigation.navigate as unknown as (name: string, params?: object) => void)(
+          navigationResult.screen,
+          navigationResult.params
+        );
       }
       
       logger.info('[DeepLink] Success:', navigationResult.screen);
@@ -469,15 +473,14 @@ class DeepLinkHandler {
   navigateToError(error: DeepLinkError, message: string) {
     if (!this.navigation || !this.navigation.isReady()) return;
     
+    const nav = this.navigation as NavigationContainerRef<RootStackParamList>;
+    
     if (error === DeepLinkError.EXPIRED) {
-      // @ts-ignore
-      this.navigation.navigate('LinkExpired', { message });
+      nav.navigate('LinkExpired', { message });
     } else if (error === DeepLinkError.NOT_FOUND) {
-      // @ts-ignore
-      this.navigation.navigate('LinkNotFound', { message });
+      nav.navigate('LinkNotFound', { message });
     } else {
-      // @ts-ignore
-      this.navigation.navigate('LinkInvalid', { message });
+      nav.navigate('LinkInvalid', { message });
     }
   }
   

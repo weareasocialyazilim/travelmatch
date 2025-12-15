@@ -17,9 +17,22 @@ export const profileApi = {
    * ID ile profil getir
    */
   getById: async (userId: string) => {
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        id,
+        username,
+        full_name,
+        avatar_url,
+        bio,
+        location,
+        is_verified,
+        rating,
+        reviews_count,
+        created_at,
+        updated_at
+      `)
       .eq('id', userId)
       .is('deleted_at', null)
       .single();
@@ -35,9 +48,22 @@ export const profileApi = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        id,
+        username,
+        full_name,
+        avatar_url,
+        bio,
+        location,
+        is_verified,
+        rating,
+        reviews_count,
+        created_at,
+        updated_at
+      `)
       .eq('id', user.id)
       .single();
 
@@ -128,9 +154,17 @@ export const profileApi = {
    * Trust score detayları
    */
   getTrustScore: async (userId: string) => {
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('trust_scores')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        score,
+        factors,
+        created_at,
+        updated_at
+      `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -144,9 +178,18 @@ export const profileApi = {
    * Proof history getir
    */
   getProofHistory: async (userId: string) => {
+    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('proofs')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        type,
+        status,
+        file_url,
+        created_at,
+        verified_at
+      `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 

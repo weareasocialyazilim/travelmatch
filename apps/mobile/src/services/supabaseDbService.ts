@@ -34,11 +34,11 @@ export const usersService = {
     }
 
     try {
-      // Optimized query with user stats in single request
+      // SECURITY: Explicit column selection for user data
       const { data, error } = await supabase
         .from('users')
         .select(`
-          *,
+          id, email, name, avatar_url, bio, location, public_key, created_at, updated_at,
           moments_count:moments!user_id(count),
           followers_count:follows!following_id(count),
           following_count:follows!follower_id(count),
@@ -545,9 +545,28 @@ export const momentsService = {
 
   async getDeleted(userId: string): Promise<{ data: any[] | null; error: Error | null }> {
     try {
+      // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('moments')
-        .select('*')
+        .select(`
+          id,
+          title,
+          description,
+          location,
+          latitude,
+          longitude,
+          start_date,
+          end_date,
+          status,
+          visibility,
+          category,
+          image_url,
+          video_url,
+          created_at,
+          updated_at,
+          deleted_at,
+          user_id
+        `)
         .eq('user_id', userId)
         .not('deleted_at', 'is', null)
         .order('deleted_at', { ascending: false });
@@ -1045,9 +1064,18 @@ export const conversationsService = {
   ): Promise<DbResult<Tables['conversations']['Row']>> {
     try {
       // First, try to find existing conversation
+      // SECURITY: Explicit column selection - never use select('*')
       const { data: existing } = await supabase
         .from('conversations')
-        .select('*')
+        .select(`
+          id,
+          participant_ids,
+          last_message_id,
+          created_at,
+          updated_at,
+          last_message_at,
+          last_message_preview
+        `)
         .contains('participant_ids', participantIds)
         .single();
 
@@ -1074,9 +1102,18 @@ export const conversationsService = {
     conversationId: string,
   ): Promise<DbResult<Tables['conversations']['Row']>> {
     try {
+      // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('conversations')
-        .select('*')
+        .select(`
+          id,
+          participant_ids,
+          last_message_id,
+          created_at,
+          updated_at,
+          last_message_at,
+          last_message_preview
+        `)
         .eq('id', conversationId)
         .single();
 
@@ -1404,9 +1441,23 @@ export const transactionsService = {
       }
 
       
+      // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          id,
+          type,
+          amount,
+          currency,
+          status,
+          description,
+          created_at,
+          metadata,
+          moment_id,
+          sender_id,
+          receiver_id,
+          user_id
+        `)
         .eq('id', id)
         .single();
 
@@ -1465,9 +1516,20 @@ export const subscriptionsService = {
     }
 
     try {
+      // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('subscription_plans')
-        .select('*')
+        .select(`
+          id,
+          name,
+          description,
+          price,
+          currency,
+          interval,
+          features,
+          is_active,
+          created_at
+        `)
         .eq('is_active', true)
         .order('price');
 

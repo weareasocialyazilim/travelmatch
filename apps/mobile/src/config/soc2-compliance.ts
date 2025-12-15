@@ -176,20 +176,45 @@ interface AuditLogEntry {
 
 /**
  * Log audit event
+ * SECURITY: Audit logging is handled via Edge Function with service_role access
+ * Client code never has access to service_role key
  */
 export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): Promise<void> {
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY! // Use service role for audit logging
-  );
+  try {
+    // Import supabase client dynamically to avoid circular dependencies
+    const { supabase } = await import('./supabase');
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      console.warn('Cannot log audit event: No active session');
+      return;
+    }
 
-  const { error } = await supabase.from('audit_logs').insert({
-    id: crypto.randomUUID(),
-    timestamp: new Date().toISOString(),
-    ...entry,
-  });
+    const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (error) {
+    if (!supabaseUrl || !anonKey) {
+      console.error('Missing Supabase configuration for audit logging');
+      return;
+    }
+
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/audit-logging/log`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': anonKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entry),
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Failed to log audit event:', await response.text());
+    }
+  } catch (error) {
     console.error('Failed to log audit event:', error);
     // Don't throw - logging failure shouldn't break the app
   }
@@ -197,6 +222,7 @@ export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp
 
 /**
  * Query audit logs
+ * SECURITY: Only admins can query audit logs via Edge Function
  */
 export async function queryAuditLogs(filters: {
   userId?: string;
@@ -206,27 +232,49 @@ export async function queryAuditLogs(filters: {
   endDate?: string;
   limit?: number;
 }): Promise<AuditLogEntry[]> {
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  try {
+    const { supabase } = await import('./supabase');
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      throw new Error('Authentication required');
+    }
 
-  let query = supabase
-    .from('audit_logs')
-    .select('*')
-    .order('timestamp', { ascending: false })
-    .limit(filters.limit || 100);
+    const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (filters.userId) query = query.eq('user_id', filters.userId);
-  if (filters.event) query = query.eq('event', filters.event);
-  if (filters.category) query = query.eq('category', filters.category);
-  if (filters.startDate) query = query.gte('timestamp', filters.startDate);
-  if (filters.endDate) query = query.lte('timestamp', filters.endDate);
+    if (!supabaseUrl || !anonKey) {
+      throw new Error('Missing Supabase configuration');
+    }
 
-  const { data, error } = await query;
+    const queryParams = new URLSearchParams();
+    if (filters.userId) queryParams.set('userId', filters.userId);
+    if (filters.event) queryParams.set('event', filters.event);
+    if (filters.category) queryParams.set('category', filters.category);
+    if (filters.startDate) queryParams.set('startDate', filters.startDate);
+    if (filters.endDate) queryParams.set('endDate', filters.endDate);
+    if (filters.limit) queryParams.set('limit', String(filters.limit));
 
-  if (error) throw error;
-  return data || [];
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/audit-logging/query?${queryParams.toString()}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': anonKey,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to query audit logs');
+    }
+
+    const result = await response.json();
+    return result.data || [];
+  } catch (error) {
+    console.error('Failed to query audit logs:', error);
+    throw error;
+  }
 }
 
 /**

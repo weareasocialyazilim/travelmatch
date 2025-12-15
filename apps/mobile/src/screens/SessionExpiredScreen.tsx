@@ -33,19 +33,17 @@ const SessionExpiredScreen: React.FC = () => {
       logger.info('[SessionExpired] Navigating to login');
       
       // Navigate to login screen
-      // @ts-ignore - Navigation typing
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Login' }],
+        routes: [{ name: 'Login' as never }],
       });
     } catch (error) {
       logger.error('[SessionExpired] Clear session failed:', error);
       
       // Force navigation anyway
-      // @ts-ignore
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Login' }],
+        routes: [{ name: 'Login' as never }],
       });
     }
   };

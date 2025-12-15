@@ -179,9 +179,23 @@ class PaymentMigrationService {
     try {
       // Read from new system if configured
       if (this.config.readFromNew || this.config.useNewSystem) {
+        // SECURITY: Explicit column selection - never use select('*')
         const { data, error } = await supabase
           .from('transactions')
-          .select('*')
+          .select(`
+            id,
+            type,
+            amount,
+            currency,
+            status,
+            description,
+            created_at,
+            metadata,
+            moment_id,
+            sender_id,
+            receiver_id,
+            user_id
+          `)
           .eq('id', transactionId)
           .single();
 
@@ -411,9 +425,22 @@ class PaymentMigrationService {
     try {
       // Get transactions from both systems
       const legacyTransactions = await this.fetchLegacyTransactions(date, date);
+      // SECURITY: Explicit column selection - never use select('*')
       const { data: supabaseTransactions } = await supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          id,
+          type,
+          amount,
+          currency,
+          status,
+          description,
+          created_at,
+          metadata,
+          moment_id,
+          sender_id,
+          receiver_id
+        `)
         .gte('created_at', `${date}T00:00:00`)
         .lt('created_at', `${date}T23:59:59`);
 

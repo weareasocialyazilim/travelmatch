@@ -242,9 +242,17 @@ export class ViralLoopEngine {
   async calculateViralMetrics(userId?: string): Promise<ViralMetrics> {
     const timeWindow = 30; // Last 30 days
 
+    // SECURITY: Explicit column selection - never use select('*')
     let query = supabase
       .from('referral_conversions')
-      .select('*')
+      .select(`
+        id,
+        referrer_id,
+        referred_id,
+        converted_at,
+        conversion_type,
+        reward_amount
+      `)
       .gte('converted_at', new Date(Date.now() - timeWindow * 24 * 60 * 60 * 1000).toISOString());
 
     if (userId) {
@@ -306,9 +314,20 @@ export class ViralLoopEngine {
     title: string;
   }> {
     // Get user's engagement metrics
+    // SECURITY: Explicit column selection - never use select('*')
     const { data: metrics } = await supabase
       .from('user_engagement_metrics')
-      .select('*')
+      .select(`
+        user_id,
+        moments_created,
+        matches_made,
+        trips_completed,
+        gifts_sent,
+        referrals_converted,
+        profile_views,
+        messages_sent,
+        updated_at
+      `)
       .eq('user_id', userId)
       .single();
 

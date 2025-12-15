@@ -64,7 +64,12 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 /**
  * Database types for TypeScript
- * TODO: Generate types from Supabase CLI: npx supabase gen types typescript
+ * 
+ * Auto-generated types are in @/types/database.types.ts
+ * Generate with: pnpm db:generate-types
+ * 
+ * This file contains legacy inline types for backward compatibility.
+ * New code should import from @/types/database.types.ts
  */
 export type Database = {
   public: {
@@ -77,6 +82,7 @@ export type Database = {
           avatar_url: string | null;
           bio: string | null;
           location: string | null;
+          public_key: string | null;
           created_at: string;
           updated_at: string;
         };
