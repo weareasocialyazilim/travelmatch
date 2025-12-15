@@ -41,11 +41,11 @@ serverAdapter.setBasePath('/admin/queues');
 
 createBullBoard({
   queues: [
-    new BullMQAdapter(kycQueue) as any,
-    new BullMQAdapter(imageQueue) as any,
-    new BullMQAdapter(emailQueue) as any,
-    new BullMQAdapter(notificationQueue) as any,
-    new BullMQAdapter(analyticsQueue) as any,
+    new BullMQAdapter(kycQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
+    new BullMQAdapter(imageQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
+    new BullMQAdapter(emailQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
+    new BullMQAdapter(notificationQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
+    new BullMQAdapter(analyticsQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
   ],
   serverAdapter,
 });
@@ -84,10 +84,11 @@ app.post('/jobs/kyc', async (req: Request, res: Response) => {
       message: 'KYC verification queued successfully',
       statusUrl: `/jobs/${job.id}`,
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(400).json({
       error: 'Invalid job data',
-      details: error.message,
+      details: message,
     });
   }
 });
@@ -104,10 +105,11 @@ app.post('/jobs/image', async (req: Request, res: Response) => {
       status: 'queued',
       statusUrl: `/jobs/${job.id}`,
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(400).json({
       error: 'Invalid job data',
-      details: error.message,
+      details: message,
     });
   }
 });
@@ -127,10 +129,11 @@ app.post('/jobs/email', async (req: Request, res: Response) => {
       status: 'queued',
       statusUrl: `/jobs/${job.id}`,
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(400).json({
       error: 'Invalid job data',
-      details: error.message,
+      details: message,
     });
   }
 });
@@ -147,10 +150,11 @@ app.post('/jobs/notification', async (req: Request, res: Response) => {
       status: 'queued',
       statusUrl: `/jobs/${job.id}`,
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(400).json({
       error: 'Invalid job data',
-      details: error.message,
+      details: message,
     });
   }
 });
@@ -166,10 +170,11 @@ app.post('/jobs/analytics', async (req: Request, res: Response) => {
       jobId: job.id,
       status: 'queued',
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(400).json({
       error: 'Invalid job data',
-      details: error.message,
+      details: message,
     });
   }
 });
@@ -209,10 +214,11 @@ app.get('/jobs/:jobId', async (req: Request, res: Response) => {
       processedOn: job.processedOn,
       finishedOn: job.finishedOn,
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({
       error: 'Failed to get job status',
-      details: error.message,
+      details: message,
     });
   }
 });
@@ -235,10 +241,11 @@ app.get('/stats', async (req: Request, res: Response) => {
       notification: stats[3],
       analytics: stats[4],
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({
       error: 'Failed to get queue stats',
-      details: error.message,
+      details: message,
     });
   }
 });
@@ -257,10 +264,11 @@ app.post('/admin/clean', async (req: Request, res: Response) => {
     ]);
 
     res.json({ message: 'Queues cleaned successfully' });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({
       error: 'Failed to clean queues',
-      details: error.message,
+      details: message,
     });
   }
 });
