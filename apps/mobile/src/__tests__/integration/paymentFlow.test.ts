@@ -28,9 +28,9 @@ jest.mock('@/services/supabaseDbService', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
-const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
+const mockSupabase = supabase ;
+const mockLogger = logger ;
+const mockTransactionsService = transactionsService ;
 
 describe('Payment Flow Integration', () => {
   const mockUser = {
@@ -76,7 +76,7 @@ describe('Payment Flow Integration', () => {
           error: null,
         }),
       };
-      (mockSupabase.from as jest.Mock).mockReturnValue(mockFromChain);
+      (mockSupabase.from ).mockReturnValue(mockFromChain);
 
       const balanceBefore = await paymentService.getBalance();
       expect(balanceBefore.available).toBe(initialBalance);
@@ -228,7 +228,7 @@ describe('Payment Flow Integration', () => {
           error: null,
         }),
       };
-      (mockSupabase.from as jest.Mock).mockReturnValue(mockFromChain);
+      (mockSupabase.from ).mockReturnValue(mockFromChain);
 
       const balanceBefore = await paymentService.getBalance();
       expect(balanceBefore.available).toBe(initialBalance);
@@ -289,7 +289,7 @@ describe('Payment Flow Integration', () => {
           error: null,
         }),
       };
-      (mockSupabase.from as jest.Mock).mockReturnValue(mockFromChain);
+      (mockSupabase.from ).mockReturnValue(mockFromChain);
 
       // Mock withdrawal rejection
       mockTransactionsService.create.mockResolvedValue({
@@ -468,7 +468,7 @@ describe('Payment Flow Integration', () => {
           })
         ),
       };
-      (mockSupabase.from as jest.Mock).mockReturnValue(mockFromChain);
+      (mockSupabase.from ).mockReturnValue(mockFromChain);
 
       // Initial balance
       const balance1 = await paymentService.getBalance();

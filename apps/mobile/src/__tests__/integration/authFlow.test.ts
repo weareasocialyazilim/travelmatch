@@ -46,9 +46,9 @@ jest.mock('@/config/supabase', () => {
 
 jest.mock('@/utils/logger');
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockAuth = auth as jest.Mocked<typeof auth>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockSupabase = supabase ;
+const mockAuth = auth ;
+const mockLogger = logger ;
 
 describe('Auth Flow Integration', () => {
   const mockUser = {
@@ -113,13 +113,13 @@ describe('Auth Flow Integration', () => {
   describe('Scenario 1: Complete Login Flow', () => {
     it('should successfully login → fetch profile → maintain session', async () => {
       // Arrange: Mock successful login
-      (mockAuth.signInWithPassword as jest.Mock).mockResolvedValue({
+      (mockAuth.signInWithPassword ).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
 
       // Mock profile fetch
-      (mockAuth.getUser as jest.Mock).mockResolvedValue({
+      (mockAuth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -129,7 +129,7 @@ describe('Auth Flow Integration', () => {
         eq: jest.fn().mockReturnThis(),
         single: jest.fn().mockResolvedValue({ data: mockProfile, error: null }),
       };
-      (mockSupabase.from as jest.Mock).mockReturnValue(mockFromChain);
+      (mockSupabase.from ).mockReturnValue(mockFromChain);
 
       // Act: Perform login
       const loginResult = await signInWithEmail('test@example.com', 'password123');
@@ -156,7 +156,7 @@ describe('Auth Flow Integration', () => {
     it('should handle invalid credentials gracefully', async () => {
       // Arrange: Mock login failure
       const authError = { message: 'Invalid login credentials' };
-      (mockAuth.signInWithPassword as jest.Mock).mockResolvedValue({
+      (mockAuth.signInWithPassword ).mockResolvedValue({
         data: { user: null, session: null },
         error: authError,
       });
@@ -180,13 +180,13 @@ describe('Auth Flow Integration', () => {
   describe('Scenario 2: Complete Logout Flow', () => {
     it('should logout → clear session → prevent further requests', async () => {
       // Arrange: User is logged in
-      (mockAuth.getUser as jest.Mock).mockResolvedValue({
+      (mockAuth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
       // Mock successful logout
-      (mockAuth.signOut as jest.Mock).mockResolvedValue({
+      (mockAuth.signOut ).mockResolvedValue({
         error: null,
       });
 
@@ -201,7 +201,7 @@ describe('Auth Flow Integration', () => {
       expect(mockLogger.info).toHaveBeenCalledWith('[Auth] Sign out successful');
 
       // Arrange: Mock unauthenticated state after logout
-      (mockAuth.getUser as jest.Mock).mockResolvedValue({
+      (mockAuth.getUser ).mockResolvedValue({
         data: { user: null },
         error: { message: 'Not authenticated' },
       });
@@ -216,7 +216,7 @@ describe('Auth Flow Integration', () => {
     it('should handle logout errors', async () => {
       // Arrange: Mock logout failure
       const logoutError = { message: 'Network error during logout' };
-      (mockAuth.signOut as jest.Mock).mockResolvedValue({
+      (mockAuth.signOut ).mockResolvedValue({
         error: logoutError,
       });
 
@@ -244,7 +244,7 @@ describe('Auth Flow Integration', () => {
       };
 
       // Arrange: Mock successful signup
-      (mockAuth.signUp as jest.Mock).mockResolvedValue({
+      (mockAuth.signUp ).mockResolvedValue({
         data: {
           user: newUser,
           session: { ...mockSession, user: newUser },
@@ -280,7 +280,7 @@ describe('Auth Flow Integration', () => {
     it('should handle duplicate email during signup', async () => {
       // Arrange: Mock signup failure (email already exists)
       const signupError = { message: 'User already registered' };
-      (mockAuth.signUp as jest.Mock).mockResolvedValue({
+      (mockAuth.signUp ).mockResolvedValue({
         data: { user: null, session: null },
         error: signupError,
       });
@@ -304,7 +304,7 @@ describe('Auth Flow Integration', () => {
   describe('Scenario 4: Password Reset Flow', () => {
     it('should request password reset → send email → confirm request', async () => {
       // Arrange: Mock successful password reset request
-      (mockAuth.resetPasswordForEmail as jest.Mock).mockResolvedValue({
+      (mockAuth.resetPasswordForEmail ).mockResolvedValue({
         error: null,
       });
 
@@ -328,7 +328,7 @@ describe('Auth Flow Integration', () => {
     it('should handle password reset errors', async () => {
       // Arrange: Mock password reset failure
       const resetError = { message: 'Email not found' };
-      (mockAuth.resetPasswordForEmail as jest.Mock).mockResolvedValue({
+      (mockAuth.resetPasswordForEmail ).mockResolvedValue({
         error: resetError,
       });
 
@@ -347,7 +347,7 @@ describe('Auth Flow Integration', () => {
   describe('Scenario 5: Session Persistence and Refresh', () => {
     it('should retrieve existing session → verify user → refresh if needed', async () => {
       // Arrange: Mock existing session
-      (mockAuth.getSession as jest.Mock).mockResolvedValue({
+      (mockAuth.getSession ).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -360,7 +360,7 @@ describe('Auth Flow Integration', () => {
       expect(sessionResult.error).toBeNull();
 
       // Arrange: Mock user verification
-      (mockAuth.getUser as jest.Mock).mockResolvedValue({
+      (mockAuth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -379,7 +379,7 @@ describe('Auth Flow Integration', () => {
         expires_at: Date.now() - 1000, // Expired 1 second ago
       };
 
-      (mockAuth.getSession as jest.Mock).mockResolvedValue({
+      (mockAuth.getSession ).mockResolvedValue({
         data: { session: expiredSession },
         error: null,
       });
@@ -394,7 +394,7 @@ describe('Auth Flow Integration', () => {
 
     it('should handle no session found', async () => {
       // Arrange: Mock no session
-      (mockAuth.getSession as jest.Mock).mockResolvedValue({
+      (mockAuth.getSession ).mockResolvedValue({
         data: { session: null },
         error: null,
       });

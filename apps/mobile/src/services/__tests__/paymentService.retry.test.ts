@@ -38,9 +38,9 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockSupabase = supabase ;
+const mockTransactionsService = transactionsService ;
+const mockLogger = logger ;
 
 // Helper function to simulate retry logic (would be in paymentService in production)
 async function processPaymentWithRetry(
@@ -49,7 +49,7 @@ async function processPaymentWithRetry(
     currency: string;
     paymentMethodId: string;
     description?: string;
-    metadata?: any;
+    metadata?;
   },
   maxRetries = 3,
   baseDelay = 1000
@@ -87,7 +87,7 @@ describe('PaymentService - Retry Logic', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({ 
+    (mockSupabase.auth.getUser ).mockResolvedValue({ 
       data: { user: mockUser }, 
       error: null 
     });
@@ -111,7 +111,7 @@ describe('PaymentService - Retry Logic', () => {
       };
 
       // First 2 attempts fail with network error, 3rd succeeds
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockRejectedValueOnce(new Error('Network request failed'))
         .mockRejectedValueOnce(new Error('Network request failed'))
         .mockResolvedValueOnce({ data: mockTransaction, error: null });
@@ -163,7 +163,7 @@ describe('PaymentService - Retry Logic', () => {
       };
 
       // First attempt fails, second succeeds
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockRejectedValueOnce(new Error('Temporary network error'))
         .mockResolvedValueOnce({ data: mockTransaction, error: null });
 
@@ -198,7 +198,7 @@ describe('PaymentService - Retry Logic', () => {
       };
 
       // Fail 3 times, succeed on 4th (last) attempt
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockRejectedValueOnce(new Error('Error 1'))
         .mockRejectedValueOnce(new Error('Error 2'))
         .mockRejectedValueOnce(new Error('Error 3'))
@@ -227,7 +227,7 @@ describe('PaymentService - Retry Logic', () => {
 
   describe('Permanent Failure Handling', () => {
     it('should not retry on authentication errors', async () => {
-      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({ 
+      (mockSupabase.auth.getUser ).mockResolvedValue({ 
         data: { user: null }, 
         error: null 
       });
@@ -248,7 +248,7 @@ describe('PaymentService - Retry Logic', () => {
     }, 15000);
 
     it('should handle validation errors', async () => {
-      (mockTransactionsService.create as jest.Mock).mockRejectedValue(
+      (mockTransactionsService.create ).mockRejectedValue(
         new Error('Invalid amount: must be positive')
       );
 
@@ -296,7 +296,7 @@ describe('PaymentService - Retry Logic', () => {
         throw lastError || new Error('Withdrawal failed');
       }
 
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({ data: mockTransaction, error: null });
 
@@ -342,7 +342,7 @@ describe('PaymentService - Retry Logic', () => {
 
       // Payment 1: fails once, then succeeds
       // Payment 2: succeeds immediately
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockRejectedValueOnce(new Error('Network error')) // Payment 1, attempt 1
         .mockResolvedValueOnce({ data: mockTransaction2, error: null }) // Payment 2, attempt 1
         .mockResolvedValueOnce({ data: mockTransaction1, error: null }); // Payment 1, attempt 2
@@ -384,7 +384,7 @@ describe('PaymentService - Retry Logic', () => {
 
       // Payment 1: permanent failure (all calls fail)
       // Payment 2: success (on second call after failures)
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockRejectedValueOnce(new Error('Permanent error')) // Payment 1 attempt 1
         .mockRejectedValueOnce(new Error('Permanent error')) // Payment 1 attempt 2
         .mockRejectedValueOnce(new Error('Permanent error')) // Payment 1 attempt 3

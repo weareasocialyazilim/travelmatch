@@ -532,7 +532,7 @@ describe('logger.ts', () => {
       remoteLogger.error('Error', { password: 'secret123' });
       remoteLogger.flushRemoteLogs();
       
-      const breadcrumbs = (Sentry.addBreadcrumb as jest.Mock).mock.calls;
+      const breadcrumbs = (Sentry.addBreadcrumb ).mock.calls;
       const hasSecret = breadcrumbs.some(call => 
         JSON.stringify(call).includes('secret123')
       );

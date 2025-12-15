@@ -25,9 +25,9 @@ jest.mock('../cloudflareImages', () => ({
   uploadToCloudflare: jest.fn(),
 }));
 
-const mockFileSystem = FileSystem as jest.Mocked<typeof FileSystem>;
-const mockCrypto = Crypto as jest.Mocked<typeof Crypto>;
-const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
+const mockFileSystem = FileSystem ;
+const mockCrypto = Crypto ;
+const mockAsyncStorage = AsyncStorage ;
 
 describe('ImageCacheManager', () => {
   beforeEach(async () => {

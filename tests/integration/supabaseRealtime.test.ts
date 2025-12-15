@@ -31,7 +31,7 @@ jest.mock('../../apps/mobile/src/config/supabase', () => ({
 }));
 
 describe('Supabase Realtime Subscriptions', () => {
-  let mockChannel: any;
+  let mockChannel;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -45,7 +45,7 @@ describe('Supabase Realtime Subscriptions', () => {
       send: jest.fn(),
     };
 
-    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
+    (supabase.channel ).mockReturnValue(mockChannel);
   });
 
   // ===========================
@@ -159,7 +159,7 @@ describe('Supabase Realtime Subscriptions', () => {
       }, insertHandler);
 
       // Simulate INSERT event
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const handler = onCall[2];
       handler({ new: newMessage });
 
@@ -183,7 +183,7 @@ describe('Supabase Realtime Subscriptions', () => {
         table: 'messages',
       }, updateHandler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const handler = onCall[2];
       handler({ new: updatedMessage, old: { id: '123', content: 'Old' } });
 
@@ -200,7 +200,7 @@ describe('Supabase Realtime Subscriptions', () => {
         table: 'messages',
       }, deleteHandler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const handler = onCall[2];
       handler({ old: { id: '123' } });
 
@@ -306,7 +306,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('presence');
       channel.on('presence', { event: 'sync' }, syncHandler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const handler = onCall[2];
       handler();
 
@@ -319,7 +319,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('presence');
       channel.on('presence', { event: 'join' }, joinHandler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const handler = onCall[2];
       handler({ key: 'user-123', newPresences: [{ user_id: 'user-123' }] });
 
@@ -334,7 +334,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('presence');
       channel.on('presence', { event: 'leave' }, leaveHandler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const handler = onCall[2];
       handler({ key: 'user-123', leftPresences: [{ user_id: 'user-123' }] });
 
@@ -389,7 +389,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('typing');
       channel.on('broadcast', { event: 'typing' }, broadcastHandler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const handler = onCall[2];
       handler({
         payload: { userId: 'user-456', isTyping: true },
@@ -535,7 +535,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('test');
       channel.on('postgres_changes', { event: 'INSERT' }, handler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const eventHandler = onCall[2];
       
       eventHandler({ new: null });
@@ -550,7 +550,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('test');
       channel.on('postgres_changes', { event: 'INSERT' }, handler);
 
-      const onCall = (mockChannel.on as jest.Mock).mock.calls[0];
+      const onCall = (mockChannel.on ).mock.calls[0];
       const eventHandler = onCall[2];
       
       eventHandler({ invalid: 'data' });

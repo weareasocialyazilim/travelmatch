@@ -45,8 +45,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockBiometricAuth = biometricAuth as jest.Mocked<typeof biometricAuth>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockBiometricAuth = biometricAuth ;
+const mockLogger = logger ;
 
 describe('BiometricAuthContext', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (

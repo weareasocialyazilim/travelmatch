@@ -33,14 +33,14 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockNetInfo = NetInfo ;
+const mockLogger = logger ;
 
 describe('Offline Sync Strategy', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     
-    (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+    (mockNetInfo.fetch ).mockResolvedValue({
       isConnected: true,
       isInternetReachable: true,
     });
@@ -51,7 +51,7 @@ describe('Offline Sync Strategy', () => {
   describe('Auto-Sync on Reconnect', () => {
     it('should automatically sync when network reconnects', async () => {
       // Start offline, queue actions
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -72,7 +72,7 @@ describe('Offline Sync Strategy', () => {
       offlineSyncQueue.registerHandler('SEND_MESSAGE', messageHandler);
 
       // Simulate network reconnect
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -92,7 +92,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should sync actions in order', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -119,7 +119,7 @@ describe('Offline Sync Strategy', () => {
       offlineSyncQueue.registerHandler('LIKE_MOMENT', likeHandler);
       offlineSyncQueue.registerHandler('SEND_MESSAGE', messageHandler);
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -130,7 +130,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should not auto-sync when network is unstable', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -138,7 +138,7 @@ describe('Offline Sync Strategy', () => {
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
       // Network connected but no internet
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: false,
       });
@@ -151,7 +151,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should handle rapid network changes', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -163,7 +163,7 @@ describe('Offline Sync Strategy', () => {
 
       // Multiple rapid reconnects
       for (let i = 0; i < 5; i++) {
-        (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+        (mockNetInfo.fetch ).mockResolvedValue({
           isConnected: i % 2 === 0,
           isInternetReachable: i % 2 === 0,
         });
@@ -178,7 +178,7 @@ describe('Offline Sync Strategy', () => {
 
   describe('Manual Sync Trigger', () => {
     it('should allow manual sync trigger', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -189,7 +189,7 @@ describe('Offline Sync Strategy', () => {
       offlineSyncQueue.registerHandler('CREATE_MOMENT', handler);
 
       // Manual trigger (user presses sync button)
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -202,7 +202,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should return sync status immediately if already syncing', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -229,7 +229,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should allow retry of failed sync', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -257,7 +257,7 @@ describe('Offline Sync Strategy', () => {
 
   describe('Sync Result Reporting', () => {
     it('should report sync success', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -280,7 +280,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should report partial sync', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -304,7 +304,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should report sync failure details', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -331,7 +331,7 @@ describe('Offline Sync Strategy', () => {
 
   describe('Partial Sync Handling', () => {
     it('should continue syncing after non-critical failure', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -354,7 +354,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should keep failed actions in queue for retry', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -384,7 +384,7 @@ describe('Offline Sync Strategy', () => {
 
   describe('Sync Conflict Detection', () => {
     it('should detect timestamp conflicts', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -420,7 +420,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should apply last-write-wins strategy', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -451,7 +451,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should handle duplicate action conflicts', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -467,7 +467,7 @@ describe('Offline Sync Strategy', () => {
 
       offlineSyncQueue.registerHandler('LIKE_MOMENT', handler);
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -480,7 +480,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should handle conflicting actions (like then unlike)', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -492,7 +492,7 @@ describe('Offline Sync Strategy', () => {
 
       offlineSyncQueue.registerHandler('LIKE_MOMENT', likeHandler);
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -506,7 +506,7 @@ describe('Offline Sync Strategy', () => {
 
   describe('Network State Transitions', () => {
     it('should handle offline → online transition', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -519,7 +519,7 @@ describe('Offline Sync Strategy', () => {
       offlineSyncQueue.registerHandler('CREATE_MOMENT', handler);
 
       // Go online
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -532,13 +532,13 @@ describe('Offline Sync Strategy', () => {
 
     it('should handle online → offline → online transition', async () => {
       // Start online
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
 
       // Go offline
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -546,7 +546,7 @@ describe('Offline Sync Strategy', () => {
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
       // Back online
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
@@ -560,7 +560,7 @@ describe('Offline Sync Strategy', () => {
     });
 
     it('should handle flaky network (intermittent connectivity)', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -576,7 +576,7 @@ describe('Offline Sync Strategy', () => {
 
       // Simulate flaky network
       for (let i = 0; i < 3; i++) {
-        (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+        (mockNetInfo.fetch ).mockResolvedValue({
           isConnected: true,
           isInternetReachable: i === 2, // Only stable on 3rd attempt
         });

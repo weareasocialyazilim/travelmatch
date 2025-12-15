@@ -44,7 +44,7 @@ describe('uploadService - Basic Functionality', () => {
     jest.clearAllMocks();
 
     // Mock auth
-    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+    (supabase.auth.getUser ).mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -58,7 +58,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    (supabase.from as jest.Mock).mockReturnValue({
+    (supabase.from ).mockReturnValue({
       select: mockSelect,
       insert: jest.fn().mockResolvedValue({ error: null }),
     });
@@ -74,7 +74,7 @@ describe('uploadService - Basic Functionality', () => {
     }) as any;
 
     // Mock FileSystem (still needed for some functions)
-    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
+    (FileSystem.getInfoAsync ).mockResolvedValue({
       exists: true,
       size: 1024 * 1024,
       uri: 'file:///tmp/test.jpg',
@@ -94,7 +94,7 @@ describe('uploadService - Basic Functionality', () => {
   });
 
   it('should reject upload when not authenticated', async () => {
-    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+    (supabase.auth.getUser ).mockResolvedValue({
       data: { user: null },
       error: null,
     });
@@ -126,7 +126,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    (supabase.from as jest.Mock).mockReturnValue({
+    (supabase.from ).mockReturnValue({
       select: mockSelect,
       insert: jest.fn().mockResolvedValue({ error: null }),
     });
@@ -148,7 +148,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    (supabase.from as jest.Mock).mockReturnValue({
+    (supabase.from ).mockReturnValue({
       select: mockSelect,
       insert: mockInsert,
     });

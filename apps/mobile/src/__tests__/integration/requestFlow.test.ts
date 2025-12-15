@@ -40,8 +40,8 @@ jest.mock('@/config/supabase', () => ({
   isSupabaseConfigured: jest.fn(() => true),
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockSupabase = supabase ;
+const mockLogger = logger ;
 
 // Ensure auth is properly assigned after mocking
 (mockSupabase.auth as any) = mockAuth;
@@ -102,7 +102,7 @@ describe('Request Flow Integration', () => {
       };
 
       // Mock moment fetch
-      (mockSupabase.from('moments').select as jest.Mock).mockReturnValue({
+      (mockSupabase.from('moments').select ).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockMoment,
@@ -211,7 +211,7 @@ describe('Request Flow Integration', () => {
         created_at: '2024-01-15T10:10:00Z',
       };
 
-      (mockSupabase.from('transactions').insert as jest.Mock).mockReturnValue({
+      (mockSupabase.from('transactions').insert ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockPaymentTransaction,
@@ -267,7 +267,7 @@ describe('Request Flow Integration', () => {
       };
 
       // Mock moment not found
-      (mockSupabase.from('moments').select as jest.Mock).mockReturnValue({
+      (mockSupabase.from('moments').select ).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: null,
@@ -308,7 +308,7 @@ describe('Request Flow Integration', () => {
         error: null,
       });
 
-      (mockSupabase.from('requests').update as jest.Mock).mockReturnValue({
+      (mockSupabase.from('requests').update ).mockReturnValue({
         eq: jest.fn().mockResolvedValue({
           data: mockAcceptedRequest,
           error: null,
@@ -467,7 +467,7 @@ describe('Request Flow Integration', () => {
         error: null,
       });
 
-      (mockSupabase.from('requests').update as jest.Mock).mockReturnValue({
+      (mockSupabase.from('requests').update ).mockReturnValue({
         eq: jest.fn().mockResolvedValue({
           data: mockCancelledRequest,
           error: null,
@@ -505,7 +505,7 @@ describe('Request Flow Integration', () => {
         created_at: '2024-01-15T11:00:00Z',
       };
 
-      (mockSupabase.from('transactions').insert as jest.Mock).mockReturnValue({
+      (mockSupabase.from('transactions').insert ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockPayment,
@@ -545,7 +545,7 @@ describe('Request Flow Integration', () => {
       mockLogger.error.mockImplementation(() => {});
 
       // Mock payment failure
-      (mockSupabase.from('transactions').insert as jest.Mock).mockReturnValue({
+      (mockSupabase.from('transactions').insert ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: null,
@@ -594,7 +594,7 @@ describe('Request Flow Integration', () => {
       };
 
       // Mock checking request status
-      (mockSupabase.from('requests').select as jest.Mock).mockReturnValue({
+      (mockSupabase.from('requests').select ).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockExpiredRequest,
@@ -647,7 +647,7 @@ describe('Request Flow Integration', () => {
         created_at: '2024-01-15T12:00:00Z',
       };
 
-      (mockSupabase.from('transactions').insert as jest.Mock).mockReturnValue({
+      (mockSupabase.from('transactions').insert ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockRefund,

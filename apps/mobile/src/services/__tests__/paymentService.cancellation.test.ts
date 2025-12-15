@@ -39,9 +39,9 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockSupabase = supabase ;
+const mockTransactionsService = transactionsService ;
+const mockLogger = logger ;
 
 // Simulated cancellable payment (would be in paymentService in production)
 class CancellablePayment {
@@ -114,7 +114,7 @@ describe('PaymentService - Payment Cancellation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({ 
+    (mockSupabase.auth.getUser ).mockResolvedValue({ 
       data: { user: mockUser }, 
       error: null 
     });
@@ -137,12 +137,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'cancelled' },
         error: null,
       });
@@ -186,7 +186,7 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -246,12 +246,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'refunded' },
         error: null,
       });
@@ -302,7 +302,7 @@ describe('PaymentService - Payment Cancellation', () => {
         metadata: { originalTransactionId: 'tx-123' },
       };
 
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockResolvedValueOnce({ data: mockPaymentTransaction, error: null })
         .mockResolvedValueOnce({ data: mockRefundTransaction, error: null });
 
@@ -344,12 +344,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'cancelled' },
         error: null,
       });
@@ -383,7 +383,7 @@ describe('PaymentService - Payment Cancellation', () => {
     it('should release payment hold on cancellation', async () => {
       const mockBalance = { balance: 100, currency: 'USD' };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
@@ -402,7 +402,7 @@ describe('PaymentService - Payment Cancellation', () => {
       // In production, this would update the balance back to original
       const updatedBalance = { balance: 100, currency: 'USD' }; // Hold released
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({ data: updatedBalance, error: null }),
@@ -439,11 +439,11 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       };
 
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
-      (mockTransactionsService.update as jest.Mock)
+      (mockTransactionsService.update )
         .mockResolvedValueOnce({ data: { ...mockTransaction1, status: 'cancelled' }, error: null })
         .mockResolvedValueOnce({ data: { ...mockTransaction2, status: 'cancelled' }, error: null });
 
@@ -499,11 +499,11 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       };
 
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
-      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction1, status: 'cancelled' },
         error: null,
       });

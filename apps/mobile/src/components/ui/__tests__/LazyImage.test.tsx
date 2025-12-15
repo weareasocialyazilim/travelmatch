@@ -18,8 +18,8 @@ jest.mock('@/utils/imageOptimization', () => ({
   },
 }));
 
-const mockUseLazyImage = useLazyImage as jest.MockedFunction<typeof useLazyImage>;
-const mockImageCacheManager = imageCacheManager as jest.Mocked<typeof imageCacheManager>;
+const mockUseLazyImage = useLazyImage ;
+const mockImageCacheManager = imageCacheManager ;
 
 describe('LazyImage', () => {
   beforeEach(() => {

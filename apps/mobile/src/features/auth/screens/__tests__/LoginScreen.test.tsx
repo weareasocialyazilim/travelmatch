@@ -36,8 +36,8 @@ const mockRoute = {
 
 describe('LoginScreen', () => {
   const mockLogin = jest.fn();
-  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-  const mockLogger = logger as jest.Mocked<typeof logger>;
+  const mockUseAuth = useAuth ;
+  const mockLogger = logger ;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -51,17 +51,17 @@ describe('LoginScreen', () => {
 
     // Mock friendlyErrorHandler functions
     // validateEmail returns true/false for inline validation, throws for form submission validation
-    (friendlyErrorHandler.validateEmail as jest.Mock) = jest.fn((email) => {
+    (friendlyErrorHandler.validateEmail ) = jest.fn((email) => {
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return re.test(email);
     });
-    (friendlyErrorHandler.validateRequired as jest.Mock) = jest.fn((value, field) => {
+    (friendlyErrorHandler.validateRequired ) = jest.fn((value, field) => {
       if (!value || value.trim() === '') {
         throw new Error(`${field} is required`);
       }
       return true;
     });
-    (friendlyErrorHandler.showErrorAlert as jest.Mock) = jest.fn();
+    (friendlyErrorHandler.showErrorAlert ) = jest.fn();
   });
 
   describe('Rendering', () => {

@@ -28,8 +28,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockScreenCapture = ScreenCapture as jest.Mocked<typeof ScreenCapture>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockScreenCapture = ScreenCapture ;
+const mockLogger = logger ;
 
 describe('useScreenSecurity', () => {
   beforeEach(() => {

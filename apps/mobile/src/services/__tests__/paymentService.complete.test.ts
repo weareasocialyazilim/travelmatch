@@ -28,22 +28,22 @@ jest.mock('../supabaseDbService', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
+const mockSupabase = supabase ;
+const mockTransactionsService = transactionsService ;
 
 describe('PaymentService', () => {
   const mockUser = { id: 'user-123', email: 'test@example.com' };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({ data: { user: mockUser }, error: null });
+    (mockSupabase.auth.getUser ).mockResolvedValue({ data: { user: mockUser }, error: null });
   });
 
   describe('getBalance', () => {
     it('should fetch user wallet balance', async () => {
       const mockBalance = { balance: 100.50, currency: 'USD' };
       
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
@@ -62,7 +62,7 @@ describe('PaymentService', () => {
     });
 
     it('should return zero balance when user not found', async () => {
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({ data: null, error: new Error('Not found') }),
@@ -80,7 +80,7 @@ describe('PaymentService', () => {
     });
 
     it('should return zero balance when user not authenticated', async () => {
-      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({ data: { user: null }, error: null });
+      (mockSupabase.auth.getUser ).mockResolvedValue({ data: { user: null }, error: null });
 
       const result = await paymentService.getBalance();
       
@@ -109,7 +109,7 @@ describe('PaymentService', () => {
         },
       ];
 
-      (mockTransactionsService.list as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.list ).mockResolvedValue({
         data: mockTransactions,
         count: 1,
         error: null,
@@ -127,7 +127,7 @@ describe('PaymentService', () => {
     });
 
     it('should filter transactions by type', async () => {
-      (mockTransactionsService.list as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -141,7 +141,7 @@ describe('PaymentService', () => {
     });
 
     it('should filter transactions by status', async () => {
-      (mockTransactionsService.list as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -155,7 +155,7 @@ describe('PaymentService', () => {
     });
 
     it('should filter transactions by date range', async () => {
-      (mockTransactionsService.list as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -173,7 +173,7 @@ describe('PaymentService', () => {
     });
 
     it('should handle pagination', async () => {
-      (mockTransactionsService.list as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -187,7 +187,7 @@ describe('PaymentService', () => {
     });
 
     it('should return empty array on error', async () => {
-      (mockTransactionsService.list as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.list ).mockResolvedValue({
         data: null,
         count: 0,
         error: new Error('Database error'),
@@ -215,7 +215,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.get as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.get ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -231,7 +231,7 @@ describe('PaymentService', () => {
     });
 
     it('should throw error when transaction not found', async () => {
-      (mockTransactionsService.get as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.get ).mockResolvedValue({
         data: null,
         error: new Error('Not found'),
       });
@@ -331,7 +331,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -351,7 +351,7 @@ describe('PaymentService', () => {
     });
 
     it('should throw error when payment fails', async () => {
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: null,
         error: new Error('Payment failed'),
       });
@@ -378,7 +378,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -395,7 +395,7 @@ describe('PaymentService', () => {
     });
 
     it('should throw error when withdrawal fails', async () => {
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: null,
         error: new Error('Withdrawal failed'),
       });
@@ -422,7 +422,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -441,7 +441,7 @@ describe('PaymentService', () => {
     it('should get complete wallet balance', async () => {
       const mockBalance = { balance: 250.75, currency: 'USD' };
       
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
@@ -470,7 +470,7 @@ describe('PaymentService', () => {
         created_at: new Date().toISOString(),
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         insert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({ data: mockIntent, error: null }),
@@ -499,7 +499,7 @@ describe('PaymentService', () => {
         status: 'completed',
       };
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             select: jest.fn().mockReturnValue({
@@ -515,7 +515,7 @@ describe('PaymentService', () => {
     });
 
     it('should handle payment confirmation failure', async () => {
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             select: jest.fn().mockReturnValue({
@@ -576,7 +576,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -607,7 +607,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -633,7 +633,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });

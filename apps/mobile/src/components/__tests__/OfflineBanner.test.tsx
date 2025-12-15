@@ -10,7 +10,7 @@ import { useNetwork } from '../../hooks/useNetwork';
 // Mock useNetwork hook
 jest.mock('../../hooks/useNetwork');
 
-const mockUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;
+const mockUseNetwork = useNetwork ;
 
 describe('OfflineBanner', () => {
   beforeEach(() => {

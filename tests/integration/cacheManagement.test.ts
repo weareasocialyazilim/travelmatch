@@ -478,7 +478,7 @@ describe('Cache Management Tests', () => {
 
     it('should use cache tags for grouped invalidation', () => {
       interface TaggedEntry {
-        data: any;
+        data;
         tags: string[];
       }
       

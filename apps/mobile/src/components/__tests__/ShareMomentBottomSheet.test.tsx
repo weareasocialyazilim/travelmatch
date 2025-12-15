@@ -92,7 +92,7 @@ describe('ShareMomentBottomSheet', () => {
     });
 
     it('shows error alert if copy fails', () => {
-      (Clipboard.setString as jest.Mock).mockImplementationOnce(() => {
+      (Clipboard.setString ).mockImplementationOnce(() => {
         throw new Error('Copy failed');
       });
       const { getByText } = render(<ShareMomentBottomSheet {...defaultProps} />);
@@ -124,7 +124,7 @@ describe('ShareMomentBottomSheet', () => {
     });
 
     it('closes bottom sheet after successful share', async () => {
-      (Share.share as jest.Mock).mockResolvedValueOnce({ action: 'sharedAction' });
+      (Share.share ).mockResolvedValueOnce({ action: 'sharedAction' });
       const { getByText } = render(<ShareMomentBottomSheet {...defaultProps} />);
       const shareButton = getByText('Share via...');
       fireEvent.press(shareButton);
@@ -147,7 +147,7 @@ describe('ShareMomentBottomSheet', () => {
     });
 
     it('handles share cancellation gracefully', async () => {
-      (Share.share as jest.Mock).mockResolvedValueOnce({ action: 'dismissedAction' });
+      (Share.share ).mockResolvedValueOnce({ action: 'dismissedAction' });
       const { getByText } = render(<ShareMomentBottomSheet {...defaultProps} />);
       const shareButton = getByText('Share via...');
       fireEvent.press(shareButton);

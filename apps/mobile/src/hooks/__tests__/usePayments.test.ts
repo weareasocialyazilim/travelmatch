@@ -38,8 +38,8 @@ jest.mock('@/services/paymentService', () => ({
 
 import { paymentService } from '@/services/paymentService';
 
-const mockPaymentService = paymentService as jest.Mocked<typeof paymentService>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockPaymentService = paymentService ;
+const mockLogger = logger ;
 
 describe('usePayments', () => {
   beforeEach(() => {
@@ -355,7 +355,7 @@ describe('usePayments', () => {
         card: newCard,
       });
 
-      let addedCard: any;
+      let addedCard;
       act(() => {
         addedCard = result.current.addCard('tok_visa');
       });
@@ -375,7 +375,7 @@ describe('usePayments', () => {
         throw new Error('Invalid token');
       });
 
-      let addedCard: any;
+      let addedCard;
       act(() => {
         addedCard = result.current.addCard('tok_invalid');
       });
@@ -532,7 +532,7 @@ describe('usePayments', () => {
         bankAccount: newAccount,
       });
 
-      let addedAccount: any;
+      let addedAccount;
       act(() => {
         addedAccount = result.current.addBankAccount(accountData);
       });
@@ -552,7 +552,7 @@ describe('usePayments', () => {
         throw new Error('Invalid account');
       });
 
-      let addedAccount: any;
+      let addedAccount;
       act(() => {
         addedAccount = result.current.addBankAccount({
           accountNumber: 'invalid',
@@ -639,7 +639,7 @@ describe('usePayments', () => {
         transaction: withdrawalTransaction,
       });
 
-      let transaction: any;
+      let transaction;
       await act(async () => {
         transaction = await result.current.requestWithdrawal(100, 'ba_1');
       });
@@ -660,7 +660,7 @@ describe('usePayments', () => {
         new Error('Insufficient balance')
       );
 
-      let transaction: any;
+      let transaction;
       await act(async () => {
         transaction = await result.current.requestWithdrawal(1000000, 'ba_1');
       });
@@ -709,7 +709,7 @@ describe('usePayments', () => {
         paymentIntent: mockIntent,
       });
 
-      let intent: any;
+      let intent;
       await act(async () => {
         intent = await result.current.createPaymentIntent('moment_1', 5000);
       });
@@ -732,7 +732,7 @@ describe('usePayments', () => {
         new Error('Invalid moment')
       );
 
-      let intent: any;
+      let intent;
       await act(async () => {
         intent = await result.current.createPaymentIntent('invalid', 5000);
       });

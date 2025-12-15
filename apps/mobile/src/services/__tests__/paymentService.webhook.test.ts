@@ -39,9 +39,9 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockSupabase = supabase ;
+const mockTransactionsService = transactionsService ;
+const mockLogger = logger ;
 
 // Simulated webhook handler (would be in Edge Function in production)
 interface WebhookEvent {
@@ -108,7 +108,7 @@ describe('PaymentService - Webhook Failures', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({ 
+    (mockSupabase.auth.getUser ).mockResolvedValue({ 
       data: { user: mockUser }, 
       error: null 
     });
@@ -180,7 +180,7 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // First 3 polls: pending, then completed
-      (mockTransactionsService.get as jest.Mock)
+      (mockTransactionsService.get )
         .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
         .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
         .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
@@ -216,7 +216,7 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // Always return pending
-      (mockTransactionsService.get as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.get ).mockResolvedValue({
         data: { ...mockTransaction, status: 'pending' },
         error: null,
       });
@@ -250,7 +250,7 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // Poll 1: pending, Poll 2: failed
-      (mockTransactionsService.get as jest.Mock)
+      (mockTransactionsService.get )
         .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
         .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'failed' }, error: null });
 
@@ -342,7 +342,7 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // Create payment
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -372,7 +372,7 @@ describe('PaymentService - Webhook Failures', () => {
       expect(webhookResult).toBeNull(); // Webhook failed
 
       // Fallback to polling
-      (mockTransactionsService.get as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.get ).mockResolvedValue({
         data: { ...mockTransaction, status: 'completed' },
         error: null,
       });
@@ -401,7 +401,7 @@ describe('PaymentService - Webhook Failures', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'completed' },
         error: null,
       });
@@ -450,7 +450,7 @@ describe('PaymentService - Webhook Failures', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'failed' },
         error: null,
       });

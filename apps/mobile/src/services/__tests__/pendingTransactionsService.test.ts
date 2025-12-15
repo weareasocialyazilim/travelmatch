@@ -21,8 +21,8 @@ import { logger } from '../../utils/logger';
 jest.mock('@react-native-async-storage/async-storage');
 jest.mock('../../utils/logger');
 
-const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockAsyncStorage = AsyncStorage ;
+const mockLogger = logger ;
 
 describe('PendingTransactionsService', () => {
   beforeEach(() => {

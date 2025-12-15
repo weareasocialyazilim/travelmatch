@@ -39,8 +39,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSentry = Sentry as jest.Mocked<typeof Sentry>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockSentry = Sentry ;
+const mockLogger = logger ;
 
 // Component that throws an error
 const ThrowError: React.FC<{ message?: string; shouldThrow?: boolean }> = ({

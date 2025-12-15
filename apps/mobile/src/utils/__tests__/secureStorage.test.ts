@@ -61,8 +61,8 @@ describe('secureStorage', () => {
 
   describe('setItem - SecureStore available', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should store item in SecureStore when available', async () => {
@@ -83,8 +83,8 @@ describe('secureStorage', () => {
 
   describe('setItem - SecureStore not available', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(false);
-      (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(false);
+      (AsyncStorage.setItem ).mockResolvedValue(undefined);
     });
 
     it('should fallback to AsyncStorage when SecureStore not available', async () => {
@@ -103,7 +103,7 @@ describe('secureStorage', () => {
   describe('setItem - web platform', () => {
     beforeEach(() => {
       mockPlatform.OS = 'web';
-      (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
+      (AsyncStorage.setItem ).mockResolvedValue(undefined);
     });
 
     it('should use AsyncStorage on web platform', async () => {
@@ -116,9 +116,9 @@ describe('secureStorage', () => {
 
   describe('setItem - error handling', () => {
     it('should fallback to AsyncStorage when SecureStore throws error', async () => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.setItemAsync as jest.Mock).mockRejectedValue(new Error('SecureStore error'));
-      (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.setItem ).mockResolvedValue(undefined);
 
       await secureStorage.setItem('test_key', 'test_value');
 
@@ -126,9 +126,9 @@ describe('secureStorage', () => {
     });
 
     it('should throw if both SecureStore and AsyncStorage fail', async () => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.setItemAsync as jest.Mock).mockRejectedValue(new Error('SecureStore error'));
-      (AsyncStorage.setItem as jest.Mock).mockRejectedValue(new Error('AsyncStorage error'));
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.setItem ).mockRejectedValue(new Error('AsyncStorage error'));
 
       await expect(secureStorage.setItem('test_key', 'test_value')).rejects.toThrow(
         'AsyncStorage error'
@@ -138,11 +138,11 @@ describe('secureStorage', () => {
 
   describe('getItem - SecureStore available', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
     });
 
     it('should retrieve item from SecureStore', async () => {
-      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue('stored_value');
+      (SecureStore.getItemAsync ).mockResolvedValue('stored_value');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -151,7 +151,7 @@ describe('secureStorage', () => {
     });
 
     it('should return null when key does not exist', async () => {
-      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+      (SecureStore.getItemAsync ).mockResolvedValue(null);
 
       const result = await secureStorage.getItem('nonexistent');
 
@@ -159,7 +159,7 @@ describe('secureStorage', () => {
     });
 
     it('should retrieve auth tokens from SecureStore', async () => {
-      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue('refresh_token_456');
+      (SecureStore.getItemAsync ).mockResolvedValue('refresh_token_456');
 
       const result = await secureStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
 
@@ -169,11 +169,11 @@ describe('secureStorage', () => {
 
   describe('getItem - SecureStore not available', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(false);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(false);
     });
 
     it('should retrieve from AsyncStorage when SecureStore not available', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('async_value');
+      (AsyncStorage.getItem ).mockResolvedValue('async_value');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -182,7 +182,7 @@ describe('secureStorage', () => {
     });
 
     it('should return null from AsyncStorage when key does not exist', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+      (AsyncStorage.getItem ).mockResolvedValue(null);
 
       const result = await secureStorage.getItem('nonexistent');
 
@@ -192,9 +192,9 @@ describe('secureStorage', () => {
 
   describe('getItem - error handling', () => {
     it('should fallback to AsyncStorage when SecureStore throws error', async () => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.getItemAsync as jest.Mock).mockRejectedValue(new Error('SecureStore error'));
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('fallback_value');
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.getItemAsync ).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.getItem ).mockResolvedValue('fallback_value');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -203,10 +203,10 @@ describe('secureStorage', () => {
     });
 
     it('should handle isAvailableAsync throwing error', async () => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockRejectedValue(
+      (SecureStore.isAvailableAsync ).mockRejectedValue(
         new Error('Availability check failed')
       );
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('async_fallback');
+      (AsyncStorage.getItem ).mockResolvedValue('async_fallback');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -216,8 +216,8 @@ describe('secureStorage', () => {
 
   describe('deleteItem - SecureStore available', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should delete from SecureStore when available', async () => {
@@ -235,8 +235,8 @@ describe('secureStorage', () => {
 
   describe('deleteItem - SecureStore not available', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(false);
-      (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(false);
+      (AsyncStorage.removeItem ).mockResolvedValue(undefined);
     });
 
     it('should delete from AsyncStorage when SecureStore not available', async () => {
@@ -248,11 +248,11 @@ describe('secureStorage', () => {
 
   describe('deleteItem - error handling', () => {
     it('should fallback to AsyncStorage when SecureStore throws error', async () => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValue(
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync ).mockRejectedValue(
         new Error('SecureStore delete error')
       );
-      (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
+      (AsyncStorage.removeItem ).mockResolvedValue(undefined);
 
       await secureStorage.deleteItem('test_key');
 
@@ -262,8 +262,8 @@ describe('secureStorage', () => {
 
   describe('deleteItems', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should delete multiple items', async () => {
@@ -298,11 +298,11 @@ describe('secureStorage', () => {
     });
 
     it('should delete items even if some fail', async () => {
-      (SecureStore.deleteItemAsync as jest.Mock)
+      (SecureStore.deleteItemAsync )
         .mockResolvedValueOnce(undefined)
         .mockRejectedValueOnce(new Error('Delete failed'))
         .mockResolvedValueOnce(undefined);
-      (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
+      (AsyncStorage.removeItem ).mockResolvedValue(undefined);
 
       const keys = ['key1', 'key2', 'key3'];
       await secureStorage.deleteItems(keys);
@@ -314,16 +314,16 @@ describe('secureStorage', () => {
 
   describe('Integration scenarios', () => {
     beforeEach(() => {
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
-      (SecureStore.getItemAsync as jest.Mock).mockImplementation((key) => {
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
+      (SecureStore.getItemAsync ).mockImplementation((key) => {
         const storage: Record<string, string> = {
           [AUTH_STORAGE_KEYS.ACCESS_TOKEN]: 'access_123',
           [AUTH_STORAGE_KEYS.REFRESH_TOKEN]: 'refresh_456',
         };
         return Promise.resolve(storage[key] || null);
       });
-      (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.deleteItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should handle full auth flow: store, retrieve, delete tokens', async () => {
@@ -351,7 +351,7 @@ describe('secureStorage', () => {
     it('should handle token refresh scenario', async () => {
       // Set item to return different values on subsequent calls
       let currentToken = 'old_token';
-      (SecureStore.getItemAsync as jest.Mock).mockImplementation(() =>
+      (SecureStore.getItemAsync ).mockImplementation(() =>
         Promise.resolve(currentToken)
       );
 
@@ -387,8 +387,8 @@ describe('secureStorage', () => {
   describe('Platform-specific behavior', () => {
     it('should handle Android platform', async () => {
       mockPlatform.OS = 'android';
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
 
       await secureStorage.setItem('android_key', 'android_value');
 
@@ -397,8 +397,8 @@ describe('secureStorage', () => {
 
     it('should handle iOS platform', async () => {
       mockPlatform.OS = 'ios';
-      (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-      (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
 
       await secureStorage.setItem('ios_key', 'ios_value');
 

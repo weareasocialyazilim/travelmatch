@@ -28,13 +28,13 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
+const mockNetInfo = NetInfo ;
 
 describe('Optimistic UI Updates', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     
-    (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+    (mockNetInfo.fetch ).mockResolvedValue({
       isConnected: true,
       isInternetReachable: true,
     });
@@ -90,7 +90,7 @@ describe('Optimistic UI Updates', () => {
     });
 
     it('should update UI immediately for offline actions', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -553,7 +553,7 @@ describe('Optimistic UI Updates', () => {
 
   describe('UI Consistency', () => {
     it('should maintain UI consistency during offline-to-online transition', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -577,7 +577,7 @@ describe('Optimistic UI Updates', () => {
       expect(cacheService.getQueryData(cacheKey)).toEqual({ id: '999', liked: true, likes: 51 });
 
       // Go online and sync
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });

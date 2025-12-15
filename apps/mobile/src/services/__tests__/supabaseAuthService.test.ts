@@ -89,7 +89,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signUpWithEmail', () => {
     it('should successfully sign up with valid credentials', async () => {
-      (auth.signUp as jest.Mock).mockResolvedValue({
+      (auth.signUp ).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
@@ -112,7 +112,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should sign up with metadata', async () => {
-      (auth.signUp as jest.Mock).mockResolvedValue({
+      (auth.signUp ).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
@@ -130,7 +130,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle sign up errors', async () => {
-      (auth.signUp as jest.Mock).mockResolvedValue({
+      (auth.signUp ).mockResolvedValue({
         data: { user: null, session: null },
         error: mockAuthError,
       });
@@ -145,7 +145,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle exceptions during sign up', async () => {
       const exception = new Error('Network error');
-      (auth.signUp as jest.Mock).mockRejectedValue(exception);
+      (auth.signUp ).mockRejectedValue(exception);
 
       const result = await signUpWithEmail('test@example.com', 'Password123!');
 
@@ -157,7 +157,7 @@ describe('supabaseAuthService', () => {
 
     it('should return error when Supabase is not configured', async () => {
       const { isSupabaseConfigured } = require('@/config/supabase');
-      (isSupabaseConfigured as jest.Mock).mockReturnValue(false);
+      (isSupabaseConfigured ).mockReturnValue(false);
 
       const result = await signUpWithEmail('test@example.com', 'Password123!');
 
@@ -165,7 +165,7 @@ describe('supabaseAuthService', () => {
       expect(logger.warn).toHaveBeenCalledWith('[Auth] Supabase not configured');
 
       // Restore
-      (isSupabaseConfigured as jest.Mock).mockReturnValue(true);
+      (isSupabaseConfigured ).mockReturnValue(true);
     });
   });
 
@@ -174,7 +174,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signInWithEmail', () => {
     it('should successfully sign in with valid credentials', async () => {
-      (auth.signInWithPassword as jest.Mock).mockResolvedValue({
+      (auth.signInWithPassword ).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
@@ -194,7 +194,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle invalid credentials', async () => {
-      (auth.signInWithPassword as jest.Mock).mockResolvedValue({
+      (auth.signInWithPassword ).mockResolvedValue({
         data: { user: null, session: null },
         error: mockAuthError,
       });
@@ -209,7 +209,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle network errors during sign in', async () => {
       const networkError = new Error('Network request failed');
-      (auth.signInWithPassword as jest.Mock).mockRejectedValue(networkError);
+      (auth.signInWithPassword ).mockRejectedValue(networkError);
 
       const result = await signInWithEmail('test@example.com', 'Password123!');
 
@@ -219,14 +219,14 @@ describe('supabaseAuthService', () => {
 
     it('should return error when Supabase is not configured', async () => {
       const { isSupabaseConfigured } = require('@/config/supabase');
-      (isSupabaseConfigured as jest.Mock).mockReturnValue(false);
+      (isSupabaseConfigured ).mockReturnValue(false);
 
       const result = await signInWithEmail('test@example.com', 'Password123!');
 
       expect(result.error?.message).toBe('Supabase not configured');
 
       // Restore
-      (isSupabaseConfigured as jest.Mock).mockReturnValue(true);
+      (isSupabaseConfigured ).mockReturnValue(true);
     });
   });
 
@@ -235,7 +235,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signInWithOAuth', () => {
     it('should generate OAuth URL for Google', async () => {
-      (auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (auth.signInWithOAuth ).mockResolvedValue({
         data: { url: 'https://google.com/oauth', provider: 'google' },
         error: null,
       });
@@ -255,7 +255,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should generate OAuth URL for Apple', async () => {
-      (auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (auth.signInWithOAuth ).mockResolvedValue({
         data: { url: 'https://apple.com/oauth', provider: 'apple' },
         error: null,
       });
@@ -273,7 +273,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle OAuth errors', async () => {
-      (auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (auth.signInWithOAuth ).mockResolvedValue({
         data: { url: null, provider: null },
         error: mockAuthError,
       });
@@ -287,7 +287,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle OAuth exceptions', async () => {
       const exception = new Error('OAuth provider unavailable');
-      (auth.signInWithOAuth as jest.Mock).mockRejectedValue(exception);
+      (auth.signInWithOAuth ).mockRejectedValue(exception);
 
       const result = await signInWithOAuth('facebook');
 
@@ -301,7 +301,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signOut', () => {
     it('should successfully sign out', async () => {
-      (auth.signOut as jest.Mock).mockResolvedValue({ error: null });
+      (auth.signOut ).mockResolvedValue({ error: null });
 
       const result = await signOut();
 
@@ -311,7 +311,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle sign out errors', async () => {
-      (auth.signOut as jest.Mock).mockResolvedValue({ error: mockAuthError });
+      (auth.signOut ).mockResolvedValue({ error: mockAuthError });
 
       const result = await signOut();
 
@@ -321,7 +321,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle sign out exceptions', async () => {
       const exception = new Error('Sign out failed');
-      (auth.signOut as jest.Mock).mockRejectedValue(exception);
+      (auth.signOut ).mockRejectedValue(exception);
 
       const result = await signOut();
 
@@ -335,7 +335,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('getSession', () => {
     it('should retrieve current session', async () => {
-      (auth.getSession as jest.Mock).mockResolvedValue({
+      (auth.getSession ).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -348,7 +348,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle missing session', async () => {
-      (auth.getSession as jest.Mock).mockResolvedValue({
+      (auth.getSession ).mockResolvedValue({
         data: { session: null },
         error: null,
       });
@@ -360,7 +360,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle session errors', async () => {
-      (auth.getSession as jest.Mock).mockResolvedValue({
+      (auth.getSession ).mockResolvedValue({
         data: { session: null },
         error: mockAuthError,
       });
@@ -374,7 +374,7 @@ describe('supabaseAuthService', () => {
 
   describe('getCurrentUser', () => {
     it('should retrieve current user', async () => {
-      (auth.getUser as jest.Mock).mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -386,7 +386,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should return null when no user is authenticated', async () => {
-      (auth.getUser as jest.Mock).mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -397,7 +397,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle errors and return null', async () => {
-      (auth.getUser as jest.Mock).mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -410,7 +410,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle exceptions and return null', async () => {
       const exception = new Error('User fetch failed');
-      (auth.getUser as jest.Mock).mockRejectedValue(exception);
+      (auth.getUser ).mockRejectedValue(exception);
 
       const user = await getCurrentUser();
 
@@ -424,7 +424,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('resetPassword', () => {
     it('should send password reset email successfully', async () => {
-      (auth.resetPasswordForEmail as jest.Mock).mockResolvedValue({ error: null });
+      (auth.resetPasswordForEmail ).mockResolvedValue({ error: null });
 
       const result = await resetPassword('test@example.com');
 
@@ -439,7 +439,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle reset password errors', async () => {
-      (auth.resetPasswordForEmail as jest.Mock).mockResolvedValue({
+      (auth.resetPasswordForEmail ).mockResolvedValue({
         error: mockAuthError,
       });
 
@@ -451,7 +451,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle reset password exceptions', async () => {
       const exception = new Error('Email service unavailable');
-      (auth.resetPasswordForEmail as jest.Mock).mockRejectedValue(exception);
+      (auth.resetPasswordForEmail ).mockRejectedValue(exception);
 
       const result = await resetPassword('test@example.com');
 
@@ -460,20 +460,20 @@ describe('supabaseAuthService', () => {
 
     it('should return error when Supabase is not configured', async () => {
       const { isSupabaseConfigured } = require('@/config/supabase');
-      (isSupabaseConfigured as jest.Mock).mockReturnValue(false);
+      (isSupabaseConfigured ).mockReturnValue(false);
 
       const result = await resetPassword('test@example.com');
 
       expect(result.error?.message).toBe('Supabase not configured');
 
       // Restore
-      (isSupabaseConfigured as jest.Mock).mockReturnValue(true);
+      (isSupabaseConfigured ).mockReturnValue(true);
     });
   });
 
   describe('updatePassword', () => {
     it('should successfully update password', async () => {
-      (auth.updateUser as jest.Mock).mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -488,7 +488,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle update password errors', async () => {
-      (auth.updateUser as jest.Mock).mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -501,7 +501,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle update password exceptions', async () => {
       const exception = new Error('Password update failed');
-      (auth.updateUser as jest.Mock).mockRejectedValue(exception);
+      (auth.updateUser ).mockRejectedValue(exception);
 
       const result = await updatePassword('NewPassword123!');
 
@@ -515,7 +515,7 @@ describe('supabaseAuthService', () => {
   describe('updateProfile', () => {
     it('should successfully update user profile', async () => {
       const updatedUser = { ...mockUser, user_metadata: { name: 'John Updated' } };
-      (auth.updateUser as jest.Mock).mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: updatedUser },
         error: null,
       });
@@ -531,7 +531,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should update avatar URL', async () => {
-      (auth.updateUser as jest.Mock).mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -544,7 +544,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle profile update errors', async () => {
-      (auth.updateUser as jest.Mock).mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -557,7 +557,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle profile update exceptions', async () => {
       const exception = new Error('Profile update failed');
-      (auth.updateUser as jest.Mock).mockRejectedValue(exception);
+      (auth.updateUser ).mockRejectedValue(exception);
 
       const result = await updateProfile({ name: 'John' });
 
@@ -577,7 +577,7 @@ describe('supabaseAuthService', () => {
 
     it('should successfully delete account and sign out', async () => {
       // Mock auth.getUser (used in deleteAccount)
-      (auth.getUser as jest.Mock).mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -587,8 +587,8 @@ describe('supabaseAuthService', () => {
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      (supabase.from as jest.Mock) = mockFrom;
-      (auth.signOut as jest.Mock).mockResolvedValue({ error: null });
+      (supabase.from ) = mockFrom;
+      (auth.signOut ).mockResolvedValue({ error: null });
 
       const result = await deleteAccount();
 
@@ -601,7 +601,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should sign out even if database update fails', async () => {
-      (auth.getUser as jest.Mock).mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -610,8 +610,8 @@ describe('supabaseAuthService', () => {
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      (supabase.from as jest.Mock) = mockFrom;
-      (auth.signOut as jest.Mock).mockResolvedValue({ error: null });
+      (supabase.from ) = mockFrom;
+      (auth.signOut ).mockResolvedValue({ error: null });
 
       const result = await deleteAccount();
 
@@ -621,7 +621,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle sign out errors during account deletion', async () => {
-      (auth.getUser as jest.Mock).mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -630,8 +630,8 @@ describe('supabaseAuthService', () => {
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      (supabase.from as jest.Mock) = mockFrom;
-      (auth.signOut as jest.Mock).mockResolvedValue({ error: mockAuthError });
+      (supabase.from ) = mockFrom;
+      (auth.signOut ).mockResolvedValue({ error: mockAuthError });
 
       const result = await deleteAccount();
 
@@ -641,7 +641,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle exceptions during account deletion', async () => {
       const exception = new Error('Account deletion failed');
-      (auth.getUser as jest.Mock).mockRejectedValue(exception);
+      (auth.getUser ).mockRejectedValue(exception);
 
       const result = await deleteAccount();
 
@@ -658,7 +658,7 @@ describe('supabaseAuthService', () => {
       const mockCallback = jest.fn();
       const mockUnsubscribe = jest.fn();
 
-      (auth.onAuthStateChange as jest.Mock).mockImplementation((callback) => {
+      (auth.onAuthStateChange ).mockImplementation((callback) => {
         // Simulate auth state change
         callback('SIGNED_IN', mockSession);
         return { data: { subscription: { unsubscribe: mockUnsubscribe } } };
@@ -674,7 +674,7 @@ describe('supabaseAuthService', () => {
     it('should handle SIGNED_OUT event', () => {
       const mockCallback = jest.fn();
 
-      (auth.onAuthStateChange as jest.Mock).mockImplementation((callback) => {
+      (auth.onAuthStateChange ).mockImplementation((callback) => {
         callback('SIGNED_OUT', null);
         return { data: { subscription: { unsubscribe: jest.fn() } } };
       });
@@ -687,7 +687,7 @@ describe('supabaseAuthService', () => {
     it('should handle TOKEN_REFRESHED event', () => {
       const mockCallback = jest.fn();
 
-      (auth.onAuthStateChange as jest.Mock).mockImplementation((callback) => {
+      (auth.onAuthStateChange ).mockImplementation((callback) => {
         callback('TOKEN_REFRESHED', mockSession);
         return { data: { subscription: { unsubscribe: jest.fn() } } };
       });

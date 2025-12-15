@@ -28,7 +28,7 @@ jest.mock('../../services/imageCacheManager', () => {
 
 // Import after mock
 import imageCacheManager from '../../services/imageCacheManager';
-const mockImageCacheManager = imageCacheManager as jest.Mocked<typeof imageCacheManager>;
+const mockImageCacheManager = imageCacheManager ;
 
 describe('CachedImage', () => {
   const mockImageUri = 'https://example.com/image.jpg';

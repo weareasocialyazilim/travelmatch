@@ -21,7 +21,7 @@ jest.mock('../../services/imageCacheManager', () => ({
   },
 }));
 
-const mockImageCacheManager = imageCacheManager as jest.Mocked<typeof imageCacheManager>;
+const mockImageCacheManager = imageCacheManager ;
 
 describe('CachedImage - Network Scenarios', () => {
   const mockImageUri = 'https://example.com/image.jpg';

@@ -52,8 +52,8 @@ jest.spyOn(Alert, 'alert');
 
 describe('RegisterScreen', () => {
   const mockRegister = jest.fn();
-  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-  const mockLogger = logger as jest.Mocked<typeof logger>;
+  const mockUseAuth = useAuth ;
+  const mockLogger = logger ;
 
   beforeEach(() => {
     jest.clearAllMocks();

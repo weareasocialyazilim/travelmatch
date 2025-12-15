@@ -31,7 +31,7 @@ describe('Discover Flow Integration', () => {
 
   beforeEach(() => {
     const useMoments = require('../../hooks/useMoments').useMoments;
-    (useMoments as jest.Mock).mockReturnValue(mockUseMoments);
+    (useMoments ).mockReturnValue(mockUseMoments);
   });
 
   afterEach(() => {
@@ -50,7 +50,7 @@ describe('Discover Flow Integration', () => {
 
     it('shows loading state during initial fetch', () => {
       const useMoments = require('../../hooks/useMoments').useMoments;
-      (useMoments as jest.Mock).mockReturnValue({
+      (useMoments ).mockReturnValue({
         ...mockUseMoments,
         loading: true,
         moments: [],
@@ -64,7 +64,7 @@ describe('Discover Flow Integration', () => {
 
     it('shows error state when fetch fails', () => {
       const useMoments = require('../../hooks/useMoments').useMoments;
-      (useMoments as jest.Mock).mockReturnValue({
+      (useMoments ).mockReturnValue({
         ...mockUseMoments,
         loading: false,
         error: 'Failed to load moments',
@@ -79,7 +79,7 @@ describe('Discover Flow Integration', () => {
 
     it('shows empty state when no moments available', () => {
       const useMoments = require('../../hooks/useMoments').useMoments;
-      (useMoments as jest.Mock).mockReturnValue({
+      (useMoments ).mockReturnValue({
         ...mockUseMoments,
         moments: [],
       });
@@ -173,7 +173,7 @@ describe('Discover Flow Integration', () => {
 
     it('does not load more when hasMore is false', async () => {
       const useMoments = require('../../hooks/useMoments').useMoments;
-      (useMoments as jest.Mock).mockReturnValue({
+      (useMoments ).mockReturnValue({
         ...mockUseMoments,
         hasMore: false,
       });

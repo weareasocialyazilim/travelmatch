@@ -47,7 +47,7 @@ describe('Integration Tests: Moments Flow', () => {
         },
       ];
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           order: jest.fn().mockReturnValue({
             limit: jest.fn().mockReturnValue({
@@ -97,7 +97,7 @@ describe('Integration Tests: Moments Flow', () => {
       };
 
       // Mock create response
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         insert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -127,7 +127,7 @@ describe('Integration Tests: Moments Flow', () => {
 
     it('should handle API errors gracefully', async () => {
       // Mock error response
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           order: jest.fn().mockReturnValue({
             limit: jest.fn().mockReturnValue({
@@ -162,7 +162,7 @@ describe('Integration Tests: Moments Flow', () => {
     it('should invalidate cache after mutation', async () => {
       const mockMoments = [{ id: '1', title: 'Test' }];
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           order: jest.fn().mockReturnValue({
             limit: jest.fn().mockReturnValue({

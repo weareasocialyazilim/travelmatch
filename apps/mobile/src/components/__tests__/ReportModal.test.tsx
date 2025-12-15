@@ -209,7 +209,7 @@ describe('ReportModal', () => {
     });
 
     it('should close modal after successful submission', async () => {
-      (moderationService.submitReport as jest.Mock).mockResolvedValueOnce({});
+      (moderationService.submitReport ).mockResolvedValueOnce({});
       const { getByText } = render(<ReportModal {...defaultProps} />);
 
       fireEvent.press(getByText('Spam'));
@@ -274,7 +274,7 @@ describe('ReportModal', () => {
 
   describe('Loading State', () => {
     it('should show loading indicator while submitting', async () => {
-      (moderationService.submitReport as jest.Mock).mockImplementation(
+      (moderationService.submitReport ).mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
@@ -293,7 +293,7 @@ describe('ReportModal', () => {
     });
 
     it('should disable submit button while loading', async () => {
-      (moderationService.submitReport as jest.Mock).mockImplementation(
+      (moderationService.submitReport ).mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
@@ -314,7 +314,7 @@ describe('ReportModal', () => {
 
   describe('Error Handling', () => {
     it('should show error toast when submission fails', async () => {
-      (moderationService.submitReport as jest.Mock).mockRejectedValueOnce(
+      (moderationService.submitReport ).mockRejectedValueOnce(
         new Error('Network error')
       );
 
@@ -332,7 +332,7 @@ describe('ReportModal', () => {
     });
 
     it('should not close modal when submission fails', async () => {
-      (moderationService.submitReport as jest.Mock).mockRejectedValueOnce(
+      (moderationService.submitReport ).mockRejectedValueOnce(
         new Error('Network error')
       );
 

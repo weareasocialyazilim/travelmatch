@@ -60,7 +60,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -83,7 +83,7 @@ describe('supabaseDbService', () => {
           error: { message: 'User not found', code: 'PGRST116' },
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -97,7 +97,7 @@ describe('supabaseDbService', () => {
       });
 
       it('should return error when Supabase is not configured', async () => {
-        (isSupabaseConfigured as jest.Mock).mockReturnValue(false);
+        (isSupabaseConfigured ).mockReturnValue(false);
 
         const result = await usersService.getById('user-123');
 
@@ -105,7 +105,7 @@ describe('supabaseDbService', () => {
         expect(result.error?.message).toBe('Supabase not configured');
 
         // Restore
-        (isSupabaseConfigured as jest.Mock).mockReturnValue(true);
+        (isSupabaseConfigured ).mockReturnValue(true);
       });
     });
 
@@ -122,7 +122,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           update: mockUpdate,
         });
         mockUpdate.mockReturnValue({ eq: mockEq });
@@ -147,7 +147,7 @@ describe('supabaseDbService', () => {
           error,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           update: mockUpdate,
         });
         mockUpdate.mockReturnValue({ eq: mockEq });
@@ -166,7 +166,7 @@ describe('supabaseDbService', () => {
       it('should follow a user successfully', async () => {
         const mockInsert = jest.fn().mockResolvedValue({ error: null });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           insert: mockInsert,
         });
 
@@ -184,7 +184,7 @@ describe('supabaseDbService', () => {
         const error = new Error('Duplicate follow');
         const mockInsert = jest.fn().mockResolvedValue({ error });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           insert: mockInsert,
         });
 
@@ -199,7 +199,7 @@ describe('supabaseDbService', () => {
         const mockEq1 = jest.fn().mockReturnThis();
         const mockEq2 = jest.fn().mockResolvedValue({ error: null });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           delete: mockDelete,
         });
         mockDelete.mockReturnValue({ eq: mockEq1 });
@@ -227,7 +227,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -252,7 +252,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -272,7 +272,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -293,7 +293,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq1 });
@@ -313,7 +313,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq1 });
@@ -340,7 +340,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ or: mockOr });
@@ -363,7 +363,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ or: mockOr });
@@ -390,7 +390,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ neq: mockNeq });
@@ -430,7 +430,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           insert: mockInsert,
         });
         mockInsert.mockReturnValue({ select: mockSelect });
@@ -458,7 +458,7 @@ describe('supabaseDbService', () => {
           error,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           insert: mockInsert,
         });
         mockInsert.mockReturnValue({ select: mockSelect });
@@ -486,7 +486,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -512,7 +512,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -534,7 +534,7 @@ describe('supabaseDbService', () => {
           error: null,
         });
 
-        (supabase.from as jest.Mock).mockReturnValue({
+        (supabase.from ).mockReturnValue({
           select: mockSelect,
         });
         mockSelect.mockReturnValue({ eq: mockEq });
@@ -562,7 +562,7 @@ describe('supabaseDbService', () => {
         error: { message: 'RLS policy violation', code: '42501' },
       });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: mockSelect,
       });
       mockSelect.mockReturnValue({ eq: mockEq });
@@ -588,7 +588,7 @@ describe('supabaseDbService', () => {
         error: networkError,
       });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: mockSelect,
       });
       mockSelect.mockReturnValue({ eq: mockEq });
@@ -610,7 +610,7 @@ describe('supabaseDbService', () => {
         error: timeoutError,
       });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: mockSelect,
       });
       mockSelect.mockReturnValue({ eq: mockEq });

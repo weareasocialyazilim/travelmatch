@@ -52,9 +52,9 @@ describe('useAuth', () => {
     await AsyncStorage.clear();
     
     // Mock secureStorage methods
-    (secureStorage.getItem as jest.Mock).mockResolvedValue(null);
-    (secureStorage.setItem as jest.Mock).mockResolvedValue(undefined);
-    (secureStorage.deleteItems as jest.Mock).mockResolvedValue(undefined);
+    (secureStorage.getItem ).mockResolvedValue(null);
+    (secureStorage.setItem ).mockResolvedValue(undefined);
+    (secureStorage.deleteItems ).mockResolvedValue(undefined);
   });
 
   describe('initial state', () => {
@@ -86,7 +86,7 @@ describe('useAuth', () => {
         JSON.stringify(mockUser),
       );
 
-      (secureStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      (secureStorage.getItem ).mockImplementation((key: string) => {
         if (key === AUTH_STORAGE_KEYS.ACCESS_TOKEN)
           return Promise.resolve('access-token-123');
         if (key === AUTH_STORAGE_KEYS.REFRESH_TOKEN)
@@ -112,7 +112,7 @@ describe('useAuth', () => {
         JSON.stringify(mockUser),
       );
 
-      (secureStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      (secureStorage.getItem ).mockImplementation((key: string) => {
         if (key === AUTH_STORAGE_KEYS.ACCESS_TOKEN)
           return Promise.resolve('access-token-123');
         if (key === AUTH_STORAGE_KEYS.REFRESH_TOKEN)
@@ -134,7 +134,7 @@ describe('useAuth', () => {
 
   describe('login', () => {
     it('should login successfully with valid credentials', async () => {
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -174,7 +174,7 @@ describe('useAuth', () => {
     });
 
     it('should handle invalid credentials', async () => {
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: null,
         session: null,
         error: new Error('Invalid credentials'),
@@ -203,7 +203,7 @@ describe('useAuth', () => {
     });
 
     it('should handle network errors', async () => {
-      (authService.signInWithEmail as jest.Mock).mockRejectedValue(
+      (authService.signInWithEmail ).mockRejectedValue(
         new Error('Network error'),
       );
 
@@ -228,7 +228,7 @@ describe('useAuth', () => {
     });
 
     it('should persist user and tokens after login', async () => {
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -270,7 +270,7 @@ describe('useAuth', () => {
 
   describe('register', () => {
     it('should register new user successfully', async () => {
-      (authService.signUpWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signUpWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -307,7 +307,7 @@ describe('useAuth', () => {
     });
 
     it('should handle duplicate email error', async () => {
-      (authService.signUpWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signUpWithEmail ).mockResolvedValue({
         user: null,
         session: null,
         error: new Error('User already exists'),
@@ -335,7 +335,7 @@ describe('useAuth', () => {
     });
 
     it('should handle weak password error', async () => {
-      (authService.signUpWithEmail as jest.Mock).mockRejectedValue(
+      (authService.signUpWithEmail ).mockRejectedValue(
         new Error('Password too weak'),
       );
 
@@ -361,7 +361,7 @@ describe('useAuth', () => {
     });
 
     it('should handle registration without immediate session', async () => {
-      (authService.signUpWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signUpWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -397,7 +397,7 @@ describe('useAuth', () => {
   describe('logout', () => {
     it('should logout successfully', async () => {
       // Setup authenticated state
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -423,7 +423,7 @@ describe('useAuth', () => {
       expect(result.current.isAuthenticated).toBe(true);
 
       // Mock signOut
-      (authService.signOut as jest.Mock).mockResolvedValue({ error: null });
+      (authService.signOut ).mockResolvedValue({ error: null });
 
       // Logout
       await act(async () => {
@@ -437,7 +437,7 @@ describe('useAuth', () => {
 
     it('should clear local data even if server logout fails', async () => {
       // Setup authenticated state
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -461,7 +461,7 @@ describe('useAuth', () => {
       });
 
       // Mock failed signOut
-      (authService.signOut as jest.Mock).mockRejectedValue(
+      (authService.signOut ).mockRejectedValue(
         new Error('Network error'),
       );
 
@@ -476,7 +476,7 @@ describe('useAuth', () => {
 
     it('should clear storage on logout', async () => {
       // Setup authenticated state
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -499,7 +499,7 @@ describe('useAuth', () => {
         });
       });
 
-      (authService.signOut as jest.Mock).mockResolvedValue({ error: null });
+      (authService.signOut ).mockResolvedValue({ error: null });
 
       await act(async () => {
         await result.current.logout();
@@ -521,7 +521,7 @@ describe('useAuth', () => {
 
       const futureExpiry = Date.now() + 3600000; // 1 hour from now
 
-      (secureStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      (secureStorage.getItem ).mockImplementation((key: string) => {
         if (key === AUTH_STORAGE_KEYS.ACCESS_TOKEN)
           return Promise.resolve('valid-token');
         if (key === AUTH_STORAGE_KEYS.REFRESH_TOKEN)
@@ -563,7 +563,7 @@ describe('useAuth', () => {
 
   describe('updateUser', () => {
     it('should update user data locally', async () => {
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -598,7 +598,7 @@ describe('useAuth', () => {
     });
 
     it('should persist updated user to storage', async () => {
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -635,7 +635,7 @@ describe('useAuth', () => {
 
   describe('refreshUser', () => {
     it('should refresh user data from server', async () => {
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -658,7 +658,7 @@ describe('useAuth', () => {
         });
       });
 
-      (authService.getCurrentUser as jest.Mock).mockResolvedValue({
+      (authService.getCurrentUser ).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email,
         user_metadata: { name: 'Server Updated Name', avatar_url: 'new-avatar.jpg' },
@@ -673,7 +673,7 @@ describe('useAuth', () => {
     });
 
     it('should handle refresh errors silently', async () => {
-      (authService.signInWithEmail as jest.Mock).mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
           id: mockUser.id,
           email: mockUser.email,
@@ -696,7 +696,7 @@ describe('useAuth', () => {
         });
       });
 
-      (authService.getCurrentUser as jest.Mock).mockRejectedValue(
+      (authService.getCurrentUser ).mockRejectedValue(
         new Error('Network error'),
       );
 
@@ -713,7 +713,7 @@ describe('useAuth', () => {
 
   describe('password operations', () => {
     it('should request password reset', async () => {
-      (authService.resetPassword as jest.Mock).mockResolvedValue({
+      (authService.resetPassword ).mockResolvedValue({
         error: null,
       });
 
@@ -735,7 +735,7 @@ describe('useAuth', () => {
     });
 
     it('should handle password reset errors', async () => {
-      (authService.resetPassword as jest.Mock).mockResolvedValue({
+      (authService.resetPassword ).mockResolvedValue({
         error: new Error('User not found'),
       });
 

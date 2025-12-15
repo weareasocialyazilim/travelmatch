@@ -28,8 +28,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockNetInfo = NetInfo ;
+const mockLogger = logger ;
 
 describe('Network State Detection', () => {
   beforeEach(() => {
@@ -38,7 +38,7 @@ describe('Network State Detection', () => {
 
   describe('Online/Offline Detection', () => {
     it('should detect online state', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -55,7 +55,7 @@ describe('Network State Detection', () => {
     });
 
     it('should detect offline state', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
         type: 'none',
@@ -71,7 +71,7 @@ describe('Network State Detection', () => {
     });
 
     it('should detect connected but no internet', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: false,
         type: 'wifi',
@@ -86,7 +86,7 @@ describe('Network State Detection', () => {
     });
 
     it('should handle null internet reachability', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: null, // Unknown reachability
         type: 'wifi',
@@ -102,7 +102,7 @@ describe('Network State Detection', () => {
 
     it('should differentiate between no connection and airplane mode', async () => {
       // Airplane mode
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
         type: 'none',
@@ -118,7 +118,7 @@ describe('Network State Detection', () => {
       });
 
       // WiFi off (different from airplane)
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
         type: 'unknown',
@@ -136,12 +136,12 @@ describe('Network State Detection', () => {
     it('should listen for network state changes', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn(); // Unsubscribe function
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -170,12 +170,12 @@ describe('Network State Detection', () => {
     it('should trigger callback on network change', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -210,9 +210,9 @@ describe('Network State Detection', () => {
     it('should cleanup listener on unmount', async () => {
       const unsubscribe = jest.fn();
 
-      (mockNetInfo.addEventListener as jest.Mock).mockReturnValue(unsubscribe);
+      (mockNetInfo.addEventListener ).mockReturnValue(unsubscribe);
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -228,12 +228,12 @@ describe('Network State Detection', () => {
     it.skip('should handle multiple network change events', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -262,7 +262,7 @@ describe('Network State Detection', () => {
 
   describe.skip('Reachability Checks', () => {
     it('should check internet reachability', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -276,7 +276,7 @@ describe('Network State Detection', () => {
     });
 
     it('should detect unreachable internet', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: false,
         type: 'wifi',
@@ -290,7 +290,7 @@ describe('Network State Detection', () => {
     });
 
     it('should retry reachability check on failure', async () => {
-      (mockNetInfo.fetch as jest.Mock)
+      (mockNetInfo.fetch )
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValue({
           isConnected: true,
@@ -308,7 +308,7 @@ describe('Network State Detection', () => {
     });
 
     it('should cache reachability check result', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -330,12 +330,12 @@ describe('Network State Detection', () => {
     it('should invalidate cache on network change', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -364,7 +364,7 @@ describe('Network State Detection', () => {
 
   describe.skip('Network Type Detection', () => {
     it('should detect WiFi connection', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -381,7 +381,7 @@ describe('Network State Detection', () => {
     });
 
     it('should detect cellular connection', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'cellular',
@@ -404,7 +404,7 @@ describe('Network State Detection', () => {
       const generations = ['3g', '4g', '5g'];
 
       for (const gen of generations) {
-        (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+        (mockNetInfo.fetch ).mockResolvedValue({
           isConnected: true,
           isInternetReachable: true,
           type: 'cellular',
@@ -422,7 +422,7 @@ describe('Network State Detection', () => {
     });
 
     it('should detect expensive connection', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'cellular',
@@ -439,7 +439,7 @@ describe('Network State Detection', () => {
     });
 
     it('should handle unknown network type', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'unknown',
@@ -459,12 +459,12 @@ describe('Network State Detection', () => {
     it('should track network type changes', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -498,12 +498,12 @@ describe('Network State Detection', () => {
     it('should attempt reconnect when network becomes available', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
         type: 'none',
@@ -532,7 +532,7 @@ describe('Network State Detection', () => {
     });
 
     it('should retry connection check with backoff', async () => {
-      (mockNetInfo.fetch as jest.Mock)
+      (mockNetInfo.fetch )
         .mockResolvedValueOnce({
           isConnected: false,
           isInternetReachable: false,
@@ -559,7 +559,7 @@ describe('Network State Detection', () => {
     });
 
     it('should stop retry after max attempts', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
         type: 'none',
@@ -583,12 +583,12 @@ describe('Network State Detection', () => {
     it('should notify on reconnect success', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
         type: 'none',
@@ -618,12 +618,12 @@ describe('Network State Detection', () => {
     it('should not trigger reconnect on network type change (WiFi to Cellular)', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -650,7 +650,7 @@ describe('Network State Detection', () => {
 
   describe.skip('Edge Cases', () => {
     it('should handle NetInfo fetch failure', async () => {
-      (mockNetInfo.fetch as jest.Mock).mockRejectedValue(new Error('NetInfo error'));
+      (mockNetInfo.fetch ).mockRejectedValue(new Error('NetInfo error'));
 
       const { result } = renderHook(() => useNetwork());
 
@@ -667,12 +667,12 @@ describe('Network State Detection', () => {
     it('should handle rapid online/offline transitions', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',
@@ -702,12 +702,12 @@ describe('Network State Detection', () => {
     it('should debounce network change events', async () => {
       let networkChangeCallback: ((state: NetInfoState) => void) | null = null;
 
-      (mockNetInfo.addEventListener as jest.Mock).mockImplementation((callback) => {
+      (mockNetInfo.addEventListener ).mockImplementation((callback) => {
         networkChangeCallback = callback;
         return jest.fn();
       });
 
-      (mockNetInfo.fetch as jest.Mock).mockResolvedValue({
+      (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
         type: 'wifi',

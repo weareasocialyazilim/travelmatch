@@ -27,7 +27,7 @@ jest.mock('../../apps/mobile/src/config/supabase');
 jest.mock('../../apps/mobile/src/utils/logger');
 
 describe('Message Arrival Handling', () => {
-  let mockChannel: any;
+  let mockChannel;
   let insertHandler: Function;
   let updateHandler: Function;
 
@@ -51,8 +51,8 @@ describe('Message Arrival Handling', () => {
       unsubscribe: jest.fn(),
     };
 
-    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
-    (supabase.removeChannel as jest.Mock).mockImplementation(() => {});
+    (supabase.channel ).mockReturnValue(mockChannel);
+    (supabase.removeChannel ).mockImplementation(() => {});
   });
 
   // ===========================

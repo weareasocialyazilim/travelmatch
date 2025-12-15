@@ -89,17 +89,17 @@ describe('useMessages Hook', () => {
     mockChannelOn = jest.fn().mockReturnThis();
     mockChannelSubscribe = jest.fn().mockReturnValue('SUBSCRIBED');
 
-    (supabase.channel as jest.Mock).mockReturnValue({
+    (supabase.channel ).mockReturnValue({
       on: mockChannelOn,
       subscribe: mockChannelSubscribe,
     });
 
     // Default mock implementations
-    (messageService.getConversations as jest.Mock).mockResolvedValue({
+    (messageService.getConversations ).mockResolvedValue({
       conversations: mockConversations,
     });
 
-    (messageService.getMessages as jest.Mock).mockResolvedValue({
+    (messageService.getMessages ).mockResolvedValue({
       messages: mockMessages,
       hasMore: false,
     });
@@ -132,7 +132,7 @@ describe('useMessages Hook', () => {
 
     it('should handle conversations loading errors', async () => {
       const errorMessage = 'Network error';
-      (messageService.getConversations as jest.Mock).mockRejectedValue(
+      (messageService.getConversations ).mockRejectedValue(
         new Error(errorMessage),
       );
 
@@ -159,7 +159,7 @@ describe('useMessages Hook', () => {
       const updatedConversations = [
         { ...mockConversations[0], unreadCount: 5 },
       ];
-      (messageService.getConversations as jest.Mock).mockResolvedValue({
+      (messageService.getConversations ).mockResolvedValue({
         conversations: updatedConversations,
       });
 
@@ -218,7 +218,7 @@ describe('useMessages Hook', () => {
       });
 
       const errorMessage = 'Failed to fetch messages';
-      (messageService.getMessages as jest.Mock).mockRejectedValue(
+      (messageService.getMessages ).mockRejectedValue(
         new Error(errorMessage),
       );
 
@@ -237,7 +237,7 @@ describe('useMessages Hook', () => {
       });
 
       // Initial load with hasMore = true
-      (messageService.getMessages as jest.Mock).mockResolvedValueOnce({
+      (messageService.getMessages ).mockResolvedValueOnce({
         messages: mockMessages,
         hasMore: true,
       });
@@ -261,7 +261,7 @@ describe('useMessages Hook', () => {
         },
       ];
 
-      (messageService.getMessages as jest.Mock).mockResolvedValueOnce({
+      (messageService.getMessages ).mockResolvedValueOnce({
         messages: moreMessages,
         hasMore: false,
       });
@@ -284,7 +284,7 @@ describe('useMessages Hook', () => {
         expect(result.current.conversationsLoading).toBe(false);
       });
 
-      (messageService.getMessages as jest.Mock).mockResolvedValue({
+      (messageService.getMessages ).mockResolvedValue({
         messages: mockMessages,
         hasMore: true,
       });
@@ -338,7 +338,7 @@ describe('useMessages Hook', () => {
         status: 'sent',
       };
 
-      (messageService.sendMessage as jest.Mock).mockResolvedValue({
+      (messageService.sendMessage ).mockResolvedValue({
         message: newMessage,
       });
 
@@ -382,7 +382,7 @@ describe('useMessages Hook', () => {
         status: 'sent',
       };
 
-      (messageService.sendMessage as jest.Mock).mockResolvedValue({
+      (messageService.sendMessage ).mockResolvedValue({
         message: newMessage,
       });
 
@@ -414,7 +414,7 @@ describe('useMessages Hook', () => {
         status: 'sent',
       };
 
-      (messageService.sendMessage as jest.Mock).mockResolvedValue({
+      (messageService.sendMessage ).mockResolvedValue({
         message: newMessage,
       });
 
@@ -440,7 +440,7 @@ describe('useMessages Hook', () => {
         expect(result.current.conversationsLoading).toBe(false);
       });
 
-      (messageService.sendMessage as jest.Mock).mockRejectedValue(
+      (messageService.sendMessage ).mockRejectedValue(
         new Error('Send failed'),
       );
 
@@ -475,7 +475,7 @@ describe('useMessages Hook', () => {
         status: 'sent',
       };
 
-      (messageService.sendMessage as jest.Mock).mockResolvedValue({
+      (messageService.sendMessage ).mockResolvedValue({
         message: imageMessage,
       });
 
@@ -523,7 +523,7 @@ describe('useMessages Hook', () => {
 
       // Note: markAsRead doesn't await the service call, so errors are not caught in the hook
       // The service call is fire-and-forget
-      (messageService.markAsRead as jest.Mock).mockReturnValue(undefined);
+      (messageService.markAsRead ).mockReturnValue(undefined);
 
       await act(async () => {
         await result.current.markAsRead('conv-1');
@@ -570,7 +570,7 @@ describe('useMessages Hook', () => {
       });
 
       // Ensure archiveConversation resolves successfully
-      (messageService.archiveConversation as jest.Mock).mockResolvedValue(undefined);
+      (messageService.archiveConversation ).mockResolvedValue(undefined);
 
       // Load messages
       await act(async () => {
@@ -601,7 +601,7 @@ describe('useMessages Hook', () => {
       // Note: archiveConversation doesn't await the service call,
       // so the try-catch won't properly catch async errors
       // Mock as synchronous throw to test error handling
-      (messageService.archiveConversation as jest.Mock).mockImplementation(() => {
+      (messageService.archiveConversation ).mockImplementation(() => {
         throw new Error('Archive failed');
       });
 
@@ -621,7 +621,7 @@ describe('useMessages Hook', () => {
   describe('Real-time Subscriptions', () => {
     beforeEach(() => {
       // Reset markAsRead mock to resolve successfully
-      (messageService.markAsRead as jest.Mock).mockResolvedValue(undefined);
+      (messageService.markAsRead ).mockResolvedValue(undefined);
     });
 
     it('should subscribe to message updates when conversation is loaded', async () => {
@@ -800,7 +800,7 @@ describe('useMessages Hook', () => {
 
       // Try to trigger state update after unmount
       const updatedConversations = [mockConversations[0]];
-      (messageService.getConversations as jest.Mock).mockResolvedValue({
+      (messageService.getConversations ).mockResolvedValue({
         conversations: updatedConversations,
       });
 

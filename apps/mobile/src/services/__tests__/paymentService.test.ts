@@ -60,7 +60,7 @@ describe('paymentService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Mock authenticated user by default
-    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+    (supabase.auth.getUser ).mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -78,7 +78,7 @@ describe('paymentService', () => {
         error: null,
       });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: mockSelect,
       });
 
@@ -108,7 +108,7 @@ describe('paymentService', () => {
         error: null,
       });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: mockSelect,
       });
 
@@ -129,7 +129,7 @@ describe('paymentService', () => {
         error: { message: 'Database error' },
       });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: mockSelect,
       });
 
@@ -145,7 +145,7 @@ describe('paymentService', () => {
     });
 
     it('should handle unauthenticated user', async () => {
-      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (supabase.auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -165,7 +165,7 @@ describe('paymentService', () => {
         error: null,
       });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from ).mockReturnValue({
         select: mockSelect,
       });
 
@@ -185,7 +185,7 @@ describe('paymentService', () => {
     it('should retrieve transaction history successfully', async () => {
       const mockTransactions = [mockTransaction];
 
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: mockTransactions,
         count: 1,
         error: null,
@@ -207,7 +207,7 @@ describe('paymentService', () => {
     });
 
     it('should filter transactions by type', async () => {
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -225,7 +225,7 @@ describe('paymentService', () => {
     });
 
     it('should filter transactions by status', async () => {
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -243,7 +243,7 @@ describe('paymentService', () => {
     });
 
     it('should support pagination', async () => {
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -261,7 +261,7 @@ describe('paymentService', () => {
     });
 
     it('should filter transactions by date range', async () => {
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -282,7 +282,7 @@ describe('paymentService', () => {
     });
 
     it('should handle multiple filters simultaneously', async () => {
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -306,7 +306,7 @@ describe('paymentService', () => {
     });
 
     it('should return empty array on error', async () => {
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: [],
         count: 0,
         error: { message: 'Database error' },
@@ -320,7 +320,7 @@ describe('paymentService', () => {
     });
 
     it('should handle unauthenticated user', async () => {
-      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (supabase.auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -339,7 +339,7 @@ describe('paymentService', () => {
         { ...mockTransaction, id: 'txn-126', type: 'refund' },
       ];
 
-      (transactionsService.list as jest.Mock).mockResolvedValue({
+      (transactionsService.list ).mockResolvedValue({
         data: mockTransactions,
         count: 4,
         error: null,
@@ -357,7 +357,7 @@ describe('paymentService', () => {
 
   describe('getTransaction', () => {
     it('should retrieve single transaction successfully', async () => {
-      (transactionsService.get as jest.Mock).mockResolvedValue({
+      (transactionsService.get ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -372,7 +372,7 @@ describe('paymentService', () => {
 
     it('should throw error when transaction not found', async () => {
       const error = new Error('Transaction not found');
-      (transactionsService.get as jest.Mock).mockResolvedValue({
+      (transactionsService.get ).mockResolvedValue({
         data: null,
         error,
       });
@@ -387,7 +387,7 @@ describe('paymentService', () => {
         metadata: { momentId: 'moment-123', requestId: 'req-456' },
       };
 
-      (transactionsService.get as jest.Mock).mockResolvedValue({
+      (transactionsService.get ).mockResolvedValue({
         data: txnWithMetadata,
         error: null,
       });
@@ -406,7 +406,7 @@ describe('paymentService', () => {
   // ========================================
   describe('processPayment', () => {
     it('should process payment successfully', async () => {
-      (transactionsService.create as jest.Mock).mockResolvedValue({
+      (transactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -435,7 +435,7 @@ describe('paymentService', () => {
 
     it('should handle payment creation errors', async () => {
       const error = new Error('Insufficient funds');
-      (transactionsService.create as jest.Mock).mockResolvedValue({
+      (transactionsService.create ).mockResolvedValue({
         data: null,
         error,
       });
@@ -451,7 +451,7 @@ describe('paymentService', () => {
     });
 
     it('should require authentication', async () => {
-      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (supabase.auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -466,7 +466,7 @@ describe('paymentService', () => {
     });
 
     it('should process payment without optional fields', async () => {
-      (transactionsService.create as jest.Mock).mockResolvedValue({
+      (transactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -490,7 +490,7 @@ describe('paymentService', () => {
 
     it('should handle large payment amounts', async () => {
       const largeTransaction = { ...mockTransaction, amount: 9999.99 };
-      (transactionsService.create as jest.Mock).mockResolvedValue({
+      (transactionsService.create ).mockResolvedValue({
         data: largeTransaction,
         error: null,
       });
@@ -518,7 +518,7 @@ describe('paymentService', () => {
         amount: 100.0,
       };
 
-      (transactionsService.create as jest.Mock).mockResolvedValue({
+      (transactionsService.create ).mockResolvedValue({
         data: withdrawalTxn,
         error: null,
       });
@@ -544,7 +544,7 @@ describe('paymentService', () => {
 
     it('should handle withdrawal errors', async () => {
       const error = new Error('Insufficient balance');
-      (transactionsService.create as jest.Mock).mockResolvedValue({
+      (transactionsService.create ).mockResolvedValue({
         data: null,
         error,
       });
@@ -560,7 +560,7 @@ describe('paymentService', () => {
     });
 
     it('should require authentication for withdrawal', async () => {
-      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+      (supabase.auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -575,7 +575,7 @@ describe('paymentService', () => {
     });
 
     it('should create withdrawal with correct description', async () => {
-      (transactionsService.create as jest.Mock).mockResolvedValue({
+      (transactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });

@@ -35,7 +35,7 @@ jest.mock('react-native/Libraries/AppState/AppState', () => ({
 }));
 
 describe('RealtimeContext', () => {
-  let mockChannel: any;
+  let mockChannel;
   let presenceSyncHandler: Function;
   let presenceJoinHandler: Function;
   let presenceLeaveHandler: Function;
@@ -49,7 +49,7 @@ describe('RealtimeContext', () => {
     jest.clearAllMocks();
 
     // Mock auth
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth ).mockReturnValue({
       user: mockUser,
       isAuthenticated: true,
     });
@@ -73,8 +73,8 @@ describe('RealtimeContext', () => {
       send: jest.fn(),
     };
 
-    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
-    (supabase.removeChannel as jest.Mock).mockImplementation(() => {});
+    (supabase.channel ).mockReturnValue(mockChannel);
+    (supabase.removeChannel ).mockImplementation(() => {});
   });
 
   // ===========================
@@ -115,7 +115,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should not setup presence when not authenticated', () => {
-      (useAuth as jest.Mock).mockReturnValue({
+      (useAuth ).mockReturnValue({
         user: null,
         isAuthenticated: false,
       });
@@ -566,7 +566,7 @@ describe('RealtimeContext', () => {
 
       // Simulate app going to background
       act(() => {
-        const listener = (AppState.addEventListener as jest.Mock).mock.calls[0][1];
+        const listener = (AppState.addEventListener ).mock.calls[0][1];
         listener('background');
       });
 
@@ -583,7 +583,7 @@ describe('RealtimeContext', () => {
 
       // Simulate app returning to foreground
       act(() => {
-        const listener = (AppState.addEventListener as jest.Mock).mock.calls[0][1];
+        const listener = (AppState.addEventListener ).mock.calls[0][1];
         listener('active');
       });
 
@@ -638,7 +638,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should handle missing user ID in presence', async () => {
-      (useAuth as jest.Mock).mockReturnValue({
+      (useAuth ).mockReturnValue({
         user: { id: null },
         isAuthenticated: true,
       });

@@ -11,7 +11,7 @@ import { useNetworkStatus } from '../../context/NetworkContext';
 // Mock NetworkContext
 jest.mock('../../context/NetworkContext');
 
-const mockUseNetworkStatus = useNetworkStatus as jest.MockedFunction<typeof useNetworkStatus>;
+const mockUseNetworkStatus = useNetworkStatus ;
 
 describe('NetworkGuard', () => {
   const TestChild = () => <Text>Protected Content</Text>;

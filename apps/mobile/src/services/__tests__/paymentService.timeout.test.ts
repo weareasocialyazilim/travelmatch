@@ -37,8 +37,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
+const mockSupabase = supabase ;
+const mockTransactionsService = transactionsService ;
 
 describe('PaymentService - Timeout Edge Cases', () => {
   const mockUser = { id: 'user-123', email: 'test@example.com' };
@@ -46,7 +46,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({ 
+    (mockSupabase.auth.getUser ).mockResolvedValue({ 
       data: { user: mockUser }, 
       error: null 
     });
@@ -77,7 +77,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 35000); // 35 seconds (exceeds 30s timeout)
       });
 
-      (mockTransactionsService.create as jest.Mock).mockReturnValue(slowPromise);
+      (mockTransactionsService.create ).mockReturnValue(slowPromise);
 
       // Create payment with timeout wrapper
       const paymentPromise = Promise.race([
@@ -111,7 +111,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
       };
 
       // Mock fast response (2 seconds)
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -151,13 +151,13 @@ describe('PaymentService - Timeout Edge Cases', () => {
       };
 
       // Create transaction first
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
       // Mock update to mark as failed
-      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'failed' },
         error: null,
       });
@@ -208,7 +208,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 35000);
       });
 
-      (mockTransactionsService.create as jest.Mock).mockReturnValue(slowPromise);
+      (mockTransactionsService.create ).mockReturnValue(slowPromise);
 
       const withdrawalPromise = Promise.race([
         paymentService.withdrawFunds({
@@ -238,7 +238,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         description: 'Withdrawal to bank account',
       };
 
-      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -275,7 +275,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 15000);
       });
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockReturnValue(slowPromise),
@@ -305,7 +305,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 15000);
       });
 
-      (mockSupabase.from as jest.Mock).mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockReturnValue(slowPromise),
@@ -354,7 +354,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 35000);
       });
 
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockReturnValueOnce(slowPromise) // First call: slow
         .mockResolvedValueOnce({ // Second call: fast
           data: {
@@ -442,7 +442,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 35000);
       });
 
-      (mockTransactionsService.create as jest.Mock)
+      (mockTransactionsService.create )
         .mockReturnValueOnce(slowPromise1)
         .mockReturnValueOnce(slowPromise2);
 
