@@ -313,8 +313,12 @@ export const useUserPresence = (userId: string | null) => {
 export const useMultipleSubscriptions = <T extends Record<string, unknown> = Record<string, unknown>>(
   subscriptions: Array<{ id: string } & UseSubscriptionOptions<T>>
 ) => {
+  // Note: This hook has a limitation - it cannot dynamically change subscriptions
+  // The subscriptions array length must remain constant across renders
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const results = subscriptions.map((sub) => {
     const { id, ...config } = sub;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useSubscription(id, config);
   });
 

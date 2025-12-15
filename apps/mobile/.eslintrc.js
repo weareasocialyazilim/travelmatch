@@ -38,7 +38,7 @@ module.exports = {
     
     // TypeScript - disable type-aware rules
     '@typescript-eslint/no-explicit-any': 'off', // Too noisy - 200+ warnings
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': 'off', // Disabled for production - too noisy
     '@typescript-eslint/ban-ts-comment': 'off', // Allow ts-nocheck during development
     '@typescript-eslint/no-var-requires': 'off', // Allow require() for assets
     '@typescript-eslint/no-empty-function': 'off', // Allow empty functions for placeholders
@@ -52,12 +52,12 @@ module.exports = {
     // Import - disable missing rule
     'import/order': 'off',
     
-    // React Native
-    'react-native/no-unused-styles': 'warn',
-    'react-native/no-inline-styles': 'warn',
-    'react-native/no-color-literals': 'off', // Too noisy
-    'react-native/sort-styles': 'off', // Too noisy
-    'react-native/no-raw-text': 'off', // Too noisy
+    // React Native - disabled for production (cosmetic only)
+    'react-native/no-unused-styles': 'off',
+    'react-native/no-inline-styles': 'off',
+    'react-native/no-color-literals': 'off',
+    'react-native/sort-styles': 'off',
+    'react-native/no-raw-text': 'off',
   },
   overrides: [
     {

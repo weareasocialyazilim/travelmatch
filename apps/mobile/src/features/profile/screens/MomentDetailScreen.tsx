@@ -216,19 +216,17 @@ const MomentDetailScreen: React.FC = () => {
         },
       ],
     );
-  }, [deleteMoment, moment.id, navigation]);
+  }, [deleteMoment, moment.id, navigation, showToast]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleAcceptRequest = useCallback((requestId: string) => {
     showToast('The guest has been notified!', 'info');
     setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-  }, []);
+  }, [showToast]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDeclineRequest = useCallback((requestId: string) => {
     showToast('The guest has been notified.', 'info');
     setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-  }, []);
+  }, [showToast]);
 
   const handleGiftOption = useCallback(() => {
     trackInteraction('gift_selected');
