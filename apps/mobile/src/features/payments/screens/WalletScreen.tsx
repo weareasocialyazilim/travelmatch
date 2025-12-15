@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -93,6 +94,68 @@ const WalletScreen = () => {
     }
   };
 
+  // Memoized render function for transaction items
+  const renderTransactionItem = useCallback(
+    ({ item: transaction }: { item: typeof filteredTransactions[0] }) => (
+      <TouchableOpacity
+        style={styles.transactionItem}
+        onPress={() =>
+          navigation.navigate('TransactionDetail', {
+            transactionId: transaction.id,
+          })
+        }
+      >
+        <View style={styles.transactionLeft}>
+          <View style={styles.transactionIcon}>
+            <MaterialCommunityIcons
+              name={getTransactionIcon(transaction.type)}
+              size={20}
+              color={COLORS.text}
+            />
+          </View>
+          <View style={styles.transactionInfo}>
+            <Text style={styles.transactionTitle}>{transaction.title}</Text>
+            <Text style={styles.transactionSubtitle}>
+              {transaction.subtitle}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.transactionRight}>
+          <Text
+            style={[
+              styles.transactionAmount,
+              transaction.isPositive && styles.transactionAmountPositive,
+            ]}
+          >
+            {transaction.isPositive ? '+' : '-'}$
+            {transaction.amount.toFixed(2)}
+          </Text>
+          {transaction.hasProofLoop && (
+            <View style={styles.proofLoopBadge}>
+              <Text style={styles.proofLoopText}>ProofLoop</Text>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    ),
+    [navigation],
+  );
+
+  // Empty state component
+  const renderEmptyState = useCallback(
+    () => (
+      <View style={styles.emptyState}>
+        <MaterialCommunityIcons
+          name="receipt"
+          size={48}
+          color={COLORS.textSecondary}
+        />
+        <Text style={styles.emptyText}>No transactions yet</Text>
+      </View>
+    ),
+    [],
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
@@ -100,6 +163,7 @@ const WalletScreen = () => {
         <TouchableOpacity
           style={styles.headerButton}
           onPress={() => navigation.goBack()}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -108,7 +172,10 @@ const WalletScreen = () => {
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Wallet</Text>
-        <TouchableOpacity style={styles.headerButton}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
           <MaterialCommunityIcons
             name="shield-check"
             size={24}
@@ -213,62 +280,15 @@ const WalletScreen = () => {
         <Text style={styles.sectionTitle}>Transactions</Text>
 
         {/* Transaction List */}
-        {filteredTransactions.length === 0 ? (
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons
-              name="receipt"
-              size={48}
-              color={COLORS.textSecondary}
-            />
-            <Text style={styles.emptyText}>No transactions yet</Text>
-          </View>
-        ) : (
-          filteredTransactions.map((transaction) => (
-            <TouchableOpacity
-              key={transaction.id}
-              style={styles.transactionItem}
-              onPress={() =>
-                navigation.navigate('TransactionDetail', {
-                  transactionId: transaction.id,
-                })
-              }
-            >
-              <View style={styles.transactionLeft}>
-                <View style={styles.transactionIcon}>
-                  <MaterialCommunityIcons
-                    name={getTransactionIcon(transaction.type)}
-                    size={20}
-                    color={COLORS.text}
-                  />
-                </View>
-                <View style={styles.transactionInfo}>
-                  <Text style={styles.transactionTitle}>
-                    {transaction.title}
-                  </Text>
-                  <Text style={styles.transactionSubtitle}>
-                    {transaction.subtitle}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.transactionRight}>
-                <Text
-                  style={[
-                    styles.transactionAmount,
-                    transaction.isPositive && styles.transactionAmountPositive,
-                  ]}
-                >
-                  {transaction.isPositive ? '+' : '-'}$
-                  {transaction.amount.toFixed(2)}
-                </Text>
-                {transaction.hasProofLoop && (
-                  <View style={styles.proofLoopBadge}>
-                    <Text style={styles.proofLoopText}>ProofLoop</Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          ))
-        )}
+        <View style={{ minHeight: 300 }}>
+          <FlashList
+            data={filteredTransactions}
+            renderItem={renderTransactionItem}
+            estimatedItemSize={70}
+            ListEmptyComponent={renderEmptyState}
+            scrollEnabled={false}
+          />
+        </View>
 
         <View style={styles.bottomSpacer} />
       </ScrollView>

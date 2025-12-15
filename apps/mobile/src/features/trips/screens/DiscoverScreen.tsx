@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  FlatList,
   RefreshControl,
   StatusBar,
   ActivityIndicator,
@@ -267,7 +266,7 @@ const DiscoverScreen = () => {
   );
 
   const renderMomentCard = useCallback(
-    (item: Moment, index: number) => {
+    ({ item, index }: { item: Moment; index: number }) => {
       if (viewMode === 'single') {
         return <MomentSingleCard moment={item} onPress={handleMomentPress} />;
       }
@@ -336,14 +335,13 @@ const DiscoverScreen = () => {
         scrollEventThrottle={400}
       >
         {/* Stories */}
-        <FlatList
+        <FlashList
           data={USER_STORIES}
           renderItem={renderStoryItem}
-          keyExtractor={(item) => item.id}
+          estimatedItemSize={100}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.storiesContainer}
-          scrollEnabled={true}
         />
 
         {/* Results Bar */}
@@ -360,6 +358,7 @@ const DiscoverScreen = () => {
                 viewMode === 'single' && styles.viewToggleButtonActive,
               ]}
               onPress={() => setViewMode('single')}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               {...a11y.button(
                 'Single column view',
                 'Display moments in a single column',
@@ -382,6 +381,7 @@ const DiscoverScreen = () => {
                 viewMode === 'grid' && styles.viewToggleButtonActive,
               ]}
               onPress={() => setViewMode('grid')}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               {...a11y.button(
                 'Grid view',
                 'Display moments in a grid layout',
@@ -432,30 +432,25 @@ const DiscoverScreen = () => {
         )}
 
         {/* Moments List */}
-        {!error &&
-          filteredMoments.length > 0 &&
-          (viewMode === 'single' ? (
-            <View style={styles.singleListContainer}>
-              {filteredMoments.map((moment) => (
-                <MomentSingleCard
-                  key={moment.id}
-                  moment={moment}
-                  onPress={handleMomentPress}
-                />
-              ))}
-            </View>
-          ) : (
-            <View style={styles.gridContainer}>
-              {filteredMoments.map((moment, index) => (
-                <MomentGridCard
-                  key={moment.id}
-                  moment={moment}
-                  index={index}
-                  onPress={handleMomentPress}
-                />
-              ))}
-            </View>
-          ))}
+        {!error && filteredMoments.length > 0 && (
+          <View style={{ minHeight: 400 }}>
+            <FlashList
+              data={filteredMoments}
+              renderItem={renderMomentCard}
+              estimatedItemSize={viewMode === 'single' ? 400 : 200}
+              numColumns={viewMode === 'grid' ? 2 : 1}
+              key={viewMode}
+              contentContainerStyle={
+                viewMode === 'single'
+                  ? styles.singleListContainer
+                  : styles.gridContainer
+              }
+              onEndReached={handleLoadMore}
+              onEndReachedThreshold={0.5}
+              scrollEnabled={false}
+            />
+          </View>
+        )}
 
         {/* Empty State */}
         {!loading && !error && filteredMoments.length === 0 && (

@@ -118,6 +118,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
             <TouchableOpacity
               style={styles.shareButton}
               onPress={handleSharePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               activeOpacity={0.8}
               accessibilityLabel="Share this moment"
               accessibilityRole="button"

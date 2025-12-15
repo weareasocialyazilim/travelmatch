@@ -28,8 +28,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         'TravelMatch needs access to your camera to let you take photos of your travel moments for verification.',
       NSPhotoLibraryUsageDescription:
         'TravelMatch needs access to your photo library to let you upload photos of your travel moments.',
-      NSMicrophoneUsageDescription:
-        'TravelMatch needs access to your microphone for video recording of travel moments.',
     },
   },
   android: {

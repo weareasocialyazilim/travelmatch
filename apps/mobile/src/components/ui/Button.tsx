@@ -143,6 +143,18 @@ export const Button: React.FC<ButtonProps> = ({
 
   const textColor = getTextColor();
 
+  // Get hitSlop based on button size for 44pt minimum touch target
+  const getHitSlop = () => {
+    switch (size) {
+      case 'sm':
+        return { top: 4, bottom: 4, left: 8, right: 8 }; // 36 + 8 = 44pt
+      case 'md':
+      case 'lg':
+      default:
+        return { top: 8, bottom: 8, left: 8, right: 8 }; // Default padding
+    }
+  };
+
   // Accessibility props
   const a11y = a11yProps.button(
     accessibilityLabel || title,
@@ -154,6 +166,7 @@ export const Button: React.FC<ButtonProps> = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || loading}
+      hitSlop={getHitSlop()}
       {...a11y}
       activeOpacity={0.7}
       accessibilityRole="button"
