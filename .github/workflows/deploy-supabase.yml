@@ -48,21 +48,25 @@ jobs:
         with:
           node-version: '20'
 
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9
+          environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+
       - name: 📦 Install Supabase CLI
         run: |
           npm install -g supabase@latest
           supabase --version
 
       - name: 🔐 Authenticate to Supabase
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           echo "Authenticating with Supabase..."
           supabase login --token $SUPABASE_ACCESS_TOKEN
 
       - name: 🔗 Link to Supabase project
-        env:
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           supabase link --project-ref ${{ env.SUPABASE_PROJECT_ID }} --password $SUPABASE_DB_PASSWORD
 
@@ -75,18 +79,9 @@ jobs:
 
       - name: ⚡ Deploy Edge Functions
         if: ${{ github.event.inputs.deploy_functions != 'false' }}
-        env:
-          # Secrets for Edge Functions
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          CLOUDFLARE_STREAM_API_KEY: ${{ secrets.CLOUDFLARE_STREAM_API_KEY }}
-          CLOUDFLARE_STREAM_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_STREAM_ACCOUNT_ID }}
-          GOOGLE_MAPS_SERVER_KEY: ${{ secrets.GOOGLE_MAPS_SERVER_KEY }}
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: |
-          echo "Setting Edge Function secrets..."
+          echo "Setting Edge Function secrets from Infisical..."
+          # Secrets are already imported from Infisical in previous step
           supabase secrets set \
             STRIPE_SECRET_KEY="$STRIPE_SECRET_KEY" \
             STRIPE_WEBHOOK_SECRET="$STRIPE_WEBHOOK_SECRET" \
