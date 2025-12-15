@@ -1,11 +1,11 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import {
   ErrorCode,
   createErrorResponse,
   createSuccessResponse,
-  createRateLimitError,
   toHttpResponse,
   toHttpSuccessResponse,
   handleUnexpectedError,
@@ -15,12 +15,6 @@ import {
   CACHE_TTL,
   rateLimiter,
 } from '../_shared/redisCache.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
 
 /**
  * GDPR Data Export Edge Function
@@ -74,9 +68,12 @@ interface UserDataExport {
 }
 
 // Rate limiter: 3 requests per hour (GDPR exports are heavy)
-const exportLimiter = createRateLimiter(RateLimitPresets.signup);
+const exportLimiter = createUpstashRateLimiter(RateLimitPresets.STANDARD);
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -91,14 +88,24 @@ serve(async (req) => {
       3, // 3 requests
       3600, // per hour
     );
-    
+
     if (!rateLimit.allowed) {
       const retryAfter = Math.ceil((rateLimit.resetAt - Date.now()) / 1000);
-      const { response, headers: rateLimitHeaders } = createRateLimitError(
-        retryAfter,
-        rateLimit.remaining,
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          retryAfter,
+        }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+          },
+        },
       );
-      return toHttpResponse(response, { ...corsHeaders, ...rateLimitHeaders });
     }
 
     // Create Supabase client with user auth

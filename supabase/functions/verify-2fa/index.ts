@@ -14,7 +14,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import { createHmac } from 'https://deno.land/std@0.168.0/node/crypto.ts';
 import {
   ErrorCode,
@@ -26,19 +27,12 @@ import {
   handleUnexpectedError,
 } from '../_shared/errorHandler.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
 const VerifyCodeSchema = z.object({
   code: z.string().length(6, 'Code must be 6 digits').regex(/^\d{6}$/, 'Code must be numeric'),
 });
 
 // Rate limiter: 5 attempts per 15 minutes (prevent brute force)
-const verify2FALimiter = createRateLimiter(RateLimitPresets.auth);
+const verify2FALimiter = createUpstashRateLimiter(RateLimitPresets.AUTH);
 
 /**
  * Generate TOTP code for given secret and time
@@ -107,6 +101,9 @@ function verifyTOTP(secret: string, code: string, window = 1): boolean {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -114,18 +111,21 @@ serve(async (req) => {
   try {
     // Check rate limit
     const rateLimitResult = await verify2FALimiter.check(req);
-    if (!rateLimitResult.ok) {
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Too many verification attempts',
-          retryAfter: rateLimitResult.retryAfter,
+          retryAfter,
         }),
         {
           status: 429,
           headers: {
             ...corsHeaders,
             'Content-Type': 'application/json',
-            'Retry-After': String(rateLimitResult.retryAfter),
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
           },
         },
       );

@@ -1,23 +1,17 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import {
   ErrorCode,
   createErrorResponse,
   createSuccessResponse,
   toHttpResponse,
   toHttpSuccessResponse,
-  createRateLimitError,
   createValidationError,
   handleUnexpectedError,
 } from '../_shared/errorHandler.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
 
 const PaymentSchema = z.object({
   amount: z.number().min(1, 'Amount must be at least 1'),
@@ -26,9 +20,12 @@ const PaymentSchema = z.object({
 });
 
 // Rate limiter: 100 requests per 15 minutes for payment creation
-const paymentLimiter = createRateLimiter(RateLimitPresets.api);
+const paymentLimiter = createUpstashRateLimiter(RateLimitPresets.PAYMENT);
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -36,15 +33,24 @@ serve(async (req) => {
   try {
     // Check rate limit first
     const rateLimitResult = await paymentLimiter.check(req);
-    if (!rateLimitResult.ok) {
-      const { response, headers: rateLimitHeaders } = createRateLimitError(
-        rateLimitResult.retryAfter || 60,
-        rateLimitResult.remaining,
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000);
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          retryAfter,
+        }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
+          },
+        },
       );
-      return new Response(response.body, {
-        status: response.status,
-        headers: { ...corsHeaders, ...rateLimitHeaders },
-      });
     }
 
     const supabase = createClient(

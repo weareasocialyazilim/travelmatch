@@ -1,9 +1,12 @@
 /**
  * Standard Error Response Handler for Edge Functions
- * 
+ *
  * Provides consistent error formatting across all edge functions
  * Format: { message: string, code: string }
  */
+
+// Environment check (Deno)
+const __DEV__ = Deno.env.get('ENVIRONMENT') === 'development';
 
 export enum ErrorCode {
   // Authentication & Authorization
@@ -268,6 +271,3 @@ export function handleSupabaseAuthError(error: any): ErrorResponse {
     { supabaseCode: error.code },
   );
 }
-
-// Environment check (Deno)
-const __DEV__ = Deno.env.get('ENVIRONMENT') === 'development';
