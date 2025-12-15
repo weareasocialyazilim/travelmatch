@@ -28,12 +28,12 @@ interface OnboardingPage {
 
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { logger } from '../../../utils/logger';
 import { COLORS } from '@/constants/colors';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { HORIZONTAL_LIST_CONFIG } from '@/utils/listOptimization';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
-import { logger } from '@/utils/logger';
 
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 
@@ -114,7 +114,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         completeOnboarding().then(() => {
           navigation.replace('Welcome');
         }).catch((error) => {
-          console.error('Onboarding completion error:', error);
+          logger.error('Onboarding completion error', { error });
           // Fallback: still navigate even if storage fails
           navigation.replace('Welcome');
         });

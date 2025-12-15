@@ -12,7 +12,9 @@
  * - Vendor management
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { logger } from '../utils/logger';
+
+// Supabase client import removed - not currently used
 
 // SOC 2 Trust Service Criteria
 export const SOC2_CRITERIA = {
@@ -186,7 +188,7 @@ export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      console.warn('Cannot log audit event: No active session');
+      logger.warn('Cannot log audit event: No active session');
       return;
     }
 
@@ -194,7 +196,7 @@ export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp
     const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !anonKey) {
-      console.error('Missing Supabase configuration for audit logging');
+      logger.error('Missing Supabase configuration for audit logging');
       return;
     }
 
@@ -212,10 +214,10 @@ export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp
     );
 
     if (!response.ok) {
-      console.error('Failed to log audit event:', await response.text());
+      logger.error('Failed to log audit event:', await response.text());
     }
   } catch (error) {
-    console.error('Failed to log audit event:', error);
+    logger.error('Failed to log audit event:', error);
     // Don't throw - logging failure shouldn't break the app
   }
 }
@@ -272,7 +274,7 @@ export async function queryAuditLogs(filters: {
     const result = await response.json();
     return result.data || [];
   } catch (error) {
-    console.error('Failed to query audit logs:', error);
+    logger.error('Failed to query audit logs:', error);
     throw error;
   }
 }

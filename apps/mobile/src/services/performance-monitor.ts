@@ -172,8 +172,7 @@ class PerformanceMonitor {
     // Log in development
     if (process.env.NODE_ENV === 'development') {
       const status = threshold && value <= threshold ? '✅' : '❌';
-      // eslint-disable-next-line no-console
-      console.log(`${status} ${name}: ${Math.round(value)}ms (threshold: ${threshold}ms)`);
+      logger.debug(`${status} ${name}: ${Math.round(value)}ms (threshold: ${threshold}ms)`);
     }
   }
 

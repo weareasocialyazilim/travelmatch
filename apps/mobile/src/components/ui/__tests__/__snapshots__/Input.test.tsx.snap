@@ -237,8 +237,14 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
         }
       />
       <RCTTouchableOpacity
+        accessibilityState={
+          {
+            "disabled": true,
+          }
+        }
+        accessible={true}
+        aria-disabled={true}
         disabled={true}
-        onClick={[Function]}
         style={
           {
             "marginLeft": 12,

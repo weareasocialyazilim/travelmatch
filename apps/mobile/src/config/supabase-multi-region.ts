@@ -10,6 +10,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { logger } from '../utils/logger';
 
 // Region configurations
 export const SUPABASE_REGIONS = {
@@ -104,7 +105,7 @@ export async function getOptimalClient(userLocation?: { lat: number; lon: number
   const healthyRegions = await getHealthyRegions();
 
   if (healthyRegions.length === 0) {
-    console.error('⚠️ No healthy regions available, using primary');
+    logger.error('No healthy regions available, using primary');
     return getRegionalClient('eu-west-1');
   }
 
@@ -127,7 +128,7 @@ export async function getOptimalClient(userLocation?: { lat: number; lon: number
   distances.sort((a, b) => a.distance - b.distance);
 
   const optimalRegion = distances[0].region;
-  console.log(`🌍 Optimal region: ${SUPABASE_REGIONS[optimalRegion].name}`);
+  logger.info(`Optimal region: ${SUPABASE_REGIONS[optimalRegion].name}`);
 
   return getRegionalClient(optimalRegion);
 }
@@ -172,9 +173,9 @@ export async function checkRegionHealth(region: RegionKey): Promise<HealthStatus
     healthStatus.set(region, status);
     
     if (status.healthy) {
-      console.log(`✅ ${SUPABASE_REGIONS[region].name}: ${latency}ms`);
+      logger.debug(`Region ${SUPABASE_REGIONS[region].name}: ${latency}ms`);
     } else {
-      console.error(`❌ ${SUPABASE_REGIONS[region].name}: ${error ? 'Error' : 'Timeout'}`);
+      logger.error(`Region ${SUPABASE_REGIONS[region].name}: ${error ? 'Error' : 'Timeout'}`);
     }
 
     return status;
@@ -187,7 +188,7 @@ export async function checkRegionHealth(region: RegionKey): Promise<HealthStatus
     };
 
     healthStatus.set(region, status);
-    console.error(`❌ ${SUPABASE_REGIONS[region].name}:`, error);
+    logger.error(`Region ${SUPABASE_REGIONS[region].name}:`, error);
 
     return status;
   }
@@ -239,7 +240,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 export async function withFailover<T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   operation: (client: SupabaseClient<any, 'public', any>) => Promise<T>,
-  userLocation?: { lat: number; lon: number }
+  _userLocation?: { lat: number; lon: number }
 ): Promise<T> {
   const healthyRegions = await getHealthyRegions();
 
@@ -256,7 +257,7 @@ export async function withFailover<T>(
       const result = await operation(client);
       return result;
     } catch (error) {
-      console.error(`Failed on ${SUPABASE_REGIONS[region].name}:`, error);
+      logger.error(`Failed on ${SUPABASE_REGIONS[region].name}:`, error);
       lastError = error as Error;
       continue;
     }
@@ -284,21 +285,23 @@ export async function monitorLatency() {
   const healthyCount = results.filter(r => r.healthy).length;
   const uptime = (healthyCount / results.length) * 100;
 
-  console.log('\n📊 Latency Report:');
-  results.forEach(r => {
-    const status = r.healthy ? '✅' : '❌';
-    console.log(`${status} ${r.region}: ${r.latency}ms`);
+  logger.info('Latency Report:', {
+    regions: results.map(r => ({
+      name: r.region,
+      latency: `${r.latency}ms`,
+      healthy: r.healthy,
+    })),
+    avgLatency: `${avgLatency.toFixed(0)}ms`,
+    uptime: `${uptime.toFixed(2)}%`,
   });
-  console.log(`\n📈 Average Latency: ${avgLatency.toFixed(0)}ms`);
-  console.log(`⚡ Uptime: ${uptime.toFixed(2)}%\n`);
 
   // Send to monitoring service
   if (avgLatency > 100) {
-    console.warn(`⚠️ Average latency ${avgLatency}ms exceeds 100ms budget`);
+    logger.warn(`Average latency ${avgLatency}ms exceeds 100ms budget`);
   }
 
   if (uptime < 99.99) {
-    console.error(`❌ Uptime ${uptime}% below 99.99% SLA`);
+    logger.error(`Uptime ${uptime}% below 99.99% SLA`);
   }
 
   return { avgLatency, uptime, results };
@@ -307,9 +310,9 @@ export async function monitorLatency() {
 // Start health monitoring every 30 seconds
 if (typeof setInterval !== 'undefined') {
   setInterval(() => {
-    monitorLatency().catch(console.error);
+    monitorLatency().catch((err) => logger.error('Health monitor failed:', err));
   }, 30000);
 }
 
 // Initial health check
-monitorLatency().catch(console.error);
+monitorLatency().catch((err) => logger.error('Initial health check failed:', err));

@@ -3,12 +3,11 @@
  */
 
 import React from 'react';
-import { FlatList, View, RefreshControl } from 'react-native';
+import { FlatList, RefreshControl } from 'react-native';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FeedSkeleton, MomentCardSkeleton } from '../components/skeletons';
 import { useImagePreload } from '../services/imagePreloader';
 import { cacheKeys, CACHE_CONFIG } from '../services/offlineCache';
-import { useMoments } from '@/hooks/useMoments';
 
 export function MomentsFeedScreen() {
   const { prefetchNextPage, prefetchMomentsImages } = useImagePreload();

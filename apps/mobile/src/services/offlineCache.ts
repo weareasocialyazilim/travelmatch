@@ -258,7 +258,7 @@ export const cacheUtils = {
    * Invalidate cache (force refetch on next access)
    */
   invalidate(queryKey: string[]) {
-    console.log('[Cache] Invalidating:', queryKey);
+    logger.debug('[Cache] Invalidating', { queryKey });
     queryClient.invalidateQueries({ queryKey });
   },
   
@@ -354,7 +354,7 @@ export const offlineMutations = {
    */
   queue(id: string, mutation: () => Promise<any>) {
     mutationQueue.push({ id, mutation, retryCount: 0 });
-    console.log('[Offline] Queued mutation:', id);
+    logger.debug('[Offline] Queued mutation', { id });
     
     // Try to process immediately if online
     if (isOnline) {
@@ -368,7 +368,7 @@ export const offlineMutations = {
   async processQueue() {
     if (!isOnline || mutationQueue.length === 0) return;
     
-    console.log('[Offline] Processing mutation queue:', mutationQueue.length, 'items');
+    logger.debug('[Offline] Processing mutation queue', { count: mutationQueue.length });
     
     const toProcess = [...mutationQueue];
     mutationQueue.length = 0;
@@ -376,9 +376,9 @@ export const offlineMutations = {
     for (const item of toProcess) {
       try {
         await item.mutation();
-        console.log('[Offline] Processed:', item.id);
+        logger.debug('[Offline] Processed mutation', { id: item.id });
       } catch (error) {
-        console.error('[Offline] Failed:', item.id, error);
+        logger.error('[Offline] Mutation failed', { id: item.id, error });
         
         // Retry up to 3 times
         if (item.retryCount < 3) {

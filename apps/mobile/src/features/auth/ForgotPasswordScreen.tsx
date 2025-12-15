@@ -41,7 +41,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const onSubmit = async (data: ForgotPasswordInput) => {
+  const onSubmit = async (_data: ForgotPasswordInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -181,6 +181,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
                       color={COLORS.textSecondary}
                     />
                     <TextInput
+                      testID="email-input"
                       style={styles.textInput}
                       placeholder="name@example.com"
                       placeholderTextColor={COLORS.textTertiary}

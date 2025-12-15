@@ -13,12 +13,13 @@ jest.mock('@sentry/react-native', () => ({
 }));
 
 // Mock console methods
-const mockConsoleInfo = jest.spyOn(console, 'log').mockImplementation();
+const mockConsoleInfo = jest.spyOn(console, 'info').mockImplementation();
 const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation();
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation();
 const mockConsoleGroup = jest.spyOn(console, 'group').mockImplementation();
 const mockConsoleGroupEnd = jest.spyOn(console, 'groupEnd').mockImplementation();
 const mockConsoleTable = jest.spyOn(console, 'table').mockImplementation();
+const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
 
 // Mock __DEV__
 const originalDEV = global.__DEV__;
@@ -660,9 +661,9 @@ describe('logger.ts', () => {
     });
 
     it('should handle special characters in dev mode', () => {
-      global.__DEV__ = true;
+      const testLogger = new Logger({ enableInProduction: true });
       const specialChars = '🚀 Special chars: @#$%^&*()';
-      logger.info(specialChars);
+      testLogger.info(specialChars);
       expect(mockConsoleInfo).toHaveBeenCalled();
     });
   });

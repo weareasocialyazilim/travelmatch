@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import PropTypes from 'prop-types';
 import Animated from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';

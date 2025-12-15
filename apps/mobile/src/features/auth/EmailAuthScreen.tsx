@@ -39,9 +39,9 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
     },
   });
 
-  const email = watch('email');
+  const _email = watch('email');
 
-  const handleContinue = async (data: EmailAuthInput) => {
+  const handleContinue = async (_data: EmailAuthInput) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);

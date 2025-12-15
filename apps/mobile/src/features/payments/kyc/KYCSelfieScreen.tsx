@@ -14,8 +14,6 @@ import { KYCProgressBar } from './KYCProgressBar';
 import { kycStyles } from './styles';
 import type { VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 type RouteParams = {
   KYCSelfie: { data: VerificationData };

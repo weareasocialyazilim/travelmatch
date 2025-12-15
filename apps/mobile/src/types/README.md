@@ -155,6 +155,94 @@ return result!; // ❌ unsafe
 function process(item) { /* ... */ } // ❌
 ```
 
+---
+
+## 🗄️ DATABASE TYPE STRATEGY (CRITICAL)
+
+### Single Source of Truth
+
+**The `database.types.ts` file is auto-generated from Supabase schema.**  
+**DO NOT create manual interfaces that mirror database tables.**
+
+### ✅ Correct Approach
+
+```typescript
+// Import from generated types
+import type { Database } from './database.types';
+
+// Create type aliases
+type Tables = Database['public']['Tables'];
+export type User = Tables['users']['Row'];
+export type Moment = Tables['moments']['Row'];
+export type Message = Tables['messages']['Row'];
+export type UserInsert = Tables['users']['Insert'];
+export type UserUpdate = Tables['users']['Update'];
+```
+
+### ❌ WRONG - Manual Type Duplication
+
+```typescript
+// DON'T DO THIS - creates type drift!
+export interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  // ... manually maintaining this is ERROR-PRONE
+}
+```
+
+### Regenerating Types
+
+```bash
+# From mobile app directory
+pnpm db:types        # Uses linked remote project
+pnpm db:types:local  # Uses local Supabase
+
+# From monorepo root
+pnpm db:generate-types        # Remote
+pnpm db:generate-types:local  # Local
+```
+
+### When to Regenerate
+
+1. **After any migration** - Schema changes require type updates
+2. **Before PRs** - Ensure types are in sync
+3. **CI/CD pipeline** - Auto-generate and fail on drift
+
+### Known Manual Types (TO BE CONSOLIDATED)
+
+The following files contain manual type definitions that should eventually 
+use `Database['public']['Tables']` instead:
+
+| File | Manual Types | Priority |
+|------|--------------|----------|
+| `types/api.ts` | `User`, `Moment` | HIGH |
+| `types/core.ts` | `User` | HIGH |
+| `types/domain.ts` | `Message`, `Moment` | MEDIUM |
+| `hooks/useMoments.ts` | `Moment` | MEDIUM |
+| `services/messageService.ts` | `Conversation`, `Message` | MEDIUM |
+| `features/discover/types/discover.types.ts` | `Profile`, `Message` | LOW |
+| `features/moments/types/moments.types.ts` | `Moment` | LOW |
+
+### Type Extension Pattern
+
+When you need to add frontend-only fields:
+
+```typescript
+import type { Database } from './database.types';
+
+type DbUser = Database['public']['Tables']['users']['Row'];
+
+// Extend with frontend-specific fields
+export interface User extends DbUser {
+  // Frontend-only computed fields
+  displayName: string; // computed from full_name
+  isOnline: boolean;   // from presence
+}
+```
+
+---
+
 ## 🔧 Konfigürasyon
 
 ### tsconfig.json
@@ -186,9 +274,12 @@ function process(item) { /* ... */ } // ❌
 - Type coverage: >95%
 - Runtime type errors: 0
 - Zod schemas: 10+
+- Manual DB type definitions: 0 (all from database.types.ts)
 
 **Şu An:**
 - ✅ 5 new type files created
 - ✅ ESLint rule enforced
 - ✅ TypeScript strict mode enhanced
+- ✅ db:types scripts added
+- ⏳ Manual type consolidation pending (12+ files)
 - ⏳ Services refactoring pending

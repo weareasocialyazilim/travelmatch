@@ -45,8 +45,8 @@ export const TransactionDetailScreen: React.FC<
           transactionId,
         );
         setTransaction(transaction);
-      } catch (error) {
-        logger.error('Failed to fetch transaction', error);
+      } catch (_error) {
+        logger.error('Failed to fetch transaction', _error);
       } finally {
         setLoading(false);
       }

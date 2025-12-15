@@ -18,6 +18,10 @@ major_version = 15
 [studio]
 enabled = true
 port = 54323
+# NOTE: This api_url is for LOCAL DEVELOPMENT ONLY.
+# Supabase Studio is only available locally via `supabase start`.
+# Production uses the Supabase Dashboard at https://app.supabase.com
+# This setting has NO EFFECT in deployed environments.
 api_url = "http://localhost"
 
 [inbucket]

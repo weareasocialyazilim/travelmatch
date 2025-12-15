@@ -23,11 +23,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTypingIndicator } from '@/context/RealtimeContext';
 import { useMessages } from '@/hooks/useMessages';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
-import {
-  CHAT_LIST_CONFIG,
-  ITEM_HEIGHTS,
-  createGetItemLayout,
-} from '@/utils/listOptimization';
+import { CHAT_LIST_CONFIG } from '@/utils/listOptimization';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';

@@ -21,6 +21,7 @@
  */
 
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Client-safe environment variables (EXPO_PUBLIC_*)
@@ -55,7 +56,7 @@ const clientEnvSchema = z.object({
  * These should NEVER be prefixed with EXPO_PUBLIC_
  * Access via Edge Functions only
  */
-const serverEnvSchema = z.object({
+const _serverEnvSchema = z.object({
   // Supabase Admin (NEVER expose to client)
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
 
@@ -226,15 +227,14 @@ export function validateEnvironment(): void {
   try {
     parseEnv();
     if (isDevelopment && __DEV__) {
-      // Development only - safe to use console for env validation
+      // Development only - safe to use logger for env validation
       // Production: This code path never executes
-      console.log('✅ Environment validation passed');
-      console.log(`📱 Running in ${env.APP_ENV} mode`);
+      logger.info('Environment validation passed', { mode: env.APP_ENV });
     }
   } catch (error) {
     // CRITICAL: Always throw env errors (blocks app startup)
     if (__DEV__) {
-      console.error('❌ Environment validation failed:', error);
+      logger.error('Environment validation failed:', error);
     }
     throw error;
   }

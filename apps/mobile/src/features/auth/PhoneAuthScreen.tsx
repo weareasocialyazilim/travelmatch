@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -48,7 +47,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
 
   const phoneNumber = watch('phone');
 
-  const onSendOTP = (data: PhoneAuthInput) => {
+  const onSendOTP = (_data: PhoneAuthInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -57,7 +56,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
     }, 1000);
   };
 
-  const onVerifyOTP = (data: PhoneAuthInput) => {
+  const onVerifyOTP = (_data: PhoneAuthInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {

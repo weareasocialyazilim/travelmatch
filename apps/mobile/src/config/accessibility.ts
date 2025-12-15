@@ -9,6 +9,8 @@
  * - Robust: Compatible with assistive technologies
  */
 
+import { logger } from '../utils/logger';
+
 // WCAG 2.1 AA Requirements
 export const WCAG_STANDARDS = {
   // Color Contrast Ratios
@@ -235,8 +237,7 @@ export const a11yUtils = {
     // Import AccessibilityInfo from react-native to use this
     // AccessibilityInfo.announceForAccessibility(message);
     if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log('[Accessibility Announce]:', message);
+      logger.debug('[Accessibility Announce]:', message);
     }
   },
 

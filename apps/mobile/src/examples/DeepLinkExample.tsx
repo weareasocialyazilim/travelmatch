@@ -5,7 +5,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { deepLinkTracker, DeepLinkType, ConversionGoal } from '../services/deepLinkTracker';
-import { useNavigation } from '@react-navigation/native';
+import { logger } from '../utils/logger';
 
 export function AppNavigator() {
   const navigationRef = React.useRef<any>(null);
@@ -16,7 +16,7 @@ export function AppNavigator() {
 
     // Subscribe to deep link events
     const unsubscribe = deepLinkTracker.subscribe((event) => {
-      console.log('[Navigation] Deep link received:', event.type);
+      logger.info('[Navigation] Deep link received:', event.type);
 
       // Navigate based on deep link type
       switch (event.type) {

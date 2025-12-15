@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { eventTracking } from '@/services/event-tracking';
 import type { CohortDefinition, FunnelStep, ABTest } from '@/services/event-tracking';
 import { logger } from '@/utils/logger';

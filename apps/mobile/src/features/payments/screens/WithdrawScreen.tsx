@@ -24,7 +24,6 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import { ControlledInput } from '@/components/ui/ControlledInput';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
-import { useToast } from '@/context/ToastContext';
 
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 
@@ -180,7 +179,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <Controller
           control={control}
           name="amount"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({ field: { onChange: _onChange, onBlur: _onBlur, value: _value }, fieldState: { error: _error } }) => (
             <View style={styles.inputWrapper}>
               <ControlledInput
                 name="amount"
@@ -196,7 +195,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <Controller
           control={control}
           name="note"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({ field: { onChange: _onChange2, onBlur: _onBlur2, value: _value2 }, fieldState: { error: _error2 } }) => (
             <View style={styles.inputWrapper}>
               <ControlledInput
                 name="note"

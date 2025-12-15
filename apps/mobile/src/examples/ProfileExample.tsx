@@ -6,7 +6,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ProfileSkeleton } from '../components/skeletons';
-import { cacheKeys, CACHE_CONFIG, queryClient, optimisticUpdate } from '../services/offlineCache';
+import { cacheKeys, CACHE_CONFIG, queryClient } from '../services/offlineCache';
 import { userService } from '../services/userService';
 
 export function ProfileScreen({ userId }: { userId: string }) {

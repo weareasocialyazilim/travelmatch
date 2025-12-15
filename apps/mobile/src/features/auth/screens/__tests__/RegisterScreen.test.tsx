@@ -5,15 +5,30 @@
  */
 
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render as rtlRender, fireEvent, waitFor, RenderOptions } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import { RegisterScreen } from '@/features/auth/screens/RegisterScreen';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/utils/logger';
+import { ToastProvider } from '@/context/ToastContext';
+
+// Helper to wrap component with required providers
+const render = (ui: React.ReactElement, options?: RenderOptions) => {
+  return rtlRender(<ToastProvider>{ui}</ToastProvider>, options);
+};
 
 // Mock dependencies
 jest.mock('@/context/AuthContext');
 jest.mock('@/utils/logger');
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
+  SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+jest.mock('@expo/vector-icons', () => ({
+  MaterialCommunityIcons: () => null,
+  Ionicons: () => null,
+}));
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -57,9 +72,9 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      expect(getByPlaceholderText('name@example.com')).toBeTruthy();
-      expect(getByPlaceholderText('Min. 8 characters')).toBeTruthy();
-      expect(getByPlaceholderText('Re-enter password')).toBeTruthy();
+      expect(getByPlaceholderText('Email')).toBeTruthy();
+      expect(getByPlaceholderText('Password')).toBeTruthy();
+      expect(getByPlaceholderText('Confirm Password')).toBeTruthy();
       expect(getAllByText('Create Account').length).toBeGreaterThan(0);
     });
 
@@ -96,7 +111,7 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      const emailInput = getByPlaceholderText('name@example.com');
+      const emailInput = getByPlaceholderText('Email');
       fireEvent.changeText(emailInput, 'test@example.com');
 
       expect(emailInput.props.value).toBe('test@example.com');
@@ -107,7 +122,7 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      const passwordInput = getByPlaceholderText('Min. 8 characters');
+      const passwordInput = getByPlaceholderText('Password');
       fireEvent.changeText(passwordInput, 'password123');
 
       expect(passwordInput.props.value).toBe('password123');
@@ -118,7 +133,7 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      const confirmPasswordInput = getByPlaceholderText('Re-enter password');
+      const confirmPasswordInput = getByPlaceholderText('Confirm Password');
       fireEvent.changeText(confirmPasswordInput, 'password123');
 
       expect(confirmPasswordInput.props.value).toBe('password123');
@@ -129,7 +144,7 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      const emailInput = getByPlaceholderText('name@example.com');
+      const emailInput = getByPlaceholderText('Email');
       fireEvent.changeText(emailInput, 'invalid-email');
       fireEvent(emailInput, 'blur');
 
@@ -143,7 +158,7 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      const passwordInput = getByPlaceholderText('Min. 8 characters');
+      const passwordInput = getByPlaceholderText('Password');
       fireEvent.changeText(passwordInput, 'short');
       fireEvent(passwordInput, 'blur');
 
@@ -157,8 +172,8 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      const passwordInput = getByPlaceholderText('Min. 8 characters');
-      const confirmPasswordInput = getByPlaceholderText('Re-enter password');
+      const passwordInput = getByPlaceholderText('Password');
+      const confirmPasswordInput = getByPlaceholderText('Confirm Password');
 
       fireEvent.changeText(passwordInput, 'password123');
       fireEvent.changeText(confirmPasswordInput, 'different123');
@@ -174,7 +189,7 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      const passwordInput = getByPlaceholderText('Min. 8 characters');
+      const passwordInput = getByPlaceholderText('Password');
       
       // Initially password should be hidden
       expect(passwordInput.props.secureTextEntry).toBe(true);
@@ -199,9 +214,9 @@ describe('RegisterScreen', () => {
       );
 
       // Fill in form
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com');
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
 
       // Submit form - find the Create Account button
       const createAccountButtons = getAllByText('Create Account');
@@ -232,9 +247,9 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com');
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);
@@ -253,12 +268,12 @@ describe('RegisterScreen', () => {
       );
 
       // Fill in invalid email but valid passwords to enable the button
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com'); // Start with valid
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com'); // Start with valid
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
 
       // Now change to invalid email
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'invalid-email');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'invalid-email');
 
       // Button should be disabled with invalid email
       const createAccountButtons = getAllByText('Create Account');
@@ -274,9 +289,9 @@ describe('RegisterScreen', () => {
       );
 
       // Fill in valid email but short password
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com');
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'short');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'short');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'short');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'short');
 
       // Button should be disabled with short password
       const createAccountButtons = getAllByText('Create Account');
@@ -291,12 +306,12 @@ describe('RegisterScreen', () => {
       );
 
       // Fill in valid email and password but mismatched confirmation
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com');
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'different123');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'different123');
 
       // Trigger blur to show error message
-      fireEvent(getByPlaceholderText('Re-enter password'), 'blur');
+      fireEvent(getByPlaceholderText('Confirm Password'), 'blur');
 
       // Should show password mismatch error
       await waitFor(() => {
@@ -319,9 +334,9 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com');
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);
@@ -410,9 +425,9 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com');
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);
@@ -433,9 +448,9 @@ describe('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />
       );
 
-      fireEvent.changeText(getByPlaceholderText('name@example.com'), 'test@example.com');
-      fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);

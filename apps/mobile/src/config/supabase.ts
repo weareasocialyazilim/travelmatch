@@ -3,7 +3,6 @@
  * Initialize and export Supabase client for database, auth, and storage
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '../utils/logger';
 import { secureStorage } from '../utils/secureStorage';

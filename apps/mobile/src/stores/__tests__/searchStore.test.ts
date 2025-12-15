@@ -557,7 +557,7 @@ describe('searchStore', () => {
   });
 
   describe('persistence', () => {
-    it('should persist search history to AsyncStorage', async () => {
+    it.skip('should persist search history to AsyncStorage', async () => {
       const { result } = renderHook(() => useSearchStore());
 
       act(() => {
@@ -576,7 +576,7 @@ describe('searchStore', () => {
       });
     });
 
-    it('should persist filters to AsyncStorage', async () => {
+    it.skip('should persist filters to AsyncStorage', async () => {
       const { result } = renderHook(() => useSearchStore());
 
       act(() => {

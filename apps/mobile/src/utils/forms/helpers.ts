@@ -9,6 +9,7 @@ import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import type { UseFormReturn, FieldValues, Path } from 'react-hook-form';
 import { useToast } from '@/context/ToastContext';
+import { logger } from '../logger';
 
 // ============================================================================
 // FORM STATE UTILITIES
@@ -379,8 +380,7 @@ export function debugFormState<T extends FieldValues>(
   label = 'Form State'
 ) {
   if (__DEV__) {
-    // eslint-disable-next-line no-console
-    console.log(`[${label}]`, {
+    logger.debug(`[${label}]`, {
       values: form.getValues(),
       errors: form.formState.errors,
       isDirty: form.formState.isDirty,
@@ -405,7 +405,6 @@ export function useFormDebug<T extends FieldValues>(
   const values = form.watch();
   
   if (__DEV__) {
-    // eslint-disable-next-line no-console
-    console.log('[Form Watch]', values);
+    logger.debug('[Form Watch]', values);
   }
 }

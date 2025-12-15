@@ -48,7 +48,7 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
 
   const passwordsMatch =
     newPassword === confirmPassword && newPassword.length > 0;
-  const allValid = hasMinLength && hasNumber && hasSymbol && passwordsMatch;
+  const _allValid = hasMinLength && hasNumber && hasSymbol && passwordsMatch;
 
   // Determine strength
   let strength: 'weak' | 'medium' | 'strong' = 'weak';
@@ -66,7 +66,7 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
     strengthColor = COLORS.success;
   }
 
-  const handleSetPassword = (data: ResetPasswordInput) => {
+  const handleSetPassword = (_data: ResetPasswordInput) => {
     // Navigate to success or home
     navigation.navigate('CompleteProfile');
   };

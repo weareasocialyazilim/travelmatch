@@ -35,7 +35,9 @@
     "secrets:pull": "infisical export --env=dev --format=dotenv > .env",
     "secrets:pull:prod": "infisical export --env=prod --format=dotenv > .env.production",
     "dev:secure": "infisical run --env=dev -- pnpm dev",
-    "build:secure": "infisical run --env=prod -- pnpm build:all"
+    "build:secure": "infisical run --env=prod -- pnpm build:all",
+    "db:types": "cd ../.. && supabase gen types typescript --linked > apps/mobile/src/types/database.generated.ts",
+    "db:types:local": "cd ../.. && supabase gen types typescript --local > apps/mobile/src/types/database.generated.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",

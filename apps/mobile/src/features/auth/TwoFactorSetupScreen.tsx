@@ -29,7 +29,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
   const { showToast } = useToast();
   const [step, setStep] = useState<'intro' | 'verify' | 'success'>('intro');
   const [isLoading, setIsLoading] = useState(false);
-  const [secretKey, setSecretKey] = useState<string | null>(null);
+  const [_secretKey, _setSecretKey] = useState<string | null>(null);
 
   const {
     control,

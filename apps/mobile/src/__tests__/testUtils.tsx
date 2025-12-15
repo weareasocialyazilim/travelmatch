@@ -3,45 +3,53 @@
  * Common helpers and utilities for testing
  */
 
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement, createContext, useContext } from 'react';
 import { render, RenderOptions } from '@testing-library/react-native';
-import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
+
+// Mock Auth Context for tests
+const MockAuthContext = createContext({
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+  login: jest.fn(),
+  logout: jest.fn(),
+  register: jest.fn(),
+  checkAuth: jest.fn(),
+});
+
+export const useAuth = () => useContext(MockAuthContext);
+
+const MockAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <MockAuthContext.Provider value={{
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      register: jest.fn(),
+      checkAuth: jest.fn(),
+    }}>
+      {children}
+    </MockAuthContext.Provider>
+  );
+};
 
 /**
  * Custom render with all providers
- * Wrapped to suppress AuthProvider initialization warnings
  */
 interface AllTheProvidersProps {
   children: React.ReactNode;
 }
 
 const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) => {
-  // Suppress act() warnings from AuthProvider initialization
-  useEffect(() => {
-    const originalError = console.error;
-    console.error = (...args: any[]) => {
-      if (
-        typeof args[0] === 'string' &&
-        args[0].includes('Warning: An update to AuthProvider') &&
-        args[0].includes('was not wrapped in act')
-      ) {
-        return; // Suppress this specific warning
-      }
-      originalError.call(console, ...args);
-    };
-    
-    return () => {
-      console.error = originalError;
-    };
-  }, []);
-
   return (
-    <AuthProvider>
+    <MockAuthProvider>
       <ToastProvider>
         {children}
       </ToastProvider>
-    </AuthProvider>
+    </MockAuthProvider>
   );
 };
 

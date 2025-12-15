@@ -147,7 +147,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     }
   };
 
-  const handleComplete = (data: CompleteProfileInput) => {
+  const handleComplete = (_data: CompleteProfileInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
