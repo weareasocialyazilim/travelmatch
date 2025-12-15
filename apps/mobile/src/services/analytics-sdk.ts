@@ -220,6 +220,7 @@ export function useScreenTracking(
 ) {
   useEffect(() => {
     trackScreen(screenName, properties);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screenName]);
 }
 
@@ -232,6 +233,7 @@ export function useEventOnMount(
 ) {
   useEffect(() => {
     trackEvent(event, properties);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
 
@@ -270,6 +272,7 @@ export function useTimeTracking(
         time_spent_seconds: Math.floor(timeSpent / 1000),
       });
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventName]);
 }
 

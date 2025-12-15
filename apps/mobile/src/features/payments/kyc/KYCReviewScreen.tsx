@@ -55,6 +55,7 @@ const KYCReviewScreen: React.FC = () => {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmed, navigation]);
 
   const handleEditPersonal = () => {

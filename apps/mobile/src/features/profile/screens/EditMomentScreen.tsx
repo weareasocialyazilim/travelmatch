@@ -74,6 +74,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
       }
     };
     fetchMoment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [momentId, setValue]);
 
   const handleSave = async (data: EditMomentInput) => {

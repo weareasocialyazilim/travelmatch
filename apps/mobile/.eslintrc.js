@@ -32,9 +32,9 @@ module.exports = {
     'react/display-name': 'off', // Allow anonymous components
     'react/jsx-no-undef': 'off', // Components may be globally available
     
-    // React Hooks - downgrade to warnings during development
-    'react-hooks/rules-of-hooks': 'warn', // Allow hook usage in render functions (Storybook)
-    'react-hooks/exhaustive-deps': 'off', // Too noisy - hook deps are complex
+    // React Hooks
+    'react-hooks/rules-of-hooks': 'warn',
+    'react-hooks/exhaustive-deps': 'warn',
     
     // TypeScript - disable type-aware rules
     '@typescript-eslint/no-explicit-any': 'off', // Too noisy - 200+ warnings
@@ -52,12 +52,12 @@ module.exports = {
     // Import - disable missing rule
     'import/order': 'off',
     
-    // React Native - disable noisy rules
-    'react-native/no-unused-styles': 'off', // Too noisy for production
-    'react-native/no-inline-styles': 'off', // Too noisy for production
+    // React Native
+    'react-native/no-unused-styles': 'warn',
+    'react-native/no-inline-styles': 'warn',
     'react-native/no-color-literals': 'off', // Too noisy
     'react-native/sort-styles': 'off', // Too noisy
-    'react-native/no-raw-text': 'off', // Too noisy for production
+    'react-native/no-raw-text': 'off', // Too noisy
   },
   overrides: [
     {

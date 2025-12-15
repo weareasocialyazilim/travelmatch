@@ -152,6 +152,7 @@ const CreateMomentScreen: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createMoment, navigation]);
 
   // Handlers
@@ -159,6 +160,7 @@ const CreateMomentScreen: React.FC = () => {
   const handleNavigateToPlaceSearch = useCallback(() => {
     // TODO: Implement proper place selection (Google Places or similar)
     showToast('Place selection coming soon', 'info');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

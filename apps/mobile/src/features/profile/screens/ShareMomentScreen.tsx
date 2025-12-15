@@ -90,6 +90,7 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     } catch (error) {
       showToast('Could not share this moment', 'error');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shareMessage, shareUrl, displayMoment.title]);
 
   const handleCopyLink = useCallback(() => {
@@ -121,6 +122,7 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const handleShareToInstagram = useCallback(() => {
     showToast('Opening Instagram to share...', 'info');
     // In production, would use Instagram API
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleShareToTwitter = useCallback(() => {

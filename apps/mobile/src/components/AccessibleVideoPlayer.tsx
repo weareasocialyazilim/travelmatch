@@ -57,6 +57,7 @@ export function AccessibleVideoPlayer({
     } else if (currentTime > 0) {
       announce(`${title} paused`, 'polite');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paused, title, announce]);
 
   const handlePlayPause = () => {

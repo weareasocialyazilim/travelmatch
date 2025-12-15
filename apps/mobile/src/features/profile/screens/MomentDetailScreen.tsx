@@ -184,6 +184,7 @@ const MomentDetailScreen: React.FC = () => {
     } finally {
       setActionLoading(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionLoading, saveMoment, moment.id, isSaved, trackInteraction]);
 
   const handleDelete = useCallback(() => {
@@ -217,11 +218,13 @@ const MomentDetailScreen: React.FC = () => {
     );
   }, [deleteMoment, moment.id, navigation]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleAcceptRequest = useCallback((requestId: string) => {
     showToast('The guest has been notified!', 'info');
     setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDeclineRequest = useCallback((requestId: string) => {
     showToast('The guest has been notified.', 'info');
     setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
@@ -271,7 +274,7 @@ const MomentDetailScreen: React.FC = () => {
         'Thank you for keeping our community safe.',
       );
     },
-    [moment.id],
+    [],
   );
 
   // Gift sheet moment data

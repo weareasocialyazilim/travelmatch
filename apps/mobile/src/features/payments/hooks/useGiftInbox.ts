@@ -50,9 +50,10 @@ export const useGiftInbox = () => {
 
   // Cleanup timeout on unmount
   useEffect(() => {
+    const timeoutRef = refreshTimeoutRef.current;
     return () => {
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
+      if (timeoutRef) {
+        clearTimeout(timeoutRef);
       }
     };
   }, []);

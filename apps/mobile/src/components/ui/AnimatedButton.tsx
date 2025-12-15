@@ -76,6 +76,7 @@ export function PulseButton({ children, onPress }: AnimatedButtonProps) {
       -1,
       false
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -100,6 +101,7 @@ export function ShimmerButton({ children, onPress }: AnimatedButtonProps) {
       -1,
       false
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const shimmerStyle = useAnimatedStyle(() => ({

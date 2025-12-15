@@ -335,7 +335,7 @@ const ProfileScreen: React.FC = () => {
                 estimatedItemSize={250}
                 numColumns={2}
                 scrollEnabled={false}
-                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+                ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
               />
             ) : (
               <EmptyState
@@ -431,38 +431,8 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     alignItems: 'center',
   },
-  momentsContent: {
-    gap: 12,
-  },
-  momentRow: {
-    gap: 12,
-  },
-
-  // Empty State
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 48,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    marginTop: 12,
-    marginBottom: 16,
-  },
-  createButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    backgroundColor: COLORS.mint,
-    borderRadius: 20,
-  },
-  createButtonDisabled: {
-    backgroundColor: COLORS.softGray,
-    opacity: 0.6,
-  },
-  createButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.white,
+  itemSeparator: {
+    height: 12,
   },
 
   bottomSpacer: {

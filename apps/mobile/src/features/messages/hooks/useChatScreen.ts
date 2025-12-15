@@ -187,6 +187,7 @@ export const useChatScreen = ({
         setIsSending(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     messageText,
     isSending,

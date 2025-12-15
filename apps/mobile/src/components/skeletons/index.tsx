@@ -7,6 +7,7 @@
  * - Smooth shimmer animation
  * - Preload pipeline for images
  */
+/* eslint-disable react-native/no-inline-styles */
 
 import React from 'react';
 import { View, StyleSheet, Animated, Easing } from 'react-native';

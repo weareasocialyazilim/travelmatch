@@ -364,10 +364,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
-  userRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   userTouchable: {
     flexDirection: 'row',
     alignItems: 'center',

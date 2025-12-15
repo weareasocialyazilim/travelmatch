@@ -112,9 +112,7 @@ export function DeletedMomentsScreen() {
             onAction={() => navigation.navigate('MyMoments' as never)}
           />
         }
-        contentContainerStyle={{
-          paddingBottom: 16,
-        }}
+        contentContainerStyle={styles.listContent}
       />
     </View>
   );
@@ -124,6 +122,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  listContent: {
+    paddingBottom: 16,
   },
   loadingContainer: {
     flex: 1,

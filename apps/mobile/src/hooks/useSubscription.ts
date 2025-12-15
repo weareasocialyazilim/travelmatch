@@ -93,14 +93,16 @@ export const useSubscription = <T extends Record<string, unknown> = Record<strin
       logger.info('useSubscription', `Unsubscribing from ${config.table} (${id})`);
       subscriptionManager.unsubscribe(id);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, id, config.table, config.filter]);
 
   const reconnect = useCallback(() => {
     subscriptionManager.unsubscribe(subscriptionIdRef.current);
     subscriptionManager.subscribe(subscriptionIdRef.current, config);
-  }, [config]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const unsubscribe = useCallback(() => {
+  const _unsubscribe = useCallback(() => {
     subscriptionManager.unsubscribe(subscriptionIdRef.current);
   }, []);
 

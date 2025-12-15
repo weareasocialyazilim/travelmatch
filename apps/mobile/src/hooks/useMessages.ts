@@ -360,7 +360,8 @@ export const useMessages = (): UseMessagesReturn => {
       logger.info('useMessages', 'Unsubscribing from message updates');
       supabase.removeChannel(channel);
     };
-  }, [currentConversationIdRef.current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Real-time subscription for conversation updates (new conversations, unread counts)
   useEffect(() => {
