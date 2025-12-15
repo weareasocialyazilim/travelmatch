@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -17,6 +16,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { COLORS } from '@/constants/colors';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -28,6 +28,7 @@ type ForgotPasswordScreenProps = StackScreenProps<
 export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   navigation,
 }) => {
+  const { showToast } = useToast();
   const { control, handleSubmit, formState, watch } = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
     mode: 'onChange',
@@ -58,7 +59,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      Alert.alert('Email Sent', 'A new reset link has been sent to your email');
+      showToast('A new reset link has been sent to your email', 'success');
     }, 1000);
   };
 

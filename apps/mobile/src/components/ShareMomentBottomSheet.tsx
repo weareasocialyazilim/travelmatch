@@ -9,11 +9,12 @@ import {
   Dimensions,
   Share,
   Clipboard,
-  Alert,
+  Linking,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { logger } from '../utils/logger';
+import { useToast } from '../context/ToastContext';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -51,13 +52,15 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
   momentUrl = 'https://travelmatch.com/moment/123',
   momentTitle = 'Check out this amazing travel moment!',
 }) => {
+  const { showToast } = useToast();
+
   const handleCopyLink = () => {
     try {
       Clipboard.setString(momentUrl);
-      Alert.alert('Success', 'Link copied to clipboard!');
+      showToast('Link copied to clipboard!', 'success');
       onClose();
     } catch (error) {
-      Alert.alert('Error', 'Failed to copy link');
+      showToast('Failed to copy link', 'error');
     }
   };
 
@@ -73,16 +76,39 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
     }
   };
 
-  const handleWhatsApp = () => {
-    // In production, use Linking.openURL with WhatsApp deep link
-    Alert.alert('WhatsApp', 'Opening WhatsApp...');
-    onClose();
+  const handleWhatsApp = async () => {
+    try {
+      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(`${momentTitle}\n${momentUrl}`)}`;
+      const canOpen = await Linking.canOpenURL(whatsappUrl);
+
+      if (canOpen) {
+        await Linking.openURL(whatsappUrl);
+      } else {
+        showToast('WhatsApp is not installed', 'warning');
+      }
+      onClose();
+    } catch (error) {
+      logger.error('WhatsApp share error:', error);
+      showToast('Failed to share to WhatsApp', 'error');
+    }
   };
 
-  const handleInstagram = () => {
-    // In production, use Linking.openURL with Instagram deep link
-    Alert.alert('Instagram', 'Opening Instagram...');
-    onClose();
+  const handleInstagram = async () => {
+    try {
+      const instagramUrl = 'instagram://';
+      const canOpen = await Linking.canOpenURL(instagramUrl);
+
+      if (canOpen) {
+        await Linking.openURL(instagramUrl);
+        showToast('Please paste the link in Instagram', 'info');
+      } else {
+        showToast('Instagram is not installed', 'warning');
+      }
+      onClose();
+    } catch (error) {
+      logger.error('Instagram share error:', error);
+      showToast('Failed to open Instagram', 'error');
+    }
   };
 
   const options = [

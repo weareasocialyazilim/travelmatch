@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useBiometric } from '@/context/BiometricAuthContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { loginSchema, type LoginInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
 
 export const LoginScreen: React.FC = () => {
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isBiometricLoading, setIsBiometricLoading] = useState(false);
   const { login } = useAuth();
@@ -29,10 +31,10 @@ export const LoginScreen: React.FC = () => {
   const onSubmit = async (data: LoginInput) => {
     try {
       setIsLoading(true);
-      await login({ email: data.email, password: data.password });
+      await login(data.email, data.password);
       // Navigation handled by auth state change
     } catch (error) {
-      Alert.alert('Login Failed', error instanceof Error ? error.message : 'Please try again');
+      showToast(error instanceof Error ? error.message : 'Please try again', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -42,29 +44,17 @@ export const LoginScreen: React.FC = () => {
     try {
       setIsBiometricLoading(true);
       const success = await authenticateForAppLaunch();
-      
+
       if (success) {
         // User authenticated with biometric, proceed with login
         // In a real app, you would retrieve stored credentials and call login
         // For now, we'll just show a success message
-        Alert.alert(
-          'Authentication Successful',
-          'You have been authenticated with ' + biometricTypeName,
-          [{ text: 'OK' }]
-        );
+        showToast('You have been authenticated with ' + biometricTypeName, 'success');
       } else {
-        Alert.alert(
-          'Authentication Failed',
-          'Could not verify your ' + biometricTypeName.toLowerCase() + '. Please try again or use your password.',
-          [{ text: 'OK' }]
-        );
+        showToast('Could not verify your ' + biometricTypeName.toLowerCase() + '. Please try again or use your password.', 'error');
       }
     } catch (error) {
-      Alert.alert(
-        'Error',
-        'Biometric authentication is not available. Please use your password.',
-        [{ text: 'OK' }]
-      );
+      showToast('Biometric authentication is not available. Please use your password.', 'error');
     } finally {
       setIsBiometricLoading(false);
     }
@@ -109,7 +99,7 @@ export const LoginScreen: React.FC = () => {
             {error && (
               <Text 
                 style={styles.errorText}
-                {...a11y.alert(error.message ?? 'Invalid email')}
+                {...a11y.alert(error.message)}
               >
                 {error.message}
               </Text>
@@ -138,7 +128,7 @@ export const LoginScreen: React.FC = () => {
             {error && (
               <Text 
                 style={styles.errorText}
-                {...a11y.alert(error.message ?? 'Invalid password')}
+                {...a11y.alert(error.message)}
               >
                 {error.message}
               </Text>
@@ -148,13 +138,14 @@ export const LoginScreen: React.FC = () => {
       />
 
       <TouchableOpacity
-        style={[styles.button, (isLoading || !canSubmitForm({ formState })) && styles.buttonDisabled]}
+        testID="login-button"
+        style={[styles.button, (isLoading || !canSubmitForm({ formState } as any)) && styles.buttonDisabled]}
         onPress={handleSubmit(onSubmit)}
-        disabled={isLoading || !canSubmitForm({ formState })}
+        disabled={isLoading || !canSubmitForm({ formState } as any)}
         {...a11y.button(
           isLoading ? 'Signing in' : 'Sign In',
           'Sign in with your email and password',
-          isLoading || !canSubmitForm({ formState })
+          isLoading || !canSubmitForm({ formState } as any)
         )}
       >
         <Text style={styles.buttonText}>
@@ -171,6 +162,7 @@ export const LoginScreen: React.FC = () => {
           </View>
 
           <TouchableOpacity
+            testID="biometric-login-button"
             style={styles.biometricButton}
             onPress={handleBiometricLogin}
             disabled={isBiometricLoading || isLoading}

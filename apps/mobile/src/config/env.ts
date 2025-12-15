@@ -10,7 +10,7 @@ import { logger } from '../utils/logger';
  * Environment Schema
  */
 const envSchema = z.object({
-  API_URL: z.string().url().optional(),
+  API_URL: z.string().url().optional(), // ✅ FIXED: Removed localhost fallback - will use Supabase Functions URL
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
@@ -21,7 +21,7 @@ const envSchema = z.object({
   MAX_UPLOAD_SIZE: z.number().default(10485760), // 10MB
   SOCKET_URL: z.string().url().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  GOOGLE_MAPS_API_KEY: z.string().optional(),
+  MAPBOX_PUBLIC_TOKEN: z.string().optional(),
   // Supabase configuration
   SUPABASE_URL: z.string().url().optional(),
   SUPABASE_ANON_KEY: z.string().optional(),
@@ -31,7 +31,7 @@ const envSchema = z.object({
  * Production environment validation
  * These variables MUST be set in production
  */
-const REQUIRED_IN_PRODUCTION = ['API_URL', 'SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
+const REQUIRED_IN_PRODUCTION = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
 
 /**
  * Parse and validate environment variables
@@ -54,7 +54,7 @@ function getEnvVars() {
     STRIPE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_STRIPE_KEY as
       | string
       | undefined,
-    GOOGLE_MAPS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY as
+    MAPBOX_PUBLIC_TOKEN: process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN as
       | string
       | undefined,
     SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined,
@@ -114,7 +114,7 @@ export const isTest = config.NODE_ENV === 'test';
  * API Configuration
  */
 export const API_CONFIG = {
-  BASE_URL: config.API_URL || (config.NODE_ENV === 'development' ? 'http://localhost:3000/api' : ''),
+  BASE_URL: config.API_URL,
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -137,7 +137,7 @@ export const FEATURES = {
   LOGGING: config.ENABLE_LOGGING,
   SOCKET_ENABLED: !!config.SOCKET_URL,
   PAYMENTS_ENABLED: !!config.STRIPE_PUBLISHABLE_KEY,
-  MAPS_ENABLED: !!config.GOOGLE_MAPS_API_KEY,
+  MAPS_ENABLED: !!config.MAPBOX_PUBLIC_TOKEN,
   SUPABASE_ENABLED: !!config.SUPABASE_URL && !!config.SUPABASE_ANON_KEY,
 } as const;
 

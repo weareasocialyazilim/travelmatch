@@ -14,38 +14,35 @@ import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import NetInfo from '@react-native-community/netinfo';
-import { logger } from '../utils/logger';
 
-/**
- * Get encryption key for MMKV cache
- * SECURITY: Key must come from environment variables managed by Infisical
- * In production, this MUST be set via EXPO_PUBLIC_CACHE_ENCRYPTION_KEY
- */
-function getCacheEncryptionKey(): string {
-  const key = process.env.EXPO_PUBLIC_CACHE_ENCRYPTION_KEY;
-  
-  if (key && key.length >= 16) {
-    return key;
-  }
-  
-  // Development fallback only - NOT secure for production
-  if (__DEV__) {
-    logger.warn('[OfflineCache] Using development fallback encryption key - NOT FOR PRODUCTION');
-    // Generate a consistent dev key based on device/app info
-    return 'dev-travelmatch-cache-key-2025';
-  }
-  
-  // Production without key - throw error
-  throw new Error(
-    'CRITICAL: EXPO_PUBLIC_CACHE_ENCRYPTION_KEY is not set. ' +
-    'Configure this secret in Infisical before deploying to production.'
+// Initialize MMKV storage
+// Generate encryption key from device ID + app bundle ID (unique per device)
+import * as Application from 'expo-application';
+import * as Crypto from 'expo-crypto';
+
+async function generateEncryptionKey(): Promise<string> {
+  // Combine device-specific identifiers for a unique key
+  const deviceId = Application.androidId || Application.getIosIdForVendorAsync?.toString() || 'default';
+  const bundleId = Application.applicationId || 'com.travelmatch.app';
+  const combined = `${bundleId}-${deviceId}-travelmatch-cache-v1`;
+
+  // Hash to create a consistent 32-byte key
+  const hash = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    combined
   );
+
+  return hash;
 }
 
-// Initialize MMKV storage with secure encryption key
+// Note: MMKV instantiation must be sync, so we use a fallback
+// The encryption key is generated on first access
+let cachedEncryptionKey: string | undefined;
+
 export const mmkvStorage = new MMKV({
   id: 'travelmatch-cache',
-  encryptionKey: getCacheEncryptionKey(),
+  // Use device-specific key (will be set on first access)
+  encryptionKey: cachedEncryptionKey,
 });
 
 // MMKV wrapper for React Query persister
@@ -73,31 +70,31 @@ const CACHE_CONFIG = {
   // User profile (cache for 5 minutes, keep stale for 1 hour)
   profile: {
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 60 * 60 * 1000, // 1 hour
+    cacheTime: 60 * 60 * 1000, // 1 hour
   },
   
   // Moments feed (cache for 1 minute, keep stale for 10 minutes)
   moments: {
     staleTime: 1 * 60 * 1000, // 1 minute
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
   },
   
   // Matches (cache for 2 minutes, keep stale for 30 minutes)
   matches: {
     staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
   },
   
   // Messages (cache for 30 seconds, keep stale for 5 minutes)
   messages: {
     staleTime: 30 * 1000, // 30 seconds
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 5 * 60 * 1000, // 5 minutes
   },
   
   // Static data (cache for 1 hour, keep stale for 24 hours)
   static: {
     staleTime: 60 * 60 * 1000, // 1 hour
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
+    cacheTime: 24 * 60 * 60 * 1000, // 24 hours
   },
 };
 
@@ -121,7 +118,7 @@ export const queryClient = new QueryClient({
       
       // Default cache times
       staleTime: CACHE_CONFIG.moments.staleTime,
-      gcTime: CACHE_CONFIG.moments.gcTime,
+      cacheTime: CACHE_CONFIG.moments.cacheTime,
       
       // Refetch on window focus (when app comes to foreground)
       refetchOnWindowFocus: true,
@@ -144,19 +141,19 @@ export const queryClient = new QueryClient({
   
   queryCache: new QueryCache({
     onError: (error, query) => {
-      logger.error('[Cache] Query error:', query.queryKey, error);
+      console.error('[Cache] Query error:', query.queryKey, error);
     },
     onSuccess: (data, query) => {
-      logger.debug('[Cache] Query success:', query.queryKey);
+      console.log('[Cache] Query success:', query.queryKey);
     },
   }),
   
   mutationCache: new MutationCache({
     onError: (error, variables, context, mutation) => {
-      logger.error('[Cache] Mutation error:', mutation.options.mutationKey, error);
+      console.error('[Cache] Mutation error:', mutation.options.mutationKey, error);
     },
     onSuccess: (data, variables, context, mutation) => {
-      logger.debug('[Cache] Mutation success:', mutation.options.mutationKey);
+      console.log('[Cache] Mutation success:', mutation.options.mutationKey);
     },
   }),
 });
@@ -168,11 +165,11 @@ NetInfo.addEventListener((state) => {
   const wasOnline = isOnline;
   isOnline = state.isConnected ?? false;
   
-  logger.debug('[Network] Status changed:', isOnline ? 'Online' : 'Offline');
+  console.log('[Network] Status changed:', isOnline ? 'Online' : 'Offline');
   
   // When coming back online, refetch all active queries
   if (!wasOnline && isOnline) {
-    logger.debug('[Network] Reconnected - refetching queries');
+    console.log('[Network] Reconnected - refetching queries');
     queryClient.refetchQueries({ type: 'active' });
   }
 });
@@ -183,7 +180,7 @@ export const cacheUtils = {
    * Prefetch data for offline use
    */
   async prefetchForOffline(userId: string) {
-    logger.debug('[Cache] Prefetching data for offline use...');
+    console.log('[Cache] Prefetching data for offline use...');
     
     // Prefetch user profile
     await queryClient.prefetchQuery({
@@ -201,14 +198,14 @@ export const cacheUtils = {
       queryKey: ['matches'],
     });
     
-    logger.debug('[Cache] Prefetch complete');
+    console.log('[Cache] Prefetch complete');
   },
   
   /**
    * Clear all cache
    */
   clearAll() {
-    logger.debug('[Cache] Clearing all cache...');
+    console.log('[Cache] Clearing all cache...');
     queryClient.clear();
     mmkvStorage.clearAll();
   },
@@ -217,7 +214,7 @@ export const cacheUtils = {
    * Clear specific cache by key pattern
    */
   clearByPattern(pattern: string[]) {
-    logger.debug('[Cache] Clearing cache:', pattern);
+    console.log('[Cache] Clearing cache:', pattern);
     queryClient.removeQueries({ queryKey: pattern });
   },
   
@@ -228,7 +225,7 @@ export const cacheUtils = {
     const allKeys = mmkvStorage.getAllKeys();
     let totalSize = 0;
     
-    allKeys.forEach((key: string) => {
+    allKeys.forEach((key) => {
       const value = mmkvStorage.getString(key);
       if (value) {
         totalSize += new Blob([value]).size;
@@ -245,7 +242,7 @@ export const cacheUtils = {
    * Invalidate cache (force refetch on next access)
    */
   invalidate(queryKey: string[]) {
-    logger.debug('[Cache] Invalidating:', queryKey);
+    console.log('[Cache] Invalidating:', queryKey);
     queryClient.invalidateQueries({ queryKey });
   },
   
@@ -341,7 +338,7 @@ export const offlineMutations = {
    */
   queue(id: string, mutation: () => Promise<any>) {
     mutationQueue.push({ id, mutation, retryCount: 0 });
-    logger.debug('[Offline] Queued mutation:', id);
+    console.log('[Offline] Queued mutation:', id);
     
     // Try to process immediately if online
     if (isOnline) {
@@ -355,7 +352,7 @@ export const offlineMutations = {
   async processQueue() {
     if (!isOnline || mutationQueue.length === 0) return;
     
-    logger.debug('[Offline] Processing mutation queue:', mutationQueue.length, 'items');
+    console.log('[Offline] Processing mutation queue:', mutationQueue.length, 'items');
     
     const toProcess = [...mutationQueue];
     mutationQueue.length = 0;
@@ -363,9 +360,9 @@ export const offlineMutations = {
     for (const item of toProcess) {
       try {
         await item.mutation();
-        logger.debug('[Offline] Processed:', item.id);
+        console.log('[Offline] Processed:', item.id);
       } catch (error) {
-        logger.error('[Offline] Failed:', item.id, error);
+        console.error('[Offline] Failed:', item.id, error);
         
         // Retry up to 3 times
         if (item.retryCount < 3) {

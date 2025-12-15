@@ -20,6 +20,7 @@ import * as Location from 'expo-location';
 import { COLORS, CARD_SHADOW } from '../../constants/colors';
 import { LAYOUT } from '../../constants/layout';
 import { VALUES } from '../../constants/values';
+import { useToast } from '@/context/ToastContext';
 
 export interface Place {
   name: string;
@@ -53,6 +54,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
     onAmountChange,
     onNavigateToPlaceSearch,
   }) => {
+    const { showToast } = useToast();
     const escrowInfo: EscrowInfo = useMemo(() => {
       const amountNum = parseFloat(amount) || 0;
 
@@ -86,7 +88,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
         try {
           const { status } = await Location.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
-            Alert.alert('Permission Required', 'Location permission is needed');
+            showToast('Location permission is needed', 'warning');
             return;
           }
 
@@ -103,7 +105,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
             });
           }
         } catch {
-          Alert.alert('Error', 'Could not get current location');
+          showToast('Could not get current location', 'error');
         }
       };
 

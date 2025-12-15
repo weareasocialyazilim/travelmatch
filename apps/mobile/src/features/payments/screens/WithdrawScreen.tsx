@@ -7,9 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+  ActivityIndicator,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +22,7 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import { ControlledInput } from '@/components/ui/ControlledInput';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
 
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 
@@ -165,6 +164,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             </View>
           </View>
           <TouchableOpacity
+            testID="change-payment-method-button"
             style={styles.changeButton}
             onPress={() => navigation.navigate('PaymentMethods')}
             activeOpacity={0.7}
@@ -228,13 +228,14 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           Payouts typically arrive in 1-3 business days
         </Text>
         <TouchableOpacity
+          testID="withdraw-button"
           style={[styles.confirmButton, (isSubmitDisabled || isSubmitting) && styles.confirmButtonDisabled]}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitDisabled || isSubmitting}
           {...a11y.button(
             isSubmitting ? 'Processing withdrawal' : 'Confirm withdraw',
-            biometricEnabled 
-              ? `This will require ${biometricTypeName} verification` 
+            biometricEnabled
+              ? `This will require ${biometricTypeName} verification`
               : 'Process withdrawal to your bank account',
             isSubmitDisabled || isSubmitting
           )}

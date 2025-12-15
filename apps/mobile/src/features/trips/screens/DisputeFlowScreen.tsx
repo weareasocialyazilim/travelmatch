@@ -7,19 +7,19 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '@/config/supabase';
-import { COLORS } from '@/constants/colors';
-import { logger } from '@/utils/logger';
-import { disputeSchema, type DisputeInput } from '@/utils/forms';
+import { supabase } from '../config/supabase';
+import { COLORS } from '../constants/colors';
+import { logger } from '../utils/logger';
+import { disputeSchema, type DisputeFormData } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import { useToast } from '@/context/ToastContext';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type _IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -30,6 +30,7 @@ export const DisputeFlowScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<DisputeFlowRouteProp>();
   const { type, id, details } = route.params || {};
+  const { showToast } = useToast();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,7 @@ export const DisputeFlowScreen: React.FC = () => {
     formState,
     watch,
     setValue,
-  } = useForm<DisputeInput>({
+  } = useForm<DisputeFormData>({
     resolver: zodResolver(disputeSchema),
     mode: 'onChange',
     defaultValues: {
@@ -76,15 +77,15 @@ export const DisputeFlowScreen: React.FC = () => {
         `evidence_${evidence.length + 1}.jpg`,
       ]);
     } else {
-      Alert.alert('Limit Reached', 'You can only upload up to 3 files.');
+      showToast('You can only upload up to 3 files.', 'warning');
     }
   };
 
   const handleRemoveFile = (index: number) => {
-    setValue('evidence', evidence.filter((_: string, i: number) => i !== index));
+    setValue('evidence', evidence.filter((_, i) => i !== index));
   };
 
-  const onSubmit = async (formData: DisputeInput) => {
+  const onSubmit = async (formData: DisputeFormData) => {
     setLoading(true);
     try {
       const _table =
@@ -114,7 +115,7 @@ export const DisputeFlowScreen: React.FC = () => {
       navigation.navigate('Success', { type: 'dispute' });
     } catch (error) {
       logger.error('Error submitting dispute', error as Error);
-      Alert.alert('Error', 'Failed to submit dispute. Please try again.');
+      showToast('Failed to submit dispute. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -173,7 +174,7 @@ export const DisputeFlowScreen: React.FC = () => {
       </Text>
 
       <View style={styles.uploadArea}>
-        {evidence.map((file: string, index: number) => (
+        {evidence.map((file, index) => (
           <View key={index} style={styles.fileItem}>
             <MaterialCommunityIcons
               name="file-document-outline"
@@ -467,7 +468,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  errorContainerText: {
+  errorText: {
     fontSize: 16,
     color: COLORS.error,
     marginBottom: 20,

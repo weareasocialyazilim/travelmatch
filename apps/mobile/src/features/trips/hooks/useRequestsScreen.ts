@@ -7,6 +7,8 @@ import { useRequests as useRequestsAPI } from '@/hooks/useRequests';
 import { useNotifications as useNotificationsAPI } from '@/hooks/useNotifications';
 import { formatTimeAgo } from '../utils/timeFormat';
 import type { RequestItem, NotificationItem, TabType } from '../types/requests.types';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 // Enable LayoutAnimation for Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -18,7 +20,8 @@ const STORAGE_KEYS = {
 };
 
 export const useRequestsScreen = (initialTab: TabType = 'pending') => {
-  const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
+    const { showToast } = useToast();
+const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
   const [hiddenRequestIds, setHiddenRequestIds] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 

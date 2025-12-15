@@ -6,9 +6,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Dimensions,
-  Alert,
-} from 'react-native';
+  Dimensions,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -16,6 +14,8 @@ import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -25,7 +25,9 @@ type ProfileDetailScreenProps = StackScreenProps<
 >;
 
 export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
-  navigation,
+    const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
+navigation,
   route,
 }) => {
   const { userId } = route.params;

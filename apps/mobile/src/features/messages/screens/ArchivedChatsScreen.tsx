@@ -5,9 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native';
+  Image,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +14,8 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface ArchivedChat {
   id: string;
@@ -27,7 +27,9 @@ interface ArchivedChat {
 }
 
 export const ArchivedChatsScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
+const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([
     {
@@ -59,7 +61,7 @@ export const ArchivedChatsScreen: React.FC = () => {
           text: 'Unarchive',
           onPress: () => {
             setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            Alert.alert('Done', 'Chat has been restored to your chats.');
+            showToast('Chat has been restored to your chats.', 'success');
           },
         },
       ],
@@ -77,7 +79,7 @@ export const ArchivedChatsScreen: React.FC = () => {
           style: 'destructive',
           onPress: () => {
             setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            Alert.alert('Deleted', 'Chat has been permanently deleted.');
+            showToast('Chat has been permanently deleted.', 'info');
           },
         },
       ],

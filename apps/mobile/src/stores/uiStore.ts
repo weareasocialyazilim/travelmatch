@@ -1,14 +1,14 @@
 /**
  * UI Store
  * Theme, language, ve diğer UI preferences
- * 
- * @note Uses AsyncStorage - Non-sensitive UI preferences only
- * @security All data here is non-sensitive and safe for AsyncStorage
+ *
+ * @note Uses MMKV - 10-20x faster than AsyncStorage
+ * @security All data here is non-sensitive and safe for MMKV storage
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import { Storage } from '../utils/storage';
 
 export type Theme = 'light' | 'dark' | 'system';
 export type Language = 'en' | 'tr';
@@ -56,7 +56,7 @@ export const useUIStore = create<UIState>()(
       }),
       {
         name: 'ui-storage',
-        storage: createJSONStorage(() => AsyncStorage),
+        storage: createJSONStorage(() => Storage),
       },
     ),
     {

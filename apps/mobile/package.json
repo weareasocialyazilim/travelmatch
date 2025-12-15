@@ -31,7 +31,11 @@
     "prebuild": "expo prebuild",
     "build:ios": "eas build --platform ios",
     "build:android": "eas build --platform android",
-    "build:all": "eas build --platform all"
+    "build:all": "eas build --platform all",
+    "secrets:pull": "infisical export --env=dev --format=dotenv > .env",
+    "secrets:pull:prod": "infisical export --env=prod --format=dotenv > .env.production",
+    "dev:secure": "infisical run --env=dev -- pnpm dev",
+    "build:secure": "infisical run --env=prod -- pnpm build:all"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
@@ -42,7 +46,9 @@
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/stack": "^6.3.0",
     "@sentry/react-native": "~7.2.0",
+    "@shopify/flash-list": "^1.6.3",
     "@supabase/supabase-js": "^2.86.2",
+    "posthog-react-native": "^3.3.8",
     "@travelmatch/design-system": "workspace:*",
     "@travelmatch/shared": "workspace:*",
     "axios": "^1.13.2",
@@ -74,7 +80,8 @@
     "react-native": "0.76.5",
     "react-native-device-info": "^15.0.1",
     "react-native-gesture-handler": "~2.20.2",
-    "react-native-maps": "1.18.0",
+    "@rnmapbox/maps": "^10.1.30",
+    "react-native-mmkv": "^2.12.2",
     "react-native-reanimated": "~3.16.1",
     "react-native-screens": "~4.4.0",
     "react-native-svg": "15.8.0",

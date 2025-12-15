@@ -3,7 +3,6 @@ import {
   StyleSheet,
   AppState,
   Platform,
-  Alert,
 } from 'react-native';
 import * as Device from 'expo-device';
 import * as SplashScreen from 'expo-splash-screen';
@@ -22,10 +21,11 @@ import { ToastProvider } from './src/context/ToastContext';
 import { useFeedbackPrompt } from './src/hooks/useFeedbackPrompt';
 import AppNavigator from './src/navigation/AppNavigator';
 import { logger } from './src/utils/logger';
-import { validateEnvironment } from './src/config/env.config';
+import { validateEnvironment, env } from './src/config/env.config';
 import { migrateSensitiveDataToSecure } from './src/utils/secureStorage';
 import { initSecurityMonitoring } from './src/utils/securityChecks';
 import './src/config/i18n'; // Initialize i18n
+import PostHog from 'posthog-react-native';
 
 import { messageService } from './src/services/messageService';
 import { cacheService } from './src/services/cacheService';
@@ -75,20 +75,8 @@ export default function App() {
         // 1. Security Check: Root/Jailbreak Detection (Warning Only)
         const isRooted = await Device.isRootedExperimentalAsync();
         if (isRooted) {
-          logger.warn('App', 'Device is rooted/jailbroken - security risk');
-          // Show warning but don't block (user choice)
-          Alert.alert(
-            'Security Warning',
-            'This device appears to be rooted or jailbroken. This may reduce the security of your data. Continue at your own risk.',
-            [
-              {
-                text: 'I Understand',
-                style: 'default',
-              },
-            ],
-            { cancelable: true },
-          );
-          // Continue with app initialization
+          logger.warn('App', 'Device is rooted/jailbroken - security risk. Data security may be compromised.');
+          // Continue with app initialization - warning logged
         }
         
         // Note: Screenshot protection is now handled per-screen via useScreenSecurity() hook
@@ -124,26 +112,40 @@ export default function App() {
         await cacheService.initialize();
         logger.info('CacheService initialized with 50MB limit');
 
-        // TODO: Initialize monitoring service (Datadog RUM) when service is implemented
-        // if (process.env.DD_APP_ID && process.env.DD_CLIENT_TOKEN) {
-        //   await monitoringService.initialize({
-        //     applicationId: process.env.DD_APP_ID,
-        //     clientToken: process.env.DD_CLIENT_TOKEN,
-        //     env: __DEV__ ? 'development' : 'production',
-        //     serviceName: 'travelmatch-mobile',
-        //     version: '1.0.0',
-        //     enabled: !__DEV__, // Only enable in production
-        //   });
-        //   
-        //   // Add global context
-        //   monitoringService.addGlobalContext({
-        //     platform: Platform.OS,
-        //     device_model: Device.modelName || 'unknown',
-        //     os_version: Platform.Version,
-        //   });
-        //   
-        //   logger.info('Monitoring service initialized');
-        // }
+        // 5. Initialize PostHog Analytics
+        const posthogApiKey = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
+        const posthogHost = process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com';
+
+        if (posthogApiKey && env.ENABLE_ANALYTICS) {
+          try {
+            await PostHog.initAsync(posthogApiKey, {
+              host: posthogHost,
+              captureApplicationLifecycleEvents: true,
+              captureDeepLinks: true,
+              enableSessionReplay: false, // Enable if needed (beta feature)
+              autocapture: {
+                captureScreens: true,
+                captureTouches: true,
+                captureLifecycleEvents: true,
+              },
+            });
+
+            // Set global properties
+            PostHog.register({
+              platform: Platform.OS,
+              device_model: Device.modelName || 'unknown',
+              os_version: String(Platform.Version),
+              app_version: '1.0.0',
+              app_env: env.APP_ENV,
+            });
+
+            logger.info('PostHog initialized successfully');
+          } catch (error) {
+            logger.warn('PostHog initialization failed (non-critical)', error);
+          }
+        } else {
+          logger.info('PostHog not configured - skipping analytics');
+        }
 
         // Increment session count
         incrementSessionCount();
@@ -156,11 +158,11 @@ export default function App() {
         const { initSentry } = await import('./src/config/sentry');
         void initSentry();
 
-        // 5. Initialize Storage Monitor
+        // 6. Initialize Storage Monitor
         storageMonitor.initialize();
         logger.info('Storage monitor initialized');
 
-        // 6. Check Pending Transactions (app crash recovery)
+        // 7. Check Pending Transactions (app crash recovery)
         const { hasPayments, hasUploads } = await pendingTransactionsService.checkPendingOnStartup();
         if (hasPayments || hasUploads) {
           logger.info('App', `Found pending transactions - payments: ${hasPayments}, uploads: ${hasUploads}`);

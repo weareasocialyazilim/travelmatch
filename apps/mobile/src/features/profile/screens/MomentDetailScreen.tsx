@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Animated, Alert, StyleSheet } from 'react-native';
+import { View, Animated, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { GiftMomentBottomSheet } from '@/components/GiftMomentBottomSheet';
 import { GiftSuccessModal } from '@/components/GiftSuccessModal';
@@ -29,6 +29,8 @@ import type {
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { MomentData } from '../types';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 type MomentDetailRouteProp = RouteProp<RootStackParamList, 'MomentDetail'>;
 
@@ -178,7 +180,7 @@ const MomentDetailScreen: React.FC = () => {
         );
       }
     } catch {
-      Alert.alert('Error', 'Could not save moment. Please try again.');
+      showToast('Could not save moment. Please try again.', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -199,7 +201,7 @@ const MomentDetailScreen: React.FC = () => {
               const success = await deleteMoment(moment.id);
               if (success) {
                 navigation.goBack();
-                Alert.alert('Deleted', 'Your moment has been deleted.');
+                showToast('Your moment has been deleted.', 'info');
               }
             } catch {
               Alert.alert(
@@ -216,12 +218,12 @@ const MomentDetailScreen: React.FC = () => {
   }, [deleteMoment, moment.id, navigation]);
 
   const handleAcceptRequest = useCallback((requestId: string) => {
-    Alert.alert('Request Accepted', 'The guest has been notified!');
+    showToast('The guest has been notified!', 'info');
     setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
   }, []);
 
   const handleDeclineRequest = useCallback((requestId: string) => {
-    Alert.alert('Request Declined', 'The guest has been notified.');
+    showToast('The guest has been notified.', 'info');
     setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
   }, []);
 

@@ -1,18 +1,22 @@
 /**
- * Geocoding Proxy - Server-side Google Maps API wrapper
- * 
- * Prevents exposing Google Maps API key in client bundle
+ * Geocoding Proxy - Server-side Mapbox Geocoding API wrapper
+ *
+ * Prevents exposing Mapbox secret token in client bundle
  * Implements rate limiting and caching for cost optimization
- * 
+ *
  * Endpoints:
  * - POST /geocode - Address to coordinates
  * - POST /reverse-geocode - Coordinates to address
- * 
+ *
  * Security:
- * - API key stored server-side only
+ * - Secret token stored server-side only
  * - Rate limiting via Upstash Redis
  * - Request validation
  * - Response caching (1 hour)
+ *
+ * Mapbox Geocoding API:
+ * - Free tier: 100,000 requests/month
+ * - Docs: https://docs.mapbox.com/api/search/geocoding/
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -30,11 +34,11 @@ import {
   handleUnexpectedError,
 } from '../_shared/errorHandler.ts';
 
-const GOOGLE_MAPS_API_KEY = Deno.env.get('GOOGLE_MAPS_SERVER_KEY');
+const MAPBOX_SECRET_TOKEN = Deno.env.get('MAPBOX_SECRET_TOKEN');
 const CACHE_TTL = 3600; // 1 hour
 
-if (!GOOGLE_MAPS_API_KEY) {
-  throw new Error('GOOGLE_MAPS_SERVER_KEY is required');
+if (!MAPBOX_SECRET_TOKEN) {
+  throw new Error('MAPBOX_SECRET_TOKEN is required');
 }
 
 // Rate limiter: 100 requests per minute
@@ -75,29 +79,39 @@ serve(async (req) => {
       return toHttpResponse(error, corsHeaders);
     }
 
-    // Build Google Maps API URL
+    // Build Mapbox Geocoding API URL
     let apiUrl: string;
     if (type === 'geocode') {
-      apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_API_KEY}`;
+      // Forward geocoding: address → coordinates
+      apiUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${MAPBOX_SECRET_TOKEN}&limit=1`;
     } else {
-      apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`;
+      // Reverse geocoding: coordinates → address
+      // Note: Mapbox uses longitude,latitude (opposite of Google Maps)
+      apiUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_SECRET_TOKEN}&limit=1`;
     }
 
-    // Call Google Maps API
+    // Call Mapbox Geocoding API
     const response = await fetch(apiUrl);
     const data = await response.json();
 
-    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-      console.error('Google Maps API error:', data);
+    // Check for errors (Mapbox returns 200 even for 0 results)
+    if (!response.ok) {
+      console.error('Mapbox API error:', data);
       const error = createErrorResponse(
         'Geocoding service failed',
         ErrorCode.EXTERNAL_SERVICE_ERROR,
-        { details: data.status },
+        { details: data.message || 'Unknown error' },
       );
       return toHttpResponse(error, corsHeaders);
     }
 
-    const success = createSuccessResponse(data);
+    // Transform Mapbox response to match expected format
+    const transformedData = {
+      results: data.features || [],
+      status: data.features && data.features.length > 0 ? 'OK' : 'ZERO_RESULTS',
+    };
+
+    const success = createSuccessResponse(transformedData);
     return new Response(JSON.stringify(success), {
       headers: {
         ...corsHeaders,

@@ -67,7 +67,7 @@ const serverEnvSchema = z.object({
   OPENAI_API_KEY: z.string().startsWith('sk-').optional(),
   CLOUDFLARE_STREAM_API_KEY: z.string().optional(),
   CLOUDFLARE_STREAM_ACCOUNT_ID: z.string().optional(),
-  GOOGLE_MAPS_SERVER_KEY: z.string().optional(),
+  MAPBOX_SECRET_TOKEN: z.string().optional(),
 
   // Upstash Redis (server-side only)
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),

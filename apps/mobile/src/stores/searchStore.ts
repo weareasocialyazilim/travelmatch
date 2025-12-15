@@ -1,11 +1,12 @@
 /**
  * Search & Filter Store
  * Manage search history, filters, and sort options
+ * Uses MMKV for 10-20x faster storage operations
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import { Storage } from '../utils/storage';
 
 export interface SearchFilters {
   category?: string;
@@ -121,7 +122,7 @@ export const useSearchStore = create<SearchState>()(
       }),
       {
         name: 'search-storage',
-        storage: createJSONStorage(() => AsyncStorage),
+        storage: createJSONStorage(() => Storage),
       },
     ),
     {

@@ -5,9 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,
-  Alert,
-  ActivityIndicator,
+  Switch,  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +16,8 @@ import { logger } from '@/utils/logger';
 import { useBiometric } from '@/context/BiometricAuthContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface ActiveSession {
   id: string;
@@ -153,7 +153,7 @@ const SecurityScreen: React.FC = () => {
 
   const handleRevokeSession = (session: ActiveSession) => {
     if (session.isCurrent) {
-      Alert.alert('Error', 'You cannot revoke your current session.');
+      showToast('You cannot revoke your current session.', 'error');
       return;
     }
 

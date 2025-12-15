@@ -2,11 +2,11 @@ import React from 'react';
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseDb } from '@/services/supabaseDbService';
 import { useAuth } from '@/context/AuthContext';
@@ -61,9 +61,9 @@ export function DeletedMomentsScreen() {
       </View>
 
       {/* List */}
-      <FlatList
+      <FlashList
         data={deletedMoments || []}
-        keyExtractor={(item) => item.id}
+        estimatedItemSize={150}
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }

@@ -20,9 +20,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: 'com.travelmatch.app',
     buildNumber: '1',
     associatedDomains: ['applinks:travelmatch.app'],
-    config: {
-      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS,
-    },
+    config: {},
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         'TravelMatch needs your location to verify your travel moments and show you relevant experiences nearby.',
@@ -57,16 +55,22 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
-    config: {
-      googleMaps: {
-        apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID,
-      },
-    },
+    config: {},
   },
   web: {
     favicon: './assets/favicon.png',
   },
-  plugins: ['expo-localization', '@sentry/react-native/expo', 'expo-font'],
+  plugins: [
+    'expo-localization',
+    '@sentry/react-native/expo',
+    'expo-font',
+    [
+      '@rnmapbox/maps',
+      {
+        RNMapboxMapsDownloadToken: process.env.EXPO_PUBLIC_MAPBOX_SECRET_TOKEN,
+      },
+    ],
+  ],
   extra: {
     eas: {
       projectId: '9721cfe0-b554-463f-af2b-ab2147d98172',

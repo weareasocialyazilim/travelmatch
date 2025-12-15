@@ -1,8 +1,9 @@
 /**
  * Error Recovery Utilities
  * Comprehensive error handling and recovery strategies
+ * Uses MMKV for 10-20x faster storage operations
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Storage } from './storage';
 import { logger } from './logger';
 
 /**
@@ -175,7 +176,7 @@ export const persistAppState = async (
       state,
     };
 
-    await AsyncStorage.setItem(APP_STATE_BACKUP_KEY, JSON.stringify(backup));
+    await Storage.setItem(APP_STATE_BACKUP_KEY, JSON.stringify(backup));
   } catch (error) {
     logger.error('Failed to persist app state:', error);
   }
@@ -198,7 +199,7 @@ export const recoverAppState = async (
   maxAge = 60 * 60 * 1000, // 1 hour
 ): Promise<Record<string, unknown> | null> => {
   try {
-    const backupStr = await AsyncStorage.getItem(APP_STATE_BACKUP_KEY);
+    const backupStr = await Storage.getItem(APP_STATE_BACKUP_KEY);
     if (!backupStr) return null;
 
     const backup = JSON.parse(backupStr) as AppStateBackup;
@@ -224,7 +225,7 @@ export const recoverAppState = async (
  */
 export const clearAppStateBackup = async (): Promise<void> => {
   try {
-    await AsyncStorage.removeItem(APP_STATE_BACKUP_KEY);
+    await Storage.removeItem(APP_STATE_BACKUP_KEY);
   } catch (error) {
     logger.error('Failed to clear app state backup:', error);
   }
@@ -235,7 +236,7 @@ export const clearAppStateBackup = async (): Promise<void> => {
  */
 export const hasAppStateBackup = async (): Promise<boolean> => {
   try {
-    const backup = await AsyncStorage.getItem(APP_STATE_BACKUP_KEY);
+    const backup = await Storage.getItem(APP_STATE_BACKUP_KEY);
     return backup !== null;
   } catch {
     return false;

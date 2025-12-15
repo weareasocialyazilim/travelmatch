@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatHeader } from '../components/ChatHeader';
@@ -114,13 +115,12 @@ const ChatScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <FlatList<Message>
+        <FlashList<Message>
           data={messages}
           renderItem={renderMessage}
-          keyExtractor={(item) => item.id}
+          estimatedItemSize={120}
           contentContainerStyle={styles.messagesList}
           {...CHAT_LIST_CONFIG}
-          getItemLayout={createGetItemLayout(ITEM_HEIGHTS.CHAT_MESSAGE)}
         />
 
         <ChatInputBar

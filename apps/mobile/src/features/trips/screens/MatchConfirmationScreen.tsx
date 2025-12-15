@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Image,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -53,8 +53,9 @@ const MatchConfirmationScreen: React.FC = () => {
         <View style={styles.headerRight} />
       </View>
 
-      <FlatList
+      <FlashList
         data={selectedGivers}
+        estimatedItemSize={100}
         renderItem={({ item }) => (
           <View style={styles.giverCard}>
             <Image source={{ uri: item.avatar }} style={styles.avatar} />
@@ -64,7 +65,6 @@ const MatchConfirmationScreen: React.FC = () => {
             </View>
           </View>
         )}
-        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
       />
 

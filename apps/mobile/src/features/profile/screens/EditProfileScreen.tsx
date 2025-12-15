@@ -6,9 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  TextInput,
-  Alert,
-  Platform,
+  TextInput,  Platform,
   // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
   KeyboardAvoidingView,
@@ -27,6 +25,8 @@ import { editProfileSchema, type EditProfileInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -165,7 +165,7 @@ const EditProfileScreen = () => {
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to pick image');
+      showToast('Failed to pick image', 'error');
     }
   };
 
@@ -173,7 +173,7 @@ const EditProfileScreen = () => {
     if (!hasChanges()) return;
 
     if (usernameAvailable === false) {
-      Alert.alert('Error', 'Username is not available');
+      showToast('Username is not available', 'error');
       return;
     }
 
@@ -198,7 +198,7 @@ const EditProfileScreen = () => {
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update profile');
+      showToast('Failed to update profile', 'error');
     }
   };
 

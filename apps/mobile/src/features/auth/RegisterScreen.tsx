@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -21,6 +20,7 @@ import SocialButton from '@/components/SocialButton';
 import { useAuth } from '@/context/AuthContext';
 import { registerSchema, type RegisterInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -30,6 +30,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   navigation,
 }) => {
   const { register } = useAuth();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,11 +68,11 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       if (result.success) {
         navigation.navigate('CompleteProfile');
       } else {
-        Alert.alert('Registration Failed', result.error || 'Please try again');
+        showToast(result.error || 'Please try again', 'error');
       }
     } catch (error) {
       logger.error('Registration error:', error);
-      Alert.alert('Error', 'An unexpected error occurred');
+      showToast('An unexpected error occurred', 'error');
     } finally {
       setLoading(false);
     }

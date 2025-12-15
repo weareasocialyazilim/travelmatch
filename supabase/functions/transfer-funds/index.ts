@@ -78,74 +78,27 @@ serve(async (req) => {
       throw new Error('Cannot transfer funds to yourself');
     }
 
-    // 1. Check Sender Balance
-    const { data: senderData, error: senderError } = await supabaseAdmin
-      .from('users')
-      .select('balance')
-      .eq('id', user.id)
-      .single();
+    // ✅ BLOCKER #1 FIX: Use atomic RPC function
+    // All operations (debit + credit + logging) happen atomically in a single transaction
+    // If any step fails, entire transaction rolls back automatically
+    // Row-level locks prevent race conditions
+    const { data, error } = await supabaseClient.rpc('atomic_transfer', {
+      p_sender_id: user.id,
+      p_recipient_id: recipientId,
+      p_amount: amount,
+      p_moment_id: momentId,
+      p_message: message,
+    });
 
-    if (senderError || !senderData) throw new Error('Sender not found');
-    if (senderData.balance < amount) throw new Error('Insufficient funds');
-
-    // 2. Perform Transaction (Atomic would be better with RPC, but this simulates the logic)
-    // Decrement Sender
-    const { error: debitError } = await supabaseAdmin
-      .from('users')
-      .update({ balance: senderData.balance - amount })
-      .eq('id', user.id);
-
-    if (debitError) throw new Error('Failed to debit sender');
-
-    // Increment Recipient
-    const { data: recipientData } = await supabaseAdmin
-      .from('users')
-      .select('balance')
-      .eq('id', recipientId)
-      .single();
-
-    if (!recipientData) throw new Error('Recipient not found');
-
-    const { error: creditError } = await supabaseAdmin
-      .from('users')
-      .update({ balance: recipientData.balance + amount })
-      .eq('id', recipientId);
-
-    if (creditError) {
-      // CRITICAL: Rollback debit (simplified for this example)
-      await supabaseAdmin
-        .from('users')
-        .update({ balance: senderData.balance })
-        .eq('id', user.id);
-      throw new Error('Failed to credit recipient');
+    if (error) {
+      throw error;
     }
-
-    // 3. Log Transaction
-    await supabaseAdmin.from('transactions').insert([
-      {
-        user_id: user.id,
-        type: 'gift',
-        amount: -amount,
-        status: 'completed',
-        description: `Sent gift to user ${recipientId}`,
-        moment_id: momentId,
-        metadata: { message, recipientId },
-      },
-      {
-        user_id: recipientId,
-        type: 'gift',
-        amount: amount,
-        status: 'completed',
-        description: `Received gift from user ${user.id}`,
-        moment_id: momentId,
-        metadata: { message, senderId: user.id },
-      },
-    ]);
 
     return new Response(
       JSON.stringify({
         success: true,
-        newBalance: senderData.balance - amount,
+        newBalance: data.newSenderBalance,
+        transactionId: data.senderTxnId,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

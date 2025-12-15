@@ -6,9 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Linking,
-  Alert,
-} from 'react-native';
+  Linking,} from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +20,8 @@ import { contactSupportSchema, type ContactSupportInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface SupportOption {
   id: string;
@@ -34,7 +34,9 @@ interface SupportOption {
 type SupportScreenProps = StackScreenProps<RootStackParamList, 'Support'>;
 
 export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
-  const { control, handleSubmit, formState, watch } = useForm<ContactSupportInput>({
+    const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
+const { control, handleSubmit, formState, watch } = useForm<ContactSupportInput>({
     resolver: zodResolver(contactSupportSchema),
     mode: 'onChange',
     defaultValues: {

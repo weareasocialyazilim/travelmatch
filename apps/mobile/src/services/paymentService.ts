@@ -7,6 +7,7 @@ import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { transactionsService as dbTransactionsService } from './supabaseDbService';
 import { PaymentMetadataSchema, type PaymentMetadata } from '../schemas/payment.schema';
+import { VALUES } from '../constants/values';
 
 // Mock storage for payment methods (simulated for store readiness)
 // WARNING: Only used in development. Production should use real payment gateway.
@@ -86,6 +87,62 @@ export interface PaymentIntent {
   clientSecret?: string;
 }
 
+// ============================================
+// BLOCKER #3: Escrow System Types & Logic
+// ============================================
+
+export type EscrowMode = 'direct' | 'optional' | 'mandatory';
+
+export interface EscrowDecision {
+  mode: EscrowMode;
+  useEscrow: boolean;
+  reason: string;
+}
+
+export interface EscrowTransaction {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  amount: number;
+  status: 'pending' | 'released' | 'refunded';
+  release_condition: string;
+  created_at: string;
+  expires_at: string;
+  moment_id?: string;
+}
+
+/**
+ * Titan Plan v2.0 Escrow Matrix:
+ * - $0-$30: Direct payment (no escrow)
+ * - $30-$100: Optional escrow (user chooses)
+ * - $100+: Mandatory escrow (forced protection)
+ */
+export function determineEscrowMode(amount: number): EscrowMode {
+  if (amount < VALUES.ESCROW_DIRECT_MAX) {
+    return 'direct'; // < $30: Direct pay
+  } else if (amount < VALUES.ESCROW_OPTIONAL_MAX) {
+    return 'optional'; // $30-$100: User chooses
+  } else {
+    return 'mandatory'; // >= $100: Must escrow
+  }
+}
+
+/**
+ * Get user-friendly escrow explanation
+ */
+export function getEscrowExplanation(mode: EscrowMode, amount: number): string {
+  switch (mode) {
+    case 'direct':
+      return `Payment of $${amount} will be sent directly to the recipient immediately.`;
+
+    case 'optional':
+      return `For payments between $${VALUES.ESCROW_DIRECT_MAX}-$${VALUES.ESCROW_OPTIONAL_MAX}, you can choose escrow protection. Funds are held until proof is verified.`;
+
+    case 'mandatory':
+      return `Payments over $${VALUES.ESCROW_OPTIONAL_MAX} must use escrow protection for your safety. Funds will be released when proof is verified.`;
+  }
+}
+
 // Payment Service
 export const paymentService = {
   /**
@@ -160,7 +217,7 @@ export const paymentService = {
 
       if (error) throw error;
 
-      const transactions: Transaction[] = data.map((row: any) => ({
+      const transactions: Transaction[] = data.map((row) => ({
         id: row.id,
         type: (row.type as TransactionType) || 'payment', // Simple cast
         amount: row.amount,
@@ -266,7 +323,7 @@ export const paymentService = {
   /**
    * Add a bank account
    */
-  addBankAccount: (_data: any): { bankAccount: BankAccount } => {
+  addBankAccount: (_data: Record<string, unknown>): { bankAccount: BankAccount } => {
     if (!__DEV__) {
       logger.error(
         'addBankAccount called in production with mock implementation!',
@@ -311,7 +368,7 @@ export const paymentService = {
     currency: string;
     paymentMethodId: string;
     description?: string;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
   }): Promise<{ transaction: Transaction }> => {
     try {
       const {
@@ -396,100 +453,198 @@ export const paymentService = {
     }
   },
 
-  /**
-   * Get wallet balance (alias for getBalance for hook compatibility)
-   */
-  getWalletBalance: async (): Promise<{
-    available: number;
-    pending: number;
-    currency: string;
-  }> => {
-    return paymentService.getBalance();
-  },
+  // ============================================
+  // BLOCKER #3: Escrow System Methods
+  // ============================================
 
   /**
-   * Set a card as the default payment method
+   * Transfer funds with Titan Plan escrow rules
+   * - < $30: Direct atomic transfer
+   * - $30-$100: Optional escrow (user choice via callback)
+   * - >= $100: Mandatory escrow
    */
-  setDefaultCard: (cardId: string): { success: boolean } => {
-    if (!__DEV__) {
-      logger.error('setDefaultCard called in production with mock implementation!');
-      throw new Error('Payment methods not configured for production');
+  transferFunds: async (params: {
+    amount: number;
+    recipientId: string;
+    momentId?: string;
+    message?: string;
+    escrowChoiceCallback?: (amount: number) => Promise<boolean>;
+  }): Promise<{ success: boolean; transactionId: string; escrowId?: string }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { amount, recipientId, momentId, message, escrowChoiceCallback } =
+        params;
+
+      // Determine escrow mode based on amount
+      const escrowMode = determineEscrowMode(amount);
+
+      switch (escrowMode) {
+        case 'direct':
+          // < $30: Direct atomic transfer (no escrow)
+          logger.info(`[Payment] Direct transfer: $${amount}`);
+          const { data: directData, error: directError } = await supabase.rpc(
+            'atomic_transfer',
+            {
+              p_sender_id: user.id,
+              p_recipient_id: recipientId,
+              p_amount: amount,
+              p_moment_id: momentId,
+              p_message: message,
+            },
+          );
+
+          if (directError) throw directError;
+
+          return {
+            success: true,
+            transactionId: directData.senderTxnId,
+          };
+
+        case 'optional':
+          // $30-$100: Ask user preference
+          logger.info(`[Payment] Optional escrow range: $${amount}`);
+          const useEscrow = escrowChoiceCallback
+            ? await escrowChoiceCallback(amount)
+            : true; // Default to safer option if no callback
+
+          if (useEscrow) {
+            // User chose escrow protection
+            const { data: escrowData, error: escrowError } = await supabase.rpc(
+              'create_escrow_transaction',
+              {
+                p_sender_id: user.id,
+                p_recipient_id: recipientId,
+                p_amount: amount,
+                p_moment_id: momentId,
+                p_release_condition: 'proof_verified',
+              },
+            );
+
+            if (escrowError) throw escrowError;
+
+            return {
+              success: true,
+              transactionId: escrowData.transaction_id,
+              escrowId: escrowData.escrow_id,
+            };
+          } else {
+            // User chose direct payment
+            const { data: directData2, error: directError2 } =
+              await supabase.rpc('atomic_transfer', {
+                p_sender_id: user.id,
+                p_recipient_id: recipientId,
+                p_amount: amount,
+                p_moment_id: momentId,
+                p_message: message,
+              });
+
+            if (directError2) throw directError2;
+
+            return {
+              success: true,
+              transactionId: directData2.senderTxnId,
+            };
+          }
+
+        case 'mandatory':
+          // >= $100: Force escrow (no choice)
+          logger.info(`[Payment] Mandatory escrow: $${amount}`);
+          const { data: mandatoryData, error: mandatoryError } =
+            await supabase.rpc('create_escrow_transaction', {
+              p_sender_id: user.id,
+              p_recipient_id: recipientId,
+              p_amount: amount,
+              p_moment_id: momentId,
+              p_release_condition: 'proof_verified',
+            });
+
+          if (mandatoryError) throw mandatoryError;
+
+          return {
+            success: true,
+            transactionId: mandatoryData.transaction_id,
+            escrowId: mandatoryData.escrow_id,
+          };
+
+        default:
+          throw new Error(`Unknown escrow mode: ${escrowMode}`);
+      }
+    } catch (error) {
+      logger.error('Transfer funds error:', error);
+      throw error;
     }
-    MOCK_CARDS = MOCK_CARDS.map((c) => ({
-      ...c,
-      isDefault: c.id === cardId,
-    }));
-    return { success: true };
   },
 
   /**
-   * Request a withdrawal (convenience wrapper for withdrawFunds)
+   * Release escrow after proof verification
+   * Called by moment owner after submitting proof
    */
-  requestWithdrawal: async (
-    amount: number,
-    bankAccountId: string,
-  ): Promise<{ transaction: Transaction }> => {
-    return paymentService.withdrawFunds({
-      amount,
-      currency: 'USD',
-      bankAccountId,
-    });
-  },
+  releaseEscrow: async (escrowId: string): Promise<{ success: boolean }> => {
+    try {
+      const { data, error } = await supabase.rpc('release_escrow', {
+        p_escrow_id: escrowId,
+      });
 
-  /**
-   * Get withdrawal limits
-   */
-  getWithdrawalLimits: (): {
-    minAmount: number;
-    maxAmount: number;
-    dailyLimit: number;
-    remainingDaily: number;
-  } => {
-    // Return mock limits for now
-    return {
-      minAmount: 10,
-      maxAmount: 10000,
-      dailyLimit: 5000,
-      remainingDaily: 5000,
-    };
-  },
+      if (error) throw error;
 
-  /**
-   * Create a payment intent for Stripe
-   */
-  createPaymentIntent: async (
-    _momentId: string,
-    amount: number,
-  ): Promise<PaymentIntent> => {
-    // In production, this would call Stripe API
-    if (!__DEV__) {
-      logger.error('createPaymentIntent called in production with mock implementation!');
-      throw new Error('Payment intents not configured for production');
+      return { success: data.success };
+    } catch (error) {
+      logger.error('Release escrow error:', error);
+      throw error;
     }
-    const id = `pi_${Date.now()}`;
-    return {
-      id,
-      paymentIntentId: id,
-      clientSecret: `${id}_secret_mock`,
-      amount,
-      currency: 'usd',
-      status: 'pending',
-    };
   },
 
   /**
-   * Confirm a payment intent
+   * Request refund for pending escrow
+   * Can be called by sender if proof not submitted within time limit
    */
-  confirmPayment: async (
-    _paymentIntentId: string,
-    _paymentMethodId?: string,
+  refundEscrow: async (
+    escrowId: string,
+    reason: string,
   ): Promise<{ success: boolean }> => {
-    // In production, this would confirm via Stripe
-    if (!__DEV__) {
-      logger.error('confirmPayment called in production with mock implementation!');
-      throw new Error('Payment confirmation not configured for production');
+    try {
+      const { data, error } = await supabase.rpc('refund_escrow', {
+        p_escrow_id: escrowId,
+        p_reason: reason,
+      });
+
+      if (error) throw error;
+
+      return { success: data.success };
+    } catch (error) {
+      logger.error('Refund escrow error:', error);
+      throw error;
     }
-    return { success: true };
+  },
+
+  /**
+   * Get user's pending escrow transactions
+   */
+  getUserEscrowTransactions: async (): Promise<EscrowTransaction[]> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('escrow_transactions')
+        .select('*')
+        .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      logger.error('Get escrow transactions error:', error);
+      return [];
+    }
   },
 };
 

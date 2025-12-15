@@ -1,11 +1,12 @@
 /**
  * Favorites Store
  * Favori moments ve bookmarks
+ * Uses MMKV for 10-20x faster storage operations
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import { Storage } from '../utils/storage';
 
 interface FavoritesState {
   // State
@@ -56,7 +57,7 @@ export const useFavoritesStore = create<FavoritesState>()(
       }),
       {
         name: 'favorites-storage',
-        storage: createJSONStorage(() => AsyncStorage),
+        storage: createJSONStorage(() => Storage),
       },
     ),
     {

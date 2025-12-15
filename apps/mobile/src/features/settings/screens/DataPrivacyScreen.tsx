@@ -6,9 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
+  TouchableOpacity,  ActivityIndicator,
   Share,
   Platform,
 } from 'react-native';
@@ -19,6 +17,8 @@ import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface ConsentSettings {
   gdprConsent: boolean;
@@ -64,7 +64,7 @@ const DataPrivacyScreen = () => {
       });
     } catch (error) {
       logger.error('Error loading consent settings:', error);
-      Alert.alert('Error', 'Failed to load privacy settings');
+      showToast('Failed to load privacy settings', 'error');
     } finally {
       setLoading(false);
     }
@@ -92,10 +92,10 @@ const DataPrivacyScreen = () => {
         setConsents(prev => ({ ...prev, analyticsConsent: value }));
       }
 
-      Alert.alert('Success', 'Privacy preferences updated');
+      showToast('Privacy preferences updated', 'success');
     } catch (error) {
       logger.error('Error updating consent:', error);
-      Alert.alert('Error', 'Failed to update privacy preferences');
+      showToast('Failed to update privacy preferences', 'error');
     }
   };
 
@@ -225,7 +225,7 @@ const DataPrivacyScreen = () => {
               );
             } catch (error) {
               logger.error('Error scheduling deletion:', error);
-              Alert.alert('Error', 'Failed to schedule account deletion');
+              showToast('Failed to schedule account deletion', 'error');
             } finally {
               setDeleteLoading(false);
             }

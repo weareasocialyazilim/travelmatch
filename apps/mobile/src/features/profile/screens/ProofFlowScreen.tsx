@@ -6,9 +6,7 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Image,
-  Alert,
-  // eslint-disable-next-line react-native/split-platform-components
+  Image,  // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
   Platform,
 } from 'react-native';
@@ -28,6 +26,8 @@ import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 type IconName = React.ComponentProps<typeof Icon>['name'];
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
@@ -78,7 +78,9 @@ const PROOF_TYPES: {
 type ProofFlowScreenProps = StackScreenProps<RootStackParamList, 'ProofFlow'>;
 
 export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
-  navigation,
+    const { showToast } = useToast();
+  const { showConfirmation } = useConfirmation();
+navigation,
 }) => {
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [loading, setLoading] = useState(false);
@@ -193,7 +195,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       }
     } catch (error) {
       logger.error('Error picking document', error as Error);
-      Alert.alert('Error', 'Failed to pick document');
+      showToast('Failed to pick document', 'error');
     }
   };
 
@@ -201,7 +203,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     const getCurrentLocation = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Location permission is needed');
+        showToast('Location permission is needed', 'info');
         return;
       }
 
@@ -226,7 +228,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
         Alert.alert('Location Set', locationName);
       } catch (error) {
-        Alert.alert('Error', 'Could not get current location');
+        showToast('Could not get current location', 'error');
       }
     };
 
@@ -258,13 +260,13 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   const handleNext = () => {
     if (currentStep === 'upload') {
       if (!photos || photos.length === 0) {
-        Alert.alert('Photo Required', 'Please add at least one photo as proof');
+        showToast('Please add at least one photo as proof', 'info');
         return;
       }
       setCurrentStep('details');
     } else if (currentStep === 'details') {
       if (!title || title.trim() === '') {
-        Alert.alert('Title Required', 'Please add a title for your proof');
+        showToast('Please add a title for your proof', 'info');
         return;
       }
       setCurrentStep('verify');

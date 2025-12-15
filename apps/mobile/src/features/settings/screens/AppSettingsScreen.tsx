@@ -5,9 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,
-  Alert,
-} from 'react-native';
+  Switch,} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +19,8 @@ import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
+import { useToast } from '@/context/ToastContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 const AppSettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -57,7 +57,7 @@ const AppSettingsScreen: React.FC = () => {
           style: 'destructive',
           onPress: () => {
             // Clear cache logic here
-            Alert.alert('Success', 'Cache cleared successfully');
+            showToast('Cache cleared successfully', 'success');
           },
         },
       ],
@@ -75,7 +75,7 @@ const AppSettingsScreen: React.FC = () => {
             // Navigation is typically handled by the auth state change in AppNavigator
           } catch (error) {
             logger.error('Sign out failed', error);
-            Alert.alert('Error', 'Failed to sign out');
+            showToast('Failed to sign out', 'error');
           }
         },
       },

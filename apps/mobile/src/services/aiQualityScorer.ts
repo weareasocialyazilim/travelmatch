@@ -9,7 +9,6 @@
  * - Auto-reject low quality submissions
  */
 
-import React from 'react';
 import { supabase } from './supabase';
 import { logger } from '../utils/logger';
 
@@ -41,11 +40,10 @@ export enum ProofType {
 class AIQualityScorer {
   private mlServiceUrl = process.env.EXPO_PUBLIC_ML_SERVICE_URL;
 
-  private getMlServiceUrl(): string {
+  constructor() {
     if (!this.mlServiceUrl) {
-      throw new Error('ML Service URL not configured. Set EXPO_PUBLIC_ML_SERVICE_URL environment variable.');
+      throw new Error('❌ EXPO_PUBLIC_ML_SERVICE_URL is required. Set it in your .env file.');
     }
-    return this.mlServiceUrl;
   }
 
   /**
@@ -57,13 +55,13 @@ class AIQualityScorer {
     userId: string
   ): Promise<QualityScore> {
     try {
-      logger.debug('[AI Quality] Scoring proof:', proofType);
+      logger.info('[AI Quality] Scoring proof:', { proofType });
 
       // Upload image to Supabase Storage first
       const imageUrl = await this.uploadImage(imageUri, userId);
 
       // Call ML service for scoring
-      const response = await fetch(`${this.getMlServiceUrl()}/api/score-proof`, {
+      const response = await fetch(`${this.mlServiceUrl}/api/score-proof`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +82,7 @@ class AIQualityScorer {
       // Save score to database
       await this.saveScore(userId, proofType, score, imageUrl);
 
-      logger.debug('[AI Quality] Score:', score.overall);
+      logger.info('[AI Quality] Score:', { overall: score.overall });
 
       return score;
     } catch (error) {
@@ -112,16 +110,9 @@ class AIQualityScorer {
    * Get score history for user
    */
   async getScoreHistory(userId: string): Promise<QualityScore[]> {
-    // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('proof_quality_scores')
-      .select(`
-        id,
-        user_id,
-        proof_type,
-        score,
-        created_at
-      `)
+      .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
