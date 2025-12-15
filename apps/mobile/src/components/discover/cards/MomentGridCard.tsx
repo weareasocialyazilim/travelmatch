@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { OptimizedImage } from '../../ui/OptimizedImage';
 import { COLORS } from '../../../constants/colors';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
@@ -31,12 +31,23 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
           onPress={() => onPress(moment)}
           activeOpacity={0.95}
         >
-          <Image source={{ uri: imageUrl }} style={styles.gridImage} />
+          <OptimizedImage
+            source={imageUrl}
+            contentFit="cover"
+            style={styles.gridImage}
+            transition={200}
+            priority="high"
+            accessibilityLabel={`Photo of ${moment.title}`}
+          />
           <View style={styles.gridContent}>
             <View style={styles.gridCreatorRow}>
-              <Image
-                source={{ uri: hostAvatar }}
+              <OptimizedImage
+                source={hostAvatar}
+                contentFit="cover"
                 style={styles.gridAvatar}
+                transition={150}
+                priority="low"
+                accessibilityLabel={`${hostName}'s avatar`}
               />
               <Text style={styles.gridCreatorName} numberOfLines={1}>
                 {hostName.split(' ')[0]}
@@ -107,6 +118,8 @@ const styles = StyleSheet.create({
   gridImage: {
     width: '100%',
     height: 120,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   gridContent: {
     padding: 10,

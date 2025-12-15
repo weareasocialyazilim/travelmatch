@@ -4,11 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Share,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
+import { OptimizedImage } from './ui/OptimizedImage';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
@@ -107,10 +107,12 @@ const MomentCard: React.FC<MomentCardProps> = memo(
       >
         <Animated.View style={[styles.card, cardScale]}>
           <View style={styles.cardImageContainer}>
-            <Image
-              source={{ uri: moment.imageUrl }}
+            <OptimizedImage
+              source={moment.imageUrl}
+              contentFit="cover"
               style={styles.cardImage}
-              resizeMode="cover"
+              transition={200}
+              priority="high"
               accessibilityLabel={`Photo of ${moment.title}`}
             />
 
@@ -131,11 +133,12 @@ const MomentCard: React.FC<MomentCardProps> = memo(
             </TouchableOpacity>
 
             <View style={styles.userBadge}>
-              <Image
-                source={{
-                  uri: moment.user?.avatar || 'https://via.placeholder.com/150',
-                }}
+              <OptimizedImage
+                source={moment.user?.avatar || 'https://via.placeholder.com/150'}
+                contentFit="cover"
                 style={styles.userAvatar}
+                transition={150}
+                priority="normal"
                 accessibilityLabel={`${moment.user?.name || 'User'}'s avatar`}
               />
               <View style={styles.userInfo}>
@@ -232,6 +235,8 @@ const styles = StyleSheet.create({
   cardImage: {
     height: 200,
     width: '100%',
+    borderTopLeftRadius: radii.xl,
+    borderTopRightRadius: radii.xl,
   },
   cardImageContainer: {
     position: 'relative',

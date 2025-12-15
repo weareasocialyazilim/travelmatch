@@ -1,6 +1,7 @@
 // Story Item Component - Individual story in the horizontal list
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { OptimizedImage } from '../ui/OptimizedImage';
 import { COLORS } from '../../constants/colors';
 import type { StoryItemProps } from './types';
 
@@ -17,7 +18,14 @@ export const StoryItem: React.FC<StoryItemProps> = ({ item, onPress }) => (
         !item.isNew && styles.storyCircleSeen,
       ]}
     >
-      <Image source={{ uri: item.avatar }} style={styles.storyAvatar} />
+      <OptimizedImage
+        source={item.avatar}
+        contentFit="cover"
+        style={styles.storyAvatar}
+        transition={150}
+        priority="normal"
+        accessibilityLabel={`${item.name}'s story`}
+      />
     </View>
     <Text style={styles.storyName} numberOfLines={1}>
       {item.name}

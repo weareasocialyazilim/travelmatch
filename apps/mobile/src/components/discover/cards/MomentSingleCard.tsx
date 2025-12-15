@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { OptimizedImage } from '../../ui/OptimizedImage';
 import { COLORS } from '../../../constants/colors';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
@@ -29,12 +29,23 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
         onPress={() => onPress(moment)}
         activeOpacity={0.95}
       >
-        <Image source={{ uri: imageUrl }} style={styles.singleImage} />
+        <OptimizedImage
+          source={imageUrl}
+          contentFit="cover"
+          style={styles.singleImage}
+          transition={200}
+          priority="high"
+          accessibilityLabel={`Photo of ${moment.title}`}
+        />
         <View style={styles.singleContent}>
           <View style={styles.creatorRow}>
-            <Image
-              source={{ uri: hostAvatar }}
+            <OptimizedImage
+              source={hostAvatar}
+              contentFit="cover"
               style={styles.creatorAvatar}
+              transition={150}
+              priority="normal"
+              accessibilityLabel={`${hostName}'s avatar`}
             />
             <View style={styles.creatorInfo}>
               <View style={styles.creatorNameRow}>
@@ -96,6 +107,8 @@ const styles = StyleSheet.create({
   singleImage: {
     width: '100%',
     height: 200,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   singleContent: {
     padding: 16,
