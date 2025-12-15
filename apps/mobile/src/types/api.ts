@@ -63,7 +63,8 @@ export interface Moment {
   description: string;
   price: number;
   imageUrl: string;
-  imageCloudflareId?: string; // Cloudflare Images CDN ID
+  imageId?: string; // Foreign key to uploaded_images.id (Cloudflare ID)
+  imageCloudflareId?: string; // Alias for imageId (Cloudflare Images CDN ID)
   imageBlurHash?: string; // BlurHash placeholder for instant loading
   image?: string; // Legacy field for backwards compatibility
   location: string;

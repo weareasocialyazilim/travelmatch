@@ -13,6 +13,7 @@
  */
 
 import { encode } from 'https://deno.land/x/blurhash@v0.1.0/mod.ts';
+import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts';
 
 /**
  * BlurHash configuration
@@ -62,23 +63,52 @@ export async function generateBlurHash(
       ? new Uint8Array(imageBuffer)
       : imageBuffer;
 
-    // Decode image to get pixel data
-    // Note: In Deno, we need to use a different approach for image decoding
-    // For now, we'll use a simplified approach that works with common formats
+    // Decode image using imagescript
+    console.log('[BlurHash] Decoding image...');
+    const image = await Image.decode(uint8Array);
 
-    // For production, you'd want to use imagescript or similar:
-    // import { decode } from 'https://deno.land/x/imagescript@1.2.15/mod.ts';
+    // Resize if needed to speed up BlurHash generation
+    let processedImage = image;
+    if (maxDimension && (image.width > maxDimension || image.height > maxDimension)) {
+      const scale = maxDimension / Math.max(image.width, image.height);
+      const newWidth = Math.round(image.width * scale);
+      const newHeight = Math.round(image.height * scale);
 
-    // Placeholder: Return a default BlurHash for testing
-    // In production, implement proper image decoding
-    const placeholderHash = 'LEHV6nWB2yk8pyo0adR*.7kCMdnj';
+      console.log(`[BlurHash] Resizing from ${image.width}x${image.height} to ${newWidth}x${newHeight}`);
+      processedImage = image.resize(newWidth, newHeight);
+    }
 
-    console.log('[BlurHash] Generated hash (using placeholder for now)');
+    // Extract pixel data in RGBA format
+    const width = processedImage.width;
+    const height = processedImage.height;
+    const pixels = new Uint8ClampedArray(width * height * 4);
 
-    return placeholderHash;
+    // Convert imagescript bitmap to RGBA array
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const pixelIndex = (y * width + x) * 4;
+        const color = processedImage.getPixelAt(x, y);
+
+        // Extract RGBA from color (imagescript uses RGBA format)
+        pixels[pixelIndex] = (color >> 24) & 0xff;     // R
+        pixels[pixelIndex + 1] = (color >> 16) & 0xff; // G
+        pixels[pixelIndex + 2] = (color >> 8) & 0xff;  // B
+        pixels[pixelIndex + 3] = color & 0xff;         // A
+      }
+    }
+
+    // Generate BlurHash
+    console.log(`[BlurHash] Encoding ${width}x${height} image with ${componentX}x${componentY} components`);
+    const hash = encode(pixels, width, height, componentX || 4, componentY || 3);
+
+    console.log('[BlurHash] Successfully generated hash:', hash);
+    return hash;
   } catch (error) {
     console.error('[BlurHash] Generation failed:', error);
+
     // Return a neutral gray BlurHash on error
+    // This ensures the app doesn't break even if BlurHash generation fails
+    console.warn('[BlurHash] Returning fallback neutral gray hash');
     return 'L00000fQfQfQfQfQfQfQfQfQfQfQ';
   }
 }
