@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { OptimizedImage } from '../../ui/OptimizedImage';
+import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../../../utils/cloudflareImageHelpers';
 import { COLORS } from '../../../constants/colors';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
@@ -19,11 +20,17 @@ interface MomentGridCardProps {
 const MomentGridCard: React.FC<MomentGridCardProps> = memo(
   ({ moment, index, onPress }) => {
     const imageUrl = moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
-    const hostAvatar = moment.hostAvatar || 'https://via.placeholder.com/24';
     const hostName = moment.hostName || 'Anonymous';
     const price = moment.price ?? moment.pricePerGuest ?? 0;
     const locationCity = typeof moment.location === 'string' ? moment.location : moment.location?.city || 'Unknown';
-    
+
+    // Prepare user object for avatar helper
+    const hostUser = {
+      avatar: moment.hostAvatar,
+      avatarCloudflareId: (moment as any).hostAvatarCloudflareId,
+      avatarBlurHash: (moment as any).hostAvatarBlurHash,
+    };
+
     return (
       <View style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}>
         <TouchableOpacity
@@ -32,7 +39,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
           activeOpacity={0.95}
         >
           <OptimizedImage
-            source={imageUrl}
+            {...getMomentImageProps(moment, IMAGE_VARIANTS_BY_CONTEXT.CARD_GRID, imageUrl)}
             contentFit="cover"
             style={styles.gridImage}
             transition={200}
@@ -42,7 +49,11 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
           <View style={styles.gridContent}>
             <View style={styles.gridCreatorRow}>
               <OptimizedImage
-                source={hostAvatar}
+                {...getAvatarImageProps(
+                  hostUser,
+                  IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
+                  'https://via.placeholder.com/24'
+                )}
                 contentFit="cover"
                 style={styles.gridAvatar}
                 transition={150}

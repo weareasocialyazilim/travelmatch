@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { OptimizedImage } from './ui/OptimizedImage';
 import { analytics } from '../services/analytics';
+import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../utils/cloudflareImageHelpers';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
@@ -118,7 +119,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         <Animated.View style={[styles.card, cardScale]}>
           <View style={styles.cardImageContainer}>
             <OptimizedImage
-              source={moment.imageUrl}
+              {...getMomentImageProps(moment, IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE)}
               contentFit="cover"
               style={styles.cardImage}
               transition={200}
@@ -144,7 +145,11 @@ const MomentCard: React.FC<MomentCardProps> = memo(
 
             <View style={styles.userBadge}>
               <OptimizedImage
-                source={moment.user?.avatar || 'https://via.placeholder.com/150'}
+                {...getAvatarImageProps(
+                  moment.user || {},
+                  IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
+                  'https://via.placeholder.com/150'
+                )}
                 contentFit="cover"
                 style={styles.userAvatar}
                 transition={150}

@@ -24,6 +24,7 @@ export const momentQueries = {
   /**
    * Get moments with user data (prevents N+1)
    * ✅ OPTIMIZED: 1 query instead of N+1
+   * ✅ BlurHash: Includes image_id and image_blur_hash for instant placeholders
    */
   getWithUser: async (filters?: Partial<Moment>) => {
     let query = supabase
@@ -35,6 +36,8 @@ export const momentQueries = {
         category,
         location,
         images,
+        image_id,
+        image_blur_hash,
         price,
         currency,
         max_guests,
@@ -50,6 +53,12 @@ export const momentQueries = {
           rating,
           review_count,
           verified
+        ),
+        uploaded_images!moments_image_id_fkey(
+          id,
+          blur_hash,
+          url,
+          variants
         )
       `);
 
@@ -62,6 +71,7 @@ export const momentQueries = {
 
   /**
    * Get moment with full details (user + request count)
+   * ✅ BlurHash: Includes uploaded_images JOIN for BlurHash data
    */
   getWithDetails: async (momentId: string) => {
     return supabase
@@ -69,7 +79,13 @@ export const momentQueries = {
       .select(`
         *,
         user:users!user_id(*),
-        requests(count)
+        requests(count),
+        uploaded_images!moments_image_id_fkey(
+          id,
+          blur_hash,
+          url,
+          variants
+        )
       `)
       .eq('id', momentId)
       .single();
@@ -77,6 +93,7 @@ export const momentQueries = {
 
   /**
    * Get moments with request count
+   * ✅ BlurHash: Includes uploaded_images JOIN for BlurHash data
    */
   getWithRequestCount: async (userId: string) => {
     return supabase
@@ -84,7 +101,13 @@ export const momentQueries = {
       .select(`
         *,
         user:users!user_id(*),
-        requests(count)
+        requests(count),
+        uploaded_images!moments_image_id_fkey(
+          id,
+          blur_hash,
+          url,
+          variants
+        )
       `)
       .eq('user_id', userId);
   },
@@ -395,6 +418,7 @@ export const batchFetchUsers = async (userIds: string[]): Promise<{ data: Array<
 
 /**
  * Batch fetch moments by IDs (prevents N+1)
+ * ✅ BlurHash: Includes image_id and uploaded_images JOIN
  */
 export const batchFetchMoments = async (momentIds: string[]): Promise<{ data: unknown[] | null; error: Error | null }> => {
   if (momentIds.length === 0) return { data: [], error: null };
@@ -407,10 +431,18 @@ export const batchFetchMoments = async (momentIds: string[]): Promise<{ data: un
       price,
       currency,
       images,
+      image_id,
+      image_blur_hash,
       user:users!user_id(
         id,
         name,
         avatar
+      ),
+      uploaded_images!moments_image_id_fkey(
+        id,
+        blur_hash,
+        url,
+        variants
       )
     `)
     .in('id', momentIds);
