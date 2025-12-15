@@ -63,7 +63,7 @@ export const WelcomeScreen: React.FC<{
             <TouchableOpacity
               style={[
                 styles.primaryButton,
-                { backgroundColor: '#000000', marginBottom: 12 },
+                styles.appleButton,
               ]}
               onPress={() => navigation.navigate('Register')} // Mock action
               activeOpacity={0.8}
@@ -205,6 +205,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.25,
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+    marginBottom: 12,
+  },
+  appleButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  appleIconText: {
+    marginRight: 8,
   },
   footerText: {
     fontSize: 14,

@@ -239,7 +239,7 @@ const MessagesScreen: React.FC = () => {
       description="When you connect with travelers or hosts, your conversations will appear here."
       actionLabel="Discover Moments"
       onAction={() => navigation.navigate('Discover')}
-      style={{ paddingTop: 80 }}
+      style={styles.emptyStateContainer}
     />
   );
 
@@ -504,6 +504,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     textAlign: 'center',
+  },
+  emptyStateContainer: {
+    paddingTop: 80,
   },
 });
 
