@@ -47,7 +47,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
     },
   });
 
-  const amount = watch('amount');
+  const _amount = watch('amount');
 
   const onSubmit = async (data: WithdrawInput) => {
     // Check if biometric is enabled and verify before proceeding

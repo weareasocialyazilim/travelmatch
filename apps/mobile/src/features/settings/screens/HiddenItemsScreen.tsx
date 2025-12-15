@@ -27,7 +27,7 @@ interface HiddenItem {
 
 export const HiddenItemsScreen: React.FC = () => {
     const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
 const navigation = useNavigation();
 
   const [hiddenItems, setHiddenItems] = useState<HiddenItem[]>([]);

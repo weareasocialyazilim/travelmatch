@@ -27,7 +27,6 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

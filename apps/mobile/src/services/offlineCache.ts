@@ -12,7 +12,7 @@
 import { MMKV } from 'react-native-mmkv';
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { PersistQueryClientProvider as _PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import NetInfo from '@react-native-community/netinfo';
 import { logger } from '../utils/logger';
 

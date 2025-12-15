@@ -32,17 +32,16 @@ import {
   MomentPreview,
   CATEGORIES,
   getCategoryEmoji,
-  type Place,
+  type Place as _Place,
 } from '@/components/createMoment';
 import { COLORS } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
-import { STRINGS } from '../constants/strings';
+import { STRINGS as _STRINGS } from '../constants/strings';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 // Import sub-components
 

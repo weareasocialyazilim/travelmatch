@@ -6,7 +6,7 @@
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { transactionsService as dbTransactionsService } from './supabaseDbService';
-import { PaymentMetadataSchema, type PaymentMetadata } from '../schemas/payment.schema';
+import { PaymentMetadataSchema, type PaymentMetadata as _PaymentMetadata } from '../schemas/payment.schema';
 import { VALUES } from '../constants/values';
 
 // Mock storage for payment methods (simulated for store readiness)

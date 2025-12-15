@@ -37,7 +37,7 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { momentId } = route.params;
   const { getMoment } = useMoments();
   const [moment, setMoment] = useState<Moment | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   const [linkCopied, setLinkCopied] = useState(false);
   const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);

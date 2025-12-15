@@ -6,7 +6,6 @@ import { useMessages } from '@/hooks/useMessages';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import { logger } from '@/utils/logger';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 export interface Message {
   id: string;

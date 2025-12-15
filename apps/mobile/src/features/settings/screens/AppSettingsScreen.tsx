@@ -22,7 +22,6 @@ import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 const AppSettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

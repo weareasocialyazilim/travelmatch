@@ -29,8 +29,8 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { showToast: _showToast } = useToast();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
   const {
     senderId,
     senderName,

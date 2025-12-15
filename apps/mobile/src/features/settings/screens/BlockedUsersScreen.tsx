@@ -58,8 +58,8 @@ const STORAGE_KEY = '@blocked_users';
 export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
   navigation,
 }) => {
-  const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { showToast: _showToast } = useToast();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
 
   // Load blocked users on mount

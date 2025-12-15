@@ -34,7 +34,7 @@ type IconName = React.ComponentProps<typeof Icon>['name'];
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
 type ProofType = 'micro-kindness' | 'verified-experience' | 'community-proof';
 
-interface ProofUpload {
+interface _ProofUpload {
   type: ProofType;
   photos: string[];
   ticket?: string;

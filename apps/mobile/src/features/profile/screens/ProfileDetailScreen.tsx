@@ -30,8 +30,8 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { showToast: _showToast } = useToast();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
   const { userId } = route.params;
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
   const [showReportSheet, setShowReportSheet] = useState(false);

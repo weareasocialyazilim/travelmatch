@@ -18,7 +18,6 @@ import { useBiometric } from '@/context/BiometricAuthContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface ActiveSession {
   id: string;

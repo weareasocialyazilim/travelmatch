@@ -69,7 +69,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   });
 
   const interests = watch('interests');
-  const bio = watch('bio');
+  const _bio = watch('bio');
 
   const pickImage = async (useCamera: boolean) => {
     try {

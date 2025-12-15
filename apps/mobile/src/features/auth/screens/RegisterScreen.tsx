@@ -8,7 +8,7 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 
 export const RegisterScreen: React.FC = () => {
-  const { showToast } = useToast();
+  const { showToast: _showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   

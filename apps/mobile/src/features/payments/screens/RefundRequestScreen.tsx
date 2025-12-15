@@ -49,8 +49,8 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { showToast: _showToast } = useToast();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
   const { transactionId } = route.params;
   
   const { control, handleSubmit, formState, watch, setValue } = useForm<RefundRequestInput>({
@@ -63,8 +63,8 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
     },
   });
 
-  const reason = watch('reason');
-  const description = watch('description');
+  const _reason = watch('reason');
+  const _description = watch('description');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: RefundRequestInput) => {

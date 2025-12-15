@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Switch,
   TouchableOpacity,  ActivityIndicator,
-  Share,
+  Share as _Share,
   Platform,
   Alert,
 } from 'react-native';
@@ -19,7 +19,6 @@ import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface ConsentSettings {
   gdprConsent: boolean;

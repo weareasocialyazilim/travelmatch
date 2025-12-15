@@ -36,8 +36,8 @@ interface SupportOption {
 type SupportScreenProps = StackScreenProps<RootStackParamList, 'Support'>;
 
 export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
-    const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+    const { showToast: _showToast } = useToast();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
 const { control, handleSubmit, formState, watch } = useForm<ContactSupportInput>({
     resolver: zodResolver(contactSupportSchema),
     mode: 'onChange',
@@ -48,7 +48,7 @@ const { control, handleSubmit, formState, watch } = useForm<ContactSupportInput>
     },
   });
 
-  const message = watch('message');
+  const _message = watch('message');
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: ContactSupportInput) => {
