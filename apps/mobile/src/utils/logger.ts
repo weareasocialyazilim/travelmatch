@@ -143,7 +143,7 @@ class Logger {
       enableInProduction: false,
       prefix: '[TravelMatch]',
       minLevel: 'debug',
-      enableRemoteLogging: false,
+      enableRemoteLogging: !__DEV__, // Enable remote logging in production for Sentry breadcrumbs
       jsonFormat: !__DEV__,
       ...config,
     };
