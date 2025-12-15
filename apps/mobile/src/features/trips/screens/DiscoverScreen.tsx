@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -95,11 +96,15 @@ const DiscoverScreen = () => {
     'Chicago, IL',
   ]);
 
-  // Refresh handler
+  // Refresh handler with haptic feedback
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await refreshMoments();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setRefreshing(false);
     }

@@ -34,7 +34,7 @@ export const LoginScreen: React.FC = () => {
       await login({ email: data.email, password: data.password });
       // Navigation handled by auth state change
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Please try again', 'error');
+      showToast(error instanceof Error ? error.message : 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -49,12 +49,12 @@ export const LoginScreen: React.FC = () => {
         // User authenticated with biometric, proceed with login
         // In a real app, you would retrieve stored credentials and call login
         // For now, we'll just show a success message
-        showToast('You have been authenticated with ' + biometricTypeName, 'success');
+        showToast(biometricTypeName + ' ile başarıyla giriş yaptınız', 'success');
       } else {
-        showToast('Could not verify your ' + biometricTypeName.toLowerCase() + '. Please try again or use your password.', 'error');
+        showToast(biometricTypeName + ' doğrulaması başarısız. Lütfen tekrar deneyin veya şifrenizi kullanın', 'error');
       }
     } catch (error) {
-      showToast('Biometric authentication is not available. Please use your password.', 'error');
+      showToast('Biyometrik doğrulama kullanılamıyor. Lütfen şifrenizi kullanın', 'error');
     } finally {
       setIsBiometricLoading(false);
     }

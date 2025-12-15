@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -66,9 +67,15 @@ const WalletScreen = () => {
     return displayTransactions.filter((t) => !t.isPositive);
   }, [displayTransactions, selectedFilter]);
 
-  const onRefresh = () => {
-    refreshBalance();
-    loadTransactions();
+  const onRefresh = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await refreshBalance();
+      await loadTransactions();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
   };
 
   const handleWithdraw = () => {
