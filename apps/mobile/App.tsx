@@ -25,8 +25,8 @@ import { validateEnvironment, env } from './src/config/env.config';
 import { migrateSensitiveDataToSecure } from './src/utils/secureStorage';
 import { initSecurityMonitoring } from './src/utils/securityChecks';
 import './src/config/i18n'; // Initialize i18n
-// PostHog removed - using Sentry for error tracking only
 
+import { analytics } from './src/services/analytics';
 import { messageService } from './src/services/messageService';
 import { cacheService } from './src/services/cacheService';
 import { sessionManager } from './src/services/sessionManager';
@@ -112,39 +112,17 @@ export default function App() {
         await cacheService.initialize();
         logger.info('CacheService initialized with 50MB limit');
 
-        // 5. Initialize PostHog Analytics
-        const posthogApiKey = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
-        const posthogHost = process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com';
+        // 5. Initialize Analytics (PostHog + Sentry)
+        await analytics.init();
 
-        if (posthogApiKey && env.ENABLE_ANALYTICS) {
-          try {
-            // PostHog v3+ uses class-based initialization
-            const posthogClient = new PostHog(posthogApiKey, {
-              host: posthogHost,
-              captureNativeAppLifecycleEvents: true,
-              enableSessionReplay: false,
-            });
-
-            await posthogClient.ready();
-
-            // Set super properties
-            posthogClient.capture('$set', {
-              $set: {
-                platform: Platform.OS,
-                device_model: Device.modelName || 'unknown',
-                os_version: String(Platform.Version),
-                app_version: '1.0.0',
-                app_env: env.APP_ENV,
-              },
-            });
-
-            logger.info('PostHog initialized successfully');
-          } catch (error) {
-            logger.warn('PostHog initialization failed (non-critical)', error);
-          }
-        } else {
-          logger.info('PostHog not configured - skipping analytics');
-        }
+        // Set device properties as super properties
+        analytics.setUserProperties({
+          platform: Platform.OS,
+          device_model: Device.modelName || 'unknown',
+          os_version: String(Platform.Version),
+          app_version: '1.0.0',
+          app_env: env.APP_ENV,
+        });
 
         // Increment session count
         incrementSessionCount();

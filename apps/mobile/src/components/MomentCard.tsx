@@ -9,6 +9,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { OptimizedImage } from './ui/OptimizedImage';
+import { analytics } from '../services/analytics';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
@@ -43,6 +44,15 @@ const MomentCard: React.FC<MomentCardProps> = memo(
           (e as { stopPropagation: () => void }).stopPropagation();
         }
         void impact('medium');
+
+        // Track gift button click
+        analytics.trackEvent('gift_moment_clicked', {
+          momentId: moment.id,
+          momentTitle: moment.title,
+          price: moment.price,
+          location: moment.location?.city || 'unknown',
+        });
+
         onGiftPress(moment);
       },
       [moment, onGiftPress, impact],

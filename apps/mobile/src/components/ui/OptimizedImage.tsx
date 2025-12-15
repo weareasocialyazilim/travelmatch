@@ -12,11 +12,12 @@
  * - Accessibility support
  */
 
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import type { ViewStyle, ImageStyle } from 'react-native';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { Image, ImageContentFit } from 'expo-image';
 import { COLORS } from '../../constants/colors';
+import { analytics } from '../../services/analytics';
 
 interface OptimizedImageProps {
   /** Image source URI */
@@ -82,6 +83,7 @@ export const OptimizedImage = memo<OptimizedImageProps>(function OptimizedImage(
 }) {
   const [isLoading, setIsLoading] = useState(showLoading);
   const [hasError, setHasError] = useState(false);
+  const loadStartTime = useRef<number>(0);
 
   // Normalize source to URI string
   const imageSource = typeof source === 'string'
@@ -91,6 +93,7 @@ export const OptimizedImage = memo<OptimizedImageProps>(function OptimizedImage(
       : source.uri;
 
   const handleLoadStart = () => {
+    loadStartTime.current = Date.now();
     setIsLoading(true);
     setHasError(false);
   };
@@ -98,6 +101,17 @@ export const OptimizedImage = memo<OptimizedImageProps>(function OptimizedImage(
   const handleLoad = () => {
     setIsLoading(false);
     setHasError(false);
+
+    // Track image load performance
+    if (loadStartTime.current > 0) {
+      const loadTime = Date.now() - loadStartTime.current;
+      analytics.trackTiming('image_load', loadTime, {
+        priority,
+        contentFit,
+        hasPlaceholder: !!placeholder,
+      });
+    }
+
     onLoad?.();
   };
 
