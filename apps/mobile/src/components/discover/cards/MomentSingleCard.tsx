@@ -162,4 +162,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export { MomentSingleCard };
 export default MomentSingleCard;

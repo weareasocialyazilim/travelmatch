@@ -85,4 +85,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export { StatsRow };
 export default StatsRow;

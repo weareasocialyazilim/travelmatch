@@ -5,7 +5,27 @@
 
 import React, { ReactElement, createContext, useContext } from 'react';
 import { render, RenderOptions } from '@testing-library/react-native';
-import { ToastProvider } from '../context/ToastContext';
+
+// Mock Toast Context for tests (avoids React Native Animated issues)
+const MockToastContext = createContext({
+  showToast: jest.fn(),
+  hideToast: jest.fn(),
+  toast: null as { id: string; message: string; type: string } | null,
+});
+
+export const useToast = () => useContext(MockToastContext);
+
+const MockToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <MockToastContext.Provider value={{
+      showToast: jest.fn(),
+      hideToast: jest.fn(),
+      toast: null,
+    }}>
+      {children}
+    </MockToastContext.Provider>
+  );
+};
 
 // Mock Auth Context for tests
 const MockAuthContext = createContext({
@@ -46,9 +66,9 @@ interface AllTheProvidersProps {
 const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) => {
   return (
     <MockAuthProvider>
-      <ToastProvider>
+      <MockToastProvider>
         {children}
-      </ToastProvider>
+      </MockToastProvider>
     </MockAuthProvider>
   );
 };

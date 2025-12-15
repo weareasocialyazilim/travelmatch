@@ -1,0 +1,313 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] = `
+<RCTView
+  style={
+    {
+      "alignItems": "center",
+      "borderTopColor": "#E5E5E5",
+      "borderTopWidth": 1,
+      "flexDirection": "row",
+      "paddingVertical": 16,
+      "width": "100%",
+    }
+  }
+>
+  <RCTTouchableOpacity
+    accessibilityLabel="15 Moments. Tap to view"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    aria-label="15 Moments. Tap to view"
+    onPress={[MockFunction]}
+    role="button"
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+      }
+    }
+  >
+    <RCTText
+      style={
+        {
+          "color": "#1A1A1A",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "marginBottom": 2,
+        }
+      }
+      testID="RCTText"
+    >
+      15
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Moments
+    </RCTText>
+  </RCTTouchableOpacity>
+  <RCTView
+    style={
+      {
+        "backgroundColor": "#E5E5E5",
+        "height": 32,
+        "width": 1,
+      }
+    }
+  />
+  <RCTTouchableOpacity
+    accessibilityLabel="42 Exchanges. Tap to view"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    aria-label="42 Exchanges. Tap to view"
+    onPress={[MockFunction]}
+    role="button"
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+      }
+    }
+  >
+    <RCTText
+      style={
+        {
+          "color": "#1A1A1A",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "marginBottom": 2,
+        }
+      }
+      testID="RCTText"
+    >
+      42
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Exchanges
+    </RCTText>
+  </RCTTouchableOpacity>
+  <RCTView
+    style={
+      {
+        "backgroundColor": "#E5E5E5",
+        "height": 32,
+        "width": 1,
+      }
+    }
+  />
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+      }
+    }
+  >
+    <RCTText
+      style={
+        {
+          "color": "#1A1A1A",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "marginBottom": 2,
+        }
+      }
+      testID="RCTText"
+    >
+      0.88
+      %
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Response
+    </RCTText>
+  </RCTView>
+</RCTView>
+`;
+
+exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
+<RCTView
+  style={
+    {
+      "alignItems": "center",
+      "borderTopColor": "#E5E5E5",
+      "borderTopWidth": 1,
+      "flexDirection": "row",
+      "paddingVertical": 16,
+      "width": "100%",
+    }
+  }
+>
+  <RCTTouchableOpacity
+    accessibilityLabel="0 Moments. Tap to view"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    aria-label="0 Moments. Tap to view"
+    onPress={[MockFunction]}
+    role="button"
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+      }
+    }
+  >
+    <RCTText
+      style={
+        {
+          "color": "#1A1A1A",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "marginBottom": 2,
+        }
+      }
+      testID="RCTText"
+    >
+      0
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Moments
+    </RCTText>
+  </RCTTouchableOpacity>
+  <RCTView
+    style={
+      {
+        "backgroundColor": "#E5E5E5",
+        "height": 32,
+        "width": 1,
+      }
+    }
+  />
+  <RCTTouchableOpacity
+    accessibilityLabel="0 Exchanges. Tap to view"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    aria-label="0 Exchanges. Tap to view"
+    onPress={[MockFunction]}
+    role="button"
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+      }
+    }
+  >
+    <RCTText
+      style={
+        {
+          "color": "#1A1A1A",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "marginBottom": 2,
+        }
+      }
+      testID="RCTText"
+    >
+      0
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Exchanges
+    </RCTText>
+  </RCTTouchableOpacity>
+  <RCTView
+    style={
+      {
+        "backgroundColor": "#E5E5E5",
+        "height": 32,
+        "width": 1,
+      }
+    }
+  />
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+      }
+    }
+  >
+    <RCTText
+      style={
+        {
+          "color": "#1A1A1A",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "marginBottom": 2,
+        }
+      }
+      testID="RCTText"
+    >
+      0
+      %
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Response
+    </RCTText>
+  </RCTView>
+</RCTView>
+`;

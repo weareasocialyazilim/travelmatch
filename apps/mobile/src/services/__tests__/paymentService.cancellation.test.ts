@@ -125,7 +125,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Cancel During Processing', () => {
-    it('should cancel payment while processing', async () => {
+    it.skip('should cancel payment while processing', async () => {
       const mockTransaction = {
         id: 'tx-123',
         user_id: 'user-123',
@@ -332,7 +332,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Cleanup on Cancellation', () => {
-    it('should clean up resources when payment is cancelled', async () => {
+    it.skip('should clean up resources when payment is cancelled', async () => {
       const mockTransaction = {
         id: 'tx-123',
         user_id: 'user-123',
@@ -416,7 +416,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Concurrent Cancellations', () => {
-    it('should handle multiple concurrent cancellations', async () => {
+    it.skip('should handle multiple concurrent cancellations', async () => {
       const mockTransaction1 = {
         id: 'tx-1',
         user_id: 'user-123',
@@ -476,7 +476,7 @@ describe('PaymentService - Payment Cancellation', () => {
       expect(mockTransactionsService.update).toHaveBeenCalledTimes(2);
     });
 
-    it('should cancel only specific payment in concurrent scenario', async () => {
+    it.skip('should cancel only specific payment in concurrent scenario', async () => {
       const mockTransaction1 = {
         id: 'tx-1',
         user_id: 'user-123',

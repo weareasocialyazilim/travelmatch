@@ -160,4 +160,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export { MomentGridCard };
 export default MomentGridCard;
