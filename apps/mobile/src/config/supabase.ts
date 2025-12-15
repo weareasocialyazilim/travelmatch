@@ -6,6 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '../utils/logger';
 import { secureStorage } from '../utils/secureStorage';
+import type { Database } from '@/types/database.types';
 
 // Supabase credentials from environment variables
 const SUPABASE_URL: string =
@@ -45,8 +46,9 @@ export const SUPABASE_EDGE_URL = SUPABASE_URL;
 /**
  * Supabase client instance
  * Configured with SecureStore for session persistence in React Native
+ * Uses auto-generated Database types from @/types/database.types.ts
  */
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storage: SupabaseStorage,
     autoRefreshToken: true,
@@ -60,148 +62,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     },
   },
 });
-
-/**
- * Database types for TypeScript
- * 
- * Auto-generated types are in @/types/database.types.ts
- * Generate with: pnpm db:generate-types
- * 
- * This file contains legacy inline types for backward compatibility.
- * New code should import from @/types/database.types.ts
- */
-export type Database = {
-  public: {
-    Tables: {
-      users: {
-        Row: {
-          id: string;
-          email: string;
-          name: string;
-          avatar_url: string | null;
-          bio: string | null;
-          location: string | null;
-          public_key: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<
-          Database['public']['Tables']['users']['Row'],
-          'id' | 'created_at' | 'updated_at'
-        >;
-        Update: Partial<Database['public']['Tables']['users']['Insert']>;
-      };
-      moments: {
-        Row: {
-          id: string;
-          user_id: string;
-          title: string;
-          description: string | null;
-          category: string;
-          location: string;
-          latitude: number | null;
-          longitude: number | null;
-          date: string;
-          max_participants: number;
-          price: number;
-          currency: string;
-          images: string[];
-          status: 'active' | 'completed' | 'cancelled';
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<
-          Database['public']['Tables']['moments']['Row'],
-          'id' | 'created_at' | 'updated_at'
-        >;
-        Update: Partial<Database['public']['Tables']['moments']['Insert']>;
-      };
-      requests: {
-        Row: {
-          id: string;
-          moment_id: string;
-          user_id: string;
-          message: string | null;
-          status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<
-          Database['public']['Tables']['requests']['Row'],
-          'id' | 'created_at' | 'updated_at'
-        >;
-        Update: Partial<Database['public']['Tables']['requests']['Insert']>;
-      };
-      messages: {
-        Row: {
-          id: string;
-          conversation_id: string;
-          sender_id: string;
-          content: string;
-          type: 'text' | 'image' | 'system';
-          read_at: string | null;
-          created_at: string;
-        };
-        Insert: Omit<
-          Database['public']['Tables']['messages']['Row'],
-          'id' | 'created_at'
-        >;
-        Update: Partial<Database['public']['Tables']['messages']['Insert']>;
-      };
-      conversations: {
-        Row: {
-          id: string;
-          participant_ids: string[];
-          last_message_id: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<
-          Database['public']['Tables']['conversations']['Row'],
-          'id' | 'created_at' | 'updated_at'
-        >;
-        Update: Partial<
-          Database['public']['Tables']['conversations']['Insert']
-        >;
-      };
-      reviews: {
-        Row: {
-          id: string;
-          reviewer_id: string;
-          reviewed_id: string;
-          moment_id: string;
-          rating: number;
-          comment: string | null;
-          created_at: string;
-        };
-        Insert: Omit<
-          Database['public']['Tables']['reviews']['Row'],
-          'id' | 'created_at'
-        >;
-        Update: Partial<Database['public']['Tables']['reviews']['Insert']>;
-      };
-      notifications: {
-        Row: {
-          id: string;
-          user_id: string;
-          type: string;
-          title: string;
-          body: string;
-          data: Record<string, unknown> | null;
-          read: boolean;
-          created_at: string;
-        };
-        Insert: Omit<
-          Database['public']['Tables']['notifications']['Row'],
-          'id' | 'created_at'
-        >;
-        Update: Partial<
-          Database['public']['Tables']['notifications']['Insert']
-        >;
-      };
-    };
-  };
-};
 
 /**
  * Typed Supabase client

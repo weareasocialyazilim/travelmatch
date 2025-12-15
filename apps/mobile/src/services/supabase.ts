@@ -5,7 +5,7 @@
 
 // Core Supabase client and types
 export { supabase, isSupabaseConfigured } from '../config/supabase';
-export type { Database } from '../config/supabase';
+export type { Database } from '@/types/database.types';
 
 // Authentication Service
 export { default as supabaseAuth } from './supabaseAuthService';
