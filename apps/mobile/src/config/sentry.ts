@@ -7,13 +7,14 @@
  */
 
 import { Platform as _Platform } from 'react-native';
+import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
 import { logger } from '../utils/logger';
 
-// Sentry DSN (replace with your actual DSN)
+// Sentry DSN from environment variables (configured in EAS)
 const SENTRY_DSN = __DEV__
   ? '' // Disable in development
-  : 'https://your-dsn@sentry.io/your-project-id';
+  : (Constants.expoConfig?.extra?.sentryDsn as string | undefined) || '';
 
 /**
  * Initialize Sentry

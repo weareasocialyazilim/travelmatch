@@ -4,11 +4,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Share,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
+import { OptimizedImage } from './ui/OptimizedImage';
+import { analytics } from '../services/analytics';
+import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../utils/cloudflareImageHelpers';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
@@ -43,6 +45,15 @@ const MomentCard: React.FC<MomentCardProps> = memo(
           (e as { stopPropagation: () => void }).stopPropagation();
         }
         void impact('medium');
+
+        // Track gift button click
+        analytics.trackEvent('gift_moment_clicked', {
+          momentId: moment.id,
+          momentTitle: moment.title,
+          price: moment.price,
+          location: moment.location?.city || 'unknown',
+        });
+
         onGiftPress(moment);
       },
       [moment, onGiftPress, impact],
@@ -107,10 +118,12 @@ const MomentCard: React.FC<MomentCardProps> = memo(
       >
         <Animated.View style={[styles.card, cardScale]}>
           <View style={styles.cardImageContainer}>
-            <Image
-              source={{ uri: moment.imageUrl }}
+            <OptimizedImage
+              {...getMomentImageProps(moment, IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE)}
+              contentFit="cover"
               style={styles.cardImage}
-              resizeMode="cover"
+              transition={200}
+              priority="high"
               accessibilityLabel={`Photo of ${moment.title}`}
             />
 
@@ -118,6 +131,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
             <TouchableOpacity
               style={styles.shareButton}
               onPress={handleSharePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               activeOpacity={0.8}
               accessibilityLabel="Share this moment"
               accessibilityRole="button"
@@ -130,11 +144,16 @@ const MomentCard: React.FC<MomentCardProps> = memo(
             </TouchableOpacity>
 
             <View style={styles.userBadge}>
-              <Image
-                source={{
-                  uri: moment.user?.avatar || 'https://via.placeholder.com/150',
-                }}
+              <OptimizedImage
+                {...getAvatarImageProps(
+                  moment.user || {},
+                  IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
+                  'https://via.placeholder.com/150'
+                )}
+                contentFit="cover"
                 style={styles.userAvatar}
+                transition={150}
+                priority="normal"
                 accessibilityLabel={`${moment.user?.name || 'User'}'s avatar`}
               />
               <View style={styles.userInfo}>
@@ -231,6 +250,8 @@ const styles = StyleSheet.create({
   cardImage: {
     height: 200,
     width: '100%',
+    borderTopLeftRadius: radii.xl,
+    borderTopRightRadius: radii.xl,
   },
   cardImageContainer: {
     position: 'relative',

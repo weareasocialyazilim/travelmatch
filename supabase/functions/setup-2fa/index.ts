@@ -13,18 +13,12 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import { createHmac } from 'https://deno.land/std@0.168.0/node/crypto.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
 // Rate limiter: 5 requests per 15 minutes (prevent abuse)
-const setup2FALimiter = createRateLimiter(RateLimitPresets.auth);
+const setup2FALimiter = createUpstashRateLimiter(RateLimitPresets.AUTH);
 
 /**
  * Generate random base32 secret for TOTP
@@ -56,6 +50,9 @@ function generateQRCodeURL(secret: string, email: string): string {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -63,18 +60,21 @@ serve(async (req) => {
   try {
     // Check rate limit
     const rateLimitResult = await setup2FALimiter.check(req);
-    if (!rateLimitResult.ok) {
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Too many 2FA setup requests',
-          retryAfter: rateLimitResult.retryAfter,
+          retryAfter,
         }),
         {
           status: 429,
           headers: {
             ...corsHeaders,
             'Content-Type': 'application/json',
-            'Retry-After': String(rateLimitResult.retryAfter),
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
           },
         },
       );

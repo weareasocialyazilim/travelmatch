@@ -15,14 +15,8 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 
 const ConfirmPaymentSchema = z.object({
   paymentIntentId: z.string().min(1, 'Payment intent ID required'),
@@ -32,7 +26,7 @@ const ConfirmPaymentSchema = z.object({
 type ConfirmPaymentRequest = z.infer<typeof ConfirmPaymentSchema>;
 
 // Rate limiter: 100 requests per 15 minutes for payment confirmation
-const confirmLimiter = createRateLimiter(RateLimitPresets.api);
+const confirmLimiter = createUpstashRateLimiter(RateLimitPresets.PAYMENT);
 
 async function logAudit(
   supabase: any,
@@ -53,6 +47,9 @@ async function logAudit(
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -99,19 +96,21 @@ serve(async (req) => {
 
     // Check rate limit
     const rateLimitResult = await confirmLimiter.check(req);
-    if (!rateLimitResult.ok) {
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Rate limit exceeded',
-          retryAfter: rateLimitResult.retryAfter,
+          retryAfter,
         }),
-        { 
-          status: 429, 
-          headers: { 
-            ...corsHeaders, 
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
             'Content-Type': 'application/json',
-            'Retry-After': String(rateLimitResult.retryAfter),
-            'X-RateLimit-Remaining': '0',
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
           },
         },
       );

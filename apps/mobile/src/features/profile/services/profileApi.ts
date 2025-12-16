@@ -199,11 +199,21 @@ export const profileApi = {
 
   /**
    * Moment'ları getir
+   * ✅ BlurHash: Includes image_id, image_blur_hash and uploaded_images JOIN
    */
   getMoments: async (userId: string) => {
     const { data, error } = await supabase
       .from('moments')
-      .select('*, profiles(*)')
+      .select(`
+        *,
+        profiles(*),
+        uploaded_images!moments_image_id_fkey(
+          id,
+          blur_hash,
+          url,
+          variants
+        )
+      `)
       .eq('user_id', userId)
       .is('deleted_at', null)
       .order('created_at', { ascending: false });

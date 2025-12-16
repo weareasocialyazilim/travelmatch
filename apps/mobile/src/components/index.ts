@@ -37,6 +37,8 @@ export { RequestAdditionalProofBottomSheet } from './RequestAdditionalProofBotto
 export { AddCardBottomSheet } from './AddCardBottomSheet';
 export { RemoveCardModal } from './RemoveCardModal';
 export { LocationPickerBottomSheet } from './LocationPickerBottomSheet';
+export { LazyLocationPicker } from './LazyLocationPicker'; // Lazy-loaded version (-3-5 MB)
+export type { Location } from './LazyLocationPicker';
 export { SetPriceBottomSheet } from './SetPriceBottomSheet';
 export { ChooseCategoryBottomSheet } from './ChooseCategoryBottomSheet';
 export { DeleteMomentModal } from './DeleteMomentModal';

@@ -3,7 +3,7 @@
  * Displays a credit/debit card in a list
  */
 
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -19,45 +19,66 @@ export interface CardListItemProps {
   onOptionsPress?: () => void;
 }
 
-export const CardListItem: React.FC<CardListItemProps> = ({
-  brand,
-  last4,
-  expiryMonth,
-  expiryYear,
-  isDefault = false,
-  onPress,
-  onOptionsPress,
-}) => {
-  const brandConfig: Record<string, { icon: 'credit-card' | 'credit-card-outline'; color: string }> = {
-    visa: { icon: 'credit-card', color: '#1A1F71' },
-    mastercard: { icon: 'credit-card', color: '#EB001B' },
-    amex: { icon: 'credit-card', color: '#006FCF' },
-    discover: { icon: 'credit-card', color: '#FF6000' },
-    unknown: { icon: 'credit-card-outline', color: COLORS.textSecondary },
-  };
-
-  const config = brandConfig[brand] || brandConfig.unknown;
-
-  return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
-      <View style={[styles.iconContainer, { backgroundColor: config.color + '20' }]}>
-        <MaterialCommunityIcons name={config.icon} size={24} color={config.color} />
-      </View>
-      <View style={styles.info}>
-        <Text style={styles.cardNumber}>•••• {last4}</Text>
-        {expiryMonth && expiryYear && (
-          <Text style={styles.expiry}>
-            Expires {String(expiryMonth).padStart(2, '0')}/{String(expiryYear).slice(-2)}
-          </Text>
-        )}
-        {isDefault && <Text style={styles.defaultBadge}>Default</Text>}
-      </View>
-      <TouchableOpacity style={styles.optionsButton} onPress={onOptionsPress}>
-        <MaterialCommunityIcons name="dots-vertical" size={20} color={COLORS.textSecondary} />
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
+// Brand config defined outside component to avoid recreation
+const brandConfig: Record<string, { icon: 'credit-card' | 'credit-card-outline'; color: string }> = {
+  visa: { icon: 'credit-card', color: '#1A1F71' },
+  mastercard: { icon: 'credit-card', color: '#EB001B' },
+  amex: { icon: 'credit-card', color: '#006FCF' },
+  discover: { icon: 'credit-card', color: '#FF6000' },
+  unknown: { icon: 'credit-card-outline', color: COLORS.textSecondary },
 };
+
+export const CardListItem: React.FC<CardListItemProps> = memo(
+  ({
+    brand,
+    last4,
+    expiryMonth,
+    expiryYear,
+    isDefault = false,
+    onPress,
+    onOptionsPress,
+  }) => {
+    // Memoize brand config to prevent recreation
+    const config = useMemo(() => brandConfig[brand] || brandConfig.unknown, [brand]);
+
+    // Memoize icon container background style
+    const iconContainerStyle = useMemo(
+      () => [styles.iconContainer, { backgroundColor: config.color + '20' }],
+      [config.color],
+    );
+
+    // Memoize expiry text to prevent recreation
+    const expiryText = useMemo(() => {
+      if (!expiryMonth || !expiryYear) return null;
+      return `Expires ${String(expiryMonth).padStart(2, '0')}/${String(expiryYear).slice(-2)}`;
+    }, [expiryMonth, expiryYear]);
+
+    return (
+      <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
+        <View style={iconContainerStyle}>
+          <MaterialCommunityIcons name={config.icon} size={24} color={config.color} />
+        </View>
+        <View style={styles.info}>
+          <Text style={styles.cardNumber}>•••• {last4}</Text>
+          {expiryText && <Text style={styles.expiry}>{expiryText}</Text>}
+          {isDefault && <Text style={styles.defaultBadge}>Default</Text>}
+        </View>
+        <TouchableOpacity style={styles.optionsButton} onPress={onOptionsPress}>
+          <MaterialCommunityIcons name="dots-vertical" size={20} color={COLORS.textSecondary} />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.id === nextProps.id &&
+    prevProps.brand === nextProps.brand &&
+    prevProps.last4 === nextProps.last4 &&
+    prevProps.expiryMonth === nextProps.expiryMonth &&
+    prevProps.expiryYear === nextProps.expiryYear &&
+    prevProps.isDefault === nextProps.isDefault,
+);
+
+CardListItem.displayName = 'CardListItem';
 
 const styles = StyleSheet.create({
   container: {

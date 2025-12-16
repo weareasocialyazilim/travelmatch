@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import type { ViewStyle } from 'react-native';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,43 +17,59 @@ export interface SocialButtonProps {
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
-const SocialButton: React.FC<SocialButtonProps> = ({
-  provider,
-  size = 'large',
-  onPress,
-  style,
-  label,
-}) => {
-  const providerConfig: Record<Provider, { icon: IconName; text: string }> = {
-    google: {
-      icon: 'google',
-      text: 'Continue with Google',
-    },
-    apple: {
-      icon: 'apple',
-      text: 'Continue with Apple',
-    },
-    facebook: {
-      icon: 'facebook',
-      text: 'Continue with Facebook',
-    },
-    phone: {
-      icon: 'phone',
-      text: 'Continue with Phone',
-    },
-    email: {
-      icon: 'email',
-      text: 'Continue with Email',
-    },
-  };
+// Provider config defined outside component to avoid recreation
+const providerConfig: Record<Provider, { icon: IconName; text: string }> = {
+  google: {
+    icon: 'google',
+    text: 'Continue with Google',
+  },
+  apple: {
+    icon: 'apple',
+    text: 'Continue with Apple',
+  },
+  facebook: {
+    icon: 'facebook',
+    text: 'Continue with Facebook',
+  },
+  phone: {
+    icon: 'phone',
+    text: 'Continue with Phone',
+  },
+  email: {
+    icon: 'email',
+    text: 'Continue with Email',
+  },
+};
 
-  const config = providerConfig[provider];
-  const displayText = label || config.text;
+const SocialButton: React.FC<SocialButtonProps> = memo(
+  ({ provider, size = 'large', onPress, style, label }) => {
+    // Memoize config lookup
+    const config = useMemo(() => providerConfig[provider], [provider]);
 
-  if (size === 'icon') {
+    // Memoize display text
+    const displayText = useMemo(() => label || config.text, [label, config.text]);
+
+    if (size === 'icon') {
+      return (
+        <TouchableOpacity
+          style={[styles.iconButton, style]}
+          onPress={onPress}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={displayText}
+        >
+          <MaterialCommunityIcons
+            name={config.icon}
+            size={24}
+            color={COLORS.white}
+          />
+        </TouchableOpacity>
+      );
+    }
+
     return (
       <TouchableOpacity
-        style={[styles.iconButton, style]}
+        style={[styles.largeButton, style]}
         onPress={onPress}
         activeOpacity={0.8}
         accessibilityRole="button"
@@ -64,27 +80,17 @@ const SocialButton: React.FC<SocialButtonProps> = ({
           size={24}
           color={COLORS.white}
         />
+        <Text style={styles.largeButtonText}>{displayText}</Text>
       </TouchableOpacity>
     );
-  }
+  },
+  (prevProps, nextProps) =>
+    prevProps.provider === nextProps.provider &&
+    prevProps.size === nextProps.size &&
+    prevProps.label === nextProps.label,
+);
 
-  return (
-    <TouchableOpacity
-      style={[styles.largeButton, style]}
-      onPress={onPress}
-      activeOpacity={0.8}
-      accessibilityRole="button"
-      accessibilityLabel={displayText}
-    >
-      <MaterialCommunityIcons
-        name={config.icon}
-        size={24}
-        color={COLORS.white}
-      />
-      <Text style={styles.largeButtonText}>{displayText}</Text>
-    </TouchableOpacity>
-  );
-};
+SocialButton.displayName = 'SocialButton';
 
 const styles = StyleSheet.create({
   iconButton: {

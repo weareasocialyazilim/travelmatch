@@ -11,23 +11,20 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import {
   getCachedUserProfile,
   invalidateUserCache,
 } from '../_shared/cache.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-};
-
 // Rate limiter: 100 requests per 15 minutes
-const profileLimiter = createRateLimiter(RateLimitPresets.api);
+const profileLimiter = createUpstashRateLimiter(RateLimitPresets.STANDARD);
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -35,18 +32,21 @@ serve(async (req) => {
   try {
     // Rate limit check
     const rateLimitResult = await profileLimiter.check(req);
-    if (!rateLimitResult.ok) {
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000);
       return new Response(
         JSON.stringify({
           error: 'Too many requests',
-          retryAfter: rateLimitResult.retryAfter,
+          retryAfter,
         }),
         {
           status: 429,
           headers: {
             ...corsHeaders,
             'Content-Type': 'application/json',
-            'Retry-After': String(rateLimitResult.retryAfter),
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
           },
         },
       );

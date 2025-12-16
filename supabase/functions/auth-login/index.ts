@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
-import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
 import {
   ErrorCode,
   createErrorResponse,
@@ -11,16 +11,15 @@ import {
   handleSupabaseAuthError,
   handleUnexpectedError,
 } from '../_shared/errorHandler.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-// Create rate limiter for auth endpoints
-const authLimiter = createRateLimiter(RateLimitPresets.auth);
+// Create rate limiter for auth endpoints (5 attempts per 15 minutes)
+const authLimiter = createUpstashRateLimiter(RateLimitPresets.AUTH);
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -29,15 +28,13 @@ serve(async (req) => {
   try {
     // Check rate limit
     const rateLimitResult = await authLimiter.check(req);
-    if (!rateLimitResult.ok) {
+    if (!rateLimitResult.success) {
+      const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000);
       const { response, headers: rateLimitHeaders } = createRateLimitError(
-        rateLimitResult.retryAfter || 60,
+        retryAfter,
         rateLimitResult.remaining,
       );
-      return new Response(response.body, {
-        status: response.status,
-        headers: { ...corsHeaders, ...rateLimitHeaders },
-      });
+      return toHttpResponse(response, { ...corsHeaders, ...rateLimitHeaders }, 429);
     }
 
     // Parse request body

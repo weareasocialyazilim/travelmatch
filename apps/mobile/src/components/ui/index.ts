@@ -30,6 +30,8 @@ export {
   getItemLayout,
 } from './OptimizedFlatList';
 export { MemoizedMomentCard, MemoizedMessageItem } from './MemoizedMomentCard';
+export { OptimizedImage } from './OptimizedImage';
+export { LazyImage } from './LazyImage';
 
 // Bottom Sheets
 export {

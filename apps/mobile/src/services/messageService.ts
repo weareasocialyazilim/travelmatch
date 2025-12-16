@@ -339,14 +339,18 @@ export const messageService = {
               const { data: sender } = await usersService.getById(
                 msg.sender_id,
               );
-              // @ts-ignore
-              if (sender?.public_key) {
-                // @ts-ignore
+
+              // Type assertion for user with encryption keys
+              interface UserWithEncryption {
+                public_key?: string;
+              }
+              const senderWithKey = sender as UserWithEncryption | null;
+
+              if (senderWithKey?.public_key) {
                 content = await encryptionService.decrypt(
                   msg.content,
                   msgNonce,
-                  // @ts-ignore
-                  sender.public_key,
+                  senderWithKey.public_key,
                 );
               }
             } catch (e) {

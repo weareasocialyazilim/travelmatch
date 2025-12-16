@@ -53,9 +53,9 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       // For now, we simulate a delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setStep('verify');
-      showToast('A verification code has been sent to your phone', 'success');
+      showToast('Doğrulama kodu telefonunuza gönderildi', 'success');
     } catch (error) {
-      showToast('Failed to send verification code', 'error');
+      showToast('Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +69,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       if (data.verificationCode === '123456') {
         setStep('success');
       } else {
-        showToast('Please check your code and try again', 'error');
+        showToast('Doğrulama kodu hatalı. Lütfen kontrol edip tekrar deneyin', 'error');
       }
     }, 1000);
   };

@@ -105,7 +105,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
             });
           }
         } catch {
-          showToast('Could not get current location', 'error');
+          showToast('Konumunuz alınamadı. Lütfen konum servislerinizin açık olduğundan emin olun', 'error');
         }
       };
 

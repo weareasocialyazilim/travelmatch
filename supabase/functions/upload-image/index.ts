@@ -28,6 +28,7 @@ import {
   toHttpSuccessResponse,
   handleUnexpectedError,
 } from '../_shared/errorHandler.ts';
+import { generateBlurHash } from '../_shared/blurhash.ts';
 
 const CF_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
 const CF_API_TOKEN = Deno.env.get('CLOUDFLARE_IMAGES_TOKEN');
@@ -71,6 +72,7 @@ interface UploadImageResponse {
   url: string;
   variants: string[];
   uploaded: string;
+  blurHash?: string;
 }
 
 serve(async (req) => {
@@ -155,6 +157,21 @@ serve(async (req) => {
     const arrayBuffer = await file.arrayBuffer();
     const blob = new Blob([arrayBuffer], { type: file.type });
 
+    // 6.5. Generate BlurHash for placeholder
+    let blurHash: string | undefined;
+    try {
+      console.log('[BlurHash] Generating hash for image...');
+      blurHash = await generateBlurHash(arrayBuffer, {
+        componentX: 4,
+        componentY: 3,
+        maxDimension: 100,
+      });
+      console.log('[BlurHash] Generated:', blurHash);
+    } catch (error) {
+      console.warn('[BlurHash] Generation failed (non-critical):', error);
+      // Continue without BlurHash - it's optional
+    }
+
     // 7. Upload to Cloudflare Images
     const uploadFormData = new FormData();
     uploadFormData.append('file', blob, file.name);
@@ -201,6 +218,7 @@ serve(async (req) => {
       uploaded_at: uploadData.result.uploaded,
       metadata: cfMetadata,
       type: metadata.type || 'general',
+      blur_hash: blurHash, // Store BlurHash for client-side placeholder
     };
 
     await supabase.from('uploaded_images').insert(imageRecord);
@@ -212,6 +230,7 @@ serve(async (req) => {
       url: uploadData.result.variants[0],
       variants: uploadData.result.variants,
       uploaded: uploadData.result.uploaded,
+      blurHash,
     });
 
     return toHttpSuccessResponse(response, corsHeaders);

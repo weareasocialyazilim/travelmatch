@@ -221,12 +221,15 @@ export function sanitizeInput(input: any): any {
 
 /**
  * Create standardized error response
+ * @param origin - Optional origin for CORS validation
  */
 export function errorResponse(
   message: string,
   status: number = 400,
   details?: any,
+  origin?: string | null,
 ): Response {
+  const headers = getCorsHeaders(origin);
   return new Response(
     JSON.stringify({
       error: message,
@@ -234,18 +237,20 @@ export function errorResponse(
     }),
     {
       status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...headers, 'Content-Type': 'application/json' },
     },
   );
 }
 
 /**
  * Create standardized success response
+ * @param origin - Optional origin for CORS validation
  */
-export function successResponse(data: any, status: number = 200): Response {
+export function successResponse(data: any, status: number = 200, origin?: string | null): Response {
+  const headers = getCorsHeaders(origin);
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    headers: { ...headers, 'Content-Type': 'application/json' },
   });
 }
 
@@ -254,7 +259,9 @@ export function successResponse(data: any, status: number = 200): Response {
  */
 export function handleCors(req: Request): Response | null {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    const origin = req.headers.get('origin');
+    const headers = getCorsHeaders(origin);
+    return new Response('ok', { headers });
   }
   return null;
 }
@@ -434,7 +441,8 @@ export function withMiddleware(
         if (rateLimiter) {
           const rateLimit = rateLimiter.check(context.user.id);
           if (!rateLimit.allowed) {
-            return errorResponse('Rate limit exceeded', 429);
+            const origin = req.headers.get('origin');
+            return errorResponse('Rate limit exceeded', 429, undefined, origin);
           }
         }
 
@@ -454,14 +462,17 @@ export function withMiddleware(
       return await handler(req, context!);
     } catch (error) {
       console.error('Middleware error:', error);
+      const origin = req.headers.get('origin');
 
       if (error.message === 'Unauthorized' || error.message === 'Missing authorization header') {
-        return errorResponse(error.message, 401);
+        return errorResponse(error.message, 401, undefined, origin);
       }
 
       return errorResponse(
         error.message || 'Internal server error',
         500,
+        undefined,
+        origin,
       );
     }
   };

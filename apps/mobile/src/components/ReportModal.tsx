@@ -79,7 +79,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedReason) {
-      showToast('Please select a reason', 'error');
+      showToast('Lütfen bir sebep seçin', 'error');
       return;
     }
 
@@ -93,10 +93,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({
         description: description.trim() || undefined,
       });
 
-      showToast('Report submitted successfully', 'success');
+      showToast('Şikayetiniz başarıyla gönderildi', 'success');
       handleClose();
     } catch (error) {
-      showToast('Failed to submit report', 'error');
+      showToast('Şikayetiniz gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setLoading(false);
     }

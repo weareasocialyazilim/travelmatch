@@ -68,11 +68,11 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       if (result.success) {
         navigation.navigate('CompleteProfile');
       } else {
-        showToast(result.error || 'Please try again', 'error');
+        showToast(result.error || 'Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin', 'error');
       }
     } catch (error) {
       logger.error('Registration error:', error);
-      showToast('An unexpected error occurred', 'error');
+      showToast('Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin', 'error');
     } finally {
       setLoading(false);
     }

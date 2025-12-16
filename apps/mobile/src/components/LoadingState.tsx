@@ -3,7 +3,7 @@
  * Provides consistent loading experience across all screens
  */
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   View,
   Text,
@@ -33,16 +33,18 @@ interface LoadingStateProps {
 }
 
 /**
- * Skeleton Item
+ * Skeleton Item - Memoized to prevent re-renders in lists
  */
-const SkeletonItem: React.FC<{ style?: object }> = ({ style }) => {
+const SkeletonItem: React.FC<{ style?: object }> = memo(({ style }) => {
   return (
     <View style={[styles.skeletonItem, style]}>
       <View style={styles.skeletonLine} />
       <View style={[styles.skeletonLine, styles.skeletonLineShort]} />
     </View>
   );
-};
+});
+
+SkeletonItem.displayName = 'SkeletonItem';
 
 /**
  * Loading State Component
@@ -57,46 +59,50 @@ const SkeletonItem: React.FC<{ style?: object }> = ({ style }) => {
  * // Overlay loading with message
  * <LoadingState type="overlay" message="Loading your trips..." />
  */
-export const LoadingState: React.FC<LoadingStateProps> = ({
-  type,
-  count = 3,
-  message,
-  color = COLORS.primary,
-  size = 'large',
-}) => {
-  switch (type) {
-    case 'skeleton':
-      return (
-        <View style={styles.skeletonContainer}>
-          {Array.from({ length: count }).map((_, index) => (
-            <SkeletonItem key={index} />
-          ))}
-        </View>
-      );
+export const LoadingState: React.FC<LoadingStateProps> = memo(
+  ({ type, count = 3, message, color = COLORS.primary, size = 'large' }) => {
+    // Memoize skeleton items array to prevent recreation
+    const skeletonItems = useMemo(
+      () => Array.from({ length: count }, (_, index) => <SkeletonItem key={index} />),
+      [count],
+    );
 
-    case 'spinner':
-      return (
-        <View style={styles.spinnerContainer}>
-          <ActivityIndicator size={size} color={color} />
-        </View>
-      );
+    switch (type) {
+      case 'skeleton':
+        return <View style={styles.skeletonContainer}>{skeletonItems}</View>;
 
-    case 'overlay':
-      return (
-        <Modal transparent visible animationType="fade">
-          <View style={styles.overlayContainer}>
-            <View style={styles.overlayContent}>
-              <ActivityIndicator size="large" color={color} />
-              {message && <Text style={styles.overlayMessage}>{message}</Text>}
-            </View>
+      case 'spinner':
+        return (
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size={size} color={color} />
           </View>
-        </Modal>
-      );
+        );
 
-    default:
-      return null;
-  }
-};
+      case 'overlay':
+        return (
+          <Modal transparent visible animationType="fade">
+            <View style={styles.overlayContainer}>
+              <View style={styles.overlayContent}>
+                <ActivityIndicator size="large" color={color} />
+                {message && <Text style={styles.overlayMessage}>{message}</Text>}
+              </View>
+            </View>
+          </Modal>
+        );
+
+      default:
+        return null;
+    }
+  },
+  (prevProps, nextProps) =>
+    prevProps.type === nextProps.type &&
+    prevProps.count === nextProps.count &&
+    prevProps.message === nextProps.message &&
+    prevProps.color === nextProps.color &&
+    prevProps.size === nextProps.size,
+);
+
+LoadingState.displayName = 'LoadingState';
 
 const styles = StyleSheet.create({
   // Skeleton Styles

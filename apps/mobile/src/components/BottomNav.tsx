@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -27,10 +27,25 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { impact } = useHaptics();
 
-  const handleTabPress = (screen: keyof RootStackParamList) => {
-    void impact('light');
-    navigation.navigate(screen as never);
-  };
+  // Memoize tab press handler
+  const handleTabPress = useCallback(
+    (screen: keyof RootStackParamList) => {
+      void impact('light');
+      navigation.navigate(screen as never);
+    },
+    [navigation, impact],
+  );
+
+  // Memoize badge display text
+  const requestsBadgeText = useMemo(
+    () => (requestsBadge > 9 ? '9+' : requestsBadge),
+    [requestsBadge],
+  );
+
+  const messagesBadgeText = useMemo(
+    () => (messagesBadge > 9 ? '9+' : messagesBadge),
+    [messagesBadge],
+  );
 
   return (
     <View style={styles.bottomNav}>
@@ -80,9 +95,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
           />
           {requestsBadge > 0 && (
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {requestsBadge > 9 ? '9+' : requestsBadge}
-              </Text>
+              <Text style={styles.badgeText}>{requestsBadgeText}</Text>
             </View>
           )}
         </View>
@@ -130,9 +143,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
           />
           {messagesBadge > 0 && (
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {messagesBadge > 9 ? '9+' : messagesBadge}
-              </Text>
+              <Text style={styles.badgeText}>{messagesBadgeText}</Text>
             </View>
           )}
         </View>
