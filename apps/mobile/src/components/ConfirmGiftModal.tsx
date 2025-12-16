@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo, useMemo } from 'react';
 import {
   View,
   Text,
@@ -28,78 +28,83 @@ interface Props {
   onConfirm: () => void;
 }
 
-export const ConfirmGiftModal: React.FC<Props> = ({
-  visible,
-  amount,
-  recipientName,
-  onCancel,
-  onConfirm,
-}) => {
-  const scale = useSharedValue(0.8);
-  const opacity = useSharedValue(0);
+export const ConfirmGiftModal: React.FC<Props> = memo(
+  ({ visible, amount, recipientName, onCancel, onConfirm }) => {
+    const scale = useSharedValue(0.8);
+    const opacity = useSharedValue(0);
 
-  useEffect(() => {
-    if (visible) {
-      scale.value = withSpring(1, { damping: 15, stiffness: 150 });
-      opacity.value = withTiming(1, { duration: 200 });
-    } else {
-      scale.value = withTiming(0.8, { duration: 150 });
-      opacity.value = withTiming(0, { duration: 150 });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+    // Memoize formatted amount to prevent recalculation
+    const formattedAmount = useMemo(() => amount.toFixed(2), [amount]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
+    useEffect(() => {
+      if (visible) {
+        scale.value = withSpring(1, { damping: 15, stiffness: 150 });
+        opacity.value = withTiming(1, { duration: 200 });
+      } else {
+        scale.value = withTiming(0.8, { duration: 150 });
+        opacity.value = withTiming(0, { duration: 150 });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visible]);
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={onCancel}
-    >
-      <View style={styles.backdrop}>
-        <Animated.View style={[styles.container, animatedStyle]}>
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              name="gift-outline"
-              size={48}
-              color={COLORS.success}
-            />
-          </View>
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    }));
 
-          <Text style={styles.title}>Confirm Gift</Text>
-          <Text style={styles.message}>
-            Send <Text style={styles.amount}>${amount.toFixed(2)}</Text> to
-            {'\n'}
-            <Text style={styles.recipient}>{recipientName}</Text>?
-          </Text>
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="none"
+        onRequestClose={onCancel}
+      >
+        <View style={styles.backdrop}>
+          <Animated.View style={[styles.container, animatedStyle]}>
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons
+                name="gift-outline"
+                size={48}
+                color={COLORS.success}
+              />
+            </View>
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={onCancel}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
+            <Text style={styles.title}>Confirm Gift</Text>
+            <Text style={styles.message}>
+              Send <Text style={styles.amount}>${formattedAmount}</Text> to
+              {'\n'}
+              <Text style={styles.recipient}>{recipientName}</Text>?
+            </Text>
 
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={onConfirm}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.confirmButtonText}>Confirm</Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </View>
-    </Modal>
-  );
-};
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={onCancel}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={onConfirm}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.confirmButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.visible === nextProps.visible &&
+    prevProps.amount === nextProps.amount &&
+    prevProps.recipientName === nextProps.recipientName,
+);
+
+ConfirmGiftModal.displayName = 'ConfirmGiftModal';
 
 const styles = StyleSheet.create({
   amount: {
