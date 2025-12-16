@@ -12,7 +12,7 @@
 ### Issues Identified & Resolved:
 
 1. **✅ Real Project IDs Removed from .env.example**
-   - ❌ Before: `EXPO_PUBLIC_SUPABASE_URL=https://isvstmzuyxuwptrrhkyi.supabase.co`
+   - ❌ Before: `EXPO_PUBLIC_SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co`
    - ✅ After: `EXPO_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co`
    - **Impact:** Prevents accidental exposure of production infrastructure
 
@@ -88,9 +88,9 @@ Slack DM: "API key is sk_..."         # ❌ DANGER!
 
 ```bash
 # Supabase
-EXPO_PUBLIC_SUPABASE_URL=https://isvstmzuyxuwptrrhkyi.supabase.co
+EXPO_PUBLIC_SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...  # Respects RLS
-VITE_SUPABASE_URL=https://isvstmzuyxuwptrrhkyi.supabase.co
+VITE_SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbG...
 
 # Stripe
@@ -170,7 +170,7 @@ SENTRY_AUTH_TOKEN=...               # Release management
 cp .env.example .env
 
 # 2. Get Supabase credentials
-# Visit: https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/settings/api
+# Visit: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/settings/api
 # Copy:
 #   - Project URL → EXPO_PUBLIC_SUPABASE_URL
 #   - anon public → EXPO_PUBLIC_SUPABASE_ANON_KEY

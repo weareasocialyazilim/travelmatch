@@ -1,7 +1,7 @@
 # 🎉 Edge Functions Deployment - Completion Report
 
 **Date:** December 8, 2025  
-**Project:** travelmatch (isvstmzuyxuwptrrhkyi)  
+**Project:** travelmatch (bjikxgtbptrvawkguypv)  
 **Status:** ✅ DEPLOYED
 
 ---
@@ -15,7 +15,7 @@
 | **transcribe-video** | ✅ Active | v1 | 2025-12-08 18:41:51 UTC |
 | **upload-image** | ✅ Active | v1 | 2025-12-08 18:41:55 UTC |
 
-**Dashboard:** https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/functions
+**Dashboard:** https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/functions
 
 ---
 
@@ -120,7 +120,7 @@ supabase secrets list
 ```
 
 **Option 3: Supabase Dashboard**
-1. Go to: https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/settings/functions
+1. Go to: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/settings/functions
 2. Click "Edge Functions"
 3. Add secrets in the "Secrets" section
 
@@ -155,7 +155,7 @@ Get a test user's access token from:
 
 ```bash
 curl -X POST \
-  'https://isvstmzuyxuwptrrhkyi.supabase.co/functions/v1/transcribe-video' \
+  'https://bjikxgtbptrvawkguypv.supabase.co/functions/v1/transcribe-video' \
   -H 'Authorization: Bearer YOUR_USER_TOKEN' \
   -H 'apikey: YOUR_ANON_KEY' \
   -H 'Content-Type: application/json' \
@@ -183,7 +183,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  'https://isvstmzuyxuwptrrhkyi.supabase.co/functions/v1/upload-image' \
+  'https://bjikxgtbptrvawkguypv.supabase.co/functions/v1/upload-image' \
   -H 'Authorization: Bearer YOUR_USER_TOKEN' \
   -H 'apikey: YOUR_ANON_KEY' \
   -F 'file=@/path/to/image.jpg' \
@@ -211,8 +211,8 @@ curl -X POST \
 ### View Logs
 
 **Dashboard (Recommended):**
-- Transcribe-Video: https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/functions/transcribe-video/logs
-- Upload-Image: https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/functions/upload-image/logs
+- Transcribe-Video: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/functions/transcribe-video/logs
+- Upload-Image: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/functions/upload-image/logs
 
 **Monitoring Script:**
 ```bash
@@ -301,7 +301,7 @@ LIMIT 10;
 Ensure your mobile app `.env` file has:
 
 ```bash
-EXPO_PUBLIC_SUPABASE_URL=https://isvstmzuyxuwptrrhkyi.supabase.co
+EXPO_PUBLIC_SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 

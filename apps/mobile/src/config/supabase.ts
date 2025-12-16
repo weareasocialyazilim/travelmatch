@@ -8,11 +8,14 @@ import { logger } from '../utils/logger';
 import { secureStorage } from '../utils/secureStorage';
 import type { Database } from '@/types/database.types';
 
+// Re-export Database type for use in services
+export type { Database } from '@/types/database.types';
+
 // Supabase credentials from environment variables
 const SUPABASE_URL: string =
-  (process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined) ?? '';
+  (process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined) ?? (process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined) ?? '';
 const SUPABASE_ANON_KEY: string =
-  (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string | undefined) ?? '';
+  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY as string | undefined) ?? (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string | undefined) ?? '';
 
 // Validate configuration
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {

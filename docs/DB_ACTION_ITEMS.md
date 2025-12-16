@@ -31,7 +31,7 @@
 
 **Command:**
 ```bash
-supabase gen types typescript --project-id isvstmzuyxuwptrrhkyi
+supabase gen types typescript --project-id bjikxgtbptrvawkguypv
 ```
 
 **Benefits:**

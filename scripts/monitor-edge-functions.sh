@@ -9,7 +9,7 @@ echo "=============================="
 echo ""
 
 # Project info
-PROJECT_REF="isvstmzuyxuwptrrhkyi"
+PROJECT_REF="bjikxgtbptrvawkguypv"
 DASHBOARD_URL="https://supabase.com/dashboard/project/$PROJECT_REF"
 
 echo "🔗 Project: $PROJECT_REF"

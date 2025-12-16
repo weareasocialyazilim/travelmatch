@@ -64,10 +64,10 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "P0 - Critical Secrets (Required for CI/CD)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-set_secret "SUPABASE_URL" "Get from: Supabase Dashboard → Settings → API" "https://isvstmzuyxuwptrrhkyi.supabase.co"
+set_secret "SUPABASE_URL" "Get from: Supabase Dashboard → Settings → API" "https://bjikxgtbptrvawkguypv.supabase.co"
 set_secret "SUPABASE_ANON_KEY" "Get from: Supabase Dashboard → Settings → API → anon key"
 set_secret "SUPABASE_SERVICE_KEY" "Get from: Supabase Dashboard → Settings → API → service_role key"
-set_secret "SUPABASE_PROJECT_REF" "Project reference ID" "isvstmzuyxuwptrrhkyi"
+set_secret "SUPABASE_PROJECT_REF" "Project reference ID" "bjikxgtbptrvawkguypv"
 set_secret "SUPABASE_ACCESS_TOKEN" "Get from: Supabase Account → Tokens"
 set_secret "EXPO_TOKEN" "Get from: https://expo.dev/accounts/[account]/settings/access-tokens"
 
@@ -78,9 +78,9 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 read -p "Do you want to set P1 secrets now? (y/N): " continue_p1
 if [[ "$continue_p1" =~ ^[Yy]$ ]]; then
-    set_secret "EXPO_PUBLIC_SUPABASE_URL" "Same as SUPABASE_URL" "https://isvstmzuyxuwptrrhkyi.supabase.co"
+    set_secret "EXPO_PUBLIC_SUPABASE_URL" "Same as SUPABASE_URL" "https://bjikxgtbptrvawkguypv.supabase.co"
     set_secret "EXPO_PUBLIC_SUPABASE_ANON_KEY" "Same as SUPABASE_ANON_KEY"
-    set_secret "VITE_SUPABASE_URL" "Same as SUPABASE_URL" "https://isvstmzuyxuwptrrhkyi.supabase.co"
+    set_secret "VITE_SUPABASE_URL" "Same as SUPABASE_URL" "https://bjikxgtbptrvawkguypv.supabase.co"
     set_secret "VITE_SUPABASE_ANON_KEY" "Same as SUPABASE_ANON_KEY"
     set_secret "STRIPE_SECRET_KEY" "Get from: https://dashboard.stripe.com/apikeys"
     set_secret "STRIPE_WEBHOOK_SECRET" "Get from: Stripe Dashboard → Webhooks"

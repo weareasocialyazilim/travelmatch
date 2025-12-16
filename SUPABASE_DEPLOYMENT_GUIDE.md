@@ -235,9 +235,9 @@ SELECT COUNT(*) FROM audit_logs;
 ```bash
 # Create apps/mobile/.env.production
 EXPO_PUBLIC_APP_ENV=production
-EXPO_PUBLIC_SUPABASE_URL=https://isvstmzuyxuwptrrhkyi.supabase.co
+EXPO_PUBLIC_SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci... # Get from Dashboard
-EXPO_PUBLIC_API_URL=https://isvstmzuyxuwptrrhkyi.supabase.co/functions/v1
+EXPO_PUBLIC_API_URL=https://bjikxgtbptrvawkguypv.supabase.co/functions/v1
 EXPO_PUBLIC_SENTRY_DSN=https://xxxxx@sentry.io/xxxxx
 ```
 

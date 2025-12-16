@@ -19,10 +19,10 @@ Bu 6 secret olmadan **hiçbir CI/CD workflow'u** çalışmaz:
 | #   | Secret Adı              | Nereden Alınır                                           | Kullanıldığı Yer                        |
 | --- | ----------------------- | -------------------------------------------------------- | --------------------------------------- |
 | 1   | `EXPO_TOKEN`            | https://expo.dev/accounts/[hesap]/settings/access-tokens | build.yml, ci.yml, deploy.yml           |
-| 2   | `SUPABASE_URL`          | `https://isvstmzuyxuwptrrhkyi.supabase.co`               | engagement-analytics.yml, load-test.yml |
+| 2   | `SUPABASE_URL`          | `https://bjikxgtbptrvawkguypv.supabase.co`               | engagement-analytics.yml, load-test.yml |
 | 3   | `SUPABASE_ANON_KEY`     | Supabase Dashboard → API                                 | load-test.yml                           |
 | 4   | `SUPABASE_SERVICE_KEY`  | Supabase Dashboard → API (service_role)                  | engagement-analytics.yml                |
-| 5   | `SUPABASE_PROJECT_REF`  | `isvstmzuyxuwptrrhkyi`                                   | monorepo-ci.yml                         |
+| 5   | `SUPABASE_PROJECT_REF`  | `bjikxgtbptrvawkguypv`                                   | monorepo-ci.yml                         |
 | 6   | `SUPABASE_ACCESS_TOKEN` | https://supabase.com/dashboard/account/tokens            | monorepo-ci.yml                         |
 
 **Aksiyon:** Bu 6 secret'ı hemen ekle → CI temel olarak çalışır hale gelir.
@@ -195,8 +195,8 @@ gh auth login
 
 # Secret'ları ekle
 gh secret set EXPO_TOKEN --body "your-expo-token"
-gh secret set SUPABASE_URL --body "https://isvstmzuyxuwptrrhkyi.supabase.co"
-gh secret set SUPABASE_PROJECT_REF --body "isvstmzuyxuwptrrhkyi"
+gh secret set SUPABASE_URL --body "https://bjikxgtbptrvawkguypv.supabase.co"
+gh secret set SUPABASE_PROJECT_REF --body "bjikxgtbptrvawkguypv"
 # ... devam et
 ```
 
@@ -235,7 +235,7 @@ Secret'ları ekledikten sonra:
 ## 🔗 Referanslar
 
 - [GitHub Secrets Setup Guide](./GITHUB_SECRETS_SETUP.md)
-- [Supabase Dashboard](https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi)
+- [Supabase Dashboard](https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv)
 - [Expo Access Tokens](https://expo.dev/accounts/[hesap]/settings/access-tokens)
 - [Stripe API Keys](https://dashboard.stripe.com/apikeys)
 

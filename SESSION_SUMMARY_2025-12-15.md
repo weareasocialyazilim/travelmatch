@@ -25,7 +25,7 @@ Successfully completed critical infrastructure setup for TravelMatch production 
 ### 1. Supabase Infrastructure (CRITICAL)
 
 #### Configuration Updates
-- **Project ID:** `isvstmzuyxuwptrrhkyi` → `bjikxgtbptrvawkguypv`
+- **Project ID:** `bjikxgtbptrvawkguypv` → `bjikxgtbptrvawkguypv`
 - **Updated Files:**
   - `supabase/config.toml` - Project reference and auth configuration
   - `apps/mobile/.env.example` - Production credentials template

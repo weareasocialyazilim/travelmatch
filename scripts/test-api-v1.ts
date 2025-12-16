@@ -15,7 +15,7 @@
 // SETUP
 // ============================================
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://isvstmzuyxuwptrrhkyi.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://bjikxgtbptrvawkguypv.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SESSION_TOKEN = process.env.SESSION_TOKEN;
 

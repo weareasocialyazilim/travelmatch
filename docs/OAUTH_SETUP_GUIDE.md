@@ -4,7 +4,7 @@ This guide walks you through setting up OAuth providers (Google, Apple, Facebook
 
 ## Prerequisites
 
-- Access to Supabase dashboard (https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi)
+- Access to Supabase dashboard (https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv)
 - Developer accounts for each provider:
   - Google Cloud Console (https://console.cloud.google.com)
   - Apple Developer Account (https://developer.apple.com)
@@ -27,7 +27,7 @@ This guide walks you through setting up OAuth providers (Google, Apple, Facebook
 - **Name**: TravelMatch Web
 - **Authorized redirect URIs**:
   ```
-  https://isvstmzuyxuwptrrhkyi.supabase.co/auth/v1/callback
+  https://bjikxgtbptrvawkguypv.supabase.co/auth/v1/callback
   ```
 - Copy the **Client ID** and **Client Secret**
 
@@ -69,7 +69,7 @@ This guide walks you through setting up OAuth providers (Google, Apple, Facebook
      - **Primary App ID**: `com.travelmatch.app`
      - **Return URLs**:
        ```
-       https://isvstmzuyxuwptrrhkyi.supabase.co/auth/v1/callback
+       https://bjikxgtbptrvawkguypv.supabase.co/auth/v1/callback
        ```
 
 5. Create **Key** for Server-to-Server Authentication:
@@ -87,7 +87,7 @@ This guide walks you through setting up OAuth providers (Google, Apple, Facebook
 4. Configure OAuth redirect URIs:
    - **Valid OAuth Redirect URIs**:
      ```
-     https://isvstmzuyxuwptrrhkyi.supabase.co/auth/v1/callback
+     https://bjikxgtbptrvawkguypv.supabase.co/auth/v1/callback
      ```
 5. Navigate to **Settings** → **Basic**
 6. Copy **App ID** and **App Secret**
@@ -109,7 +109,7 @@ This guide walks you through setting up OAuth providers (Google, Apple, Facebook
 
 ### 4. Configure Supabase Dashboard
 
-1. Go to [Supabase Authentication Settings](https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/auth/providers)
+1. Go to [Supabase Authentication Settings](https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/auth/providers)
 
 #### Enable Google Provider
 

@@ -25,11 +25,11 @@ Your CI/CD workflows require **46 GitHub secrets** to function properly. Current
 You already have some of these values! Here's where to find them:
 
 #### From Supabase Dashboard
-- Go to: https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/settings/api
-- **SUPABASE_URL**: `https://isvstmzuyxuwptrrhkyi.supabase.co`
+- Go to: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/settings/api
+- **SUPABASE_URL**: `https://bjikxgtbptrvawkguypv.supabase.co`
 - **SUPABASE_ANON_KEY**: Found under "Project API keys" → "anon public"
 - **SUPABASE_SERVICE_KEY**: Found under "Project API keys" → "service_role" (⚠️ Keep secret!)
-- **SUPABASE_PROJECT_REF**: `isvstmzuyxuwptrrhkyi`
+- **SUPABASE_PROJECT_REF**: `bjikxgtbptrvawkguypv`
 
 #### From Supabase Access Token
 - Go to: https://supabase.com/dashboard/account/tokens
@@ -48,7 +48,7 @@ You already have some of these values! Here's where to find them:
 | `SUPABASE_URL` | Supabase Dashboard → Settings → API | All workflows |
 | `SUPABASE_ANON_KEY` | Supabase Dashboard → Settings → API | All workflows |
 | `SUPABASE_SERVICE_KEY` | Supabase Dashboard → Settings → API | Edge functions |
-| `SUPABASE_PROJECT_REF` | `isvstmzuyxuwptrrhkyi` | Deployments |
+| `SUPABASE_PROJECT_REF` | `bjikxgtbptrvawkguypv` | Deployments |
 | `SUPABASE_ACCESS_TOKEN` | Supabase Account → Tokens | CLI operations |
 
 **Action:** Add these 6 secrets FIRST to unblock basic CI/CD.
@@ -191,8 +191,8 @@ gh auth login
 
 # Add secrets
 gh secret set EXPO_TOKEN --body "your-expo-token-here"
-gh secret set SUPABASE_URL --body "https://isvstmzuyxuwptrrhkyi.supabase.co"
-gh secret set SUPABASE_PROJECT_REF --body "isvstmzuyxuwptrrhkyi"
+gh secret set SUPABASE_URL --body "https://bjikxgtbptrvawkguypv.supabase.co"
+gh secret set SUPABASE_PROJECT_REF --body "bjikxgtbptrvawkguypv"
 
 # ... continue for all secrets
 ```
@@ -218,7 +218,7 @@ npx expo whoami
 
 ### SUPABASE_URL
 ```bash
-# Already known: https://isvstmzuyxuwptrrhkyi.supabase.co
+# Already known: https://bjikxgtbptrvawkguypv.supabase.co
 # Or get from: Supabase Dashboard → Settings → API → Project URL
 ```
 
@@ -237,7 +237,7 @@ npx expo whoami
 
 ### SUPABASE_PROJECT_REF
 ```bash
-# Your project reference ID: isvstmzuyxuwptrrhkyi
+# Your project reference ID: bjikxgtbptrvawkguypv
 # Found in: Supabase Dashboard URL or Settings → General
 ```
 
@@ -348,7 +348,7 @@ gh run view [run-id] --log
 - **Solution:** Make sure secret name is EXACTLY `EXPO_TOKEN` (all caps)
 
 **Issue:** `Error: Invalid Supabase URL`
-- **Solution:** URL should be `https://isvstmzuyxuwptrrhkyi.supabase.co` (no trailing slash)
+- **Solution:** URL should be `https://bjikxgtbptrvawkguypv.supabase.co` (no trailing slash)
 
 **Issue:** `Error: Authentication failed`
 - **Solution:** Regenerate the token and update the secret

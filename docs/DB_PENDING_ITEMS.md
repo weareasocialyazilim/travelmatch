@@ -40,7 +40,7 @@ Status: PRODUCTION READY 🚀
 
 **Command Used:**
 ```bash
-supabase gen types typescript --project-id isvstmzuyxuwptrrhkyi
+supabase gen types typescript --project-id bjikxgtbptrvawkguypv
 ```
 
 ---

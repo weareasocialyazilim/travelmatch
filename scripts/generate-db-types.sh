@@ -27,7 +27,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 OUTPUT_FILE="apps/mobile/src/types/database.types.ts"
-PROJECT_ID="isvstmzuyxuwptrrhkyi"
+PROJECT_ID="bjikxgtbptrvawkguypv"
 MODE="${1:-remote}"  # Default to remote if no argument
 
 echo -e "${BLUE}🔧 Supabase Type Generation${NC}"

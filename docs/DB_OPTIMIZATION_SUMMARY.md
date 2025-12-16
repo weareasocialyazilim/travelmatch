@@ -156,7 +156,7 @@ const { data, error } = await momentQueries.getWithUser({ status: 'active' });
 
 **Command Used:**
 ```bash
-supabase gen types typescript --project-id isvstmzuyxuwptrrhkyi
+supabase gen types typescript --project-id bjikxgtbptrvawkguypv
 ```
 
 **Output Includes:**

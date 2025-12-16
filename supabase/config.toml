@@ -59,8 +59,8 @@ enable_signup = false
 enable_confirmations = false
 
 [auth.external.apple]
-enabled = true
-# Apple Sign In credentials configured via Supabase Dashboard:
+enabled = false
+# Apple Sign In credentials configured via Supabase Dashboard (production only):
 # - Service ID (client_id)
 # - Team ID
 # - Key ID
@@ -68,8 +68,8 @@ enabled = true
 # See: https://supabase.com/docs/guides/auth/social-login/auth-apple
 
 [auth.external.google]
-enabled = true
-# Google OAuth credentials configured via Supabase Dashboard:
+enabled = false
+# Google OAuth credentials configured via Supabase Dashboard (production only):
 # - Client ID
 # - Client Secret
 # See: https://supabase.com/docs/guides/auth/social-login/auth-google

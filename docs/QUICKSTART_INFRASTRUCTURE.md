@@ -42,10 +42,10 @@
 
 **P0 - Kritik (CI için zorunlu):**
 - `EXPO_TOKEN` - Expo build için
-- `SUPABASE_URL` - `https://isvstmzuyxuwptrrhkyi.supabase.co`
+- `SUPABASE_URL` - `https://bjikxgtbptrvawkguypv.supabase.co`
 - `SUPABASE_ANON_KEY` - Supabase Dashboard'dan
 - `SUPABASE_SERVICE_KEY` - Supabase Dashboard'dan
-- `SUPABASE_PROJECT_REF` - `isvstmzuyxuwptrrhkyi`
+- `SUPABASE_PROJECT_REF` - `bjikxgtbptrvawkguypv`
 - `SUPABASE_ACCESS_TOKEN` - Supabase Account → Tokens
 
 ### 2. Test PR Aç (5 dakika)

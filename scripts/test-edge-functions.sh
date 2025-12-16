@@ -17,7 +17,7 @@ echo ""
 # Get Supabase project details
 PROJECT_REF=$(supabase status 2>/dev/null | grep "Project ID" | awk '{print $3}' || echo "")
 if [ -z "$PROJECT_REF" ]; then
-  PROJECT_REF="isvstmzuyxuwptrrhkyi" # Fallback to known project
+  PROJECT_REF="bjikxgtbptrvawkguypv" # Fallback to known project
 fi
 
 SUPABASE_URL="https://${PROJECT_REF}.supabase.co"

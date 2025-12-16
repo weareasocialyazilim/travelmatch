@@ -122,8 +122,8 @@ case $choice in
         echo ""
         
         # Known Supabase values for TravelMatch project
-        SUPABASE_URL="https://isvstmzuyxuwptrrhkyi.supabase.co"
-        SUPABASE_PROJECT_REF="isvstmzuyxuwptrrhkyi"
+        SUPABASE_URL="https://bjikxgtbptrvawkguypv.supabase.co"
+        SUPABASE_PROJECT_REF="bjikxgtbptrvawkguypv"
         
         echo "Adding known Supabase secrets..."
         echo ""
@@ -170,7 +170,7 @@ prompt_secret "EXPO_TOKEN" \
 
 prompt_secret "SUPABASE_URL" \
     "Supabase project URL" \
-    "https://isvstmzuyxuwptrrhkyi.supabase.co" \
+    "https://bjikxgtbptrvawkguypv.supabase.co" \
     false
 
 prompt_secret "SUPABASE_ANON_KEY" \
@@ -183,7 +183,7 @@ prompt_secret "SUPABASE_SERVICE_KEY" \
 
 prompt_secret "SUPABASE_PROJECT_REF" \
     "Supabase project reference ID" \
-    "isvstmzuyxuwptrrhkyi" \
+    "bjikxgtbptrvawkguypv" \
     false
 
 prompt_secret "SUPABASE_ACCESS_TOKEN" \
@@ -210,7 +210,7 @@ echo -e "${YELLOW}════════════════════�
 echo ""
 
 # Auto-fill from previous SUPABASE_URL and SUPABASE_ANON_KEY if available
-SUPABASE_URL_DEFAULT="https://isvstmzuyxuwptrrhkyi.supabase.co"
+SUPABASE_URL_DEFAULT="https://bjikxgtbptrvawkguypv.supabase.co"
 
 prompt_secret "EXPO_PUBLIC_SUPABASE_URL" \
     "Public Supabase URL (same as SUPABASE_URL)" \

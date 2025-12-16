@@ -248,10 +248,10 @@ gh auth login
 
 # P0 Secret'ları ekle
 gh secret set EXPO_TOKEN --body "your-token"
-gh secret set SUPABASE_URL --body "https://isvstmzuyxuwptrrhkyi.supabase.co"
+gh secret set SUPABASE_URL --body "https://bjikxgtbptrvawkguypv.supabase.co"
 gh secret set SUPABASE_ANON_KEY --body "your-anon-key"
 gh secret set SUPABASE_SERVICE_KEY --body "your-service-key"
-gh secret set SUPABASE_PROJECT_REF --body "isvstmzuyxuwptrrhkyi"
+gh secret set SUPABASE_PROJECT_REF --body "bjikxgtbptrvawkguypv"
 gh secret set SUPABASE_ACCESS_TOKEN --body "your-access-token"
 ```
 

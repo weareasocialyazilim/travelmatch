@@ -19,9 +19,9 @@ NC='\033[0m'
 echo -e "${BLUE}Your TravelMatch Supabase Project${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "Project Reference: isvstmzuyxuwptrrhkyi"
+echo "Project Reference: bjikxgtbptrvawkguypv"
 echo "Region: South Asia (Mumbai)"
-echo "Project URL: https://isvstmzuyxuwptrrhkyi.supabase.co"
+echo "Project URL: https://bjikxgtbptrvawkguypv.supabase.co"
 echo ""
 
 echo -e "${YELLOW}📋 COPY THESE VALUES TO YOUR GITHUB SECRETS:${NC}"
@@ -32,20 +32,20 @@ echo -e "${GREEN}✅ Known Values (can be added now):${NC}"
 echo ""
 
 echo "1. SUPABASE_URL"
-echo "   Value: https://isvstmzuyxuwptrrhkyi.supabase.co"
+echo "   Value: https://bjikxgtbptrvawkguypv.supabase.co"
 echo ""
 
 echo "2. SUPABASE_PROJECT_REF"
-echo "   Value: isvstmzuyxuwptrrhkyi"
+echo "   Value: bjikxgtbptrvawkguypv"
 echo ""
 
 echo "3. EXPO_PUBLIC_SUPABASE_URL"
-echo "   Value: https://isvstmzuyxuwptrrhkyi.supabase.co"
+echo "   Value: https://bjikxgtbptrvawkguypv.supabase.co"
 echo "   (same as SUPABASE_URL)"
 echo ""
 
 echo "4. VITE_SUPABASE_URL"
-echo "   Value: https://isvstmzuyxuwptrrhkyi.supabase.co"
+echo "   Value: https://bjikxgtbptrvawkguypv.supabase.co"
 echo "   (same as SUPABASE_URL)"
 echo ""
 
@@ -56,7 +56,7 @@ echo ""
 echo -e "${BLUE}Step 1: Get API Keys${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "URL: https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/settings/api"
+echo "URL: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/settings/api"
 echo ""
 echo "Find these sections:"
 echo ""
@@ -105,16 +105,16 @@ cat << 'EOF'
 ./scripts/add-github-secrets.sh
 
 # Option 2: Use GitHub CLI directly
-gh secret set SUPABASE_URL --body "https://isvstmzuyxuwptrrhkyi.supabase.co"
-gh secret set SUPABASE_PROJECT_REF --body "isvstmzuyxuwptrrhkyi"
+gh secret set SUPABASE_URL --body "https://bjikxgtbptrvawkguypv.supabase.co"
+gh secret set SUPABASE_PROJECT_REF --body "bjikxgtbptrvawkguypv"
 gh secret set SUPABASE_ANON_KEY --body "YOUR_ANON_KEY_HERE"
 gh secret set SUPABASE_SERVICE_KEY --body "YOUR_SERVICE_KEY_HERE"
 gh secret set SUPABASE_ACCESS_TOKEN --body "YOUR_ACCESS_TOKEN_HERE"
 
 # Public variants (same as above)
-gh secret set EXPO_PUBLIC_SUPABASE_URL --body "https://isvstmzuyxuwptrrhkyi.supabase.co"
+gh secret set EXPO_PUBLIC_SUPABASE_URL --body "https://bjikxgtbptrvawkguypv.supabase.co"
 gh secret set EXPO_PUBLIC_SUPABASE_ANON_KEY --body "YOUR_ANON_KEY_HERE"
-gh secret set VITE_SUPABASE_URL --body "https://isvstmzuyxuwptrrhkyi.supabase.co"
+gh secret set VITE_SUPABASE_URL --body "https://bjikxgtbptrvawkguypv.supabase.co"
 gh secret set VITE_SUPABASE_ANON_KEY --body "YOUR_ANON_KEY_HERE"
 EOF
 
@@ -168,7 +168,7 @@ echo ""
 # Offer to open URLs
 read -p "Open Supabase API settings in browser? (y/n): " open_api
 if [ "$open_api" = "y" ]; then
-    open "https://supabase.com/dashboard/project/isvstmzuyxuwptrrhkyi/settings/api"
+    open "https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/settings/api"
     echo "✅ Opened API settings"
 fi
 
