@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -34,6 +34,7 @@ interface FilterOptions {
   timing: 'today' | 'next3days' | 'thisweek';
 }
 
+// Move static arrays outside component to prevent recreation
 const CATEGORIES = ['All', 'Coffee', 'Meals', 'Tickets', 'Experiences'];
 const TIMING_OPTIONS = [
   { value: 'today', label: 'Today' },
@@ -54,33 +55,43 @@ const TIMING_OPTIONS = [
  * />
  * ```
  */
-export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = ({
-  visible,
-  onClose,
-  onApply,
-}) => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [priceMin, setPriceMin] = useState(5);
-  const [priceMax, setPriceMax] = useState(200);
-  const [selectedTiming, setSelectedTiming] = useState<
-    'today' | 'next3days' | 'thisweek'
-  >('today');
+export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = memo(
+  ({ visible, onClose, onApply }) => {
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [priceMin, setPriceMin] = useState(5);
+    const [priceMax, setPriceMax] = useState(200);
+    const [selectedTiming, setSelectedTiming] = useState<
+      'today' | 'next3days' | 'thisweek'
+    >('today');
 
-  const handleApply = () => {
-    onApply({
-      category: selectedCategory,
-      priceRange: { min: priceMin, max: priceMax },
-      timing: selectedTiming,
-    });
-    onClose();
-  };
+    // Memoize price range display
+    const priceRangeText = useMemo(() => `$${priceMin} - $${priceMax}`, [priceMin, priceMax]);
 
-  const handleClear = () => {
-    setSelectedCategory('All');
-    setPriceMin(5);
-    setPriceMax(200);
-    setSelectedTiming('today');
-  };
+    // Memoize range progress styles
+    const rangeProgressStyle = useMemo(
+      () => ({
+        left: `${(priceMin / 300) * 100}%`,
+        width: `${((priceMax - priceMin) / 300) * 100}%`,
+      }),
+      [priceMin, priceMax],
+    );
+
+    // Memoize handlers
+    const handleApply = useCallback(() => {
+      onApply({
+        category: selectedCategory,
+        priceRange: { min: priceMin, max: priceMax },
+        timing: selectedTiming,
+      });
+      onClose();
+    }, [selectedCategory, priceMin, priceMax, selectedTiming, onApply, onClose]);
+
+    const handleClear = useCallback(() => {
+      setSelectedCategory('All');
+      setPriceMin(5);
+      setPriceMax(200);
+      setSelectedTiming('today');
+    }, []);
 
   return (
     <Modal
@@ -144,21 +155,11 @@ export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = ({
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Price</Text>
-              <Text style={styles.priceRange}>
-                ${priceMin} - ${priceMax}
-              </Text>
+              <Text style={styles.priceRange}>{priceRangeText}</Text>
             </View>
             <View style={styles.rangeContainer}>
               <View style={styles.rangeTrack} />
-              <View
-                style={[
-                  styles.rangeProgress,
-                  {
-                    left: `${(priceMin / 300) * 100}%`,
-                    width: `${((priceMax - priceMin) / 300) * 100}%`,
-                  },
-                ]}
-              />
+              <View style={[styles.rangeProgress, rangeProgressStyle]} />
             </View>
           </View>
 
@@ -215,8 +216,15 @@ export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = ({
         </View>
       </View>
     </Modal>
-  );
-};
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.visible === nextProps.visible &&
+    prevProps.onClose === nextProps.onClose &&
+    prevProps.onApply === nextProps.onApply,
+);
+
+FilterBottomSheet.displayName = 'FilterBottomSheet';
 
 const styles = StyleSheet.create({
   backdrop: {

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -30,7 +30,8 @@ export const Badge = memo<BadgeProps>(function Badge({
   dot = false,
   style,
 }) {
-  const getVariantStyles = (): { bg: string; text: string } => {
+  // Memoize variant styles
+  const variantStyles = useMemo((): { bg: string; text: string } => {
     switch (variant) {
       case 'success':
         return { bg: COLORS.mintTransparent, text: COLORS.success };
@@ -45,28 +46,35 @@ export const Badge = memo<BadgeProps>(function Badge({
       default:
         return { bg: COLORS.gray[100], text: COLORS.gray[600] };
     }
-  };
+  }, [variant]);
 
-  const getSizeStyles = (): {
-    paddingH: number;
-    paddingV: number;
-    fontSize: number;
-    iconSize: number;
-  } => {
-    switch (size) {
-      case 'sm':
-        return { paddingH: 8, paddingV: 2, fontSize: 10, iconSize: 12 };
-      case 'md':
-        return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
-      case 'lg':
-        return { paddingH: 12, paddingV: 6, fontSize: 14, iconSize: 16 };
-      default:
-        return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
-    }
-  };
+  // Memoize size styles
+  const sizeStyles = useMemo(
+    (): {
+      paddingH: number;
+      paddingV: number;
+      fontSize: number;
+      iconSize: number;
+    } => {
+      switch (size) {
+        case 'sm':
+          return { paddingH: 8, paddingV: 2, fontSize: 10, iconSize: 12 };
+        case 'md':
+          return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
+        case 'lg':
+          return { paddingH: 12, paddingV: 6, fontSize: 14, iconSize: 16 };
+        default:
+          return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
+      }
+    },
+    [size],
+  );
 
-  const variantStyles = getVariantStyles();
-  const sizeStyles = getSizeStyles();
+  // Memoize dot style
+  const dotStyle = useMemo(
+    () => [styles.dot, { backgroundColor: variantStyles.text }],
+    [variantStyles.text],
+  );
 
   return (
     <View
@@ -80,9 +88,7 @@ export const Badge = memo<BadgeProps>(function Badge({
         style,
       ]}
     >
-      {dot && (
-        <View style={[styles.dot, { backgroundColor: variantStyles.text }]} />
-      )}
+      {dot && <View style={dotStyle} />}
       {icon && (
         <MaterialCommunityIcons
           name={icon}
