@@ -3,7 +3,7 @@
  * Displays a single gift item in the inbox
  */
 
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
 
@@ -22,63 +22,84 @@ export interface GiftInboxCardProps {
   onPress?: () => void;
 }
 
-export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
-  senderName,
-  senderAvatar,
-  amount,
-  currency = 'USD',
-  message,
-  momentTitle,
-  status,
-  createdAt,
-  onAccept,
-  onReject,
-  onPress,
-}) => {
-  const statusColors = {
-    pending: COLORS.warning,
-    accepted: COLORS.success,
-    rejected: COLORS.error,
-    expired: COLORS.textSecondary,
-  };
-
-  return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
-      <View style={styles.header}>
-        <Image
-          source={{ uri: senderAvatar || 'https://via.placeholder.com/40' }}
-          style={styles.avatar}
-        />
-        <View style={styles.headerInfo}>
-          <Text style={styles.senderName}>{senderName}</Text>
-          <Text style={styles.date}>{createdAt}</Text>
-        </View>
-        <View style={[styles.statusBadge, { backgroundColor: statusColors[status] }]}>
-          <Text style={styles.statusText}>{status.toUpperCase()}</Text>
-        </View>
-      </View>
-
-      <View style={styles.content}>
-        <Text style={styles.momentTitle}>For: {momentTitle}</Text>
-        <Text style={styles.amount}>
-          {currency} {amount.toFixed(2)}
-        </Text>
-        {message && <Text style={styles.message}>{message}</Text>}
-      </View>
-
-      {status === 'pending' && (
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.rejectButton} onPress={onReject}>
-            <Text style={styles.rejectText}>Decline</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.acceptButton} onPress={onAccept}>
-            <Text style={styles.acceptText}>Accept</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+// Status colors defined outside component to avoid recreation
+const statusColors = {
+  pending: COLORS.warning,
+  accepted: COLORS.success,
+  rejected: COLORS.error,
+  expired: COLORS.textSecondary,
 };
+
+export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
+  ({
+    senderName,
+    senderAvatar,
+    amount,
+    currency = 'USD',
+    message,
+    momentTitle,
+    status,
+    createdAt,
+    onAccept,
+    onReject,
+    onPress,
+  }) => {
+    // Memoize formatted amount
+    const formattedAmount = useMemo(() => `${currency} ${amount.toFixed(2)}`, [currency, amount]);
+
+    // Memoize status badge style
+    const statusBadgeStyle = useMemo(
+      () => [styles.statusBadge, { backgroundColor: statusColors[status] }],
+      [status],
+    );
+
+    // Memoize avatar source
+    const avatarSource = useMemo(
+      () => ({ uri: senderAvatar || 'https://via.placeholder.com/40' }),
+      [senderAvatar],
+    );
+
+    return (
+      <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+        <View style={styles.header}>
+          <Image source={avatarSource} style={styles.avatar} />
+          <View style={styles.headerInfo}>
+            <Text style={styles.senderName}>{senderName}</Text>
+            <Text style={styles.date}>{createdAt}</Text>
+          </View>
+          <View style={statusBadgeStyle}>
+            <Text style={styles.statusText}>{status.toUpperCase()}</Text>
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <Text style={styles.momentTitle}>For: {momentTitle}</Text>
+          <Text style={styles.amount}>{formattedAmount}</Text>
+          {message && <Text style={styles.message}>{message}</Text>}
+        </View>
+
+        {status === 'pending' && (
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.rejectButton} onPress={onReject}>
+              <Text style={styles.rejectText}>Decline</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.acceptButton} onPress={onAccept}>
+              <Text style={styles.acceptText}>Accept</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.id === nextProps.id &&
+    prevProps.status === nextProps.status &&
+    prevProps.amount === nextProps.amount &&
+    prevProps.senderName === nextProps.senderName &&
+    prevProps.message === nextProps.message,
+);
+
+GiftInboxCard.displayName = 'GiftInboxCard';
 
 const styles = StyleSheet.create({
   card: {
