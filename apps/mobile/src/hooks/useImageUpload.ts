@@ -1,13 +1,14 @@
 /**
  * Image Upload Hook
  * File upload with progress tracking
+ * Uses native XMLHttpRequest instead of axios (saves ~45 KB)
  */
 
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import { uploadWithProgress } from '../utils/uploadWithProgress';
+import type { UploadProgressEvent } from '../utils/uploadWithProgress';
 import { useToast } from '../context/ToastContext';
 import type { ImageAsset, UploadProgress } from '../utils/imageHandling';
-import type { AxiosProgressEvent } from 'axios';
 
 interface UploadOptions {
   onProgress?: (progress: UploadProgress) => void;
@@ -64,19 +65,16 @@ export function useImageUpload() {
           type: image.mimeType || `image/${fileExtension}`,
         } as unknown as Blob);
 
-        // Upload with progress tracking
-        const response = await axios.post<CloudinaryResponse>(
+        // Upload with progress tracking (using native XMLHttpRequest)
+        const response = await uploadWithProgress<CloudinaryResponse>(
           uploadUrl,
           formData,
           {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-            onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-              const total = progressEvent.total ?? 0;
-              const loaded = progressEvent.loaded;
-              const percentage =
-                total > 0 ? Math.round((loaded * 100) / total) : 0;
+            onUploadProgress: (progressEvent: UploadProgressEvent) => {
+              const { loaded, total, percentage } = progressEvent;
 
               const progress: UploadProgress = {
                 loaded,
@@ -181,16 +179,13 @@ export function useMultiImageUpload() {
             type: image.mimeType ?? `image/${fileExtension}`,
           } as unknown as Blob);
 
-          const response = await axios.post<CloudinaryResponse>(
+          const response = await uploadWithProgress<CloudinaryResponse>(
             uploadUrl,
             formData,
             {
               headers: { 'Content-Type': 'multipart/form-data' },
-              onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-                const total = progressEvent.total ?? 0;
-                const loaded = progressEvent.loaded;
-                const percentage =
-                  total > 0 ? Math.round((loaded * 100) / total) : 0;
+              onUploadProgress: (progressEvent: UploadProgressEvent) => {
+                const { loaded, total, percentage } = progressEvent;
 
                 setUploads((prev) => {
                   const next = new Map(prev);
