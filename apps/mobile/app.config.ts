@@ -60,7 +60,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-localization',
-    '@sentry/react-native/expo',
+    [
+      '@sentry/react-native/expo',
+      {
+        organization: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+      },
+    ],
     'expo-font',
     [
       '@rnmapbox/maps',
@@ -73,5 +79,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     eas: {
       projectId: '9721cfe0-b554-463f-af2b-ab2147d98172',
     },
+    // Sentry configuration (from environment variables)
+    sentryDsn: process.env.SENTRY_DSN || '',
+  },
+  hooks: {
+    postPublish: [
+      {
+        file: '@sentry/react-native/expo',
+        config: {
+          organization: process.env.SENTRY_ORG || '',
+          project: process.env.SENTRY_PROJECT || '',
+          authToken: process.env.SENTRY_AUTH_TOKEN || '',
+        },
+      },
+    ],
   },
 });
