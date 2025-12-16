@@ -3,7 +3,7 @@
  * Show/hide özelliği ile şifre input component
  */
 
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback, useMemo } from 'react';
 import type { TextInputProps } from 'react-native';
 import { Input } from './Input';
 
@@ -15,22 +15,31 @@ interface PasswordInputProps extends Omit<TextInputProps, 'secureTextEntry'> {
   showSuccess?: boolean;
 }
 
-export const PasswordInput: React.FC<PasswordInputProps> = (props) => {
+export const PasswordInput: React.FC<PasswordInputProps> = memo((props) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const togglePasswordVisibility = () => {
+  // Memoize toggle handler
+  const togglePasswordVisibility = useCallback(() => {
     setIsPasswordVisible((prev) => !prev);
-  };
+  }, []);
+
+  // Memoize right icon name
+  const rightIcon = useMemo(
+    () => (isPasswordVisible ? 'eye-off-outline' : 'eye-outline'),
+    [isPasswordVisible],
+  );
 
   return (
     <Input
       {...props}
       leftIcon="lock-outline"
-      rightIcon={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+      rightIcon={rightIcon}
       onRightIconPress={togglePasswordVisibility}
       secureTextEntry={!isPasswordVisible}
       autoCapitalize="none"
       autoCorrect={false}
     />
   );
-};
+});
+
+PasswordInput.displayName = 'PasswordInput';
