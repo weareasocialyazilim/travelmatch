@@ -3,7 +3,7 @@
  * Displays a digital wallet (Apple Pay/Google Pay) with connection status
  */
 
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,45 +21,67 @@ interface WalletItemProps {
   onPress: (wallet: Wallet) => void;
 }
 
-export const WalletItem: React.FC<WalletItemProps> = ({
-  wallet,
-  walletSettings,
-  onPress,
-}) => {
-  const iconName = Platform.OS === 'ios' ? 'apple' : 'google';
+export const WalletItem: React.FC<WalletItemProps> = memo(
+  ({ wallet, walletSettings, onPress }) => {
+    // Memoize icon name (won't change during runtime but good practice)
+    const iconName = useMemo(
+      () => (Platform.OS === 'ios' ? 'apple' : 'google'),
+      [],
+    );
 
-  return (
-    <TouchableOpacity
-      style={styles.walletItem}
-      onPress={() => onPress(wallet)}
-      activeOpacity={0.7}
-      accessibilityLabel={`${wallet.name}, ${wallet.status}${
-        walletSettings.isDefaultPayment ? ', default payment method' : ''
-      }`}
-      accessibilityRole="button"
-    >
-      <View style={styles.walletIcon}>
-        <MaterialCommunityIcons name={iconName} size={24} color={COLORS.text} />
-      </View>
-      <View style={styles.walletInfo}>
-        <View style={styles.walletNameRow}>
-          <Text style={styles.walletName}>{wallet.name}</Text>
-          {walletSettings.isDefaultPayment && (
-            <View style={styles.defaultBadge}>
-              <Text style={styles.defaultBadgeText}>Default</Text>
-            </View>
-          )}
+    // Memoize accessibility label
+    const accessibilityLabel = useMemo(
+      () =>
+        `${wallet.name}, ${wallet.status}${
+          walletSettings.isDefaultPayment ? ', default payment method' : ''
+        }`,
+      [wallet.name, wallet.status, walletSettings.isDefaultPayment],
+    );
+
+    // Memoize press handler
+    const handlePress = useCallback(() => {
+      onPress(wallet);
+    }, [wallet, onPress]);
+
+    return (
+      <TouchableOpacity
+        style={styles.walletItem}
+        onPress={handlePress}
+        activeOpacity={0.7}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole="button"
+      >
+        <View style={styles.walletIcon}>
+          <MaterialCommunityIcons name={iconName} size={24} color={COLORS.text} />
         </View>
-        <Text style={styles.walletStatus}>{wallet.status}</Text>
-      </View>
-      <MaterialCommunityIcons
-        name="chevron-right"
-        size={20}
-        color={COLORS.softGray}
-      />
-    </TouchableOpacity>
-  );
-};
+        <View style={styles.walletInfo}>
+          <View style={styles.walletNameRow}>
+            <Text style={styles.walletName}>{wallet.name}</Text>
+            {walletSettings.isDefaultPayment && (
+              <View style={styles.defaultBadge}>
+                <Text style={styles.defaultBadgeText}>Default</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.walletStatus}>{wallet.status}</Text>
+        </View>
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={20}
+          color={COLORS.softGray}
+        />
+      </TouchableOpacity>
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.wallet.id === nextProps.wallet.id &&
+    prevProps.wallet.name === nextProps.wallet.name &&
+    prevProps.wallet.status === nextProps.wallet.status &&
+    prevProps.walletSettings.isDefaultPayment ===
+      nextProps.walletSettings.isDefaultPayment,
+);
+
+WalletItem.displayName = 'WalletItem';
 
 const styles = StyleSheet.create({
   walletItem: {

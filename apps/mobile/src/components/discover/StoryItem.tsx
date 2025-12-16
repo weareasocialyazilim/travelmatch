@@ -1,47 +1,67 @@
 // Story Item Component - Individual story in the horizontal list
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../../utils/cloudflareImageHelpers';
 import { COLORS } from '../../constants/colors';
 import type { StoryItemProps } from './types';
 
-export const StoryItem: React.FC<StoryItemProps> = ({ item, onPress }) => {
-  // Prepare user object for avatar helper
-  const user = {
-    avatar: item.avatar,
-    avatarCloudflareId: (item as any).avatarCloudflareId,
-    avatarBlurHash: (item as any).avatarBlurHash,
-  };
+export const StoryItem: React.FC<StoryItemProps> = memo(
+  ({ item, onPress }) => {
+    // Memoize user object to prevent recreating on every render
+    const user = useMemo(
+      () => ({
+        avatar: item.avatar,
+        avatarCloudflareId: (item as any).avatarCloudflareId,
+        avatarBlurHash: (item as any).avatarBlurHash,
+      }),
+      [item.avatar, (item as any).avatarCloudflareId, (item as any).avatarBlurHash],
+    );
 
-  return (
-    <TouchableOpacity
-      style={styles.storyItem}
-      onPress={() => onPress(item)}
-      activeOpacity={0.8}
-    >
-      <View
-        style={[
-          styles.storyCircle,
-          item.isNew && styles.storyCircleNew,
-          !item.isNew && styles.storyCircleSeen,
-        ]}
+    // Memoize press handler to prevent recreating on every render
+    const handlePress = useCallback(() => {
+      onPress(item);
+    }, [item, onPress]);
+
+    // Memoize circle style to prevent recreation
+    const circleStyle = useMemo(
+      () => [
+        styles.storyCircle,
+        item.isNew ? styles.storyCircleNew : styles.storyCircleSeen,
+      ],
+      [item.isNew],
+    );
+
+    return (
+      <TouchableOpacity
+        style={styles.storyItem}
+        onPress={handlePress}
+        activeOpacity={0.8}
       >
-        <OptimizedImage
-          {...getAvatarImageProps(user, IMAGE_VARIANTS_BY_CONTEXT.STORY_AVATAR)}
-          contentFit="cover"
-          style={styles.storyAvatar}
-          transition={150}
-          priority="normal"
-          accessibilityLabel={`${item.name}'s story`}
-        />
-      </View>
-      <Text style={styles.storyName} numberOfLines={1}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+        <View style={circleStyle}>
+          <OptimizedImage
+            {...getAvatarImageProps(user, IMAGE_VARIANTS_BY_CONTEXT.STORY_AVATAR)}
+            contentFit="cover"
+            style={styles.storyAvatar}
+            transition={150}
+            priority="normal"
+            accessibilityLabel={`${item.name}'s story`}
+          />
+        </View>
+        <Text style={styles.storyName} numberOfLines={1}>
+          {item.name}
+        </Text>
+      </TouchableOpacity>
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.item.id === nextProps.item.id &&
+    prevProps.item.isNew === nextProps.item.isNew &&
+    prevProps.item.name === nextProps.item.name &&
+    prevProps.item.avatar === nextProps.item.avatar,
+);
+
+StoryItem.displayName = 'StoryItem';
 
 const styles = StyleSheet.create({
   storyItem: {
