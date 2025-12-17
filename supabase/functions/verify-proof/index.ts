@@ -11,6 +11,13 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.20.1';
 import { getCorsHeaders } from '../_shared/security-middleware.ts';
+import { createUpstashRateLimiter, RateLimitConfig } from '../_shared/upstashRateLimit.ts';
+
+// Rate limit config: 10 requests per hour per user
+const RATE_LIMIT_CONFIG: RateLimitConfig = {
+  requests: 10,
+  window: 3600, // 1 hour in seconds
+};
 
 interface VerifyProofRequest {
   videoUrl: string;
@@ -177,6 +184,42 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
 
+    // Verify user and get user ID for rate limiting
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authorization token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Apply rate limiting (10 requests per hour per user)
+    const rateLimiter = createUpstashRateLimiter(RATE_LIMIT_CONFIG);
+    const rateLimitResult = await rateLimiter.limit(`verify-proof:${user.id}`);
+    
+    if (!rateLimitResult.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded', 
+          message: 'Maximum 10 verification requests per hour',
+          retryAfter: rateLimitResult.reset
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Reset': String(rateLimitResult.reset)
+          } 
+        }
+      );
+    }
+
     if (!anthropicApiKey) {
       return new Response(
         JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured' }),
@@ -184,7 +227,6 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const anthropic = new Anthropic({ apiKey: anthropicApiKey });
 
     // Parse request body
