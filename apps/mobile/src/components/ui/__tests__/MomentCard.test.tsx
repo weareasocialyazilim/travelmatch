@@ -5,15 +5,35 @@
  */
 
 import React from 'react';
-import { render, fireEvent, waitFor, RenderOptions } from '@testing-library/react-native';
+import {
+  render,
+  fireEvent,
+  waitFor,
+  RenderOptions,
+} from '@testing-library/react-native';
 import { Alert, Share } from 'react-native';
 import MomentCard from '@/components/MomentCard';
 import type { Moment } from '@/types';
-import { ToastProvider } from '@/context/ToastContext';
+
+// Mock ToastContext to avoid React Native Animated issues in tests
+const mockShowToast = jest.fn();
+jest.mock('@/context/ToastContext', () => ({
+  useToast: () => ({
+    showToast: mockShowToast,
+    success: jest.fn(),
+    error: jest.fn(),
+    warning: jest.fn(),
+    info: jest.fn(),
+  }),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 // Helper to wrap component with required providers
-const renderWithProviders = (ui: React.ReactElement, options?: RenderOptions) => {
-  return render(<ToastProvider>{ui}</ToastProvider>, options);
+const renderWithProviders = (
+  ui: React.ReactElement,
+  options?: RenderOptions,
+) => {
+  return render(ui, options);
 };
 
 // Mock dependencies
@@ -93,7 +113,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText('Coffee in Paris')).toBeTruthy();
@@ -109,7 +129,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText(/John Doe/)).toBeTruthy();
@@ -122,7 +142,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const userName = getByText(/John Doe/);
@@ -135,7 +155,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const image = getByLabelText('Photo of Coffee in Paris');
@@ -149,7 +169,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const avatar = getByLabelText("John Doe's avatar");
@@ -163,7 +183,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText('Gift this moment')).toBeTruthy();
@@ -175,7 +195,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText('Maybe later')).toBeTruthy();
@@ -187,7 +207,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByLabelText('Share this moment')).toBeTruthy();
@@ -201,12 +221,10 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
-      const card = getByLabelText(
-        'Moment: Coffee in Paris by John Doe'
-      );
+      const card = getByLabelText('Moment: Coffee in Paris by John Doe');
       fireEvent.press(card);
 
       expect(mockOnPress).toHaveBeenCalledTimes(1);
@@ -218,7 +236,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const giftButton = getByText('Gift this moment');
@@ -234,7 +252,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const giftButton = getByText('Gift this moment');
@@ -251,7 +269,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const maybeLaterButton = getByText('Maybe later');
@@ -268,7 +286,7 @@ describe('MomentCard', () => {
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
           onSharePress={mockOnSharePress}
-        />
+        />,
       );
 
       const shareButton = getByLabelText('Share this moment');
@@ -279,14 +297,16 @@ describe('MomentCard', () => {
     });
 
     it('should use default share when onSharePress is not provided', async () => {
-      const shareSpy = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' });
+      const shareSpy = jest
+        .spyOn(Share, 'share')
+        .mockResolvedValue({ action: 'sharedAction' });
 
       const { getByLabelText } = renderWithProviders(
         <MomentCard
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const shareButton = getByLabelText('Share this moment');
@@ -309,16 +329,23 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const shareButton = getByLabelText('Share this moment');
       fireEvent.press(shareButton);
 
-      // The component uses Toast instead of Alert for error handling
-      // Just verify the share was attempted and error was caught
+      // The component uses Toast for error handling
       await waitFor(() => {
         expect(shareSpy).toHaveBeenCalled();
+      });
+
+      // Verify toast was shown with error message
+      await waitFor(() => {
+        expect(mockShowToast).toHaveBeenCalledWith(
+          'Could not share this moment',
+          'error',
+        );
       });
 
       shareSpy.mockRestore();
@@ -335,7 +362,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const shareButton = getByLabelText('Share this moment');
@@ -360,7 +387,7 @@ describe('MomentCard', () => {
           moment={momentWithoutUser}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText('Anonymous')).toBeTruthy();
@@ -378,7 +405,7 @@ describe('MomentCard', () => {
           moment={momentWithoutAvatar}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const avatar = getByLabelText("John Doe's avatar");
@@ -396,7 +423,7 @@ describe('MomentCard', () => {
           moment={unverifiedMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText('John Doe')).toBeTruthy();
@@ -405,7 +432,8 @@ describe('MomentCard', () => {
     it('should truncate long titles to 2 lines', () => {
       const longTitleMoment = {
         ...mockMoment,
-        title: 'This is a very long moment title that should be truncated to two lines maximum',
+        title:
+          'This is a very long moment title that should be truncated to two lines maximum',
       };
 
       const { getByText } = renderWithProviders(
@@ -413,7 +441,7 @@ describe('MomentCard', () => {
           moment={longTitleMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const titleElement = getByText(longTitleMoment.title);
@@ -434,7 +462,7 @@ describe('MomentCard', () => {
           moment={longLocationMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const locationElement = getByText(longLocationMoment.location.name);
@@ -449,7 +477,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const card = getByLabelText('Moment: Coffee in Paris by John Doe');
@@ -463,7 +491,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       const shareButton = getByLabelText('Share this moment');
@@ -476,7 +504,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByLabelText('Photo of Coffee in Paris')).toBeTruthy();
@@ -491,18 +519,16 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
-      // Re-render with same props (wrapped in ToastProvider)
+      // Re-render with same props
       rerender(
-        <ToastProvider>
-          <MomentCard
-            moment={mockMoment}
-            onPress={mockOnPress}
-            onGiftPress={mockOnGiftPress}
-          />
-        </ToastProvider>
+        <MomentCard
+          moment={mockMoment}
+          onPress={mockOnPress}
+          onGiftPress={mockOnGiftPress}
+        />,
       );
 
       // Component should use memo optimization
@@ -517,7 +543,7 @@ describe('MomentCard', () => {
           moment={mockMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText('$25')).toBeTruthy();
@@ -531,7 +557,7 @@ describe('MomentCard', () => {
           moment={expensiveMoment}
           onPress={mockOnPress}
           onGiftPress={mockOnGiftPress}
-        />
+        />,
       );
 
       expect(getByText('$500')).toBeTruthy();
