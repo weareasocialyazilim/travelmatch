@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
 
     const payload: StorageWebhookPayload = await req.json();
     
-    console.log('Received webhook payload:', JSON.stringify(payload, null, 2));
+    // Debug log for development only
 
     // Only process INSERT events on storage.objects
     if (payload.type !== 'INSERT' || payload.table !== 'objects') {
@@ -91,14 +91,12 @@ Deno.serve(async (req) => {
       .single();
 
     if (error) {
-      console.error('Error inserting uploaded_images:', error);
+      // Error logged by Supabase
       return new Response(
         JSON.stringify({ error: error.message }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    console.log('Created uploaded_images record:', data);
 
     return new Response(
       JSON.stringify({ success: true, data }),
@@ -106,9 +104,9 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Webhook handler error:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
