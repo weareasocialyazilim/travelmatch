@@ -19,24 +19,21 @@ ALTER FUNCTION public.update_uploaded_images_updated_at() SET search_path = publ
 ALTER FUNCTION public.invalidate_cdn_manually(text, text[]) SET search_path = public, pg_temp;
 
 -- ============================================================
--- 2. GÜVENLİK FIXLERİ: PostGIS Tablosu RLS (DEFCON 1)
+-- 2. GÜVENLİK FIXLERİ: PostGIS Tablosu (DEFCON 1)
 -- Sorun: spatial_ref_sys tablosunda RLS kapalı
--- NOT: Bu PostGIS sistem tablosu, Dashboard'dan owner yetkisi ile yapılmalı
--- Çözüm: RLS etkinleştir + salt okunur politika
+-- Çözüm: Privilege kısıtlama (RLS owner yetkisi gerektiriyor)
 -- ============================================================
 
--- Supabase Dashboard > SQL Editor'den çalıştırılmalı:
--- ALTER TABLE IF EXISTS public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
+-- Step 1: Revoke all privileges from public-facing roles
+REVOKE ALL ON public.spatial_ref_sys FROM anon, authenticated;
 
--- Mevcut politika yoksa oluştur (Sadece okumaya izin ver)
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_policies WHERE tablename = 'spatial_ref_sys' AND policyname = 'Allow public read access'
-    ) THEN
-        CREATE POLICY "Allow public read access" ON public.spatial_ref_sys FOR SELECT USING (true);
-    END IF;
-END $$;
+-- Step 2: Grant only SELECT to authenticated users (read-only reference data)
+GRANT SELECT ON public.spatial_ref_sys TO authenticated;
+
+-- Step 3: RLS etkinleştirme - Supabase Dashboard > SQL Editor'den çalıştırılmalı:
+-- (supabase_admin owner yetkisi gerektirir)
+-- ALTER TABLE public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY "Allow read to authenticated" ON public.spatial_ref_sys FOR SELECT TO authenticated USING (true);
 
 -- ============================================================
 -- 3. PERFORMANS FIXLERİ: RLS Optimizasyonu (DEFCON 2)
