@@ -42,11 +42,37 @@ async function analyzeBundleSizes() {
     const bundleFile = path.join(BUNDLE_OUTPUT_DIR, `index.${platform}.bundle`);
     const sourceMapFile = path.join(BUNDLE_OUTPUT_DIR, `index.${platform}.bundle.map`);
 
-    const bundleCommand = platform === 'ios'
-      ? `npx react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ${bundleFile} --sourcemap-output ${sourceMapFile}`
-      : `npx react-native bundle --entry-file index.js --platform android --dev false --bundle-output ${bundleFile} --sourcemap-output ${sourceMapFile}`;
+    // Security: Validate platform and paths to prevent command injection
+    const validPlatforms = ['ios', 'android'];
+    if (!validPlatforms.includes(platform)) {
+      throw new Error(`Invalid platform: ${platform}. Must be 'ios' or 'android'`);
+    }
+    
+    // Ensure paths are within expected directory
+    const resolvedBundle = path.resolve(bundleFile);
+    const resolvedSourceMap = path.resolve(sourceMapFile);
+    const resolvedOutputDir = path.resolve(BUNDLE_OUTPUT_DIR);
+    
+    if (!resolvedBundle.startsWith(resolvedOutputDir) || !resolvedSourceMap.startsWith(resolvedOutputDir)) {
+      throw new Error('Invalid output paths detected');
+    }
 
-    await execAsync(bundleCommand, { cwd: './apps/mobile' });
+    // Use spawn with array args instead of string interpolation to prevent injection
+    const { spawn } = await import('child_process');
+    const bundleArgs = [
+      'react-native', 'bundle',
+      '--entry-file', 'index.js',
+      '--platform', platform,
+      '--dev', 'false',
+      '--bundle-output', resolvedBundle,
+      '--sourcemap-output', resolvedSourceMap
+    ];
+    
+    await new Promise((resolve, reject) => {
+      const child = spawn('npx', bundleArgs, { cwd: './apps/mobile', stdio: 'inherit' });
+      child.on('close', (code) => code === 0 ? resolve() : reject(new Error(`Bundle failed with code ${code}`)));
+      child.on('error', reject);
+    });
 
     // Get bundle size
     const stats = await fs.stat(bundleFile);
@@ -65,7 +91,10 @@ async function analyzeBundleSizes() {
 
     // Analyze source map for top modules
     console.log('📈 Analyzing largest modules...');
-    const sourceMap = JSON.parse(await fs.readFile(sourceMapFile, 'utf-8'));
+    
+    // Note: resolvedSourceMap already validated above during bundle creation
+    
+    const sourceMap = JSON.parse(await fs.readFile(resolvedSourceMap, 'utf-8'));
     
     // Parse source map to find largest contributors
     const moduleSizes = {};

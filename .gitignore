@@ -40,6 +40,7 @@ yarn-error.*
 .env.development
 .env.staging
 .env.production
+.env.test
 
 # typescript
 *.tsbuildinfo
@@ -92,4 +93,4 @@ desktop.ini
 # IDE
 .vscode/
 .idea/
-*.sublime-*
+*.sublime-*.turbo/

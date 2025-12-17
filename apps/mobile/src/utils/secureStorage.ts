@@ -112,12 +112,19 @@ export const secureStorage = {
 
 /**
  * Storage keys classification for GDPR and security compliance
+ * 
+ * NOTE: These are KEY NAMES (identifiers), not actual secrets.
+ * The actual sensitive data is stored encrypted in SecureStore.
+ * Key names are intentionally descriptive for debugging/logging.
+ * 
+ * @security These constants define WHERE to store data, not the data itself.
  */
 export const StorageKeys = {
   // SENSITIVE - Must use SecureStore (encrypted, hardware-backed)
+  // Key names prefixed with 'secure:' to distinguish from public keys
   SECURE: {
-    ACCESS_TOKEN: 'secure:access_token',
-    REFRESH_TOKEN: 'secure:refresh_token',
+    ACCESS_TOKEN: 'secure:access_token', // Key name, not the token
+    REFRESH_TOKEN: 'secure:refresh_token', // Key name, not the token
     TOKEN_EXPIRES_AT: 'secure:token_expires_at',
     BIOMETRIC_KEY: 'secure:biometric_key',
     PIN_CODE: 'secure:pin_code',
@@ -143,10 +150,12 @@ export const StorageKeys = {
 
 /**
  * @deprecated Use StorageKeys.SECURE instead
+ * @security These are KEY NAMES for AsyncStorage, not actual secrets.
+ * Legacy keys kept for migration purposes only.
  */
 export const AUTH_STORAGE_KEYS = {
-  ACCESS_TOKEN: 'auth_access_token',
-  REFRESH_TOKEN: 'auth_refresh_token',
+  ACCESS_TOKEN: 'auth_access_token', // Key name for migration
+  REFRESH_TOKEN: 'auth_refresh_token', // Key name for migration
   TOKEN_EXPIRES_AT: 'auth_token_expires',
   USER: '@auth_user',
 };

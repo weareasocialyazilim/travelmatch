@@ -13,7 +13,7 @@ export const createPaymentSchema = z.object({
   amount: z.number().positive('Amount must be positive'),
   currency: z.enum(['USD', 'EUR', 'TRY']),
   paymentMethod: z.enum(['card', 'bank_transfer', 'wallet']).optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
 });
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;

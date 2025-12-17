@@ -158,8 +158,11 @@ export const edgeHandler = {
       strategy = CACHE_STRATEGIES.ugc;
     }
 
-    // Check cache first
-    const cacheKey = strategy.cacheKey(request);
+    // Generate and sanitize cache key to prevent injection attacks
+    const rawCacheKey = strategy.cacheKey(request);
+    // Sanitize: only allow alphanumeric, dash, underscore, colon, slash
+    const cacheKey = rawCacheKey.replace(/[^a-zA-Z0-9\-_:\/]/g, '');
+    
     // caches.default is Cloudflare Workers API
     const cache = (caches as unknown as { default: Cache }).default;
     let response = await cache.match(cacheKey);

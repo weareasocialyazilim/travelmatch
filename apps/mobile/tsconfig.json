@@ -34,7 +34,9 @@
       "@/types/*": ["src/types/*"],
       "@/config/*": ["src/config/*"],
       "@/theme/*": ["src/theme/*"],
-      "@/navigation/*": ["src/navigation/*"]
+      "@/navigation/*": ["src/navigation/*"],
+      "@travelmatch/shared": ["../../packages/shared/src/index.ts"],
+      "@travelmatch/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": ["src/**/*", "src/types/*.d.ts", "index.ts", "App.tsx"],

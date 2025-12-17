@@ -19,6 +19,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+
+// Security: Disable X-Powered-By header to prevent information disclosure
+app.disable('x-powered-by');
+
 app.use(express.json());
 
 // Create Redis connection

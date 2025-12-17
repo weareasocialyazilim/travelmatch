@@ -1,7 +1,5 @@
-import '@testing-library/jest-native/extend-expect';
-
-// Mock React Native modules
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+// Jest setup for design-system package
+// Compatible with React Native 0.76+
 
 // Global test timeout
 jest.setTimeout(10000);

@@ -12,6 +12,7 @@
 import { readFile, writeFile } from 'fs/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -54,7 +55,15 @@ async function findFilesWithInlineFontSize() {
 }
 
 async function migrateFile(filePath) {
-  const content = await readFile(`${searchPath}/${filePath}`, 'utf-8');
+  // Security: Validate file path to prevent path traversal
+  const resolvedSearchPath = path.resolve(searchPath);
+  const fullPath = path.resolve(searchPath, filePath);
+  if (!fullPath.startsWith(resolvedSearchPath)) {
+    console.error(`⚠️ Skipping ${filePath} - path traversal detected`);
+    return { filePath, changesMade: 0, skipped: true };
+  }
+  
+  const content = await readFile(fullPath, 'utf-8');
   let modified = content;
   let changesMade = 0;
 
@@ -105,7 +114,8 @@ async function migrateFile(filePath) {
 
   // Only write if in live mode and changes were made
   if (!isDryRun && changesMade > 0) {
-    await writeFile(`${searchPath}/${filePath}`, modified, 'utf-8');
+    // Security: Path already validated at start of function
+    await writeFile(fullPath, modified, 'utf-8');
     console.log(`   ✅ Migrated ${changesMade} fontSize usages`);
   } else if (changesMade > 0) {
     console.log(`   [DRY RUN] Would migrate ${changesMade} fontSize usages`);

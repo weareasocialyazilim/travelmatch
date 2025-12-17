@@ -12,26 +12,32 @@ jest.mock('react-native-video', () => {
 }, { virtual: true });
 
 // Mock design system tokens
-jest.mock('@travelmatch/design-system', () => ({
+jest.mock('@travelmatch/design-system/tokens', () => ({
   colors: {
-    primary: { 500: '#007AFF' },
+    primary: { 500: '#007AFF', main: '#007AFF' },
     neutral: { 0: '#FFFFFF', 100: '#F5F5F5', 200: '#E5E5E5', 300: '#D4D4D4', 900: '#171717' },
     text: { primary: '#000000', secondary: '#666666' },
-    background: { secondary: '#F5F5F5' },
-    border: { light: '#E5E5E5' },
+    background: { secondary: '#F5F5F5', primary: '#FFFFFF' },
+    border: { light: '#E5E5E5', primary: '#E5E5E5' },
+    status: { error: '#EF4444' },
   },
-  spacing: { xs: 4, sm: 8, md: 16, lg: 24 },
+  spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
   typography: {
     styles: {
-      h3: { fontSize: 20, fontWeight: '600' },
-      h4: { fontSize: 18, fontWeight: '600' },
-      body1: { fontSize: 16 },
-      body2: { fontSize: 14 },
-      button: { fontSize: 16, fontWeight: '500' },
-      caption: { fontSize: 12 },
+      h1: { fontSize: 48, fontWeight: '700', lineHeight: 1.2, letterSpacing: -0.5 },
+      h2: { fontSize: 36, fontWeight: '700', lineHeight: 1.2, letterSpacing: -0.5 },
+      h3: { fontSize: 30, fontWeight: '600', lineHeight: 1.3, letterSpacing: 0 },
+      h4: { fontSize: 24, fontWeight: '600', lineHeight: 1.4, letterSpacing: 0 },
+      h5: { fontSize: 20, fontWeight: '600', lineHeight: 1.4, letterSpacing: 0 },
+      h6: { fontSize: 18, fontWeight: '600', lineHeight: 1.5, letterSpacing: 0 },
+      body1: { fontSize: 16, fontWeight: '400', lineHeight: 1.5, letterSpacing: 0 },
+      body2: { fontSize: 14, fontWeight: '400', lineHeight: 1.5, letterSpacing: 0 },
+      button: { fontSize: 16, fontWeight: '600', lineHeight: 1.5, letterSpacing: 0.5 },
+      caption: { fontSize: 12, fontWeight: '400', lineHeight: 1.5, letterSpacing: 0.5 },
     },
-    fontSize: { base: 16 },
-    lineHeight: { relaxed: 1.6 },
+    fontSize: { base: 16, sm: 14, lg: 18 },
+    lineHeight: { relaxed: 1.6, normal: 1.5 },
+    fontWeight: { regular: '400', semibold: '600', bold: '700' },
   },
 }));
 

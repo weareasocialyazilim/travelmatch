@@ -5,6 +5,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+
+// Security: Disable X-Powered-By header to prevent information disclosure
+app.disable('x-powered-by');
+
 app.use(express.json());
 
 // Initialize Supabase client with service role key
@@ -114,7 +118,11 @@ async function handleKycComplete(
       created_at: new Date().toISOString(),
     });
 
-    console.error(`KYC verification failed for user ${userId}:`, error);
+    // Sanitize error for logging to prevent log injection
+    const sanitizedError = typeof error === 'string' 
+      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
+      : JSON.stringify(error).slice(0, 500);
+    console.error(`KYC verification failed for user ${userId}:`, sanitizedError);
   }
 }
 
@@ -132,7 +140,11 @@ async function handleImageComplete(
     // Update image URLs in database
     // Send notification if needed
   } else {
-    console.error(`Image processing failed for user ${userId}:`, error);
+    // Sanitize error for logging to prevent log injection
+    const sanitizedError = typeof error === 'string' 
+      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
+      : JSON.stringify(error).slice(0, 500);
+    console.error(`Image processing failed for user ${userId}:`, sanitizedError);
   }
 }
 
@@ -148,7 +160,11 @@ async function handleEmailComplete(
   if (status === 'completed') {
     console.log(`Email sent successfully to user ${userId}`);
   } else {
-    console.error(`Email sending failed for user ${userId}:`, error);
+    // Sanitize error for logging to prevent log injection
+    const sanitizedError = typeof error === 'string' 
+      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
+      : JSON.stringify(error).slice(0, 500);
+    console.error(`Email sending failed for user ${userId}:`, sanitizedError);
     // Retry logic or alert admin
   }
 }

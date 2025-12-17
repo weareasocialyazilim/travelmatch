@@ -34,7 +34,7 @@ export function DeletedMomentsScreen() {
     queryFn: async () => {
       const result = await supabaseDb.moments.getDeleted(user!.id);
       if (result.error) throw result.error;
-      return result.data as DeletedMoment[];
+      return result.data as unknown as DeletedMoment[];
     },
     enabled: !!user?.id,
   });

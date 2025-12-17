@@ -100,6 +100,7 @@ export const moderationService = {
         });
 
       if (error) throw error;
+      if (!reportData) throw new Error('Failed to create report');
 
       const report: Report = {
         id: reportData.id,
