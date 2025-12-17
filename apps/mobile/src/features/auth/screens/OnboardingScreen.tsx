@@ -54,30 +54,33 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Dynamic onboarding pages from i18n
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const iconImage = require('../../../../assets/icon.png') as ImageSourcePropType;
+  
   const ONBOARDING_PAGES: OnboardingPage[] = [
     {
       id: '1',
       title: t('onboarding.page1.title'),
       description: t('onboarding.page1.description'),
-      image: require('../../../../assets/icon.png') as ImageSourcePropType,
+      image: iconImage,
     },
     {
       id: '2',
       title: t('onboarding.page2.title'),
       description: t('onboarding.page2.description'),
-      image: require('../../../../assets/icon.png') as ImageSourcePropType,
+      image: iconImage,
     },
     {
       id: '3',
       title: t('onboarding.page3.title'),
       description: t('onboarding.page3.description'),
-      image: require('../../../../assets/icon.png') as ImageSourcePropType,
+      image: iconImage,
     },
     {
       id: '4',
       title: t('onboarding.page4.title'),
       description: t('onboarding.page4.description'),
-      image: require('../../../../assets/icon.png') as ImageSourcePropType,
+      image: iconImage,
     },
   ];
 
@@ -113,7 +116,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         });
         completeOnboarding().then(() => {
           navigation.replace('Welcome');
-        }).catch((error) => {
+        }).catch((error: unknown) => {
           logger.error('Onboarding completion error', { error });
           // Fallback: still navigate even if storage fails
           navigation.replace('Welcome');

@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "stripe": "https://esm.sh/stripe@14",
+    "zod": "https://esm.sh/zod@3.22.4",
+    "std/": "https://deno.land/std@0.208.0/"
+  },
+  "tasks": {
+    "check": "deno check functions/*/index.ts",
+    "lint": "deno lint functions/",
+    "fmt": "deno fmt functions/",
+    "test": "deno test --allow-env --allow-net functions/_shared/",
+    "serve": "supabase functions serve --no-verify-jwt",
+    "deploy": "supabase functions deploy"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": [
+        "ban-untagged-todo",
+        "no-unused-vars",
+        "eqeqeq"
+      ]
+    },
+    "exclude": [
+      "node_modules",
+      "coverage"
+    ]
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "proseWrap": "preserve"
+  }
+}
