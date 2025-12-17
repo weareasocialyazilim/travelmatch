@@ -1,6 +1,6 @@
 /**
  * AI Quality Scoring for Profile Proofs
- * 
+ *
  * Validates profile verification photos using AI:
  * - Face detection (is there a face?)
  * - ID card detection (is ID visible?)
@@ -13,6 +13,8 @@ import React from 'react';
 
 import { supabase } from './supabase';
 import { logger } from '../utils/logger';
+import { toJson } from '../utils/jsonHelper';
+import type { Database } from '../types/database.types';
 
 // Quality score breakdown
 export interface QualityScore {
@@ -44,7 +46,9 @@ class AIQualityScorer {
 
   constructor() {
     if (!this.mlServiceUrl) {
-      throw new Error('❌ EXPO_PUBLIC_ML_SERVICE_URL is required. Set it in your .env file.');
+      throw new Error(
+        '❌ EXPO_PUBLIC_ML_SERVICE_URL is required. Set it in your .env file.',
+      );
     }
   }
 
@@ -54,7 +58,7 @@ class AIQualityScorer {
   async scoreProof(
     imageUri: string,
     proofType: ProofType,
-    userId: string
+    userId: string,
   ): Promise<QualityScore> {
     try {
       logger.info('[AI Quality] Scoring proof:', { proofType });
@@ -89,7 +93,7 @@ class AIQualityScorer {
       return score;
     } catch (error) {
       logger.error('[AI Quality] Scoring failed:', error);
-      
+
       // Return fallback score (manual review required)
       return this.fallbackScore();
     }
@@ -100,10 +104,10 @@ class AIQualityScorer {
    */
   async batchScore(
     images: Array<{ uri: string; type: ProofType }>,
-    userId: string
+    userId: string,
   ): Promise<QualityScore[]> {
     const scores = await Promise.all(
-      images.map((img) => this.scoreProof(img.uri, img.type, userId))
+      images.map((img) => this.scoreProof(img.uri, img.type, userId)),
     );
     return scores;
   }
@@ -123,7 +127,7 @@ class AIQualityScorer {
       return [];
     }
 
-    return data.map((row) => row.score);
+    return (data || []).map((row: any) => row.score as QualityScore);
   }
 
   /**
@@ -162,16 +166,19 @@ class AIQualityScorer {
     userId: string,
     proofType: ProofType,
     score: QualityScore,
-    imageUrl: string
+    imageUrl: string,
   ) {
-    await supabase.from('proof_quality_scores').insert({
-      user_id: userId,
-      proof_type: proofType,
-      score,
-      image_url: imageUrl,
-      approved: score.approved,
-      created_at: new Date().toISOString(),
-    });
+    const payload: Database['public']['Tables']['proof_quality_scores']['Insert'] =
+      {
+        user_id: userId,
+        proof_type: proofType,
+        score: toJson(score) ?? null,
+        image_url: imageUrl,
+        approved: score.approved,
+        created_at: new Date().toISOString(),
+      };
+
+    await supabase.from('proof_quality_scores').insert(payload);
   }
 
   /**
@@ -252,7 +259,8 @@ class AIQualityScorer {
     if (overall >= 85) {
       return {
         status: 'excellent',
-        message: 'Perfect! Your verification photo meets all quality standards.',
+        message:
+          'Perfect! Your verification photo meets all quality standards.',
         actionRequired: false,
       };
     }
@@ -268,14 +276,16 @@ class AIQualityScorer {
     if (overall >= 50) {
       return {
         status: 'fair',
-        message: 'Your photo quality is acceptable but could be improved. Please review suggestions below.',
+        message:
+          'Your photo quality is acceptable but could be improved. Please review suggestions below.',
         actionRequired: true,
       };
     }
 
     return {
       status: 'poor',
-      message: 'Please retake your photo following the guidelines below for better quality.',
+      message:
+        'Please retake your photo following the guidelines below for better quality.',
       actionRequired: true,
     };
   }
@@ -292,11 +302,15 @@ export function useAIQualityScoring() {
   const scoreProof = async (
     imageUri: string,
     proofType: ProofType,
-    userId: string
+    userId: string,
   ) => {
     setIsScoring(true);
     try {
-      const result = await aiQualityScorer.scoreProof(imageUri, proofType, userId);
+      const result = await aiQualityScorer.scoreProof(
+        imageUri,
+        proofType,
+        userId,
+      );
       setScore(result);
       return result;
     } finally {
@@ -322,13 +336,17 @@ export function useAIQualityScoring() {
 // Quality score component for UI
 export function QualityScoreIndicator({ score }: { score: QualityScore }) {
   const interpretation = aiQualityScorer.interpretScore(score);
-  
+
   const getColor = () => {
     switch (interpretation.status) {
-      case 'excellent': return '#10B981'; // green
-      case 'good': return '#3B82F6'; // blue
-      case 'fair': return '#F59E0B'; // orange
-      case 'poor': return '#EF4444'; // red
+      case 'excellent':
+        return '#10B981'; // green
+      case 'good':
+        return '#3B82F6'; // blue
+      case 'fair':
+        return '#F59E0B'; // orange
+      case 'poor':
+        return '#EF4444'; // red
     }
   };
 

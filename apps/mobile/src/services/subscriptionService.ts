@@ -1,7 +1,7 @@
 /**
  * Real-time Subscriptions Infrastructure
  * Manages Supabase real-time subscriptions for live data updates
- * 
+ *
  * Features:
  * - Automatic reconnection on connection loss
  * - Subscription lifecycle management
@@ -10,7 +10,10 @@
  * - Performance monitoring
  */
 
-import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import {
+  RealtimeChannel,
+  RealtimePostgresChangesPayload,
+} from '@supabase/supabase-js';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 
@@ -22,17 +25,19 @@ export type SubscriptionEvent = 'INSERT' | 'UPDATE' | 'DELETE' | '*';
 /**
  * Subscription status
  */
-export type SubscriptionStatus = 
-  | 'IDLE'           // Not subscribed
-  | 'SUBSCRIBING'    // Attempting to subscribe
-  | 'SUBSCRIBED'     // Active subscription
-  | 'UNSUBSCRIBING'  // Cleaning up
-  | 'ERROR';         // Subscription failed
+export type SubscriptionStatus =
+  | 'IDLE' // Not subscribed
+  | 'SUBSCRIBING' // Attempting to subscribe
+  | 'SUBSCRIBED' // Active subscription
+  | 'UNSUBSCRIBING' // Cleaning up
+  | 'ERROR'; // Subscription failed
 
 /**
  * Subscription configuration
  */
-export interface SubscriptionConfig<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface SubscriptionConfig<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> {
   table: string;
   event?: SubscriptionEvent;
   filter?: string; // e.g., "user_id=eq.123"
@@ -74,11 +79,14 @@ class SubscriptionManager {
    */
   subscribe<T extends Record<string, unknown> = Record<string, unknown>>(
     id: string,
-    config: SubscriptionConfig<T>
+    config: SubscriptionConfig<T>,
   ): Subscription {
     // Unsubscribe existing subscription with same ID
     if (this.subscriptions.has(id)) {
-      logger.warn('SubscriptionManager', `Replacing existing subscription: ${id}`);
+      logger.warn(
+        'SubscriptionManager',
+        `Replacing existing subscription: ${id}`,
+      );
       this.unsubscribe(id);
     }
 
@@ -119,10 +127,12 @@ class SubscriptionManager {
 
       // Build filter string
       const filterStr = config.filter || '';
-      
+
       // Subscribe to postgres changes
-      const postgresChanges = channel.on(
-        'postgres_changes' as any,
+      const postgresChanges = (
+        channel as unknown as { on: (...args: unknown[]) => unknown }
+      ).on(
+        'postgres_changes',
         {
           event: config.event || '*',
           schema: config.schema || 'public',
@@ -131,13 +141,16 @@ class SubscriptionManager {
         },
         (payload: RealtimePostgresChangesPayload<any>) => {
           this.handleChange(id, payload);
-        }
+        },
       );
 
       // Subscribe to channel
       await channel.subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          logger.info('SubscriptionManager', `Subscribed to ${config.table} (${id})`);
+          logger.info(
+            'SubscriptionManager',
+            `Subscribed to ${config.table} (${id})`,
+          );
           subscription.channel = channel;
           subscription.reconnectAttempts = 0;
           this.updateStatus(id, 'SUBSCRIBED');
@@ -149,7 +162,6 @@ class SubscriptionManager {
           this.handleError(id, new Error('Channel error'));
         }
       });
-
     } catch (error) {
       logger.error('SubscriptionManager', `Failed to subscribe: ${id}`, error);
       this.handleError(id, error as Error);
@@ -161,7 +173,7 @@ class SubscriptionManager {
    */
   private handleChange(
     id: string,
-    payload: RealtimePostgresChangesPayload<any>
+    payload: RealtimePostgresChangesPayload<any>,
   ): void {
     const subscription = this.subscriptions.get(id);
     if (!subscription) return;
@@ -184,9 +196,12 @@ class SubscriptionManager {
 
       // Call general change handler
       config.onChange?.(payload);
-
     } catch (error) {
-      logger.error('SubscriptionManager', `Error in change handler: ${id}`, error);
+      logger.error(
+        'SubscriptionManager',
+        `Error in change handler: ${id}`,
+        error,
+      );
       config.onError?.(error as Error);
     }
   }
@@ -217,9 +232,12 @@ class SubscriptionManager {
     if (!subscription) return;
 
     logger.warn('SubscriptionManager', `Disconnected: ${id}`);
-    
+
     // Attempt reconnection if enabled
-    if (subscription.config.autoReconnect && subscription.status === 'SUBSCRIBED') {
+    if (
+      subscription.config.autoReconnect &&
+      subscription.status === 'SUBSCRIBED'
+    ) {
       this.scheduleReconnect(id);
     }
   }
@@ -231,13 +249,14 @@ class SubscriptionManager {
     const subscription = this.subscriptions.get(id);
     if (!subscription) return;
 
-    const { maxReconnectAttempts = 5, reconnectDelay = 3000 } = subscription.config;
+    const { maxReconnectAttempts = 5, reconnectDelay = 3000 } =
+      subscription.config;
 
     // Check reconnect attempts
     if (subscription.reconnectAttempts >= maxReconnectAttempts) {
       logger.error(
         'SubscriptionManager',
-        `Max reconnect attempts reached for ${id}`
+        `Max reconnect attempts reached for ${id}`,
       );
       this.updateStatus(id, 'ERROR');
       return;
@@ -254,7 +273,9 @@ class SubscriptionManager {
 
     logger.info(
       'SubscriptionManager',
-      `Reconnecting ${id} in ${delay}ms (attempt ${subscription.reconnectAttempts + 1}/${maxReconnectAttempts})`
+      `Reconnecting ${id} in ${delay}ms (attempt ${
+        subscription.reconnectAttempts + 1
+      }/${maxReconnectAttempts})`,
     );
 
     const timer = setTimeout(() => {
@@ -330,7 +351,7 @@ class SubscriptionManager {
    */
   getActiveSubscriptions(): Subscription[] {
     return Array.from(this.subscriptions.values()).filter(
-      (sub) => sub.status === 'SUBSCRIBED'
+      (sub) => sub.status === 'SUBSCRIBED',
     );
   }
 
@@ -356,9 +377,11 @@ export const subscriptionManager = new SubscriptionManager();
  * React Hook-friendly subscription helper
  * Use this in components with useEffect
  */
-export const createSubscription = <T extends Record<string, unknown> = Record<string, unknown>>(
+export const createSubscription = <
+  T extends Record<string, unknown> = Record<string, unknown>,
+>(
   id: string,
-  config: SubscriptionConfig<T>
+  config: SubscriptionConfig<T>,
 ): (() => void) => {
   subscriptionManager.subscribe(id, config);
 
@@ -377,7 +400,10 @@ export const Subscriptions = {
    */
   userMoments: (
     userId: string,
-    handlers: Pick<SubscriptionConfig, 'onInsert' | 'onUpdate' | 'onDelete' | 'onChange'>
+    handlers: Pick<
+      SubscriptionConfig,
+      'onInsert' | 'onUpdate' | 'onDelete' | 'onChange'
+    >,
   ) => {
     return createSubscription(`user-moments-${userId}`, {
       table: 'moments',
@@ -391,7 +417,7 @@ export const Subscriptions = {
    */
   chatMessages: (
     chatId: string,
-    handlers: Pick<SubscriptionConfig, 'onInsert' | 'onUpdate' | 'onDelete'>
+    handlers: Pick<SubscriptionConfig, 'onInsert' | 'onUpdate' | 'onDelete'>,
   ) => {
     return createSubscription(`chat-messages-${chatId}`, {
       table: 'messages',
@@ -405,7 +431,7 @@ export const Subscriptions = {
    */
   userNotifications: (
     userId: string,
-    handlers: Pick<SubscriptionConfig, 'onInsert' | 'onUpdate'>
+    handlers: Pick<SubscriptionConfig, 'onInsert' | 'onUpdate'>,
   ) => {
     return createSubscription(`user-notifications-${userId}`, {
       table: 'notifications',
@@ -420,7 +446,7 @@ export const Subscriptions = {
    */
   bookingRequests: (
     userId: string,
-    handlers: Pick<SubscriptionConfig, 'onInsert' | 'onUpdate'>
+    handlers: Pick<SubscriptionConfig, 'onInsert' | 'onUpdate'>,
   ) => {
     return createSubscription(`booking-requests-${userId}`, {
       table: 'exchanges',
@@ -434,7 +460,7 @@ export const Subscriptions = {
    */
   userPresence: (
     userId: string,
-    handlers: Pick<SubscriptionConfig, 'onChange'>
+    handlers: Pick<SubscriptionConfig, 'onChange'>,
   ) => {
     return createSubscription(`user-presence-${userId}`, {
       table: 'user_presence',
@@ -447,7 +473,4 @@ export const Subscriptions = {
 /**
  * Export types
  */
-export type {
-  RealtimePostgresChangesPayload,
-  RealtimeChannel,
-};
+export type { RealtimePostgresChangesPayload, RealtimeChannel };

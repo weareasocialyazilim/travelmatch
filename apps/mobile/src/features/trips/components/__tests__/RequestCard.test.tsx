@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { RequestCard } from '../src/features/trips/components/RequestCard';
-import { COLORS } from '../src/constants/colors';
+import { RequestCard } from '@/features/trips/components/RequestCard';
+import { COLORS } from '@/constants/colors';
 
 // Mock navigation
 const mockNavigate = jest.fn();

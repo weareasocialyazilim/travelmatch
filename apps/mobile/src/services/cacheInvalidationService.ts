@@ -1,9 +1,9 @@
 /**
  * Cache Invalidation Service
- * 
+ *
  * Centralized cache management for payment-related data
  * Supports multiple cache backends: AsyncStorage, Redis (via Supabase)
- * 
+ *
  * Features:
  * - Time-based invalidation (TTL)
  * - Tag-based invalidation (invalidate all user payments)
@@ -59,10 +59,7 @@ class CacheInvalidationService {
   /**
    * Get cached data with automatic invalidation check
    */
-  async get<T>(
-    prefix: string,
-    identifier: string,
-  ): Promise<T | null> {
+  async get<T>(prefix: string, identifier: string): Promise<T | null> {
     try {
       const key = this.buildKey(prefix, identifier);
 
@@ -133,7 +130,7 @@ class CacheInvalidationService {
    */
   async invalidate(prefix: string, identifier: string): Promise<void> {
     await this.remove(prefix, identifier);
-    
+
     // Also mark as invalidated in Supabase for other devices
     await this.markInvalidated(this.buildKey(prefix, identifier));
   }
@@ -219,7 +216,7 @@ class CacheInvalidationService {
     try {
       const allKeys = await AsyncStorage.getAllKeys();
       const cacheKeys = allKeys.filter((key) => key.startsWith('cache:'));
-      
+
       if (cacheKeys.length > 0) {
         await AsyncStorage.multiRemove(cacheKeys);
       }
@@ -259,7 +256,9 @@ class CacheInvalidationService {
 
       if (error || !data) return false;
 
-      const invalidatedAt = new Date(data.invalidated_at).getTime();
+      const invalidatedAt = data.invalidated_at
+        ? new Date(data.invalidated_at).getTime()
+        : 0;
       return invalidatedAt > entry.timestamp;
     } catch (error) {
       // Don't fail if invalidation check fails
@@ -368,7 +367,10 @@ export async function getCachedTransactions(userId: string) {
   return cacheInvalidationService.get(CACHE_KEYS.TRANSACTIONS, userId);
 }
 
-export async function setCachedTransactions(userId: string, data: TransactionData[]) {
+export async function setCachedTransactions(
+  userId: string,
+  data: TransactionData[],
+) {
   return cacheInvalidationService.set(
     CACHE_KEYS.TRANSACTIONS,
     userId,
@@ -387,7 +389,10 @@ export async function getCachedPaymentMethods(userId: string) {
   return cacheInvalidationService.get(CACHE_KEYS.PAYMENT_METHODS, userId);
 }
 
-export async function setCachedPaymentMethods(userId: string, data: PaymentMethodData[]) {
+export async function setCachedPaymentMethods(
+  userId: string,
+  data: PaymentMethodData[],
+) {
   return cacheInvalidationService.set(
     CACHE_KEYS.PAYMENT_METHODS,
     userId,

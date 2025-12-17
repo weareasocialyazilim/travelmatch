@@ -117,7 +117,7 @@ export const updatePushTokenPreferences = async (
     // For now, we assume notification_preferences column handles this
     const { error } = await supabase
       .from('users')
-      .update({ notification_preferences: preferences as Json })
+      .update({ notification_preferences: preferences as unknown as Json })
       .eq('id', user.id);
 
     if (error) throw error;

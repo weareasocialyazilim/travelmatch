@@ -4,23 +4,25 @@
  * Target Coverage: 80%+
  */
 
-import {
+const {
   usersService,
   momentsService,
   transactionsService,
-} from '@/services/supabaseDbService';
-import { supabase, isSupabaseConfigured } from '@/config/supabase';
-import { logger } from '@/utils/logger';
+} = require('../supabaseDbService');
+// Use relative require for the config mock to avoid resolver alias issues in Jest runs
+const { supabase, isSupabaseConfigured } = require('../../config/supabase');
+// Use relative require for logger to avoid alias resolution issues in Jest
+const { logger } = require('../../utils/logger');
 
 // Mock dependencies
-jest.mock('@/config/supabase', () => ({
+jest.mock('../../config/supabase', () => ({
   supabase: {
     from: jest.fn(),
   },
   isSupabaseConfigured: jest.fn(() => true),
 }));
 
-jest.mock('@/utils/logger', () => ({
+jest.mock('../../utils/logger', () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn(),

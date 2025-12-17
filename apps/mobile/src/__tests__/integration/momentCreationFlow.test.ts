@@ -1,7 +1,7 @@
 /**
  * Moment Creation Flow Integration Tests
  * Tests the complete workflow: Create → Upload images → Publish
- * 
+ *
  * Scenarios:
  * 1. Complete Moment Creation Flow (2 tests)
  * 2. Multi-Image Upload Flow (2 tests)
@@ -40,8 +40,8 @@ jest.mock('@/config/supabase', () => ({
   isSupabaseConfigured: jest.fn(() => true),
 }));
 
-const mockSupabase = supabase ;
-const mockLogger = logger ;
+const mockSupabase = supabase;
+const mockLogger = logger;
 
 describe('Moment Creation Flow Integration', () => {
   const mockUser = {
@@ -66,11 +66,17 @@ describe('Moment Creation Flow Integration', () => {
         error: null,
       }),
       getPublicUrl: jest.fn().mockReturnValue({
-        data: { publicUrl: 'https://storage.supabase.co/moments/image-123.jpg' },
+        data: {
+          publicUrl: 'https://storage.supabase.co/moments/image-123.jpg',
+        },
       }),
     };
 
-    mockSupabase.storage.from.mockReturnValue(mockStorageBucket as any);
+    mockSupabase.storage.from.mockReturnValue(
+      mockStorageBucket as unknown as ReturnType<
+        typeof mockSupabase.storage.from
+      >,
+    );
 
     // Setup default from() chain
     const mockFromChain = {
@@ -82,7 +88,9 @@ describe('Moment Creation Flow Integration', () => {
       single: jest.fn(),
     };
 
-    mockSupabase.from.mockReturnValue(mockFromChain as any);
+    mockSupabase.from.mockReturnValue(
+      mockFromChain as unknown as ReturnType<typeof mockSupabase.from>,
+    );
   });
 
   describe('Scenario 1: Complete Moment Creation Flow', () => {
@@ -107,7 +115,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T10:00:00Z',
       };
 
-      (mockSupabase.from('moments').insert ).mockReturnValue({
+      mockSupabase.from('moments').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockCreatedMoment,
@@ -116,7 +124,10 @@ describe('Moment Creation Flow Integration', () => {
         }),
       });
 
-      const { data: createdMoment, error: createError } = await momentsService.create(momentData as any);
+      const { data: createdMoment, error: createError } =
+        await momentsService.create(
+          momentData as unknown as Parameters<typeof momentsService.create>[0],
+        );
 
       expect(createError).toBeNull();
       expect(createdMoment).toBeDefined();
@@ -141,7 +152,7 @@ describe('Moment Creation Flow Integration', () => {
       }));
 
       // Mock uploadImages to return the uploaded images
-      (uploadImages ).mockResolvedValue(mockUploadedImages);
+      uploadImages.mockResolvedValue(mockUploadedImages);
 
       const uploadedImages = await uploadImages(imageUris);
 
@@ -149,7 +160,7 @@ describe('Moment Creation Flow Integration', () => {
       expect(uploadedImages[0].url).toContain('storage.supabase.co');
 
       // Step 3: Update moment with image URLs and publish
-      const imageUrls = uploadedImages.map(img => img.url);
+      const imageUrls = uploadedImages.map((img) => img.url);
       const publishData = {
         images: imageUrls,
         status: 'active',
@@ -162,7 +173,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T10:05:00Z',
       };
 
-      (mockSupabase.from('moments').update ).mockReturnValue({
+      mockSupabase.from('moments').update.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -174,7 +185,10 @@ describe('Moment Creation Flow Integration', () => {
       });
 
       const updateQuery = mockSupabase.from('moments').update(publishData);
-      const { data: publishedMoment } = await updateQuery.eq('id', createdMoment!.id).select().single();
+      const { data: publishedMoment } = await updateQuery
+        .eq('id', createdMoment!.id)
+        .select()
+        .single();
 
       expect(publishedMoment.status).toBe('active');
       expect(publishedMoment.images).toHaveLength(3);
@@ -188,7 +202,7 @@ describe('Moment Creation Flow Integration', () => {
         price: -10, // Invalid: negative price
       };
 
-      (mockSupabase.from('moments').insert ).mockReturnValue({
+      mockSupabase.from('moments').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: null,
@@ -198,14 +212,18 @@ describe('Moment Creation Flow Integration', () => {
       });
 
       // Act
-      const { data, error } = await momentsService.create(invalidMomentData as any);
+      const { data, error } = await momentsService.create(
+        invalidMomentData as unknown as Parameters<
+          typeof momentsService.create
+        >[0],
+      );
 
       // Assert
       expect(data).toBeNull();
       expect(error).toBeDefined();
       expect(mockLogger.error).toHaveBeenCalledWith(
         '[DB] Create moment error:',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });
@@ -230,7 +248,7 @@ describe('Moment Creation Flow Integration', () => {
       }));
 
       // Mock uploadImages
-      (uploadImages ).mockResolvedValue(mockResults);
+      uploadImages.mockResolvedValue(mockResults);
 
       // Act: Upload all images
       const results = await uploadImages(imageUris);
@@ -251,11 +269,14 @@ describe('Moment Creation Flow Integration', () => {
         'file:///path/to/corrupted.jpg', // This will fail
       ];
 
-      (uploadImages )
-        .mockRejectedValue(new Error('File corrupted or invalid format'));
+      uploadImages.mockRejectedValue(
+        new Error('File corrupted or invalid format'),
+      );
 
       // Act & Assert: Should throw error
-      await expect(uploadImages(imageUris)).rejects.toThrow('File corrupted or invalid format');
+      await expect(uploadImages(imageUris)).rejects.toThrow(
+        'File corrupted or invalid format',
+      );
     });
   });
 
@@ -280,7 +301,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T09:00:00Z',
       };
 
-      (mockSupabase.from('moments').insert ).mockReturnValue({
+      mockSupabase.from('moments').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockDraft,
@@ -289,12 +310,15 @@ describe('Moment Creation Flow Integration', () => {
         }),
       });
 
-      const { data: draft } = await momentsService.create(draftData as any);
+      const { data: draft } = await momentsService.create(
+        draftData as unknown as Parameters<typeof momentsService.create>[0],
+      );
       expect(draft?.status).toBe('draft');
 
       // Step 2: Update draft with more details
       const updateData = {
-        description: 'Join me for an exclusive wine tasting at a local vineyard',
+        description:
+          'Join me for an exclusive wine tasting at a local vineyard',
         location: 'Napa Valley, CA',
         images: ['https://storage.supabase.co/moments/wine1.jpg'],
       };
@@ -305,7 +329,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T09:30:00Z',
       };
 
-      (mockSupabase.from('moments').update ).mockReturnValue({
+      mockSupabase.from('moments').update.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -317,7 +341,10 @@ describe('Moment Creation Flow Integration', () => {
       });
 
       const updateQuery = mockSupabase.from('moments').update(updateData);
-      const { data: updatedDraft } = await updateQuery.eq('id', draft!.id).select().single();
+      const { data: updatedDraft } = await updateQuery
+        .eq('id', draft!.id)
+        .select()
+        .single();
 
       expect(updatedDraft.description).toContain('exclusive wine tasting');
       expect(updatedDraft.images).toHaveLength(1);
@@ -330,7 +357,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T10:00:00Z',
       };
 
-      (mockSupabase.from('moments').update ).mockReturnValue({
+      mockSupabase.from('moments').update.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -342,7 +369,10 @@ describe('Moment Creation Flow Integration', () => {
       });
 
       const publishQuery = mockSupabase.from('moments').update(publishUpdate);
-      const { data: published } = await publishQuery.eq('id', draft!.id).select().single();
+      const { data: published } = await publishQuery
+        .eq('id', draft!.id)
+        .select()
+        .single();
 
       expect(published.status).toBe('active');
     });
@@ -360,7 +390,7 @@ describe('Moment Creation Flow Integration', () => {
         images: [], // Missing required images
       };
 
-      (mockSupabase.from('moments').update ).mockReturnValue({
+      mockSupabase.from('moments').update.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -372,8 +402,13 @@ describe('Moment Creation Flow Integration', () => {
       });
 
       // Act: Try to publish
-      const publishQuery = mockSupabase.from('moments').update({ status: 'active' });
-      const { data, error } = await publishQuery.eq('id', incompleteDraft.id).select().single();
+      const publishQuery = mockSupabase
+        .from('moments')
+        .update({ status: 'active' });
+      const { data, error } = await publishQuery
+        .eq('id', incompleteDraft.id)
+        .select()
+        .single();
 
       // Assert
       expect(data).toBeNull();
@@ -399,7 +434,7 @@ describe('Moment Creation Flow Integration', () => {
         created_at: '2024-01-15T08:00:00Z',
       };
 
-      (mockSupabase.from('moments').insert ).mockReturnValue({
+      mockSupabase.from('moments').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockMoment,
@@ -408,16 +443,17 @@ describe('Moment Creation Flow Integration', () => {
         }),
       });
 
-      const { data: moment } = await momentsService.create(momentData as any);
+      const { data: moment } = await momentsService.create(
+        momentData as unknown as Parameters<typeof momentsService.create>[0],
+      );
       expect(moment).toBeDefined();
 
       // Act: Upload fails
-      (uploadImage )
-        .mockRejectedValue(new Error('Upload rate limit exceeded'));
+      uploadImage.mockRejectedValue(new Error('Upload rate limit exceeded'));
 
       // Assert: Should handle error gracefully
       await expect(
-        uploadImage('file:///path/to/large-image.jpg')
+        uploadImage('file:///path/to/large-image.jpg'),
       ).rejects.toThrow('Upload rate limit exceeded');
 
       // Moment remains in draft state
@@ -429,7 +465,7 @@ describe('Moment Creation Flow Integration', () => {
       const draftId = 'moment-draft-456';
 
       // Act: Network error during publish
-      (mockSupabase.from('moments').update ).mockReturnValue({
+      mockSupabase.from('moments').update.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -440,8 +476,13 @@ describe('Moment Creation Flow Integration', () => {
         }),
       });
 
-      const publishQuery = mockSupabase.from('moments').update({ status: 'active' });
-      const { data, error } = await publishQuery.eq('id', draftId).select().single();
+      const publishQuery = mockSupabase
+        .from('moments')
+        .update({ status: 'active' });
+      const { data, error } = await publishQuery
+        .eq('id', draftId)
+        .select()
+        .single();
 
       // Assert: Error handled
       expect(data).toBeNull();

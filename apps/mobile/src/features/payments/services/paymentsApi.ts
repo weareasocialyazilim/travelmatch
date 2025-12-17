@@ -9,7 +9,7 @@ export interface CreatePaymentIntentDto {
 
 /**
  * Payments API Service
- * 
+ *
  * Ödeme, wallet ve KYC yönetimi için API çağrıları
  */
 export const paymentsApi = {
@@ -17,13 +17,16 @@ export const paymentsApi = {
    * Wallet bilgilerini getir
    */
   getWallet: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('wallets')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         balance,
@@ -31,7 +34,8 @@ export const paymentsApi = {
         status,
         created_at,
         updated_at
-      `)
+      `,
+      )
       .eq('user_id', user.id)
       .single();
 
@@ -43,13 +47,16 @@ export const paymentsApi = {
    * Transaction geçmişi
    */
   getTransactions: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('transactions')
-      .select(`
+      .select(
+        `
         id,
         type,
         amount,
@@ -59,7 +66,8 @@ export const paymentsApi = {
         created_at,
         metadata,
         moment_id
-      `)
+      `,
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -74,7 +82,8 @@ export const paymentsApi = {
     // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('transactions')
-      .select(`
+      .select(
+        `
         id,
         type,
         amount,
@@ -86,7 +95,8 @@ export const paymentsApi = {
         moment_id,
         sender_id,
         receiver_id
-      `)
+      `,
+      )
       .eq('id', transactionId)
       .single();
 
@@ -98,13 +108,16 @@ export const paymentsApi = {
    * Payment methods listesi
    */
   getPaymentMethods: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     // SECURITY: Explicit column selection
     const { data, error } = await supabase
       .from('payment_methods')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         type,
@@ -116,7 +129,8 @@ export const paymentsApi = {
         is_default,
         is_active,
         created_at
-      `)
+      `,
+      )
       .eq('user_id', user.id)
       .eq('is_active', true);
 
@@ -128,9 +142,12 @@ export const paymentsApi = {
    * Payment intent oluştur (Stripe)
    */
   createPaymentIntent: async (paymentData: CreatePaymentIntentDto) => {
-    const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-      body: paymentData,
-    });
+    const { data, error } = await supabase.functions.invoke(
+      'create-payment-intent',
+      {
+        body: paymentData,
+      },
+    );
 
     if (error) throw error;
     return data;
@@ -140,12 +157,17 @@ export const paymentsApi = {
    * Para çekme işlemi
    */
   withdraw: async (amount: number) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase.functions.invoke('process-withdrawal', {
-      body: { amount },
-    });
+    const { data, error } = await supabase.functions.invoke(
+      'process-withdrawal',
+      {
+        body: { amount },
+      },
+    );
 
     if (error) throw error;
     return data;
@@ -155,13 +177,16 @@ export const paymentsApi = {
    * KYC durumu sorgula
    */
   getKYCStatus: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     // SECURITY: Explicit column selection
     const { data, error } = await supabase
       .from('kyc_verifications')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         status,
@@ -172,7 +197,8 @@ export const paymentsApi = {
         rejection_reason,
         created_at,
         updated_at
-      `)
+      `,
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -186,19 +212,27 @@ export const paymentsApi = {
    * KYC belgeleri gönder
    */
   submitKYC: async (documents: FormData) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     // Upload documents to storage
     const documentUrls: string[] = [];
-    
+
     const frontImage = documents.get('front') as File;
     const backImage = documents.get('back') as File;
     const selfie = documents.get('selfie') as File;
 
-    for (const [key, file] of [['front', frontImage], ['back', backImage], ['selfie', selfie]]) {
+    for (const [key, file] of [
+      ['front', frontImage],
+      ['back', backImage],
+      ['selfie', selfie],
+    ]) {
       if (file && file instanceof File) {
-        const fileName = `${user.id}-${key}-${Date.now()}.${file.name.split('.').pop()}`;
+        const fileName = `${user.id}-${key}-${Date.now()}.${file.name
+          .split('.')
+          .pop()}`;
         const filePath = `kyc/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -223,7 +257,7 @@ export const paymentsApi = {
         document_type: documents.get('documentType'),
         document_urls: documentUrls,
         status: 'pending',
-      })
+      } as any)
       .select()
       .single();
 
@@ -235,7 +269,9 @@ export const paymentsApi = {
    * Aktif abonelik bilgisi
    */
   getSubscription: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -253,9 +289,12 @@ export const paymentsApi = {
    * Yeni abonelik oluştur
    */
   createSubscription: async (planId: string) => {
-    const { data, error } = await supabase.functions.invoke('create-subscription', {
-      body: { planId },
-    });
+    const { data, error } = await supabase.functions.invoke(
+      'create-subscription',
+      {
+        body: { planId },
+      },
+    );
 
     if (error) throw error;
     return data;
@@ -265,12 +304,14 @@ export const paymentsApi = {
    * Abonelik iptal et
    */
   cancelSubscription: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
       .from('subscriptions')
-      .update({ 
+      .update({
         status: 'cancelled',
         cancelled_at: new Date().toISOString(),
       })
@@ -299,12 +340,16 @@ export const paymentsApi = {
    * Gift geçmişi
    */
   getGifts: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
       .from('gifts')
-      .select('*, sender:profiles!sender_id(*), recipient:profiles!recipient_id(*)')
+      .select(
+        '*, sender:profiles!sender_id(*), recipient:profiles!recipient_id(*)',
+      )
       .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
       .order('created_at', { ascending: false });
 

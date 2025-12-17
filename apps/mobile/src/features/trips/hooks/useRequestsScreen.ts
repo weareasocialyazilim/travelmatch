@@ -6,12 +6,19 @@ import { logger } from '@/utils/logger';
 import { useRequests as useRequestsAPI } from '@/hooks/useRequests';
 import { useNotifications as useNotificationsAPI } from '@/hooks/useNotifications';
 import { formatTimeAgo } from '../utils/timeFormat';
-import type { RequestItem, NotificationItem, TabType } from '../types/requests.types';
+import type {
+  RequestItem,
+  NotificationItem,
+  TabType,
+} from '../types/requests.types';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
 
 // Enable LayoutAnimation for Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -20,8 +27,8 @@ const STORAGE_KEYS = {
 };
 
 export const useRequestsScreen = (initialTab: TabType = 'pending') => {
-    const { showToast } = useToast();
-const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
+  const { showToast } = useToast();
+  const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
   const [hiddenRequestIds, setHiddenRequestIds] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -62,10 +69,10 @@ const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
         },
         momentTitle: req.momentTitle,
         momentEmoji: '🎁',
-        amount: req.totalPrice,
+        amount: req.totalPrice ?? 0,
         message: req.message || '',
-        createdAt: req.createdAt,
-        timeAgo: formatTimeAgo(req.createdAt),
+        createdAt: req.createdAt ?? '',
+        timeAgo: formatTimeAgo(req.createdAt ?? ''),
         isNew: req.status === 'pending',
         proofRequired: false,
         proofUploaded: false,
@@ -77,33 +84,35 @@ const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
   // Map API notifications to UI format
   useEffect(() => {
     if (apiNotifications) {
-      const mappedNotifications: NotificationItem[] = apiNotifications.map((notif) => {
-        let type: NotificationItem['type'] = 'new_request';
-        if (notif.type === 'request_accepted') type = 'accepted';
-        if (notif.type === 'request_completed') type = 'completed';
-        if (notif.type === 'review_received') type = 'review';
-        if (notif.type === 'payment_received') type = 'payment';
+      const mappedNotifications: NotificationItem[] = apiNotifications.map(
+        (notif) => {
+          let type: NotificationItem['type'] = 'new_request';
+          if (notif.type === 'request_accepted') type = 'accepted';
+          if (notif.type === 'request_completed') type = 'completed';
+          if (notif.type === 'review_received') type = 'review';
+          if (notif.type === 'payment_received') type = 'payment';
 
-        let targetType: NotificationItem['targetType'] = 'request';
-        if (notif.type === 'payment_received') targetType = 'wallet';
-        if (notif.type === 'review_received') targetType = 'moment';
+          let targetType: NotificationItem['targetType'] = 'request';
+          if (notif.type === 'payment_received') targetType = 'wallet';
+          if (notif.type === 'review_received') targetType = 'moment';
 
-        return {
-          id: notif.id,
-          type,
-          title: notif.title,
-          body: notif.body,
-          avatar: notif.userAvatar,
-          timeAgo: formatTimeAgo(notif.createdAt),
-          isRead: notif.read,
-          momentId: notif.momentId,
-          targetType,
-          targetData: {
+          return {
+            id: notif.id,
+            type,
+            title: notif.title,
+            body: notif.body,
+            avatar: notif.userAvatar,
+            timeAgo: formatTimeAgo(notif.createdAt),
+            isRead: notif.read,
             momentId: notif.momentId,
-            userId: notif.userId,
-          },
-        };
-      });
+            targetType,
+            targetData: {
+              momentId: notif.momentId,
+              userId: notif.userId,
+            },
+          };
+        },
+      );
       setNotifications(mappedNotifications);
     }
   }, [apiNotifications]);
@@ -126,7 +135,10 @@ const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
 
   const saveHiddenIds = async (ids: string[]) => {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.HIDDEN_REQUESTS, JSON.stringify(ids));
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.HIDDEN_REQUESTS,
+        JSON.stringify(ids),
+      );
     } catch (error) {
       logger.error('Error saving hidden IDs:', error);
     }
@@ -145,7 +157,8 @@ const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
     return notifications.filter((n) => !n.isRead).length;
   }, [notifications]);
 
-  const isLoading = selectedTab === 'pending' ? requestsLoading : notificationsLoading;
+  const isLoading =
+    selectedTab === 'pending' ? requestsLoading : notificationsLoading;
 
   // Handlers
   const handleAccept = async (item: RequestItem) => {
@@ -158,7 +171,7 @@ const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Upload Proof', onPress: () => handleUploadProof(item) },
-        ]
+        ],
       );
       return;
     }
@@ -172,21 +185,29 @@ const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
   };
 
   const handleDecline = async (item: RequestItem) => {
-    Alert.alert('Decline Request', 'Are you sure you want to decline this request?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Decline',
-        style: 'destructive',
-        onPress: async () => {
-          const success = await apiDeclineRequest(item.id);
-          if (success) {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setRequests((prev) => prev.filter((r) => r.id !== item.id));
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          }
+    Alert.alert(
+      'Decline Request',
+      'Are you sure you want to decline this request?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Decline',
+          style: 'destructive',
+          onPress: async () => {
+            const success = await apiDeclineRequest(item.id);
+            if (success) {
+              LayoutAnimation.configureNext(
+                LayoutAnimation.Presets.easeInEaseOut,
+              );
+              setRequests((prev) => prev.filter((r) => r.id !== item.id));
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success,
+              );
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   const handleUploadProof = (item: RequestItem) => {
@@ -203,7 +224,7 @@ const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
   const markNotificationAsRead = async (notificationId: string) => {
     await apiMarkAsRead(notificationId);
     setNotifications((prev) =>
-      prev.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n))
+      prev.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n)),
     );
   };
 

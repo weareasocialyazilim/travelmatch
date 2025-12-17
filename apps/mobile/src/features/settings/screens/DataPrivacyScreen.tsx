@@ -6,7 +6,8 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  TouchableOpacity,  ActivityIndicator,
+  TouchableOpacity,
+  ActivityIndicator,
   Share as _Share,
   Platform,
   Alert,
@@ -14,6 +15,7 @@ import {
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { supabase } from '@/config/supabase';
+import { callRpc } from '@/services/supabaseRpc';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
@@ -49,20 +51,24 @@ const DataPrivacyScreen = () => {
 
   const loadConsentSettings = async () => {
     try {
-      const { data, error } = await supabase
+      const res = await supabase
         .from('profiles')
-        .select('gdpr_consent_at, marketing_consent, analytics_consent, privacy_policy_version, terms_accepted_at')
+        .select(
+          'gdpr_consent_at, marketing_consent, analytics_consent, privacy_policy_version, terms_accepted_at',
+        )
         .eq('id', user?.id)
         .single();
 
-      if (error) throw error;
+      if (res.error) throw res.error;
+
+      const dataAny: any = res.data;
 
       setConsents({
-        gdprConsent: !!data.gdpr_consent_at,
-        marketingConsent: data.marketing_consent || false,
-        analyticsConsent: data.analytics_consent ?? true,
-        privacyPolicyVersion: data.privacy_policy_version,
-        termsAcceptedAt: data.terms_accepted_at,
+        gdprConsent: !!dataAny.gdpr_consent_at,
+        marketingConsent: dataAny.marketing_consent || false,
+        analyticsConsent: dataAny.analytics_consent ?? true,
+        privacyPolicyVersion: dataAny.privacy_policy_version,
+        termsAcceptedAt: dataAny.terms_accepted_at,
       });
     } catch (error) {
       logger.error('Error loading consent settings:', error);
@@ -74,24 +80,24 @@ const DataPrivacyScreen = () => {
 
   const updateConsent = async (
     consentType: 'marketing' | 'analytics',
-    value: boolean
+    value: boolean,
   ) => {
     try {
       // Record consent in history
-      const { error } = await supabase.rpc('record_consent', {
+      const { data: rpcData, error } = await callRpc('record_consent', {
         target_user_id: user?.id,
         consent_type: consentType,
         consented: value,
         version: '1.0',
       });
 
-      if (error) throw error;
+      if (error) throw error as Error;
 
       // Update local state
       if (consentType === 'marketing') {
-        setConsents(prev => ({ ...prev, marketingConsent: value }));
+        setConsents((prev) => ({ ...prev, marketingConsent: value }));
       } else {
-        setConsents(prev => ({ ...prev, analyticsConsent: value }));
+        setConsents((prev) => ({ ...prev, analyticsConsent: value }));
       }
 
       showToast('Privacy preferences updated', 'success');
@@ -113,7 +119,8 @@ const DataPrivacyScreen = () => {
             setExportLoading(true);
             try {
               // Call GDPR-compliant export function
-              const { data: exportData, error } = await userService.exportData();
+              const { data: exportData, error } =
+                await userService.exportData();
 
               if (error) throw error;
 
@@ -124,7 +131,9 @@ const DataPrivacyScreen = () => {
               if (Platform.OS === 'web') {
                 // Web: Create download link
                 const dataStr = JSON.stringify(exportData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const dataBlob = new Blob([dataStr], {
+                  type: 'application/json',
+                });
                 const url = URL.createObjectURL(dataBlob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -137,7 +146,7 @@ const DataPrivacyScreen = () => {
                 await FileSystem.writeAsStringAsync(
                   fileUri,
                   JSON.stringify(exportData, null, 2),
-                  { encoding: FileSystem.EncodingType.UTF8 }
+                  { encoding: FileSystem.EncodingType.UTF8 },
                 );
 
                 // Check if sharing is available
@@ -153,7 +162,7 @@ const DataPrivacyScreen = () => {
                   Alert.alert(
                     'Export Saved',
                     `Your data has been saved to:\n${fileUri}`,
-                    [{ text: 'OK' }]
+                    [{ text: 'OK' }],
                   );
                 }
               }
@@ -162,14 +171,14 @@ const DataPrivacyScreen = () => {
               Alert.alert(
                 'Export Completed',
                 `Your data export includes:\n\n` +
-                `• Profile information\n` +
-                `• ${exportData.metadata.totalMoments} moments\n` +
-                `• ${exportData.metadata.totalRequests} requests\n` +
-                `• ${exportData.metadata.totalMessages} messages\n` +
-                `• ${exportData.metadata.totalTransactions} transactions\n` +
-                `• ${exportData.metadata.totalReviews} reviews\n\n` +
-                `This file is valid for 7 days as per GDPR requirements.`,
-                [{ text: 'OK' }]
+                  `• Profile information\n` +
+                  `• ${exportData.metadata.totalMoments} moments\n` +
+                  `• ${exportData.metadata.totalRequests} requests\n` +
+                  `• ${exportData.metadata.totalMessages} messages\n` +
+                  `• ${exportData.metadata.totalTransactions} transactions\n` +
+                  `• ${exportData.metadata.totalReviews} reviews\n\n` +
+                  `This file is valid for 7 days as per GDPR requirements.`,
+                [{ text: 'OK' }],
               );
             } catch (error) {
               logger.error('[DataPrivacy] Error exporting data:', error);
@@ -178,14 +187,14 @@ const DataPrivacyScreen = () => {
                 error instanceof Error
                   ? error.message
                   : 'Failed to export data. Please try again or contact support.',
-                [{ text: 'OK' }]
+                [{ text: 'OK' }],
               );
             } finally {
               setExportLoading(false);
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -206,12 +215,15 @@ const DataPrivacyScreen = () => {
           onPress: async () => {
             setDeleteLoading(true);
             try {
-              const { error } = await supabase.rpc('schedule_account_deletion', {
-                target_user_id: user?.id,
-                deletion_reason: 'User requested deletion',
-              });
+              const { data: rpcData2, error } = await callRpc(
+                'schedule_account_deletion',
+                {
+                  target_user_id: user?.id,
+                  deletion_reason: 'User requested deletion',
+                },
+              );
 
-              if (error) throw error;
+              if (error) throw error as Error;
 
               Alert.alert(
                 'Account Deletion Scheduled',
@@ -223,7 +235,7 @@ const DataPrivacyScreen = () => {
                       // Optionally navigate to a confirmation screen or logout
                     },
                   },
-                ]
+                ],
               );
             } catch (error) {
               logger.error('Error scheduling deletion:', error);
@@ -233,7 +245,7 @@ const DataPrivacyScreen = () => {
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -242,7 +254,8 @@ const DataPrivacyScreen = () => {
       // SECURITY: Explicit column selection
       const { data, error } = await supabase
         .from('consent_history')
-        .select(`
+        .select(
+          `
           id,
           user_id,
           consent_type,
@@ -250,7 +263,8 @@ const DataPrivacyScreen = () => {
           ip_address,
           user_agent,
           created_at
-        `)
+        `,
+        )
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
@@ -259,7 +273,7 @@ const DataPrivacyScreen = () => {
       // Navigate to consent history screen or show modal
       Alert.alert(
         'Consent History',
-        `You have ${data.length} consent records. View them in the app.`
+        `You have ${data.length} consent records. View them in the app.`,
       );
     } catch (error) {
       logger.error('Error fetching consent history:', error);
@@ -279,7 +293,8 @@ const DataPrivacyScreen = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>GDPR Rights</Text>
         <Text style={styles.sectionDescription}>
-          Under GDPR, you have the right to access, export, and delete your personal data.
+          Under GDPR, you have the right to access, export, and delete your
+          personal data.
         </Text>
 
         <TouchableOpacity
@@ -345,7 +360,9 @@ const DataPrivacyScreen = () => {
         <TouchableOpacity style={styles.linkButton}>
           <Text style={styles.linkText}>Privacy Policy</Text>
           {consents.privacyPolicyVersion && (
-            <Text style={styles.versionText}>v{consents.privacyPolicyVersion}</Text>
+            <Text style={styles.versionText}>
+              v{consents.privacyPolicyVersion}
+            </Text>
           )}
         </TouchableOpacity>
 
@@ -358,20 +375,23 @@ const DataPrivacyScreen = () => {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.linkButton} onPress={handleViewConsentHistory}>
+        <TouchableOpacity
+          style={styles.linkButton}
+          onPress={handleViewConsentHistory}
+        >
           <Text style={styles.linkText}>View Consent History</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.footerText}>
-          Your privacy is important to us. We are committed to protecting your personal data
-          in accordance with GDPR and other privacy regulations.
+          Your privacy is important to us. We are committed to protecting your
+          personal data in accordance with GDPR and other privacy regulations.
         </Text>
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

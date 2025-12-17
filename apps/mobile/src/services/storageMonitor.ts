@@ -47,7 +47,10 @@ class StorageMonitorService {
   async initialize(): Promise<void> {
     try {
       // Check on startup
-      await this.checkStorage();
+      const initial = await this.checkStorage();
+      if (initial === null) {
+        throw new Error('Init failed');
+      }
       
       // Setup periodic checks
       this.startMonitoring();
@@ -136,6 +139,7 @@ class StorageMonitorService {
       const storageInfo = await this.getStorageInfo();
       
       if (!storageInfo) {
+        logger.error('StorageMonitor', 'Storage check failed', new Error('Failed to get storage info'));
         return null;
       }
       
@@ -181,10 +185,21 @@ class StorageMonitorService {
         logger.warn('StorageMonitor', 'Cannot verify storage, allowing upload');
         return { allowed: true };
       }
-      
+
       // Check if file would fit
       const requiredSpace = fileSize * 1.5; // 1.5x buffer for processing
-      
+
+      // Block outright if storage level is critical
+      if (storageInfo.level === StorageLevel.CRITICAL) {
+        const reason = `Insufficient storage: level=${storageInfo.level}`;
+        logger.error('StorageMonitor', 'Upload blocked: Insufficient storage', {
+          fileSize: this.formatBytes(fileSize),
+          freeSpace: this.formatBytes(storageInfo.freeSpace),
+          required: this.formatBytes(requiredSpace),
+        });
+        return { allowed: false, reason };
+      }
+
       if (storageInfo.freeSpace < requiredSpace) {
         logger.error('StorageMonitor', 'Upload blocked: Insufficient storage', {
           fileSize: this.formatBytes(fileSize),
@@ -276,6 +291,11 @@ class StorageMonitorService {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     
+    // If MB value is large (>=1000 MB), prefer displaying in GB rounded
+    if (i === 2 && bytes / Math.pow(k, i) >= 1000) {
+      return Math.round(bytes / Math.pow(k, 3)) + ' GB';
+    }
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
@@ -287,7 +307,7 @@ class StorageMonitorService {
       const info = await this.getStorageInfo();
       
       if (!info) {
-        return 'Storage info unavailable';
+        return 'Failed to get storage stats';
       }
       
       return `

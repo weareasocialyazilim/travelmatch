@@ -1,13 +1,12 @@
 import React, { memo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { OptimizedImage } from '../../ui/OptimizedImage';
-import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../../../utils/cloudflareImageHelpers';
+import {
+  getMomentImageProps,
+  getAvatarImageProps,
+  IMAGE_VARIANTS_BY_CONTEXT,
+} from '../../../utils/cloudflareImageHelpers';
 import { COLORS } from '../../../constants/colors';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
@@ -18,17 +17,27 @@ interface MomentSingleCardProps {
 
 const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
   ({ moment, onPress }) => {
-    const imageUrl = moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
+    const imageUrl =
+      moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
     const hostName = moment.hostName || 'Anonymous';
     const price = moment.price ?? moment.pricePerGuest ?? 0;
-    const locationCity = typeof moment.location === 'string' ? moment.location : moment.location?.city || 'Unknown';
+    const locationCity =
+      typeof moment.location === 'string'
+        ? moment.location
+        : moment.location?.city || 'Unknown';
 
     // Prepare user object for avatar helper
-    const hostUser = {
-      avatar: moment.hostAvatar,
-      avatarCloudflareId: (moment as any).hostAvatarCloudflareId,
-      avatarBlurHash: (moment as any).hostAvatarBlurHash,
-    };
+    const hostUser = (() => {
+      const m = moment as unknown as {
+        hostAvatarCloudflareId?: string;
+        hostAvatarBlurHash?: string;
+      };
+      return {
+        avatar: moment.hostAvatar,
+        avatarCloudflareId: m.hostAvatarCloudflareId,
+        avatarBlurHash: m.hostAvatarBlurHash,
+      };
+    })();
 
     return (
       <TouchableOpacity
@@ -37,7 +46,11 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
         activeOpacity={0.95}
       >
         <OptimizedImage
-          {...getMomentImageProps(moment, IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE, imageUrl)}
+          {...getMomentImageProps(
+            moment,
+            IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE,
+            imageUrl,
+          )}
           contentFit="cover"
           style={styles.singleImage}
           transition={200}
@@ -50,7 +63,7 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
               {...getAvatarImageProps(
                 hostUser,
                 IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                'https://via.placeholder.com/40'
+                'https://via.placeholder.com/40',
               )}
               contentFit="cover"
               style={styles.creatorAvatar}
@@ -60,9 +73,7 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
             />
             <View style={styles.creatorInfo}>
               <View style={styles.creatorNameRow}>
-                <Text style={styles.creatorName}>
-                  {hostName}
-                </Text>
+                <Text style={styles.creatorName}>{hostName}</Text>
                 {moment.hostRating > 4.5 && (
                   <MaterialCommunityIcons
                     name="check-decagram"
@@ -87,9 +98,7 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
               size={14}
               color={COLORS.textSecondary}
             />
-            <Text style={styles.locationText}>
-              {locationCity}
-            </Text>
+            <Text style={styles.locationText}>{locationCity}</Text>
           </View>
           <Text style={styles.priceValue}>${price}</Text>
         </View>

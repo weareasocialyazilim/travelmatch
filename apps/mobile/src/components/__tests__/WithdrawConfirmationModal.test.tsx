@@ -19,16 +19,18 @@ describe('WithdrawConfirmationModal', () => {
   describe('Rendering', () => {
     it('renders modal when visible is true', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       expect(getByText('Withdraw money?')).toBeTruthy();
-      expect(getByText('It will arrive to your bank in 1–2 days.')).toBeTruthy();
+      expect(
+        getByText('It will arrive to your bank in 1–2 days.'),
+      ).toBeTruthy();
     });
 
     it('renders with correct amount formatting', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={100} />
+        <WithdrawConfirmationModal {...defaultProps} amount={100} />,
       );
 
       expect(getByText('$100.00')).toBeTruthy();
@@ -36,7 +38,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('renders with decimal amount', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={123.45} />
+        <WithdrawConfirmationModal {...defaultProps} amount={123.45} />,
       );
 
       expect(getByText('$123.45')).toBeTruthy();
@@ -44,12 +46,12 @@ describe('WithdrawConfirmationModal', () => {
 
     it('renders wallet icon', () => {
       const { UNSAFE_getAllByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-      
+
       expect(icons.length).toBeGreaterThan(0);
       expect(icons[0].props.name).toBe('wallet');
       expect(icons[0].props.size).toBe(40);
@@ -57,7 +59,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('renders cancel button', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       expect(getByText('Cancel')).toBeTruthy();
@@ -65,7 +67,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('renders confirm button', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       expect(getByText('Confirm')).toBeTruthy();
@@ -75,7 +77,7 @@ describe('WithdrawConfirmationModal', () => {
   describe('User Interactions', () => {
     it('calls onConfirm when confirm button is pressed', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Confirm'));
@@ -86,7 +88,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('calls onCancel when cancel button is pressed', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Cancel'));
@@ -97,7 +99,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('allows multiple confirm presses', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Confirm'));
@@ -109,7 +111,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('allows multiple cancel presses', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Cancel'));
@@ -122,7 +124,7 @@ describe('WithdrawConfirmationModal', () => {
   describe('Modal Behavior', () => {
     it('has transparent prop set to true', () => {
       const { UNSAFE_getByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const { Modal } = require('react-native');
@@ -133,7 +135,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('has fade animation type', () => {
       const { UNSAFE_getByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const { Modal } = require('react-native');
@@ -144,7 +146,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('calls onCancel when modal requests close', () => {
       const { UNSAFE_getByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const { Modal } = require('react-native');
@@ -157,7 +159,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('does not render when visible is false', () => {
       const { UNSAFE_getByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} visible={false} />
+        <WithdrawConfirmationModal {...defaultProps} visible={false} />,
       );
 
       const { Modal } = require('react-native');
@@ -170,7 +172,7 @@ describe('WithdrawConfirmationModal', () => {
   describe('Amount Display', () => {
     it('formats small amounts correctly', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={1.5} />
+        <WithdrawConfirmationModal {...defaultProps} amount={1.5} />,
       );
 
       expect(getByText('$1.50')).toBeTruthy();
@@ -178,7 +180,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('formats large amounts correctly', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={999999.99} />
+        <WithdrawConfirmationModal {...defaultProps} amount={999999.99} />,
       );
 
       expect(getByText('$999999.99')).toBeTruthy();
@@ -186,7 +188,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('formats zero amount', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={0} />
+        <WithdrawConfirmationModal {...defaultProps} amount={0} />,
       );
 
       expect(getByText('$0.00')).toBeTruthy();
@@ -194,7 +196,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('handles single decimal place', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={50.5} />
+        <WithdrawConfirmationModal {...defaultProps} amount={50.5} />,
       );
 
       expect(getByText('$50.50')).toBeTruthy();
@@ -202,7 +204,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('rounds to two decimal places', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={12.345} />
+        <WithdrawConfirmationModal {...defaultProps} amount={12.345} />,
       );
 
       expect(getByText('$12.35')).toBeTruthy();
@@ -212,7 +214,7 @@ describe('WithdrawConfirmationModal', () => {
   describe('Accessibility', () => {
     it('cancel button has activeOpacity', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const cancelButton = getByText('Cancel').parent?.parent;
@@ -221,7 +223,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('confirm button has activeOpacity', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const confirmButton = getByText('Confirm').parent?.parent;
@@ -232,10 +234,7 @@ describe('WithdrawConfirmationModal', () => {
   describe('Edge Cases', () => {
     it('handles undefined onConfirm gracefully', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal
-          {...defaultProps}
-          onConfirm={undefined as any}
-        />
+        <WithdrawConfirmationModal {...defaultProps} onConfirm={undefined} />,
       );
 
       expect(() => fireEvent.press(getByText('Confirm'))).not.toThrow();
@@ -243,10 +242,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('handles undefined onCancel gracefully', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal
-          {...defaultProps}
-          onCancel={undefined as any}
-        />
+        <WithdrawConfirmationModal {...defaultProps} onCancel={undefined} />,
       );
 
       expect(() => fireEvent.press(getByText('Cancel'))).not.toThrow();
@@ -254,7 +250,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('handles negative amount', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={-50} />
+        <WithdrawConfirmationModal {...defaultProps} amount={-50} />,
       );
 
       expect(getByText('$-50.00')).toBeTruthy();
@@ -262,7 +258,7 @@ describe('WithdrawConfirmationModal', () => {
 
     it('handles very large amount', () => {
       const { getByText } = render(
-        <WithdrawConfirmationModal {...defaultProps} amount={1000000000} />
+        <WithdrawConfirmationModal {...defaultProps} amount={1000000000} />,
       );
 
       expect(getByText('$1000000000.00')).toBeTruthy();
@@ -272,7 +268,7 @@ describe('WithdrawConfirmationModal', () => {
   describe('Component Structure', () => {
     it('renders backdrop view', () => {
       const { UNSAFE_getAllByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const { View } = require('react-native');
@@ -284,24 +280,24 @@ describe('WithdrawConfirmationModal', () => {
 
     it('renders icon container with correct styling', () => {
       const { UNSAFE_getAllByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const { View } = require('react-native');
       const views = UNSAFE_getAllByType(View);
-      
+
       // Icon container should have specific dimensions (64x64) and borderRadius (32)
       const iconContainer = views.find((view) => {
         const style = JSON.stringify(view.props.style);
         return style.includes('64') && style.includes('32');
       });
-      
+
       expect(iconContainer).toBeTruthy();
     });
 
     it('renders button group container', () => {
       const { UNSAFE_getAllByType } = render(
-        <WithdrawConfirmationModal {...defaultProps} />
+        <WithdrawConfirmationModal {...defaultProps} />,
       );
 
       const { View } = require('react-native');

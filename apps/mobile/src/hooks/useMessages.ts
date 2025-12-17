@@ -84,14 +84,17 @@ export const useMessages = (): UseMessagesReturn => {
       setConversationsError(null);
       const response = await retryWithErrorHandling(
         () => messageService.getConversations(),
-        { context: 'refreshConversations', maxRetries: 2 }
+        { context: 'refreshConversations', maxRetries: 2 },
       );
       if (mountedRef.current) {
         setConversations(response.conversations);
       }
     } catch (error) {
       if (mountedRef.current) {
-        const standardizedError = ErrorHandler.handle(error, 'refreshConversations');
+        const standardizedError = ErrorHandler.handle(
+          error,
+          'refreshConversations',
+        );
         setConversationsError(standardizedError.userMessage);
       }
     } finally {
@@ -180,11 +183,11 @@ export const useMessages = (): UseMessagesReturn => {
       try {
         const newMessage = await retryWithErrorHandling(
           () => messageService.sendMessage(data),
-          { 
-            context: 'sendMessage', 
+          {
+            context: 'sendMessage',
             maxRetries: 3,
-            baseDelay: 1000
-          }
+            baseDelay: 1000,
+          },
         );
 
         if (!mountedRef.current) return newMessage;
@@ -204,11 +207,15 @@ export const useMessages = (): UseMessagesReturn => {
                   }
                 : conv,
             )
-            .sort(
-              (a, b) =>
-                new Date(b.lastMessageAt).getTime() -
-                new Date(a.lastMessageAt).getTime(),
-            ),
+            .sort((a, b) => {
+              const bTime = b.lastMessageAt
+                ? new Date(b.lastMessageAt).getTime()
+                : 0;
+              const aTime = a.lastMessageAt
+                ? new Date(a.lastMessageAt).getTime()
+                : 0;
+              return bTime - aTime;
+            }),
         );
 
         return newMessage;
@@ -276,7 +283,10 @@ export const useMessages = (): UseMessagesReturn => {
   useEffect(() => {
     if (!currentConversationIdRef.current) return;
 
-    logger.info('useMessages', `Setting up real-time for: ${currentConversationIdRef.current}`);
+    logger.info(
+      'useMessages',
+      `Setting up real-time for: ${currentConversationIdRef.current}`,
+    );
 
     // Subscribe to new messages in current conversation
     const channel = supabase
@@ -303,7 +313,9 @@ export const useMessages = (): UseMessagesReturn => {
             senderId: String(dbMessage.sender_id || ''),
             content: String(dbMessage.content || ''),
             type: (dbMessage.type as MessageType) || 'text',
-            imageUrl: dbMessage.image_url ? String(dbMessage.image_url) : undefined,
+            imageUrl: dbMessage.image_url
+              ? String(dbMessage.image_url)
+              : undefined,
             location: dbMessage.location || undefined,
             createdAt: String(dbMessage.created_at || new Date().toISOString()),
             status: 'sent' as MessageStatus,
@@ -315,7 +327,7 @@ export const useMessages = (): UseMessagesReturn => {
             if (exists) return prev;
             return [newMessage, ...prev];
           });
-        }
+        },
       )
       .on(
         'postgres_changes',
@@ -339,13 +351,15 @@ export const useMessages = (): UseMessagesReturn => {
                 return {
                   ...msg,
                   content: String(dbMessage.content || msg.content),
-                  readAt: dbMessage.read_at ? String(dbMessage.read_at) : undefined,
+                  readAt: dbMessage.read_at
+                    ? String(dbMessage.read_at)
+                    : undefined,
                 };
               }
               return msg;
-            })
+            }),
           );
-        }
+        },
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -384,7 +398,7 @@ export const useMessages = (): UseMessagesReturn => {
 
           // Refresh conversations to get the new one
           void refreshConversations();
-        }
+        },
       )
       .on(
         'postgres_changes',
@@ -406,14 +420,18 @@ export const useMessages = (): UseMessagesReturn => {
               if (conv.id === String(dbConv.id || '')) {
                 return {
                   ...conv,
-                  lastMessage: String(dbConv.last_message_content || conv.lastMessage),
-                  lastMessageAt: String(dbConv.updated_at || conv.lastMessageAt),
+                  lastMessage: String(
+                    dbConv.last_message_content || conv.lastMessage,
+                  ),
+                  lastMessageAt: String(
+                    dbConv.updated_at || conv.lastMessageAt,
+                  ),
                 };
               }
               return conv;
-            })
+            }),
           );
-        }
+        },
       )
       .subscribe();
 

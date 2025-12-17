@@ -4,9 +4,14 @@
  */
 
 import { supabase } from '../config/supabase';
+import { callRpc } from './supabaseRpc';
 import { logger } from '../utils/logger';
 import { transactionsService as dbTransactionsService } from './supabaseDbService';
-import { PaymentMetadataSchema, type PaymentMetadata as _PaymentMetadata } from '../schemas/payment.schema';
+import type { Database } from '../types/database.types';
+import {
+  PaymentMetadataSchema,
+  type PaymentMetadata as _PaymentMetadata,
+} from '../schemas/payment.schema';
 import { VALUES } from '../constants/values';
 
 // Mock storage for payment methods (simulated for store readiness)
@@ -83,7 +88,12 @@ export interface PaymentIntent {
   paymentIntentId?: string;
   amount: number;
   currency: string;
-  status: PaymentStatus | 'requires_payment_method' | 'requires_confirmation' | 'succeeded' | 'cancelled';
+  status:
+    | PaymentStatus
+    | 'requires_payment_method'
+    | 'requires_confirmation'
+    | 'succeeded'
+    | 'cancelled';
   clientSecret?: string;
   momentId?: string;
 }
@@ -259,7 +269,7 @@ export const paymentService = {
       if (error) throw error;
 
       // Validate and parse metadata
-      const validatedMetadata = data.metadata 
+      const validatedMetadata = data.metadata
         ? PaymentMetadataSchema.parse(data.metadata)
         : undefined;
 
@@ -335,7 +345,9 @@ export const paymentService = {
   /**
    * Add a bank account
    */
-  addBankAccount: (_data: Record<string, unknown>): { bankAccount: BankAccount } => {
+  addBankAccount: (
+    _data: Record<string, unknown>,
+  ): { bankAccount: BankAccount } => {
     if (!__DEV__) {
       logger.error(
         'addBankAccount called in production with mock implementation!',
@@ -384,7 +396,9 @@ export const paymentService = {
    */
   setDefaultCard: async (cardId: string): Promise<{ success: boolean }> => {
     if (!__DEV__) {
-      logger.error('setDefaultCard called in production with mock implementation!');
+      logger.error(
+        'setDefaultCard called in production with mock implementation!',
+      );
       throw new Error('Payment methods not configured for production');
     }
     MOCK_CARDS = MOCK_CARDS.map((c) => ({ ...c, isDefault: c.id === cardId }));
@@ -399,7 +413,9 @@ export const paymentService = {
     bankAccountId: string,
   ): Promise<{ transaction: Transaction }> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       // In production, this would call a payment gateway
@@ -429,7 +445,9 @@ export const paymentService = {
     amount: number,
   ): Promise<PaymentIntent> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       // In production, this would create a Stripe PaymentIntent
@@ -600,7 +618,11 @@ export const paymentService = {
     momentId?: string;
     message?: string;
     escrowChoiceCallback?: (amount: number) => Promise<boolean>;
-  }): Promise<{ success: boolean; transactionId: string; escrowId?: string }> => {
+  }): Promise<{
+    success: boolean;
+    transactionId: string;
+    escrowId?: string;
+  }> => {
     try {
       const {
         data: { user },
@@ -617,7 +639,7 @@ export const paymentService = {
         case 'direct':
           // < $30: Direct atomic transfer (no escrow)
           logger.info(`[Payment] Direct transfer: $${amount}`);
-          const { data: directData, error: directError } = await supabase.rpc(
+          const { data: directData, error: directError } = await callRpc<any>(
             'atomic_transfer',
             {
               p_sender_id: user.id,
@@ -632,7 +654,7 @@ export const paymentService = {
 
           return {
             success: true,
-            transactionId: directData.senderTxnId,
+            transactionId: directData?.senderTxnId,
           };
 
         case 'optional':
@@ -644,7 +666,7 @@ export const paymentService = {
 
           if (useEscrow) {
             // User chose escrow protection
-            const { data: escrowData, error: escrowError } = await supabase.rpc(
+            const { data: escrowData, error: escrowError } = await callRpc<any>(
               'create_escrow_transaction',
               {
                 p_sender_id: user.id,
@@ -659,13 +681,13 @@ export const paymentService = {
 
             return {
               success: true,
-              transactionId: escrowData.transaction_id,
-              escrowId: escrowData.escrow_id,
+              transactionId: escrowData?.transaction_id,
+              escrowId: escrowData?.escrow_id,
             };
           } else {
             // User chose direct payment
             const { data: directData2, error: directError2 } =
-              await supabase.rpc('atomic_transfer', {
+              await callRpc<any>('atomic_transfer', {
                 p_sender_id: user.id,
                 p_recipient_id: recipientId,
                 p_amount: amount,
@@ -677,7 +699,7 @@ export const paymentService = {
 
             return {
               success: true,
-              transactionId: directData2.senderTxnId,
+              transactionId: directData2?.senderTxnId,
             };
           }
 
@@ -685,7 +707,7 @@ export const paymentService = {
           // >= $100: Force escrow (no choice)
           logger.info(`[Payment] Mandatory escrow: $${amount}`);
           const { data: mandatoryData, error: mandatoryError } =
-            await supabase.rpc('create_escrow_transaction', {
+            await callRpc<any>('create_escrow_transaction', {
               p_sender_id: user.id,
               p_recipient_id: recipientId,
               p_amount: amount,
@@ -697,8 +719,8 @@ export const paymentService = {
 
           return {
             success: true,
-            transactionId: mandatoryData.transaction_id,
-            escrowId: mandatoryData.escrow_id,
+            transactionId: mandatoryData?.transaction_id,
+            escrowId: mandatoryData?.escrow_id,
           };
 
         default:
@@ -716,13 +738,13 @@ export const paymentService = {
    */
   releaseEscrow: async (escrowId: string): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await supabase.rpc('release_escrow', {
+      const { data, error } = await callRpc<any>('release_escrow', {
         p_escrow_id: escrowId,
       });
 
       if (error) throw error;
 
-      return { success: data.success };
+      return { success: data?.success };
     } catch (error) {
       logger.error('Release escrow error:', error);
       throw error;
@@ -738,14 +760,14 @@ export const paymentService = {
     reason: string,
   ): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await supabase.rpc('refund_escrow', {
+      const { data, error } = await callRpc<any>('refund_escrow', {
         p_escrow_id: escrowId,
         p_reason: reason,
       });
 
       if (error) throw error;
 
-      return { success: data.success };
+      return { success: data?.success };
     } catch (error) {
       logger.error('Refund escrow error:', error);
       throw error;
@@ -771,7 +793,21 @@ export const paymentService = {
 
       if (error) throw error;
 
-      return data || [];
+      const rows = data as unknown as
+        | Database['public']['Tables']['escrow_transactions']['Row'][]
+        | null;
+
+      return (rows || []).map((r) => ({
+        id: r.id,
+        sender_id: r.sender_id,
+        recipient_id: r.recipient_id,
+        amount: r.amount,
+        status: r.status as EscrowTransaction['status'],
+        release_condition: r.release_condition,
+        created_at: r.created_at,
+        expires_at: r.expires_at,
+        moment_id: r.moment_id || undefined,
+      }));
     } catch (error) {
       logger.error('Get escrow transactions error:', error);
       return [];

@@ -1,8 +1,8 @@
 /**
  * Cached Image Component
- * 
+ *
  * Production-ready image component with comprehensive error handling
- * 
+ *
  * Features:
  * - State machine: idle → loading → success | error
  * - Multi-tier caching (Memory → Disk → Cloudflare → Network)
@@ -12,7 +12,7 @@
  * - Automatic WebP conversion via Cloudflare
  * - Responsive image variants
  * - No crashes, no empty spaces
- * 
+ *
  * @example
  * <CachedImage
  *   source={{ uri: 'https://example.com/image.jpg' }}
@@ -35,7 +35,9 @@ import {
   Text,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import imageCacheManager, { type ImageVariant } from '../services/imageCacheManager';
+import imageCacheManager, {
+  type ImageVariant,
+} from '../services/imageCacheManager';
 import { COLORS } from '../constants/colors';
 
 // ============================================================================
@@ -46,7 +48,8 @@ type ImageState = 'idle' | 'loading' | 'success' | 'error';
 
 type ImageType = 'default' | 'avatar' | 'moment' | 'trip' | 'gift' | 'profile';
 
-export interface CachedImageProps extends Omit<ImageProps, 'source' | 'onError' | 'onLoadStart' | 'onLoadEnd'> {
+export interface CachedImageProps
+  extends Omit<ImageProps, 'source' | 'onError' | 'onLoadStart' | 'onLoadEnd'> {
   source: { uri: string };
   type?: ImageType;
   cloudflareId?: string;
@@ -72,7 +75,10 @@ export interface CachedImageProps extends Omit<ImageProps, 'source' | 'onError' 
 // FALLBACK CONFIGURATIONS
 // ============================================================================
 
-const FALLBACK_CONFIG: Record<ImageType, { icon: string; color: string; bg: string; label: string }> = {
+const FALLBACK_CONFIG: Record<
+  ImageType,
+  { icon: string; color: string; bg: string; label: string }
+> = {
   default: {
     icon: 'image-off-outline',
     color: COLORS.gray[400],
@@ -218,7 +224,14 @@ export const CachedImage: React.FC<CachedImageProps> = ({
     }
 
     return (
-      <View style={[styles.container, styles.loadingContainer, containerStyle, style as ViewStyle]}>
+      <View
+        style={[
+          styles.container,
+          styles.loadingContainer,
+          containerStyle,
+          style as ViewStyle,
+        ]}
+      >
         <ActivityIndicator size="small" color={COLORS.primary} />
         <Text style={styles.loadingText}>Yükleniyor...</Text>
       </View>
@@ -232,21 +245,37 @@ export const CachedImage: React.FC<CachedImageProps> = ({
     }
 
     return (
-      <View style={[styles.container, styles.errorContainer, { backgroundColor: fallbackConfig.bg }, containerStyle, style as ViewStyle]}>
-        <MaterialCommunityIcons 
-          name={fallbackConfig.icon as any} 
-          size={48} 
-          color={fallbackConfig.color} 
+      <View
+        style={[
+          styles.container,
+          styles.errorContainer,
+          { backgroundColor: fallbackConfig.bg },
+          containerStyle,
+          style as ViewStyle,
+        ]}
+      >
+        <MaterialCommunityIcons
+          name={
+            fallbackConfig.icon as unknown as React.ComponentProps<
+              typeof MaterialCommunityIcons
+            >['name']
+          }
+          size={48}
+          color={fallbackConfig.color}
         />
         <Text style={styles.errorText}>{fallbackConfig.label}</Text>
-        
+
         {enableRetry && retryCount < maxRetries && (
-          <TouchableOpacity 
-            style={styles.retryButton} 
+          <TouchableOpacity
+            style={styles.retryButton}
             onPress={handleRetry}
             activeOpacity={0.7}
           >
-            <MaterialCommunityIcons name="refresh" size={16} color={COLORS.primary} />
+            <MaterialCommunityIcons
+              name="refresh"
+              size={16}
+              color={COLORS.primary}
+            />
             <Text style={styles.retryText}>
               Tekrar Dene {retryCount > 0 && `(${retryCount}/${maxRetries})`}
             </Text>
@@ -254,7 +283,9 @@ export const CachedImage: React.FC<CachedImageProps> = ({
         )}
 
         {retryCount >= maxRetries && (
-          <Text style={styles.maxRetriesText}>Maksimum deneme sayısına ulaşıldı</Text>
+          <Text style={styles.maxRetriesText}>
+            Maksimum deneme sayısına ulaşıldı
+          </Text>
         )}
       </View>
     );

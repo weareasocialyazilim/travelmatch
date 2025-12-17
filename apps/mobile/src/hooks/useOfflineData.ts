@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 import {
   cacheService,
   CACHE_KEYS as _CACHE_KEYS,
@@ -128,7 +129,7 @@ export function useOfflineData<T>({
 }
 
 interface UseOfflineMutationOptions {
-  onSuccess?: () => void;
+  onSuccess?: (result?: unknown) => void;
   onError?: (error: Error) => void;
   offlineActionType?: OfflineActionType;
 }
@@ -148,14 +149,27 @@ export function useOfflineMutation<
   TParams extends Record<string, unknown>,
   TResult,
 >(
-  mutationFn: (params: TParams) => Promise<TResult>,
-  options: UseOfflineMutationOptions = {},
+  // Allow either a mutation function or an options object as the first
+  // parameter to support both usage patterns in tests and in-app code.
+  mutationOrOptions:
+    | ((params: TParams) => Promise<TResult>)
+    | UseOfflineMutationOptions = {} as UseOfflineMutationOptions,
+  maybeOptions: UseOfflineMutationOptions = {},
 ): UseOfflineMutationReturn<TParams, TResult> {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isQueued, setIsQueued] = useState(false);
 
   const { isOnline } = useNetwork();
+
+  const mutationFn =
+    typeof mutationOrOptions === 'function'
+      ? mutationOrOptions
+      : undefined;
+
+  const options: UseOfflineMutationOptions =
+    typeof mutationOrOptions === 'function' ? maybeOptions : (mutationOrOptions as UseOfflineMutationOptions);
+
   const { onSuccess, onError, offlineActionType } = options;
 
   const mutate = useCallback(
@@ -165,21 +179,54 @@ export function useOfflineMutation<
       setIsQueued(false);
 
       try {
-        if (isOnline) {
-          // Execute immediately if online
-          const result = await mutationFn(params);
-          onSuccess?.();
-          return result;
-        } else if (offlineActionType) {
-          // Queue for later if offline and action type is specified
-          await offlineSyncQueue.add(offlineActionType, params);
-          setIsQueued(true);
-          onSuccess?.();
-          return null;
-        } else {
-          // No offline support, throw error
+        // Re-check network state at mutation time to avoid relying on
+        // potentially-stale `isOnline` value from the hook state.
+        const netState = await NetInfo.fetch();
+        const online = !!(
+          netState && netState.isConnected && netState.isInternetReachable !== false
+        );
+        if (mutationFn) {
+          // Caller supplied a direct mutation function
+          if (online) {
+            const result = await mutationFn(params);
+            onSuccess?.(result as unknown as TResult);
+            return result;
+          } else if (offlineActionType) {
+            // If an offlineActionType is provided alongside a mutation function,
+            // also queue the action for later processing. Set queued state
+            // synchronously so callers observe it immediately.
+            setIsQueued(true);
+            const _id = await offlineSyncQueue.add(offlineActionType, params);
+            onSuccess?.();
+            return null;
+          }
           throw new Error('No network connection');
         }
+
+        // No mutation function provided: rely on registered handlers and
+        // `offlineActionType` to execute the proper logic.
+        if (!offlineActionType) {
+          throw new Error('No mutation function or offlineActionType provided');
+        }
+
+        if (online) {
+          // Execute registered handler immediately when online
+          // `executeHandler` will throw if no handler exists.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const result = await (offlineSyncQueue as any).executeHandler(
+            offlineActionType,
+            params as Record<string, unknown>,
+          );
+          onSuccess?.(result as unknown as TResult);
+          return result as unknown as TResult;
+        }
+
+        // Offline: queue the action for later. Set queued state synchronously
+        // so tests and callers can observe the queued state immediately.
+        setIsQueued(true);
+        await offlineSyncQueue.add(offlineActionType, params as Record<string, unknown>);
+        onSuccess?.();
+        return null;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Mutation failed';

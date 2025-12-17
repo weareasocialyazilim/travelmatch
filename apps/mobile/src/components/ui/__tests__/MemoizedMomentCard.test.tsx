@@ -55,7 +55,7 @@ describe('MemoizedMomentCard', () => {
     it('renders correctly with required props', () => {
       const moment = createMockMoment();
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Coffee at Sunset Cafe')).toBeTruthy();
@@ -65,7 +65,7 @@ describe('MemoizedMomentCard', () => {
     it('displays moment title', () => {
       const moment = createMockMoment({ title: 'Amazing Food Tour' });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Amazing Food Tour')).toBeTruthy();
@@ -74,7 +74,8 @@ describe('MemoizedMomentCard', () => {
     it('displays moment price', () => {
       const moment = createMockMoment({ price: 25 });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />  );
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
+      );
 
       // Price might be in accessibility label or rendered text
       expect(getByText(/25/)).toBeTruthy();
@@ -83,7 +84,7 @@ describe('MemoizedMomentCard', () => {
     it('displays price unit', () => {
       const moment = createMockMoment();
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('/person')).toBeTruthy();
@@ -92,7 +93,7 @@ describe('MemoizedMomentCard', () => {
     it('renders with single variant by default', () => {
       const moment = createMockMoment();
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Single variant shows full title (2 lines)
@@ -106,7 +107,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           variant="grid"
-        />
+        />,
       );
 
       // Grid variant shows title (1 line, truncated)
@@ -127,7 +128,7 @@ describe('MemoizedMomentCard', () => {
         },
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Bob Smith')).toBeTruthy();
@@ -135,14 +136,14 @@ describe('MemoizedMomentCard', () => {
 
     it('displays user name from creator field', () => {
       const moment = createMockMoment({
-        user: undefined as any,
+        user: undefined,
         creator: {
           id: 'creator1',
           name: 'Charlie Brown',
         },
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Charlie Brown')).toBeTruthy();
@@ -150,11 +151,11 @@ describe('MemoizedMomentCard', () => {
 
     it('shows "Unknown host" when no user info', () => {
       const moment = createMockMoment({
-        user: undefined as any,
+        user: undefined,
         creator: undefined,
       });
       const { getByLabelText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Check accessibility label mentions Unknown host
@@ -169,7 +170,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           variant="grid"
-        />
+        />,
       );
 
       // Grid variant hides host info
@@ -183,7 +184,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           variant="single"
-        />
+        />,
       );
 
       expect(getByText('Alice Johnson')).toBeTruthy();
@@ -203,7 +204,7 @@ describe('MemoizedMomentCard', () => {
         },
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Paris')).toBeTruthy();
@@ -218,7 +219,7 @@ describe('MemoizedMomentCard', () => {
         },
       });
       const { getByText, queryByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Should show name if available, otherwise city
@@ -229,10 +230,10 @@ describe('MemoizedMomentCard', () => {
 
     it('handles string location', () => {
       const moment = createMockMoment({
-        location: 'Berlin, Germany' as any,
+        location: 'Berlin, Germany',
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Berlin, Germany')).toBeTruthy();
@@ -240,10 +241,10 @@ describe('MemoizedMomentCard', () => {
 
     it('does not crash with missing location', () => {
       const moment = createMockMoment({
-        location: undefined as any,
+        location: undefined,
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Coffee at Sunset Cafe')).toBeTruthy();
@@ -258,7 +259,7 @@ describe('MemoizedMomentCard', () => {
     it('displays distance when provided', () => {
       const moment = createMockMoment({ distance: '1.5 km away' });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('1.5 km away')).toBeTruthy();
@@ -267,7 +268,7 @@ describe('MemoizedMomentCard', () => {
     it('does not show distance when not provided', () => {
       const moment = createMockMoment({ distance: undefined });
       const { queryByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(queryByText(/km away/)).toBeNull();
@@ -276,7 +277,7 @@ describe('MemoizedMomentCard', () => {
     it('handles various distance formats', () => {
       const moment = createMockMoment({ distance: '500m' });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('500m')).toBeTruthy();
@@ -297,7 +298,7 @@ describe('MemoizedMomentCard', () => {
         },
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Food & Drinks')).toBeTruthy();
@@ -305,10 +306,10 @@ describe('MemoizedMomentCard', () => {
 
     it('displays category as string', () => {
       const moment = createMockMoment({
-        category: 'Adventure' as any,
+        category: 'Adventure',
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText('Adventure')).toBeTruthy();
@@ -317,7 +318,7 @@ describe('MemoizedMomentCard', () => {
     it('does not show category when not provided', () => {
       const moment = createMockMoment({ category: undefined });
       const { queryByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // No category badge should be visible
@@ -335,7 +336,7 @@ describe('MemoizedMomentCard', () => {
         imageUrl: 'https://example.com/moment1.jpg',
       });
       const { UNSAFE_root } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Component should render with image
@@ -344,12 +345,11 @@ describe('MemoizedMomentCard', () => {
 
     it('falls back to image field', () => {
       const moment = createMockMoment({
-        imageUrl: undefined as any,
+        imageUrl: undefined,
         image: 'https://example.com/fallback.jpg',
       });
       const { UNSAFE_root } = render(
-        <MemoizedMomentCard moment={moment} onPress=
-{mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Component should render with fallback image
@@ -369,7 +369,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
-        />
+        />,
       );
 
       // Should have MaterialCommunityIcons for favorite
@@ -380,7 +380,7 @@ describe('MemoizedMomentCard', () => {
     it('does not show favorite button when onFavorite not provided', () => {
       const moment = createMockMoment();
       const { UNSAFE_root } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Without onFavorite, there should be no heart icon
@@ -399,7 +399,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
-        />
+        />,
       );
 
       const favoriteButton = getByLabelText('Add to favorites');
@@ -416,7 +416,7 @@ describe('MemoizedMomentCard', () => {
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
           isFavorite={true}
-        />
+        />,
       );
 
       const icons = UNSAFE_root.findAllByType('MaterialCommunityIcons');
@@ -432,7 +432,7 @@ describe('MemoizedMomentCard', () => {
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
           isFavorite={false}
-        />
+        />,
       );
 
       const icons = UNSAFE_root.findAllByType('MaterialCommunityIcons');
@@ -451,7 +451,7 @@ describe('MemoizedMomentCard', () => {
     it('calls onPress when card is pressed', () => {
       const moment = createMockMoment();
       const { getByRole } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       const card = getByRole('button');
@@ -466,7 +466,7 @@ describe('MemoizedMomentCard', () => {
         title: 'Test Moment',
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       const card = getByText('Test Moment');
@@ -487,7 +487,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
-        />
+        />,
       );
 
       const card = getByText('Coffee at Sunset Cafe');
@@ -505,7 +505,7 @@ describe('MemoizedMomentCard', () => {
     it('does not re-render when props unchanged', () => {
       const moment = createMockMoment();
       const { rerender } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Re-render with same props
@@ -520,7 +520,7 @@ describe('MemoizedMomentCard', () => {
       const moment2 = createMockMoment({ id: '2' });
 
       const { rerender, getByText } = render(
-        <MemoizedMomentCard moment={moment1} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment1} onPress={mockOnPress} />,
       );
 
       rerender(<MemoizedMomentCard moment={moment2} onPress={mockOnPress} />);
@@ -538,7 +538,7 @@ describe('MemoizedMomentCard', () => {
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
           isFavorite={false}
-        />
+        />,
       );
 
       rerender(
@@ -564,7 +564,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           variant="single"
-        />
+        />,
       );
 
       rerender(
@@ -588,7 +588,7 @@ describe('MemoizedMomentCard', () => {
     it('has accessible role for card', () => {
       const moment = createMockMoment();
       const { getByRole } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       const card = getByRole('button');
@@ -602,7 +602,7 @@ describe('MemoizedMomentCard', () => {
         user: { id: '1', name: 'John' },
       });
       const { getByLabelText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       const card = getByLabelText(/Food Tour.*John.*20/i);
@@ -617,7 +617,7 @@ describe('MemoizedMomentCard', () => {
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
           isFavorite={false}
-        />
+        />,
       );
 
       const favoriteButton = getByLabelText('Add to favorites');
@@ -632,7 +632,7 @@ describe('MemoizedMomentCard', () => {
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
           isFavorite={true}
-        />
+        />,
       );
 
       const favoriteButton = getByLabelText('Remove from favorites');
@@ -649,7 +649,7 @@ describe('MemoizedMomentCard', () => {
       const longTitle = 'A'.repeat(200);
       const moment = createMockMoment({ title: longTitle });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText(longTitle)).toBeTruthy();
@@ -658,7 +658,7 @@ describe('MemoizedMomentCard', () => {
     it('handles price of 0', () => {
       const moment = createMockMoment({ price: 0 });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText(/0/)).toBeTruthy();
@@ -667,7 +667,7 @@ describe('MemoizedMomentCard', () => {
     it('handles very high price', () => {
       const moment = createMockMoment({ price: 9999 });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       expect(getByText(/9999/)).toBeTruthy();
@@ -679,7 +679,7 @@ describe('MemoizedMomentCard', () => {
         image: undefined,
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Should still render card without crashing
@@ -692,7 +692,7 @@ describe('MemoizedMomentCard', () => {
         creator: { id: 'creator1', name: 'Creator Name' },
       });
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Should prefer user over creator
@@ -724,7 +724,7 @@ describe('MemoizedMomentCard', () => {
           onFavorite={mockOnFavorite}
           isFavorite={false}
           variant="single"
-        />
+        />,
       );
 
       expect(getByText('Sunset Yoga on the Beach')).toBeTruthy();
@@ -744,7 +744,7 @@ describe('MemoizedMomentCard', () => {
           moment={moment}
           onPress={mockOnPress}
           variant="grid"
-        />
+        />,
       );
 
       expect(getByText('Quick Coffee Meetup')).toBeTruthy();
@@ -762,7 +762,7 @@ describe('MemoizedMomentCard', () => {
           onPress={mockOnPress}
           onFavorite={mockOnFavorite}
           isFavorite={false}
-        />
+        />,
       );
 
       // Press favorite button
@@ -779,7 +779,7 @@ describe('MemoizedMomentCard', () => {
       });
 
       const { getByText } = render(
-        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />
+        <MemoizedMomentCard moment={moment} onPress={mockOnPress} />,
       );
 
       // Press card

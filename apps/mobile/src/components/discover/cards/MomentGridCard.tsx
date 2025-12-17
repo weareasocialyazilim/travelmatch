@@ -1,13 +1,12 @@
 import React, { memo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { OptimizedImage } from '../../ui/OptimizedImage';
-import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../../../utils/cloudflareImageHelpers';
+import {
+  getMomentImageProps,
+  getAvatarImageProps,
+  IMAGE_VARIANTS_BY_CONTEXT,
+} from '../../../utils/cloudflareImageHelpers';
 import { COLORS } from '../../../constants/colors';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
@@ -19,27 +18,43 @@ interface MomentGridCardProps {
 
 const MomentGridCard: React.FC<MomentGridCardProps> = memo(
   ({ moment, index, onPress }) => {
-    const imageUrl = moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
+    const imageUrl =
+      moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
     const hostName = moment.hostName || 'Anonymous';
     const price = moment.price ?? moment.pricePerGuest ?? 0;
-    const locationCity = typeof moment.location === 'string' ? moment.location : moment.location?.city || 'Unknown';
+    const locationCity =
+      typeof moment.location === 'string'
+        ? moment.location
+        : moment.location?.city || 'Unknown';
 
     // Prepare user object for avatar helper
-    const hostUser = {
-      avatar: moment.hostAvatar,
-      avatarCloudflareId: (moment as any).hostAvatarCloudflareId,
-      avatarBlurHash: (moment as any).hostAvatarBlurHash,
-    };
+    const hostUser = (() => {
+      const m = moment as unknown as {
+        hostAvatarCloudflareId?: string;
+        hostAvatarBlurHash?: string;
+      };
+      return {
+        avatar: moment.hostAvatar,
+        avatarCloudflareId: m.hostAvatarCloudflareId,
+        avatarBlurHash: m.hostAvatarBlurHash,
+      };
+    })();
 
     return (
-      <View style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}>
+      <View
+        style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}
+      >
         <TouchableOpacity
           style={styles.gridCard}
           onPress={() => onPress(moment)}
           activeOpacity={0.95}
         >
           <OptimizedImage
-            {...getMomentImageProps(moment, IMAGE_VARIANTS_BY_CONTEXT.CARD_GRID, imageUrl)}
+            {...getMomentImageProps(
+              moment,
+              IMAGE_VARIANTS_BY_CONTEXT.CARD_GRID,
+              imageUrl,
+            )}
             contentFit="cover"
             style={styles.gridImage}
             transition={200}
@@ -52,7 +67,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
                 {...getAvatarImageProps(
                   hostUser,
                   IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                  'https://via.placeholder.com/24'
+                  'https://via.placeholder.com/24',
                 )}
                 contentFit="cover"
                 style={styles.gridAvatar}
@@ -86,9 +101,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
                   size={10}
                   color={COLORS.textSecondary}
                 />
-                <Text style={styles.gridDistance}>
-                  {locationCity}
-                </Text>
+                <Text style={styles.gridDistance}>{locationCity}</Text>
               </View>
               <Text style={styles.gridPrice}>${price}</Text>
             </View>

@@ -1,6 +1,6 @@
 /**
  * Database Query Helpers
- * 
+ *
  * Centralized, optimized queries to prevent N+1 problems
  * All queries use Supabase JOINs to fetch related data efficiently
  */
@@ -27,9 +27,7 @@ export const momentQueries = {
    * ✅ BlurHash: Includes image_id and image_blur_hash for instant placeholders
    */
   getWithUser: async (filters?: Partial<Moment>) => {
-    let query = supabase
-      .from('moments')
-      .select(`
+    let query = supabase.from('moments').select(`
         id,
         title,
         description,
@@ -76,7 +74,8 @@ export const momentQueries = {
   getWithDetails: async (momentId: string) => {
     return supabase
       .from('moments')
-      .select(`
+      .select(
+        `
         *,
         user:users!user_id(*),
         requests(count),
@@ -86,7 +85,8 @@ export const momentQueries = {
           url,
           variants
         )
-      `)
+      `,
+      )
       .eq('id', momentId)
       .single();
   },
@@ -98,7 +98,8 @@ export const momentQueries = {
   getWithRequestCount: async (userId: string) => {
     return supabase
       .from('moments')
-      .select(`
+      .select(
+        `
         *,
         user:users!user_id(*),
         requests(count),
@@ -108,7 +109,8 @@ export const momentQueries = {
           url,
           variants
         )
-      `)
+      `,
+      )
       .eq('user_id', userId);
   },
 };
@@ -125,9 +127,7 @@ export const requestQueries = {
    * ✅ OPTIMIZED: Single query with nested JOINs
    */
   getWithDetails: async (filters?: { user_id?: string; status?: string }) => {
-    let query = supabase
-      .from('requests')
-      .select(`
+    let query = supabase.from('requests').select(`
         id,
         status,
         message,
@@ -175,7 +175,8 @@ export const requestQueries = {
   getIncomingRequests: async (hostId: string) => {
     return supabase
       .from('requests')
-      .select(`
+      .select(
+        `
         *,
         moment:moments!moment_id(
           id,
@@ -188,7 +189,8 @@ export const requestQueries = {
           avatar,
           rating
         )
-      `)
+      `,
+      )
       .eq('moments.user_id', hostId);
   },
 };
@@ -207,7 +209,8 @@ export const transactionQueries = {
   getWithDetails: async (userId: string) => {
     return supabase
       .from('transactions')
-      .select(`
+      .select(
+        `
         id,
         type,
         amount,
@@ -228,7 +231,8 @@ export const transactionQueries = {
             title
           )
         )
-      `)
+      `,
+      )
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
   },
@@ -239,14 +243,16 @@ export const transactionQueries = {
   getPending: async () => {
     return supabase
       .from('transactions')
-      .select(`
+      .select(
+        `
         *,
         user:users!user_id(*),
         request:requests!request_id(
           *,
           moment:moments!moment_id(*)
         )
-      `)
+      `,
+      )
       .eq('status', 'pending')
       .order('created_at', { ascending: true });
   },
@@ -265,12 +271,14 @@ export const userQueries = {
   getWithStats: async (userId: string) => {
     return supabase
       .from('users')
-      .select(`
+      .select(
+        `
         *,
         moments(count),
         requests(count),
         reviews(count)
-      `)
+      `,
+      )
       .eq('id', userId)
       .single();
   },
@@ -281,7 +289,8 @@ export const userQueries = {
   getWithLatestMoment: async (userIds: string[]) => {
     return supabase
       .from('users')
-      .select(`
+      .select(
+        `
         id,
         name,
         avatar,
@@ -292,7 +301,8 @@ export const userQueries = {
           images,
           created_at
         )
-      `)
+      `,
+      )
       .in('id', userIds)
       .order('moments.created_at', { ascending: false })
       .limit(1, { foreignTable: 'moments' });
@@ -313,7 +323,8 @@ export const messageQueries = {
   getConversations: async (userId: string) => {
     return supabase
       .from('conversations')
-      .select(`
+      .select(
+        `
         id,
         updated_at,
         participant:users!other_user_id(
@@ -327,7 +338,8 @@ export const messageQueries = {
           content,
           created_at
         )
-      `)
+      `,
+      )
       .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`)
       .order('updated_at', { ascending: false })
       .limit(1, { foreignTable: 'messages' });
@@ -339,7 +351,8 @@ export const messageQueries = {
   getWithSender: async (conversationId: string) => {
     return supabase
       .from('messages')
-      .select(`
+      .select(
+        `
         id,
         content,
         created_at,
@@ -349,7 +362,8 @@ export const messageQueries = {
           name,
           avatar
         )
-      `)
+      `,
+      )
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true });
   },
@@ -365,10 +379,11 @@ export const videoQueries = {
   /**
    * Get videos with user and moment data
    */
-  getWithDetails: async (filters?: { user_id?: string; moment_id?: string }) => {
-    let query = supabase
-      .from('videos')
-      .select(`
+  getWithDetails: async (filters?: {
+    user_id?: string;
+    moment_id?: string;
+  }) => {
+    let query = supabase.from('videos').select(`
         id,
         url,
         thumbnail_url,
@@ -407,25 +422,49 @@ export const videoQueries = {
 /**
  * Batch fetch users by IDs (prevents N+1)
  */
-export const batchFetchUsers = async (userIds: string[]): Promise<{ data: Array<{id: string; name: string; avatar: string; verified: boolean; rating: number}> | null; error: Error | null }> => {
+export const batchFetchUsers = async (
+  userIds: string[],
+): Promise<{
+  data: Array<{
+    id: string;
+    name: string;
+    avatar: string;
+    verified: boolean;
+    rating: number;
+  }> | null;
+  error: Error | null;
+}> => {
   if (userIds.length === 0) return { data: [], error: null };
-
-  return supabase
+  const { data, error } = await supabase
     .from('users')
     .select('id, name, avatar, verified, rating')
     .in('id', userIds);
+
+  return {
+    data: data as Array<{
+      id: string;
+      name: string;
+      avatar: string;
+      verified: boolean;
+      rating: number;
+    }> | null,
+    error: error as unknown as Error | null,
+  };
 };
 
 /**
  * Batch fetch moments by IDs (prevents N+1)
  * ✅ BlurHash: Includes image_id and uploaded_images JOIN
  */
-export const batchFetchMoments = async (momentIds: string[]): Promise<{ data: unknown[] | null; error: Error | null }> => {
+export const batchFetchMoments = async (
+  momentIds: string[],
+): Promise<{ data: unknown[] | null; error: Error | null }> => {
   if (momentIds.length === 0) return { data: [], error: null };
 
   return supabase
     .from('moments')
-    .select(`
+    .select(
+      `
       id,
       title,
       price,
@@ -444,7 +483,8 @@ export const batchFetchMoments = async (momentIds: string[]): Promise<{ data: un
         url,
         variants
       )
-    `)
+    `,
+    )
     .in('id', momentIds);
 };
 
@@ -472,9 +512,7 @@ export const getCount = async (
   table: string,
   filters?: Record<string, unknown>,
 ) => {
-  let query = supabase
-    .from(table)
-    .select('*', { count: 'exact', head: true });
+  let query = supabase.from(table).select('*', { count: 'exact', head: true });
 
   if (filters) {
     query = query.match(filters);

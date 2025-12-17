@@ -1,7 +1,7 @@
 /**
  * Payment Backend Migration Infrastructure
  * Handles migration from old payment system to new Supabase-based system
- * 
+ *
  * Features:
  * - Dual-write strategy for data consistency
  * - Gradual migration with feature flags
@@ -11,6 +11,7 @@
  */
 
 import { supabase } from '../config/supabase';
+import type { Database } from '../types/database.types';
 import { logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -44,11 +45,11 @@ interface MigrationConfig {
   useNewSystem: boolean; // Whether to use new Supabase system
   dualWrite: boolean; // Write to both old and new systems
   readFromNew: boolean; // Read from new system (vs old)
-  
+
   // Providers
   primaryProvider: PaymentProvider;
   fallbackProvider?: PaymentProvider;
-  
+
   // Migration state
   migrationStartDate?: string;
   migrationCompleteDate?: string;
@@ -81,7 +82,7 @@ class PaymentMigrationService {
       if (stored) {
         this.config = { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
       }
-      
+
       logger.info('PaymentMigration', 'Initialized with config:', this.config);
     } catch (error) {
       logger.error('PaymentMigration', 'Failed to initialize:', error);
@@ -93,12 +94,12 @@ class PaymentMigrationService {
    */
   async updateConfig(updates: Partial<MigrationConfig>): Promise<void> {
     this.config = { ...this.config, ...updates };
-    
+
     await AsyncStorage.setItem(
       MIGRATION_CONFIG_KEY,
-      JSON.stringify(this.config)
+      JSON.stringify(this.config),
     );
-    
+
     logger.info('PaymentMigration', 'Config updated:', this.config);
   }
 
@@ -113,7 +114,7 @@ class PaymentMigrationService {
    * Create payment transaction (with dual-write support)
    */
   async createTransaction(
-    transaction: Omit<PaymentTransaction, 'id' | 'created_at'>
+    transaction: Omit<PaymentTransaction, 'id' | 'created_at'>,
   ): Promise<PaymentTransaction> {
     const errors: Error[] = [];
 
@@ -139,7 +140,11 @@ class PaymentMigrationService {
 
       if (supabaseError) throw supabaseError;
 
-      logger.info('PaymentMigration', 'Transaction created in Supabase:', supabaseTransaction.id);
+      logger.info(
+        'PaymentMigration',
+        'Transaction created in Supabase:',
+        supabaseTransaction.id,
+      );
 
       // If dual-write is enabled, also write to old system
       if (this.config.dualWrite && !this.config.useNewSystem) {
@@ -147,9 +152,13 @@ class PaymentMigrationService {
           // TODO: Call old payment API
           await this.writeToLegacySystem(transaction);
         } catch (legacyError) {
-          logger.error('PaymentMigration', 'Failed to write to legacy system:', legacyError);
+          logger.error(
+            'PaymentMigration',
+            'Failed to write to legacy system:',
+            legacyError,
+          );
           errors.push(legacyError as Error);
-          
+
           // Don't fail the transaction, but log for reconciliation
           await this.logMigrationError({
             transaction_id: supabaseTransaction.id,
@@ -163,9 +172,8 @@ class PaymentMigrationService {
       return {
         ...transaction,
         id: supabaseTransaction.id,
-        created_at: supabaseTransaction.created_at,
+        created_at: supabaseTransaction.created_at ?? '',
       };
-
     } catch (error) {
       logger.error('PaymentMigration', 'Failed to create transaction:', error);
       throw error;
@@ -175,14 +183,17 @@ class PaymentMigrationService {
   /**
    * Get transaction by ID
    */
-  async getTransaction(transactionId: string): Promise<PaymentTransaction | null> {
+  async getTransaction(
+    transactionId: string,
+  ): Promise<PaymentTransaction | null> {
     try {
       // Read from new system if configured
       if (this.config.readFromNew || this.config.useNewSystem) {
         // SECURITY: Explicit column selection - never use select('*')
         const { data, error } = await supabase
           .from('transactions')
-          .select(`
+          .select(
+            `
             id,
             type,
             amount,
@@ -195,12 +206,13 @@ class PaymentMigrationService {
             sender_id,
             receiver_id,
             user_id
-          `)
+          `,
+          )
           .eq('id', transactionId)
           .single();
 
         if (error && error.code !== 'PGRST116') throw error; // Ignore not found
-        
+
         if (data) {
           return this.mapSupabaseToTransaction(data);
         }
@@ -228,7 +240,7 @@ class PaymentMigrationService {
       offset?: number;
       status?: PaymentTransaction['status'];
       type?: PaymentTransaction['type'];
-    }
+    },
   ): Promise<{ data: PaymentTransaction[]; count: number }> {
     try {
       let query = supabase
@@ -250,7 +262,10 @@ class PaymentMigrationService {
       }
 
       if (options?.offset) {
-        query = query.range(options.offset, options.offset + (options.limit || 50) - 1);
+        query = query.range(
+          options.offset,
+          options.offset + (options.limit || 50) - 1,
+        );
       }
 
       const { data, count, error } = await query;
@@ -273,7 +288,7 @@ class PaymentMigrationService {
   async updateTransactionStatus(
     transactionId: string,
     status: PaymentTransaction['status'],
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ): Promise<void> {
     try {
       const updates: any = {
@@ -296,14 +311,21 @@ class PaymentMigrationService {
 
       if (error) throw error;
 
-      logger.info('PaymentMigration', `Transaction ${transactionId} status updated to ${status}`);
+      logger.info(
+        'PaymentMigration',
+        `Transaction ${transactionId} status updated to ${status}`,
+      );
 
       // Dual-write to legacy system if enabled
       if (this.config.dualWrite && !this.config.useNewSystem) {
         await this.updateLegacySystemStatus(transactionId, status);
       }
     } catch (error) {
-      logger.error('PaymentMigration', 'Failed to update transaction status:', error);
+      logger.error(
+        'PaymentMigration',
+        'Failed to update transaction status:',
+        error,
+      );
       throw error;
     }
   }
@@ -311,7 +333,10 @@ class PaymentMigrationService {
   /**
    * Migrate batch of transactions from legacy to new system
    */
-  async migrateBatch(startDate: string, endDate: string): Promise<{
+  async migrateBatch(
+    startDate: string,
+    endDate: string,
+  ): Promise<{
     success: number;
     failed: number;
     errors: Array<{ transaction: any; error: string }>;
@@ -328,15 +353,28 @@ class PaymentMigrationService {
     };
 
     try {
-      logger.info('PaymentMigration', `Starting batch migration: ${startDate} to ${endDate}`);
+      logger.info(
+        'PaymentMigration',
+        `Starting batch migration: ${startDate} to ${endDate}`,
+      );
 
       // Fetch transactions from legacy system
-      const legacyTransactions = await this.fetchLegacyTransactions(startDate, endDate);
+      const legacyTransactions = await this.fetchLegacyTransactions(
+        startDate,
+        endDate,
+      );
 
-      logger.info('PaymentMigration', `Found ${legacyTransactions.length} legacy transactions`);
+      logger.info(
+        'PaymentMigration',
+        `Found ${legacyTransactions.length} legacy transactions`,
+      );
 
       // Migrate in batches
-      for (let i = 0; i < legacyTransactions.length; i += this.config.batchSize) {
+      for (
+        let i = 0;
+        i < legacyTransactions.length;
+        i += this.config.batchSize
+      ) {
         const batch = legacyTransactions.slice(i, i + this.config.batchSize);
 
         for (const legacyTx of batch) {
@@ -349,40 +387,47 @@ class PaymentMigrationService {
               .single();
 
             if (existing) {
-              logger.debug('PaymentMigration', `Transaction ${legacyTx.id} already migrated`);
+              logger.debug(
+                'PaymentMigration',
+                `Transaction ${legacyTx.id} already migrated`,
+              );
               continue;
             }
 
             // Insert into Supabase
-            const { error } = await supabase
-              .from('transactions')
-              .insert({
-                user_id: legacyTx.user_id,
-                amount: legacyTx.amount,
-                currency: legacyTx.currency,
-                type: legacyTx.type,
-                status: legacyTx.status,
-                description: legacyTx.description || 'Migrated transaction',
-                metadata: {
-                  legacy_id: legacyTx.id,
-                  migrated_at: new Date().toISOString(),
-                  ...legacyTx.metadata,
-                },
-                created_at: legacyTx.created_at,
-              });
+            const { error } = await supabase.from('transactions').insert({
+              user_id: legacyTx.user_id,
+              amount: legacyTx.amount,
+              currency: legacyTx.currency,
+              type: legacyTx.type,
+              status: legacyTx.status,
+              description: legacyTx.description || 'Migrated transaction',
+              metadata: {
+                legacy_id: legacyTx.id,
+                migrated_at: new Date().toISOString(),
+                ...legacyTx.metadata,
+              },
+              created_at: legacyTx.created_at,
+            });
 
             if (error) throw error;
 
             result.success++;
-            logger.debug('PaymentMigration', `Migrated transaction ${legacyTx.id}`);
-
+            logger.debug(
+              'PaymentMigration',
+              `Migrated transaction ${legacyTx.id}`,
+            );
           } catch (error) {
             result.failed++;
             result.errors.push({
               transaction: legacyTx,
               error: (error as Error).message,
             });
-            logger.error('PaymentMigration', `Failed to migrate ${legacyTx.id}:`, error);
+            logger.error(
+              'PaymentMigration',
+              `Failed to migrate ${legacyTx.id}:`,
+              error,
+            );
           }
         }
 
@@ -390,10 +435,12 @@ class PaymentMigrationService {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
-      logger.info('PaymentMigration', `Batch migration complete: ${result.success} success, ${result.failed} failed`);
+      logger.info(
+        'PaymentMigration',
+        `Batch migration complete: ${result.success} success, ${result.failed} failed`,
+      );
 
       return result;
-
     } catch (error) {
       logger.error('PaymentMigration', 'Batch migration failed:', error);
       throw error;
@@ -428,7 +475,8 @@ class PaymentMigrationService {
       // SECURITY: Explicit column selection - never use select('*')
       const { data: supabaseTransactions } = await supabase
         .from('transactions')
-        .select(`
+        .select(
+          `
           id,
           type,
           amount,
@@ -440,16 +488,20 @@ class PaymentMigrationService {
           moment_id,
           sender_id,
           receiver_id
-        `)
+        `,
+        )
         .gte('created_at', `${date}T00:00:00`)
         .lt('created_at', `${date}T23:59:59`);
+
+      const supabaseTxList = (supabaseTransactions ||
+        []) as unknown as Database['public']['Tables']['transactions']['Row'][];
 
       result.total = legacyTransactions.length;
 
       // Compare transactions
       for (const legacyTx of legacyTransactions) {
-        const supabaseTx = supabaseTransactions?.find(
-          (tx) => tx.metadata?.legacy_id === legacyTx.id
+        const supabaseTx = supabaseTxList.find(
+          (tx: any) => tx.metadata?.legacy_id === legacyTx.id,
         );
 
         if (!supabaseTx) {
@@ -480,7 +532,6 @@ class PaymentMigrationService {
       logger.info('PaymentMigration', 'Reconciliation complete:', result);
 
       return result;
-
     } catch (error) {
       logger.error('PaymentMigration', 'Reconciliation failed:', error);
       throw error;
@@ -542,32 +593,58 @@ class PaymentMigrationService {
    */
   private async writeToLegacySystem(transaction: any): Promise<void> {
     // TODO: Implement legacy API call
-    logger.debug('PaymentMigration', 'Would write to legacy system:', transaction);
+    logger.debug(
+      'PaymentMigration',
+      'Would write to legacy system:',
+      transaction,
+    );
   }
 
   /**
    * Helper: Read from legacy system (placeholder)
    */
-  private async readFromLegacySystem(transactionId: string): Promise<PaymentTransaction | null> {
+  private async readFromLegacySystem(
+    transactionId: string,
+  ): Promise<PaymentTransaction | null> {
     // TODO: Implement legacy API call
-    logger.debug('PaymentMigration', 'Would read from legacy system:', transactionId);
+    logger.debug(
+      'PaymentMigration',
+      'Would read from legacy system:',
+      transactionId,
+    );
     return null;
   }
 
   /**
    * Helper: Update legacy system status (placeholder)
    */
-  private async updateLegacySystemStatus(transactionId: string, status: string): Promise<void> {
+  private async updateLegacySystemStatus(
+    transactionId: string,
+    status: string,
+  ): Promise<void> {
     // TODO: Implement legacy API call
-    logger.debug('PaymentMigration', 'Would update legacy system:', transactionId, status);
+    logger.debug(
+      'PaymentMigration',
+      'Would update legacy system:',
+      transactionId,
+      status,
+    );
   }
 
   /**
    * Helper: Fetch legacy transactions (placeholder)
    */
-  private async fetchLegacyTransactions(startDate: string, endDate: string): Promise<any[]> {
+  private async fetchLegacyTransactions(
+    startDate: string,
+    endDate: string,
+  ): Promise<any[]> {
     // TODO: Implement legacy API call
-    logger.debug('PaymentMigration', 'Would fetch legacy transactions:', startDate, endDate);
+    logger.debug(
+      'PaymentMigration',
+      'Would fetch legacy transactions:',
+      startDate,
+      endDate,
+    );
     return [];
   }
 
@@ -599,7 +676,11 @@ class PaymentMigrationService {
         created_at: new Date().toISOString(),
       });
     } catch (err) {
-      logger.error('PaymentMigration', 'Failed to log reconciliation issue:', err);
+      logger.error(
+        'PaymentMigration',
+        'Failed to log reconciliation issue:',
+        err,
+      );
     }
   }
 }

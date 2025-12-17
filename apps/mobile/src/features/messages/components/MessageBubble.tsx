@@ -100,11 +100,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           style={styles.messageAvatar}
         />
         <View style={styles.imageMessageContainer}>
-          <Image
-            source={{ uri: item.imageUrl }}
-            style={styles.messageImage}
-            resizeMode="cover"
-          />
+          {item.imageUrl ? (
+            <Image
+              source={{ uri: item.imageUrl }}
+              style={styles.messageImage}
+              resizeMode="cover"
+            />
+          ) : null}
         </View>
       </View>
     );

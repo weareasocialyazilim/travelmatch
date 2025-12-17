@@ -54,11 +54,13 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(getByText('Share Your Proof')).toBeTruthy();
-      expect(getByText('Let the world see the impact of kindness.')).toBeTruthy();
+      expect(
+        getByText('Let the world see the impact of kindness.'),
+      ).toBeTruthy();
     });
 
     it('renders all social platforms', () => {
@@ -68,7 +70,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(getByText('Instagram')).toBeTruthy();
@@ -85,7 +87,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -104,7 +106,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Instagram'));
@@ -118,7 +120,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Facebook'));
@@ -132,7 +134,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Twitter'));
@@ -146,7 +148,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       fireEvent.press(getByText('WhatsApp'));
@@ -160,7 +162,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       fireEvent.press(getByText('More'));
@@ -174,7 +176,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Instagram'));
@@ -194,11 +196,17 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
-      const platforms = ['Instagram', 'Facebook', 'Twitter', 'WhatsApp', 'More'];
-      
+      const platforms = [
+        'Instagram',
+        'Facebook',
+        'Twitter',
+        'WhatsApp',
+        'More',
+      ];
+
       platforms.forEach((platform) => {
         mockOnShare.mockClear();
         fireEvent.press(getByText(platform));
@@ -222,9 +230,9 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
-      
+
       expect(() => unmount()).not.toThrow();
       expect(() => jest.advanceTimersByTime(2000)).not.toThrow();
     });
@@ -236,7 +244,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -247,7 +255,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -258,7 +266,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -269,7 +277,7 @@ describe('ShareProofModal', () => {
         'https://example.com/proof/12345',
         'https://ex.co/p/1',
         '',
-        'https://example.com/proof?id=123&name=test%20proof'
+        'https://example.com/proof?id=123&name=test%20proof',
       ];
 
       urls.forEach((url) => {
@@ -279,7 +287,7 @@ describe('ShareProofModal', () => {
             onClose={mockOnClose}
             onShare={mockOnShare}
             proofUrl={url}
-          />
+          />,
         );
 
         expect(getByText('Share Your Proof')).toBeTruthy();
@@ -297,7 +305,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -305,15 +313,15 @@ describe('ShareProofModal', () => {
 
     it('renders modal on different platforms', () => {
       ['web', 'ios', 'android'].forEach((platform) => {
-        Platform.OS = platform as any;
-        
+        Platform.OS = platform as string;
+
         const { getByText } = render(
           <ShareProofModal
             visible={true}
             onClose={mockOnClose}
             onShare={mockOnShare}
             proofUrl={mockProofUrl}
-          />
+          />,
         );
 
         expect(getByText('Share Your Proof')).toBeTruthy();
@@ -334,8 +342,8 @@ describe('ShareProofModal', () => {
             onClose={mockOnClose}
             onShare={mockOnShare}
             proofUrl={mockProofUrl}
-          />
-        )
+          />,
+        ),
       ).not.toThrow();
     });
 
@@ -346,7 +354,7 @@ describe('ShareProofModal', () => {
           onClose={mockOnClose}
           onShare={mockOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -362,7 +370,7 @@ describe('ShareProofModal', () => {
           onClose={customOnClose}
           onShare={customOnShare}
           proofUrl={mockProofUrl}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Instagram'));

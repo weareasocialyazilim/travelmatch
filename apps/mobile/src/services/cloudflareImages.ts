@@ -25,6 +25,7 @@ import { logger } from '../utils/logger';
 
 // Environment variables
 const CLOUDFLARE_ACCOUNT_ID = process.env.EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_ID || '';
+const CLOUDFLARE_ACCOUNT_HASH = process.env.EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_HASH || ''; // For imagedelivery.net URLs
 const CLOUDFLARE_IMAGES_TOKEN = process.env.CLOUDFLARE_IMAGES_TOKEN || '';
 const CLOUDFLARE_IMAGES_URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`;
 
@@ -132,8 +133,7 @@ export function getImageUrl(
   imageId: string,
   variant: ImageVariant = 'medium',
 ): string {
-  const accountHash = CLOUDFLARE_ACCOUNT_ID;
-  return `https://imagedelivery.net/${accountHash}/${imageId}/${variant}`;
+  return `https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_HASH}/${imageId}/${variant}`;
 }
 
 /**

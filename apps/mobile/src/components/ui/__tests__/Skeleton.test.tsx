@@ -112,7 +112,9 @@ describe('Skeleton Component', () => {
     });
 
     it('renders with circular border radius', () => {
-      const { UNSAFE_root } = render(<Skeleton width={48} height={48} borderRadius={24} />);
+      const { UNSAFE_root } = render(
+        <Skeleton width={48} height={48} borderRadius={24} />,
+      );
       expect(UNSAFE_root).toBeTruthy();
     });
 
@@ -137,7 +139,7 @@ describe('Skeleton Component', () => {
 
     it('renders with multiple custom styles', () => {
       const { UNSAFE_root } = render(
-        <Skeleton style={{ marginTop: 10, marginBottom: 10 }} />
+        <Skeleton style={{ marginTop: 10, marginBottom: 10 }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -148,7 +150,7 @@ describe('Skeleton Component', () => {
     });
 
     it('handles null style gracefully', () => {
-      const { UNSAFE_root } = render(<Skeleton style={null as any} />);
+      const { UNSAFE_root } = render(<Skeleton style={null} />);
       expect(UNSAFE_root).toBeTruthy();
     });
   });
@@ -165,7 +167,7 @@ describe('Skeleton Component', () => {
           height={50}
           borderRadius={12}
           style={{ margin: 20 }}
-        />
+        />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -176,7 +178,7 @@ describe('Skeleton Component', () => {
           <Skeleton width="100%" height={20} />
           <Skeleton width="80%" height={16} />
           <Skeleton width="60%" height={14} />
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -206,7 +208,9 @@ describe('Skeleton Component', () => {
     });
 
     it('renders SkeletonCard with custom style', () => {
-      const { UNSAFE_root } = render(<SkeletonCard style={{ marginTop: 20 }} />);
+      const { UNSAFE_root } = render(
+        <SkeletonCard style={{ marginTop: 20 }} />,
+      );
       expect(UNSAFE_root).toBeTruthy();
     });
 
@@ -216,7 +220,7 @@ describe('Skeleton Component', () => {
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -233,7 +237,7 @@ describe('Skeleton Component', () => {
           {items.map((item) => (
             <SkeletonCard key={item} />
           ))}
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -251,7 +255,7 @@ describe('Skeleton Component', () => {
 
     it('renders SkeletonListItem with custom style', () => {
       const { UNSAFE_root } = render(
-        <SkeletonListItem style={{ marginTop: 10 }} />
+        <SkeletonListItem style={{ marginTop: 10 }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -262,7 +266,7 @@ describe('Skeleton Component', () => {
           <SkeletonListItem />
           <SkeletonListItem />
           <SkeletonListItem />
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -279,7 +283,7 @@ describe('Skeleton Component', () => {
           {items.map((item) => (
             <SkeletonListItem key={item} />
           ))}
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -297,7 +301,7 @@ describe('Skeleton Component', () => {
           <SkeletonListItem />
           <SkeletonListItem />
           <SkeletonCard />
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -309,7 +313,7 @@ describe('Skeleton Component', () => {
           <SkeletonCard />
           <Skeleton width="80%" height={16} />
           <SkeletonListItem />
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -346,7 +350,7 @@ describe('Skeleton Component', () => {
 
     it('updates style dynamically', () => {
       const { rerender, UNSAFE_root } = render(
-        <Skeleton style={{ marginTop: 10 }} />
+        <Skeleton style={{ marginTop: 10 }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
 
@@ -363,7 +367,7 @@ describe('Skeleton Component', () => {
             width={i % 2 === 0 ? '100%' : 200}
             height={20 + i * 10}
             borderRadius={4 + i * 2}
-          />
+          />,
         );
       }
 
@@ -416,30 +420,40 @@ describe('Skeleton Component', () => {
       const { UNSAFE_root } = render(
         <>
           <Skeleton width="100%" height={24} borderRadius={4} />
-          <Skeleton width="90%" height={20} borderRadius={4} style={{ marginTop: 8 }} />
-          <Skeleton width="70%" height={20} borderRadius={4} style={{ marginTop: 8 }} />
-        </>
+          <Skeleton
+            width="90%"
+            height={20}
+            borderRadius={4}
+            style={{ marginTop: 8 }}
+          />
+          <Skeleton
+            width="70%"
+            height={20}
+            borderRadius={4}
+            style={{ marginTop: 8 }}
+          />
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders avatar placeholder skeleton', () => {
       const { UNSAFE_root } = render(
-        <Skeleton width={48} height={48} borderRadius={24} />
+        <Skeleton width={48} height={48} borderRadius={24} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders image placeholder skeleton', () => {
       const { UNSAFE_root } = render(
-        <Skeleton width="100%" height={200} borderRadius={12} />
+        <Skeleton width="100%" height={200} borderRadius={12} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders button placeholder skeleton', () => {
       const { UNSAFE_root } = render(
-        <Skeleton width={120} height={44} borderRadius={22} />
+        <Skeleton width={120} height={44} borderRadius={22} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -448,9 +462,19 @@ describe('Skeleton Component', () => {
       const { UNSAFE_root } = render(
         <>
           <Skeleton width={80} height={80} borderRadius={40} />
-          <Skeleton width="60%" height={24} borderRadius={4} style={{ marginTop: 12 }} />
-          <Skeleton width="40%" height={16} borderRadius={4} style={{ marginTop: 8 }} />
-        </>
+          <Skeleton
+            width="60%"
+            height={24}
+            borderRadius={4}
+            style={{ marginTop: 12 }}
+          />
+          <Skeleton
+            width="40%"
+            height={16}
+            borderRadius={4}
+            style={{ marginTop: 8 }}
+          />
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -461,7 +485,7 @@ describe('Skeleton Component', () => {
           {[1, 2, 3, 4, 5].map((item) => (
             <SkeletonListItem key={item} />
           ))}
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -472,7 +496,7 @@ describe('Skeleton Component', () => {
           {[1, 2, 3, 4].map((item) => (
             <SkeletonCard key={item} />
           ))}
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -487,13 +511,23 @@ describe('Skeleton Component', () => {
       const { UNSAFE_root } = render(
         <>
           <Skeleton width={80} height={80} borderRadius={40} />
-          <Skeleton width="70%" height={24} borderRadius={4} style={{ marginTop: 12 }} />
-          <Skeleton width="50%" height={16} borderRadius={4} style={{ marginTop: 8 }} />
+          <Skeleton
+            width="70%"
+            height={24}
+            borderRadius={4}
+            style={{ marginTop: 12 }}
+          />
+          <Skeleton
+            width="50%"
+            height={16}
+            borderRadius={4}
+            style={{ marginTop: 8 }}
+          />
           <SkeletonCard style={{ marginTop: 20 }} />
           <SkeletonListItem />
           <SkeletonListItem />
           <SkeletonListItem />
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -507,9 +541,9 @@ describe('Skeleton Component', () => {
               <SkeletonCard key={item} />
             ) : (
               <SkeletonListItem key={item} />
-            )
+            ),
           )}
-        </>
+        </>,
       );
       expect(UNSAFE_root).toBeTruthy();
     });

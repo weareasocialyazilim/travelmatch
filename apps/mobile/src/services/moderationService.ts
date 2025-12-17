@@ -108,7 +108,7 @@ export const moderationService = {
         targetId: data.targetId,
         reason: reportData.reason as ReportReason,
         description: reportData.description || '',
-        status: reportData.status as any,
+        status: reportData.status as Report['status'],
         createdAt: reportData.created_at,
       };
 

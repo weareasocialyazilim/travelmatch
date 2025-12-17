@@ -15,6 +15,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
 import { useMoments, type Moment } from '@/hooks/useMoments';
+import type { Moment as ApiMoment } from '@/types/api';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -43,16 +44,23 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
 
   // Extract unique categories from saved moments
   const filterOptions = useMemo(() => {
-    const categories = new Set(savedMoments.map((m) => {
-      return typeof m.category === 'string' ? m.category : m.category?.label || 'Other';
-    }));
+    const categories = new Set(
+      savedMoments.map((m) => {
+        return typeof m.category === 'string'
+          ? m.category
+          : m.category?.label || 'Other';
+      }),
+    );
     return ['All', ...Array.from(categories)];
   }, [savedMoments]);
 
   const filteredMoments = useMemo(() => {
     if (selectedFilter === 'All') return savedMoments;
     return savedMoments.filter((m) => {
-      const categoryLabel = typeof m.category === 'string' ? m.category : m.category?.label || 'Other';
+      const categoryLabel =
+        typeof m.category === 'string'
+          ? m.category
+          : m.category?.label || 'Other';
       return categoryLabel === selectedFilter;
     });
   }, [savedMoments, selectedFilter]);
@@ -62,7 +70,10 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
   };
 
   const handleMomentPress = (moment: Moment) => {
-    const categoryLabel = typeof moment.category === 'string' ? moment.category : moment.category?.label || 'Other';
+    const categoryLabel =
+      typeof moment.category === 'string'
+        ? moment.category
+        : moment.category?.label || 'Other';
     navigation.navigate('MomentDetail', {
       moment: {
         ...moment,
@@ -82,7 +93,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
         },
         giftCount: 0,
         category: categoryLabel,
-      } as any,
+      } as unknown as RootStackParamList['MomentDetail']['moment'],
     });
   };
 
@@ -210,7 +221,10 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
                       {typeof moment.location === 'string'
                         ? moment.location
                         : moment.location?.city}{' '}
-                      • ${moment.pricePerGuest} • {typeof moment.category === 'string' ? moment.category : moment.category?.label || 'Other'}
+                      • ${moment.pricePerGuest} •{' '}
+                      {typeof moment.category === 'string'
+                        ? moment.category
+                        : moment.category?.label || 'Other'}
                     </Text>
                   </View>
                 </View>

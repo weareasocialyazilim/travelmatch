@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
-import { render, mockMoment } from '../../../../__tests__/testUtils';
+import { render, mockMoment } from '../../../../__tests__/testUtilsRender.helper';
 import { MomentGridCard } from '../../../../components/discover/cards/MomentGridCard';
 
 describe('MomentGridCard Component', () => {

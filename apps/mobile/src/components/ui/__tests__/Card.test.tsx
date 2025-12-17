@@ -5,7 +5,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent } from '@testing-library/react-native';
-import { render } from '../../../__tests__/testUtils';
+import { render } from '../../../__tests__/testUtilsRender.helper';
 import { Card } from '../../../components/ui/Card';
 
 describe('Card Component', () => {

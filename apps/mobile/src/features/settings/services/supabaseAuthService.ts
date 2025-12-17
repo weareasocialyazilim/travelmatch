@@ -33,28 +33,37 @@ export async function deleteAccount(): Promise<DeleteAccountResult> {
       .eq('id', userId);
 
     if (updateError) {
-      logger.error('[DeleteAccount] Failed to mark user for deletion', { error: updateError });
+      logger.error('[DeleteAccount] Failed to mark user for deletion', {
+        error: updateError,
+      });
       return { error: updateError };
     }
 
     // Sign out user
     const { error: signOutError } = await supabase.auth.signOut();
     if (signOutError) {
-      logger.warn('[DeleteAccount] Sign out failed after deletion request', { error: signOutError });
+      logger.warn('[DeleteAccount] Sign out failed after deletion request', {
+        error: signOutError,
+      });
     }
 
     logger.info('[DeleteAccount] Account scheduled for deletion', { userId });
     return { error: null };
   } catch (error) {
     logger.error('[DeleteAccount] Unexpected error', { error });
-    return { error: error instanceof Error ? error : new Error('Unknown error') };
+    return {
+      error: error instanceof Error ? error : new Error('Unknown error'),
+    };
   }
 }
 
 /**
  * Request data export according to GDPR
  */
-export async function requestDataExport(): Promise<{ error: Error | null; requestId?: string }> {
+export async function requestDataExport(): Promise<{
+  error: Error | null;
+  requestId?: string;
+}> {
   try {
     const { data: session } = await supabase.auth.getSession();
     if (!session?.session?.user) {
@@ -79,11 +88,14 @@ export async function requestDataExport(): Promise<{ error: Error | null; reques
       return { error };
     }
 
-    logger.info('[DataExport] Export request created', { userId, requestId: data?.id });
-    return { error: null, requestId: data?.id };
+    const requestId = (data as { id?: string } | null)?.id;
+    logger.info('[DataExport] Export request created', { userId, requestId });
+    return { error: null, requestId };
   } catch (error) {
     logger.error('[DataExport] Unexpected error', { error });
-    return { error: error instanceof Error ? error : new Error('Unknown error') };
+    return {
+      error: error instanceof Error ? error : new Error('Unknown error'),
+    };
   }
 }
 

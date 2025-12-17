@@ -21,7 +21,7 @@ export interface Gift {
   message: string;
   paymentType: 'direct' | 'half_escrow' | 'full_escrow';
   status: 'received' | 'pending_proof' | 'verifying' | 'verified' | 'failed';
-  createdAt: string;
+  createdAt: string | null;
 }
 
 export interface GiftInboxItem {
@@ -30,13 +30,21 @@ export interface GiftInboxItem {
   gifts: Gift[];
   totalAmount: number;
   latestMessage: string;
-  latestGiftAt: string;
+  latestGiftAt: string | null;
   canStartChat: boolean;
   score: number;
 }
 
-export type SortOption = 'newest' | 'highest_amount' | 'highest_rating' | 'best_match';
-export type FilterOption = 'all' | 'thirty_plus' | 'verified_only' | 'ready_to_chat';
+export type SortOption =
+  | 'newest'
+  | 'highest_amount'
+  | 'highest_rating'
+  | 'best_match';
+export type FilterOption =
+  | 'all'
+  | 'thirty_plus'
+  | 'verified_only'
+  | 'ready_to_chat';
 
 export const useGiftInbox = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -95,22 +103,32 @@ export const useGiftInbox = () => {
           id: req.id,
           momentTitle: req.momentTitle,
           momentEmoji: '🎁',
-          amount: req.totalPrice,
+          amount: req.totalPrice ?? 0,
           message: req.message || '',
           paymentType: 'direct',
           status: req.status === 'completed' ? 'received' : 'pending_proof',
-          createdAt: req.createdAt,
+          createdAt: req.createdAt ?? null,
         });
 
-        acc[senderId].totalAmount += req.totalPrice;
+        acc[senderId].totalAmount += req.totalPrice ?? 0;
         acc[senderId].score = acc[senderId].totalAmount; // Simple score based on amount
 
-        if (
-          !acc[senderId].latestGiftAt ||
-          new Date(req.createdAt) > new Date(acc[senderId].latestGiftAt)
-        ) {
-          acc[senderId].latestGiftAt = req.createdAt;
+        // Only update latestGiftAt when we have a valid createdAt to compare
+        if (!acc[senderId].latestGiftAt) {
+          acc[senderId].latestGiftAt = req.createdAt ?? null;
           acc[senderId].latestMessage = req.message || '';
+        } else if (req.createdAt) {
+          try {
+            if (
+              new Date(req.createdAt) >
+              new Date(acc[senderId].latestGiftAt || 0)
+            ) {
+              acc[senderId].latestGiftAt = req.createdAt;
+              acc[senderId].latestMessage = req.message || '';
+            }
+          } catch (e) {
+            // If parsing fails, keep existing latestGiftAt
+          }
         }
 
         return acc;
@@ -137,8 +155,8 @@ export const useGiftInbox = () => {
   // New Today
   const newToday = inboxItems.filter(
     (item) =>
-      item.latestGiftAt.includes('m ago') ||
-      item.latestGiftAt.includes('h ago'),
+      item.latestGiftAt?.includes('m ago') ||
+      item.latestGiftAt?.includes('h ago'),
   );
 
   // Apply filters
@@ -221,7 +239,7 @@ export const useGiftInbox = () => {
     setShowSortModal,
     setShowFilterModal,
     onRefresh,
-    
+
     // Helpers
     getSortLabel,
     getFilterLabel,

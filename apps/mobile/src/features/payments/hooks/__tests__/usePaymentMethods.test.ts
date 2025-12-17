@@ -1,10 +1,10 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { usePaymentMethods } from '../src/features/payments/hooks/usePaymentMethods';
-import { logger } from '../src/utils/logger';
+import { usePaymentMethods } from '@/features/payments/hooks/usePaymentMethods';
+import { logger } from '@/utils/logger';
 
 // Mock dependencies
-jest.mock('../src/utils/logger');
-jest.mock('../src/hooks/useScreenPerformance', () => ({
+jest.mock('@/utils/logger');
+jest.mock('@/hooks/useScreenPerformance', () => ({
   useScreenPerformance: () => ({
     trackMount: jest.fn(),
     trackInteraction: jest.fn(),

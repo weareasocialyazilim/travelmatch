@@ -17,19 +17,22 @@ import {
 jest.mock('../ErrorBoundary', () => {
   const React = require('react');
   const { View } = require('react-native');
-  
+
   return {
-    ScreenErrorBoundary: ({ children, fallbackType }: any) => (
-      React.createElement(View, { testID: `error-boundary-${fallbackType || 'default'}` }, children)
-    ),
+    ScreenErrorBoundary: ({ children, fallbackType }: any) =>
+      React.createElement(
+        View,
+        { testID: `error-boundary-${fallbackType || 'default'}` },
+        children,
+      ),
   };
 });
 
 describe('withErrorBoundary HOC', () => {
   // Test component
-  const TestComponent: React.FC<{ message?: string }> = ({ message = 'Test Component' }) => (
-    <Text testID="test-component">{message}</Text>
-  );
+  const TestComponent: React.FC<{ message?: string }> = ({
+    message = 'Test Component',
+  }) => <Text testID="test-component">{message}</Text>;
   TestComponent.displayName = 'TestComponent';
 
   // ============================================
@@ -47,7 +50,9 @@ describe('withErrorBoundary HOC', () => {
 
     it('renders wrapped component with props', () => {
       const WrappedComponent = withErrorBoundary(TestComponent);
-      const { getByText } = render(<WrappedComponent message="Custom Message" />);
+      const { getByText } = render(
+        <WrappedComponent message="Custom Message" />,
+      );
 
       expect(getByText('Custom Message')).toBeTruthy();
     });
@@ -73,21 +78,27 @@ describe('withErrorBoundary HOC', () => {
 
   describe('Fallback Types', () => {
     it('wraps component with network fallback type', () => {
-      const WrappedComponent = withErrorBoundary(TestComponent, { fallbackType: 'network' });
+      const WrappedComponent = withErrorBoundary(TestComponent, {
+        fallbackType: 'network',
+      });
       const { getByTestId } = render(<WrappedComponent />);
 
       expect(getByTestId('error-boundary-network')).toBeTruthy();
     });
 
     it('wraps component with generic fallback type', () => {
-      const WrappedComponent = withErrorBoundary(TestComponent, { fallbackType: 'generic' });
+      const WrappedComponent = withErrorBoundary(TestComponent, {
+        fallbackType: 'generic',
+      });
       const { getByTestId } = render(<WrappedComponent />);
 
       expect(getByTestId('error-boundary-generic')).toBeTruthy();
     });
 
     it('wraps component with critical fallback type', () => {
-      const WrappedComponent = withErrorBoundary(TestComponent, { fallbackType: 'critical' });
+      const WrappedComponent = withErrorBoundary(TestComponent, {
+        fallbackType: 'critical',
+      });
       const { getByTestId } = render(<WrappedComponent />);
 
       expect(getByTestId('error-boundary-critical')).toBeTruthy();
@@ -108,12 +119,18 @@ describe('withErrorBoundary HOC', () => {
   describe('Display Names', () => {
     it('sets display name with component name', () => {
       const WrappedComponent = withErrorBoundary(TestComponent);
-      expect(WrappedComponent.displayName).toBe('withErrorBoundary(TestComponent)');
+      expect(WrappedComponent.displayName).toBe(
+        'withErrorBoundary(TestComponent)',
+      );
     });
 
     it('sets display name with custom display name option', () => {
-      const WrappedComponent = withErrorBoundary(TestComponent, { displayName: 'CustomName' });
-      expect(WrappedComponent.displayName).toBe('withErrorBoundary(CustomName)');
+      const WrappedComponent = withErrorBoundary(TestComponent, {
+        displayName: 'CustomName',
+      });
+      expect(WrappedComponent.displayName).toBe(
+        'withErrorBoundary(CustomName)',
+      );
     });
 
     it('sets display name for anonymous component', () => {
@@ -126,7 +143,9 @@ describe('withErrorBoundary HOC', () => {
       const ComponentWithDisplayName: React.FC = () => <Text>Test</Text>;
       ComponentWithDisplayName.displayName = 'MyDisplayName';
       const WrappedComponent = withErrorBoundary(ComponentWithDisplayName);
-      expect(WrappedComponent.displayName).toBe('withErrorBoundary(MyDisplayName)');
+      expect(WrappedComponent.displayName).toBe(
+        'withErrorBoundary(MyDisplayName)',
+      );
     });
   });
 
@@ -161,7 +180,9 @@ describe('withErrorBoundary HOC', () => {
 
     it('convenience functions pass props correctly', () => {
       const WrappedComponent = withNetworkErrorBoundary(TestComponent);
-      const { getByText } = render(<WrappedComponent message="Network Error Test" />);
+      const { getByText } = render(
+        <WrappedComponent message="Network Error Test" />,
+      );
 
       expect(getByText('Network Error Test')).toBeTruthy();
     });
@@ -175,8 +196,18 @@ describe('withErrorBoundary HOC', () => {
     it('extracts and passes navigation prop', () => {
       const mockNavigation = { navigate: jest.fn(), goBack: jest.fn() };
       const WrappedComponent = withErrorBoundary(TestComponent);
-      
-      const { getByTestId } = render(<WrappedComponent navigation={mockNavigation as any} />);
+
+      const { getByTestId } = render(
+        <WrappedComponent
+          navigation={
+            mockNavigation as unknown as {
+              navigate?: (...args: unknown[]) => void;
+              goBack?: () => void;
+              reset?: (...args: unknown[]) => void;
+            }
+          }
+        />,
+      );
 
       expect(getByTestId('test-component')).toBeTruthy();
     });
@@ -191,9 +222,18 @@ describe('withErrorBoundary HOC', () => {
     it('passes navigation alongside other props', () => {
       const mockNavigation = { navigate: jest.fn() };
       const WrappedComponent = withErrorBoundary(TestComponent);
-      
+
       const { getByText } = render(
-        <WrappedComponent navigation={mockNavigation as any} message="With Navigation" />
+        <WrappedComponent
+          navigation={
+            mockNavigation as unknown as {
+              navigate?: (...args: unknown[]) => void;
+              goBack?: () => void;
+              reset?: (...args: unknown[]) => void;
+            }
+          }
+          message="With Navigation"
+        />,
       );
 
       expect(getByText('With Navigation')).toBeTruthy();
@@ -206,8 +246,12 @@ describe('withErrorBoundary HOC', () => {
 
   describe('Multiple Wrapping', () => {
     it('can wrap same component multiple times with different options', () => {
-      const Wrapped1 = withErrorBoundary(TestComponent, { fallbackType: 'network' });
-      const Wrapped2 = withErrorBoundary(TestComponent, { fallbackType: 'generic' });
+      const Wrapped1 = withErrorBoundary(TestComponent, {
+        fallbackType: 'network',
+      });
+      const Wrapped2 = withErrorBoundary(TestComponent, {
+        fallbackType: 'generic',
+      });
 
       const { getByTestId: getById1 } = render(<Wrapped1 />);
       const { getByTestId: getById2 } = render(<Wrapped2 />);
@@ -232,7 +276,7 @@ describe('withErrorBoundary HOC', () => {
     it('handles component with no props', () => {
       const NoPropsComponent = () => <Text>No Props</Text>;
       const WrappedComponent = withErrorBoundary(NoPropsComponent);
-      
+
       const { getByText } = render(<WrappedComponent />);
       expect(getByText('No Props')).toBeTruthy();
     });
@@ -242,9 +286,9 @@ describe('withErrorBoundary HOC', () => {
         <Text>{JSON.stringify(props)}</Text>
       );
       const WrappedComponent = withErrorBoundary(ManyPropsComponent);
-      
+
       const { UNSAFE_root } = render(
-        <WrappedComponent prop1="a" prop2="b" prop3="c" prop4="d" />
+        <WrappedComponent prop1="a" prop2="b" prop3="c" prop4="d" />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -255,10 +299,10 @@ describe('withErrorBoundary HOC', () => {
           return <Text>Class Component</Text>;
         }
       }
-      
+
       const WrappedComponent = withErrorBoundary(ClassComponent);
       const { getByText } = render(<WrappedComponent />);
-      
+
       expect(getByText('Class Component')).toBeTruthy();
     });
 
@@ -274,10 +318,10 @@ describe('withErrorBoundary HOC', () => {
         const [count] = React.useState(0);
         return <Text>Count: {count}</Text>;
       };
-      
+
       const WrappedComponent = withErrorBoundary(StatefulComponent);
       const { getByText } = render(<WrappedComponent />);
-      
+
       expect(getByText('Count: 0')).toBeTruthy();
     });
   });
@@ -292,14 +336,16 @@ describe('withErrorBoundary HOC', () => {
         title: string;
         count?: number;
       }
-      
+
       const TypedComponent: React.FC<CustomProps> = ({ title, count = 0 }) => (
-        <Text>{title}: {count}</Text>
+        <Text>
+          {title}: {count}
+        </Text>
       );
-      
+
       const WrappedComponent = withErrorBoundary(TypedComponent);
       const { getByText } = render(<WrappedComponent title="Test" count={5} />);
-      
+
       expect(getByText('Test: 5')).toBeTruthy();
     });
 
@@ -308,14 +354,19 @@ describe('withErrorBoundary HOC', () => {
         required: string;
         optional?: string;
       }
-      
-      const OptionalPropsComponent: React.FC<OptionalProps> = ({ required, optional }) => (
-        <Text>{required} {optional || 'default'}</Text>
+
+      const OptionalPropsComponent: React.FC<OptionalProps> = ({
+        required,
+        optional,
+      }) => (
+        <Text>
+          {required} {optional || 'default'}
+        </Text>
       );
-      
+
       const WrappedComponent = withErrorBoundary(OptionalPropsComponent);
       const { getByText } = render(<WrappedComponent required="Test" />);
-      
+
       expect(getByText('Test default')).toBeTruthy();
     });
   });
@@ -330,18 +381,26 @@ describe('withErrorBoundary HOC', () => {
         fallbackType: 'network',
         displayName: 'CustomErrorComponent',
       });
-      
-      expect(WrappedComponent.displayName).toBe('withErrorBoundary(CustomErrorComponent)');
-      
+
+      expect(WrappedComponent.displayName).toBe(
+        'withErrorBoundary(CustomErrorComponent)',
+      );
+
       const { getByTestId } = render(<WrappedComponent />);
       expect(getByTestId('error-boundary-network')).toBeTruthy();
     });
 
     it('handles all possible fallbackType values', () => {
-      const types: Array<'network' | 'generic' | 'critical'> = ['network', 'generic', 'critical'];
-      
+      const types: Array<'network' | 'generic' | 'critical'> = [
+        'network',
+        'generic',
+        'critical',
+      ];
+
       types.forEach((type) => {
-        const WrappedComponent = withErrorBoundary(TestComponent, { fallbackType: type });
+        const WrappedComponent = withErrorBoundary(TestComponent, {
+          fallbackType: type,
+        });
         const { getByTestId } = render(<WrappedComponent />);
         expect(getByTestId(`error-boundary-${type}`)).toBeTruthy();
       });

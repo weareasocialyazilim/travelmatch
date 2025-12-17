@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
-import { render } from '../../../__tests__/testUtils';
+import { render } from '../../../__tests__/testUtilsRender.helper';
 import { Button } from '../../../components/ui/Button';
 
 describe('Button Component', () => {

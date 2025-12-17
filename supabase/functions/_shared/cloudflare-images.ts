@@ -18,6 +18,7 @@
 
 // Cloudflare Images API configuration
 const CF_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
+const CF_ACCOUNT_HASH = Deno.env.get('CLOUDFLARE_ACCOUNT_HASH') || ''; // For imagedelivery.net URLs
 const CF_API_TOKEN = Deno.env.get('CLOUDFLARE_IMAGES_TOKEN') || '';
 const CF_IMAGES_URL = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/images/v1`;
 
@@ -79,7 +80,7 @@ export function getImageURL(
   variant: string = 'public',
   options?: ImageTransformOptions,
 ): string {
-  const baseURL = `https://imagedelivery.net/${CF_ACCOUNT_ID}/${imageId}/${variant}`;
+  const baseURL = `https://imagedelivery.net/${CF_ACCOUNT_HASH}/${imageId}/${variant}`;
   
   if (!options) {
     return baseURL;

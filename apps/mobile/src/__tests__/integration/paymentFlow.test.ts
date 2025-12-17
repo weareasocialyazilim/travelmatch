@@ -1,6 +1,6 @@
 /**
  * Payment Flow Integration Tests
- * 
+ *
  * Tests complete payment workflows that span multiple services:
  * - Create payment → Process → Update balance
  * - Add payment method → Make payment → Verify transaction
@@ -8,7 +8,7 @@
  * - Payment failure → Retry → Success
  * - Refund processing flow
  * - Transaction history and filtering
- * 
+ *
  * Target: 6 scenarios
  */
 
@@ -28,9 +28,9 @@ jest.mock('@/services/supabaseDbService', () => ({
   },
 }));
 
-const mockSupabase = supabase ;
-const mockLogger = logger ;
-const mockTransactionsService = transactionsService ;
+const mockSupabase = supabase;
+const mockLogger = logger;
+const mockTransactionsService = transactionsService;
 
 describe('Payment Flow Integration', () => {
   const mockUser = {
@@ -47,7 +47,7 @@ describe('Payment Flow Integration', () => {
         data: { user: mockUser },
         error: null,
       }),
-    } as any;
+    } as unknown as typeof mockSupabase.auth;
 
     // Setup default from() chain mock
     const mockFromChain = {
@@ -58,7 +58,9 @@ describe('Payment Flow Integration', () => {
       eq: jest.fn().mockReturnThis(),
       single: jest.fn(),
     };
-    mockSupabase.from = jest.fn(() => mockFromChain) as any;
+    mockSupabase.from = jest.fn(
+      () => mockFromChain,
+    ) as unknown as typeof mockSupabase.from;
   });
 
   describe('Scenario 1: Complete Payment Processing Flow', () => {
@@ -76,7 +78,7 @@ describe('Payment Flow Integration', () => {
           error: null,
         }),
       };
-      (mockSupabase.from ).mockReturnValue(mockFromChain);
+      mockSupabase.from.mockReturnValue(mockFromChain);
 
       const balanceBefore = await paymentService.getBalance();
       expect(balanceBefore.available).toBe(initialBalance);
@@ -144,13 +146,13 @@ describe('Payment Flow Integration', () => {
           amount: 1000000,
           currency: 'USD',
           paymentMethodId: 'pm-card-123',
-        })
+        }),
       ).rejects.toThrow('Insufficient funds');
 
       // Verify error logging
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Process payment error:',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -165,7 +167,7 @@ describe('Payment Flow Integration', () => {
 
       // Step 2: Verify card was added
       const paymentMethods = paymentService.getPaymentMethods();
-      const verifiedCard = paymentMethods.cards.find(c => c.id === cardId);
+      const verifiedCard = paymentMethods.cards.find((c) => c.id === cardId);
       expect(verifiedCard).toBeDefined();
 
       // Step 3: Use card for payment
@@ -208,7 +210,7 @@ describe('Payment Flow Integration', () => {
           amount: 50,
           currency: 'USD',
           paymentMethodId: 'invalid-pm-123',
-        })
+        }),
       ).rejects.toThrow('Payment method not found');
     });
   });
@@ -228,7 +230,7 @@ describe('Payment Flow Integration', () => {
           error: null,
         }),
       };
-      (mockSupabase.from ).mockReturnValue(mockFromChain);
+      mockSupabase.from.mockReturnValue(mockFromChain);
 
       const balanceBefore = await paymentService.getBalance();
       expect(balanceBefore.available).toBe(initialBalance);
@@ -289,7 +291,7 @@ describe('Payment Flow Integration', () => {
           error: null,
         }),
       };
-      (mockSupabase.from ).mockReturnValue(mockFromChain);
+      mockSupabase.from.mockReturnValue(mockFromChain);
 
       // Mock withdrawal rejection
       mockTransactionsService.create.mockResolvedValue({
@@ -303,12 +305,12 @@ describe('Payment Flow Integration', () => {
           amount: 1000,
           currency: 'USD',
           bankAccountId: 'ba-123',
-        })
+        }),
       ).rejects.toThrow('Insufficient balance for withdrawal');
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Withdraw funds error:',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -341,7 +343,7 @@ describe('Payment Flow Integration', () => {
           amount: 100,
           currency: 'USD',
           paymentMethodId: 'card-declined-123',
-        })
+        }),
       ).rejects.toThrow('Card declined');
 
       // Attempt 2: Succeed with different card
@@ -406,7 +408,7 @@ describe('Payment Flow Integration', () => {
 
       // Step 2: Filter by type (withdrawals only)
       const withdrawalTransactions = mockTransactions.filter(
-        t => t.type === 'withdrawal'
+        (t) => t.type === 'withdrawal',
       );
       mockTransactionsService.list.mockResolvedValue({
         data: withdrawalTransactions,
@@ -422,7 +424,7 @@ describe('Payment Flow Integration', () => {
 
       // Step 3: Filter by date range
       const recentTransactions = mockTransactions.filter(
-        t => new Date(t.created_at) >= new Date('2024-01-14T00:00:00Z')
+        (t) => new Date(t.created_at) >= new Date('2024-01-14T00:00:00Z'),
       );
       mockTransactionsService.list.mockResolvedValue({
         data: recentTransactions,
@@ -461,14 +463,14 @@ describe('Payment Flow Integration', () => {
       const mockFromChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockImplementation(() => 
+        single: jest.fn().mockImplementation(() =>
           Promise.resolve({
             data: { balance: currentBalance, currency: 'USD' },
             error: null,
-          })
+          }),
         ),
       };
-      (mockSupabase.from ).mockReturnValue(mockFromChain);
+      mockSupabase.from.mockReturnValue(mockFromChain);
 
       // Initial balance
       const balance1 = await paymentService.getBalance();
@@ -550,18 +552,18 @@ describe('Payment Flow Integration', () => {
 
       // Process all transactions concurrently
       const results = await Promise.all(
-        transactions.map(txn =>
+        transactions.map((txn) =>
           paymentService.processPayment({
             amount: txn.amount,
             currency: 'USD',
             paymentMethodId: 'pm-123',
-          })
-        )
+          }),
+        ),
       );
 
       // Verify all completed successfully
       expect(results).toHaveLength(3);
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(result.transaction.status).toBe('completed');
       });
 

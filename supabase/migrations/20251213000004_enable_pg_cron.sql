@@ -36,17 +36,27 @@ WHERE extname = 'pg_cron';
 -- ============================================
 
 -- Remove existing job if exists (idempotent)
-SELECT cron.unschedule('refund-expired-escrow');
+DO $$
+BEGIN
+  -- Try to unschedule and schedule the cron job, but do not fail the
+  -- migration if pg_cron is not available or scheduling fails in this
+  -- environment (e.g. local dev / restricted permissions).
+  BEGIN
+    PERFORM cron.unschedule('refund-expired-escrow');
+  EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'Could not unschedule refund-expired-escrow: %', SQLERRM;
+  END;
 
--- Schedule daily refund job at 2 AM UTC
-SELECT cron.schedule(
-  'refund-expired-escrow',           -- Job name
-  '0 2 * * *',                       -- Cron schedule: Daily at 02:00 UTC
-  $$
-    -- Call the refund function
-    SELECT refund_expired_escrow();
-  $$
-);
+  BEGIN
+    PERFORM cron.schedule(
+      'refund-expired-escrow',
+      '0 2 * * *',
+      $cmd$SELECT refund_expired_escrow();$cmd$
+    );
+  EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'Could not schedule refund-expired-escrow: %', SQLERRM;
+  END;
+END $$;
 
 -- ============================================
 -- 3. VERIFY SCHEDULED JOB

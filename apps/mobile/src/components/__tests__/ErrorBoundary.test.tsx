@@ -1,6 +1,6 @@
 /**
  * ErrorBoundary - Comprehensive Tests
- * 
+ *
  * Tests for error boundary functionality:
  * - Component crash recovery
  * - Error reporting integration (Sentry)
@@ -12,7 +12,12 @@
 
 import React from 'react';
 import { Text, View } from 'react-native';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react-native';
 import { CommonActions } from '@react-navigation/native';
 import * as Sentry from '../../config/sentry';
 import { logger } from '../../utils/logger';
@@ -39,8 +44,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSentry = Sentry ;
-const mockLogger = logger ;
+const mockSentry = Sentry;
+const mockLogger = logger;
 
 // Component that throws an error
 const ThrowError: React.FC<{ message?: string; shouldThrow?: boolean }> = ({
@@ -76,7 +81,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ThrowError />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -87,7 +92,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <SuccessComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByTestId('success-component')).toBeTruthy();
@@ -98,7 +103,7 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Error should be caught
@@ -112,7 +117,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should show success
@@ -123,7 +128,7 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <ThrowError message="Initial Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -134,7 +139,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <SuccessComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByTestId('success-component')).toBeTruthy();
@@ -154,7 +159,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <NestedComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -169,7 +174,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ThrowError message="Sentry Test Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(mockSentry.addBreadcrumb).toHaveBeenCalledWith(
@@ -179,7 +184,7 @@ describe('ErrorBoundary', () => {
         expect.objectContaining({
           level: 'component',
           errorMessage: 'Sentry Test Error',
-        })
+        }),
       );
 
       expect(mockSentry.captureException).toHaveBeenCalledWith(
@@ -189,7 +194,7 @@ describe('ErrorBoundary', () => {
           tags: expect.objectContaining({
             errorBoundaryLevel: 'component',
           }),
-        })
+        }),
       );
     });
 
@@ -197,7 +202,7 @@ describe('ErrorBoundary', () => {
       render(
         <AppErrorBoundary>
           <ThrowError message="Critical App Error" />
-        </AppErrorBoundary>
+        </AppErrorBoundary>,
       );
 
       expect(mockSentry.captureException).toHaveBeenCalledWith(
@@ -207,7 +212,7 @@ describe('ErrorBoundary', () => {
           tags: expect.objectContaining({
             errorBoundaryLevel: 'app',
           }),
-        })
+        }),
       );
     });
 
@@ -215,12 +220,12 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary level="screen">
           <ThrowError message="Logger Test Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         '[SCREEN Error Boundary]',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -232,7 +237,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ThrowError message="Test Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should still show error UI
@@ -241,7 +246,7 @@ describe('ErrorBoundary', () => {
       // Should log Sentry failure
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to report to Sentry',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -251,14 +256,14 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary onError={onError}>
           <ThrowError message="Custom Handler Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(onError).toHaveBeenCalledWith(
         expect.any(Error),
         expect.objectContaining({
           componentStack: expect.any(String),
-        })
+        }),
       );
     });
   });
@@ -268,7 +273,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ThrowError />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should show error icon
@@ -292,11 +297,13 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallback={customFallback}>
           <ThrowError message="Custom Fallback Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByTestId('custom-fallback')).toBeTruthy();
-      expect(screen.getByText('Custom Error: Custom Fallback Error')).toBeTruthy();
+      expect(
+        screen.getByText('Custom Error: Custom Fallback Error'),
+      ).toBeTruthy();
       expect(screen.getByText('Custom Reset')).toBeTruthy();
     });
 
@@ -304,7 +311,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallbackType="network">
           <ThrowError message="Network error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Bağlantı Hatası')).toBeTruthy();
@@ -315,7 +322,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallbackType="server">
           <ThrowError message="Server error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Sunucu Hatası')).toBeTruthy();
@@ -326,7 +333,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallbackType="unauthorized">
           <ThrowError message="Unauthorized" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Yetkilendirme Hatası')).toBeTruthy();
@@ -337,7 +344,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallbackType="notfound">
           <ThrowError message="Not found" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Sayfa Bulunamadı')).toBeTruthy();
@@ -348,7 +355,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallbackType="critical">
           <ThrowError message="Critical error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Kritik Hata')).toBeTruthy();
@@ -359,7 +366,7 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <ThrowError message="Network fetch failed" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Bağlantı Hatası')).toBeTruthy();
@@ -367,7 +374,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ThrowError message="404 not found" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Sayfa Bulunamadı')).toBeTruthy();
@@ -375,7 +382,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ThrowError message="401 unauthorized access" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Yetkilendirme Hatası')).toBeTruthy();
@@ -383,7 +390,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ThrowError message="500 server error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Sunucu Hatası')).toBeTruthy();
@@ -393,7 +400,7 @@ describe('ErrorBoundary', () => {
       render(
         <AppErrorBoundary>
           <ThrowError />
-        </AppErrorBoundary>
+        </AppErrorBoundary>,
       );
 
       expect(screen.getByText('Ana Sayfaya Dön')).toBeTruthy();
@@ -403,7 +410,7 @@ describe('ErrorBoundary', () => {
       render(
         <ComponentErrorBoundary>
           <ThrowError />
-        </ComponentErrorBoundary>
+        </ComponentErrorBoundary>,
       );
 
       expect(screen.queryByText('Ana Sayfaya Dön')).toBeNull();
@@ -425,7 +432,7 @@ describe('ErrorBoundary', () => {
             </ErrorBoundary>
             <Text>Outer content still visible</Text>
           </View>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Inner error boundary should catch the error
@@ -436,7 +443,9 @@ describe('ErrorBoundary', () => {
     });
 
     it('should isolate errors to nearest boundary', () => {
-      const ComponentA: React.FC = () => <Text testID="component-a">Component A</Text>;
+      const ComponentA: React.FC = () => (
+        <Text testID="component-a">Component A</Text>
+      );
       const ComponentB: React.FC = () => {
         throw new Error('Component B Error');
       };
@@ -452,7 +461,7 @@ describe('ErrorBoundary', () => {
               <ComponentB />
             </ComponentErrorBoundary>
           </View>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Component A should still render
@@ -463,7 +472,9 @@ describe('ErrorBoundary', () => {
     });
 
     it('should propagate to parent boundary if child boundary fails', () => {
-      const BrokenBoundary: React.FC<{ children: React.ReactNode }> = ({ children: _children }) => {
+      const BrokenBoundary: React.FC<{ children: React.ReactNode }> = ({
+        children: _children,
+      }) => {
         throw new Error('Boundary itself is broken');
       };
 
@@ -472,7 +483,7 @@ describe('ErrorBoundary', () => {
           <BrokenBoundary>
             <Text>Child content</Text>
           </BrokenBoundary>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // App-level boundary should catch the error
@@ -501,7 +512,7 @@ describe('ErrorBoundary', () => {
           <ComponentErrorBoundary>
             <SuccessComponent />
           </ComponentErrorBoundary>
-        </View>
+        </View>,
       );
 
       // Both error boundaries should catch errors
@@ -522,7 +533,7 @@ describe('ErrorBoundary', () => {
       render(
         <ScreenErrorBoundary navigation={mockNavigation}>
           <ThrowError />
-        </ScreenErrorBoundary>
+        </ScreenErrorBoundary>,
       );
 
       const homeButton = screen.getByText('Ana Sayfaya Dön');
@@ -532,7 +543,7 @@ describe('ErrorBoundary', () => {
         CommonActions.reset({
           index: 0,
           routes: [{ name: 'Discover' }],
-        })
+        }),
       );
     });
 
@@ -544,7 +555,7 @@ describe('ErrorBoundary', () => {
       render(
         <ScreenErrorBoundary navigation={mockNavigation}>
           <ThrowError />
-        </ScreenErrorBoundary>
+        </ScreenErrorBoundary>,
       );
 
       const homeButton = screen.getByText('Ana Sayfaya Dön');
@@ -558,7 +569,7 @@ describe('ErrorBoundary', () => {
       render(
         <ScreenErrorBoundary>
           <ThrowError />
-        </ScreenErrorBoundary>
+        </ScreenErrorBoundary>,
       );
 
       const homeButton = screen.getByText('Ana Sayfaya Dön');
@@ -573,7 +584,7 @@ describe('ErrorBoundary', () => {
       render(
         <AppErrorBoundary>
           <ThrowError />
-        </AppErrorBoundary>
+        </AppErrorBoundary>,
       );
 
       expect(screen.getByText('Bir Şeyler Yanlış Gitti')).toBeTruthy();
@@ -584,7 +595,7 @@ describe('ErrorBoundary', () => {
       render(
         <NavigationErrorBoundary>
           <ThrowError />
-        </NavigationErrorBoundary>
+        </NavigationErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -595,7 +606,7 @@ describe('ErrorBoundary', () => {
       render(
         <ScreenErrorBoundary>
           <ThrowError />
-        </ScreenErrorBoundary>
+        </ScreenErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -606,7 +617,7 @@ describe('ErrorBoundary', () => {
       render(
         <ComponentErrorBoundary>
           <ThrowError />
-        </ComponentErrorBoundary>
+        </ComponentErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -617,33 +628,33 @@ describe('ErrorBoundary', () => {
   describe('Debug Mode', () => {
     it('should show debug info in development mode', () => {
       const originalEnv = __DEV__;
-      (global as any).__DEV__ = true;
+      (global as unknown as Record<string, unknown>).__DEV__ = true;
 
       render(
         <ErrorBoundary>
           <ThrowError message="Debug Test Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Debug Info:')).toBeTruthy();
       expect(screen.getByText(/Debug Test Error/)).toBeTruthy();
 
-      (global as any).__DEV__ = originalEnv;
+      (global as unknown as Record<string, unknown>).__DEV__ = originalEnv;
     });
 
     it('should hide debug info in production mode', () => {
       const originalEnv = __DEV__;
-      (global as any).__DEV__ = false;
+      (global as unknown as Record<string, unknown>).__DEV__ = false;
 
       render(
         <ErrorBoundary>
           <ThrowError message="Production Error" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.queryByText('Debug Info:')).toBeNull();
 
-      (global as any).__DEV__ = originalEnv;
+      (global as unknown as Record<string, unknown>).__DEV__ = originalEnv;
     });
   });
 
@@ -656,7 +667,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <NoMessageError />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -670,7 +681,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ThrowString />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should still catch and show error UI
@@ -689,7 +700,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <AsyncError />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       await waitFor(() => {
@@ -701,7 +712,7 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <ThrowError message="Error 1" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();
@@ -712,7 +723,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ThrowError message="Error 2" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Hata Oluştu')).toBeTruthy();

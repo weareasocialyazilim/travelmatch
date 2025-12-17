@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MomentGridCard Component Snapshots matches snapshot for left column 1`] = `null`;
+exports[`MomentGridCard Component Snapshots matches snapshot for left column 1`] = `
+<RCTTouchableOpacity
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
+  accessible={true}
+  onPress={[Function]}
+>
+  <RCTText
+    testID="RCTText"
+  >
+    Test Moment
+  </RCTText>
+</RCTTouchableOpacity>
+`;
 
-exports[`MomentGridCard Component Snapshots matches snapshot for right column 1`] = `null`;
+exports[`MomentGridCard Component Snapshots matches snapshot for right column 1`] = `
+<RCTTouchableOpacity
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
+  accessible={true}
+  onPress={[Function]}
+>
+  <RCTText
+    testID="RCTText"
+  >
+    Test Moment
+  </RCTText>
+</RCTTouchableOpacity>
+`;

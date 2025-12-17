@@ -1,7 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Card Component Snapshots matches snapshot for basic card 1`] = `
-[
+<RCTView
+  style={
+    {
+      "backgroundColor": "#FFFFFF",
+      "borderRadius": 16,
+      "elevation": 3,
+      "overflow": "hidden",
+      "padding": 16,
+      "shadowColor": "#000",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.1,
+      "shadowRadius": 8,
+    }
+  }
+>
+  <RCTText
+    testID="RCTText"
+  >
+    Basic Card
+  </RCTText>
+</RCTView>
+`;
+
+exports[`Card Component Snapshots matches snapshot for disabled card 1`] = `
+<RCTPressable
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
+  accessible={true}
+  onPress={[MockFunction]}
+  role="button"
+  style={[Function]}
+>
   <RCTView
     style={
       {
@@ -23,134 +61,48 @@ exports[`Card Component Snapshots matches snapshot for basic card 1`] = `
     <RCTText
       testID="RCTText"
     >
-      Basic Card
+      Disabled Card
     </RCTText>
-  </RCTView>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
-    style={
-      {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
-      }
-    }
-    testID="RCTSafeAreaView"
-  />,
-]
-`;
-
-exports[`Card Component Snapshots matches snapshot for disabled card 1`] = `
-[
-  <RCTPressable
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "disabled": false,
-      }
-    }
-    accessible={true}
-    onPress={[MockFunction]}
-    role="button"
-    style={[Function]}
-  >
-    <RCTView
-      style={
-        {
-          "backgroundColor": "#FFFFFF",
-          "borderRadius": 16,
-          "elevation": 3,
-          "overflow": "hidden",
-          "padding": 16,
-          "shadowColor": "#000",
-          "shadowOffset": {
-            "height": 2,
-            "width": 0,
-          },
-          "shadowOpacity": 0.1,
-          "shadowRadius": 8,
-        }
-      }
-    >
-      <RCTText
-        testID="RCTText"
-      >
-        Disabled Card
-      </RCTText>
-    </RCTView>
-  </RCTPressable>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
-    style={
-      {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
-      }
-    }
-    testID="RCTSafeAreaView"
-  />,
-]
+  </RCTView>
+</RCTPressable>
 `;
 
 exports[`Card Component Snapshots matches snapshot for pressable card 1`] = `
-[
-  <RCTPressable
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "disabled": false,
-      }
+<RCTPressable
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "disabled": false,
     }
-    accessible={true}
-    onPress={[MockFunction]}
-    role="button"
-    style={[Function]}
-  >
-    <RCTView
-      style={
-        {
-          "backgroundColor": "#FFFFFF",
-          "borderRadius": 16,
-          "elevation": 3,
-          "overflow": "hidden",
-          "padding": 16,
-          "shadowColor": "#000",
-          "shadowOffset": {
-            "height": 2,
-            "width": 0,
-          },
-          "shadowOpacity": 0.1,
-          "shadowRadius": 8,
-        }
-      }
-    >
-      <RCTText
-        testID="RCTText"
-      >
-        Pressable Card
-      </RCTText>
-    </RCTView>
-  </RCTPressable>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
+  }
+  accessible={true}
+  onPress={[MockFunction]}
+  role="button"
+  style={[Function]}
+>
+  <RCTView
     style={
       {
-        "left": 0,
+        "backgroundColor": "#FFFFFF",
+        "borderRadius": 16,
+        "elevation": 3,
+        "overflow": "hidden",
         "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
+        "shadowColor": "#000",
+        "shadowOffset": {
+          "height": 2,
+          "width": 0,
+        },
+        "shadowOpacity": 0.1,
+        "shadowRadius": 8,
       }
     }
-    testID="RCTSafeAreaView"
-  />,
-]
+  >
+    <RCTText
+      testID="RCTText"
+    >
+      Pressable Card
+    </RCTText>
+  </RCTView>
+</RCTPressable>
 `;

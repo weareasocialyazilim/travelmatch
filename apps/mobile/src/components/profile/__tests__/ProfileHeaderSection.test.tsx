@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
-import { render, mockUser } from '../../../__tests__/testUtils';
+import { render, mockUser } from '../../../__tests__/testUtilsRender.helper';
 import { ProfileHeaderSection } from '../ProfileHeaderSection';
 
 describe('ProfileHeaderSection Component', () => {
@@ -131,10 +131,13 @@ describe('ProfileHeaderSection Component', () => {
       const TestWrapper = () => {
         const [count, setCount] = React.useState(0);
         renderCount++;
+        const { TouchableOpacity, Text } = require('react-native');
         return (
           <>
             <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
-            <button onClick={() => setCount(c => c + 1)}>Update</button>
+            <TouchableOpacity onPress={() => setCount((c) => c + 1)}>
+              <Text>Update</Text>
+            </TouchableOpacity>
           </>
         );
       };

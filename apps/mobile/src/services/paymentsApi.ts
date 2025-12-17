@@ -1,13 +1,14 @@
 /**
  * Payments API Service
  * Handles payment-related API calls via Supabase Edge Functions
- * 
+ *
  * SECURITY: All payment operations are handled server-side via Edge Functions
  * Client never has access to Stripe secret keys or service_role credentials
  */
 
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
+import { toJson, toRecord } from '../utils/jsonHelper';
 
 export interface PaymentMethod {
   id: string;
@@ -49,22 +50,21 @@ interface EdgeFunctionResponse<T> {
  */
 async function callEdgeFunction<T>(
   functionName: string,
-  payload?: Record<string, unknown>
+  payload?: Record<string, unknown>,
 ): Promise<T> {
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData?.session?.access_token) {
     throw new Error('User not authenticated');
   }
 
-  const { data, error } = await supabase.functions.invoke<EdgeFunctionResponse<T>>(
-    functionName,
-    {
-      body: payload,
-      headers: {
-        Authorization: `Bearer ${sessionData.session.access_token}`,
-      },
-    }
-  );
+  const { data, error } = await supabase.functions.invoke<
+    EdgeFunctionResponse<T>
+  >(functionName, {
+    body: payload,
+    headers: {
+      Authorization: `Bearer ${sessionData.session.access_token}`,
+    },
+  });
 
   if (error) {
     logger.error(`Edge function ${functionName} error`, { error });
@@ -84,7 +84,9 @@ export const paymentsApi = {
    */
   async getPaymentMethods(): Promise<PaymentMethod[]> {
     try {
-      const methods = await callEdgeFunction<PaymentMethod[]>('get-payment-methods');
+      const methods = await callEdgeFunction<PaymentMethod[]>(
+        'get-payment-methods',
+      );
       return methods || [];
     } catch (error) {
       logger.error('Failed to get payment methods', { error });
@@ -97,9 +99,12 @@ export const paymentsApi = {
    */
   async addPaymentMethod(paymentMethodId: string): Promise<PaymentMethod> {
     try {
-      const method = await callEdgeFunction<PaymentMethod>('add-payment-method', {
-        paymentMethodId,
-      });
+      const method = await callEdgeFunction<PaymentMethod>(
+        'add-payment-method',
+        {
+          paymentMethodId,
+        },
+      );
       logger.info('Added payment method', { paymentMethodId });
       return method;
     } catch (error) {
@@ -144,7 +149,7 @@ export const paymentsApi = {
    */
   async getTransactionHistory(
     limit = 20,
-    offset = 0
+    offset = 0,
   ): Promise<TransactionRecord[]> {
     try {
       const { data: session } = await supabase.auth.getSession();
@@ -155,22 +160,24 @@ export const paymentsApi = {
       // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('transactions')
-        .select('id, type, amount, currency, status, created_at, description, metadata')
+        .select(
+          'id, type, amount, currency, status, created_at, description, metadata',
+        )
         .eq('user_id', session.session.user.id)
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (error) throw error;
 
-      return (data || []).map(tx => ({
+      return (data || []).map((tx: any) => ({
         id: tx.id,
         type: tx.type as TransactionRecord['type'],
         amount: tx.amount,
-        currency: tx.currency,
+        currency: tx.currency ?? '',
         status: tx.status as TransactionRecord['status'],
-        createdAt: tx.created_at,
-        description: tx.description,
-        metadata: tx.metadata,
+        createdAt: tx.created_at ?? '',
+        description: tx.description ?? undefined,
+        metadata: toRecord(tx.metadata),
       }));
     } catch (error) {
       logger.error('Failed to get transaction history', { error });
@@ -185,15 +192,22 @@ export const paymentsApi = {
   async createPaymentIntent(
     amount: number,
     currency: string,
-    momentId?: string
+    momentId?: string,
   ): Promise<PaymentIntent> {
     try {
-      const intent = await callEdgeFunction<PaymentIntent>('create-payment-intent', {
+      const intent = await callEdgeFunction<PaymentIntent>(
+        'create-payment-intent',
+        {
+          amount,
+          currency,
+          momentId,
+        },
+      );
+      logger.info('Created payment intent', {
+        intentId: intent.id,
         amount,
         currency,
-        momentId,
       });
-      logger.info('Created payment intent', { intentId: intent.id, amount, currency });
       return intent;
     } catch (error) {
       logger.error('Failed to create payment intent', { error });
@@ -227,7 +241,10 @@ export const paymentsApi = {
         .eq('user_id', session.session.user.id)
         .eq('status', 'pending');
 
-      const pendingBalance = (pendingTx || []).reduce((sum, tx) => sum + tx.amount, 0);
+      const pendingBalance = (pendingTx || []).reduce(
+        (sum, tx) => sum + tx.amount,
+        0,
+      );
 
       return {
         balance: data?.balance || 0,
@@ -250,7 +267,9 @@ export const paymentsApi = {
   /**
    * Get transaction by ID
    */
-  async getTransactionById(transactionId: string): Promise<TransactionRecord | null> {
+  async getTransactionById(
+    transactionId: string,
+  ): Promise<TransactionRecord | null> {
     try {
       const { data: session } = await supabase.auth.getSession();
       if (!session?.session?.user) {
@@ -260,7 +279,9 @@ export const paymentsApi = {
       // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('transactions')
-        .select('id, type, amount, currency, status, created_at, description, metadata')
+        .select(
+          'id, type, amount, currency, status, created_at, description, metadata',
+        )
         .eq('id', transactionId)
         .eq('user_id', session.session.user.id)
         .single();
@@ -274,11 +295,11 @@ export const paymentsApi = {
         id: data.id,
         type: data.type as TransactionRecord['type'],
         amount: data.amount,
-        currency: data.currency,
+        currency: data.currency ?? '',
         status: data.status as TransactionRecord['status'],
-        createdAt: data.created_at,
-        description: data.description,
-        metadata: data.metadata,
+        createdAt: data.created_at ?? '',
+        description: data.description ?? undefined,
+        metadata: toRecord(data.metadata),
       };
     } catch (error) {
       logger.error('Failed to get transaction', { error, transactionId });
@@ -292,15 +313,18 @@ export const paymentsApi = {
    */
   async withdraw(amount: number, paymentMethodId: string) {
     try {
-      const result = await callEdgeFunction<{ success: boolean; transactionId: string }>(
-        'transfer-funds',
-        {
-          type: 'withdrawal',
-          amount,
-          paymentMethodId,
-        }
-      );
-      logger.info('Withdrawal initiated', { amount, transactionId: result.transactionId });
+      const result = await callEdgeFunction<{
+        success: boolean;
+        transactionId: string;
+      }>('transfer-funds', {
+        type: 'withdrawal',
+        amount,
+        paymentMethodId,
+      });
+      logger.info('Withdrawal initiated', {
+        amount,
+        transactionId: result.transactionId,
+      });
       return result;
     } catch (error) {
       logger.error('Failed to withdraw', { error, amount, paymentMethodId });
@@ -327,10 +351,15 @@ export const paymentsApi = {
 
       if (error) throw error;
 
+      const row: any = data;
       return {
-        status: (data?.kyc_status || 'pending') as 'pending' | 'in_review' | 'verified' | 'rejected',
-        verified: data?.verified || false,
-        verifiedAt: data?.verified_at,
+        status: (row?.kyc_status || 'pending') as
+          | 'pending'
+          | 'in_review'
+          | 'verified'
+          | 'rejected',
+        verified: row?.verified || false,
+        verifiedAt: row?.verified_at,
       };
     } catch (error) {
       logger.error('Failed to get KYC status', { error });
@@ -344,12 +373,15 @@ export const paymentsApi = {
    */
   async submitKYC(documents: Record<string, string>) {
     try {
-      const result = await callEdgeFunction<{ success: boolean; status: string }>(
-        'verify-kyc',
-        { documents }
-      );
+      const result = await callEdgeFunction<{
+        success: boolean;
+        status: string;
+      }>('verify-kyc', { documents });
       logger.info('KYC submission initiated', { status: result.status });
-      return { success: result.success, status: result.status as 'pending' | 'in_review' };
+      return {
+        success: result.success,
+        status: result.status as 'pending' | 'in_review',
+      };
     } catch (error) {
       logger.error('Failed to submit KYC', { error });
       throw error;
@@ -369,7 +401,9 @@ export const paymentsApi = {
       // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('user_subscriptions')
-        .select('id, plan_id, status, current_period_start, current_period_end, cancel_at')
+        .select(
+          'id, plan_id, status, current_period_start, current_period_end, cancel_at',
+        )
         .eq('user_id', session.session.user.id)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
@@ -394,17 +428,29 @@ export const paymentsApi = {
    */
   async createSubscription(planId: string, paymentMethodId: string) {
     try {
-      const result = await callEdgeFunction<{ id: string; planId: string; status: string }>(
-        'create-subscription',
-        {
-          planId,
-          paymentMethodId,
-        }
-      );
-      logger.info('Subscription created', { subscriptionId: result.id, planId });
-      return { id: result.id, planId: result.planId, status: result.status as 'active' };
+      const result = await callEdgeFunction<{
+        id: string;
+        planId: string;
+        status: string;
+      }>('create-subscription', {
+        planId,
+        paymentMethodId,
+      });
+      logger.info('Subscription created', {
+        subscriptionId: result.id,
+        planId,
+      });
+      return {
+        id: result.id,
+        planId: result.planId,
+        status: result.status as 'active',
+      };
     } catch (error) {
-      logger.error('Failed to create subscription', { error, planId, paymentMethodId });
+      logger.error('Failed to create subscription', {
+        error,
+        planId,
+        paymentMethodId,
+      });
       throw error;
     }
   },
@@ -414,7 +460,9 @@ export const paymentsApi = {
    */
   async cancelSubscription() {
     try {
-      const result = await callEdgeFunction<{ success: boolean }>('cancel-subscription');
+      const result = await callEdgeFunction<{ success: boolean }>(
+        'cancel-subscription',
+      );
       logger.info('Subscription cancelled');
       return result;
     } catch (error) {

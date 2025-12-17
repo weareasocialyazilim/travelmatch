@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { fireEvent, waitFor } from '@testing-library/react-native';
-import { render, mockMoment, mockFilter } from '../testUtils';
+import { render, mockMoment, mockFilter } from '../testUtilsRender.helper';
 
 // Mock dependencies
 jest.mock('../../hooks/useMoments');

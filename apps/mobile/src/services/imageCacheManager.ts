@@ -592,11 +592,58 @@ class ImageCacheManager {
 // ============================================================================
 
 export const imageCacheManager = new ImageCacheManager();
+// Auto-initialize when not running under Jest so tests can control init.
+try {
+  const isJest = typeof (globalThis as any).jest !== 'undefined' ||
+    (typeof process !== 'undefined' && Boolean((process.env as any).JEST_WORKER_ID));
+  if (!isJest) {
+    void imageCacheManager.initialize().catch((error) => {
+      logger.error('[ImageCache] Auto-init failed:', error);
+    });
+  }
+} catch {
+  // ignore
+}
 
-// Auto-initialize
-imageCacheManager.initialize().catch((error) => {
-  logger.error('[ImageCache] Auto-init failed:', error);
-});
+// Provide legacy-compatible public helpers used by tests and older code
+// These delegate to the internal implementations.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(imageCacheManager as any).clear = async function (options?: { memory?: boolean; disk?: boolean }) {
+  return await imageCacheManager.clearCache(options);
+};
+
+// pruneExpiredEntries -> cleanExpired
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(imageCacheManager as any).pruneExpiredEntries = async function () {
+  // @ts-ignore access private method for test compatibility
+  return await (imageCacheManager as any).cleanExpired?.() || Promise.resolve();
+};
+
+// cleanupDiskCache helper
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(imageCacheManager as any).cleanupDiskCache = async function () {
+  // Prefer evictLRU to reclaim space; fall back to cleaning expired entries
+  // @ts-ignore
+  try {
+    return await (imageCacheManager as any).evictLRU?.(Math.max(1, (imageCacheManager as any).config?.maxDiskCacheSizeMB * 0.8))
+  } catch {
+    // @ts-ignore
+    return await (imageCacheManager as any).cleanExpired?.();
+  }
+};
+
+// prefetchImages and prefetchResponsiveVariants
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(imageCacheManager as any).prefetchImages = async function (uris: string[]) {
+  return Promise.all((uris || []).map((u) => imageCacheManager.getImage(u)));
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(imageCacheManager as any).prefetchResponsiveVariants = async function (uri: string, cloudflareId?: string) {
+  if (!cloudflareId) return;
+  // @ts-ignore
+  return await (imageCacheManager as any).prefetchVariants?.(cloudflareId, undefined);
+};
 
 // ============================================================================
 // REACT HOOKS

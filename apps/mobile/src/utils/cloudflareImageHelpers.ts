@@ -32,7 +32,7 @@ export interface CloudflareImage {
  * User avatar with optional Cloudflare/BlurHash fields
  */
 export interface CloudflareAvatar {
-  avatar?: string;
+  avatar?: string | null;
   avatarCloudflareId?: string;
   avatarBlurHash?: string;
 }
@@ -258,7 +258,9 @@ export function migrateToCloudflare(
  * // Preload all sizes
  * variants.forEach(url => Image.prefetch(url));
  */
-export function getAllVariantUrls(cloudflareId: string): Record<ImageVariant, string> {
+export function getAllVariantUrls(
+  cloudflareId: string,
+): Record<ImageVariant, string> {
   return {
     thumbnail: getImageUrl(cloudflareId, 'thumbnail'),
     small: getImageUrl(cloudflareId, 'small'),

@@ -20,7 +20,8 @@ interface ExpoFileSystemExtended {
   };
 }
 
-const FileSystemExtended = FileSystem as typeof FileSystem & ExpoFileSystemExtended;
+const FileSystemExtended = FileSystem as typeof FileSystem &
+  ExpoFileSystemExtended;
 const File = FileSystemExtended.File;
 const Paths = FileSystemExtended.Paths;
 
@@ -78,9 +79,9 @@ export const uploadFile = async (
   }
 
   try {
-    // Read file using new SDK 54 File API
-    const file = new File(fileUri);
-    const arrayBuffer = await file.arrayBuffer();
+    // Read file via fetch and get ArrayBuffer (works across RN runtimes)
+    const response = await fetch(fileUri);
+    const arrayBuffer = await response.arrayBuffer();
 
     const fileName = options?.fileName || generateFileName(fileUri, userId);
     const contentType = options?.contentType || getMimeType(fileUri);
@@ -143,17 +144,18 @@ export const downloadFile = async (
 
     if (error) throw error;
 
-    // Save to local cache using SDK 54 File API
+    // Save to local cache using expo-file-system
     const fileName = path.split('/').pop() || 'download';
-    const cacheFile = new File(Paths.cache, fileName);
+    const localPath = `${FileSystem.cacheDirectory}${fileName}`;
 
     const arrayBuffer = await data.arrayBuffer();
     const base64 = encode(arrayBuffer);
 
-    // Write returns void (not Promise), wrap with Promise.resolve for consistency
-    cacheFile.write(base64, { encoding: 'base64' });
+    await FileSystem.writeAsStringAsync(localPath, base64, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
 
-    return { localUri: cacheFile.uri, error: null };
+    return { localUri: localPath, error: null };
   } catch (error) {
     logger.error('[Storage] Download error:', error);
     return { localUri: null, error: error as Error };

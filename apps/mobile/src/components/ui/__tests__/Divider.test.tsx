@@ -45,7 +45,9 @@ describe('Divider Component', () => {
     });
 
     it('handles long text', () => {
-      const { getByText } = render(<Divider text="Choose one of the following options" />);
+      const { getByText } = render(
+        <Divider text="Choose one of the following options" />,
+      );
       expect(getByText('Choose one of the following options')).toBeTruthy();
     });
 
@@ -118,7 +120,7 @@ describe('Divider Component', () => {
 
     it('renders with multiple custom styles', () => {
       const { UNSAFE_root } = render(
-        <Divider style={{ marginTop: 10, marginBottom: 10 }} />
+        <Divider style={{ marginTop: 10, marginBottom: 10 }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -130,7 +132,7 @@ describe('Divider Component', () => {
 
     it('applies custom styles with text', () => {
       const { getByText } = render(
-        <Divider text="OR" style={{ opacity: 0.5 }} />
+        <Divider text="OR" style={{ opacity: 0.5 }} />,
       );
       expect(getByText('OR')).toBeTruthy();
     });
@@ -143,7 +145,7 @@ describe('Divider Component', () => {
   describe('Combinations', () => {
     it('renders with all props', () => {
       const { getByText } = render(
-        <Divider text="OR" spacing="lg" style={{ marginHorizontal: 20 }} />
+        <Divider text="OR" spacing="lg" style={{ marginHorizontal: 20 }} />,
       );
       expect(getByText('OR')).toBeTruthy();
     });
@@ -155,7 +157,7 @@ describe('Divider Component', () => {
 
     it('combines large spacing with custom style', () => {
       const { UNSAFE_root } = render(
-        <Divider spacing="lg" style={{ backgroundColor: '#000' }} />
+        <Divider spacing="lg" style={{ backgroundColor: '#000' }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -166,7 +168,7 @@ describe('Divider Component', () => {
           <Divider />
           <Divider text="OR" />
           <Divider text="AND" spacing="lg" />
-        </>
+        </>,
       );
 
       expect(getByText('OR')).toBeTruthy();
@@ -208,7 +210,7 @@ describe('Divider Component', () => {
     });
 
     it('handles null style gracefully', () => {
-      const { UNSAFE_root } = render(<Divider style={null as any} />);
+      const { UNSAFE_root } = render(<Divider style={null} />);
       expect(UNSAFE_root).toBeTruthy();
     });
   });
@@ -220,7 +222,7 @@ describe('Divider Component', () => {
   describe('State Updates', () => {
     it('updates from no text to text', () => {
       const { rerender, getByText } = render(<Divider />);
-      
+
       rerender(<Divider text="OR" />);
       expect(getByText('OR')).toBeTruthy();
     });
@@ -234,7 +236,9 @@ describe('Divider Component', () => {
     });
 
     it('updates text content', () => {
-      const { rerender, getByText, queryByText } = render(<Divider text="OR" />);
+      const { rerender, getByText, queryByText } = render(
+        <Divider text="OR" />,
+      );
       expect(getByText('OR')).toBeTruthy();
 
       rerender(<Divider text="AND" />);
@@ -251,7 +255,9 @@ describe('Divider Component', () => {
     });
 
     it('updates style dynamically', () => {
-      const { rerender, UNSAFE_root } = render(<Divider style={{ marginTop: 10 }} />);
+      const { rerender, UNSAFE_root } = render(
+        <Divider style={{ marginTop: 10 }} />,
+      );
       expect(UNSAFE_root).toBeTruthy();
 
       rerender(<Divider style={{ marginTop: 20 }} />);
@@ -281,7 +287,7 @@ describe('Divider Component', () => {
           <Divider text="First" />
           <Divider text="Second" />
           <Divider text="Third" />
-        </>
+        </>,
       );
 
       expect(getByText('First')).toBeTruthy();
@@ -312,14 +318,14 @@ describe('Divider Component', () => {
 
     it('renders with custom margin for tight layouts', () => {
       const { UNSAFE_root } = render(
-        <Divider spacing="sm" style={{ marginVertical: 4 }} />
+        <Divider spacing="sm" style={{ marginVertical: 4 }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders with custom margin for spacious layouts', () => {
       const { UNSAFE_root } = render(
-        <Divider spacing="lg" style={{ marginVertical: 32 }} />
+        <Divider spacing="lg" style={{ marginVertical: 32 }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -336,7 +342,7 @@ describe('Divider Component', () => {
           <Divider />
           <Divider text="OR" spacing="md" />
           <Divider />
-        </>
+        </>,
       );
 
       expect(getByText('OR')).toBeTruthy();
@@ -350,7 +356,7 @@ describe('Divider Component', () => {
           <Divider
             text={i % 2 === 0 ? 'OR' : undefined}
             spacing={i % 3 === 0 ? 'sm' : i % 3 === 1 ? 'md' : 'lg'}
-          />
+          />,
         );
       }
 
@@ -365,7 +371,7 @@ describe('Divider Component', () => {
           <Divider text="Section 2" spacing="md" />
           <Divider spacing="lg" />
           <Divider text="Section 3" spacing="lg" />
-        </>
+        </>,
       );
 
       expect(getByText('Section 1')).toBeTruthy();

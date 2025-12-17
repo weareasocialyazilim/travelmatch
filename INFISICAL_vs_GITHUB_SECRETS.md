@@ -6,18 +6,18 @@
 
 ## 📊 KARŞILAŞTIRMA
 
-| Özellik | GitHub Secrets ❌ | Infisical ✅ |
-|---------|-------------------|--------------|
-| **Secret Sayısı** | 20+ (her biri manuel) | 2 (sadece Infisical credentials) |
-| **Yönetim** | GitHub her repo için | Tek dashboard tüm projeler |
-| **Environment** | Manuel ayrım | Otomatik (dev, staging, prod) |
-| **Audit Logs** | ❌ Yok | ✅ Kim, ne zaman, ne erişti |
-| **Secret Versioning** | ❌ Yok | ✅ Değişiklik geçmişi |
-| **Secret Rotation** | 😰 Her secret tek tek | ✅ Tek yerden hepsi |
-| **Multi-Project** | 😰 Her repo ayrı | ✅ Tüm projeler tek yerden |
-| **Mobile App Runtime** | ❌ Kullanılamaz | ✅ SDK ile çeker |
-| **Team Collaboration** | 😰 Zor | ✅ Role-based access |
-| **Cost** | Ücretsiz | Ücretsiz (5000 secret'a kadar) |
+| Özellik                | GitHub Secrets ❌     | Infisical ✅                     |
+| ---------------------- | --------------------- | -------------------------------- |
+| **Secret Sayısı**      | 20+ (her biri manuel) | 2 (sadece Infisical credentials) |
+| **Yönetim**            | GitHub her repo için  | Tek dashboard tüm projeler       |
+| **Environment**        | Manuel ayrım          | Otomatik (dev, staging, prod)    |
+| **Audit Logs**         | ❌ Yok                | ✅ Kim, ne zaman, ne erişti      |
+| **Secret Versioning**  | ❌ Yok                | ✅ Değişiklik geçmişi            |
+| **Secret Rotation**    | 😰 Her secret tek tek | ✅ Tek yerden hepsi              |
+| **Multi-Project**      | 😰 Her repo ayrı      | ✅ Tüm projeler tek yerden       |
+| **Mobile App Runtime** | ❌ Kullanılamaz       | ✅ SDK ile çeker                 |
+| **Team Collaboration** | 😰 Zor                | ✅ Role-based access             |
+| **Cost**               | Ücretsiz              | Ücretsiz (5000 secret'a kadar)   |
 
 ---
 
@@ -48,6 +48,7 @@ INFISICAL_CLIENT_SECRET
 **Eklenecek Secrets:**
 
 #### 🟢 Development Environment
+
 ```bash
 # Supabase
 SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
@@ -64,12 +65,13 @@ STRIPE_WEBHOOK_SECRET=whsec_test_xxxxx
 OPENAI_API_KEY=sk-xxxxx
 CLOUDFLARE_STREAM_API_KEY=xxxxx
 CLOUDFLARE_STREAM_ACCOUNT_ID=xxxxx
-GOOGLE_MAPS_SERVER_KEY=AIzaSy...
+MAPBOX_SECRET_TOKEN=pk.eyJ... # Mapbox secret token (server-side)
 UPSTASH_REDIS_REST_URL=https://...
 UPSTASH_REDIS_REST_TOKEN=...
 ```
 
 #### 🔴 Production Environment
+
 ```bash
 # Same as dev but with LIVE keys:
 STRIPE_SECRET_KEY=sk_live_xxxxx
@@ -94,7 +96,7 @@ steps:
       client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
       client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
       project-id: cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9
-      environment: production  # veya staging
+      environment: production # veya staging
 
   # Artık TÜM secrets environment variables olarak mevcut!
   - name: Deploy
@@ -164,6 +166,7 @@ Her environment için yukarıdaki secrets'ları ekle.
 ### Adım 4: GitHub Secrets Ekle (1 dakika)
 
 GitHub → Settings → Secrets → Actions:
+
 - `INFISICAL_CLIENT_ID` (yukarıdan)
 - `INFISICAL_CLIENT_SECRET` (yukarıdan)
 
@@ -174,11 +177,14 @@ GitHub → Settings → Secrets → Actions:
 ## 📋 KONTROL LİSTESİ
 
 ### GitHub'da (Sadece 2 secret!)
+
 - [ ] `INFISICAL_CLIENT_ID`
 - [ ] `INFISICAL_CLIENT_SECRET`
 
 ### Infisical'da (Tüm secrets!)
+
 **Development Environment:**
+
 - [ ] `SUPABASE_URL`
 - [ ] `SUPABASE_ANON_KEY`
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`
@@ -188,11 +194,12 @@ GitHub → Settings → Secrets → Actions:
 - [ ] `STRIPE_WEBHOOK_SECRET` (test)
 - [ ] `OPENAI_API_KEY` (optional)
 - [ ] `CLOUDFLARE_STREAM_API_KEY` (optional)
-- [ ] `GOOGLE_MAPS_SERVER_KEY` (optional)
+- [ ] `MAPBOX_SECRET_TOKEN` (optional)
 - [ ] `UPSTASH_REDIS_REST_URL` (optional)
 - [ ] `UPSTASH_REDIS_REST_TOKEN` (optional)
 
 **Production Environment:**
+
 - [ ] Same as above but with **LIVE** keys!
 
 ---
@@ -200,6 +207,7 @@ GitHub → Settings → Secrets → Actions:
 ## 🎉 FAYDALAR
 
 ### Tek Dashboard
+
 ```
 GitHub Secrets (ESKİ):
 ❌ Stripe secrets → GitHub'da
@@ -219,6 +227,7 @@ Infisical (YENİ):
 ```
 
 ### Güvenlik
+
 ```
 GitHub Secrets:
 ❌ Secret leak → GitHub'da değiştir
@@ -233,6 +242,7 @@ Infisical:
 ```
 
 ### Developer Experience
+
 ```
 GitHub Secrets:
 ❌ Yeni developer → 20 secret gir
@@ -250,7 +260,9 @@ Infisical:
 ## ❓ SSS
 
 ### S: Neden GitHub Secrets kullanmayayım?
+
 **C:** Çünkü:
+
 - 20+ secret manuel girmek zahmetli
 - Her değişiklik GitHub UI'dan
 - Audit log yok
@@ -258,21 +270,27 @@ Infisical:
 - Mobile app'te kullanılamaz
 
 ### S: Infisical güvenli mi?
+
 **C:** ✅ Evet!
+
 - End-to-end encryption
 - Zero-knowledge architecture
 - SOC 2 Type II certified
 - Kullanılan: GitLab, Webflow, Automattic
 
 ### S: Infisical ücretli mi?
+
 **C:** 🆓 Ücretsiz!
+
 - 5000 secret'a kadar free
 - Unlimited projects
 - Unlimited environments
 - TravelMatch için yeterli
 
 ### S: GitHub Secrets hiç kullanılmayacak mı?
+
 **C:** Sadece 2 tane:
+
 - `INFISICAL_CLIENT_ID`
 - `INFISICAL_CLIENT_SECRET`
 
@@ -291,14 +309,15 @@ Geri kalan HER ŞEY Infisical'da!
 
 ## ✅ ÖZET
 
-| Ne Yapılır | Nerede | Kaç Tane |
-|------------|--------|----------|
-| **Machine Identity** | Infisical | 1 kez |
-| **GitHub Secrets** | GitHub Actions | 2 secret |
-| **App Secrets** | Infisical | Tümü! |
-| **Yönetim** | Infisical Dashboard | Tek yer |
+| Ne Yapılır           | Nerede              | Kaç Tane |
+| -------------------- | ------------------- | -------- |
+| **Machine Identity** | Infisical           | 1 kez    |
+| **GitHub Secrets**   | GitHub Actions      | 2 secret |
+| **App Secrets**      | Infisical           | Tümü!    |
+| **Yönetim**          | Infisical Dashboard | Tek yer  |
 
 **Sonuç:**
+
 - ❌ GitHub Secrets'a 20+ secret girme
 - ✅ Infisical'a 1 kez setup
 - ✅ Sonsuza kadar kolay yönetim

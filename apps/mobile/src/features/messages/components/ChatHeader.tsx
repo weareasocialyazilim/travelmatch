@@ -7,9 +7,9 @@ interface ChatHeaderProps {
   otherUser: {
     id: string;
     name: string;
-    avatar?: string;
+    avatar?: string | null;
     type?: string;
-    isVerified?: boolean;
+    isVerified?: boolean | null;
   };
   onBack: () => void;
   onUserPress: () => void;

@@ -1,7 +1,7 @@
 /**
  * React Hooks for Real-time Subscriptions
  * Easy-to-use hooks for managing Supabase real-time subscriptions in components
- * 
+ *
  * Type-safe implementation using database.types.ts
  */
 
@@ -26,7 +26,8 @@ type RequestRow = Tables['requests']['Row'];
 /**
  * Hook options
  */
-interface UseSubscriptionOptions<T extends Record<string, unknown>> extends Omit<SubscriptionConfig<T>, 'table'> {
+interface UseSubscriptionOptions<T extends Record<string, unknown>>
+  extends Omit<SubscriptionConfig<T>, 'table'> {
   enabled?: boolean; // Whether subscription is active
   table: string;
 }
@@ -45,7 +46,7 @@ interface UseSubscriptionResult {
 /**
  * Generic subscription hook
  * Automatically manages subscription lifecycle
- * 
+ *
  * @example
  * const { isSubscribed, status } = useSubscription({
  *   table: 'moments',
@@ -54,9 +55,11 @@ interface UseSubscriptionResult {
  *   enabled: !!userId,
  * });
  */
-export const useSubscription = <T extends Record<string, unknown> = Record<string, unknown>>(
+export const useSubscription = <
+  T extends Record<string, unknown> = Record<string, unknown>,
+>(
   id: string,
-  options: UseSubscriptionOptions<T>
+  options: UseSubscriptionOptions<T>,
 ): UseSubscriptionResult => {
   const { enabled = true, ...config } = options;
   const [status, setStatus] = useState<SubscriptionStatus>('IDLE');
@@ -90,7 +93,10 @@ export const useSubscription = <T extends Record<string, unknown> = Record<strin
 
     // Cleanup on unmount or when dependencies change
     return () => {
-      logger.info('useSubscription', `Unsubscribing from ${config.table} (${id})`);
+      logger.info(
+        'useSubscription',
+        `Unsubscribing from ${config.table} (${id})`,
+      );
       subscriptionManager.unsubscribe(id);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,13 +117,13 @@ export const useSubscription = <T extends Record<string, unknown> = Record<strin
     isSubscribed: status === 'SUBSCRIBED',
     error,
     reconnect,
-    unsubscribe,
+    unsubscribe: _unsubscribe,
   };
 };
 
 /**
  * Hook for subscribing to user's moments
- * 
+ *
  * @example
  * const { moments } = useUserMomentsSubscription(userId, {
  *   onInsert: (moment) => console.log('New moment:', moment),
@@ -129,7 +135,7 @@ export const useUserMomentsSubscription = (
     onInsert?: (moment: MomentRow) => void;
     onUpdate?: (moment: MomentRow) => void;
     onDelete?: (momentId: string) => void;
-  } = {}
+  } = {},
 ) => {
   return useSubscription(`user-moments-${userId}`, {
     table: 'moments',
@@ -149,7 +155,7 @@ export const useUserMomentsSubscription = (
 
 /**
  * Hook for subscribing to chat messages
- * 
+ *
  * @example
  * const { isSubscribed } = useChatMessagesSubscription(chatId, {
  *   onNewMessage: (message) => {
@@ -162,7 +168,7 @@ export const useChatMessagesSubscription = (
   handlers: {
     onNewMessage?: (message: MessageRow) => void;
     onMessageUpdate?: (message: MessageRow) => void;
-  } = {}
+  } = {},
 ) => {
   return useSubscription(`chat-messages-${chatId}`, {
     table: 'messages',
@@ -179,7 +185,7 @@ export const useChatMessagesSubscription = (
 
 /**
  * Hook for subscribing to user notifications
- * 
+ *
  * @example
  * const { unreadCount } = useNotificationsSubscription(userId, {
  *   onNewNotification: (notification) => {
@@ -192,7 +198,7 @@ export const useNotificationsSubscription = (
   handlers: {
     onNewNotification?: (notification: NotificationRow) => void;
     onNotificationRead?: (notificationId: string) => void;
-  } = {}
+  } = {},
 ) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -222,7 +228,7 @@ export const useNotificationsSubscription = (
 
 /**
  * Hook for subscribing to booking requests
- * 
+ *
  * @example
  * const { pendingRequests } = useBookingRequestsSubscription(userId, {
  *   onNewRequest: (request) => {
@@ -235,7 +241,7 @@ export const useBookingRequestsSubscription = (
   handlers: {
     onNewRequest?: (request: RequestRow) => void;
     onRequestUpdate?: (request: RequestRow) => void;
-  } = {}
+  } = {},
 ) => {
   const [pendingRequests, setPendingRequests] = useState<RequestRow[]>([]);
 
@@ -253,7 +259,7 @@ export const useBookingRequestsSubscription = (
     onUpdate: (payload) => {
       const newRecord = payload.new as Partial<RequestRow>;
       setPendingRequests((prev) =>
-        prev.filter((req) => req.id !== newRecord?.id)
+        prev.filter((req) => req.id !== newRecord?.id),
       );
       handlers.onRequestUpdate?.(payload.new as RequestRow);
     },
@@ -274,7 +280,7 @@ interface UserPresenceRecord {
 
 /**
  * Hook for tracking user presence
- * 
+ *
  * @example
  * const { isOnline } = useUserPresence(otherUserId);
  */
@@ -303,15 +309,17 @@ export const useUserPresence = (userId: string | null) => {
 /**
  * Hook for multiple subscriptions
  * Manages multiple subscriptions with a single hook
- * 
+ *
  * @example
  * useMultipleSubscriptions([
  *   { id: 'moments', table: 'moments', onInsert: handleNewMoment },
  *   { id: 'messages', table: 'messages', onInsert: handleNewMessage },
  * ]);
  */
-export const useMultipleSubscriptions = <T extends Record<string, unknown> = Record<string, unknown>>(
-  subscriptions: Array<{ id: string } & UseSubscriptionOptions<T>>
+export const useMultipleSubscriptions = <
+  T extends Record<string, unknown> = Record<string, unknown>,
+>(
+  subscriptions: Array<{ id: string } & UseSubscriptionOptions<T>>,
 ) => {
   // Note: This hook has a limitation - it cannot dynamically change subscriptions
   // The subscriptions array length must remain constant across renders
@@ -338,7 +346,7 @@ export const useMultipleSubscriptions = <T extends Record<string, unknown> = Rec
 /**
  * Hook for data synchronization
  * Keeps local state in sync with real-time updates
- * 
+ *
  * @example
  * const { data, setData, isSubscribed } = useRealtimeData({
  *   table: 'moments',
@@ -346,7 +354,9 @@ export const useMultipleSubscriptions = <T extends Record<string, unknown> = Rec
  *   filter: `user_id=eq.${userId}`,
  * });
  */
-export const useRealtimeData = <T extends Record<string, unknown> = Record<string, unknown>>({
+export const useRealtimeData = <
+  T extends Record<string, unknown> = Record<string, unknown>,
+>({
   table,
   filter,
   initialData,
@@ -373,7 +383,7 @@ export const useRealtimeData = <T extends Record<string, unknown> = Record<strin
           const itemWithId = item as T & { id?: string };
           const newData = payload.new as T & { id?: string };
           return itemWithId.id === newData.id ? (payload.new as T) : item;
-        })
+        }),
       );
     },
     onDelete: (payload) => {
@@ -382,7 +392,7 @@ export const useRealtimeData = <T extends Record<string, unknown> = Record<strin
           const itemWithId = item as T & { id?: string };
           const oldData = payload.old as Partial<T> & { id?: string };
           return itemWithId.id !== oldData.id;
-        })
+        }),
       );
     },
   });

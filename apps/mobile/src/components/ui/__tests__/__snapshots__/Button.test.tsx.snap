@@ -1,227 +1,203 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Button Component Snapshots matches snapshot for disabled state 1`] = `
-[
-  <RCTTouchableOpacity
-    accessibilityLabel="Disabled"
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "disabled": true,
-      }
+<RCTTouchableOpacity
+  accessibilityLabel="Disabled"
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "disabled": true,
     }
-    accessible={true}
-    activeOpacity={0.7}
-    aria-disabled={true}
-    aria-label="Disabled"
-    disabled={true}
-    role="button"
+  }
+  accessible={true}
+  activeOpacity={0.7}
+  aria-disabled={true}
+  aria-label="Disabled"
+  disabled={true}
+  hitSlop={
+    {
+      "bottom": 8,
+      "left": 8,
+      "right": 8,
+      "top": 8,
+    }
+  }
+  role="button"
+  style={
+    [
+      {
+        "alignItems": "center",
+        "borderRadius": 9999,
+        "flexDirection": "row",
+        "justifyContent": "center",
+      },
+      {
+        "backgroundColor": "#D1D5DB",
+        "borderWidth": 0,
+      },
+      {
+        "height": 48,
+        "paddingHorizontal": 20,
+      },
+      false,
+      undefined,
+    ]
+  }
+>
+  <RCTView
     style={
-      [
-        {
-          "alignItems": "center",
-          "borderRadius": 9999,
-          "flexDirection": "row",
-          "justifyContent": "center",
-        },
-        {
-          "backgroundColor": "#D1D5DB",
-          "borderWidth": 0,
-        },
-        {
-          "height": 48,
-          "paddingHorizontal": 20,
-        },
-        false,
-        undefined,
-      ]
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "center",
+      }
     }
   >
-    <RCTView
+    <RCTText
       style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        }
+        [
+          {
+            "fontWeight": "700",
+          },
+          {
+            "color": "#9CA3AF",
+            "fontSize": 16,
+          },
+          undefined,
+        ]
       }
+      testID="RCTText"
     >
-      <RCTText
-        style={
-          [
-            {
-              "fontWeight": "700",
-            },
-            {
-              "color": "#9CA3AF",
-              "fontSize": 16,
-            },
-            undefined,
-          ]
-        }
-        testID="RCTText"
-      >
-        Disabled
-      </RCTText>
-    </RCTView>
-  </RCTTouchableOpacity>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
-    style={
-      {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
-      }
-    }
-    testID="RCTSafeAreaView"
-  />,
-]
+      Disabled
+    </RCTText>
+  </RCTView>
+</RCTTouchableOpacity>
 `;
 
 exports[`Button Component Snapshots matches snapshot for loading state 1`] = `
-[
-  <RCTTouchableOpacity
-    accessibilityHint="Loading"
-    accessibilityLabel="Loading"
-    accessibilityRole="button"
-    accessibilityState={
+<RCTTouchableOpacity
+  accessibilityHint="Loading"
+  accessibilityLabel="Loading"
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "disabled": true,
+    }
+  }
+  accessible={true}
+  activeOpacity={0.7}
+  aria-disabled={true}
+  aria-label="Loading"
+  disabled={true}
+  hitSlop={
+    {
+      "bottom": 8,
+      "left": 8,
+      "right": 8,
+      "top": 8,
+    }
+  }
+  role="button"
+  style={
+    [
       {
-        "disabled": true,
-      }
-    }
-    accessible={true}
-    activeOpacity={0.7}
-    aria-disabled={true}
-    aria-label="Loading"
-    disabled={true}
-    role="button"
-    style={
-      [
-        {
-          "alignItems": "center",
-          "borderRadius": 9999,
-          "flexDirection": "row",
-          "justifyContent": "center",
-        },
-        {
-          "backgroundColor": "#A6E5C1",
-          "borderWidth": 0,
-        },
-        {
-          "height": 48,
-          "paddingHorizontal": 20,
-        },
-        false,
-        undefined,
-      ]
-    }
-  >
-    <RCTActivityIndicator
-      color="#1A1A1A"
-      size="small"
-      testID="RCTActivityIndicator"
-    />
-  </RCTTouchableOpacity>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
-    style={
+        "alignItems": "center",
+        "borderRadius": 9999,
+        "flexDirection": "row",
+        "justifyContent": "center",
+      },
       {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
-      }
-    }
-    testID="RCTSafeAreaView"
-  />,
-]
+        "backgroundColor": "#A6E5C1",
+        "borderWidth": 0,
+      },
+      {
+        "height": 48,
+        "paddingHorizontal": 20,
+      },
+      false,
+      undefined,
+    ]
+  }
+>
+  <RCTActivityIndicator
+    color="#1A1A1A"
+    size="small"
+    testID="RCTActivityIndicator"
+  />
+</RCTTouchableOpacity>
 `;
 
 exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
-[
-  <RCTTouchableOpacity
-    accessibilityLabel="Primary"
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "disabled": false,
-      }
+<RCTTouchableOpacity
+  accessibilityLabel="Primary"
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "disabled": false,
     }
-    accessible={true}
-    activeOpacity={0.7}
-    aria-disabled={false}
-    aria-label="Primary"
-    disabled={false}
-    onPress={[MockFunction]}
-    role="button"
+  }
+  accessible={true}
+  activeOpacity={0.7}
+  aria-disabled={false}
+  aria-label="Primary"
+  disabled={false}
+  hitSlop={
+    {
+      "bottom": 8,
+      "left": 8,
+      "right": 8,
+      "top": 8,
+    }
+  }
+  onPress={[MockFunction]}
+  role="button"
+  style={
+    [
+      {
+        "alignItems": "center",
+        "borderRadius": 9999,
+        "flexDirection": "row",
+        "justifyContent": "center",
+      },
+      {
+        "backgroundColor": "#A6E5C1",
+        "borderWidth": 0,
+      },
+      {
+        "height": 48,
+        "paddingHorizontal": 20,
+      },
+      false,
+      undefined,
+    ]
+  }
+>
+  <RCTView
     style={
-      [
-        {
-          "alignItems": "center",
-          "borderRadius": 9999,
-          "flexDirection": "row",
-          "justifyContent": "center",
-        },
-        {
-          "backgroundColor": "#A6E5C1",
-          "borderWidth": 0,
-        },
-        {
-          "height": 48,
-          "paddingHorizontal": 20,
-        },
-        false,
-        undefined,
-      ]
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "center",
+      }
     }
   >
-    <RCTView
+    <RCTText
       style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        }
+        [
+          {
+            "fontWeight": "700",
+          },
+          {
+            "color": "#1A1A1A",
+            "fontSize": 16,
+          },
+          undefined,
+        ]
       }
+      testID="RCTText"
     >
-      <RCTText
-        style={
-          [
-            {
-              "fontWeight": "700",
-            },
-            {
-              "color": "#1A1A1A",
-              "fontSize": 16,
-            },
-            undefined,
-          ]
-        }
-        testID="RCTText"
-      >
-        Primary
-      </RCTText>
-    </RCTView>
-  </RCTTouchableOpacity>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
-    style={
-      {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
-      }
-    }
-    testID="RCTSafeAreaView"
-  />,
-]
+      Primary
+    </RCTText>
+  </RCTView>
+</RCTTouchableOpacity>
 `;

@@ -6,21 +6,15 @@ import { moderationService } from '../../services/moderationService';
 // Mock dependencies
 jest.mock('../../services/moderationService', () => ({
   moderationService: {
-    submitReport: jest.fn(),
+    createReport: jest.fn(),
   },
-  REPORT_REASONS: {
-    SPAM: { label: 'Spam', description: 'Unwanted or repetitive content' },
-    HARASSMENT: {
-      label: 'Harassment',
-      description: 'Bullying or threatening behavior',
-    },
-    INAPPROPRIATE: {
-      label: 'Inappropriate Content',
-      description: 'Offensive or explicit material',
-    },
-    FRAUD: { label: 'Fraud', description: 'Scam or deceptive behavior' },
-    OTHER: { label: 'Other', description: 'Something else' },
-  },
+  REPORT_REASONS: [
+    { label: 'Spam', value: 'spam' },
+    { label: 'Harassment', value: 'harassment' },
+    { label: 'Inappropriate Content', value: 'inappropriate_content' },
+    { label: 'Fraud', value: 'scam_fraud' },
+    { label: 'Other', value: 'other' },
+  ],
 }));
 
 const mockShowToast = jest.fn();
@@ -176,12 +170,12 @@ describe('ReportModal', () => {
       fireEvent.press(getByText('Submit Report'));
 
       await waitFor(() => {
-        expect(moderationService.submitReport).toHaveBeenCalledWith({
-          targetType: 'user',
-          targetId: 'user-123',
-          reason: 'SPAM',
-          description: undefined,
-        });
+          expect(moderationService.createReport).toHaveBeenCalledWith({
+            targetType: 'user',
+            targetId: 'user-123',
+            reason: 'spam',
+            description: undefined,
+          });
       });
     });
 
@@ -199,12 +193,12 @@ describe('ReportModal', () => {
       fireEvent.press(getByText('Submit Report'));
 
       await waitFor(() => {
-        expect(moderationService.submitReport).toHaveBeenCalledWith({
-          targetType: 'user',
-          targetId: 'user-123',
-          reason: 'FRAUD',
-          description: 'Trying to scam users',
-        });
+          expect(moderationService.createReport).toHaveBeenCalledWith({
+            targetType: 'user',
+            targetId: 'user-123',
+            reason: 'scam_fraud',
+            description: 'Trying to scam users',
+          });
       });
     });
 
@@ -274,7 +268,7 @@ describe('ReportModal', () => {
 
   describe('Loading State', () => {
     it('should show loading indicator while submitting', async () => {
-      (moderationService.submitReport ).mockImplementation(
+      (moderationService.createReport ).mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
@@ -293,7 +287,7 @@ describe('ReportModal', () => {
     });
 
     it('should disable submit button while loading', async () => {
-      (moderationService.submitReport ).mockImplementation(
+      (moderationService.createReport ).mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
@@ -314,7 +308,7 @@ describe('ReportModal', () => {
 
   describe('Error Handling', () => {
     it('should show error toast when submission fails', async () => {
-      (moderationService.submitReport ).mockRejectedValueOnce(
+      (moderationService.createReport ).mockRejectedValueOnce(
         new Error('Network error')
       );
 
@@ -332,7 +326,7 @@ describe('ReportModal', () => {
     });
 
     it('should not close modal when submission fails', async () => {
-      (moderationService.submitReport ).mockRejectedValueOnce(
+      (moderationService.createReport ).mockRejectedValueOnce(
         new Error('Network error')
       );
 
@@ -342,7 +336,7 @@ describe('ReportModal', () => {
       fireEvent.press(getByText('Submit Report'));
 
       await waitFor(() => {
-        expect(moderationService.submitReport).toHaveBeenCalled();
+          expect(moderationService.createReport).toHaveBeenCalled();
       });
 
       expect(mockOnClose).not.toHaveBeenCalled();

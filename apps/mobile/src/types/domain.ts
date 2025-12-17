@@ -8,7 +8,7 @@ export interface Message {
   id: string;
   senderId: string;
   text: string;
-  timestamp: string;
+  timestamp: string | null;
   isMine: boolean;
   proofId?: string;
 }
@@ -49,7 +49,7 @@ export interface Proof {
   aiScore?: number;
   communityScore?: number;
   verifiedAt?: string;
-  createdAt: string;
+  createdAt: string | null;
   geo?: { lat: number; lng: number };
   // Extended fields for UI
   title?: string;
@@ -76,7 +76,7 @@ export type TransactionStatus =
 export interface TransactionParticipant {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 export interface Transaction {
@@ -84,15 +84,15 @@ export interface Transaction {
   type: TransactionType;
   status: TransactionStatus;
   amount: number;
-  currency?: string;
+  currency?: string | null;
   senderId?: string;
   receiverId?: string;
   momentId?: string;
   proofId?: string;
   paymentMethod?: string;
   description?: string;
-  createdAt: string;
-  completedAt?: string;
+  createdAt: string | null;
+  completedAt?: string | null;
   // UI-specific fields
   title?: string;
   transactionId?: string;
@@ -105,7 +105,7 @@ export interface Transaction {
 export interface ProofStoryAuthor {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
   trustScore: number;
 }
 
@@ -126,7 +126,7 @@ export interface ProofStory {
   images: string[];
   author: ProofStoryAuthor;
   stats: ProofStoryStats;
-  createdAt: string;
+  createdAt: string | null;
   date?: string;
 }
 
@@ -134,7 +134,7 @@ export interface ProofStory {
 export interface GiverInfo {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
   trustScore: number;
 }
 
@@ -161,7 +161,7 @@ export interface MomentLocation {
 export interface MomentUser {
   id?: string;
   name: string;
-  avatar?: string;
+  avatar?: string | null;
   role?: string;
   type?: 'traveler' | 'local';
   location?: string;

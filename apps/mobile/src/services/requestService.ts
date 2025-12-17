@@ -1,4 +1,17 @@
 /**
+      let query = supabase
+        .from('requests')
+        .select('*, users(*), moments(*)', { count: 'exact' });
+
+      if (filters?.status) {
+        query = query.eq('status', filters.status);
+      }
+
+      const { data, count, error } = await query.order('created_at', {
+        ascending: false,
+      });
+      if (error) throw error;
+/**
  * Request Service
  * Gift requests, bookings, and related operations
  */
@@ -6,6 +19,7 @@
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { requestsService as dbRequestsService } from './supabaseDbService';
+import type { Database } from '../types/database.types';
 
 // Types
 export type RequestStatus =
@@ -21,7 +35,7 @@ export type RequestType = 'gift_request' | 'booking' | 'collaboration';
 export interface GiftRequest {
   id: string;
   type: RequestType;
-  status: RequestStatus;
+  status: RequestStatus | null;
 
   // Moment info
   momentId: string;
@@ -43,18 +57,18 @@ export interface GiftRequest {
 
   // Request details
   message?: string;
-  guestCount: number;
+  guestCount: number | null;
   preferredDates?: string[];
-  selectedDate?: string;
+  selectedDate?: string | null;
 
   // Pricing
   pricePerGuest: number;
-  totalPrice: number;
-  currency: string;
+  totalPrice?: number;
+  currency?: string | null;
 
   // Timestamps
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
   expiresAt?: string;
   acceptedAt?: string;
   completedAt?: string;
@@ -101,11 +115,6 @@ export const requestService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // We need to fetch moment details to get host_id and pricing
-      // For now, we'll assume the DB trigger or backend handles validation
-      // But strictly speaking we should fetch the moment first.
-      // Let's assume the UI passes valid data or we fetch it here.
-
       // Fetch moment to get host_id
       const { data: moment, error: momentError } = await supabase
         .from('moments')
@@ -115,46 +124,48 @@ export const requestService = {
 
       if (momentError || !moment) throw new Error('Moment not found');
 
+      const momentRow =
+        moment as unknown as Database['public']['Tables']['moments']['Row'];
+
       const requestData = {
         user_id: user.id, // Requester
         moment_id: data.momentId,
-        host_id: moment.user_id,
+        // host_id is not part of requests table in DB schema; store for backend if needed
         status: 'pending',
         message: data.message,
-        guest_count: data.guestCount,
-        preferred_dates: data.preferredDates,
-        total_price: (moment.price || 0) * data.guestCount,
-        currency: moment.currency || 'USD',
-        type: 'gift_request', // Default
-      };
+        // guest_count and pricing fields may be handled elsewhere; keep minimal insert
+        type: 'gift_request',
+      } as unknown as Database['public']['Tables']['requests']['Insert'];
 
       const { data: newRequest, error } = await dbRequestsService.create(
-        requestData as any,
+        requestData,
       );
       if (error) throw error;
 
-      // Construct return object
-      // Note: In a real app, we might want to return the expanded object
-      // but for creation, basic info + what we have is often enough
+      const dbTotal = (newRequest as any)?.total_price;
+      const computedTotal = Number(momentRow.price || 0) * Number(data.guestCount || 0);
+
       const request: GiftRequest = {
         id: newRequest!.id,
         type: 'gift_request',
         status: 'pending',
         momentId: data.momentId,
-        momentTitle: moment.title,
-        momentImage: moment.images?.[0] || '',
+        momentTitle: momentRow.title,
+        momentImage: momentRow.images?.[0] || '',
         requesterId: user.id,
-        requesterName: '', // Current user name (could fetch from auth metadata)
+        requesterName: '',
         requesterAvatar: '',
-        hostId: moment.user_id,
-        hostName: '', // Would need to fetch
+        hostId: momentRow.user_id || '',
+        hostName: '',
         hostAvatar: '',
         message: data.message,
         guestCount: data.guestCount,
         preferredDates: data.preferredDates,
-        pricePerGuest: moment.price || 0,
-        totalPrice: requestData.total_price,
-        currency: requestData.currency,
+        selectedDate: null,
+        pricePerGuest: momentRow.price || 0,
+        // Compute totalPrice locally to ensure UI/client consistency
+        totalPrice: computedTotal,
+        currency: momentRow.currency || 'USD',
         createdAt: newRequest!.created_at,
         updatedAt: newRequest!.created_at,
       };
@@ -178,56 +189,49 @@ export const requestService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Determine if we are filtering by role
-      const _userIdFilter = undefined;
-      // If role is specified, we might need a custom query in db service
-      // But dbRequestsService.list takes userId which usually implies "requests involving this user"
-      // or "requests created by this user".
-      // Looking at dbRequestsService.list implementation:
-      // if (options?.userId) query = query.eq('user_id', options.userId);
-      // This means it filters by REQUESTER.
-
-      // If we want to filter by HOST, we need to update dbRequestsService or use raw query here.
-      // For now, let's assume we want requests where I am the requester.
-
-      // TODO: Update dbRequestsService to support host_id filtering
-
+      // Use DB service to get requests where I am the requester
       const { data, count, error } = await dbRequestsService.list({
-        userId: user.id, // This gets requests created BY me
+        userId: user.id,
         status: filters?.status,
       });
 
       if (error) throw error;
 
-      const requests: GiftRequest[] = data.map((row: any) => ({
-        id: row.id,
-        type: 'gift_request', // Default or from row
-        status: row.status,
-        momentId: row.moment_id,
-        momentTitle: row.moments?.title || '',
-        momentImage: row.moments?.images?.[0] || '',
-        requesterId: row.user_id,
-        requesterName: row.users?.full_name || '',
-        requesterAvatar: row.users?.avatar_url || '',
-        requesterRating: row.users?.rating || 0,
-        requesterVerified: row.users?.verified || false,
-        requesterLocation: row.users?.location || '',
-        hostId: row.host_id,
-        hostName: '', // Need to join host
-        hostAvatar: '',
-        message: row.message,
-        guestCount: row.guest_count,
-        preferredDates: row.preferred_dates,
-        selectedDate: row.selected_date,
-        pricePerGuest: 0, // Need from moment
-        totalPrice: row.total_price,
-        currency: row.currency,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        expiresAt: row.expires_at,
-        acceptedAt: row.accepted_at,
-        completedAt: row.completed_at,
-      }));
+      const requests: GiftRequest[] = (data || []).map((row: unknown) => {
+        const r = row as Database['public']['Tables']['requests']['Row'] & {
+          users?: any;
+          moments?: any;
+        };
+        return {
+          id: r.id,
+          type: 'gift_request',
+          status: r.status as RequestStatus | null,
+          momentId: r.moment_id,
+          momentTitle: r.moments?.title || '',
+          momentImage: r.moments?.images?.[0] || '',
+          requesterId: r.user_id,
+          requesterName: r.users?.full_name || '',
+          requesterAvatar: r.users?.avatar_url || '',
+          requesterRating: r.users?.rating || 0,
+          requesterVerified: r.users?.verified || false,
+          requesterLocation: r.users?.location || '',
+          hostId: r.moments?.user_id || '',
+          hostName: '',
+          hostAvatar: '',
+          message: r.message ?? undefined,
+          guestCount: null,
+          preferredDates: undefined,
+          selectedDate: undefined,
+          pricePerGuest: 0,
+          totalPrice: undefined,
+          currency: undefined,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+          expiresAt: undefined,
+          acceptedAt: undefined,
+          completedAt: undefined,
+        };
+      });
 
       return { requests, total: count };
     } catch (error) {
@@ -251,56 +255,58 @@ export const requestService = {
   getReceivedRequests: async (
     filters?: Omit<RequestFilters, 'role'>,
   ): Promise<{ requests: GiftRequest[]; total: number }> => {
-    // This requires a query by host_id which dbRequestsService.list doesn't support yet via 'userId' param
-    // We'll implement a direct query here for now
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      let query = supabase
+      const { data, count, error } = await supabase
         .from('requests')
         .select('*, users(*), moments(*)', { count: 'exact' })
-        .eq('host_id', user.id);
+        .order('created_at', { ascending: false });
 
-      if (filters?.status) {
-        query = query.eq('status', filters.status);
-      }
-
-      const { data, count, error } = await query.order('created_at', {
-        ascending: false,
-      });
       if (error) throw error;
 
-      const requests: GiftRequest[] = (data || []).map((row: any) => ({
-        id: row.id,
-        type: 'gift_request',
-        status: row.status,
-        momentId: row.moment_id,
-        momentTitle: row.moments?.title || '',
-        momentImage: row.moments?.images?.[0] || '',
-        requesterId: row.user_id,
-        requesterName: row.users?.full_name || '',
-        requesterAvatar: row.users?.avatar_url || '',
-        requesterRating: row.users?.rating || 0,
-        requesterVerified: row.users?.verified || false,
-        requesterLocation: row.users?.location || '',
-        hostId: row.host_id,
-        hostName: '', // Me
-        hostAvatar: '',
-        message: row.message,
-        guestCount: row.guest_count,
-        preferredDates: row.preferred_dates,
-        selectedDate: row.selected_date,
-        pricePerGuest: 0,
-        totalPrice: row.total_price,
-        currency: row.currency,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-      }));
+      // Filter by moment owner (host)
+      const filtered = (data || []).filter(
+        (row: any) => (row?.moments?.user_id ?? '') === user.id,
+      );
 
-      return { requests, total: count || 0 };
+      const requests: GiftRequest[] = filtered.map((row: unknown) => {
+        const r = row as Database['public']['Tables']['requests']['Row'] & {
+          users?: any;
+          moments?: any;
+        };
+        return {
+          id: r.id,
+          type: 'gift_request',
+          status: r.status as RequestStatus | null,
+          momentId: r.moment_id,
+          momentTitle: r.moments?.title || '',
+          momentImage: r.moments?.images?.[0] || '',
+          requesterId: r.user_id,
+          requesterName: r.users?.full_name || '',
+          requesterAvatar: r.users?.avatar_url || '',
+          requesterRating: r.users?.rating || 0,
+          requesterVerified: r.users?.verified || false,
+          requesterLocation: r.users?.location || '',
+          hostId: r.moments?.user_id || '',
+          hostName: '',
+          hostAvatar: '',
+          message: r.message ?? undefined,
+          guestCount: null,
+          preferredDates: undefined,
+          selectedDate: undefined,
+          pricePerGuest: 0,
+          totalPrice: undefined,
+          currency: undefined,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+        };
+      });
+
+      return { requests, total: filtered.length || 0 };
     } catch (error) {
       logger.error('Get received requests error:', error);
       return { requests: [], total: 0 };
@@ -320,28 +326,34 @@ export const requestService = {
 
       if (error) throw error;
 
+      const row =
+        data as unknown as Database['public']['Tables']['requests']['Row'] & {
+          users?: any;
+          moments?: any;
+        };
+
       const request: GiftRequest = {
-        id: data.id,
+        id: row.id,
         type: 'gift_request',
-        status: data.status,
-        momentId: data.moment_id,
-        momentTitle: data.moments?.title || '',
-        momentImage: data.moments?.images?.[0] || '',
-        requesterId: data.user_id,
-        requesterName: data.users?.full_name || '',
-        requesterAvatar: data.users?.avatar_url || '',
-        hostId: data.host_id,
+        status: row.status as RequestStatus | null,
+        momentId: row.moment_id,
+        momentTitle: row.moments?.title || '',
+        momentImage: row.moments?.images?.[0] || '',
+        requesterId: row.user_id,
+        requesterName: row.users?.full_name || '',
+        requesterAvatar: row.users?.avatar_url || '',
+        hostId: row.moments?.user_id || '',
         hostName: '',
         hostAvatar: '',
-        message: data.message,
-        guestCount: data.guest_count,
-        preferredDates: data.preferred_dates,
-        selectedDate: data.selected_date,
+        message: row.message ?? undefined,
+        guestCount: null,
+        preferredDates: undefined,
+        selectedDate: undefined,
         pricePerGuest: 0,
-        totalPrice: data.total_price,
-        currency: data.currency,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        totalPrice: undefined,
+        currency: undefined,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
       };
 
       return { request };
@@ -369,7 +381,9 @@ export const requestService = {
       if (data.selectedDate) {
         await supabase
           .from('requests')
-          .update({ selected_date: data.selectedDate })
+          .update({
+            selected_date: data.selectedDate,
+          } as Database['public']['Tables']['requests']['Update'])
           .eq('id', requestId);
       }
 
@@ -405,7 +419,9 @@ export const requestService = {
   /**
    * Cancel a request (as requester)
    */
-  cancelRequest: async (requestId: string): Promise<{ request: GiftRequest }> => {
+  cancelRequest: async (
+    requestId: string,
+  ): Promise<{ request: GiftRequest }> => {
     try {
       const { data: _updated, error } = await dbRequestsService.updateStatus(
         requestId,
@@ -423,7 +439,9 @@ export const requestService = {
   /**
    * Complete a request
    */
-  completeRequest: async (requestId: string): Promise<{ request: GiftRequest }> => {
+  completeRequest: async (
+    requestId: string,
+  ): Promise<{ request: GiftRequest }> => {
     try {
       const { data: _updated, error } = await dbRequestsService.updateStatus(
         requestId,
@@ -447,13 +465,13 @@ export const getStatusColor = (status: RequestStatus): string => {
     case 'accepted':
       return '#4CAF50'; // Green
     case 'declined':
-      return '#F44336'; // Red
+      return '#F44336';
     case 'cancelled':
-      return '#9E9E9E'; // Grey
+      return '#9E9E9E';
     case 'completed':
-      return '#2196F3'; // Blue
+      return '#2196F3';
     case 'expired':
-      return '#9E9E9E'; // Grey
+      return '#9E9E9E';
     default:
       return '#9E9E9E';
   }

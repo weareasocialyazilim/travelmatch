@@ -224,7 +224,8 @@ export function checkLoggingPatterns(): SecurityIssue[] {
   };
 
   // In development, monitor console methods
-  if (__DEV__) {
+  // Skip wrapping during Jest runs to avoid interfering with test spies
+  if (__DEV__ && !process.env.JEST_WORKER_ID) {
     console.log = wrapConsole(originalConsoleLog, 'log');
     console.warn = wrapConsole(originalConsoleWarn, 'warn');
     console.error = wrapConsole(originalConsoleError, 'error');

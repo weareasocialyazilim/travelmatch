@@ -18,8 +18,8 @@ jest.mock('@/utils/imageOptimization', () => ({
   },
 }));
 
-const mockUseLazyImage = useLazyImage ;
-const mockImageCacheManager = imageCacheManager ;
+const mockUseLazyImage = useLazyImage;
+const mockImageCacheManager = imageCacheManager;
 
 describe('LazyImage', () => {
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="lazy-image"
-        />
+        />,
       );
 
       // Component should render (Image is nested in View)
@@ -48,7 +48,7 @@ describe('LazyImage', () => {
 
     it('renders with local source (require)', () => {
       const { UNSAFE_root } = render(
-        <LazyImage source={123} testID="local-image" />
+        <LazyImage source={123} testID="local-image" />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -60,7 +60,7 @@ describe('LazyImage', () => {
           source={{ uri: 'https://example.com/image.jpg' }}
           style={{ width: 200, height: 200 }}
           testID="styled-image"
-        />
+        />,
       );
 
       const image = getByTestId('styled-image');
@@ -72,7 +72,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           containerStyle={{ padding: 10 }}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -96,7 +96,7 @@ describe('LazyImage', () => {
       mockUseLazyImage.mockReturnValue({ isLoading: true, hasError: false });
 
       const { UNSAFE_root } = render(
-        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />
+        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />,
       );
 
       // Component renders when loading
@@ -110,7 +110,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="loaded-image"
-        />
+        />,
       );
 
       const image = getByTestId('loaded-image');
@@ -124,7 +124,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           showLoading={true}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -137,7 +137,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           showLoading={false}
-        />
+        />,
       );
 
       const indicators = UNSAFE_root.findAllByType('ActivityIndicator');
@@ -153,10 +153,12 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           loadingComponent={<CustomLoader />}
-        />
+        />,
       );
 
-      const customLoader = UNSAFE_root.findAllByProps({ testID: 'custom-loader' });
+      const customLoader = UNSAFE_root.findAllByProps({
+        testID: 'custom-loader',
+      });
       expect(customLoader.length).toBeGreaterThan(0);
     });
 
@@ -169,10 +171,12 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           loadingComponent={<CustomLoader />}
-        />
+        />,
       );
 
-      const customLoader = UNSAFE_root.findAllByProps({ testID: 'custom-loader' });
+      const customLoader = UNSAFE_root.findAllByProps({
+        testID: 'custom-loader',
+      });
       expect(customLoader.length).toBeGreaterThan(0);
     });
   });
@@ -186,7 +190,7 @@ describe('LazyImage', () => {
       mockUseLazyImage.mockReturnValue({ isLoading: false, hasError: true });
 
       const { UNSAFE_root } = render(
-        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />
+        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />,
       );
 
       // Component renders error state
@@ -202,10 +206,12 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           errorComponent={<CustomError />}
-        />
+        />,
       );
 
-      const customError = UNSAFE_root.findAllByProps({ testID: 'custom-error' });
+      const customError = UNSAFE_root.findAllByProps({
+        testID: 'custom-error',
+      });
       expect(customError.length).toBeGreaterThan(0);
     });
 
@@ -218,10 +224,12 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           errorComponent={<CustomError />}
-        />
+        />,
       );
 
-      const customError = UNSAFE_root.findAllByProps({ testID: 'custom-error' });
+      const customError = UNSAFE_root.findAllByProps({
+        testID: 'custom-error',
+      });
       expect(customError.length).toBeGreaterThan(0);
     });
 
@@ -229,7 +237,7 @@ describe('LazyImage', () => {
       mockUseLazyImage.mockReturnValue({ isLoading: false, hasError: true });
 
       const { UNSAFE_root } = render(
-        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />
+        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />,
       );
 
       const images = UNSAFE_root.findAllByType('Image');
@@ -248,7 +256,7 @@ describe('LazyImage', () => {
       render(<LazyImage source={{ uri: 'https://example.com/image.jpg' }} />);
 
       expect(mockImageCacheManager.isCached).toHaveBeenCalledWith(
-        'https://example.com/image.jpg'
+        'https://example.com/image.jpg',
       );
     });
 
@@ -260,7 +268,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/cached.jpg' }}
           testID="cached-image"
-        />
+        />,
       );
 
       // Image should render (cached images skip loading state)
@@ -276,7 +284,7 @@ describe('LazyImage', () => {
           source={{ uri: 'https://example.com/cached.jpg' }}
           fadeInDuration={500}
           testID="cached-fade"
-        />
+        />,
       );
 
       const image = getByTestId('cached-fade');
@@ -291,7 +299,7 @@ describe('LazyImage', () => {
           source={{ uri: 'https://example.com/image.jpg' }}
           fadeInDuration={500}
           testID="uncached-fade"
-        />
+        />,
       );
 
       const image = getByTestId('uncached-fade');
@@ -305,7 +313,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="default-fade"
-        />
+        />,
       );
 
       const image = getByTestId('default-fade');
@@ -323,7 +331,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="image-with-handler"
-        />
+        />,
       );
 
       const image = getByTestId('image-with-handler');
@@ -335,7 +343,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="image-error-handler"
-        />
+        />,
       );
 
       const image = getByTestId('image-error-handler');
@@ -347,7 +355,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="mark-cached-image"
-        />
+        />,
       );
 
       // Component renders and would mark as cached on load
@@ -358,7 +366,7 @@ describe('LazyImage', () => {
 
     it('does not mark cached if source is not uri', () => {
       const { getByTestId } = render(
-        <LazyImage source={123} testID="local-no-cache" />
+        <LazyImage source={123} testID="local-no-cache" />,
       );
 
       const image = getByTestId('local-no-cache');
@@ -378,7 +386,7 @@ describe('LazyImage', () => {
           source={{ uri: 'https://example.com/image.jpg' }}
           resizeMode="cover"
           testID="resize-image"
-        />
+        />,
       );
 
       const image = getByTestId('resize-image');
@@ -390,7 +398,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="test-image"
-        />
+        />,
       );
 
       const image = getByTestId('test-image');
@@ -403,7 +411,7 @@ describe('LazyImage', () => {
           source={{ uri: 'https://example.com/image.jpg' }}
           accessible={true}
           testID="accessible-image"
-        />
+        />,
       );
 
       const image = getByTestId('accessible-image');
@@ -416,7 +424,7 @@ describe('LazyImage', () => {
           source={{ uri: 'https://example.com/image.jpg' }}
           accessibilityLabel="Profile picture"
           testID="labeled-image"
-        />
+        />,
       );
 
       const image = getByTestId('labeled-image');
@@ -436,9 +444,7 @@ describe('LazyImage', () => {
     });
 
     it('handles undefined source gracefully', () => {
-      const { UNSAFE_root } = render(
-        <LazyImage source={undefined as any} />
-      );
+      const { UNSAFE_root } = render(<LazyImage source={undefined} />);
 
       expect(mockUseLazyImage).toHaveBeenCalledWith({ uri: '' });
     });
@@ -447,8 +453,8 @@ describe('LazyImage', () => {
       const { UNSAFE_root } = render(
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
-          containerStyle={null as any}
-        />
+          containerStyle={null}
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -458,7 +464,7 @@ describe('LazyImage', () => {
       mockUseLazyImage.mockReturnValue({ isLoading: true, hasError: true });
 
       const { UNSAFE_root } = render(
-        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />
+        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />,
       );
 
       // Error state takes precedence
@@ -468,11 +474,11 @@ describe('LazyImage', () => {
 
     it('handles source change', () => {
       const { rerender } = render(
-        <LazyImage source={{ uri: 'https://example.com/image1.jpg' }} />
+        <LazyImage source={{ uri: 'https://example.com/image1.jpg' }} />,
       );
 
       rerender(
-        <LazyImage source={{ uri: 'https://example.com/image2.jpg' }} />
+        <LazyImage source={{ uri: 'https://example.com/image2.jpg' }} />,
       );
 
       // useLazyImage should be called with new source
@@ -494,7 +500,7 @@ describe('LazyImage', () => {
           style={{ width: 50, height: 50, borderRadius: 25 }}
           resizeMode="cover"
           testID="avatar"
-        />
+        />,
       );
 
       const avatar = getByTestId('avatar');
@@ -511,7 +517,7 @@ describe('LazyImage', () => {
           source={{ uri: 'https://example.com/post.jpg' }}
           loadingComponent={<CustomLoader />}
           style={{ width: '100%', height: 300 }}
-        />
+        />,
       );
 
       const skeleton = UNSAFE_root.findAllByProps({ testID: 'skeleton' });
@@ -527,7 +533,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/broken.jpg' }}
           errorComponent={<CustomError />}
-        />
+        />,
       );
 
       const errorView = UNSAFE_root.findAllByProps({ testID: 'broken-image' });
@@ -542,7 +548,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/cached.jpg' }}
           testID="instant-image"
-        />
+        />,
       );
 
       const image = getByTestId('instant-image');
@@ -557,7 +563,7 @@ describe('LazyImage', () => {
           resizeMode="cover"
           fadeInDuration={200}
           testID="gallery-item"
-        />
+        />,
       );
 
       const galleryItem = getByTestId('gallery-item');
@@ -571,7 +577,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="transition-image"
-        />
+        />,
       );
 
       // Initially loading - component renders
@@ -583,7 +589,7 @@ describe('LazyImage', () => {
         <LazyImage
           source={{ uri: 'https://example.com/image.jpg' }}
           testID="transition-image"
-        />
+        />,
       );
 
       // Should still render after transition
@@ -594,7 +600,7 @@ describe('LazyImage', () => {
       mockUseLazyImage.mockReturnValue({ isLoading: true, hasError: false });
 
       const { rerender, UNSAFE_root } = render(
-        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />
+        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />,
       );
 
       // Initially loading - component renders
@@ -602,9 +608,7 @@ describe('LazyImage', () => {
 
       // Simulate load error
       mockUseLazyImage.mockReturnValue({ isLoading: false, hasError: true });
-      rerender(
-        <LazyImage source={{ uri: 'https://example.com/image.jpg' }} />
-      );
+      rerender(<LazyImage source={{ uri: 'https://example.com/image.jpg' }} />);
 
       // Should render error state
       expect(UNSAFE_root).toBeTruthy();

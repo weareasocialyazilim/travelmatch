@@ -6,6 +6,8 @@
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { notificationsService as dbNotificationsService } from './supabaseDbService';
+import { toRecord } from '../utils/jsonHelper';
+import type { Database } from '../types/database.types';
 
 // Types
 export type NotificationType =
@@ -222,21 +224,21 @@ export const notificationService = {
 
       if (error) throw error;
 
-      const prefs = data.notification_preferences || {};
+      const prefsRecord = toRecord(data.notification_preferences) ?? {};
 
       return {
         preferences: {
-          pushEnabled: true, // This usually comes from device settings
-          messages: prefs.messages ?? true,
-          requests: prefs.requests ?? true,
-          reviews: prefs.reviews ?? true,
-          followers: prefs.followers ?? true,
-          momentActivity: prefs.momentActivity ?? true,
-          payments: prefs.payments ?? true,
-          marketing: prefs.marketing ?? false,
-          quietHoursEnabled: prefs.quietHoursEnabled ?? false,
-          quietHoursStart: prefs.quietHoursStart,
-          quietHoursEnd: prefs.quietHoursEnd,
+          pushEnabled: true,
+          messages: prefsRecord.messages ?? true,
+          requests: prefsRecord.requests ?? true,
+          reviews: prefsRecord.reviews ?? true,
+          followers: prefsRecord.followers ?? true,
+          momentActivity: prefsRecord.momentActivity ?? true,
+          payments: prefsRecord.payments ?? true,
+          marketing: prefsRecord.marketing ?? false,
+          quietHoursEnabled: prefsRecord.quietHoursEnabled ?? false,
+          quietHoursStart: prefsRecord.quietHoursStart,
+          quietHoursEnd: prefsRecord.quietHoursEnd,
         },
       };
     } catch (error) {
@@ -277,8 +279,12 @@ export const notificationService = {
         .eq('id', user.id)
         .single();
 
-      const currentPrefs = currentData?.notification_preferences || {};
-      const newPrefs = { ...currentPrefs, ...preferences };
+      const currentPrefs =
+        toRecord(currentData?.notification_preferences) ?? {};
+      const newPrefs = { ...currentPrefs, ...preferences } as Record<
+        string,
+        any
+      >;
 
       const { error } = await supabase
         .from('users')

@@ -19,6 +19,9 @@ module.exports = {
   moduleNameMapper: {
     ...jestExpoPreset.moduleNameMapper,
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^expo-image$': '<rootDir>/__mocks__/expo-image.js',
+    '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',
+    '^@travelmatch/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',
   },
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
@@ -28,6 +31,7 @@ module.exports = {
     '/node_modules/',
     '/__tests__\\.backup/',
     '/tests\\.backup/',
+    '\\.helper\\.tsx?$',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

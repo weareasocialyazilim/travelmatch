@@ -100,27 +100,28 @@ class PendingTransactionsService {
    */
   async updatePaymentStatus(id: string, status: TransactionStatus): Promise<void> {
     try {
-      const payments = await this.getPendingPayments();
-      const index = payments.findIndex(p => p.id === id);
-      
+      const stored = await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
+      const payments = stored ? JSON.parse(stored) : [];
+      const index = payments.findIndex((p: any) => p.id === id);
+
       if (index === -1) {
         logger.warn('PendingTransactions', 'Payment not found for update', { id });
         return;
       }
-      
+
       const payment = payments[index];
       if (!payment) return;
-      
+
       payment.status = status;
       payment.updatedAt = Date.now();
-      
+
       // Remove if completed or failed
       if (status === TransactionStatus.COMPLETED || status === TransactionStatus.FAILED) {
         payments.splice(index, 1);
       }
-      
+
       await AsyncStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(payments));
-      
+
       logger.info('PendingTransactions', 'Payment status updated', { id, status });
     } catch (error) {
       logger.error('PendingTransactions', 'Failed to update payment status', error);
@@ -210,32 +211,33 @@ class PendingTransactionsService {
    */
   async updateUploadProgress(id: string, progress: number, status?: TransactionStatus): Promise<void> {
     try {
-      const uploads = await this.getPendingUploads();
-      const index = uploads.findIndex(u => u.id === id);
-      
+      const stored = await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
+      const uploads = stored ? JSON.parse(stored) : [];
+      const index = uploads.findIndex((u: any) => u.id === id);
+
       if (index === -1) {
         logger.warn('PendingTransactions', 'Upload not found for progress update', { id });
         return;
       }
-      
+
       const upload = uploads[index];
       if (!upload) return;
-      
+
       upload.progress = progress;
       upload.updatedAt = Date.now();
-      
+
       if (status) {
         upload.status = status;
       }
-      
+
       // Remove if completed or max retries reached
       if (status === TransactionStatus.COMPLETED ||
           (status === TransactionStatus.FAILED && upload.retryCount >= 3)) {
         uploads.splice(index, 1);
       }
-      
+
       await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(uploads));
-      
+
       logger.info('PendingTransactions', 'Upload progress updated', { id, progress, status });
     } catch (error) {
       logger.error('PendingTransactions', 'Failed to update upload progress', error);
@@ -331,23 +333,27 @@ class PendingTransactionsService {
     uploads: PendingUpload[];
   }> {
     try {
+      // Probe storage first so storage-level errors are surfaced as a single aggregated error
+      await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
+      await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
+
       const payments = await this.getPendingPayments();
       const uploads = await this.getPendingUploads();
-      
+
       const result = {
         hasPayments: payments.length > 0,
         hasUploads: uploads.length > 0,
         payments,
         uploads,
       };
-      
+
       if (result.hasPayments || result.hasUploads) {
         logger.warn('PendingTransactions', 'Found pending transactions on startup', {
           paymentsCount: payments.length,
           uploadsCount: uploads.length,
         });
       }
-      
+
       return result;
     } catch (error) {
       logger.error('PendingTransactions', 'Failed to check pending transactions', error);

@@ -1,7 +1,7 @@
 /**
  * Request Flow Integration Tests
  * Tests the complete workflow: Create request → Accept → Payment → Complete
- * 
+ *
  * Scenarios:
  * 1. Complete Request Flow (2 tests)
  * 2. Request Acceptance Flow (2 tests)
@@ -40,11 +40,11 @@ jest.mock('@/config/supabase', () => ({
   isSupabaseConfigured: jest.fn(() => true),
 }));
 
-const mockSupabase = supabase ;
-const mockLogger = logger ;
+const mockSupabase = supabase;
+const mockLogger = logger;
 
 // Ensure auth is properly assigned after mocking
-(mockSupabase.auth as any) = mockAuth;
+mockSupabase.auth = mockAuth as unknown as typeof mockSupabase.auth;
 
 describe('Request Flow Integration', () => {
   const mockRequester = {
@@ -88,7 +88,9 @@ describe('Request Flow Integration', () => {
       range: jest.fn().mockReturnThis(),
     };
 
-    mockSupabase.from.mockReturnValue(mockFromChain as any);
+    mockSupabase.from.mockReturnValue(
+      mockFromChain as unknown as ReturnType<typeof mockSupabase.from>,
+    );
   });
 
   describe('Scenario 1: Complete Request Flow', () => {
@@ -102,7 +104,7 @@ describe('Request Flow Integration', () => {
       };
 
       // Mock moment fetch
-      (mockSupabase.from('moments').select ).mockReturnValue({
+      mockSupabase.from('moments').select.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockMoment,
@@ -131,7 +133,9 @@ describe('Request Flow Integration', () => {
         error: null,
       });
 
-      const { request: createdRequest } = await requestService.createRequest(requestData);
+      const { request: createdRequest } = await requestService.createRequest(
+        requestData,
+      );
 
       expect(createdRequest).toBeDefined();
       expect(createdRequest.status).toBe('pending');
@@ -188,7 +192,7 @@ describe('Request Flow Integration', () => {
 
       const { request: acceptedRequest } = await requestService.acceptRequest(
         createdRequest.id,
-        acceptData
+        acceptData,
       );
 
       expect(acceptedRequest.status).toBe('accepted');
@@ -211,7 +215,7 @@ describe('Request Flow Integration', () => {
         created_at: '2024-01-15T10:10:00Z',
       };
 
-      (mockSupabase.from('transactions').insert ).mockReturnValue({
+      mockSupabase.from('transactions').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockPaymentTransaction,
@@ -252,7 +256,7 @@ describe('Request Flow Integration', () => {
 
       const { request: completedRequest } = await requestService.acceptRequest(
         createdRequest.id,
-        { message: 'Completed' }
+        { message: 'Completed' },
       );
 
       expect(completedRequest).toBeDefined();
@@ -267,7 +271,7 @@ describe('Request Flow Integration', () => {
       };
 
       // Mock moment not found
-      (mockSupabase.from('moments').select ).mockReturnValue({
+      mockSupabase.from('moments').select.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: null,
@@ -278,7 +282,7 @@ describe('Request Flow Integration', () => {
 
       // Act & Assert
       await expect(
-        requestService.createRequest(invalidRequestData)
+        requestService.createRequest(invalidRequestData),
       ).rejects.toThrow('Moment not found');
     });
   });
@@ -308,7 +312,7 @@ describe('Request Flow Integration', () => {
         error: null,
       });
 
-      (mockSupabase.from('requests').update ).mockReturnValue({
+      mockSupabase.from('requests').update.mockReturnValue({
         eq: jest.fn().mockResolvedValue({
           data: mockAcceptedRequest,
           error: null,
@@ -340,12 +344,18 @@ describe('Request Flow Integration', () => {
       });
 
       // Act
-      const { request } = await requestService.acceptRequest(requestId, acceptData);
+      const { request } = await requestService.acceptRequest(
+        requestId,
+        acceptData,
+      );
 
       // Assert
       expect(request.status).toBe('accepted');
       expect(request.selectedDate).toBe('2024-01-25');
-      expect(dbRequestsService.updateStatus).toHaveBeenCalledWith(requestId, 'accepted');
+      expect(dbRequestsService.updateStatus).toHaveBeenCalledWith(
+        requestId,
+        'accepted',
+      );
     });
 
     it('should handle concurrent request acceptance attempts', async () => {
@@ -358,11 +368,10 @@ describe('Request Flow Integration', () => {
       });
 
       // First acceptance succeeds
-      jest.spyOn(dbRequestsService, 'updateStatus')
-        .mockResolvedValueOnce({
-          data: { id: requestId, status: 'accepted' },
-          error: null,
-        });
+      jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValueOnce({
+        data: { id: requestId, status: 'accepted' },
+        error: null,
+      });
 
       jest.spyOn(requestService, 'getRequest').mockResolvedValue({
         request: {
@@ -441,11 +450,17 @@ describe('Request Flow Integration', () => {
       });
 
       // Act
-      const { request } = await requestService.declineRequest(requestId, declineReason);
+      const { request } = await requestService.declineRequest(
+        requestId,
+        declineReason,
+      );
 
       // Assert
       expect(request.status).toBe('declined');
-      expect(dbRequestsService.updateStatus).toHaveBeenCalledWith(requestId, 'rejected');
+      expect(dbRequestsService.updateStatus).toHaveBeenCalledWith(
+        requestId,
+        'rejected',
+      );
     });
 
     it('should allow requester to cancel their pending request', async () => {
@@ -467,7 +482,7 @@ describe('Request Flow Integration', () => {
         error: null,
       });
 
-      (mockSupabase.from('requests').update ).mockReturnValue({
+      mockSupabase.from('requests').update.mockReturnValue({
         eq: jest.fn().mockResolvedValue({
           data: mockCancelledRequest,
           error: null,
@@ -475,7 +490,10 @@ describe('Request Flow Integration', () => {
       });
 
       // Act
-      const { data } = await dbRequestsService.updateStatus(requestId, 'cancelled' as any);
+      const { data } = await dbRequestsService.updateStatus(
+        requestId,
+        'cancelled',
+      );
 
       // Assert
       expect(data?.status).toBe('cancelled');
@@ -505,7 +523,7 @@ describe('Request Flow Integration', () => {
         created_at: '2024-01-15T11:00:00Z',
       };
 
-      (mockSupabase.from('transactions').insert ).mockReturnValue({
+      mockSupabase.from('transactions').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockPayment,
@@ -530,8 +548,10 @@ describe('Request Flow Integration', () => {
 
     it('should handle payment failure and maintain request state', async () => {
       // Suppress console output for this test
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
       // Arrange: Payment fails
       const requestId = 'request-payment-fail-123';
       const totalAmount = 100;
@@ -545,7 +565,7 @@ describe('Request Flow Integration', () => {
       mockLogger.error.mockImplementation(() => {});
 
       // Mock payment failure
-      (mockSupabase.from('transactions').insert ).mockReturnValue({
+      mockSupabase.from('transactions').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: null,
@@ -571,7 +591,7 @@ describe('Request Flow Integration', () => {
 
       // Request should remain in accepted state (not completed)
       // In a real scenario, we'd verify the request status hasn't changed to completed
-      
+
       // Restore console
       consoleSpy.mockRestore();
     });
@@ -590,11 +610,13 @@ describe('Request Flow Integration', () => {
         moment_id: mockMoment.id,
         status: 'expired',
         created_at: twoDaysAgo.toISOString(),
-        expires_at: new Date(twoDaysAgo.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+        expires_at: new Date(
+          twoDaysAgo.getTime() + 24 * 60 * 60 * 1000,
+        ).toISOString(),
       };
 
       // Mock checking request status
-      (mockSupabase.from('requests').select ).mockReturnValue({
+      mockSupabase.from('requests').select.mockReturnValue({
         eq: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockExpiredRequest,
@@ -615,7 +637,10 @@ describe('Request Flow Integration', () => {
       });
 
       // Assert: Should fail
-      const { error } = await dbRequestsService.updateStatus(expiredRequestId, 'accepted');
+      const { error } = await dbRequestsService.updateStatus(
+        expiredRequestId,
+        'accepted',
+      );
       expect(error?.message).toContain('expired');
     });
 
@@ -647,7 +672,7 @@ describe('Request Flow Integration', () => {
         created_at: '2024-01-15T12:00:00Z',
       };
 
-      (mockSupabase.from('transactions').insert ).mockReturnValue({
+      mockSupabase.from('transactions').insert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockRefund,
@@ -659,12 +684,12 @@ describe('Request Flow Integration', () => {
       // Act
       const { data: cancelledRequest } = await dbRequestsService.updateStatus(
         paidRequestId,
-        'cancelled' as any
+        'cancelled',
       );
 
       // Assert
       expect(cancelledRequest?.status).toBe('cancelled');
-      
+
       // Verify that tables were accessed (they may be called in different order)
       expect(mockSupabase.from).toHaveBeenCalled();
       // In a real implementation, both requests and transactions would be involved

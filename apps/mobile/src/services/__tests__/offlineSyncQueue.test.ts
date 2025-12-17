@@ -184,23 +184,31 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should trigger network listener on reconnect', async () => {
-      (mockNetInfo.addEventListener ).mockImplementation((_listener) => {
+      // Reload service to attach listener (use require so Jest mocks are preserved)
+      jest.resetModules();
+
+      // Ensure we get the freshly created NetInfo mock and configure it
+      const netInfoMock = jest.requireMock('@react-native-community/netinfo');
+      // Ensure test-level reference points to the fresh mock implementation
+      mockNetInfo.addEventListener = netInfoMock.addEventListener;
+      netInfoMock.addEventListener.mockImplementation((_listener: any) => {
         return jest.fn();
       });
 
-      // Reload service to attach listener
-      jest.resetModules();
+      // Re-require the module so constructor runs and attaches listener
+      // eslint-disable-next-line global-require
+      const { offlineSyncQueue: newQueue } = require('../offlineSyncQueue');
       
-      // Queue action while offline
+      // Queue action while offline on the newly required instance
       (mockNetInfo.fetch ).mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
 
-      await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
+      await newQueue.add('CREATE_MOMENT', { title: 'Test' });
 
       const handler = jest.fn().mockResolvedValue(true);
-      offlineSyncQueue.registerHandler('CREATE_MOMENT', handler);
+      newQueue.registerHandler('CREATE_MOMENT', handler);
 
       // Network change would trigger processQueue in real implementation
       // This test verifies addEventListener was called
@@ -221,7 +229,7 @@ describe('OfflineSyncQueue', () => {
         .mockRejectedValueOnce(new Error('Fail 1'))
         .mockRejectedValueOnce(new Error('Fail 2'))
         .mockRejectedValueOnce(new Error('Fail 3'))
-        .mockResolvedValue(true);
+        .mockRejectedValueOnce(new Error('Fail 4'));
 
       offlineSyncQueue.registerHandler('CREATE_MOMENT', handler);
 
@@ -279,6 +287,7 @@ describe('OfflineSyncQueue', () => {
 
       const handler = jest.fn()
         .mockRejectedValueOnce(new Error('Fail'))
+        .mockRejectedValueOnce(new Error('Fail 2'))
         .mockResolvedValue(true);
 
       offlineSyncQueue.registerHandler('CREATE_MOMENT', handler);
@@ -329,11 +338,12 @@ describe('OfflineSyncQueue', () => {
         JSON.stringify(savedQueue)
       );
 
-      // Reload service to trigger loadQueue
+      // Reload service to trigger loadQueue (use require to avoid ESM dynamic import issues)
       jest.resetModules();
-      const { offlineSyncQueue: newQueue } = await import('../offlineSyncQueue');
+      // eslint-disable-next-line global-require
+      const { offlineSyncQueue: newQueue } = require('../offlineSyncQueue');
 
-      // Wait for loadQueue to complete
+      // Wait briefly for async loadQueue to settle
       await new Promise(resolve => setTimeout(resolve, 100));
 
       const status = newQueue.getQueueStatus();

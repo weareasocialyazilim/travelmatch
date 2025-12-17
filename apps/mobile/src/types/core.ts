@@ -17,20 +17,20 @@ export interface User {
   phoneNumber?: string;
   photoUrl?: string;
   profilePhoto?: string; // Alternative photo field
-  avatar?: string;
-  avatarUrl?: string; // Alternative avatar field
+  avatar?: string | null;
+  avatarUrl?: string | null; // Alternative avatar field
   bio?: string;
   role: Role;
   type?: 'traveler' | 'local';
   kyc: KYCStatus;
   location: UserLocation | string;
-  trustScore?: number;
-  isVerified?: boolean;
+  trustScore?: number | null;
+  isVerified?: boolean | null;
   interests?: string[];
-  createdAt?: string;
-  lastActive?: string;
+  createdAt?: string | null;
+  lastActive?: string | null;
   travelDays?: number;
-  visitingUntil?: string;
+  visitingUntil?: string | null;
 }
 
 export interface GiftItem {

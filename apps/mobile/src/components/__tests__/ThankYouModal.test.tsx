@@ -28,50 +28,54 @@ describe('ThankYouModal', () => {
 
     it('renders with giver name in message', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} giverName="Alice" />
+        <ThankYouModal {...defaultProps} giverName="Alice" />,
       );
 
       expect(
-        getByText('Your gratitude message has been sent to Alice.')
+        getByText('Your gratitude message has been sent to Alice.'),
       ).toBeTruthy();
     });
 
     it('renders with amount in message when provided', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} giverName="Bob" amount={50} />
+        <ThankYouModal {...defaultProps} giverName="Bob" amount={50} />,
       );
 
       expect(
-        getByText('Your gratitude message has been sent to Bob for their 50 contribution.')
+        getByText(
+          'Your gratitude message has been sent to Bob for their 50 contribution.',
+        ),
       ).toBeTruthy();
     });
 
     it('renders without amount in message when not provided', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} giverName="Charlie" />
+        <ThankYouModal {...defaultProps} giverName="Charlie" />,
       );
 
       expect(
-        getByText('Your gratitude message has been sent to Charlie.')
+        getByText('Your gratitude message has been sent to Charlie.'),
       ).toBeTruthy();
     });
 
     it('renders check-circle icon', () => {
       const { UNSAFE_getAllByType } = render(
-        <ThankYouModal {...defaultProps} />
+        <ThankYouModal {...defaultProps} />,
       );
 
       const Icon = require('@expo/vector-icons/MaterialCommunityIcons').default;
       const icons = UNSAFE_getAllByType(Icon);
 
-      const checkIcon = icons.find((icon) => icon.props.name === 'check-circle');
+      const checkIcon = icons.find(
+        (icon) => icon.props.name === 'check-circle',
+      );
       expect(checkIcon).toBeTruthy();
       expect(checkIcon?.props.size).toBe(80);
     });
 
     it('renders heart icon in note card', () => {
       const { UNSAFE_getAllByType } = render(
-        <ThankYouModal {...defaultProps} />
+        <ThankYouModal {...defaultProps} />,
       );
 
       const Icon = require('@expo/vector-icons/MaterialCommunityIcons').default;
@@ -85,7 +89,9 @@ describe('ThankYouModal', () => {
     it('renders appreciation note', () => {
       const { getByText } = render(<ThankYouModal {...defaultProps} />);
 
-      expect(getByText('Gratitude strengthens the bond of kindness')).toBeTruthy();
+      expect(
+        getByText('Gratitude strengthens the bond of kindness'),
+      ).toBeTruthy();
     });
 
     it('renders Continue button', () => {
@@ -147,7 +153,7 @@ describe('ThankYouModal', () => {
 
     it('does not render when visible is false', () => {
       const { UNSAFE_getByType } = render(
-        <ThankYouModal {...defaultProps} visible={false} />
+        <ThankYouModal {...defaultProps} visible={false} />,
       );
 
       const { Modal } = require('react-native');
@@ -160,11 +166,11 @@ describe('ThankYouModal', () => {
   describe('Giver Name Display', () => {
     it('handles short names', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} giverName="Jo" />
+        <ThankYouModal {...defaultProps} giverName="Jo" />,
       );
 
       expect(
-        getByText('Your gratitude message has been sent to Jo.')
+        getByText('Your gratitude message has been sent to Jo.'),
       ).toBeTruthy();
     });
 
@@ -173,33 +179,33 @@ describe('ThankYouModal', () => {
         <ThankYouModal
           {...defaultProps}
           giverName="Christopher Alexander Wellington"
-        />
+        />,
       );
 
       expect(
         getByText(
-          'Your gratitude message has been sent to Christopher Alexander Wellington.'
-        )
+          'Your gratitude message has been sent to Christopher Alexander Wellington.',
+        ),
       ).toBeTruthy();
     });
 
     it('handles names with special characters', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} giverName="O'Brien-Smith" />
+        <ThankYouModal {...defaultProps} giverName="O'Brien-Smith" />,
       );
 
       expect(
-        getByText("Your gratitude message has been sent to O'Brien-Smith.")
+        getByText("Your gratitude message has been sent to O'Brien-Smith."),
       ).toBeTruthy();
     });
 
     it('handles empty name', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} giverName="" />
+        <ThankYouModal {...defaultProps} giverName="" />,
       );
 
       expect(
-        getByText('Your gratitude message has been sent to .')
+        getByText('Your gratitude message has been sent to .'),
       ).toBeTruthy();
     });
   });
@@ -207,37 +213,31 @@ describe('ThankYouModal', () => {
   describe('Amount Display', () => {
     it('handles small amounts', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} amount={1} />
+        <ThankYouModal {...defaultProps} amount={1} />,
       );
 
-      expect(
-        getByText(/for their 1 contribution/)
-      ).toBeTruthy();
+      expect(getByText(/for their 1 contribution/)).toBeTruthy();
     });
 
     it('handles large amounts', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} amount={999999} />
+        <ThankYouModal {...defaultProps} amount={999999} />,
       );
 
-      expect(
-        getByText(/for their 999999 contribution/)
-      ).toBeTruthy();
+      expect(getByText(/for their 999999 contribution/)).toBeTruthy();
     });
 
     it('handles decimal amounts', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} amount={123.45} />
+        <ThankYouModal {...defaultProps} amount={123.45} />,
       );
 
-      expect(
-        getByText(/for their 123.45 contribution/)
-      ).toBeTruthy();
+      expect(getByText(/for their 123.45 contribution/)).toBeTruthy();
     });
 
     it('handles zero amount', () => {
       const { getAllByText } = render(
-        <ThankYouModal {...defaultProps} amount={0} />
+        <ThankYouModal {...defaultProps} amount={0} />,
       );
 
       // Component shows the full message with "0" in it
@@ -290,7 +290,7 @@ describe('ThankYouModal', () => {
   describe('Edge Cases', () => {
     it('handles undefined onClose gracefully', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} onClose={undefined as any} />
+        <ThankYouModal {...defaultProps} onClose={undefined} />,
       );
 
       expect(() => fireEvent.press(getByText('Continue'))).not.toThrow();
@@ -298,17 +298,15 @@ describe('ThankYouModal', () => {
 
     it('handles negative amount', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} amount={-50} />
+        <ThankYouModal {...defaultProps} amount={-50} />,
       );
 
-      expect(
-        getByText(/for their -50 contribution/)
-      ).toBeTruthy();
+      expect(getByText(/for their -50 contribution/)).toBeTruthy();
     });
 
     it('renders correctly when visible changes from true to false', () => {
       const { rerender, UNSAFE_getByType } = render(
-        <ThankYouModal {...defaultProps} visible={true} />
+        <ThankYouModal {...defaultProps} visible={true} />,
       );
 
       const { Modal } = require('react-native');
@@ -323,7 +321,7 @@ describe('ThankYouModal', () => {
 
     it('renders correctly when visible changes from false to true', () => {
       const { rerender, UNSAFE_getByType } = render(
-        <ThankYouModal {...defaultProps} visible={false} />
+        <ThankYouModal {...defaultProps} visible={false} />,
       );
 
       const { Modal } = require('react-native');
@@ -340,7 +338,7 @@ describe('ThankYouModal', () => {
   describe('Component Structure', () => {
     it('renders animated view', () => {
       const { UNSAFE_getAllByType } = render(
-        <ThankYouModal {...defaultProps} />
+        <ThankYouModal {...defaultProps} />,
       );
 
       const Animated = require('react-native-reanimated').default;
@@ -351,7 +349,7 @@ describe('ThankYouModal', () => {
 
     it('renders multiple Text components', () => {
       const { UNSAFE_getAllByType } = render(
-        <ThankYouModal {...defaultProps} />
+        <ThankYouModal {...defaultProps} />,
       );
 
       const { Text } = require('react-native');
@@ -363,7 +361,7 @@ describe('ThankYouModal', () => {
 
     it('renders multiple View components', () => {
       const { UNSAFE_getAllByType } = render(
-        <ThankYouModal {...defaultProps} />
+        <ThankYouModal {...defaultProps} />,
       );
 
       const { View } = require('react-native');

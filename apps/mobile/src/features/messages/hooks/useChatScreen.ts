@@ -11,9 +11,9 @@ export interface Message {
   id: string;
   type: 'text' | 'image' | 'system' | 'proof';
   text?: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
   user: 'me' | 'other' | 'system';
-  timestamp?: string;
+  timestamp?: string | null;
 }
 
 interface UseChatScreenParams {
@@ -221,12 +221,7 @@ export const useChatScreen = ({
 
   // Handle chat options actions
   const handleChatAction = useCallback(
-    (
-      action: string,
-      reason: string,
-      details: string,
-      navigation: any,
-    ) => {
+    (action: string, reason: string, details: string, navigation: any) => {
       logger.debug('Chat action:', action, reason, details);
       if (action === 'block') {
         Alert.alert('User Blocked', `You have blocked ${otherUserName}`);
@@ -256,7 +251,7 @@ export const useChatScreen = ({
     showAttachmentSheet,
     showChatOptions,
     isAnyoneTyping,
-    
+
     // Actions
     setMessageText: handleTextChange,
     setShowAttachmentSheet,
@@ -265,7 +260,7 @@ export const useChatScreen = ({
     handlePhotoVideo,
     handleGift,
     handleChatAction,
-    
+
     // Computed
     getSystemMessages,
     getProofSystemMessage,

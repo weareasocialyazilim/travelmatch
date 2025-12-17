@@ -178,7 +178,7 @@ export const Button: React.FC<ButtonProps> = memo(
         {...a11y}
         activeOpacity={0.7}
         accessibilityRole="button"
-        accessibilityLabel={title}
+        accessibilityLabel={accessibilityLabel || title}
         accessibilityState={{ disabled: disabled || loading }}
         style={[
           styles.base,

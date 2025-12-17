@@ -1,9 +1,9 @@
 /**
  * Secure Payment Service (Client-Side)
- * 
+ *
  * Communicates with server-side Edge Functions for PCI-compliant payment processing
  * Never exposes Stripe secret keys on the client
- * 
+ *
  * Features:
  * - Server-side Stripe API calls
  * - Automatic cache invalidation
@@ -23,6 +23,8 @@ import {
   invalidateTransactions,
   invalidateAllPaymentCache,
 } from './cacheInvalidationService';
+import { toJson, toRecord } from '../utils/jsonHelper';
+import type { Database } from '../types/database.types';
 
 // Types
 export interface PaymentIntent {
@@ -43,11 +45,11 @@ export interface Transaction {
   id: string;
   type: string;
   amount: number;
-  currency: string;
-  status: string;
-  description: string;
-  createdAt: string;
-  metadata?: Record<string, any>;
+  currency?: string | null;
+  status: string | null;
+  description: string | null;
+  createdAt: string | null;
+  metadata?: Record<string, any> | null;
 }
 
 export interface CreatePaymentIntentParams {
@@ -86,7 +88,7 @@ class SecurePaymentService {
 
   /**
    * Create a payment intent (server-side)
-   * 
+   *
    * This calls the Edge Function which securely communicates with Stripe
    * The Stripe secret key never leaves the server
    */
@@ -137,7 +139,7 @@ class SecurePaymentService {
 
   /**
    * Confirm a payment intent (server-side)
-   * 
+   *
    * Securely confirms the payment with Stripe on the server
    */
   async confirmPayment(params: ConfirmPaymentParams): Promise<{
@@ -199,8 +201,11 @@ class SecurePaymentService {
       const cached = await getCachedWallet(user.id);
       if (cached) {
         logger.info('Wallet balance from cache');
-        // Convert WalletData to WalletBalance
-        const cachedData = cached as any;
+        const cachedData = cached as unknown as {
+          balance?: number;
+          pendingBalance?: number;
+          currency?: string;
+        };
         return {
           available: cachedData.balance || 0,
           pending: cachedData.pendingBalance || 0,
@@ -217,10 +222,11 @@ class SecurePaymentService {
 
       if (error) throw error;
 
+      const dbData = data as unknown as { balance?: number; currency?: string };
       const balance: WalletBalance = {
-        available: (data as any).balance || 0,
+        available: dbData.balance || 0,
         pending: 0,
-        currency: (data as any).currency || 'USD',
+        currency: dbData.currency || 'USD',
       };
 
       // Cache the result - convert to WalletData format
@@ -253,7 +259,7 @@ class SecurePaymentService {
 
       // Build cache key with params
       const cacheKey = `${user.id}:${JSON.stringify(params || {})}`;
-      
+
       // Try cache first
       const cached = await getCachedTransactions(cacheKey);
       if (cached && Array.isArray(cached) && cached.length > 0) {
@@ -264,7 +270,8 @@ class SecurePaymentService {
       // Build query with JOIN to fetch related data (prevents N+1)
       let query = supabase
         .from('transactions')
-        .select(`
+        .select(
+          `
           *,
           request:requests!request_id(
             id,
@@ -275,7 +282,8 @@ class SecurePaymentService {
               price
             )
           )
-        `)
+        `,
+        )
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -302,12 +310,21 @@ class SecurePaymentService {
         currency: tx.currency,
         status: tx.status,
         description: tx.description || '',
-        createdAt: tx.created_at,
-        metadata: tx.metadata,
+        createdAt: tx.created_at ?? null,
+        metadata: toRecord(tx.metadata),
       }));
 
-      // Cache the result
-      await setCachedTransactions(cacheKey, transactions);
+      // Cache the result (coerce types for storage)
+      await setCachedTransactions(
+        cacheKey,
+        transactions.map((t) => ({
+          id: t.id,
+          amount: t.amount,
+          type: t.type,
+          status: t.status ?? 'unknown',
+          createdAt: t.createdAt ?? '',
+        })),
+      );
 
       return transactions;
     } catch (error) {
@@ -364,8 +381,8 @@ class SecurePaymentService {
         currency: data.currency,
         status: data.status,
         description: data.description,
-        createdAt: data.created_at,
-        metadata: data.metadata,
+        createdAt: data.created_at ?? null,
+        metadata: toRecord(data.metadata),
       };
 
       logger.info('Withdrawal requested:', transaction.id);
@@ -384,7 +401,8 @@ class SecurePaymentService {
       // SECURITY: Only select required transaction fields - never use select('*')
       const { data, error } = await supabase
         .from('transactions')
-        .select(`
+        .select(
+          `
           id,
           type,
           amount,
@@ -396,21 +414,24 @@ class SecurePaymentService {
           moment_id,
           sender_id,
           receiver_id
-        `)
+        `,
+        )
         .eq('moment_id', momentId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      return (data || []).map((tx) => ({
-        id: tx.id,
-        type: tx.type,
-        amount: tx.amount,
-        currency: tx.currency,
-        status: tx.status,
-        description: tx.description || '',
-        createdAt: tx.created_at,
-        metadata: tx.metadata,
+      const txList = (data ||
+        []) as unknown as Database['public']['Tables']['transactions']['Row'][];
+      return txList.map((row) => ({
+        id: row.id,
+        type: row.type,
+        amount: row.amount,
+        currency: row.currency,
+        status: row.status,
+        description: row.description || '',
+        createdAt: row.created_at ?? null,
+        metadata: toRecord(row.metadata),
       }));
     } catch (error) {
       logger.error('Get moment payments error:', error);
@@ -448,9 +469,7 @@ class SecurePaymentService {
   /**
    * Subscribe to real-time payment updates
    */
-  subscribeToPaymentUpdates(
-    callback: (payload: any) => void,
-  ): () => void {
+  subscribeToPaymentUpdates(callback: (payload: any) => void): () => void {
     const channel = supabase
       .channel('payment-updates')
       .on(
@@ -462,7 +481,7 @@ class SecurePaymentService {
         },
         async (payload) => {
           logger.info('Payment update received:', payload);
-          
+
           // Invalidate caches
           const {
             data: { user },

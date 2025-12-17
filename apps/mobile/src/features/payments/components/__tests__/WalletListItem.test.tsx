@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { WalletListItem } from '../src/features/payments/components/WalletListItem';
+import { WalletListItem } from '@/features/payments/components/WalletListItem';
 
 describe('WalletListItem', () => {
   const mockWallet = {

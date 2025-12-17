@@ -1,281 +1,233 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
-[
+<RCTView
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Email
+  </RCTText>
   <RCTView
     style={
       {
-        "marginBottom": 16,
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E7EB",
+        "borderRadius": 12,
+        "borderWidth": 1,
+        "flexDirection": "row",
+        "height": 52,
+        "paddingHorizontal": 16,
       }
     }
   >
-    <RCTText
+    <RCTTextInput
+      accessibilityLabel="Email"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholder="Enter email"
+      placeholderTextColor="#9CA3AF"
+      secureTextEntry={false}
       style={
-        {
-          "color": "#1A1A1A",
-          "fontSize": 14,
-          "fontWeight": "600",
-          "marginBottom": 8,
-        }
+        [
+          {
+            "color": "#1A1A1A",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          undefined,
+          false,
+        ]
       }
-      testID="RCTText"
-    >
-      Email
-    </RCTText>
-    <RCTView
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#FFFFFF",
-          "borderColor": "#E5E7EB",
-          "borderRadius": 12,
-          "borderWidth": 1,
-          "flexDirection": "row",
-          "height": 52,
-          "paddingHorizontal": 16,
-        }
-      }
-    >
-      <RCTTextInput
-        accessibilityLabel="Email"
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        placeholder="Enter email"
-        placeholderTextColor="#9CA3AF"
-        secureTextEntry={false}
-        style={
-          [
-            {
-              "color": "#1A1A1A",
-              "flex": 1,
-              "fontSize": 16,
-              "paddingVertical": 0,
-            },
-            undefined,
-            false,
-          ]
-        }
-      />
-    </RCTView>
-  </RCTView>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
-    style={
-      {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
-      }
-    }
-    testID="RCTSafeAreaView"
-  />,
-]
+    />
+  </RCTView>
+</RCTView>
 `;
 
 exports[`Input Component Snapshots matches snapshot with error 1`] = `
-[
+<RCTView
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Password
+  </RCTText>
   <RCTView
     style={
       {
-        "marginBottom": 16,
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#EF4444",
+        "borderRadius": 12,
+        "borderWidth": 1,
+        "flexDirection": "row",
+        "height": 52,
+        "paddingHorizontal": 16,
       }
     }
   >
-    <RCTText
+    <RCTTextInput
+      accessibilityLabel="Password"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#9CA3AF"
+      secureTextEntry={false}
       style={
-        {
-          "color": "#1A1A1A",
-          "fontSize": 14,
-          "fontWeight": "600",
-          "marginBottom": 8,
-        }
+        [
+          {
+            "color": "#1A1A1A",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          undefined,
+          false,
+        ]
       }
-      testID="RCTText"
-    >
-      Password
-    </RCTText>
-    <RCTView
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#FFFFFF",
-          "borderColor": "#EF4444",
-          "borderRadius": 12,
-          "borderWidth": 1,
-          "flexDirection": "row",
-          "height": 52,
-          "paddingHorizontal": 16,
-        }
-      }
-    >
-      <RCTTextInput
-        accessibilityLabel="Password"
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        placeholderTextColor="#9CA3AF"
-        secureTextEntry={false}
-        style={
-          [
-            {
-              "color": "#1A1A1A",
-              "flex": 1,
-              "fontSize": 16,
-              "paddingVertical": 0,
-            },
-            undefined,
-            false,
-          ]
-        }
-      />
-    </RCTView>
-    <RCTText
-      style={
-        {
-          "color": "#EF4444",
-          "fontSize": 12,
-          "marginTop": 4,
-        }
-      }
-      testID="RCTText"
-    >
-      Too short
-    </RCTText>
-  </RCTView>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
+    />
+  </RCTView>
+  <RCTText
     style={
       {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
+        "color": "#EF4444",
+        "fontSize": 12,
+        "marginTop": 4,
       }
     }
-    testID="RCTSafeAreaView"
-  />,
-]
+    testID="RCTText"
+  >
+    Too short
+  </RCTText>
+</RCTView>
 `;
 
 exports[`Input Component Snapshots matches snapshot with icons 1`] = `
-[
+<RCTView
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Search
+  </RCTText>
   <RCTView
     style={
       {
-        "marginBottom": 16,
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E7EB",
+        "borderRadius": 12,
+        "borderWidth": 1,
+        "flexDirection": "row",
+        "height": 52,
+        "paddingHorizontal": 16,
       }
     }
   >
     <RCTText
+      color="#9CA3AF"
+      name="magnify"
+      size={20}
       style={
         {
-          "color": "#1A1A1A",
-          "fontSize": 14,
-          "fontWeight": "600",
-          "marginBottom": 8,
+          "marginRight": 12,
         }
       }
       testID="RCTText"
     >
-      Search
+      magnify
     </RCTText>
-    <RCTView
+    <RCTTextInput
+      accessibilityLabel="Search"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#9CA3AF"
+      secureTextEntry={false}
+      style={
+        [
+          {
+            "color": "#1A1A1A",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          {
+            "paddingLeft": 0,
+          },
+          {
+            "paddingRight": 0,
+          },
+        ]
+      }
+    />
+    <RCTTouchableOpacity
+      accessibilityState={
+        {
+          "disabled": true,
+        }
+      }
+      accessible={true}
+      aria-disabled={true}
+      disabled={true}
       style={
         {
-          "alignItems": "center",
-          "backgroundColor": "#FFFFFF",
-          "borderColor": "#E5E7EB",
-          "borderRadius": 12,
-          "borderWidth": 1,
-          "flexDirection": "row",
-          "height": 52,
-          "paddingHorizontal": 16,
+          "marginLeft": 12,
+          "padding": 4,
         }
       }
     >
       <RCTText
         color="#9CA3AF"
-        name="magnify"
+        name="close"
         size={20}
-        style={
-          {
-            "marginRight": 12,
-          }
-        }
         testID="RCTText"
       >
-        magnify
+        close
       </RCTText>
-      <RCTTextInput
-        accessibilityLabel="Search"
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        placeholderTextColor="#9CA3AF"
-        secureTextEntry={false}
-        style={
-          [
-            {
-              "color": "#1A1A1A",
-              "flex": 1,
-              "fontSize": 16,
-              "paddingVertical": 0,
-            },
-            {
-              "paddingLeft": 0,
-            },
-            {
-              "paddingRight": 0,
-            },
-          ]
-        }
-      />
-      <RCTTouchableOpacity
-        accessibilityState={
-          {
-            "disabled": true,
-          }
-        }
-        accessible={true}
-        aria-disabled={true}
-        disabled={true}
-        style={
-          {
-            "marginLeft": 12,
-            "padding": 4,
-          }
-        }
-      >
-        <RCTText
-          color="#9CA3AF"
-          name="close"
-          size={20}
-          testID="RCTText"
-        >
-          close
-        </RCTText>
-      </RCTTouchableOpacity>
-    </RCTView>
-  </RCTView>,
-  <RCTSafeAreaView
-    pointerEvents="box-none"
-    style={
-      {
-        "left": 0,
-        "padding": 16,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "zIndex": 9999,
-      }
-    }
-    testID="RCTSafeAreaView"
-  />,
-]
+    </RCTTouchableOpacity>
+  </RCTView>
+</RCTView>
 `;

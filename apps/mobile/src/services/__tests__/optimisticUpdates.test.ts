@@ -1,6 +1,6 @@
 /**
  * Optimistic UI Updates - Comprehensive Tests
- * 
+ *
  * Tests for optimistic updates:
  * - Optimistic state updates before API response
  * - Rollback on mutation failure
@@ -28,13 +28,13 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockNetInfo = NetInfo ;
+const mockNetInfo = NetInfo;
 
 describe('Optimistic UI Updates', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
-    
-    (mockNetInfo.fetch ).mockResolvedValue({
+
+    mockNetInfo.fetch.mockResolvedValue({
       isConnected: true,
       isInternetReachable: true,
     });
@@ -48,7 +48,7 @@ describe('Optimistic UI Updates', () => {
       const onSuccess = jest.fn();
       const mutationFn = jest.fn().mockImplementation(async () => {
         // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         return { id: '123', liked: true };
       });
 
@@ -57,40 +57,50 @@ describe('Optimistic UI Updates', () => {
       // Mock cache service inline
       const mockCache: any = {};
       const cacheService = {
-        setQueryData: (key: string, data: any) => { mockCache[key] = data; },
+        setQueryData: (key: string, data: any) => {
+          mockCache[key] = data;
+        },
         getQueryData: (key: string) => mockCache[key],
       };
 
-      const { result } = renderHook(() =>
-        useOfflineMutation(mutationFn)
-      );
+      const { result } = renderHook(() => useOfflineMutation(mutationFn, { onSuccess }));
 
       // Cache current state
       const cacheKey = 'moment-123';
-      cacheService.setQueryData(cacheKey, { id: '123', liked: false, likes: 10 });
+      cacheService.setQueryData(cacheKey, {
+        id: '123',
+        liked: false,
+        likes: 10,
+      });
 
       // Perform mutation with optimistic update
       await act(async () => {
         result.current.mutate({ momentId: '123' });
 
         // Apply optimistic update
-        cacheService.setQueryData(cacheKey, { id: '123', liked: true, likes: 11 });
+        cacheService.setQueryData(cacheKey, {
+          id: '123',
+          liked: true,
+          likes: 11,
+        });
       });
 
       // Check optimistic state (before API response)
       const optimisticData = cacheService.getQueryData(cacheKey);
       expect(optimisticData).toEqual({ id: '123', liked: true, likes: 11 });
 
-      // Wait for mutation to complete
+      // Wait for mutation to complete and onSuccess to be invoked
       await waitFor(() => {
         expect(mutationFn).toHaveBeenCalled();
       });
 
-      expect(onSuccess).toHaveBeenCalledWith({ id: '123', liked: true });
+      await waitFor(() => {
+        expect(onSuccess).toHaveBeenCalledWith({ id: '123', liked: true });
+      });
     });
 
     it('should update UI immediately for offline actions', async () => {
-      (mockNetInfo.fetch ).mockResolvedValue({
+      mockNetInfo.fetch.mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
@@ -98,17 +108,25 @@ describe('Optimistic UI Updates', () => {
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'LIKE_MOMENT',
-        })
+        }),
       );
 
       const cacheKey = 'moment-456';
-      cacheService.setQueryData(cacheKey, { id: '456', liked: false, likes: 5 });
+      cacheService.setQueryData(cacheKey, {
+        id: '456',
+        liked: false,
+        likes: 5,
+      });
 
       await act(async () => {
         result.current.mutate({ momentId: '456' });
 
         // Optimistic update while offline
-        cacheService.setQueryData(cacheKey, { id: '456', liked: true, likes: 6 });
+        cacheService.setQueryData(cacheKey, {
+          id: '456',
+          liked: true,
+          likes: 6,
+        });
       });
 
       // UI should show liked state immediately
@@ -132,13 +150,13 @@ describe('Optimistic UI Updates', () => {
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'LIKE_MOMENT',
-        })
+        }),
       );
 
       // Like multiple moments
       await act(async () => {
         result.current.mutate({ momentId: '1' });
-        
+
         cacheService.setQueryData(cacheKey, [
           { id: '1', liked: true, likes: 11 },
           { id: '2', liked: false, likes: 20 },
@@ -148,7 +166,7 @@ describe('Optimistic UI Updates', () => {
 
       await act(async () => {
         result.current.mutate({ momentId: '3' });
-        
+
         cacheService.setQueryData(cacheKey, [
           { id: '1', liked: true, likes: 11 },
           { id: '2', liked: false, likes: 20 },
@@ -180,7 +198,7 @@ describe('Optimistic UI Updates', () => {
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'SEND_REQUEST',
-        })
+        }),
       );
 
       await act(async () => {
@@ -220,19 +238,23 @@ describe('Optimistic UI Updates', () => {
         useOfflineMutation({
           onError,
           offlineActionType: 'LIKE_MOMENT',
-        })
+        }),
       );
 
       const cacheKey = 'moment-789';
       const originalData = { id: '789', liked: false, likes: 15 };
-      
+
       cacheService.setQueryData(cacheKey, originalData);
 
       await act(async () => {
         result.current.mutate({ momentId: '789' });
 
         // Apply optimistic update
-        cacheService.setQueryData(cacheKey, { id: '789', liked: true, likes: 16 });
+        cacheService.setQueryData(cacheKey, {
+          id: '789',
+          liked: true,
+          likes: 16,
+        });
       });
 
       // Wait for mutation to fail
@@ -263,19 +285,21 @@ describe('Optimistic UI Updates', () => {
 
       cacheService.setQueryData(cacheKey, originalProfile);
 
-      const mutationFn = jest.fn().mockRejectedValue(new Error('Update failed'));
+      const mutationFn = jest
+        .fn()
+        .mockRejectedValue(new Error('Update failed'));
       offlineSyncQueue.registerHandler('UPDATE_MOMENT', mutationFn);
 
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'UPDATE_MOMENT',
-        })
+        }),
       );
 
       // Optimistic update
       await act(async () => {
         result.current.mutate({ bio: 'New bio' });
-        
+
         cacheService.setQueryData(cacheKey, {
           ...originalProfile,
           bio: 'New bio',
@@ -304,19 +328,21 @@ describe('Optimistic UI Updates', () => {
 
       cacheService.setQueryData(cacheKey, originalMoments);
 
-      const mutationFn = jest.fn().mockRejectedValue(new Error('Creation failed'));
+      const mutationFn = jest
+        .fn()
+        .mockRejectedValue(new Error('Creation failed'));
       offlineSyncQueue.registerHandler('CREATE_MOMENT', mutationFn);
 
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'CREATE_MOMENT',
-        })
+        }),
       );
 
       // Optimistically add new moment
       await act(async () => {
         result.current.mutate({ title: 'Moment 3' });
-        
+
         cacheService.setQueryData(cacheKey, [
           ...originalMoments,
           { id: 'temp-3', title: 'Moment 3' },
@@ -353,13 +379,13 @@ describe('Optimistic UI Updates', () => {
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'UPDATE_MOMENT',
-        })
+        }),
       );
 
       // Update first item
       await act(async () => {
         result.current.mutate({ id: '1' });
-        
+
         cacheService.setQueryData(cacheKey, [
           { id: '1', status: 'completed' },
           { id: '2', status: 'pending' },
@@ -377,7 +403,7 @@ describe('Optimistic UI Updates', () => {
 
       await act(async () => {
         result.current.mutate({ id: '2' });
-        
+
         cacheService.setQueryData(cacheKey, [
           { id: '1', status: 'completed' },
           { id: '2', status: 'completed' },
@@ -413,7 +439,11 @@ describe('Optimistic UI Updates', () => {
         { id: '123', likes: 10 },
         { id: '456', likes: 20 },
       ]);
-      cacheService.setQueryData(detailKey, { id: '123', likes: 10, title: 'Test' });
+      cacheService.setQueryData(detailKey, {
+        id: '123',
+        likes: 10,
+        title: 'Test',
+      });
 
       const mutationFn = jest.fn().mockResolvedValue({ id: '123', likes: 11 });
       offlineSyncQueue.registerHandler('LIKE_MOMENT', mutationFn);
@@ -426,7 +456,7 @@ describe('Optimistic UI Updates', () => {
             cacheService.invalidateQuery(listKey);
             cacheService.invalidateQuery(detailKey);
           },
-        })
+        }),
       );
 
       await act(async () => {
@@ -458,7 +488,7 @@ describe('Optimistic UI Updates', () => {
             // Invalidate all moment lists
             cacheService.invalidateQueries((key) => key.startsWith('moments-'));
           },
-        })
+        }),
       );
 
       await act(async () => {
@@ -492,17 +522,19 @@ describe('Optimistic UI Updates', () => {
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'LIKE_MOMENT',
-          onSuccess: (data: any) => {
+          onSuccess: (data: unknown) => {
             // Update only the affected item
-            const currentData = cacheService.getQueryData(cacheKey) as any[];
+            const currentData = cacheService.getQueryData(
+              cacheKey,
+            ) as unknown as Array<Record<string, unknown>> | undefined;
             if (currentData) {
               const updated = currentData.map((item) =>
-                item.id === data.id ? { ...item, liked: data.liked } : item
+                item.id === data.id ? { ...item, liked: data.liked } : item,
               );
               cacheService.setQueryData(cacheKey, updated);
             }
           },
-        })
+        }),
       );
 
       await act(async () => {
@@ -513,7 +545,9 @@ describe('Optimistic UI Updates', () => {
         expect(mutationFn).toHaveBeenCalled();
       });
 
-      const data = cacheService.getQueryData(cacheKey) as any[];
+      const data = cacheService.getQueryData(cacheKey) as unknown as Array<
+        Record<string, unknown>
+      >;
       expect(data[0].liked).toBe(false);
       expect(data[1].liked).toBe(true);
       expect(data[2].liked).toBe(false);
@@ -534,7 +568,7 @@ describe('Optimistic UI Updates', () => {
             // Only invalidate moment cache
             cacheService.invalidateQuery('moments-list');
           },
-        })
+        }),
       );
 
       await act(async () => {
@@ -553,42 +587,60 @@ describe('Optimistic UI Updates', () => {
 
   describe('UI Consistency', () => {
     it('should maintain UI consistency during offline-to-online transition', async () => {
-      (mockNetInfo.fetch ).mockResolvedValue({
+      mockNetInfo.fetch.mockResolvedValue({
         isConnected: false,
         isInternetReachable: false,
       });
 
       const cacheKey = 'moment-999';
-      cacheService.setQueryData(cacheKey, { id: '999', liked: false, likes: 50 });
+      cacheService.setQueryData(cacheKey, {
+        id: '999',
+        liked: false,
+        likes: 50,
+      });
 
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'LIKE_MOMENT',
-        })
+        }),
       );
 
       // Offline optimistic update
       await act(async () => {
         result.current.mutate({ momentId: '999' });
-        
-        cacheService.setQueryData(cacheKey, { id: '999', liked: true, likes: 51 });
+
+        cacheService.setQueryData(cacheKey, {
+          id: '999',
+          liked: true,
+          likes: 51,
+        });
       });
 
-      expect(cacheService.getQueryData(cacheKey)).toEqual({ id: '999', liked: true, likes: 51 });
+      expect(cacheService.getQueryData(cacheKey)).toEqual({
+        id: '999',
+        liked: true,
+        likes: 51,
+      });
 
       // Go online and sync
-      (mockNetInfo.fetch ).mockResolvedValue({
+      mockNetInfo.fetch.mockResolvedValue({
         isConnected: true,
         isInternetReachable: true,
       });
 
-      const mutationFn = jest.fn().mockResolvedValue({ id: '999', liked: true, likes: 51 });
+      const mutationFn = jest
+        .fn()
+        .mockResolvedValue({ id: '999', liked: true, likes: 51 });
       offlineSyncQueue.registerHandler('LIKE_MOMENT', mutationFn);
 
       await offlineSyncQueue.processQueue();
 
       // UI should remain consistent
-      expect(cacheService.getQueryData(cacheKey)).toEqual({ id: '999', liked: true, likes: 51 });
+      expect(cacheService.getQueryData(cacheKey)).toEqual({
+        id: '999',
+        liked: true,
+        likes: 51,
+      });
     });
 
     it('should handle concurrent optimistic updates', async () => {
@@ -598,7 +650,7 @@ describe('Optimistic UI Updates', () => {
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'LIKE_MOMENT',
-        })
+        }),
       );
 
       // Multiple concurrent updates
@@ -618,13 +670,13 @@ describe('Optimistic UI Updates', () => {
       const { result } = renderHook(() =>
         useOfflineMutation({
           offlineActionType: 'CREATE_MOMENT',
-        })
+        }),
       );
 
       expect(result.current.loading).toBe(false);
 
       const mutationFn = jest.fn().mockImplementation(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         return { id: '123' };
       });
 

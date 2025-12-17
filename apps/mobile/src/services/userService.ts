@@ -8,10 +8,21 @@ import { COLORS } from '../constants/colors';
 import { logger } from '../utils/logger';
 import { encryptionService } from './encryptionService';
 import { usersService as dbUsersService } from './supabaseDbService';
+import type { Database } from '../types/database.types';
 import { uploadFile } from './supabaseStorageService';
-import { NotificationPreferencesSchema, PrivacySettingsSchema, UpdateUserProfileSchema } from '../schemas/user.schema';
+import {
+  NotificationPreferencesSchema,
+  PrivacySettingsSchema,
+  UpdateUserProfileSchema,
+} from '../schemas/user.schema';
 import { isNotNull } from '../types/guards';
-import type { FollowRow, UserRow, UpdateProfilePayload, NotificationPreferences, PrivacySettings } from '../types/database-manual.types';
+import type {
+  FollowRow,
+  UserRow,
+  UpdateProfilePayload,
+  NotificationPreferences,
+  PrivacySettings,
+} from '../types/database-manual.types';
 
 // Types
 export interface UserProfile {
@@ -105,6 +116,26 @@ export interface FollowUser {
   isFollowedBy: boolean;
 }
 
+// Lightweight DB user shape used for mapping - includes snake_case fields returned from PostgREST
+type DBUserRowLike = Partial<{
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  name: string | null;
+  avatar_url: string | null;
+  avatar: string | null;
+  languages: string[] | null;
+  interests: string[] | null;
+  verified: boolean | null;
+  kyc_status: 'unverified' | 'pending' | 'verified' | 'rejected' | null;
+  rating: number | null;
+  review_count: number | null;
+  created_at: string | null;
+  last_seen_at: string | null;
+  updated_at: string | null;
+  public_key: string | null;
+}>;
+
 // User Service
 export const userService = {
   /**
@@ -112,7 +143,9 @@ export const userService = {
    */
   syncKeys: async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // 1. Ensure local keys exist
@@ -122,11 +155,12 @@ export const userService = {
       const { data: profile } = await dbUsersService.getById(user.id);
 
       // Upload public key if not already set
-      if (profile && !profile.public_key) {
+      const typedProfile = profile as DBUserRowLike | null;
+      if (typedProfile && !typedProfile.public_key) {
         logger.info('[User] Uploading public key');
         await dbUsersService.update(user.id, {
           public_key: keys.publicKey,
-        });
+        } as Database['public']['Tables']['users']['Update']);
       }
     } catch (error) {
       logger.error('[User] Failed to sync keys', error);
@@ -148,7 +182,8 @@ export const userService = {
     // SECURITY: Only select public profile fields - never expose sensitive data like balance, kyc_status
     const { data: profile, error } = await supabase
       .from('users')
-      .select(`
+      .select(
+        `
         id,
         username,
         name,
@@ -170,7 +205,8 @@ export const userService = {
         notification_preferences,
         created_at,
         updated_at
-      `)
+      `,
+      )
       .eq('id', user.id)
       .single();
 
@@ -189,7 +225,8 @@ export const userService = {
     // SECURITY: Only select public profile fields
     const { data: profile, error } = await supabase
       .from('users')
-      .select(`
+      .select(
+        `
         id,
         username,
         name,
@@ -206,7 +243,8 @@ export const userService = {
         instagram,
         twitter,
         website
-      `)
+      `,
+      )
       .eq('id', userId)
       .single();
 
@@ -227,7 +265,8 @@ export const userService = {
     // SECURITY: Only select public profile fields
     const { data: profile, error } = await supabase
       .from('users')
-      .select(`
+      .select(
+        `
         id,
         username,
         name,
@@ -244,7 +283,8 @@ export const userService = {
         instagram,
         twitter,
         website
-      `)
+      `,
+      )
       .eq('username', username)
       .single();
 
@@ -287,7 +327,7 @@ export const userService = {
 
     const { data: profile, error } = await supabase
       .from('users')
-      .update(data)
+      .update(data as Database['public']['Tables']['users']['Update'])
       .eq('id', user.id)
       .select()
       .single();
@@ -489,8 +529,10 @@ export const userService = {
     if (!userData) throw new Error('User not found');
 
     const typedUserData = userData as UserRow;
-    const notifPrefs: NotificationPreferences = typedUserData.notification_preferences || {};
-    const privacySettings: PrivacySettings = typedUserData.privacy_settings || {};
+    const notifPrefs: NotificationPreferences =
+      typedUserData.notification_preferences || {};
+    const privacySettings: PrivacySettings =
+      typedUserData.privacy_settings || {};
 
     const preferences: UserPreferences = {
       emailNotifications: notifPrefs.email ?? true,
@@ -501,8 +543,8 @@ export const userService = {
       showLastActive: privacySettings.showLastSeen ?? true,
       allowMessages: privacySettings.allowMessages ?? 'everyone',
 
-      language: ((userData as any).languages?.[0]) || 'en',
-      currency: (userData as any).currency || 'USD',
+      language: typedUserData.languages?.[0] || 'en',
+      currency: typedUserData.currency || 'USD',
       timezone: privacySettings.timezone || 'UTC',
 
       autoAcceptRequests: privacySettings.autoAcceptRequests ?? false,
@@ -526,8 +568,10 @@ export const userService = {
     // Fetch current to merge
     const { data: currentUser } = await dbUsersService.getById(user.id);
     const typedCurrentUser = currentUser as UserRow | null;
-    const currentNotif: NotificationPreferences = typedCurrentUser?.notification_preferences || {};
-    const currentPrivacy: PrivacySettings = typedCurrentUser?.privacy_settings || {};
+    const currentNotif: NotificationPreferences =
+      typedCurrentUser?.notification_preferences || {};
+    const currentPrivacy: PrivacySettings =
+      typedCurrentUser?.privacy_settings || {};
 
     const updates: Partial<UserRow> = {};
 
@@ -561,13 +605,15 @@ export const userService = {
 
     const { data: updatedUser, error } = await dbUsersService.update(
       user.id,
-      updates as any,
+      updates as Database['public']['Tables']['users']['Update'],
     );
     if (error) throw error;
 
     const typedUpdatedUser = updatedUser as UserRow | null;
-    const newNotif: NotificationPreferences = typedUpdatedUser?.notification_preferences || {};
-    const newPrivacy: PrivacySettings = typedUpdatedUser?.privacy_settings || {};
+    const newNotif: NotificationPreferences =
+      typedUpdatedUser?.notification_preferences || {};
+    const newPrivacy: PrivacySettings =
+      typedUpdatedUser?.privacy_settings || {};
 
     const preferences: UserPreferences = {
       emailNotifications: newNotif.email ?? true,
@@ -578,8 +624,8 @@ export const userService = {
       showLastActive: newPrivacy.showLastSeen ?? true,
       allowMessages: newPrivacy.allowMessages ?? 'everyone',
 
-      language: ((updatedUser as any)?.languages?.[0]) || 'en',
-      currency: (updatedUser as any)?.currency || 'USD',
+      language: typedUpdatedUser?.languages?.[0] || 'en',
+      currency: typedUpdatedUser?.currency || 'USD',
       timezone: newPrivacy.timezone || 'UTC',
 
       autoAcceptRequests: newPrivacy.autoAcceptRequests ?? false,
@@ -598,7 +644,9 @@ export const userService = {
     currentPassword: string;
     newPassword: string;
   }): Promise<{ success: boolean }> => {
-    const { error } = await supabase.auth.updateUser({ password: data.newPassword });
+    const { error } = await supabase.auth.updateUser({
+      password: data.newPassword,
+    });
     if (error) throw error;
     return { success: true };
   },
@@ -606,7 +654,9 @@ export const userService = {
   /**
    * Request password reset
    */
-  requestPasswordReset: async (email: string): Promise<{ success: boolean }> => {
+  requestPasswordReset: async (
+    email: string,
+  ): Promise<{ success: boolean }> => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) throw error;
     return { success: true };
@@ -624,9 +674,14 @@ export const userService = {
    * Resend verification email
    */
   resendVerificationEmail: async (): Promise<{ success: boolean }> => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user?.email) throw new Error('No user email found');
-    const { error } = await supabase.auth.resend({ type: 'signup', email: user.email });
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: user.email,
+    });
     if (error) throw error;
     return { success: true };
   },
@@ -644,7 +699,7 @@ export const userService = {
 
     const { error } = await dbUsersService.update(user.id, {
       deleted_at: new Date().toISOString(),
-    } as any);
+    } as Database['public']['Tables']['users']['Update']);
     if (error) throw error;
 
     await supabase.auth.signOut();
@@ -663,7 +718,7 @@ export const userService = {
     // Soft delete for now
     const { error: delError } = await dbUsersService.update(user.id, {
       deleted_at: new Date().toISOString(),
-    } as any);
+    } as Database['public']['Tables']['users']['Update']);
     if (delError) throw delError;
 
     await supabase.auth.signOut();
@@ -730,31 +785,34 @@ export const userService = {
     );
     if (error) throw error;
 
-    const users = (data || [])
-      .filter(isNotNull)
-      .map((user) => {
-        const u = user as any;
-        return {
-          id: u.id,
-          email: u.email || '',
-          name: u.full_name || u.name || 'Unknown',
-          username: u.email ? u.email.split('@')[0] : '',
-          avatar: u.avatar_url || u.avatar || '',
-          languages: Array.isArray(u.languages) ? u.languages : [],
-          interests: Array.isArray(u.interests) ? u.interests : [],
-          isVerified: Boolean(u.verified),
-          kycStatus: (u.kyc_status as 'unverified' | 'pending' | 'verified' | 'rejected') || 'unverified',
-          rating: Number(u.rating) || 0,
-          reviewCount: Number(u.review_count) || 0,
-          momentCount: 0,
-          followerCount: 0,
-          followingCount: 0,
-          giftsSent: 0,
-          giftsReceived: 0,
-          createdAt: u.created_at,
-          lastActiveAt: u.last_seen_at || u.updated_at,
-        };
-      });
+    const users = (data || []).filter(isNotNull).map((user) => {
+      const u = user as DBUserRowLike;
+      return {
+        id: u.id || '',
+        email: u.email || '',
+        name: u.full_name || u.name || 'Unknown',
+        username: u.email ? u.email.split('@')[0] : '',
+        avatar: u.avatar_url || u.avatar || '',
+        languages: Array.isArray(u.languages) ? u.languages : [],
+        interests: Array.isArray(u.interests) ? u.interests : [],
+        isVerified: Boolean(u.verified),
+        kycStatus:
+          (u.kyc_status as
+            | 'unverified'
+            | 'pending'
+            | 'verified'
+            | 'rejected') || 'unverified',
+        rating: Number(u.rating) || 0,
+        reviewCount: Number(u.review_count) || 0,
+        momentCount: 0,
+        followerCount: 0,
+        followingCount: 0,
+        giftsSent: 0,
+        giftsReceived: 0,
+        createdAt: u.created_at || '',
+        lastActiveAt: u.last_seen_at || u.updated_at || '',
+      };
+    });
 
     return { users, total: count || 0 };
   },
@@ -776,31 +834,34 @@ export const userService = {
     );
     if (error) throw error;
 
-    const users = (data || [])
-      .filter(isNotNull)
-      .map((user) => {
-        const u = user as any;
-        return {
-          id: u.id,
-          email: u.email || '',
-          name: u.full_name || u.name || 'Unknown',
-          username: u.email ? u.email.split('@')[0] : '',
-          avatar: u.avatar_url || u.avatar || '',
-          languages: Array.isArray(u.languages) ? u.languages : [],
-          interests: Array.isArray(u.interests) ? u.interests : [],
-          isVerified: Boolean(u.verified),
-          kycStatus: (u.kyc_status as 'unverified' | 'pending' | 'verified' | 'rejected') || 'unverified',
-          rating: Number(u.rating) || 0,
-          reviewCount: Number(u.review_count) || 0,
-          momentCount: 0,
-          followerCount: 0,
-          followingCount: 0,
-          giftsSent: 0,
-          giftsReceived: 0,
-          createdAt: u.created_at,
-          lastActiveAt: u.last_seen_at || u.updated_at,
-        };
-      });
+    const users = (data || []).filter(isNotNull).map((user) => {
+      const u = user as DBUserRowLike;
+      return {
+        id: u.id || '',
+        email: u.email || '',
+        name: u.full_name || u.name || 'Unknown',
+        username: u.email ? u.email.split('@')[0] : '',
+        avatar: u.avatar_url || u.avatar || '',
+        languages: Array.isArray(u.languages) ? u.languages : [],
+        interests: Array.isArray(u.interests) ? u.interests : [],
+        isVerified: Boolean(u.verified),
+        kycStatus:
+          (u.kyc_status as
+            | 'unverified'
+            | 'pending'
+            | 'verified'
+            | 'rejected') || 'unverified',
+        rating: Number(u.rating) || 0,
+        reviewCount: Number(u.review_count) || 0,
+        momentCount: 0,
+        followerCount: 0,
+        followingCount: 0,
+        giftsSent: 0,
+        giftsReceived: 0,
+        createdAt: u.created_at || '',
+        lastActiveAt: u.last_seen_at || u.updated_at || '',
+      };
+    });
 
     return { users };
   },

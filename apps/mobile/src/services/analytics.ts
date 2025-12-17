@@ -16,7 +16,7 @@ import * as Sentry from '@sentry/react-native';
 class AnalyticsService {
   private static instance: AnalyticsService;
   private initialized = false;
-  private posthog: PostHog | null = null;
+  private posthog: typeof PostHog | null = null;
 
   private constructor() {}
 
@@ -36,10 +36,13 @@ class AnalyticsService {
 
     try {
       const apiKey = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
-      const host = process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com';
+      const host =
+        process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://us.posthog.com';
 
       if (!apiKey) {
-        logger.warn('[Analytics] PostHog API key not found, analytics disabled');
+        logger.warn(
+          '[Analytics] PostHog API key not found, analytics disabled',
+        );
         return;
       }
 
@@ -167,7 +170,7 @@ class AnalyticsService {
   public trackTiming(
     metricName: string,
     duration: number,
-    properties?: Record<string, any>
+    properties?: Record<string, any>,
   ) {
     if (!this.initialized) return;
 
@@ -178,7 +181,16 @@ class AnalyticsService {
       });
 
       // Also send to Sentry for performance monitoring
-      Sentry.metrics?.distribution(metricName, duration, {
+      const sentryMetrics = Sentry as unknown as {
+        metrics?: {
+          distribution?: (
+            name: string,
+            value: number,
+            opts?: { unit?: string; tags?: Record<string, string> },
+          ) => void;
+        };
+      };
+      sentryMetrics.metrics?.distribution?.(metricName, duration, {
         unit: 'millisecond',
         tags: properties as Record<string, string>,
       });
@@ -222,7 +234,7 @@ class AnalyticsService {
    * Get feature flag payload
    */
   public async getFeatureFlagPayload(
-    flagKey: string
+    flagKey: string,
   ): Promise<string | boolean | object | undefined> {
     if (!this.initialized || !this.posthog) return undefined;
 

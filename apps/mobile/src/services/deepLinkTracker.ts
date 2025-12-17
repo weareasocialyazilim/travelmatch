@@ -1,6 +1,6 @@
 /**
  * Deep Link Event Tracking Service
- * 
+ *
  * Tracks user journey from deep links through the app:
  * - Attribution (which campaign/source brought user)
  * - Conversion tracking (did user complete intended action)
@@ -13,6 +13,7 @@ import { Linking } from 'react-native';
 import analytics from '@react-native-firebase/analytics';
 import { supabase } from './supabase';
 import { logger } from '../utils/logger';
+import type { Database } from '../types/database.types';
 
 // Deep link types
 export enum DeepLinkType {
@@ -52,20 +53,20 @@ interface DeepLinkEvent {
   userId?: string;
   sessionId: string;
   timestamp: Date;
-  
+
   // Tracking metadata
   campaign?: string;
   medium?: string;
   term?: string;
   content?: string;
-  
+
   // User journey
   landingScreen?: string;
   targetScreen?: string;
   completed: boolean;
   completedAt?: Date;
   dropOffScreen?: string;
-  
+
   // Performance
   timeToLand: number; // Time from link click to app open
   timeToComplete?: number; // Time from open to conversion
@@ -113,7 +114,7 @@ class DeepLinkTracker {
   private async handleDeepLink(url: string, isInitial: boolean) {
     try {
       const parsed = this.parseDeepLink(url);
-      
+
       const event: DeepLinkEvent = {
         id: this.generateEventId(),
         type: parsed.type,
@@ -127,7 +128,9 @@ class DeepLinkTracker {
         term: parsed.params.utm_term,
         content: parsed.params.utm_content,
         completed: false,
-        timeToLand: isInitial ? 0 : Date.now() - this.getClickTimestamp(parsed.params),
+        timeToLand: isInitial
+          ? 0
+          : Date.now() - this.getClickTimestamp(parsed.params),
       };
 
       this.currentEvent = event;
@@ -141,7 +144,10 @@ class DeepLinkTracker {
       // Notify listeners
       this.notifyListeners(event);
 
-      logger.info('[DeepLink] Tracked', { type: event.type, source: event.source });
+      logger.info('[DeepLink] Tracked', {
+        type: event.type,
+        source: event.source,
+      });
     } catch (error) {
       logger.error('[DeepLink] Error handling deep link', error);
     }
@@ -158,8 +164,10 @@ class DeepLinkTracker {
     // Parse URL
     // Format: travelmatch://profile/123?utm_source=instagram&utm_campaign=summer
     // Or: https://travelmatch.com/p/123?utm_source=instagram
-    
-    const urlObj = new URL(url.replace('travelmatch://', 'https://travelmatch.com/'));
+
+    const urlObj = new URL(
+      url.replace('travelmatch://', 'https://travelmatch.com/'),
+    );
     const pathParts = urlObj.pathname.split('/').filter(Boolean);
     const params = Object.fromEntries(urlObj.searchParams.entries());
 
@@ -184,7 +192,7 @@ class DeepLinkTracker {
     // Determine source from utm_source or referer
     let source: AttributionSource = AttributionSource.UNKNOWN;
     const utmSource = params.utm_source?.toLowerCase();
-    
+
     if (utmSource === 'instagram' || utmSource === 'ig') {
       source = AttributionSource.INSTAGRAM;
     } else if (utmSource === 'facebook' || utmSource === 'fb') {
@@ -234,7 +242,8 @@ class DeepLinkTracker {
 
     this.currentEvent.completed = true;
     this.currentEvent.completedAt = new Date();
-    this.currentEvent.timeToComplete = Date.now() - this.currentEvent.timestamp.getTime();
+    this.currentEvent.timeToComplete =
+      Date.now() - this.currentEvent.timestamp.getTime();
 
     // Log conversion to analytics
     await analytics().logEvent('deep_link_conversion', {
@@ -250,7 +259,10 @@ class DeepLinkTracker {
     // Update database
     await this.updateEventInDatabase(this.currentEvent);
 
-    logger.info('[DeepLink] Conversion', { goal, timeToComplete: this.currentEvent.timeToComplete });
+    logger.info('[DeepLink] Conversion', {
+      goal,
+      timeToComplete: this.currentEvent.timeToComplete,
+    });
   }
 
   /**
@@ -325,27 +337,33 @@ class DeepLinkTracker {
     try {
       const { data: user } = await supabase.auth.getUser();
 
-      await supabase.from('deep_link_events').insert({
-        id: event.id,
-        user_id: user?.user?.id,
-        type: event.type,
-        source: event.source,
-        url: event.url,
-        params: event.params,
-        session_id: event.sessionId,
-        campaign: event.campaign,
-        medium: event.medium,
-        term: event.term,
-        content: event.content,
-        landing_screen: event.landingScreen,
-        target_screen: event.targetScreen,
-        completed: event.completed,
-        completed_at: event.completedAt,
-        drop_off_screen: event.dropOffScreen,
-        time_to_land: event.timeToLand,
-        time_to_complete: event.timeToComplete,
-        created_at: event.timestamp,
-      });
+      const insertPayload: Database['public']['Tables']['deep_link_events']['Insert'] =
+        {
+          id: event.id,
+          user_id: user?.user?.id ?? undefined,
+          type: event.type,
+          source: event.source,
+          url: event.url,
+          params:
+            event.params as unknown as Database['public']['Tables']['deep_link_events']['Row']['params'],
+          session_id: event.sessionId,
+          campaign: event.campaign,
+          medium: event.medium,
+          term: event.term,
+          content: event.content,
+          landing_screen: event.landingScreen ?? undefined,
+          target_screen: event.targetScreen ?? undefined,
+          completed: event.completed,
+          completed_at: event.completedAt
+            ? event.completedAt.toISOString()
+            : undefined,
+          drop_off_screen: event.dropOffScreen ?? undefined,
+          time_to_land: event.timeToLand,
+          time_to_complete: event.timeToComplete ?? undefined,
+          created_at: event.timestamp.toISOString(),
+        };
+
+      await supabase.from('deep_link_events').insert(insertPayload);
     } catch (error) {
       logger.error('[DeepLink] Failed to save to database', error);
     }
@@ -356,16 +374,21 @@ class DeepLinkTracker {
    */
   private async updateEventInDatabase(event: DeepLinkEvent) {
     try {
+      const updatePayload: Database['public']['Tables']['deep_link_events']['Update'] =
+        {
+          landing_screen: event.landingScreen ?? undefined,
+          target_screen: event.targetScreen ?? undefined,
+          completed: event.completed,
+          completed_at: event.completedAt
+            ? event.completedAt.toISOString()
+            : undefined,
+          drop_off_screen: event.dropOffScreen ?? undefined,
+          time_to_complete: event.timeToComplete ?? undefined,
+        };
+
       await supabase
         .from('deep_link_events')
-        .update({
-          landing_screen: event.landingScreen,
-          target_screen: event.targetScreen,
-          completed: event.completed,
-          completed_at: event.completedAt,
-          drop_off_screen: event.dropOffScreen,
-          time_to_complete: event.timeToComplete,
-        })
+        .update(updatePayload)
         .eq('id', event.id);
     } catch (error) {
       logger.error('[DeepLink] Failed to update event', error);
@@ -417,7 +440,7 @@ class DeepLinkTracker {
       medium?: string;
       term?: string;
       content?: string;
-    }
+    },
   ): string {
     const baseUrl = 'https://travelmatch.com';
     const params = new URLSearchParams();
@@ -427,14 +450,16 @@ class DeepLinkTracker {
     if (options?.medium) params.set('utm_medium', options.medium);
     if (options?.term) params.set('utm_term', options.term);
     if (options?.content) params.set('utm_content', options.content);
-    
+
     // Add click timestamp
     params.set('ts', Date.now().toString());
 
     const typePrefix = this.getTypePrefix(type);
     const queryString = params.toString();
 
-    return `${baseUrl}/${typePrefix}/${id}${queryString ? '?' + queryString : ''}`;
+    return `${baseUrl}/${typePrefix}/${id}${
+      queryString ? '?' + queryString : ''
+    }`;
   }
 
   /**
@@ -462,7 +487,7 @@ export const deepLinkTracker = new DeepLinkTracker();
 // Export hook for React components
 export function useDeepLinkTracking() {
   const [currentEvent, setCurrentEvent] = React.useState<DeepLinkEvent | null>(
-    deepLinkTracker.getCurrentEvent()
+    deepLinkTracker.getCurrentEvent(),
   );
 
   React.useEffect(() => {

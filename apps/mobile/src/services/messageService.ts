@@ -21,11 +21,11 @@ const OFFLINE_QUEUE_KEY = 'offline_message_queue';
 export interface Conversation {
   id: string;
   participantId: string;
-  participantName: string;
-  participantAvatar: string;
-  participantVerified: boolean;
+  participantName: string | null;
+  participantAvatar: string | null;
+  participantVerified: boolean | null;
   lastMessage: string;
-  lastMessageAt: string;
+  lastMessageAt: string | null;
   unreadCount: number;
   momentId?: string;
   momentTitle?: string;
@@ -37,13 +37,13 @@ export interface Message {
   senderId: string;
   content: string;
   type: 'text' | 'image' | 'system' | 'location';
-  imageUrl?: string;
+  imageUrl?: string | null;
   location?: {
     lat: number;
     lng: number;
     name: string;
   };
-  createdAt: string;
+  createdAt: string | null;
   readAt?: string;
   status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
 }
@@ -152,7 +152,7 @@ export const messageService = {
       // Fetch user profiles
       const { data: users, error: usersError } = await supabase
         .from('users')
-        .select('id, name, avatar, is_verified')
+        .select('id, full_name, avatar_url, verified')
         .in('id', Array.from(otherUserIds));
 
       if (usersError) {
@@ -170,9 +170,11 @@ export const messageService = {
           .from('messages')
           .select('id, content')
           .in('id', lastMessageIds);
-        
+
         if (lastMessages) {
-          lastMessagesMap = new Map(lastMessages.map((m) => [m.id, { content: m.content }]));
+          lastMessagesMap = new Map(
+            lastMessages.map((m) => [m.id, { content: m.content }]),
+          );
         }
       }
 
@@ -184,14 +186,16 @@ export const messageService = {
           row.participant_ids.find((id: string) => id !== user.id) || 'unknown';
 
         const otherUser = userMap.get(otherUserId);
-        const lastMessage = row.last_message_id ? lastMessagesMap.get(row.last_message_id) : null;
+        const lastMessage = row.last_message_id
+          ? lastMessagesMap.get(row.last_message_id)
+          : null;
 
         return {
           id: row.id,
           participantId: otherUserId,
-          participantName: otherUser?.name || 'Unknown User',
-          participantAvatar: otherUser?.avatar || '',
-          participantVerified: otherUser?.is_verified || false,
+          participantName: otherUser?.full_name || 'Unknown User',
+          participantAvatar: otherUser?.avatar_url || '',
+          participantVerified: otherUser?.verified || false,
           lastMessage: lastMessage?.content || '',
           lastMessageAt: row.updated_at,
           unreadCount: 0, // Needs calculation
@@ -359,7 +363,12 @@ export const messageService = {
             }
           }
 
-          const msgType = msg.type === 'system' ? 'system' : msg.type === 'image' ? 'image' : 'text';
+          const msgType =
+            msg.type === 'system'
+              ? 'system'
+              : msg.type === 'image'
+              ? 'image'
+              : 'text';
 
           return {
             id: msg.id,
@@ -405,10 +414,7 @@ export const messageService = {
     try {
       const { error } = await supabase
         .from('messages')
-        .update({
-          deleted_at: new Date().toISOString(),
-          deleted_by: (await supabase.auth.getUser()).data.user?.id
-        })
+        .delete()
         .eq('id', messageId)
         .eq('conversation_id', conversationId);
 

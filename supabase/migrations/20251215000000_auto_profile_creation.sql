@@ -54,8 +54,14 @@ CREATE TRIGGER on_auth_user_created
 COMMENT ON FUNCTION public.handle_new_user() IS
   'Auto-creates profile in public.users when user signs up via auth.users. Extracts name and avatar from OAuth metadata if available.';
 
-COMMENT ON TRIGGER on_auth_user_created ON auth.users IS
-  'Ensures every authenticated user has a corresponding profile in public.users';
+DO $$
+BEGIN
+  BEGIN
+    EXECUTE 'COMMENT ON TRIGGER on_auth_user_created ON auth.users IS ''Ensures every authenticated user has a corresponding profile in public.users''';
+  EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'Skipping COMMENT ON TRIGGER on_auth_user_created: %', SQLERRM;
+  END;
+END $$;
 
 -- ============================================
 -- VERIFY TRIGGER

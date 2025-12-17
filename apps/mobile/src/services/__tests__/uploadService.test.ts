@@ -44,7 +44,7 @@ describe('uploadService - Basic Functionality', () => {
     jest.clearAllMocks();
 
     // Mock auth
-    (supabase.auth.getUser ).mockResolvedValue({
+    supabase.auth.getUser.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -58,7 +58,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    (supabase.from ).mockReturnValue({
+    supabase.from.mockReturnValue({
       select: mockSelect,
       insert: jest.fn().mockResolvedValue({ error: null }),
     });
@@ -71,10 +71,10 @@ describe('uploadService - Basic Functionality', () => {
         size: 1024 * 1024, // 1MB
         type: 'image/jpeg',
       }),
-    }) as any;
+    }) as unknown as { blob: () => Promise<{ size: number; type: string }> };
 
     // Mock FileSystem (still needed for some functions)
-    (FileSystem.getInfoAsync ).mockResolvedValue({
+    FileSystem.getInfoAsync.mockResolvedValue({
       exists: true,
       size: 1024 * 1024,
       uri: 'file:///tmp/test.jpg',
@@ -94,13 +94,13 @@ describe('uploadService - Basic Functionality', () => {
   });
 
   it('should reject upload when not authenticated', async () => {
-    (supabase.auth.getUser ).mockResolvedValue({
+    supabase.auth.getUser.mockResolvedValue({
       data: { user: null },
       error: null,
     });
 
     await expect(
-      uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' })
+      uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' }),
     ).rejects.toThrow('Not authenticated');
   });
 
@@ -112,7 +112,9 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    await uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' });
+    await uploadService.uploadImage('file:///tmp/test.jpg', {
+      folder: 'avatars',
+    });
 
     expect(supabase.from).toHaveBeenCalledWith('file_uploads');
   });
@@ -126,7 +128,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    (supabase.from ).mockReturnValue({
+    supabase.from.mockReturnValue({
       select: mockSelect,
       insert: jest.fn().mockResolvedValue({ error: null }),
     });
@@ -134,7 +136,7 @@ describe('uploadService - Basic Functionality', () => {
     mockEq.mockReturnValue({ gte: mockGte });
 
     await expect(
-      uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' })
+      uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' }),
     ).rejects.toThrow('rate limit');
   });
 
@@ -148,7 +150,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    (supabase.from ).mockReturnValue({
+    supabase.from.mockReturnValue({
       select: mockSelect,
       insert: mockInsert,
     });
@@ -162,7 +164,9 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    await uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' });
+    await uploadService.uploadImage('file:///tmp/test.jpg', {
+      folder: 'avatars',
+    });
 
     expect(mockInsert).toHaveBeenCalled();
   });
@@ -171,7 +175,9 @@ describe('uploadService - Basic Functionality', () => {
     global.fetch = jest.fn().mockRejectedValue(new Error('File not found'));
 
     await expect(
-      uploadService.uploadImage('file:///tmp/missing.jpg', { folder: 'avatars' })
+      uploadService.uploadImage('file:///tmp/missing.jpg', {
+        folder: 'avatars',
+      }),
     ).rejects.toThrow();
   });
 
@@ -181,10 +187,10 @@ describe('uploadService - Basic Functionality', () => {
         size: 5 * 1024 * 1024, // 5MB - over 2MB avatar limit
         type: 'image/jpeg',
       }),
-    }) as any;
+    }) as unknown as { blob: () => Promise<{ size: number; type: string }> };
 
     await expect(
-      uploadService.uploadImage('file:///tmp/large.jpg', { folder: 'avatars' })
+      uploadService.uploadImage('file:///tmp/large.jpg', { folder: 'avatars' }),
     ).rejects.toThrow();
   });
 
@@ -202,7 +208,7 @@ describe('uploadService - Basic Functionality', () => {
 
     const results = await uploadService.uploadImages(
       ['file:///tmp/1.jpg', 'file:///tmp/2.jpg'],
-      { folder: 'moments' }
+      { folder: 'moments' },
     );
 
     expect(results).toHaveLength(2);
@@ -224,7 +230,7 @@ describe('uploadService - Basic Functionality', () => {
     });
 
     await expect(
-      uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' })
+      uploadService.uploadImage('file:///tmp/test.jpg', { folder: 'avatars' }),
     ).rejects.toThrow();
 
     expect(logger.error).toHaveBeenCalled();

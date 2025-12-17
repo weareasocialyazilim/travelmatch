@@ -1,12 +1,12 @@
 /**
  * Database Type Aliases
- * 
+ *
  * SINGLE SOURCE OF TRUTH for all database-related types.
  * These types are derived from the auto-generated database.types.ts
- * 
+ *
  * DO NOT create manual interfaces that mirror these database tables.
  * Instead, extend these types if you need frontend-specific fields.
- * 
+ *
  * @see README.md for the type strategy documentation
  */
 
@@ -31,7 +31,8 @@ export type DbFavorite = Tables['favorites']['Row'];
 export type DbBlock = Tables['blocks']['Row'];
 export type DbReport = Tables['reports']['Row'];
 export type DbAuditLog = Tables['audit_logs']['Row'];
-export type DbConversationParticipant = Tables['conversation_participants']['Row'];
+export type DbConversationParticipant =
+  Tables['conversation_participants']['Row'];
 export type DbKycVerification = Tables['kyc_verifications']['Row'];
 export type DbSubscriptionPlan = Tables['subscription_plans']['Row'];
 export type DbUserSubscription = Tables['user_subscriptions']['Row'];
@@ -71,13 +72,13 @@ export interface User extends DbUser {
   // Computed display fields
   displayName?: string;
   isOnline?: boolean;
-  
+
   // Legacy field mappings (for backward compatibility)
   name?: string; // Maps to full_name
   avatar?: string; // Maps to avatar_url
   avatarUrl?: string; // Alias for avatar_url
   photoUrl?: string; // Alias for avatar_url
-  
+
   // Frontend-only state
   trustScore?: number;
   isVerified?: boolean; // Computed from verified
@@ -88,19 +89,22 @@ export interface User extends DbUser {
  */
 export interface Moment extends DbMoment {
   // Host info (joined from users table)
-  host?: Pick<DbUser, 'id' | 'full_name' | 'avatar_url' | 'rating' | 'review_count' | 'verified'>;
+  host?: Pick<
+    DbUser,
+    'id' | 'full_name' | 'avatar_url' | 'rating' | 'review_count' | 'verified'
+  >;
   hostId?: string; // Alias for user_id
   hostName?: string;
   hostAvatar?: string;
   hostRating?: number;
   hostReviewCount?: number;
-  
+
   // Computed fields
   imageUrl?: string; // First image from images[]
   image?: string; // Alias for imageUrl
   pricePerGuest?: number; // Alias for price
   distance?: string; // Computed from coordinates
-  
+
   // UI state
   isSaved?: boolean;
   saves?: number;
@@ -114,14 +118,14 @@ export interface Message extends DbMessage {
   // UI state
   status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
   isMine?: boolean;
-  
+
   // Parsed location from metadata
   location?: {
     lat: number;
     lng: number;
     name?: string;
   };
-  
+
   // Image URL from metadata
   imageUrl?: string;
 }
@@ -135,12 +139,12 @@ export interface Conversation extends DbConversation {
   participantName?: string;
   participantAvatar?: string;
   participantVerified?: boolean;
-  
+
   // Last message info
   lastMessage?: string;
   lastMessageAt?: string;
   unreadCount?: number;
-  
+
   // Related moment
   momentTitle?: string;
 }
@@ -153,7 +157,7 @@ export interface Transaction extends DbTransaction {
   title?: string;
   transactionId?: string;
   date?: string;
-  
+
   // Participant info
   giver?: {
     id: string;
@@ -179,10 +183,7 @@ export interface Request extends DbRequest {
 /**
  * Notification with typed data payload
  */
-export interface Notification extends DbNotification {
-  // Typed data based on notification type
-  // The 'data' field from DB is Json, this provides type hints
-}
+export type Notification = DbNotification;
 
 // ============================================
 // UTILITY TYPES

@@ -90,11 +90,18 @@ class OfflineSyncQueue {
    * Setup network change listener
    */
   private setupNetworkListener(): void {
-    NetInfo.addEventListener((state) => {
-      if (state.isConnected && state.isInternetReachable) {
-        void this.processQueue();
-      }
-    });
+    // Support both default and named import shapes from the NetInfo mock/runtime
+    const addListener: any = (NetInfo as any).addEventListener ||
+      (NetInfo as any).default?.addEventListener;
+
+    if (addListener) {
+      logger.info('OfflineSyncQueue.setupNetworkListener hasAddListener', !!addListener);
+      addListener((state: { isConnected?: boolean; isInternetReachable?: boolean }) => {
+        if (state.isConnected && state.isInternetReachable) {
+          void this.processQueue();
+        }
+      });
+    }
   }
 
   /**
@@ -122,6 +129,23 @@ class OfflineSyncQueue {
   }
 
   /**
+   * Execute a registered handler immediately (used when online and a
+   * handler was registered via `registerHandler`). Returns the handler
+   * result or throws if no handler found.
+   */
+  async executeHandler(
+    type: OfflineActionType,
+    payload: Record<string, unknown>,
+  ): Promise<boolean> {
+    const handler = this.handlers.get(type);
+    if (!handler) {
+      throw new Error(`No handler registered for action type: ${type}`);
+    }
+
+    return handler(payload);
+  }
+
+  /**
    * Add action to queue
    */
   async add(
@@ -142,11 +166,9 @@ class OfflineSyncQueue {
     this.queue.push(action);
     await this.saveQueue();
 
-    // Try to process immediately if online
-    const netState = await NetInfo.fetch();
-    if (netState.isConnected && netState.isInternetReachable) {
-      void this.processQueue();
-    }
+    // Note: do not auto-trigger processing here to avoid races where
+    // handlers may be registered after calling `add`. Network listener
+    // or explicit `processQueue()` should be used to start syncing.
 
     return action.id;
   }
@@ -209,9 +231,14 @@ class OfflineSyncQueue {
       errors: [],
     };
 
-    const pendingActions = this.queue.filter((a) => a.status === 'pending');
+    // Ensure isProcessing is always cleared even on unexpected errors
+    try {
+      const pendingActions = this.queue.filter((a) => a.status === 'pending');
 
-    for (const action of pendingActions) {
+      // pending actions and handlers are processed below
+
+      for (const action of pendingActions) {
+        // processing action
       try {
         action.status = 'processing';
         await this.saveQueue();
@@ -230,13 +257,16 @@ class OfflineSyncQueue {
           result.processedCount++;
           // Remove completed action
           this.queue = this.queue.filter((a) => a.id !== action.id);
+          // action removed from queue
         } else {
           throw new Error('Handler returned false');
         }
       } catch (error) {
         action.retryCount++;
 
-        if (action.retryCount >= action.maxRetries) {
+        // Only mark as failed when retryCount exceeds allowed maxRetries.
+        // This preserves actions for the intended number of retries.
+        if (action.retryCount > action.maxRetries) {
           action.status = 'failed';
           action.error =
             error instanceof Error ? error.message : 'Unknown error';
@@ -250,8 +280,10 @@ class OfflineSyncQueue {
       await this.saveQueue();
     }
 
-    this.isProcessing = false;
-    result.success = result.failedCount === 0;
+    } finally {
+      this.isProcessing = false;
+      result.success = result.failedCount === 0;
+    }
 
     return result;
   }
@@ -289,6 +321,7 @@ class OfflineSyncQueue {
    */
   async clearAll(): Promise<void> {
     this.queue = [];
+    this.isProcessing = false;
     await this.saveQueue();
   }
 }

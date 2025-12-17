@@ -7,6 +7,7 @@ import {
   Modal,
   ScrollView,
   TouchableWithoutFeedback,
+  ViewStyle,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
 
@@ -65,7 +66,10 @@ export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = memo(
     >('today');
 
     // Memoize price range display
-    const priceRangeText = useMemo(() => `$${priceMin} - $${priceMax}`, [priceMin, priceMax]);
+    const priceRangeText = useMemo(
+      () => `$${priceMin} - $${priceMax}`,
+      [priceMin, priceMax],
+    );
 
     // Memoize range progress styles
     const rangeProgressStyle = useMemo(
@@ -84,7 +88,14 @@ export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = memo(
         timing: selectedTiming,
       });
       onClose();
-    }, [selectedCategory, priceMin, priceMax, selectedTiming, onApply, onClose]);
+    }, [
+      selectedCategory,
+      priceMin,
+      priceMax,
+      selectedTiming,
+      onApply,
+      onClose,
+    ]);
 
     const handleClear = useCallback(() => {
       setSelectedCategory('All');
@@ -93,129 +104,135 @@ export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = memo(
       setSelectedTiming('today');
     }, []);
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop} />
-      </TouchableWithoutFeedback>
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
 
-      <View style={styles.bottomSheet}>
-        {/* Handle */}
-        <View style={styles.handleContainer}>
-          <View style={styles.handle} />
-        </View>
-
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={styles.headerContainer}>
-            <Text style={styles.headline}>Filters</Text>
-            <Text style={styles.subtitle}>Narrow down moments</Text>
+        <View style={styles.bottomSheet}>
+          {/* Handle */}
+          <View style={styles.handleContainer}>
+            <View style={styles.handle} />
           </View>
 
-          {/* Category Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Category</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chipsContainer}
-            >
-              {CATEGORIES.map((category) => (
-                <TouchableOpacity
-                  key={category}
-                  style={[
-                    styles.chip,
-                    selectedCategory === category && styles.chipSelected,
-                  ]}
-                  onPress={() => setSelectedCategory(category)}
-                  activeOpacity={0.7}
-                >
-                  <Text
+          <ScrollView
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header */}
+            <View style={styles.headerContainer}>
+              <Text style={styles.headline}>Filters</Text>
+              <Text style={styles.subtitle}>Narrow down moments</Text>
+            </View>
+
+            {/* Category Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Category</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chipsContainer}
+              >
+                {CATEGORIES.map((category) => (
+                  <TouchableOpacity
+                    key={category}
                     style={[
-                      styles.chipText,
-                      selectedCategory === category && styles.chipTextSelected,
+                      styles.chip,
+                      selectedCategory === category && styles.chipSelected,
                     ]}
+                    onPress={() => setSelectedCategory(category)}
+                    activeOpacity={0.7}
                   >
-                    {category}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-
-          {/* Price Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Price</Text>
-              <Text style={styles.priceRange}>{priceRangeText}</Text>
+                    <Text
+                      style={[
+                        styles.chipText,
+                        selectedCategory === category &&
+                          styles.chipTextSelected,
+                      ]}
+                    >
+                      {category}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
-            <View style={styles.rangeContainer}>
-              <View style={styles.rangeTrack} />
-              <View style={[styles.rangeProgress, rangeProgressStyle]} />
-            </View>
-          </View>
 
-          {/* Timing Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>When</Text>
-            <View style={styles.segmentedControl}>
-              {TIMING_OPTIONS.map((option) => (
-                <TouchableOpacity
-                  key={option.value}
+            {/* Price Section */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Price</Text>
+                <Text style={styles.priceRange}>{priceRangeText}</Text>
+              </View>
+              <View style={styles.rangeContainer}>
+                <View style={styles.rangeTrack} />
+                <View
                   style={[
-                    styles.segmentButton,
-                    selectedTiming === option.value &&
-                      styles.segmentButtonSelected,
+                    styles.rangeProgress,
+                    rangeProgressStyle as ViewStyle,
                   ]}
-                  onPress={() =>
-                    setSelectedTiming(
-                      option.value as 'today' | 'next3days' | 'thisweek',
-                    )
-                  }
-                  activeOpacity={0.7}
-                >
-                  <Text
+                />
+              </View>
+            </View>
+
+            {/* Timing Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>When</Text>
+              <View style={styles.segmentedControl}>
+                {TIMING_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
                     style={[
-                      styles.segmentButtonText,
+                      styles.segmentButton,
                       selectedTiming === option.value &&
-                        styles.segmentButtonTextSelected,
+                        styles.segmentButtonSelected,
                     ]}
+                    onPress={() =>
+                      setSelectedTiming(
+                        option.value as 'today' | 'next3days' | 'thisweek',
+                      )
+                    }
+                    activeOpacity={0.7}
                   >
-                    {option.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Text
+                      style={[
+                        styles.segmentButtonText,
+                        selectedTiming === option.value &&
+                          styles.segmentButtonTextSelected,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={handleClear}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.clearButtonText}>Clear filters</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.applyButton}
-            onPress={handleApply}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.applyButtonText}>Show 15 results</Text>
-          </TouchableOpacity>
+          {/* Footer */}
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={handleClear}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.clearButtonText}>Clear filters</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={handleApply}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.applyButtonText}>Show 15 results</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
     );
   },
   (prevProps, nextProps) =>

@@ -1,6 +1,6 @@
 /**
  * Payment Service - Webhook Failure Edge Cases
- * 
+ *
  * Tests for Stripe webhook failure scenarios:
  * - Webhook timeout
  * - Webhook retry logic
@@ -39,9 +39,9 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase ;
-const mockTransactionsService = transactionsService ;
-const mockLogger = logger ;
+const mockSupabase = supabase;
+const mockTransactionsService = transactionsService;
+const mockLogger = logger;
 
 // Simulated webhook handler (would be in Edge Function in production)
 interface WebhookEvent {
@@ -56,7 +56,10 @@ interface WebhookEvent {
   };
 }
 
-async function handleWebhook(event: WebhookEvent, timeout = 5000): Promise<boolean> {
+async function handleWebhook(
+  event: WebhookEvent,
+  timeout = 5000,
+): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(new Error('Webhook processing timeout'));
@@ -65,7 +68,7 @@ async function handleWebhook(event: WebhookEvent, timeout = 5000): Promise<boole
     // Simulate webhook processing
     setTimeout(() => {
       clearTimeout(timer);
-      
+
       if (event.type === 'payment_intent.succeeded') {
         resolve(true);
       } else if (event.type === 'payment_intent.failed') {
@@ -81,20 +84,25 @@ async function handleWebhook(event: WebhookEvent, timeout = 5000): Promise<boole
 async function pollPaymentStatus(
   transactionId: string,
   maxAttempts = 10,
-  interval = 2000
+  interval = 2000,
 ): Promise<'completed' | 'failed' | 'pending'> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    logger.info(`Polling payment status, attempt ${attempt + 1}/${maxAttempts}`);
-    
+    logger.info(
+      `Polling payment status, attempt ${attempt + 1}/${maxAttempts}`,
+    );
+
     const transaction = await transactionsService.get(transactionId);
-    
-    if (transaction.data?.status === 'completed' || transaction.data?.status === 'failed') {
+
+    if (
+      transaction.data?.status === 'completed' ||
+      transaction.data?.status === 'failed'
+    ) {
       logger.info(`Payment status resolved: ${transaction.data.status}`);
       return transaction.data.status;
     }
 
     if (attempt < maxAttempts - 1) {
-      await new Promise(resolve => setTimeout(resolve, interval));
+      await new Promise((resolve) => setTimeout(resolve, interval));
     }
   }
 
@@ -108,9 +116,9 @@ describe('PaymentService - Webhook Failures', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    (mockSupabase.auth.getUser ).mockResolvedValue({ 
-      data: { user: mockUser }, 
-      error: null 
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
     });
   });
 
@@ -139,7 +147,9 @@ describe('PaymentService - Webhook Failures', () => {
       // Simulate slow processing (6 seconds)
       jest.advanceTimersByTime(6000);
 
-      await expect(webhookPromise).rejects.toThrow('Webhook processing timeout');
+      await expect(webhookPromise).rejects.toThrow(
+        'Webhook processing timeout',
+      );
     });
 
     it('should complete webhook processing before timeout', async () => {
@@ -180,11 +190,23 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // First 3 polls: pending, then completed
-      (mockTransactionsService.get )
-        .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
-        .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
-        .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
-        .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'completed' }, error: null });
+      mockTransactionsService.get
+        .mockResolvedValueOnce({
+          data: { ...mockTransaction, status: 'pending' },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          data: { ...mockTransaction, status: 'pending' },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          data: { ...mockTransaction, status: 'pending' },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          data: { ...mockTransaction, status: 'completed' },
+          error: null,
+        });
 
       const pollingPromise = pollPaymentStatus('tx-123', 10, 2000);
 
@@ -199,7 +221,7 @@ describe('PaymentService - Webhook Failures', () => {
       expect(status).toBe('completed');
       expect(mockTransactionsService.get).toHaveBeenCalledTimes(4);
       expect(mockLogger.info).toHaveBeenCalledWith(
-        expect.stringContaining('Payment status resolved: completed')
+        expect.stringContaining('Payment status resolved: completed'),
       );
     });
 
@@ -216,7 +238,7 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // Always return pending
-      (mockTransactionsService.get ).mockResolvedValue({
+      mockTransactionsService.get.mockResolvedValue({
         data: { ...mockTransaction, status: 'pending' },
         error: null,
       });
@@ -233,7 +255,7 @@ describe('PaymentService - Webhook Failures', () => {
       expect(status).toBe('pending');
       expect(mockTransactionsService.get).toHaveBeenCalledTimes(5);
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Payment status polling timed out')
+        expect.stringContaining('Payment status polling timed out'),
       );
     });
 
@@ -250,9 +272,15 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // Poll 1: pending, Poll 2: failed
-      (mockTransactionsService.get )
-        .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'pending' }, error: null })
-        .mockResolvedValueOnce({ data: { ...mockTransaction, status: 'failed' }, error: null });
+      mockTransactionsService.get
+        .mockResolvedValueOnce({
+          data: { ...mockTransaction, status: 'pending' },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          data: { ...mockTransaction, status: 'failed' },
+          error: null,
+        });
 
       const pollingPromise = pollPaymentStatus('tx-123', 10, 2000);
 
@@ -283,18 +311,23 @@ describe('PaymentService - Webhook Failures', () => {
 
       let attempts = 0;
 
-      async function handleWebhookWithRetry(event: WebhookEvent, maxRetries = 3): Promise<boolean> {
+      async function handleWebhookWithRetry(
+        event: WebhookEvent,
+        maxRetries = 3,
+      ): Promise<boolean> {
         for (let retry = 0; retry <= maxRetries; retry++) {
           attempts++;
           try {
             logger.info(`Webhook attempt ${retry + 1}/${maxRetries + 1}`);
             return await handleWebhook(event, 5000);
           } catch (error: any) {
-            logger.warn(`Webhook attempt ${retry + 1} failed: ${error.message}`);
-            
+            logger.warn(
+              `Webhook attempt ${retry + 1} failed: ${error.message}`,
+            );
+
             if (retry < maxRetries) {
               const delay = 1000 * Math.pow(2, retry);
-              await new Promise(resolve => setTimeout(resolve, delay));
+              await new Promise((resolve) => setTimeout(resolve, delay));
             } else {
               throw error;
             }
@@ -304,23 +337,25 @@ describe('PaymentService - Webhook Failures', () => {
       }
 
       // First 2 attempts fail, 3rd succeeds
-      jest.spyOn(global, 'setTimeout').mockImplementation(((callback: any, delay: number) => {
-        if (attempts < 3) {
-          // Simulate failure
-          return setTimeout(() => {
-            throw new Error('Webhook timeout');
-          }, delay);
-        } else {
-          // Simulate success
-          return setTimeout(callback, delay);
-        }
-      }) as any);
+      jest
+        .spyOn(global, 'setTimeout')
+        .mockImplementation((callback: any, delay: number) => {
+          if (attempts < 3) {
+            // Simulate failure
+            return setTimeout(() => {
+              throw new Error('Webhook timeout');
+            }, delay);
+          } else {
+            // Simulate success
+            return setTimeout(callback, delay);
+          }
+        });
 
       void handleWebhookWithRetry(webhookEvent);
 
       await jest.advanceTimersByTimeAsync(1000); // 1st retry
       await jest.advanceTimersByTimeAsync(2000); // 2nd retry
-      await jest.advanceTimersByTimeAsync(200);  // Success
+      await jest.advanceTimersByTimeAsync(200); // Success
 
       // Note: This test is simplified - actual retry logic would need better mocking
       expect(attempts).toBeGreaterThan(0);
@@ -342,7 +377,7 @@ describe('PaymentService - Webhook Failures', () => {
       };
 
       // Create payment
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -372,7 +407,7 @@ describe('PaymentService - Webhook Failures', () => {
       expect(webhookResult).toBeNull(); // Webhook failed
 
       // Fallback to polling
-      (mockTransactionsService.get ).mockResolvedValue({
+      mockTransactionsService.get.mockResolvedValue({
         data: { ...mockTransaction, status: 'completed' },
         error: null,
       });
@@ -385,7 +420,7 @@ describe('PaymentService - Webhook Failures', () => {
 
       expect(status).toBe('completed');
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Webhook failed')
+        expect.stringContaining('Webhook failed'),
       );
     });
 
@@ -401,7 +436,7 @@ describe('PaymentService - Webhook Failures', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.update ).mockResolvedValue({
+      mockTransactionsService.update.mockResolvedValue({
         data: { ...mockTransaction, status: 'completed' },
         error: null,
       });
@@ -450,7 +485,7 @@ describe('PaymentService - Webhook Failures', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.update ).mockResolvedValue({
+      mockTransactionsService.update.mockResolvedValue({
         data: { ...mockTransaction, status: 'failed' },
         error: null,
       });
@@ -514,7 +549,11 @@ describe('PaymentService - Webhook Failures', () => {
 
       jest.advanceTimersByTime(200);
 
-      const [result1, result2, result3] = await Promise.all([promise1, promise2, promise3]);
+      const [result1, result2, result3] = await Promise.all([
+        promise1,
+        promise2,
+        promise3,
+      ]);
 
       expect(result1).toBe(true);
       expect(result2).toBe(true);
@@ -550,7 +589,7 @@ describe('PaymentService - Webhook Failures', () => {
       expect(result1).toBe(true);
       expect(result2).toBe(true);
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Duplicate webhook detected')
+        expect.stringContaining('Duplicate webhook detected'),
       );
       expect(processedWebhooks.size).toBe(1);
     });

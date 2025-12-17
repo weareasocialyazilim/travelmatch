@@ -2,21 +2,27 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { OptimizedImage } from '../ui/OptimizedImage';
-import { getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../../utils/cloudflareImageHelpers';
+import {
+  getAvatarImageProps,
+  IMAGE_VARIANTS_BY_CONTEXT,
+} from '../../utils/cloudflareImageHelpers';
 import { COLORS } from '../../constants/colors';
 import type { StoryItemProps } from './types';
 
 export const StoryItem: React.FC<StoryItemProps> = memo(
   ({ item, onPress }) => {
     // Memoize user object to prevent recreating on every render
-    const user = useMemo(
-      () => ({
+    const user = useMemo(() => {
+      const it = item as unknown as {
+        avatarCloudflareId?: string;
+        avatarBlurHash?: string;
+      };
+      return {
         avatar: item.avatar,
-        avatarCloudflareId: (item as any).avatarCloudflareId,
-        avatarBlurHash: (item as any).avatarBlurHash,
-      }),
-      [item.avatar, (item as any).avatarCloudflareId, (item as any).avatarBlurHash],
-    );
+        avatarCloudflareId: it.avatarCloudflareId,
+        avatarBlurHash: it.avatarBlurHash,
+      };
+    }, [item.avatar, item]);
 
     // Memoize press handler to prevent recreating on every render
     const handlePress = useCallback(() => {
@@ -40,7 +46,10 @@ export const StoryItem: React.FC<StoryItemProps> = memo(
       >
         <View style={circleStyle}>
           <OptimizedImage
-            {...getAvatarImageProps(user, IMAGE_VARIANTS_BY_CONTEXT.STORY_AVATAR)}
+            {...getAvatarImageProps(
+              user,
+              IMAGE_VARIANTS_BY_CONTEXT.STORY_AVATAR,
+            )}
             contentFit="cover"
             style={styles.storyAvatar}
             transition={150}

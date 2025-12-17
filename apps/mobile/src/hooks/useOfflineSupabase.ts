@@ -1,6 +1,6 @@
 /**
  * Offline-aware Supabase Hook
- * 
+ *
  * Wraps Supabase queries with automatic offline detection
  * Use this instead of direct supabase.from() calls
  */
@@ -15,7 +15,7 @@ import { logger } from '../utils/logger';
  */
 export class OfflineError extends Error {
   code = 'OFFLINE';
-  
+
   constructor(message = 'İnternet bağlantısı yok') {
     super(message);
     this.name = 'OfflineError';
@@ -39,48 +39,53 @@ const checkOnline = async (): Promise<boolean> => {
 
 /**
  * Hook for offline-aware Supabase queries
- * 
+ *
  * @example
  * const { query } = useOfflineSupabase();
- * 
+ *
  * // Automatic offline check
  * const { data, error } = await query('moments').select('*');
- * 
+ *
  * // Will throw OfflineError if not connected
  */
 export const useOfflineSupabase = () => {
-  const query = useCallback(
-    (table: string) => {
-      // Create a proxy that checks online status before each query
-      const baseQuery = supabase.from(table);
-      
-      return new Proxy(baseQuery, {
-        get(target, prop) {
-          const original = target[prop as keyof typeof target];
-          
-          // If it's a function that executes the query (select, insert, update, delete)
-          if (typeof original === 'function' && 
-              ['select', 'insert', 'update', 'delete', 'upsert'].includes(String(prop))) {
-            return async function(...args: any[]) {
-              // Check online status
-              const isOnline = await checkOnline();
-              
-              if (!isOnline) {
-                logger.warn(`[Supabase] Offline - blocking ${String(prop)} on ${table}`);
-                throw new OfflineError();
-              }
-              
-              // Execute original method
-              return (original as any)(...args);
-            };
-          }
-          
-          return original;
-        },
-      });
-    },
-    [],
-  );
+  const query = useCallback((table: string) => {
+    // Create a proxy that checks online status before each query
+    const baseQuery = supabase.from(table);
+
+    return new Proxy(baseQuery, {
+      get(target, prop) {
+        const original = target[prop as keyof typeof target];
+
+        // If it's a function that executes the query (select, insert, update, delete)
+        if (
+          typeof original === 'function' &&
+          ['select', 'insert', 'update', 'delete', 'upsert'].includes(
+            String(prop),
+          )
+        ) {
+          return async function (...args: unknown[]) {
+            // Check online status
+            const isOnline = await checkOnline();
+
+            if (!isOnline) {
+              logger.warn(
+                `[Supabase] Offline - blocking ${String(prop)} on ${table}`,
+              );
+              throw new OfflineError();
+            }
+
+            // Execute original method (typed call)
+            const fn = original as (...a: unknown[]) => unknown;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return fn(...args);
+          };
+        }
+
+        return original;
+      },
+    });
+  }, []);
 
   return {
     query,
@@ -90,12 +95,12 @@ export const useOfflineSupabase = () => {
 
 /**
  * Utility: Wrap any async function with offline check
- * 
+ *
  * @example
  * const safeFetch = withOfflineCheck(async () => {
  *   return await fetch('https://api.example.com');
  * });
- * 
+ *
  * await safeFetch(); // Throws OfflineError if offline
  */
 export const withOfflineCheck = <T extends (...args: any[]) => Promise<any>>(
@@ -103,11 +108,11 @@ export const withOfflineCheck = <T extends (...args: any[]) => Promise<any>>(
 ): T => {
   return (async (...args: Parameters<T>) => {
     const isOnline = await checkOnline();
-    
+
     if (!isOnline) {
       throw new OfflineError();
     }
-    
+
     return fn(...args);
   }) as T;
 };

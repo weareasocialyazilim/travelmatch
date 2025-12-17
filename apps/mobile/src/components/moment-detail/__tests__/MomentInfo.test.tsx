@@ -1,6 +1,6 @@
 /**
  * MomentInfo Component Tests
- * 
+ *
  * Tests the moment detail information display with:
  * - Title rendering
  * - Category pill (emoji + label)
@@ -9,7 +9,7 @@
  * - Story/description section
  * - Location card
  * - React.memo optimization
- * 
+ *
  * @coverage 100% target
  */
 
@@ -37,7 +37,11 @@ describe('MomentInfo', () => {
     });
 
     it('should render with all props', () => {
-      const category: MomentCategory = { id: '1', label: 'Adventure', emoji: '🏔️' };
+      const category: MomentCategory = {
+        id: '1',
+        label: 'Adventure',
+        emoji: '🏔️',
+      };
       const location: MomentLocation = {
         id: '1',
         name: 'Central Park',
@@ -53,7 +57,7 @@ describe('MomentInfo', () => {
           availability="Tomorrow"
           date="2024-12-10"
           story="Join us for a relaxing picnic in the park"
-        />
+        />,
       );
 
       expect(getByText('Park Picnic')).toBeTruthy();
@@ -75,7 +79,7 @@ describe('MomentInfo', () => {
       const category: MomentCategory = { id: '1', label: 'Food', emoji: '🍕' };
 
       const { getByText } = render(
-        <MomentInfo title="Pizza Night" category={category} />
+        <MomentInfo title="Pizza Night" category={category} />,
       );
 
       expect(getByText('🍕')).toBeTruthy();
@@ -91,11 +95,19 @@ describe('MomentInfo', () => {
     });
 
     it('should render different category emojis', () => {
-      const category1: MomentCategory = { id: '1', label: 'Culture', emoji: '🎭' };
-      const category2: MomentCategory = { id: '2', label: 'Sports', emoji: '⚽' };
+      const category1: MomentCategory = {
+        id: '1',
+        label: 'Culture',
+        emoji: '🎭',
+      };
+      const category2: MomentCategory = {
+        id: '2',
+        label: 'Sports',
+        emoji: '⚽',
+      };
 
       const { rerender, getByText } = render(
-        <MomentInfo title="Event" category={category1} />
+        <MomentInfo title="Event" category={category1} />,
       );
 
       expect(getByText('🎭')).toBeTruthy();
@@ -115,7 +127,7 @@ describe('MomentInfo', () => {
       };
 
       const { getByText } = render(
-        <MomentInfo title="Learn Together" category={category} />
+        <MomentInfo title="Learn Together" category={category} />,
       );
 
       expect(getByText('📚')).toBeTruthy();
@@ -137,7 +149,7 @@ describe('MomentInfo', () => {
       };
 
       const { getByText } = render(
-        <MomentInfo title="Coffee Time" location={location} />
+        <MomentInfo title="Coffee Time" location={location} />,
       );
 
       expect(getByText('Istanbul')).toBeTruthy();
@@ -152,7 +164,7 @@ describe('MomentInfo', () => {
       };
 
       const { getAllByText } = render(
-        <MomentInfo title="Beach Day" location={location} />
+        <MomentInfo title="Beach Day" location={location} />,
       );
 
       // Name appears in both meta row and location card
@@ -177,7 +189,7 @@ describe('MomentInfo', () => {
       };
 
       const { getByText } = render(
-        <MomentInfo title="Park Walk" location={location} />
+        <MomentInfo title="Park Walk" location={location} />,
       );
 
       expect(getByText('Golden Gate Park')).toBeTruthy();
@@ -193,7 +205,7 @@ describe('MomentInfo', () => {
       };
 
       const { getByText } = render(
-        <MomentInfo title="City Tour" location={location} />
+        <MomentInfo title="City Tour" location={location} />,
       );
 
       expect(getByText('Unknown Location')).toBeTruthy();
@@ -209,7 +221,7 @@ describe('MomentInfo', () => {
       };
 
       const { getAllByText, getByText } = render(
-        <MomentInfo title="Hidden Gem" location={location} />
+        <MomentInfo title="Hidden Gem" location={location} />,
       );
 
       // Name appears in both meta row and location card
@@ -226,7 +238,7 @@ describe('MomentInfo', () => {
   describe('Availability/Date Display', () => {
     it('should display availability when provided', () => {
       const { getByText } = render(
-        <MomentInfo title="Workout" availability="Every Monday" />
+        <MomentInfo title="Workout" availability="Every Monday" />,
       );
 
       expect(getByText('Every Monday')).toBeTruthy();
@@ -234,7 +246,7 @@ describe('MomentInfo', () => {
 
     it('should display date when availability is not provided', () => {
       const { getByText } = render(
-        <MomentInfo title="Concert" date="2024-12-25" />
+        <MomentInfo title="Concert" date="2024-12-25" />,
       );
 
       expect(getByText('2024-12-25')).toBeTruthy();
@@ -242,11 +254,7 @@ describe('MomentInfo', () => {
 
     it('should prefer availability over date when both provided', () => {
       const { getByText, queryByText } = render(
-        <MomentInfo
-          title="Meeting"
-          availability="Weekly"
-          date="2024-12-10"
-        />
+        <MomentInfo title="Meeting" availability="Weekly" date="2024-12-10" />,
       );
 
       expect(getByText('Weekly')).toBeTruthy();
@@ -261,7 +269,7 @@ describe('MomentInfo', () => {
 
     it('should display formatted date strings', () => {
       const { getByText } = render(
-        <MomentInfo title="Workshop" date="December 15, 2024" />
+        <MomentInfo title="Workshop" date="December 15, 2024" />,
       );
 
       expect(getByText('December 15, 2024')).toBeTruthy();
@@ -277,7 +285,7 @@ describe('MomentInfo', () => {
       const story = 'Join us for an amazing adventure through the mountains!';
 
       const { getByText } = render(
-        <MomentInfo title="Hiking Trip" story={story} />
+        <MomentInfo title="Hiking Trip" story={story} />,
       );
 
       expect(getByText('About this moment')).toBeTruthy();
@@ -297,7 +305,7 @@ describe('MomentInfo', () => {
         'Ut enim ad minim veniam, quis nostrud exercitation.';
 
       const { getByText } = render(
-        <MomentInfo title="Long Description" story={story} />
+        <MomentInfo title="Long Description" story={story} />,
       );
 
       expect(getByText(story)).toBeTruthy();
@@ -307,7 +315,7 @@ describe('MomentInfo', () => {
       const story = 'First paragraph.\n\nSecond paragraph.\n\nThird paragraph.';
 
       const { getByText } = render(
-        <MomentInfo title="Multi-paragraph" story={story} />
+        <MomentInfo title="Multi-paragraph" story={story} />,
       );
 
       expect(getByText(story)).toBeTruthy();
@@ -341,7 +349,7 @@ describe('MomentInfo', () => {
           category={category}
           location={location}
           availability="Friday 8 PM"
-        />
+        />,
       );
 
       expect(getByText('Music')).toBeTruthy();
@@ -362,7 +370,11 @@ describe('MomentInfo', () => {
       };
 
       const { getByText } = render(
-        <MomentInfo title="Meetup" location={location} availability="Tomorrow" />
+        <MomentInfo
+          title="Meetup"
+          location={location}
+          availability="Tomorrow"
+        />,
       );
 
       expect(getByText('Tokyo')).toBeTruthy();
@@ -370,7 +382,9 @@ describe('MomentInfo', () => {
     });
 
     it('should handle minimal meta info', () => {
-      const { getAllByText, getByText } = render(<MomentInfo title="Simple Event" />);
+      const { getAllByText, getByText } = render(
+        <MomentInfo title="Simple Event" />,
+      );
 
       // "Location" appears multiple times
       const locations = getAllByText('Location');
@@ -397,7 +411,7 @@ describe('MomentInfo', () => {
 
     it('should re-render when title changes', () => {
       const { rerender, getByText, queryByText } = render(
-        <MomentInfo title="Original Title" />
+        <MomentInfo title="Original Title" />,
       );
 
       expect(getByText('Original Title')).toBeTruthy();
@@ -413,7 +427,7 @@ describe('MomentInfo', () => {
       const category2: MomentCategory = { id: '2', label: 'Tech', emoji: '💻' };
 
       const { rerender, getByText, queryByText } = render(
-        <MomentInfo title="Event" category={category1} />
+        <MomentInfo title="Event" category={category1} />,
       );
 
       expect(getByText('Art')).toBeTruthy();
@@ -439,7 +453,7 @@ describe('MomentInfo', () => {
       };
 
       const { rerender, getByText, queryByText } = render(
-        <MomentInfo title="Event" location={location1} />
+        <MomentInfo title="Event" location={location1} />,
       );
 
       expect(getByText('City A')).toBeTruthy();
@@ -473,14 +487,16 @@ describe('MomentInfo', () => {
 
     it('should handle special characters in title', () => {
       const { getByText } = render(
-        <MomentInfo title="Special @#$% Characters! 🎉" />
+        <MomentInfo title="Special @#$% Characters! 🎉" />,
       );
 
       expect(getByText('Special @#$% Characters! 🎉')).toBeTruthy();
     });
 
     it('should handle undefined location object', () => {
-      const { getAllByText, getByText } = render(<MomentInfo title="Event" location={undefined} />);
+      const { getAllByText, getByText } = render(
+        <MomentInfo title="Event" location={undefined} />,
+      );
 
       // "Location" appears multiple times
       const locations = getAllByText('Location');
@@ -497,7 +513,7 @@ describe('MomentInfo', () => {
       };
 
       const { getByText } = render(
-        <MomentInfo title="Event" location={location} />
+        <MomentInfo title="Event" location={location} />,
       );
 
       expect(getByText('Unknown Location')).toBeTruthy();
@@ -512,7 +528,7 @@ describe('MomentInfo', () => {
 
     it('should handle null category', () => {
       const { getByText } = render(
-        <MomentInfo title="Event" category={null as any} />
+        <MomentInfo title="Event" category={null} />,
       );
 
       // Should not crash, just not render category pill
@@ -521,7 +537,7 @@ describe('MomentInfo', () => {
 
     it('should handle null location', () => {
       const { getAllByText, getByText } = render(
-        <MomentInfo title="Event" location={null as any} />
+        <MomentInfo title="Event" location={null} />,
       );
 
       // Should fallback to defaults - "Location" appears multiple times
@@ -558,7 +574,7 @@ describe('MomentInfo', () => {
           location={location}
           availability="Saturday 10 AM"
           story={story}
-        />
+        />,
       );
 
       expect(getByText('Weekend Coffee Meetup')).toBeTruthy();
@@ -573,7 +589,9 @@ describe('MomentInfo', () => {
     });
 
     it('should render minimal moment info', () => {
-      const { getAllByText, getByText } = render(<MomentInfo title="Quick Meetup" />);
+      const { getAllByText, getByText } = render(
+        <MomentInfo title="Quick Meetup" />,
+      );
 
       expect(getByText('Quick Meetup')).toBeTruthy();
       // "Location" appears multiple times
@@ -596,7 +614,8 @@ describe('MomentInfo', () => {
         city: 'Washington',
         country: 'USA',
       };
-      const story = 'Experience the beauty of Mount Rainier on this guided hike!';
+      const story =
+        'Experience the beauty of Mount Rainier on this guided hike!';
 
       const { getByText } = render(
         <MomentInfo
@@ -605,7 +624,7 @@ describe('MomentInfo', () => {
           location={location}
           date="2024-07-15"
           story={story}
-        />
+        />,
       );
 
       expect(getByText('Mountain Adventure')).toBeTruthy();
@@ -635,7 +654,7 @@ describe('MomentInfo', () => {
           category={category}
           location={location}
           availability="Every Friday"
-        />
+        />,
       );
 
       expect(getByText('Fine Dining Experience')).toBeTruthy();
@@ -655,7 +674,7 @@ describe('MomentInfo', () => {
       };
 
       const { getByText } = render(
-        <MomentInfo title="Iconic Landmark Tour" location={location} />
+        <MomentInfo title="Iconic Landmark Tour" location={location} />,
       );
 
       expect(getByText('Paris')).toBeTruthy();

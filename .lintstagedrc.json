@@ -1,17 +1,13 @@
 {
   "*.{ts,tsx}": [
     "eslint --fix",
-    "prettier --write",
-    "jest --bail --findRelatedTests --passWithNoTests"
+    "prettier --write"
   ],
-  "*.{js,jsx}": [
+  "apps/mobile/**/*.{ts,tsx,js,jsx}": [
     "eslint --fix",
-    "prettier --write"
+    "prettier --write",
+    "node scripts/jest-mobile-lint-staged.js"
   ],
-  "*.{json,md,yml,yaml}": [
-    "prettier --write"
-  ],
-  "package.json": [
-    "prettier --write"
-  ]
+  "*.{json,md,yml,yaml}": ["prettier --write"],
+  "package.json": ["prettier --write"]
 }

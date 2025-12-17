@@ -1,0 +1,337 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverified user 1`] = `
+<RCTView
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#FFFFFF",
+      "borderRadius": 20,
+      "elevation": 3,
+      "marginHorizontal": 16,
+      "padding": 24,
+      "shadowColor": "#000000",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.08,
+      "shadowRadius": 12,
+    }
+  }
+>
+  <RCTTouchableOpacity
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    activeOpacity={0.9}
+    style={
+      {
+        "marginBottom": 16,
+        "position": "relative",
+      }
+    }
+  >
+    <RCTImage
+      source="avatar.jpg"
+      style={
+        {
+          "borderColor": "#FFFFFF",
+          "borderRadius": 45,
+          "borderWidth": 3,
+          "height": 90,
+          "width": 90,
+        }
+      }
+      testID="profile-avatar"
+    />
+  </RCTTouchableOpacity>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 22,
+        "fontWeight": "700",
+        "marginBottom": 4,
+      }
+    }
+    testID="RCTText"
+  >
+    Test User
+  </RCTText>
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "gap": 4,
+        "marginBottom": 16,
+      }
+    }
+  >
+    <RCTText
+      color="#666666"
+      name="map-marker"
+      size={16}
+      testID="RCTText"
+    >
+      map-marker
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 14,
+        }
+      }
+      testID="RCTText"
+    >
+      Test City
+    </RCTText>
+  </RCTView>
+  <RCTTouchableOpacity
+    accessibilityLabel="ProofScore undefined percent. Tap to view Trust Garden"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    aria-label="ProofScore undefined percent. Tap to view Trust Garden"
+    role="button"
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgba(166, 229, 193, 0.12)",
+        "borderRadius": 20,
+        "flexDirection": "row",
+        "gap": 6,
+        "marginBottom": 20,
+        "paddingHorizontal": 14,
+        "paddingVertical": 8,
+      }
+    }
+  >
+    <RCTText
+      color="#A6E5C1"
+      name="shield-check"
+      size={16}
+      testID="RCTText"
+    >
+      shield-check
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#A6E5C1",
+          "fontSize": 14,
+          "fontWeight": "600",
+        }
+      }
+      testID="RCTText"
+    >
+      ProofScore 
+      60
+      %
+    </RCTText>
+    <RCTText
+      color="#A6E5C1"
+      name="chevron-right"
+      size={16}
+      testID="RCTText"
+    >
+      chevron-right
+    </RCTText>
+  </RCTTouchableOpacity>
+  <RCTTouchableOpacity
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    onPress={[MockFunction]}
+    role="button"
+    testID="edit-button"
+  >
+    <RCTText
+      testID="RCTText"
+    >
+      Edit
+    </RCTText>
+  </RCTTouchableOpacity>
+</RCTView>
+`;
+
+exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified user 1`] = `
+<RCTView
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#FFFFFF",
+      "borderRadius": 20,
+      "elevation": 3,
+      "marginHorizontal": 16,
+      "padding": 24,
+      "shadowColor": "#000000",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.08,
+      "shadowRadius": 12,
+    }
+  }
+>
+  <RCTTouchableOpacity
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    activeOpacity={0.9}
+    style={
+      {
+        "marginBottom": 16,
+        "position": "relative",
+      }
+    }
+  >
+    <RCTImage
+      source="avatar.jpg"
+      style={
+        {
+          "borderColor": "#FFFFFF",
+          "borderRadius": 45,
+          "borderWidth": 3,
+          "height": 90,
+          "width": 90,
+        }
+      }
+      testID="profile-avatar"
+    />
+  </RCTTouchableOpacity>
+  <RCTText
+    style={
+      {
+        "color": "#1A1A1A",
+        "fontSize": 22,
+        "fontWeight": "700",
+        "marginBottom": 4,
+      }
+    }
+    testID="RCTText"
+  >
+    Test User
+  </RCTText>
+  <RCTView
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "gap": 4,
+        "marginBottom": 16,
+      }
+    }
+  >
+    <RCTText
+      color="#666666"
+      name="map-marker"
+      size={16}
+      testID="RCTText"
+    >
+      map-marker
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#666666",
+          "fontSize": 14,
+        }
+      }
+      testID="RCTText"
+    >
+      Test City
+    </RCTText>
+  </RCTView>
+  <RCTTouchableOpacity
+    accessibilityLabel="ProofScore undefined percent. Tap to view Trust Garden"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    aria-label="ProofScore undefined percent. Tap to view Trust Garden"
+    role="button"
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgba(166, 229, 193, 0.12)",
+        "borderRadius": 20,
+        "flexDirection": "row",
+        "gap": 6,
+        "marginBottom": 20,
+        "paddingHorizontal": 14,
+        "paddingVertical": 8,
+      }
+    }
+  >
+    <RCTText
+      color="#A6E5C1"
+      name="shield-check"
+      size={16}
+      testID="RCTText"
+    >
+      shield-check
+    </RCTText>
+    <RCTText
+      style={
+        {
+          "color": "#A6E5C1",
+          "fontSize": 14,
+          "fontWeight": "600",
+        }
+      }
+      testID="RCTText"
+    >
+      ProofScore 
+      90
+      %
+    </RCTText>
+    <RCTText
+      color="#A6E5C1"
+      name="chevron-right"
+      size={16}
+      testID="RCTText"
+    >
+      chevron-right
+    </RCTText>
+  </RCTTouchableOpacity>
+  <RCTTouchableOpacity
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    onPress={[MockFunction]}
+    role="button"
+    testID="edit-button"
+  >
+    <RCTText
+      testID="RCTText"
+    >
+      Edit
+    </RCTText>
+  </RCTTouchableOpacity>
+</RCTView>
+`;

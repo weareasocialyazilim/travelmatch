@@ -1,7 +1,7 @@
 /**
  * useMoments Hook
  * Moment CRUD operations and feed management
- * 
+ *
  * PERFORMANCE OPTIMIZED:
  * - Uses cursor-based pagination (O(1) vs O(n) for offset)
  * - Efficient for large datasets (1000+ moments)
@@ -14,6 +14,7 @@ import { momentsService } from '../services/supabaseDbService';
 import { logger } from '../utils/logger';
 import { ErrorHandler } from '../utils/errorHandler';
 import { usePagination, type PaginatedResponse } from './usePagination';
+import type { Database } from '../types/database.types';
 
 // MomentRow type from the database - includes joined data from momentsService
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,14 +26,16 @@ export interface Moment {
   title: string;
   description: string;
   category: string | { id: string; label: string; emoji: string };
-  location: {
-    city: string;
-    country: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
-  } | string; // Can be string for legacy/display purposes
+  location:
+    | {
+        city: string;
+        country: string;
+        coordinates?: {
+          lat: number;
+          lng: number;
+        };
+      }
+    | string; // Can be string for legacy/display purposes
   images: string[];
   image?: string; // Single image shorthand
   pricePerGuest: number;
@@ -144,7 +147,7 @@ const mapToMoment = (row: MomentRow): Moment => {
   // Extract user data from the optimized join
   const userData = row.users || row.user || {};
   const categoryData = row.categories || {};
-  
+
   return {
     id: row.id,
     title: row.title,
@@ -243,13 +246,10 @@ export const useMoments = (): UseMomentsReturn => {
   /**
    * Set filters and refresh
    */
-  const setFilters = useCallback(
-    (newFilters: MomentFilters) => {
-      setFiltersState(newFilters);
-      // Refresh will be triggered by useEffect when filters change
-    },
-    [],
-  );
+  const setFilters = useCallback((newFilters: MomentFilters) => {
+    setFiltersState(newFilters);
+    // Refresh will be triggered by useEffect when filters change
+  }, []);
 
   /**
    * Clear filters and refresh
@@ -294,7 +294,10 @@ export const useMoments = (): UseMomentsReturn => {
           title: data.title,
           description: data.description,
           category: data.category,
-          location: typeof data.location === 'string' ? data.location : (data.location?.city || ''),
+          location:
+            typeof data.location === 'string'
+              ? data.location
+              : data.location?.city || '',
           latitude: data.location?.coordinates?.lat ?? null,
           longitude: data.location?.coordinates?.lng ?? null,
           date: new Date().toISOString(),
@@ -308,7 +311,11 @@ export const useMoments = (): UseMomentsReturn => {
           status: 'active',
         };
 
-        const { data: moment, error } = await momentsService.create(momentData as any);
+        const insertPayload =
+          momentData as unknown as Database['public']['Tables']['moments']['Insert'];
+        const { data: moment, error } = await momentsService.create(
+          insertPayload,
+        );
         if (error) throw error;
 
         const newMoment = moment ? mapToMoment(moment) : null;
@@ -360,7 +367,7 @@ export const useMoments = (): UseMomentsReturn => {
           // Update in lists where it appears
           const updateFn = (list: Moment[]) =>
             list.map((m) => (m.id === id ? updatedMoment : m));
-          
+
           setMyMoments(updateFn);
           // Note: Main feed uses cursor pagination, refresh to see update
           void refresh();

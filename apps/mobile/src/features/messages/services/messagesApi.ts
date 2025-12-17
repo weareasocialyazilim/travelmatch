@@ -1,8 +1,9 @@
 import { supabase } from '@/config/supabase';
+import type { Database } from '../../../types/database.types';
 
 /**
  * Messages API Service
- * 
+ *
  * Mesajlaşma yönetimi için API çağrıları
  */
 export const messagesApi = {
@@ -10,18 +11,15 @@ export const messagesApi = {
    * Tüm konuşmaları getir
    */
   getConversations: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
       .from('conversations')
-      .select(`
-        *,
-        participant1:profiles!participant1_id(*),
-        participant2:profiles!participant2_id(*),
-        last_message:messages(content, created_at)
-      `)
-      .or(`participant1_id.eq.${user.id},participant2_id.eq.${user.id}`)
+      .select(`*, last_message:messages(content, created_at)`)
+      .contains('participant_ids', [user.id])
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
@@ -34,18 +32,13 @@ export const messagesApi = {
   getConversation: async (conversationId: string) => {
     const { data, error } = await supabase
       .from('conversations')
-      .select(`
-        *,
-        participant1:profiles!participant1_id(*),
-        participant2:profiles!participant2_id(*)
-      `)
+      .select('*')
       .eq('id', conversationId)
       .single();
 
     if (error) throw error;
     return data;
   },
-
   /**
    * Konuşmadaki mesajları getir
    */
@@ -64,7 +57,9 @@ export const messagesApi = {
    * Mesaj gönder
    */
   sendMessage: async (conversationId: string, content: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -92,36 +87,29 @@ export const messagesApi = {
    * Yeni konuşma başlat
    */
   createConversation: async (recipientId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     // Check if conversation already exists
     // SECURITY: Explicit column selection - never use select('*')
     const { data: existing } = await supabase
       .from('conversations')
-      .select(`
-        id,
-        participant1_id,
-        participant2_id,
-        created_at,
-        updated_at,
-        last_message_at
-      `)
-      .or(
-        `and(participant1_id.eq.${user.id},participant2_id.eq.${recipientId}),` +
-        `and(participant1_id.eq.${recipientId},participant2_id.eq.${user.id})`
-      )
+      .select(`id, participant_ids, created_at, updated_at, last_message_at`)
+      .contains('participant_ids', [user.id, recipientId])
       .single();
 
     if (existing) return existing;
 
     // Create new conversation
+    const insertPayload = {
+      participant_ids: [user.id, recipientId],
+    } as unknown as Database['public']['Tables']['conversations']['Insert'];
+
     const { data, error } = await supabase
       .from('conversations')
-      .insert({
-        participant1_id: user.id,
-        participant2_id: recipientId,
-      })
+      .insert(insertPayload)
       .select()
       .single();
 
@@ -133,16 +121,20 @@ export const messagesApi = {
    * Konuşmayı arşivle
    */
   archiveConversation: async (conversationId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
+
+    const upsertPayload = {
+      conversation_id: conversationId,
+      user_id: user.id,
+      is_archived: true,
+    } as unknown as Database['public']['Tables']['conversation_settings']['Insert'];
 
     const { error } = await supabase
       .from('conversation_settings')
-      .upsert({
-        conversation_id: conversationId,
-        user_id: user.id,
-        is_archived: true,
-      });
+      .upsert(upsertPayload);
 
     if (error) throw error;
   },
@@ -153,7 +145,7 @@ export const messagesApi = {
   deleteConversation: async (conversationId: string) => {
     const { error } = await supabase
       .from('conversations')
-      .update({ deleted_at: new Date().toISOString() })
+      .delete()
       .eq('id', conversationId);
 
     if (error) throw error;
@@ -163,7 +155,9 @@ export const messagesApi = {
    * Mesajları okundu işaretle
    */
   markAsRead: async (conversationId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { error } = await supabase
@@ -182,7 +176,7 @@ export const messagesApi = {
   deleteMessage: async (messageId: string) => {
     const { error } = await supabase
       .from('messages')
-      .update({ deleted_at: new Date().toISOString() })
+      .delete()
       .eq('id', messageId);
 
     if (error) throw error;
@@ -192,17 +186,14 @@ export const messagesApi = {
    * Arşivlenmiş konuşmaları getir
    */
   getArchivedConversations: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
       .from('conversations')
-      .select(`
-        *,
-        participant1:profiles!participant1_id(*),
-        participant2:profiles!participant2_id(*),
-        conversation_settings!inner(*)
-      `)
+      .select(`*, conversation_settings!inner(*)`)
       .eq('conversation_settings.user_id', user.id)
       .eq('conversation_settings.is_archived', true)
       .order('updated_at', { ascending: false });

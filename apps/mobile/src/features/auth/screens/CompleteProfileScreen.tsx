@@ -20,9 +20,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { LoadingState } from '@/components/LoadingState';
 import { COLORS } from '@/constants/colors';
-import { showErrorAlert, AppError, AppErrorCode } from '@/utils/friendlyErrorHandler';
-import { completeProfileSchema, type CompleteProfileInput } from '@/utils/forms';
+import {
+  showErrorAlert,
+  AppError,
+  AppErrorCode,
+} from '@/utils/friendlyErrorHandler';
+import {
+  completeProfileSchema,
+  type CompleteProfileInput,
+} from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -56,17 +64,18 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   const { showConfirmation } = useConfirmation();
   const [loading, setLoading] = useState(false);
 
-  const { control, handleSubmit, formState, setValue, watch } = useForm<CompleteProfileInput>({
-    resolver: zodResolver(completeProfileSchema),
-    mode: 'onChange',
-    defaultValues: {
-      fullName: '',
-      username: '',
-      bio: '',
-      avatar: '',
-      interests: [],
-    },
-  });
+  const { control, handleSubmit, formState, setValue, watch } =
+    useForm<CompleteProfileInput>({
+      resolver: zodResolver(completeProfileSchema),
+      mode: 'onChange',
+      defaultValues: {
+        fullName: '',
+        username: '',
+        bio: '',
+        avatar: '',
+        interests: [],
+      },
+    });
 
   const interests = watch('interests');
   const _bio = watch('bio');
@@ -137,7 +146,10 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
 
   const toggleInterest = (interestId: string) => {
     if (interests.includes(interestId)) {
-      setValue('interests', interests.filter((id) => id !== interestId));
+      setValue(
+        'interests',
+        interests.filter((id) => id !== interestId),
+      );
     } else {
       if (interests.length < 5) {
         setValue('interests', [...interests, interestId]);
@@ -226,10 +238,15 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         <Controller
           control={control}
           name="fullName"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View style={styles.inputSection}>
               <Text style={styles.inputLabel}>Full Name *</Text>
-              <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
+              <View
+                style={[styles.inputWrapper, error && styles.inputWrapperError]}
+              >
                 <Icon name="account" size={20} color={COLORS.textSecondary} />
                 <TextInput
                   style={styles.input}
@@ -241,9 +258,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   autoCapitalize="words"
                 />
               </View>
-              {error && (
-                <Text style={styles.errorText}>{error.message}</Text>
-              )}
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
         />
@@ -252,10 +267,15 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         <Controller
           control={control}
           name="username"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View style={styles.inputSection}>
               <Text style={styles.inputLabel}>Username *</Text>
-              <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
+              <View
+                style={[styles.inputWrapper, error && styles.inputWrapperError]}
+              >
                 <Icon name="at" size={20} color={COLORS.textSecondary} />
                 <TextInput
                   style={styles.input}
@@ -267,9 +287,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   autoCapitalize="none"
                 />
               </View>
-              {error && (
-                <Text style={styles.errorText}>{error.message}</Text>
-              )}
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
         />
@@ -278,10 +296,19 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         <Controller
           control={control}
           name="bio"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View style={styles.inputSection}>
               <Text style={styles.inputLabel}>Bio (Optional)</Text>
-              <View style={[styles.inputWrapper, styles.bioWrapper, error && styles.inputWrapperError]}>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  styles.bioWrapper,
+                  error && styles.inputWrapperError,
+                ]}
+              >
                 <TextInput
                   style={[styles.input, styles.bioInput]}
                   placeholder="Tell us about yourself..."
@@ -294,9 +321,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                 />
               </View>
               <Text style={styles.charCount}>{value?.length || 0}/150</Text>
-              {error && (
-                <Text style={styles.errorText}>{error.message}</Text>
-              )}
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
         />
@@ -348,11 +373,15 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.completeButton,
-            (!canSubmitForm({ formState } as any) || loading) &&
+            (!canSubmitForm({ formState } as { formState: MinimalFormState }) ||
+              loading) &&
               styles.completeButtonDisabled,
           ]}
           onPress={handleSubmit(handleComplete)}
-          disabled={!canSubmitForm({ formState } as any) || loading}
+          disabled={
+            !canSubmitForm({ formState } as { formState: MinimalFormState }) ||
+            loading
+          }
           activeOpacity={0.8}
         >
           <Text style={styles.buttonText}>Complete Profile</Text>

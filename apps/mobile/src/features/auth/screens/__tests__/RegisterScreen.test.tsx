@@ -5,7 +5,12 @@
  */
 
 import React from 'react';
-import { render as rtlRender, fireEvent, waitFor, RenderOptions } from '@testing-library/react-native';
+import {
+  render as rtlRender,
+  fireEvent,
+  waitFor,
+  RenderOptions,
+} from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import { RegisterScreen } from '@/features/auth/screens/RegisterScreen';
 import { useAuth } from '@/context/AuthContext';
@@ -40,7 +45,11 @@ const mockNavigation = {
   navigate: jest.fn(),
   goBack: jest.fn(),
   reset: jest.fn(),
-} as any;
+} as unknown as {
+  navigate: (...args: unknown[]) => void;
+  goBack: () => void;
+  reset: (...args: unknown[]) => void;
+};
 
 const mockRoute = {
   key: 'Register',
@@ -52,8 +61,8 @@ jest.spyOn(Alert, 'alert');
 
 describe('RegisterScreen', () => {
   const mockRegister = jest.fn();
-  const mockUseAuth = useAuth ;
-  const mockLogger = logger ;
+  const mockUseAuth = useAuth;
+  const mockLogger = logger;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -63,13 +72,13 @@ describe('RegisterScreen', () => {
       logout: jest.fn(),
       user: null,
       loading: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAuth>);
   });
 
   describe('Rendering', () => {
     it('should render all form elements', () => {
       const { getByPlaceholderText, getAllByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       expect(getByPlaceholderText('Email')).toBeTruthy();
@@ -80,7 +89,7 @@ describe('RegisterScreen', () => {
 
     it('should render social signup buttons', () => {
       const { getByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       expect(getByText('Or sign up with')).toBeTruthy();
@@ -88,7 +97,7 @@ describe('RegisterScreen', () => {
 
     it('should render terms and conditions', () => {
       const { getByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       expect(getByText(/Terms of Service/i)).toBeTruthy();
@@ -97,7 +106,7 @@ describe('RegisterScreen', () => {
 
     it('should render login link', () => {
       const { getByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       expect(getByText(/Already have an account/i)).toBeTruthy();
@@ -108,7 +117,7 @@ describe('RegisterScreen', () => {
   describe('Form Validation', () => {
     it('should update email input', () => {
       const { getByPlaceholderText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const emailInput = getByPlaceholderText('Email');
@@ -119,7 +128,7 @@ describe('RegisterScreen', () => {
 
     it('should update password input', () => {
       const { getByPlaceholderText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const passwordInput = getByPlaceholderText('Password');
@@ -130,7 +139,7 @@ describe('RegisterScreen', () => {
 
     it('should update confirm password input', () => {
       const { getByPlaceholderText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const confirmPasswordInput = getByPlaceholderText('Confirm Password');
@@ -141,7 +150,7 @@ describe('RegisterScreen', () => {
 
     it('should show error for invalid email', async () => {
       const { getByPlaceholderText, queryByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const emailInput = getByPlaceholderText('Email');
@@ -155,7 +164,7 @@ describe('RegisterScreen', () => {
 
     it('should show error for short password', async () => {
       const { getByPlaceholderText, queryByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const passwordInput = getByPlaceholderText('Password');
@@ -163,13 +172,15 @@ describe('RegisterScreen', () => {
       fireEvent(passwordInput, 'blur');
 
       await waitFor(() => {
-        expect(queryByText('Password must be at least 8 characters')).toBeTruthy();
+        expect(
+          queryByText('Password must be at least 8 characters'),
+        ).toBeTruthy();
       });
     });
 
     it('should show error when passwords do not match', async () => {
       const { getByPlaceholderText, queryByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const passwordInput = getByPlaceholderText('Password');
@@ -186,18 +197,18 @@ describe('RegisterScreen', () => {
 
     it('should toggle password visibility', () => {
       const { getByPlaceholderText, getAllByRole } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const passwordInput = getByPlaceholderText('Password');
-      
+
       // Initially password should be hidden
       expect(passwordInput.props.secureTextEntry).toBe(true);
 
       // Get all buttons and find one that toggles visibility
       // We'll simulate pressing near the password field
       const buttons = getAllByRole('button');
-      
+
       // The component has multiple buttons, we need to find the eye icon toggle
       // For now, let's just verify the initial state and skip the toggle test
       // since we can't easily identify which button is the password toggle
@@ -210,17 +221,21 @@ describe('RegisterScreen', () => {
       mockRegister.mockResolvedValue({ success: true });
 
       const { getByPlaceholderText, getAllByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       // Fill in form
       fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
       fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
+      fireEvent.changeText(
+        getByPlaceholderText('Confirm Password'),
+        'password123',
+      );
 
       // Submit form - find the Create Account button
       const createAccountButtons = getAllByText('Create Account');
-      const submitButton = createAccountButtons[createAccountButtons.length - 1];
+      const submitButton =
+        createAccountButtons[createAccountButtons.length - 1];
       fireEvent.press(submitButton);
 
       await waitFor(() => {
@@ -244,12 +259,15 @@ describe('RegisterScreen', () => {
       });
 
       const { getByPlaceholderText, getAllByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
       fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
+      fireEvent.changeText(
+        getByPlaceholderText('Confirm Password'),
+        'password123',
+      );
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);
@@ -257,35 +275,39 @@ describe('RegisterScreen', () => {
       await waitFor(() => {
         expect(Alert.alert).toHaveBeenCalledWith(
           'Registration Failed',
-          'Email already exists'
+          'Email already exists',
         );
       });
     });
 
     it('should validate email before registration', async () => {
       const { getByPlaceholderText, getAllByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       // Fill in invalid email but valid passwords to enable the button
       fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com'); // Start with valid
       fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
+      fireEvent.changeText(
+        getByPlaceholderText('Confirm Password'),
+        'password123',
+      );
 
       // Now change to invalid email
       fireEvent.changeText(getByPlaceholderText('Email'), 'invalid-email');
 
       // Button should be disabled with invalid email
       const createAccountButtons = getAllByText('Create Account');
-      const submitButton = createAccountButtons[createAccountButtons.length - 1];
-      
+      const submitButton =
+        createAccountButtons[createAccountButtons.length - 1];
+
       // Form should not be valid
       expect(mockRegister).not.toHaveBeenCalled();
     });
 
     it('should validate password length', async () => {
       const { getByPlaceholderText, getAllByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       // Fill in valid email but short password
@@ -295,20 +317,23 @@ describe('RegisterScreen', () => {
 
       // Button should be disabled with short password
       const createAccountButtons = getAllByText('Create Account');
-      
+
       // Form should not be valid
       expect(mockRegister).not.toHaveBeenCalled();
     });
 
     it('should validate password match', async () => {
       const { getByPlaceholderText, getAllByText, queryByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       // Fill in valid email and password but mismatched confirmation
       fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
       fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'different123');
+      fireEvent.changeText(
+        getByPlaceholderText('Confirm Password'),
+        'different123',
+      );
 
       // Trigger blur to show error message
       fireEvent(getByPlaceholderText('Confirm Password'), 'blur');
@@ -326,17 +351,20 @@ describe('RegisterScreen', () => {
       mockRegister.mockImplementation(
         () =>
           new Promise((resolve) =>
-            setTimeout(() => resolve({ success: true }), 100)
-          )
+            setTimeout(() => resolve({ success: true }), 100),
+          ),
       );
 
       const { getByPlaceholderText, getAllByText, queryByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
       fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
+      fireEvent.changeText(
+        getByPlaceholderText('Confirm Password'),
+        'password123',
+      );
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);
@@ -356,7 +384,7 @@ describe('RegisterScreen', () => {
   describe('Navigation', () => {
     it('should navigate back when back button is pressed', () => {
       const { getByLabelText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const backButton = getByLabelText('Go back');
@@ -367,7 +395,7 @@ describe('RegisterScreen', () => {
 
     it('should navigate to login when login link is pressed', () => {
       const { getByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const loginLink = getByText('Log in');
@@ -378,7 +406,7 @@ describe('RegisterScreen', () => {
 
     it('should navigate to Terms of Service', () => {
       const { getByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const termsLink = getByText('Terms of Service');
@@ -389,7 +417,7 @@ describe('RegisterScreen', () => {
 
     it('should navigate to Privacy Policy', () => {
       const { getByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       const privacyLink = getByText('Privacy Policy');
@@ -402,7 +430,7 @@ describe('RegisterScreen', () => {
   describe('Social Registration', () => {
     it('should handle Apple social registration', () => {
       const { getAllByRole } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       // Social buttons are present - we'll just verify navigation happens
@@ -422,12 +450,15 @@ describe('RegisterScreen', () => {
       mockRegister.mockRejectedValue(new Error('Network error'));
 
       const { getByPlaceholderText, getAllByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
       fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
+      fireEvent.changeText(
+        getByPlaceholderText('Confirm Password'),
+        'password123',
+      );
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);
@@ -436,7 +467,7 @@ describe('RegisterScreen', () => {
         expect(mockLogger.error).toHaveBeenCalled();
         expect(Alert.alert).toHaveBeenCalledWith(
           'Error',
-          'An unexpected error occurred'
+          'An unexpected error occurred',
         );
       });
     });
@@ -445,12 +476,15 @@ describe('RegisterScreen', () => {
       mockRegister.mockRejectedValue(new Error('Unexpected error'));
 
       const { getByPlaceholderText, getAllByText } = render(
-        <RegisterScreen navigation={mockNavigation} route={mockRoute} />
+        <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
       fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'password123');
+      fireEvent.changeText(
+        getByPlaceholderText('Confirm Password'),
+        'password123',
+      );
 
       const createAccountButtons = getAllByText('Create Account');
       fireEvent.press(createAccountButtons[createAccountButtons.length - 1]);

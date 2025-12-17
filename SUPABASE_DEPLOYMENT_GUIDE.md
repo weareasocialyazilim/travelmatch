@@ -1,14 +1,14 @@
 # 🚀 TravelMatch Supabase Production Setup Guide
 
-**Project ID:** `bjikxgtbptrvawkguypv`
-**Status:** Ready for Production Deployment
-**Last Updated:** 2025-12-15
+**Project ID:** `bjikxgtbptrvawkguypv` **Status:** Ready for Production Deployment **Last Updated:**
+2025-12-15
 
 ---
 
 ## 📋 PRE-DEPLOYMENT CHECKLIST
 
 ### ✅ Already Complete
+
 - [x] 38 Database migrations (idempotent, production-ready)
 - [x] RLS policies on all 10 tables
 - [x] Storage policies on 5 buckets
@@ -23,6 +23,7 @@
 ## 🔧 STEP-BY-STEP DEPLOYMENT
 
 ### Prerequisites
+
 ```bash
 # Install Supabase CLI (choose one method)
 
@@ -41,6 +42,7 @@ docker pull supabase/cli
 ## 🗄️ DATABASE SETUP
 
 ### Step 1: Login to Supabase
+
 ```bash
 npx supabase login
 ```
@@ -48,6 +50,7 @@ npx supabase login
 You'll be redirected to browser to authorize. Copy the access token.
 
 ### Step 2: Link Project
+
 ```bash
 # Link to production project
 npx supabase link --project-ref bjikxgtbptrvawkguypv
@@ -57,6 +60,7 @@ npx supabase projects list
 ```
 
 ### Step 3: Apply Migrations
+
 ```bash
 # Dry run (check what will be applied)
 npx supabase db diff --linked
@@ -72,6 +76,7 @@ npx supabase db push
 ```
 
 ### Step 4: Verify Database Schema
+
 ```bash
 # Generate TypeScript types (verify schema)
 npx supabase gen types typescript --linked > apps/mobile/src/types/database.generated.types.ts
@@ -81,6 +86,7 @@ diff apps/mobile/src/types/database.types.ts apps/mobile/src/types/database.gene
 ```
 
 ### Step 5: Apply Seed Data (Development Only!)
+
 ```bash
 # WARNING: Only run this in development/staging
 # DO NOT run in production (creates test data)
@@ -94,6 +100,7 @@ psql "postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgre
 ## ⚙️ EDGE FUNCTIONS DEPLOYMENT
 
 ### Step 1: Deploy All Functions
+
 ```bash
 # Deploy all functions at once
 npx supabase functions deploy
@@ -114,6 +121,7 @@ npx supabase functions deploy feed-delta
 ```
 
 ### Step 2: Set Environment Variables
+
 ```bash
 # Navigate to Supabase Dashboard
 # https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/settings/functions
@@ -126,13 +134,14 @@ npx supabase secrets set CLOUDFLARE_STREAM_API_KEY=xxxxx
 npx supabase secrets set CLOUDFLARE_STREAM_ACCOUNT_ID=xxxxx
 npx supabase secrets set UPSTASH_REDIS_REST_URL=https://xxxxx
 npx supabase secrets set UPSTASH_REDIS_REST_TOKEN=xxxxx
-npx supabase secrets set GOOGLE_MAPS_SERVER_KEY=AIzaSy...
+  npx supabase secrets set MAPBOX_SECRET_TOKEN=pk.eyJ...
 
 # Verify secrets
 npx supabase secrets list
 ```
 
 ### Step 3: Test Edge Functions
+
 ```bash
 # Test payment intent creation
 curl -X POST \
@@ -153,6 +162,7 @@ curl -X POST \
 ## 🗂️ STORAGE BUCKETS SETUP
 
 ### Step 1: Create Buckets
+
 ```bash
 # Buckets are created via migrations (20251213000000_secure_storage_policies.sql)
 # Verify they exist in Dashboard:
@@ -160,6 +170,7 @@ curl -X POST \
 ```
 
 ### Step 2: Verify Buckets
+
 ```sql
 -- Run in SQL Editor
 SELECT id, name, public, file_size_limit, allowed_mime_types
@@ -175,6 +186,7 @@ ORDER BY created_at;
 ```
 
 ### Step 3: Test Upload
+
 ```bash
 # Test avatar upload
 curl -X POST \
@@ -191,6 +203,7 @@ curl -X POST \
 ## 🔐 SECURITY VERIFICATION
 
 ### RLS Policies Check
+
 ```sql
 -- Run in SQL Editor
 SELECT
@@ -208,6 +221,7 @@ ORDER BY tablename, policyname;
 ```
 
 ### Storage Policies Check
+
 ```sql
 SELECT
   bucket_id,
@@ -220,6 +234,7 @@ ORDER BY bucket_id, name;
 ```
 
 ### Audit Logging Check
+
 ```sql
 -- Verify audit_logs table exists
 SELECT COUNT(*) FROM audit_logs;
@@ -232,6 +247,7 @@ SELECT COUNT(*) FROM audit_logs;
 ## 🌍 ENVIRONMENT VARIABLES
 
 ### Mobile App (.env.production)
+
 ```bash
 # Create apps/mobile/.env.production
 EXPO_PUBLIC_APP_ENV=production
@@ -242,6 +258,7 @@ EXPO_PUBLIC_SENTRY_DSN=https://xxxxx@sentry.io/xxxxx
 ```
 
 ### Verification
+
 ```bash
 # Test environment loading
 cd apps/mobile
@@ -256,6 +273,7 @@ EXPO_PUBLIC_APP_ENV=production npx expo start
 ## 🧪 PRODUCTION TESTING
 
 ### Test Script: Verify All Components
+
 ```bash
 #!/bin/bash
 # File: scripts/verify-supabase.sh
@@ -285,6 +303,7 @@ echo "✅ All Supabase components verified!"
 ```
 
 ### Run Test
+
 ```bash
 chmod +x scripts/verify-supabase.sh
 ./scripts/verify-supabase.sh
@@ -295,6 +314,7 @@ chmod +x scripts/verify-supabase.sh
 ## 📊 POST-DEPLOYMENT VERIFICATION
 
 ### Check Migration Status
+
 ```bash
 npx supabase migration list --linked
 
@@ -302,6 +322,7 @@ npx supabase migration list --linked
 ```
 
 ### Check Function Logs
+
 ```bash
 # View real-time logs
 npx supabase functions logs payment/create-payment-intent --tail
@@ -311,6 +332,7 @@ npx supabase functions logs --tail | grep ERROR
 ```
 
 ### Monitor Database Performance
+
 ```sql
 -- Top 10 slowest queries
 SELECT
@@ -327,6 +349,7 @@ LIMIT 10;
 ## 🚨 TROUBLESHOOTING
 
 ### Issue: Migrations fail
+
 ```bash
 # Check current migration version
 npx supabase db version --linked
@@ -339,6 +362,7 @@ npx supabase db push
 ```
 
 ### Issue: Edge Function timeout
+
 ```bash
 # Increase timeout in function (max 300s)
 # Edit supabase/functions/[function]/index.ts
@@ -346,6 +370,7 @@ npx supabase db push
 ```
 
 ### Issue: Storage upload fails
+
 ```sql
 -- Check storage policies
 SELECT * FROM storage.policies WHERE bucket_id = 'avatars';
@@ -364,6 +389,7 @@ SELECT storage.can_insert_object(
 ## 📚 ADDITIONAL RESOURCES
 
 ### Supabase Dashboard
+
 - Project: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv
 - Database: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/editor
 - Edge Functions: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/functions
@@ -371,6 +397,7 @@ SELECT storage.can_insert_object(
 - Logs: https://supabase.com/dashboard/project/bjikxgtbptrvawkguypv/logs/explorer
 
 ### Documentation
+
 - [Supabase CLI Docs](https://supabase.com/docs/guides/cli)
 - [Database Migrations](https://supabase.com/docs/guides/cli/local-development#database-migrations)
 - [Edge Functions](https://supabase.com/docs/guides/functions)
@@ -425,6 +452,5 @@ npx supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxxxx
 
 ---
 
-**Status:** 🟢 Ready for Production Deployment
-**Next Action:** Run deployment checklist above
+**Status:** 🟢 Ready for Production Deployment **Next Action:** Run deployment checklist above
 **Support:** See PRODUCTION_PREFLIGHT_CHECKLIST.md for comprehensive guide

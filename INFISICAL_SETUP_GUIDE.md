@@ -1,15 +1,14 @@
 # 🔐 Infisical Secrets Management Setup
 
-**Organization:** travelmatch
-**Organization ID:** `cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9`
-**Status:** Ready for Configuration
-**Last Updated:** 2025-12-15
+**Organization:** travelmatch **Organization ID:** `cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9`
+**Status:** Ready for Configuration **Last Updated:** 2025-12-15
 
 ---
 
 ## 📋 OVERVIEW
 
-Infisical centralizes all sensitive secrets (API keys, tokens, database credentials) in a secure, encrypted vault. This eliminates the need for `.env` files in production and provides:
+Infisical centralizes all sensitive secrets (API keys, tokens, database credentials) in a secure,
+encrypted vault. This eliminates the need for `.env` files in production and provides:
 
 - ✅ **Secret Versioning:** Track changes to secrets over time
 - ✅ **Access Control:** Role-based permissions for team members
@@ -37,6 +36,7 @@ Infisical centralizes all sensitive secrets (API keys, tokens, database credenti
 Navigate to **Secrets** tab for each environment:
 
 #### 🟢 Development Environment
+
 ```bash
 # Supabase
 SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
@@ -58,6 +58,7 @@ ENABLE_DEBUG_LOGGING=true
 ```
 
 #### 🟡 Staging Environment
+
 ```bash
 # Same as production but with staging URLs
 SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
@@ -67,6 +68,7 @@ ENABLE_DEBUG_LOGGING=false
 ```
 
 #### 🔴 Production Environment
+
 ```bash
 # Supabase (Production)
 SUPABASE_URL=https://bjikxgtbptrvawkguypv.supabase.co
@@ -82,7 +84,7 @@ STRIPE_WEBHOOK_SECRET=whsec_live_xxxxx
 OPENAI_API_KEY=sk-xxxxx
 CLOUDFLARE_STREAM_API_KEY=xxxxx
 CLOUDFLARE_STREAM_ACCOUNT_ID=xxxxx
-GOOGLE_MAPS_SERVER_KEY=AIzaSy...
+MAPBOX_SECRET_TOKEN=pk.eyJ... # Mapbox secret token (server-side)
 UPSTASH_REDIS_REST_URL=https://xxxxx.upstash.io
 UPSTASH_REDIS_REST_TOKEN=xxxxx
 
@@ -215,6 +217,7 @@ EXPO_PUBLIC_APP_ENV=development
 ```
 
 **Add to `.gitignore`:**
+
 ```bash
 # Already added in previous cleanup
 .infisical/
@@ -257,6 +260,7 @@ infisical run -- npx expo start
 ## 🔒 SECURITY BEST PRACTICES
 
 ### ✅ DO
+
 - Store ALL sensitive keys in Infisical (Stripe, OpenAI, etc.)
 - Use Machine Identities for CI/CD pipelines
 - Enable audit logging for all secret access
@@ -265,8 +269,9 @@ infisical run -- npx expo start
 - Set short cache TTL (5 minutes) for critical secrets
 
 ### ❌ DON'T
+
 - Never commit `.env` files with real secrets
-- Never use EXPO_PUBLIC_ prefix for sensitive keys
+- Never use EXPO*PUBLIC* prefix for sensitive keys
 - Never hardcode API keys in source code
 - Never share Machine Identity credentials in chat/email
 - Never disable audit logging
@@ -297,6 +302,7 @@ infisical run -- npm run restart:all
 ### Audit Logs
 
 Monitor secret access in Infisical dashboard:
+
 - Who accessed which secrets
 - When secrets were updated
 - Failed access attempts
@@ -305,6 +311,7 @@ Monitor secret access in Infisical dashboard:
 ### Alerts
 
 Set up alerts for:
+
 - Unauthorized access attempts
 - Secrets accessed outside business hours
 - Secrets not rotated in 90+ days
@@ -315,6 +322,7 @@ Set up alerts for:
 ## 🎯 CHECKLIST
 
 ### Initial Setup
+
 - [ ] Create Infisical project: "TravelMatch"
 - [ ] Add all secrets to development environment
 - [ ] Add all secrets to staging environment
@@ -323,6 +331,7 @@ Set up alerts for:
 - [ ] Install Infisical CLI on dev machines
 
 ### Integration
+
 - [ ] Add `.infisical.json` to project root
 - [ ] Update `.env.example` with Infisical variables
 - [ ] Test `infisical run -- npx expo start`
@@ -330,6 +339,7 @@ Set up alerts for:
 - [ ] Update deployment docs with Infisical instructions
 
 ### Security
+
 - [ ] Enable audit logging
 - [ ] Set up secret rotation schedule
 - [ ] Configure access controls (role-based)
@@ -369,6 +379,5 @@ infisical run -- npx expo start
 
 ---
 
-**Status:** 🟢 Ready for Setup
-**Organization ID:** cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9
-**Next Action:** Create project in Infisical dashboard → Add secrets → Test integration
+**Status:** 🟢 Ready for Setup **Organization ID:** cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9 **Next
+Action:** Create project in Infisical dashboard → Add secrets → Test integration

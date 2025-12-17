@@ -10,6 +10,12 @@ import { reviewsService as dbReviewsService } from './supabaseDbService';
 // ReviewRow type placeholder - should be defined in database.types.ts
 type ReviewRow = Record<string, unknown>;
 
+// Lightweight review row with joined relations used in mappings
+type ReviewRowLike = ReviewRow & {
+  reviewer?: { full_name?: string; avatar_url?: string } | null;
+  moment?: { title?: string } | null;
+};
+
 // Types
 export interface Review {
   id: string;
@@ -31,13 +37,13 @@ export interface Review {
   requestId: string;
 
   // Timestamps
-  createdAt: string;
-  updatedAt?: string;
+  createdAt: string | null;
+  updatedAt?: string | null;
 
   // Response from reviewee
   response?: {
     text: string;
-    createdAt: string;
+    createdAt: string | null;
   };
 
   // Flags
@@ -95,17 +101,18 @@ export const reviewService = {
 
       // Determine who is being reviewed
       // If I am the host, I review the user. If I am the user, I review the host.
+      const reqRow: any = request;
       let reviewedId = '';
-      if (user.id === request.host_id) {
-        reviewedId = request.user_id;
-      } else if (user.id === request.user_id) {
-        reviewedId = request.host_id;
+      if (user.id === reqRow.host_id) {
+        reviewedId = reqRow.user_id;
+      } else if (user.id === reqRow.user_id) {
+        reviewedId = reqRow.host_id;
       } else {
         throw new Error('Not authorized to review this request');
       }
 
       const { data: newReview, error } = await dbReviewsService.create({
-        moment_id: request.moment_id,
+        moment_id: reqRow.moment_id,
         reviewer_id: user.id,
         reviewed_id: reviewedId,
         rating: data.rating,
@@ -126,7 +133,7 @@ export const reviewService = {
         reviewerAvatar: '',
         revieweeId: reviewedId,
         revieweeName: '',
-        momentId: request.moment_id,
+        momentId: reqRow.moment_id,
         momentTitle: '',
         requestId: data.requestId,
         createdAt: newReview!.created_at,
@@ -174,12 +181,12 @@ export const reviewService = {
         rating: row.rating as number,
         comment: (row.comment as string) || '',
         reviewerId: row.reviewer_id as string,
-        reviewerName: row.reviewer?.full_name || 'User',
-        reviewerAvatar: row.reviewer?.avatar_url || '',
+        reviewerName: (row as ReviewRowLike).reviewer?.full_name || 'User',
+        reviewerAvatar: (row as ReviewRowLike).reviewer?.avatar_url || '',
         revieweeId: row.reviewed_id as string,
         revieweeName: '', // Could be fetched
         momentId: row.moment_id as string,
-        momentTitle: row.moment?.title || '',
+        momentTitle: (row as ReviewRowLike).moment?.title || '',
         requestId: '', // Not stored in reviews table directly usually
         createdAt: row.created_at as string,
         isVerified: true,
@@ -385,12 +392,12 @@ export const reviewService = {
         rating: updated.rating,
         comment: updated.comment || '',
         reviewerId: updated.reviewer_id,
-        reviewerName: (updated as any).reviewer?.full_name || 'User',
-        reviewerAvatar: (updated as any).reviewer?.avatar_url || '',
+        reviewerName: (updated as ReviewRowLike).reviewer?.full_name || 'User',
+        reviewerAvatar: (updated as ReviewRowLike).reviewer?.avatar_url || '',
         revieweeId: updated.reviewed_id,
         revieweeName: '',
         momentId: updated.moment_id,
-        momentTitle: (updated as any).moment?.title || '',
+        momentTitle: (updated as ReviewRowLike).moment?.title || '',
         requestId: '',
         createdAt: updated.created_at,
         isVerified: true,
@@ -444,7 +451,8 @@ export const reviewService = {
       // SECURITY: Explicit column selection - never use select('*')
       const { data: existingReview, error: fetchError } = await supabase
         .from('reviews')
-        .select(`
+        .select(
+          `
           id,
           reviewer_id,
           reviewed_id,
@@ -454,7 +462,8 @@ export const reviewService = {
           created_at,
           response,
           response_at
-        `)
+        `,
+        )
         .eq('id', reviewId)
         .eq('reviewed_id', user.id)
         .single();
@@ -465,12 +474,14 @@ export const reviewService = {
 
       // Note: Response field may need to be added to the reviews table
       // For now, we'll store it but the schema may need updating
+      const updatePayload = {
+        response: text,
+        response_at: new Date().toISOString(),
+      } as unknown as import('../types/database.types').Database['public']['Tables']['reviews']['Update'];
+
       const { data: updated, error } = await supabase
         .from('reviews')
-        .update({
-          response: text,
-          response_at: new Date().toISOString(),
-        } as any)
+        .update(updatePayload)
         .eq('id', reviewId)
         .select('*, reviewer:users(*), moment:moments(*)')
         .single();
@@ -482,12 +493,12 @@ export const reviewService = {
         rating: updated!.rating,
         comment: updated!.comment || '',
         reviewerId: updated!.reviewer_id,
-        reviewerName: (updated as any)?.reviewer?.full_name || 'User',
-        reviewerAvatar: (updated as any)?.reviewer?.avatar_url || '',
+        reviewerName: (updated as ReviewRowLike)?.reviewer?.full_name || 'User',
+        reviewerAvatar: (updated as ReviewRowLike)?.reviewer?.avatar_url || '',
         revieweeId: updated!.reviewed_id,
         revieweeName: '',
         momentId: updated!.moment_id,
-        momentTitle: (updated as any)?.moment?.title || '',
+        momentTitle: (updated as ReviewRowLike)?.moment?.title || '',
         requestId: '',
         createdAt: updated!.created_at,
         isVerified: true,
@@ -516,13 +527,15 @@ export const reviewService = {
       if (!user) throw new Error('Not authenticated');
 
       // Insert into reports table (assuming it exists)
-      const { error } = await supabase.from('reports').insert({
+      const reportPayload = {
         reporter_id: user.id,
         target_type: 'review',
         target_id: reviewId,
         reason,
         status: 'pending',
-      } as any);
+      } as unknown as import('../types/database.types').Database['public']['Tables']['reports']['Insert'];
+
+      const { error } = await supabase.from('reports').insert(reportPayload);
 
       if (error) throw error;
     } catch (error) {

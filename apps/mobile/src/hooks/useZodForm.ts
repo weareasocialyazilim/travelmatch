@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useHookForm } from 'react-hook-form';
 import { logger } from '../utils/logger';
 import type { UseFormProps, UseFormReturn, FieldValues } from 'react-hook-form';
-import type { ZodType, TypeOf } from 'zod';
+import type { ZodType, TypeOf, ZodTypeAny } from 'zod';
 
 /**
  * Zod schema ile entegre form hook
@@ -19,22 +19,17 @@ import type { ZodType, TypeOf } from 'zod';
  *   defaultValues: { email: '', password: '' }
  * });
  */
-export function useZodForm<
-  TSchema extends ZodType<FieldValues>,
-  TOutput extends FieldValues = TypeOf<TSchema>,
->(
+export function useZodForm<TOutput extends FieldValues = FieldValues>(
   options: Omit<UseFormProps<TOutput>, 'resolver'> & {
-    schema: TSchema;
+    schema: ZodTypeAny;
   },
 ): UseFormReturn<TOutput> {
   const { schema, ...formOptions } = options;
 
   return useHookForm<TOutput>({
     ...formOptions,
-    // zodResolver returns a compatible resolver
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    resolver: zodResolver(schema as any) as any,
-    mode: formOptions.mode || 'onChange', // Default to real-time validation
+    resolver: zodResolver(schema as any) as UseFormProps<TOutput>['resolver'],
+    mode: formOptions.mode || 'onChange',
   });
 }
 

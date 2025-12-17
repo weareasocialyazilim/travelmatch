@@ -77,7 +77,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ],
   extra: {
     eas: {
-      projectId: '9721cfe0-b554-463f-af2b-ab2147d98172',
+      projectId: '55ca9fff-1a53-4190-b368-f9facf1febfd',
     },
     // Sentry configuration (from environment variables)
     sentryDsn: process.env.SENTRY_DSN || '',

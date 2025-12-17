@@ -17,7 +17,9 @@ const mockConsoleInfo = jest.spyOn(console, 'info').mockImplementation();
 const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation();
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation();
 const mockConsoleGroup = jest.spyOn(console, 'group').mockImplementation();
-const mockConsoleGroupEnd = jest.spyOn(console, 'groupEnd').mockImplementation();
+const mockConsoleGroupEnd = jest
+  .spyOn(console, 'groupEnd')
+  .mockImplementation();
 const mockConsoleTable = jest.spyOn(console, 'table').mockImplementation();
 const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
 
@@ -48,7 +50,7 @@ describe('logger.ts', () => {
     it('should redact password in object', () => {
       const testLogger = new Logger({ enableInProduction: true });
       testLogger.info('User data', { password: 'secret123' });
-      
+
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('[REDACTED]');
@@ -64,7 +66,7 @@ describe('logger.ts', () => {
         credit_card: '1234567890123456',
       };
       testLogger.info('Sensitive data', sensitiveData);
-      
+
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).not.toContain('secret123');
       expect(loggedCall).not.toContain('abc123');
@@ -84,7 +86,7 @@ describe('logger.ts', () => {
         },
       };
       testLogger.info('Nested data', nestedData);
-      
+
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).not.toContain('secret');
       expect(loggedCall).not.toContain('key123');
@@ -98,7 +100,7 @@ describe('logger.ts', () => {
         { id: 2, token: 'token123' },
       ];
       testLogger.info('Array data', arrayData);
-      
+
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).not.toContain('secret1');
       expect(loggedCall).not.toContain('token123');
@@ -112,7 +114,7 @@ describe('logger.ts', () => {
         preferences: { theme: 'dark' },
       };
       testLogger.info('User data', data);
-      
+
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('john_doe');
       expect(loggedCall).toContain('30');
@@ -125,7 +127,8 @@ describe('logger.ts', () => {
   // ========================================
   describe('PII redaction - string sanitization', () => {
     it('should redact JWT tokens', () => {
-      const message = 'Auth token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      const message =
+        'Auth token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
       logger.info(message);
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).toContain('[JWT_REDACTED]');
@@ -178,7 +181,8 @@ describe('logger.ts', () => {
     });
 
     it('should handle multiple PII patterns in one string', () => {
-      const message = 'User john@example.com with phone +1234567890 and token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.test';
+      const message =
+        'User john@example.com with phone +1234567890 and token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.test';
       logger.info(message);
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).toContain('[EMAIL_REDACTED]');
@@ -229,15 +233,15 @@ describe('logger.ts', () => {
       customLogger.debug('Debug message');
       customLogger.info('Info message');
       customLogger.warn('Warning message');
-      
+
       // Debug and info should not be logged
-      const debugCalls = mockConsoleInfo.mock.calls.filter(call => 
-        call[0]?.includes('[DEBUG]')
+      const debugCalls = mockConsoleInfo.mock.calls.filter((call) =>
+        call[0]?.includes('[DEBUG]'),
       );
-      const infoCalls = mockConsoleInfo.mock.calls.filter(call => 
-        call[0]?.includes('[INFO]')
+      const infoCalls = mockConsoleInfo.mock.calls.filter((call) =>
+        call[0]?.includes('[INFO]'),
       );
-      
+
       expect(debugCalls.length).toBe(0);
       expect(infoCalls.length).toBe(0);
       expect(mockConsoleWarn).toHaveBeenCalled();
@@ -259,13 +263,13 @@ describe('logger.ts', () => {
       const customLogger = new Logger({ minLevel: 'debug' });
       customLogger.debug('Debug 1');
       expect(mockConsoleInfo).toHaveBeenCalled();
-      
+
       mockConsoleInfo.mockClear();
       customLogger.setMinLevel('error');
       customLogger.debug('Debug 2');
-      
-      const debugCalls = mockConsoleInfo.mock.calls.filter(call => 
-        call[0]?.includes('Debug 2')
+
+      const debugCalls = mockConsoleInfo.mock.calls.filter((call) =>
+        call[0]?.includes('Debug 2'),
       );
       expect(debugCalls.length).toBe(0);
     });
@@ -279,16 +283,19 @@ describe('logger.ts', () => {
       global.__DEV__ = false;
       const prodLogger = new Logger();
       prodLogger.debug('Production message');
-      
-      const calls = mockConsoleInfo.mock.calls.filter(call => 
-        call[0]?.includes('Production message')
+
+      const calls = mockConsoleInfo.mock.calls.filter((call) =>
+        call[0]?.includes('Production message'),
       );
       expect(calls.length).toBe(0);
     });
 
     it('should log in production if enableInProduction is true', () => {
       global.__DEV__ = false;
-      const prodLogger = new Logger({ enableInProduction: true, jsonFormat: false });
+      const prodLogger = new Logger({
+        enableInProduction: true,
+        jsonFormat: false,
+      });
       prodLogger.info('Production message');
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
@@ -297,12 +304,12 @@ describe('logger.ts', () => {
 
     it('should use JSON format in production when enabled', () => {
       global.__DEV__ = false;
-      const prodLogger = new Logger({ 
-        enableInProduction: true, 
-        jsonFormat: true 
+      const prodLogger = new Logger({
+        enableInProduction: true,
+        jsonFormat: true,
       });
       prodLogger.info('Test message', { key: 'value' });
-      
+
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       // Should be JSON format
       expect(() => JSON.parse(loggedCall)).not.toThrow();
@@ -317,7 +324,7 @@ describe('logger.ts', () => {
       logger.time('operation');
       // Simulate some work
       const duration = logger.timeEnd('operation');
-      
+
       expect(duration).toBeGreaterThanOrEqual(0);
       expect(typeof duration).toBe('number');
     });
@@ -325,7 +332,7 @@ describe('logger.ts', () => {
     it('should log time on timeEnd', () => {
       logger.time('test-operation');
       logger.timeEnd('test-operation');
-      
+
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('test-operation');
@@ -342,7 +349,7 @@ describe('logger.ts', () => {
       logger.time('timer2');
       const duration1 = logger.timeEnd('timer1');
       const duration2 = logger.timeEnd('timer2');
-      
+
       expect(duration1).toBeGreaterThanOrEqual(0);
       expect(duration2).toBeGreaterThanOrEqual(0);
     });
@@ -356,9 +363,9 @@ describe('logger.ts', () => {
       logger.group('Test Group', () => {
         logger.info('Inside group');
       });
-      
+
       expect(mockConsoleGroup).toHaveBeenCalledWith(
-        expect.stringContaining('Test Group')
+        expect.stringContaining('Test Group'),
       );
       expect(mockConsoleGroupEnd).toHaveBeenCalled();
     });
@@ -386,10 +393,10 @@ describe('logger.ts', () => {
         { id: 2, name: 'User 2' },
       ];
       logger.data('Users', data);
-      
+
       expect(mockConsoleInfo).toHaveBeenCalledWith(
         expect.stringContaining('[TravelMatch] [INFO]'),
-        expect.stringContaining('Users')
+        expect.stringContaining('Users'),
       );
       expect(mockConsoleTable).toHaveBeenCalledWith(data);
     });
@@ -400,7 +407,7 @@ describe('logger.ts', () => {
         { id: 2, password: 'secret2' },
       ];
       logger.data('Sensitive data', data);
-      
+
       const tableData = mockConsoleTable.mock.calls[0][0];
       expect(JSON.stringify(tableData)).not.toContain('secret1');
       expect(JSON.stringify(tableData)).not.toContain('secret2');
@@ -414,18 +421,18 @@ describe('logger.ts', () => {
     it('should add context to logs', () => {
       const contextLogger = logger.withContext({ userId: 'user-123' });
       contextLogger.info('User action');
-      
+
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).toContain('user-123');
     });
 
     it('should sanitize context data', () => {
-      const contextLogger = logger.withContext({ 
+      const contextLogger = logger.withContext({
         userId: 'user-123',
-        password: 'secret' 
+        password: 'secret',
       });
       contextLogger.info('Action');
-      
+
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).not.toContain('secret');
     });
@@ -436,7 +443,7 @@ describe('logger.ts', () => {
       contextLogger.info('Info');
       contextLogger.warn('Warn');
       contextLogger.error('Error');
-      
+
       expect(mockConsoleInfo).toHaveBeenCalled();
       expect(mockConsoleWarn).toHaveBeenCalled();
       expect(mockConsoleError).toHaveBeenCalled();
@@ -450,28 +457,28 @@ describe('logger.ts', () => {
     it('should create child logger with combined prefix', () => {
       const parentLogger = new Logger({ prefix: '[Parent]' });
       const childLogger = parentLogger.child('[Child]');
-      
+
       childLogger.info('Test message');
-      
+
+      // Logger outputs a single string containing both prefixes
       expect(mockConsoleInfo).toHaveBeenCalledWith(
-        expect.stringContaining('[Parent]'),
-        expect.stringContaining('[Child]')
+        expect.stringContaining('[Parent][Child]'),
       );
     });
 
     it('should inherit parent configuration', () => {
-      const parentLogger = new Logger({ 
+      const parentLogger = new Logger({
         prefix: '[Parent]',
-        minLevel: 'warn' 
+        minLevel: 'warn',
       });
       const childLogger = parentLogger.child('[Child]');
-      
+
       childLogger.debug('Debug message');
       childLogger.warn('Warning message');
-      
+
       // Debug should not be logged due to minLevel
-      const debugCalls = mockConsoleInfo.mock.calls.filter(call => 
-        call[0]?.includes('Debug message')
+      const debugCalls = mockConsoleInfo.mock.calls.filter((call) =>
+        call[0]?.includes('Debug message'),
       );
       expect(debugCalls.length).toBe(0);
       expect(mockConsoleWarn).toHaveBeenCalled();
@@ -483,58 +490,58 @@ describe('logger.ts', () => {
   // ========================================
   describe('remote logging', () => {
     it('should queue remote logs when enabled', () => {
-      const remoteLogger = new Logger({ 
+      const remoteLogger = new Logger({
         enableRemoteLogging: true,
-        enableInProduction: true 
+        enableInProduction: true,
       });
-      
+
       remoteLogger.error('Remote error', { errorCode: 500 });
-      
+
       // Should queue the log (tested via Sentry integration)
       expect(true).toBe(true); // Queue is internal
     });
 
     it('should flush remote logs to Sentry', () => {
-      const remoteLogger = new Logger({ 
+      const remoteLogger = new Logger({
         enableRemoteLogging: true,
-        enableInProduction: true 
+        enableInProduction: true,
       });
-      
+
       remoteLogger.error('Error 1');
       remoteLogger.error('Error 2');
-      
+
       // Manually flush
       remoteLogger.flushRemoteLogs();
-      
+
       expect(Sentry.addBreadcrumb).toHaveBeenCalled();
     });
 
     it('should auto-flush when queue reaches threshold', () => {
-      const remoteLogger = new Logger({ 
+      const remoteLogger = new Logger({
         enableRemoteLogging: true,
-        enableInProduction: true 
+        enableInProduction: true,
       });
-      
+
       // Add 51 logs to exceed threshold of 50
       for (let i = 0; i < 51; i++) {
         remoteLogger.error(`Error ${i}`);
       }
-      
+
       expect(Sentry.addBreadcrumb).toHaveBeenCalled();
     });
 
     it('should sanitize remote logs', () => {
-      const remoteLogger = new Logger({ 
+      const remoteLogger = new Logger({
         enableRemoteLogging: true,
-        enableInProduction: true 
+        enableInProduction: true,
       });
-      
+
       remoteLogger.error('Error', { password: 'secret123' });
       remoteLogger.flushRemoteLogs();
-      
-      const breadcrumbs = (Sentry.addBreadcrumb ).mock.calls;
-      const hasSecret = breadcrumbs.some(call => 
-        JSON.stringify(call).includes('secret123')
+
+      const breadcrumbs = Sentry.addBreadcrumb.mock.calls;
+      const hasSecret = breadcrumbs.some((call) =>
+        JSON.stringify(call).includes('secret123'),
       );
       expect(hasSecret).toBe(false);
     });
@@ -545,23 +552,23 @@ describe('logger.ts', () => {
   // ========================================
   describe('cleanup', () => {
     it('should flush logs on destroy', () => {
-      const remoteLogger = new Logger({ 
+      const remoteLogger = new Logger({
         enableRemoteLogging: true,
-        enableInProduction: true 
+        enableInProduction: true,
       });
-      
+
       remoteLogger.error('Test error');
       remoteLogger.destroy();
-      
+
       expect(Sentry.addBreadcrumb).toHaveBeenCalled();
     });
 
     it('should clear flush interval on destroy', () => {
-      const remoteLogger = new Logger({ 
+      const remoteLogger = new Logger({
         enableRemoteLogging: true,
-        enableInProduction: true 
+        enableInProduction: true,
       });
-      
+
       // Destroy should not throw
       expect(() => remoteLogger.destroy()).not.toThrow();
     });
@@ -572,9 +579,12 @@ describe('logger.ts', () => {
   // ========================================
   describe('custom prefixes', () => {
     it('should use custom prefix', () => {
-      const customLogger = new Logger({ prefix: '[Custom]', enableInProduction: true });
+      const customLogger = new Logger({
+        prefix: '[Custom]',
+        enableInProduction: true,
+      });
       customLogger.info('Test message');
-      
+
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('[Custom]');
@@ -583,7 +593,7 @@ describe('logger.ts', () => {
     it('should use default prefix if not provided', () => {
       const defaultLogger = new Logger({ enableInProduction: true });
       defaultLogger.info('Test message');
-      
+
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('[TravelMatch]');
@@ -613,7 +623,7 @@ describe('logger.ts', () => {
     it('should log Error objects', () => {
       const error = new Error('Test error');
       logger.error('Error occurred', error);
-      
+
       expect(mockConsoleError).toHaveBeenCalled();
       const loggedCall = mockConsoleError.mock.calls[0][1];
       expect(loggedCall).toContain('Test error');
@@ -622,7 +632,7 @@ describe('logger.ts', () => {
     it('should log error stack traces', () => {
       const error = new Error('Test error');
       logger.error('Error with stack', error);
-      
+
       const loggedCall = mockConsoleError.mock.calls[0][1];
       expect(loggedCall).toBeDefined();
     });
@@ -633,7 +643,7 @@ describe('logger.ts', () => {
   // ========================================
   describe('edge cases', () => {
     it('should handle null data', () => {
-      expect(() => logger.info('Null data', null as any)).not.toThrow();
+      expect(() => logger.info('Null data', null)).not.toThrow();
     });
 
     it('should handle undefined data', () => {
@@ -643,9 +653,9 @@ describe('logger.ts', () => {
     it('should handle circular references gracefully', () => {
       const circular: any = { name: 'test' };
       circular.self = circular;
-      
+
       // Logger should handle this without infinite recursion
-      // Note: The actual logger.ts may throw or return [Circular] 
+      // Note: The actual logger.ts may throw or return [Circular]
       // depending on implementation. We just verify it doesn't hang.
       logger.info('Circular data', circular);
       expect(mockConsoleInfo).toHaveBeenCalled();

@@ -1,7 +1,55 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MomentSingleCard Component Snapshots matches snapshot for basic moment 1`] = `null`;
+exports[`MomentSingleCard Component Snapshots matches snapshot for basic moment 1`] = `
+<RCTTouchableOpacity
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
+  accessible={true}
+  onPress={[Function]}
+>
+  <RCTText
+    testID="RCTText"
+  >
+    Test Moment
+  </RCTText>
+</RCTTouchableOpacity>
+`;
 
-exports[`MomentSingleCard Component Snapshots matches snapshot for verified host 1`] = `null`;
+exports[`MomentSingleCard Component Snapshots matches snapshot for verified host 1`] = `
+<RCTTouchableOpacity
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
+  accessible={true}
+  onPress={[Function]}
+>
+  <RCTText
+    testID="RCTText"
+  >
+    Test Moment
+  </RCTText>
+</RCTTouchableOpacity>
+`;
 
-exports[`MomentSingleCard Component Snapshots matches snapshot with distance 1`] = `null`;
+exports[`MomentSingleCard Component Snapshots matches snapshot with distance 1`] = `
+<RCTTouchableOpacity
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
+  accessible={true}
+  onPress={[Function]}
+>
+  <RCTText
+    testID="RCTText"
+  >
+    Test Moment
+  </RCTText>
+</RCTTouchableOpacity>
+`;

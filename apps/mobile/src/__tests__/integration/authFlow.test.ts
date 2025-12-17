@@ -1,20 +1,20 @@
 /**
  * Auth Flow Integration Tests
- * 
+ *
  * Tests complete authentication workflows that span multiple services:
  * - Login → Profile fetch → Logout
  * - Signup → Email verification → Profile setup
  * - Password reset flow
  * - Session persistence and refresh
  * - Multi-device logout
- * 
+ *
  * Target: 5 scenarios
  */
 
-import { 
-  signInWithEmail, 
-  signUpWithEmail, 
-  signOut, 
+import {
+  signInWithEmail,
+  signUpWithEmail,
+  signOut,
   getCurrentUser,
   resetPassword,
   getSession,
@@ -33,7 +33,7 @@ jest.mock('@/config/supabase', () => {
     getSession: jest.fn(),
     resetPasswordForEmail: jest.fn(),
   };
-  
+
   return {
     supabase: {
       auth: mockAuth,
@@ -46,9 +46,9 @@ jest.mock('@/config/supabase', () => {
 
 jest.mock('@/utils/logger');
 
-const mockSupabase = supabase ;
-const mockAuth = auth ;
-const mockLogger = logger ;
+const mockSupabase = supabase;
+const mockAuth = auth;
+const mockLogger = logger;
 
 describe('Auth Flow Integration', () => {
   const mockUser = {
@@ -107,19 +107,21 @@ describe('Auth Flow Integration', () => {
       eq: jest.fn().mockReturnThis(),
       single: jest.fn(),
     };
-    mockSupabase.from = jest.fn(() => mockFromChain) as any;
+    mockSupabase.from = jest.fn(
+      () => mockFromChain,
+    ) as unknown as typeof mockSupabase.from;
   });
 
   describe('Scenario 1: Complete Login Flow', () => {
     it('should successfully login → fetch profile → maintain session', async () => {
       // Arrange: Mock successful login
-      (mockAuth.signInWithPassword ).mockResolvedValue({
+      mockAuth.signInWithPassword.mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
 
       // Mock profile fetch
-      (mockAuth.getUser ).mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -129,10 +131,13 @@ describe('Auth Flow Integration', () => {
         eq: jest.fn().mockReturnThis(),
         single: jest.fn().mockResolvedValue({ data: mockProfile, error: null }),
       };
-      (mockSupabase.from ).mockReturnValue(mockFromChain);
+      mockSupabase.from.mockReturnValue(mockFromChain);
 
       // Act: Perform login
-      const loginResult = await signInWithEmail('test@example.com', 'password123');
+      const loginResult = await signInWithEmail(
+        'test@example.com',
+        'password123',
+      );
 
       // Assert: Login successful
       expect(loginResult.user).toEqual(mockUser);
@@ -149,14 +154,14 @@ describe('Auth Flow Integration', () => {
       // Verify logging
       expect(mockLogger.info).toHaveBeenCalledWith(
         '[Auth] Sign in successful',
-        { userId: mockUser.id }
+        { userId: mockUser.id },
       );
     });
 
     it('should handle invalid credentials gracefully', async () => {
       // Arrange: Mock login failure
       const authError = { message: 'Invalid login credentials' };
-      (mockAuth.signInWithPassword ).mockResolvedValue({
+      mockAuth.signInWithPassword.mockResolvedValue({
         data: { user: null, session: null },
         error: authError,
       });
@@ -172,7 +177,7 @@ describe('Auth Flow Integration', () => {
       // Verify error logging
       expect(mockLogger.error).toHaveBeenCalledWith(
         '[Auth] Sign in error:',
-        authError
+        authError,
       );
     });
   });
@@ -180,13 +185,13 @@ describe('Auth Flow Integration', () => {
   describe('Scenario 2: Complete Logout Flow', () => {
     it('should logout → clear session → prevent further requests', async () => {
       // Arrange: User is logged in
-      (mockAuth.getUser ).mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
       // Mock successful logout
-      (mockAuth.signOut ).mockResolvedValue({
+      mockAuth.signOut.mockResolvedValue({
         error: null,
       });
 
@@ -198,10 +203,12 @@ describe('Auth Flow Integration', () => {
       expect(mockAuth.signOut).toHaveBeenCalled();
 
       // Verify logging
-      expect(mockLogger.info).toHaveBeenCalledWith('[Auth] Sign out successful');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        '[Auth] Sign out successful',
+      );
 
       // Arrange: Mock unauthenticated state after logout
-      (mockAuth.getUser ).mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: { message: 'Not authenticated' },
       });
@@ -216,7 +223,7 @@ describe('Auth Flow Integration', () => {
     it('should handle logout errors', async () => {
       // Arrange: Mock logout failure
       const logoutError = { message: 'Network error during logout' };
-      (mockAuth.signOut ).mockResolvedValue({
+      mockAuth.signOut.mockResolvedValue({
         error: logoutError,
       });
 
@@ -227,7 +234,7 @@ describe('Auth Flow Integration', () => {
       expect(result.error).toEqual(logoutError);
       expect(mockLogger.error).toHaveBeenCalledWith(
         '[Auth] Sign out error:',
-        logoutError
+        logoutError,
       );
     });
   });
@@ -244,7 +251,7 @@ describe('Auth Flow Integration', () => {
       };
 
       // Arrange: Mock successful signup
-      (mockAuth.signUp ).mockResolvedValue({
+      mockAuth.signUp.mockResolvedValue({
         data: {
           user: newUser,
           session: { ...mockSession, user: newUser },
@@ -256,7 +263,7 @@ describe('Auth Flow Integration', () => {
       const signupResult = await signUpWithEmail(
         'newuser@example.com',
         'securepassword123',
-        { name: 'New User' }
+        { name: 'New User' },
       );
 
       // Assert: Signup successful
@@ -273,14 +280,14 @@ describe('Auth Flow Integration', () => {
       // Verify logging
       expect(mockLogger.info).toHaveBeenCalledWith(
         '[Auth] Sign up successful',
-        { userId: newUser.id }
+        { userId: newUser.id },
       );
     });
 
     it('should handle duplicate email during signup', async () => {
       // Arrange: Mock signup failure (email already exists)
       const signupError = { message: 'User already registered' };
-      (mockAuth.signUp ).mockResolvedValue({
+      mockAuth.signUp.mockResolvedValue({
         data: { user: null, session: null },
         error: signupError,
       });
@@ -288,7 +295,7 @@ describe('Auth Flow Integration', () => {
       // Act: Attempt signup with existing email
       const result = await signUpWithEmail(
         'existing@example.com',
-        'password123'
+        'password123',
       );
 
       // Assert: Error returned
@@ -296,7 +303,7 @@ describe('Auth Flow Integration', () => {
       expect(result.error).toEqual(signupError);
       expect(mockLogger.error).toHaveBeenCalledWith(
         '[Auth] Sign up error:',
-        signupError
+        signupError,
       );
     });
   });
@@ -304,7 +311,7 @@ describe('Auth Flow Integration', () => {
   describe('Scenario 4: Password Reset Flow', () => {
     it('should request password reset → send email → confirm request', async () => {
       // Arrange: Mock successful password reset request
-      (mockAuth.resetPasswordForEmail ).mockResolvedValue({
+      mockAuth.resetPasswordForEmail.mockResolvedValue({
         error: null,
       });
 
@@ -315,20 +322,20 @@ describe('Auth Flow Integration', () => {
       expect(result.error).toBeNull();
       expect(mockAuth.resetPasswordForEmail).toHaveBeenCalledWith(
         'test@example.com',
-        { redirectTo: 'travelmatch://auth/reset-password' }
+        { redirectTo: 'travelmatch://auth/reset-password' },
       );
 
       // Verify logging
       expect(mockLogger.info).toHaveBeenCalledWith(
         '[Auth] Password reset email sent to',
-        'test@example.com'
+        'test@example.com',
       );
     });
 
     it('should handle password reset errors', async () => {
       // Arrange: Mock password reset failure
       const resetError = { message: 'Email not found' };
-      (mockAuth.resetPasswordForEmail ).mockResolvedValue({
+      mockAuth.resetPasswordForEmail.mockResolvedValue({
         error: resetError,
       });
 
@@ -339,7 +346,7 @@ describe('Auth Flow Integration', () => {
       expect(result.error).toEqual(resetError);
       expect(mockLogger.error).toHaveBeenCalledWith(
         '[Auth] Reset password error:',
-        resetError
+        resetError,
       );
     });
   });
@@ -347,7 +354,7 @@ describe('Auth Flow Integration', () => {
   describe('Scenario 5: Session Persistence and Refresh', () => {
     it('should retrieve existing session → verify user → refresh if needed', async () => {
       // Arrange: Mock existing session
-      (mockAuth.getSession ).mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -360,7 +367,7 @@ describe('Auth Flow Integration', () => {
       expect(sessionResult.error).toBeNull();
 
       // Arrange: Mock user verification
-      (mockAuth.getUser ).mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -379,7 +386,7 @@ describe('Auth Flow Integration', () => {
         expires_at: Date.now() - 1000, // Expired 1 second ago
       };
 
-      (mockAuth.getSession ).mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: expiredSession },
         error: null,
       });
@@ -394,7 +401,7 @@ describe('Auth Flow Integration', () => {
 
     it('should handle no session found', async () => {
       // Arrange: Mock no session
-      (mockAuth.getSession ).mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: null },
         error: null,
       });

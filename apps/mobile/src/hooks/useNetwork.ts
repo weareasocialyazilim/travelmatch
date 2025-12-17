@@ -33,11 +33,25 @@ export const useNetwork = (): UseNetworkReturn => {
     // Get initial state
     void NetInfo.fetch().then(handleNetInfoChange);
 
-    // Subscribe to network changes
-    const unsubscribe = NetInfo.addEventListener(handleNetInfoChange);
+    // Subscribe to network changes. Some mocks return a function, others an
+    // object with a `remove()` method — support both shapes to avoid runtime
+    // errors during tests/unmount.
+    const subscriber = NetInfo.addEventListener(handleNetInfoChange);
 
     return () => {
-      unsubscribe();
+      if (typeof subscriber === 'function') {
+        try {
+          subscriber();
+        } catch (_) {
+          // swallow - defensive in case mock throws on double-unsubscribe
+        }
+      } else if (subscriber && typeof (subscriber as any).remove === 'function') {
+        try {
+          (subscriber as any).remove();
+        } catch (_) {
+          // swallow
+        }
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

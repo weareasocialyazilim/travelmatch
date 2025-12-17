@@ -67,100 +67,105 @@ interface OptimizedImageProps {
  * />
  * ```
  */
-export const OptimizedImage = memo<OptimizedImageProps>(function OptimizedImage({
-  source,
-  contentFit = 'cover',
-  placeholder,
-  transition = 200,
-  containerStyle,
-  style,
-  showLoading = false,
-  errorComponent,
-  accessibilityLabel,
-  priority = 'normal',
-  onLoad,
-  onError,
-}) {
-  const [isLoading, setIsLoading] = useState(showLoading);
-  const [hasError, setHasError] = useState(false);
-  const loadStartTime = useRef<number>(0);
+export const OptimizedImage = memo<OptimizedImageProps>(
+  function OptimizedImage({
+    source,
+    contentFit = 'cover',
+    placeholder,
+    transition = 200,
+    containerStyle,
+    style,
+    showLoading = false,
+    errorComponent,
+    accessibilityLabel,
+    priority = 'normal',
+    onLoad,
+    onError,
+  }) {
+    const [isLoading, setIsLoading] = useState(showLoading);
+    const [hasError, setHasError] = useState(false);
+    const loadStartTime = useRef<number>(0);
 
-  // Normalize source to URI string
-  const imageSource = typeof source === 'string'
-    ? source
-    : typeof source === 'number'
-      ? source
-      : source.uri;
+    // Normalize source to ImageSourcePropType ({ uri } or number)
+    const imageSource = typeof source === 'string' ? { uri: source } : source;
 
-  const handleLoadStart = () => {
-    loadStartTime.current = Date.now();
-    setIsLoading(true);
-    setHasError(false);
-  };
+    const handleLoadStart = () => {
+      loadStartTime.current = Date.now();
+      setIsLoading(true);
+      setHasError(false);
+    };
 
-  const handleLoad = () => {
-    setIsLoading(false);
-    setHasError(false);
+    const handleLoad = () => {
+      setIsLoading(false);
+      setHasError(false);
 
-    // Track image load performance
-    if (loadStartTime.current > 0) {
-      const loadTime = Date.now() - loadStartTime.current;
-      analytics.trackTiming('image_load', loadTime, {
-        priority,
-        contentFit,
-        hasPlaceholder: !!placeholder,
-      });
-    }
+      // Track image load performance
+      if (loadStartTime.current > 0) {
+        const loadTime = Date.now() - loadStartTime.current;
+        analytics.trackTiming('image_load', loadTime, {
+          priority,
+          contentFit,
+          hasPlaceholder: !!placeholder,
+        });
+      }
 
-    onLoad?.();
-  };
+      onLoad?.();
+    };
 
-  const handleError = (error: any) => {
-    setIsLoading(false);
-    setHasError(true);
-    onError?.(error);
-    console.error('OptimizedImage load error:', error);
-  };
+    const handleError = (error: any) => {
+      setIsLoading(false);
+      setHasError(true);
+      onError?.(error);
+      console.error('OptimizedImage load error:', error);
+    };
 
-  // Show error state
-  if (hasError) {
-    if (errorComponent) {
+    // Show error state
+    if (hasError) {
+      if (errorComponent) {
+        return (
+          <View style={[styles.container, containerStyle]}>
+            {errorComponent}
+          </View>
+        );
+      }
       return (
-        <View style={[styles.container, containerStyle]}>
-          {errorComponent}
+        <View
+          style={[
+            styles.container,
+            styles.errorContainer,
+            containerStyle,
+            style,
+          ]}
+        >
+          <View style={styles.errorPlaceholder} />
         </View>
       );
     }
+
     return (
-      <View style={[styles.container, styles.errorContainer, containerStyle, style]}>
-        <View style={styles.errorPlaceholder} />
+      <View style={[styles.container, containerStyle]}>
+        <Image
+          source={imageSource}
+          contentFit={contentFit}
+          placeholder={placeholder}
+          transition={transition}
+          style={[styles.image, style]}
+          onLoadStart={handleLoadStart}
+          onLoad={handleLoad}
+          onError={handleError}
+          accessibilityLabel={accessibilityLabel}
+          priority={priority}
+          cachePolicy="memory-disk"
+        />
+        {isLoading && showLoading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="small" color={COLORS.primary} />
+          </View>
+        )}
       </View>
     );
-  }
-
-  return (
-    <View style={[styles.container, containerStyle]}>
-      <Image
-        source={imageSource}
-        contentFit={contentFit}
-        placeholder={placeholder}
-        transition={transition}
-        style={[styles.image, style]}
-        onLoadStart={handleLoadStart}
-        onLoad={handleLoad}
-        onError={handleError}
-        accessibilityLabel={accessibilityLabel}
-        priority={priority}
-        cachePolicy="memory-disk"
-      />
-      {isLoading && showLoading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="small" color={COLORS.primary} />
-        </View>
-      )}
-    </View>
-  );
-});
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

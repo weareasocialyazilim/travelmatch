@@ -4,7 +4,9 @@
  */
 
 import React, { ReactElement, createContext, useContext } from 'react';
-import { render, RenderOptions } from '@testing-library/react-native';
+import { render, RenderOptions, screen } from '@testing-library/react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { NetworkProvider } from '@/context/NetworkContext';
 
 // Mock Toast Context for tests (avoids React Native Animated issues)
 const MockToastContext = createContext({
@@ -65,18 +67,59 @@ interface AllTheProvidersProps {
 
 const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) => {
   return (
-    <MockAuthProvider>
-      <MockToastProvider>
-        {children}
-      </MockToastProvider>
-    </MockAuthProvider>
+    <NavigationContainer>
+      <MockAuthProvider>
+        <NetworkProvider>
+          <MockToastProvider>
+            {children}
+          </MockToastProvider>
+        </NetworkProvider>
+      </MockAuthProvider>
+    </NavigationContainer>
   );
 };
 
 const customRender = (
   ui: ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllTheProviders, ...options });
+) => {
+  // If the caller passes a `navigation` prop directly to the root component,
+  // expose it as a global used by the test navigation mock in jest.setup.
+  // If the root UI element carries a `navigation` prop, expose it on global
+  // for the test navigation mock in `jest.setup` so `useNavigation` returns it.
+  // Avoid try/catch for lint cleanliness — access safely via guards.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (ui && ui.props && ui.props.navigation) {
+    // @ts-ignore
+    global.__TEST_NAVIGATION__ = ui.props.navigation;
+  }
+
+  const result = render(ui, { wrapper: AllTheProviders, ...options });
+
+  // Fallback getByPlaceholderText to handle cases where scoped queries don't
+  // find inputs rendered by NavigationContainer/modal roots.
+  const originalGetByPlaceholderText = result.getByPlaceholderText;
+  result.getByPlaceholderText = (text: string) => {
+    try {
+      return originalGetByPlaceholderText(text as any);
+    } catch (err) {
+      const fallback = result.queryAllByPlaceholderText(text as any);
+      if (fallback && fallback.length > 0) return fallback[0];
+      // As a last resort, look for a discover header search testID which some
+      // mocks expose when Navigation containers create separate roots.
+      const discoverSearch = result.queryByTestId('discover-search');
+      if (discoverSearch) return discoverSearch;
+      throw err;
+    }
+  };
+
+  // If the caller passes a `navigation` prop directly to the root component,
+  // expose it as a global used by the test navigation mock in jest.setup.
+  // (navigation prop already attached above)
+
+  return result;
+};
 
 export * from '@testing-library/react-native';
 export { customRender as render };

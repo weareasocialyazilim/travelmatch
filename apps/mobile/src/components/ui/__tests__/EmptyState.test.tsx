@@ -14,11 +14,7 @@ jest.mock('../EmptyStateIllustration', () => {
   const RN = require('react-native');
   return {
     EmptyStateIllustration: ({ type }: { type: string }) =>
-      React.createElement(
-        RN.Text,
-        { testID: `illustration-${type}` },
-        type
-      ),
+      React.createElement(RN.Text, { testID: `illustration-${type}` }, type),
   };
 });
 
@@ -34,8 +30,8 @@ jest.mock('../Button', () => {
         React.createElement(
           RN.Text,
           { testID: `button-variant-${variant}` },
-          variant
-        )
+          variant,
+        ),
       ),
   };
 });
@@ -53,7 +49,7 @@ describe('EmptyState Component', () => {
 
     it('renders with title and description', () => {
       const { getByText } = render(
-        <EmptyState title="No items" description="No items found" />
+        <EmptyState title="No items" description="No items found" />,
       );
       expect(getByText('No items')).toBeTruthy();
       expect(getByText('No items found')).toBeTruthy();
@@ -61,7 +57,7 @@ describe('EmptyState Component', () => {
 
     it('renders with title and subtitle alias', () => {
       const { getByText } = render(
-        <EmptyState title="Empty" subtitle="Nothing here" />
+        <EmptyState title="Empty" subtitle="Nothing here" />,
       );
       expect(getByText('Empty')).toBeTruthy();
       expect(getByText('Nothing here')).toBeTruthy();
@@ -73,7 +69,7 @@ describe('EmptyState Component', () => {
           title="Title"
           description="Description text"
           subtitle="Subtitle text"
-        />
+        />,
       );
       expect(getByText('Description text')).toBeTruthy();
       expect(queryByText('Subtitle text')).toBeNull();
@@ -92,7 +88,7 @@ describe('EmptyState Component', () => {
   describe('Icons', () => {
     it('renders with custom icon', () => {
       const { UNSAFE_root } = render(
-        <EmptyState title="No messages" icon="message-outline" />
+        <EmptyState title="No messages" icon="message-outline" />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -119,7 +115,7 @@ describe('EmptyState Component', () => {
   describe('Illustrations', () => {
     it('renders with illustration type', () => {
       const { getByTestId } = render(
-        <EmptyState title="No moments" illustrationType="no_moments" />
+        <EmptyState title="No moments" illustrationType="no_moments" />,
       );
       expect(getByTestId('illustration-no_moments')).toBeTruthy();
     });
@@ -134,7 +130,7 @@ describe('EmptyState Component', () => {
 
       types.forEach((type) => {
         const { getByTestId } = render(
-          <EmptyState title="Test" illustrationType={type} />
+          <EmptyState title="Test" illustrationType={type} />,
         );
         expect(getByTestId(`illustration-${type}`)).toBeTruthy();
       });
@@ -143,7 +139,7 @@ describe('EmptyState Component', () => {
     it('renders with custom illustration component', () => {
       const CustomIllustration = () => <Text>Custom</Text>;
       const { getByText } = render(
-        <EmptyState title="Test" illustration={<CustomIllustration />} />
+        <EmptyState title="Test" illustration={<CustomIllustration />} />,
       );
       expect(getByText('Custom')).toBeTruthy();
     });
@@ -155,7 +151,7 @@ describe('EmptyState Component', () => {
           title="Test"
           illustration={<CustomIllustration />}
           illustrationType="no_moments"
-        />
+        />,
       );
       expect(getByText('Custom')).toBeTruthy();
       expect(queryByTestId('illustration-no_moments')).toBeNull();
@@ -167,7 +163,7 @@ describe('EmptyState Component', () => {
           title="Test"
           illustrationType="no_messages"
           icon="heart-outline"
-        />
+        />,
       );
       expect(getByTestId('illustration-no_messages')).toBeTruthy();
     });
@@ -181,7 +177,7 @@ describe('EmptyState Component', () => {
     it('renders primary action button', () => {
       const onAction = jest.fn();
       const { getByText } = render(
-        <EmptyState title="Empty" actionLabel="Reload" onAction={onAction} />
+        <EmptyState title="Empty" actionLabel="Reload" onAction={onAction} />,
       );
       expect(getByText('Reload')).toBeTruthy();
     });
@@ -189,7 +185,7 @@ describe('EmptyState Component', () => {
     it('calls onAction when primary button pressed', () => {
       const onAction = jest.fn();
       const { getByText } = render(
-        <EmptyState title="Empty" actionLabel="Reload" onAction={onAction} />
+        <EmptyState title="Empty" actionLabel="Reload" onAction={onAction} />,
       );
 
       fireEvent.press(getByText('Reload'));
@@ -198,7 +194,7 @@ describe('EmptyState Component', () => {
 
     it('does not render action button without onAction', () => {
       const { queryByText } = render(
-        <EmptyState title="Empty" actionLabel="Reload" />
+        <EmptyState title="Empty" actionLabel="Reload" />,
       );
       expect(queryByText('Reload')).toBeNull();
     });
@@ -206,7 +202,7 @@ describe('EmptyState Component', () => {
     it('does not render action button without actionLabel', () => {
       const onAction = jest.fn();
       const { UNSAFE_root } = render(
-        <EmptyState title="Empty" onAction={onAction} />
+        <EmptyState title="Empty" onAction={onAction} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -214,7 +210,7 @@ describe('EmptyState Component', () => {
     it('renders primary button with primary variant', () => {
       const onAction = jest.fn();
       const { getByTestId } = render(
-        <EmptyState title="Empty" actionLabel="Action" onAction={onAction} />
+        <EmptyState title="Empty" actionLabel="Action" onAction={onAction} />,
       );
       expect(getByTestId('button-variant-primary')).toBeTruthy();
     });
@@ -232,7 +228,7 @@ describe('EmptyState Component', () => {
           title="Empty"
           secondaryActionLabel="Cancel"
           onSecondaryAction={onSecondary}
-        />
+        />,
       );
       expect(getByText('Cancel')).toBeTruthy();
     });
@@ -244,7 +240,7 @@ describe('EmptyState Component', () => {
           title="Empty"
           secondaryActionLabel="Cancel"
           onSecondaryAction={onSecondary}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Cancel'));
@@ -253,7 +249,7 @@ describe('EmptyState Component', () => {
 
     it('does not render secondary button without onSecondaryAction', () => {
       const { queryByText } = render(
-        <EmptyState title="Empty" secondaryActionLabel="Cancel" />
+        <EmptyState title="Empty" secondaryActionLabel="Cancel" />,
       );
       expect(queryByText('Cancel')).toBeNull();
     });
@@ -265,7 +261,7 @@ describe('EmptyState Component', () => {
           title="Empty"
           secondaryActionLabel="Cancel"
           onSecondaryAction={onSecondary}
-        />
+        />,
       );
       expect(getByTestId('button-variant-secondary')).toBeTruthy();
     });
@@ -280,7 +276,7 @@ describe('EmptyState Component', () => {
           onAction={onAction}
           secondaryActionLabel="Secondary"
           onSecondaryAction={onSecondary}
-        />
+        />,
       );
 
       expect(getByText('Primary')).toBeTruthy();
@@ -297,7 +293,7 @@ describe('EmptyState Component', () => {
           onAction={onAction}
           secondaryActionLabel="Secondary"
           onSecondaryAction={onSecondary}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Primary'));
@@ -317,7 +313,7 @@ describe('EmptyState Component', () => {
   describe('Custom Styles', () => {
     it('accepts custom style prop', () => {
       const { UNSAFE_root } = render(
-        <EmptyState title="Empty" style={{ padding: 20 }} />
+        <EmptyState title="Empty" style={{ padding: 20 }} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -327,14 +323,14 @@ describe('EmptyState Component', () => {
         <EmptyState
           title="Empty"
           style={{ padding: 20, backgroundColor: '#fff' }}
-        />
+        />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
 
     it('handles undefined style gracefully', () => {
       const { UNSAFE_root } = render(
-        <EmptyState title="Empty" style={undefined} />
+        <EmptyState title="Empty" style={undefined} />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -351,7 +347,7 @@ describe('EmptyState Component', () => {
           title="No messages"
           description="Start a conversation"
           illustrationType="no_messages"
-        />
+        />,
       );
       expect(getByText('No messages')).toBeTruthy();
       expect(getByText('Start a conversation')).toBeTruthy();
@@ -363,7 +359,7 @@ describe('EmptyState Component', () => {
           title="No results found"
           description="Try different search terms"
           illustrationType="no_results"
-        />
+        />,
       );
       expect(getByText('No results found')).toBeTruthy();
       expect(getByText('Try different search terms')).toBeTruthy();
@@ -375,22 +371,24 @@ describe('EmptyState Component', () => {
           title="No notifications"
           description="You're all caught up"
           illustrationType="no_notifications"
-        />
+        />,
       );
       expect(getByText('No notifications')).toBeTruthy();
       expect(getByText("You're all caught up")).toBeTruthy();
     });
 
     it('renders with very long title', () => {
-      const longTitle = 'This is a very long title that should still render correctly without breaking the layout';
+      const longTitle =
+        'This is a very long title that should still render correctly without breaking the layout';
       const { getByText } = render(<EmptyState title={longTitle} />);
       expect(getByText(longTitle)).toBeTruthy();
     });
 
     it('renders with very long description', () => {
-      const longDesc = 'This is a very long description that provides detailed information about why the state is empty and what the user can do about it.';
+      const longDesc =
+        'This is a very long description that provides detailed information about why the state is empty and what the user can do about it.';
       const { getByText } = render(
-        <EmptyState title="Empty" description={longDesc} />
+        <EmptyState title="Empty" description={longDesc} />,
       );
       expect(getByText(longDesc)).toBeTruthy();
     });
@@ -408,14 +406,18 @@ describe('EmptyState Component', () => {
 
     it('handles undefined description gracefully', () => {
       const { queryByText, getByText } = render(
-        <EmptyState title="Title" description={undefined} />
+        <EmptyState title="Title" description={undefined} />,
       );
       expect(getByText('Title')).toBeTruthy();
     });
 
     it('handles both description and subtitle as undefined', () => {
       const { UNSAFE_root } = render(
-        <EmptyState title="Title" description={undefined} subtitle={undefined} />
+        <EmptyState
+          title="Title"
+          description={undefined}
+          subtitle={undefined}
+        />,
       );
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -427,15 +429,13 @@ describe('EmptyState Component', () => {
 
     it('handles special characters in description', () => {
       const { getByText } = render(
-        <EmptyState title="Empty" description="Try again... ✨" />
+        <EmptyState title="Empty" description="Try again... ✨" />,
       );
       expect(getByText('Try again... ✨')).toBeTruthy();
     });
 
     it('handles null style prop', () => {
-      const { UNSAFE_root } = render(
-        <EmptyState title="Empty" style={null as any} />
-      );
+      const { UNSAFE_root } = render(<EmptyState title="Empty" style={null} />);
       expect(UNSAFE_root).toBeTruthy();
     });
   });
@@ -447,7 +447,7 @@ describe('EmptyState Component', () => {
   describe('State Updates', () => {
     it('updates title dynamically', () => {
       const { rerender, getByText, queryByText } = render(
-        <EmptyState title="Original" />
+        <EmptyState title="Original" />,
       );
       expect(getByText('Original')).toBeTruthy();
 
@@ -458,7 +458,7 @@ describe('EmptyState Component', () => {
 
     it('updates description dynamically', () => {
       const { rerender, getByText } = render(
-        <EmptyState title="Title" description="Original desc" />
+        <EmptyState title="Title" description="Original desc" />,
       );
       expect(getByText('Original desc')).toBeTruthy();
 
@@ -475,7 +475,7 @@ describe('EmptyState Component', () => {
 
     it('removes description dynamically', () => {
       const { rerender, queryByText } = render(
-        <EmptyState title="Title" description="Description" />
+        <EmptyState title="Title" description="Description" />,
       );
       expect(queryByText('Description')).toBeTruthy();
 
@@ -485,7 +485,7 @@ describe('EmptyState Component', () => {
 
     it('updates illustration type', () => {
       const { rerender, getByTestId } = render(
-        <EmptyState title="Title" illustrationType="no_moments" />
+        <EmptyState title="Title" illustrationType="no_moments" />,
       );
       expect(getByTestId('illustration-no_moments')).toBeTruthy();
 
@@ -498,7 +498,7 @@ describe('EmptyState Component', () => {
       const { rerender, getByText } = render(<EmptyState title="Title" />);
 
       rerender(
-        <EmptyState title="Title" actionLabel="Action" onAction={onAction} />
+        <EmptyState title="Title" actionLabel="Action" onAction={onAction} />,
       );
       expect(getByText('Action')).toBeTruthy();
     });
@@ -522,7 +522,7 @@ describe('EmptyState Component', () => {
           secondaryActionLabel="Browse All"
           onSecondaryAction={onSecondary}
           style={{ padding: 40 }}
-        />
+        />,
       );
 
       expect(getByText('No items found')).toBeTruthy();
@@ -543,7 +543,7 @@ describe('EmptyState Component', () => {
         <>
           <EmptyState title="First" description="First description" />
           <EmptyState title="Second" description="Second description" />
-        </>
+        </>,
       );
 
       expect(getByText('First')).toBeTruthy();
@@ -561,7 +561,7 @@ describe('EmptyState Component', () => {
             title={`Title ${i}`}
             description={i % 2 === 0 ? `Description ${i}` : undefined}
             illustrationType={i % 2 === 0 ? 'no_moments' : undefined}
-          />
+          />,
         );
       }
 
@@ -583,7 +583,7 @@ describe('EmptyState Component', () => {
           illustrationType="no_results"
           actionLabel="Clear Filters"
           onAction={handleClear}
-        />
+        />,
       );
 
       expect(getByText('No results found')).toBeTruthy();
@@ -600,7 +600,7 @@ describe('EmptyState Component', () => {
           illustrationType="no_messages"
           actionLabel="Discover"
           onAction={handleDiscover}
-        />
+        />,
       );
 
       expect(getByText('No messages yet')).toBeTruthy();
@@ -614,7 +614,7 @@ describe('EmptyState Component', () => {
           title="All caught up!"
           description="No new notifications"
           illustrationType="no_notifications"
-        />
+        />,
       );
 
       expect(getByText('All caught up!')).toBeTruthy();
