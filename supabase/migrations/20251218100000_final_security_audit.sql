@@ -223,15 +223,21 @@ CREATE POLICY "rate_limits_service_only" ON public.rate_limits
 FOR ALL USING ((select auth.role()) = 'service_role')
 WITH CHECK ((select auth.role()) = 'service_role');
 
--- 2.23 RATE_LIMIT_CONFIG - SELECT & ALL Policies
+-- 2.23 RATE_LIMIT_CONFIG - Separate policies to avoid multiple permissive SELECT
 DROP POLICY IF EXISTS "rate_limit_config_read" ON public.rate_limit_config;
-CREATE POLICY "rate_limit_config_read" ON public.rate_limit_config
-FOR SELECT USING ((select auth.role()) = 'service_role');
-
 DROP POLICY IF EXISTS "rate_limit_config_write" ON public.rate_limit_config;
-CREATE POLICY "rate_limit_config_write" ON public.rate_limit_config
-FOR ALL USING ((select auth.role()) = 'service_role')
-WITH CHECK ((select auth.role()) = 'service_role');
+
+CREATE POLICY "rate_limit_config_select" ON public.rate_limit_config
+FOR SELECT USING ((select auth.role()) IN ('authenticated', 'service_role'));
+
+CREATE POLICY "rate_limit_config_insert" ON public.rate_limit_config
+FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
+
+CREATE POLICY "rate_limit_config_update" ON public.rate_limit_config
+FOR UPDATE USING ((select auth.role()) = 'service_role');
+
+CREATE POLICY "rate_limit_config_delete" ON public.rate_limit_config
+FOR DELETE USING ((select auth.role()) = 'service_role');
 
 -- 2.24 REPORTS - INSERT Policy
 DROP POLICY IF EXISTS "Users can create reports" ON public.reports;
