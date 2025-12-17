@@ -70,6 +70,20 @@ FOR INSERT WITH CHECK (
   (select auth.uid()) = reporter_id
 );
 
+-- Reports: View Policy - Optimized
+DROP POLICY IF EXISTS "Users can view own reports" ON public.reports;
+CREATE POLICY "Users can view own reports" ON public.reports
+FOR SELECT USING (
+  (select auth.uid()) = reporter_id
+);
+
+-- Favorites: View Policy - Optimized
+DROP POLICY IF EXISTS "Users can view own favorites" ON public.favorites;
+CREATE POLICY "Users can view own favorites" ON public.favorites
+FOR SELECT USING (
+  (select auth.uid()) = user_id
+);
+
 -- ============================================================
 -- 4. PERFORMANS FIXLERİ: Missing Foreign Key Indexes
 -- Sorun: JOIN sorgularını yavaşlatan eksik indeksler
