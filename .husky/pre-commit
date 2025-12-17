@@ -4,9 +4,10 @@ npx lint-staged
 # Run type checking with Turbo (only changed packages)
 pnpm turbo run type-check --filter="[HEAD^1]"
 
-# Check for console.log in production code (excluding tests, stories, mocks)
+# Check for console.log in production code (excluding tests, stories, mocks, and supabase edge functions)
+# Note: Supabase Edge Functions use Deno, where console.log goes to Supabase Logs (acceptable)
 echo "🔍 Checking for console.log usage..."
-if git diff --cached --name-only | grep -E '\.(ts|tsx)$' | grep -v -E '(\.stories\.|\.test\.|\.spec\.|__tests__|testUtils)' | xargs grep -n 'console\.\(log\|warn\|error\|info\|debug\)' 2>/dev/null; then
+if git diff --cached --name-only | grep -E '\.(ts|tsx)$' | grep -v -E '(\.stories\.|\.test\.|\.spec\.|__tests__|testUtils|supabase/functions)' | xargs grep -n 'console\.\(log\|warn\|error\|info\|debug\)' 2>/dev/null; then
   echo "❌ ERROR: console.log found in production code!"
   echo "   Please use logger.debug(), logger.info(), logger.warn(), or logger.error() instead."
   echo "   Import from: import { logger } from '@/utils/logger';"
