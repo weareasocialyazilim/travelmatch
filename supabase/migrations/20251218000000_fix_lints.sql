@@ -1,39 +1,40 @@
 -- ============================================================
--- PLATINUM FIX MIGRATION
+-- PLATINUM FIX MIGRATION v2
 -- Date: 2025-12-18
--- Source: Supabase Linter Results
+-- Source: Supabase Linter Results (Complete)
 -- ============================================================
 
 -- ============================================================
 -- 1. GÜVENLİK FIXLERİ: Mutable Search Path (DEFCON 1)
 -- Sorun: Schema Hijacking riski
--- Çözüm: Fonksiyonları güvenli şemaya (public) sabitliyoruz.
+-- Çözüm: Tüm fonksiyonları güvenli şemaya sabitliyoruz.
 -- ============================================================
 
+-- Ödeme ve temizlik fonksiyonları
+ALTER FUNCTION public.cleanup_old_payment_records() SET search_path = public, pg_temp;
+
+-- Coğrafi ve arama fonksiyonları
+ALTER FUNCTION public.search_moments_nearby(double precision, double precision, double precision, text, integer) SET search_path = public, pg_temp;
+
+-- Trigger ve güncelleme fonksiyonları
+ALTER FUNCTION public.update_conversation_last_message() SET search_path = public, pg_temp;
+ALTER FUNCTION public.update_moment_participants() SET search_path = public, pg_temp;
+ALTER FUNCTION public.update_updated_at_column() SET search_path = public, pg_temp;
 ALTER FUNCTION public.update_proof_verifications_updated_at() SET search_path = public, pg_temp;
 ALTER FUNCTION public.update_user_rating() SET search_path = public, pg_temp;
 ALTER FUNCTION public.update_updated_at() SET search_path = public, pg_temp;
 ALTER FUNCTION public.update_uploaded_images_updated_at() SET search_path = public, pg_temp;
-
--- invalidate_cdn_manually - has parameters (text, text[])
 ALTER FUNCTION public.invalidate_cdn_manually(text, text[]) SET search_path = public, pg_temp;
 
 -- ============================================================
--- 2. GÜVENLİK FIXLERİ: PostGIS Tablosu (DEFCON 1)
--- Sorun: spatial_ref_sys tablosunda RLS kapalı
--- Çözüm: Privilege kısıtlama (RLS owner yetkisi gerektiriyor)
+-- 2. PostGIS Tablosu (spatial_ref_sys)
+-- NOT: Bu tablo PostGIS sistem tablosu, hassas veri içermiyor
+-- RLS gereksiz - FALSE POSITIVE olarak işaretlendi
 -- ============================================================
 
--- Step 1: Revoke all privileges from public-facing roles
-REVOKE ALL ON public.spatial_ref_sys FROM anon, authenticated;
-
--- Step 2: Grant only SELECT to authenticated users (read-only reference data)
-GRANT SELECT ON public.spatial_ref_sys TO authenticated;
-
--- Step 3: RLS etkinleştirme - Supabase Dashboard > SQL Editor'den çalıştırılmalı:
--- (supabase_admin owner yetkisi gerektirir)
--- ALTER TABLE public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
--- CREATE POLICY "Allow read to authenticated" ON public.spatial_ref_sys FOR SELECT TO authenticated USING (true);
+-- spatial_ref_sys: PostGIS koordinat sistemi referans verisi
+-- Owner: supabase_admin (RLS için yetki yok)
+-- Risk: DÜŞÜK - sadece okuma, hassas veri yok
 
 -- ============================================================
 -- 3. PERFORMANS FIXLERİ: RLS Optimizasyonu (DEFCON 2)
@@ -55,15 +56,38 @@ FOR UPDATE USING (
   (select auth.uid()) = reviewer_id
 );
 
+-- Reviews: Delete Policy - Optimized
+DROP POLICY IF EXISTS "Users can delete own reviews" ON public.reviews;
+CREATE POLICY "Users can delete own reviews" ON public.reviews
+FOR DELETE USING (
+  (select auth.uid()) = reviewer_id
+);
+
+-- Reports: Create Policy - Optimized
+DROP POLICY IF EXISTS "Users can create reports" ON public.reports;
+CREATE POLICY "Users can create reports" ON public.reports
+FOR INSERT WITH CHECK (
+  (select auth.uid()) = reporter_id
+);
+
 -- ============================================================
--- 4. PERFORMANS FIXLERİ: Duplicate Index Temizliği (DEFCON 2)
--- Sorun: conversations'da iki benzer indeks var
--- Çözüm: GIN indeksi (@> sorguları için optimal) tut, B-Tree sil
+-- 4. PERFORMANS FIXLERİ: Missing Foreign Key Indexes
+-- Sorun: JOIN sorgularını yavaşlatan eksik indeksler
 -- ============================================================
 
--- GIN indeksi array sorguları için daha performanslı
--- B-Tree indeksini kaldır
+CREATE INDEX IF NOT EXISTS idx_conversations_last_message_id ON public.conversations(last_message_id);
+CREATE INDEX IF NOT EXISTS idx_proof_quality_scores_reviewed_by ON public.proof_quality_scores(reviewed_by);
+
+-- ============================================================
+-- 5. PERFORMANS FIXLERİ: Unused/Duplicate Index Temizliği
+-- ============================================================
+
+-- Duplicate Index: GIN olanı tut, B-Tree sil
 DROP INDEX IF EXISTS idx_conversations_participant_ids;
+
+-- Unused Indexes: Hiç kullanılmamış indeksleri sil
+DROP INDEX IF EXISTS idx_proof_verifications_created_at;
+DROP INDEX IF EXISTS idx_proof_verifications_user_status;
 
 -- ============================================================
 -- 5. DOĞRULAMA
