@@ -1,3 +1,5 @@
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+
 // Edge Function: handle-storage-upload
 // Webhook handler for storage.objects INSERT events
 // Creates uploaded_images records automatically

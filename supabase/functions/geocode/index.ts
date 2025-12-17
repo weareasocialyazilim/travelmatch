@@ -1,3 +1,5 @@
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+
 /**
  * Geocoding Proxy - Server-side Mapbox Geocoding API wrapper
  *
