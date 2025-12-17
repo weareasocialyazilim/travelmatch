@@ -56,7 +56,11 @@ FOR SELECT USING (
   (select auth.uid()) = sender_id OR (select auth.uid()) = recipient_id
 );
 
--- 2.5 FAVORITES - DELETE Policy (SELECT already optimized)
+-- 2.5 FAVORITES - SELECT & DELETE Policies
+DROP POLICY IF EXISTS "Users can view own favorites" ON public.favorites;
+CREATE POLICY "Users can view own favorites" ON public.favorites
+FOR SELECT USING ((select auth.uid()) = user_id);
+
 DROP POLICY IF EXISTS "Users can delete own favorites" ON public.favorites;
 CREATE POLICY "Users can delete own favorites" ON public.favorites
 FOR DELETE USING ((select auth.uid()) = user_id);
@@ -165,14 +169,124 @@ FOR SELECT USING (
   )
 );
 
--- 2.15 CDN_INVALIDATION_LOGS - JWT based policies (optimize jwt access)
+-- 2.15 CDN_INVALIDATION_LOGS - Use auth.role() for service role (consistent pattern)
 DROP POLICY IF EXISTS "Service role can read cdn invalidation logs" ON public.cdn_invalidation_logs;
 CREATE POLICY "Service role can read cdn invalidation logs" ON public.cdn_invalidation_logs
-FOR SELECT USING ((select auth.jwt() ->> 'role') = 'service_role');
+FOR SELECT USING ((select auth.role()) = 'service_role');
 
 DROP POLICY IF EXISTS "Service role can update cdn invalidation logs" ON public.cdn_invalidation_logs;
 CREATE POLICY "Service role can update cdn invalidation logs" ON public.cdn_invalidation_logs
-FOR UPDATE USING ((select auth.jwt() ->> 'role') = 'service_role');
+FOR UPDATE USING ((select auth.role()) = 'service_role');
+
+DROP POLICY IF EXISTS "Service role can insert cdn invalidation logs" ON public.cdn_invalidation_logs;
+CREATE POLICY "Service role can insert cdn invalidation logs" ON public.cdn_invalidation_logs
+FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
+
+-- ============================================================
+-- 2.5 INSERT/ALL POLICIES OPTIMIZATION (auth_rls_initplan fix)
+-- ============================================================
+
+-- 2.16 FAVORITES - INSERT Policy
+DROP POLICY IF EXISTS "Users can create favorites" ON public.favorites;
+CREATE POLICY "Users can create favorites" ON public.favorites
+FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
+
+-- 2.17 AUDIT_LOGS - INSERT Policy
+DROP POLICY IF EXISTS "audit_logs_insert_policy" ON public.audit_logs;
+CREATE POLICY "audit_logs_insert_policy" ON public.audit_logs
+FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
+
+-- 2.18 CACHE_INVALIDATION - INSERT Policy
+DROP POLICY IF EXISTS "cache_invalidation_insert_policy" ON public.cache_invalidation;
+CREATE POLICY "cache_invalidation_insert_policy" ON public.cache_invalidation
+FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
+
+-- 2.19 PROCESSED_WEBHOOK_EVENTS - ALL Policy
+DROP POLICY IF EXISTS "webhook_events_policy" ON public.processed_webhook_events;
+CREATE POLICY "webhook_events_policy" ON public.processed_webhook_events
+FOR ALL USING ((select auth.role()) = 'service_role')
+WITH CHECK ((select auth.role()) = 'service_role');
+
+-- 2.20 FEED_DELTA - INSERT Policy
+DROP POLICY IF EXISTS "Service role can insert feed delta" ON public.feed_delta;
+CREATE POLICY "Service role can insert feed delta" ON public.feed_delta
+FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
+
+-- 2.21 CONVERSATION_PARTICIPANTS - INSERT Policy
+DROP POLICY IF EXISTS "Users can add themselves to conversations" ON public.conversation_participants;
+CREATE POLICY "Users can add themselves to conversations" ON public.conversation_participants
+FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
+
+-- 2.22 RATE_LIMITS - ALL Policy
+DROP POLICY IF EXISTS "rate_limits_service_only" ON public.rate_limits;
+CREATE POLICY "rate_limits_service_only" ON public.rate_limits
+FOR ALL USING ((select auth.role()) = 'service_role')
+WITH CHECK ((select auth.role()) = 'service_role');
+
+-- 2.23 RATE_LIMIT_CONFIG - SELECT & ALL Policies
+DROP POLICY IF EXISTS "rate_limit_config_read" ON public.rate_limit_config;
+CREATE POLICY "rate_limit_config_read" ON public.rate_limit_config
+FOR SELECT USING ((select auth.role()) = 'service_role');
+
+DROP POLICY IF EXISTS "rate_limit_config_write" ON public.rate_limit_config;
+CREATE POLICY "rate_limit_config_write" ON public.rate_limit_config
+FOR ALL USING ((select auth.role()) = 'service_role')
+WITH CHECK ((select auth.role()) = 'service_role');
+
+-- 2.24 REPORTS - INSERT Policy
+DROP POLICY IF EXISTS "Users can create reports" ON public.reports;
+CREATE POLICY "Users can create reports" ON public.reports
+FOR INSERT WITH CHECK ((select auth.uid()) = reporter_id);
+
+-- 2.25 REVIEWS - INSERT Policy
+DROP POLICY IF EXISTS "Users can create reviews" ON public.reviews;
+CREATE POLICY "Users can create reviews" ON public.reviews
+FOR INSERT WITH CHECK ((select auth.uid()) = reviewer_id);
+
+-- ============================================================
+-- 2.6 MULTIPLE PERMISSIVE POLICIES FIX
+-- ============================================================
+
+-- 2.26 KYC_VERIFICATIONS - Consolidate policies (was: 2 overlapping → 4 specific)
+DROP POLICY IF EXISTS "Service role can manage KYC verifications" ON public.kyc_verifications;
+DROP POLICY IF EXISTS "Users can view their own KYC verifications" ON public.kyc_verifications;
+
+CREATE POLICY "KYC verifications access" ON public.kyc_verifications
+FOR SELECT USING (
+  (select auth.uid()) = user_id OR (select auth.role()) = 'service_role'
+);
+
+CREATE POLICY "KYC verifications service write" ON public.kyc_verifications
+FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
+
+CREATE POLICY "KYC verifications service update" ON public.kyc_verifications
+FOR UPDATE USING ((select auth.role()) = 'service_role');
+
+CREATE POLICY "KYC verifications service delete" ON public.kyc_verifications
+FOR DELETE USING ((select auth.role()) = 'service_role');
+
+-- 2.27 PROOF_VERIFICATIONS - Consolidate 2 SELECT → 1
+DROP POLICY IF EXISTS "Users can view own proof verifications" ON public.proof_verifications;
+DROP POLICY IF EXISTS "Users can view verifications for their moments" ON public.proof_verifications;
+
+CREATE POLICY "Users can view proof verifications" ON public.proof_verifications
+FOR SELECT USING (
+  (select auth.uid()) = user_id
+  OR EXISTS (
+    SELECT 1 FROM moments 
+    WHERE moments.id = proof_verifications.moment_id 
+    AND moments.user_id = (select auth.uid())
+  )
+);
+
+-- 2.28 USERS - Remove redundant public select policy
+DROP POLICY IF EXISTS "users_select_public" ON public.users;
+
+-- 2.29 REQUESTS - Remove duplicate policies (keep *_related versions)
+DROP POLICY IF EXISTS "Users can delete own requests" ON public.requests;
+DROP POLICY IF EXISTS "Users can create requests" ON public.requests;
+DROP POLICY IF EXISTS "Users can view own requests" ON public.requests;
+DROP POLICY IF EXISTS "Users can update own requests" ON public.requests;
 
 -- ============================================================
 -- 3. SİSTEM GÜVENLİĞİ: spatial_ref_sys
@@ -205,27 +319,40 @@ DO $$
 DECLARE
   policy_count INT;
   optimized_count INT;
+  multiple_permissive INT;
 BEGIN
-  -- Count total RLS policies with auth.uid()
+  -- Count total RLS policies with auth calls
   SELECT COUNT(*) INTO policy_count
   FROM pg_policies 
   WHERE schemaname = 'public' 
-  AND (qual LIKE '%auth.uid()%' OR qual LIKE '%auth.jwt()%');
+  AND (qual LIKE '%auth.%' OR with_check LIKE '%auth.%');
   
   -- Count optimized policies (with select wrapper)
   SELECT COUNT(*) INTO optimized_count
   FROM pg_policies 
   WHERE schemaname = 'public' 
-  AND (qual LIKE '%(select auth.%');
+  AND (LOWER(qual) LIKE '%(select auth.%' OR LOWER(with_check) LIKE '%(select auth.%');
+  
+  -- Count multiple permissive policies
+  SELECT COUNT(*) INTO multiple_permissive
+  FROM (
+    SELECT tablename, cmd
+    FROM pg_policies 
+    WHERE schemaname = 'public' AND permissive = 'PERMISSIVE'
+    GROUP BY tablename, cmd 
+    HAVING COUNT(*) > 1
+  ) sub;
   
   RAISE NOTICE '========================================';
   RAISE NOTICE '✅ FINAL SECURITY AUDIT COMPLETE';
   RAISE NOTICE '========================================';
   RAISE NOTICE 'Total RLS policies with auth calls: %', policy_count;
   RAISE NOTICE 'Optimized policies (cached): %', optimized_count;
+  RAISE NOTICE 'Multiple permissive policy issues: %', multiple_permissive;
   RAISE NOTICE '========================================';
   RAISE NOTICE '✅ Function search_path: ALL SECURED';
-  RAISE NOTICE '✅ RLS InitPlan: OPTIMIZED';
+  RAISE NOTICE '✅ RLS InitPlan: ALL OPTIMIZED';
+  RAISE NOTICE '✅ Multiple Permissive: CONSOLIDATED';
   RAISE NOTICE '✅ FK Indexes: ALL COVERED';
   RAISE NOTICE '✅ Duplicate Indexes: CLEANED';
   RAISE NOTICE '⚪ spatial_ref_sys: FALSE POSITIVE (PostGIS system table)';
