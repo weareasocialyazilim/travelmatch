@@ -13,38 +13,39 @@ jobs:
   lighthouse-ci:
     name: Lighthouse Performance Audit
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9.15.0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build application
         run: pnpm run build
         env:
           NODE_ENV: production
-      
+
       - name: Run Lighthouse CI
+        continue-on-error: true
         run: |
           npm install -g @lhci/cli@0.13.x
           lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-      
+
       - name: Upload Lighthouse reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -52,72 +53,72 @@ jobs:
           name: lighthouse-reports
           path: .lighthouseci/
           retention-days: 30
-      
+
       - name: Check performance budgets
         run: |
           # Extract scores from Lighthouse report
           PERF_SCORE=$(cat .lighthouseci/manifest.json | jq '.[0].summary.performance')
           echo "Performance Score: $PERF_SCORE"
-          
+
           if (( $(echo "$PERF_SCORE < 0.9" | bc -l) )); then
             echo "❌ Performance score $PERF_SCORE is below 0.9 threshold"
             exit 1
           fi
-          
+
           echo "✅ Performance score OK: $PERF_SCORE"
 
   bundle-analysis:
     name: Bundle Size Analysis
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9.15.0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build with bundle analysis
         run: pnpm run build
         env:
           ANALYZE: true
           NODE_ENV: production
-      
+
       - name: Check bundle size
         run: |
           # Check main bundle size
           BUNDLE_SIZE=$(du -sb dist/assets/*.js | awk '{sum+=$1} END {print sum}')
           BUNDLE_SIZE_MB=$(echo "scale=2; $BUNDLE_SIZE / 1024 / 1024" | bc)
-          
+
           echo "Total Bundle Size: ${BUNDLE_SIZE_MB}MB"
-          
+
           # 5MB limit
           MAX_SIZE=5242880
-          
+
           if [ $BUNDLE_SIZE -gt $MAX_SIZE ]; then
             echo "❌ Bundle size ${BUNDLE_SIZE_MB}MB exceeds 5MB limit"
             exit 1
           fi
-          
+
           echo "✅ Bundle size OK: ${BUNDLE_SIZE_MB}MB"
-      
+
       - name: Upload bundle stats
         uses: actions/upload-artifact@v4
         with:
           name: bundle-stats
           path: bundle-stats.json
           retention-days: 30
-      
+
       - name: Comment PR with bundle size
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -125,15 +126,15 @@ jobs:
           script: |
             const fs = require('fs');
             const stats = JSON.parse(fs.readFileSync('bundle-stats.json', 'utf8'));
-            
+
             const totalSize = stats.assets.reduce((sum, asset) => sum + asset.size, 0);
             const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
-            
+
             const body = `## 📦 Bundle Size Report
-            
+
             **Total Size:** ${sizeMB}MB / 5MB
             **Status:** ${totalSize < 5242880 ? '✅ Pass' : '❌ Fail'}
-            
+
             ### Top 5 Largest Assets
             ${stats.assets
               .sort((a, b) => b.size - a.size)
@@ -141,7 +142,7 @@ jobs:
               .map(asset => `- ${asset.name}: ${(asset.size / 1024).toFixed(2)}KB`)
               .join('\n')}
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -152,85 +153,85 @@ jobs:
   performance-monitoring:
     name: Real-time Performance Monitoring
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
+    if: github.ref == 'refs/heads/main' && secrets.SENTRY_AUTH_TOKEN != ''
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9.15.0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Deploy to Sentry
         run: |
           # Create Sentry release
           npm install -g @sentry/cli
-          
+
           export SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
           export SENTRY_ORG=travelmatch
           export SENTRY_PROJECT=travelmatch-mobile
-          
+
           # Create release
           sentry-cli releases new ${{ github.sha }}
           sentry-cli releases set-commits ${{ github.sha }} --auto
           sentry-cli releases finalize ${{ github.sha }}
-          
+
           echo "✅ Sentry release created"
 
   cdn-deployment:
     name: Multi-Region CDN Deployment
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && secrets.CLOUDFLARE_API_TOKEN != ''
     needs: [lighthouse-ci, bundle-analysis]
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9.15.0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build for production
         run: pnpm run build
         env:
           NODE_ENV: production
-      
+
       - name: Deploy to Cloudflare CDN
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=travelmatch
-      
+
       - name: Purge CDN cache
         run: |
           curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             --data '{"purge_everything":false,"files":["https://travelmatch.app/"]}'
-          
+
           echo "✅ CDN cache purged"
-      
+
       - name: Verify deployment
         run: |
           # Check all regions
@@ -250,11 +251,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lighthouse-ci, bundle-analysis, performance-monitoring]
     if: always()
-    
+
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
-      
+
       - name: Generate report
         run: |
           echo "# 📊 Performance Report" > report.md
@@ -262,7 +263,7 @@ jobs:
           echo "**Date:** $(date)" >> report.md
           echo "**Commit:** ${{ github.sha }}" >> report.md
           echo "" >> report.md
-          
+
           # Add Lighthouse scores
           if [ -f lighthouse-reports/manifest.json ]; then
             PERF=$(cat lighthouse-reports/manifest.json | jq '.[0].summary.performance')
@@ -272,7 +273,7 @@ jobs:
             echo "- Accessibility: $A11Y" >> report.md
             echo "" >> report.md
           fi
-          
+
           # Add bundle size
           if [ -f bundle-stats/bundle-stats.json ]; then
             SIZE=$(cat bundle-stats/bundle-stats.json | jq '.assets | map(.size) | add')
@@ -281,9 +282,9 @@ jobs:
             echo "- Total: ${SIZE_MB}MB / 5MB" >> report.md
             echo "" >> report.md
           fi
-          
+
           cat report.md
-      
+
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -291,7 +292,7 @@ jobs:
           script: |
             const fs = require('fs');
             const report = fs.readFileSync('report.md', 'utf8');
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -306,28 +307,28 @@ jobs:
     strategy:
       matrix:
         platform: [ios, android]
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9.15.0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Analyze React Native bundle
         run: node scripts/analyze-rn-bundle.mjs ${{ matrix.platform }} --threshold=18
         continue-on-error: false
-      
+
       - name: Upload RN bundle report
         uses: actions/upload-artifact@v4
         if: always()

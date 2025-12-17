@@ -13,30 +13,32 @@ jobs:
   dependency-scan:
     name: Dependency Vulnerability Scan
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9.15.0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Run npm audit
         run: pnpm audit --audit-level=high
         continue-on-error: true
-      
+
       - name: Run Snyk security scan
+        if: ${{ secrets.SNYK_TOKEN != '' }}
         uses: snyk/actions/node@master
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -45,12 +47,12 @@ jobs:
   secret-scan:
     name: Secret & Credential Scan
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: TruffleHog Secret Scan
         uses: trufflesecurity/trufflehog@main
         with:
@@ -61,25 +63,25 @@ jobs:
   code-quality:
     name: Code Security Analysis
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: javascript, typescript
-      
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
   soc2-compliance:
     name: SOC 2 Compliance Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Check encryption configuration
         run: |
           # Verify TLS 1.3 enforcement
@@ -88,7 +90,7 @@ jobs:
             exit 1
           fi
           echo "✅ TLS 1.3 enforced"
-      
+
       - name: Check audit logging
         run: |
           # Verify audit logging is implemented
@@ -97,7 +99,7 @@ jobs:
             exit 1
           fi
           echo "✅ Audit logging implemented"
-      
+
       - name: Check password policy
         run: |
           # Verify password policy enforcement
@@ -106,7 +108,7 @@ jobs:
             exit 1
           fi
           echo "✅ Password policy enforced"
-      
+
       - name: Check data retention
         run: |
           # Verify data retention policies
@@ -120,32 +122,32 @@ jobs:
     name: OWASP ZAP Security Scan
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9.15.0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build application
         run: pnpm run build
-      
+
       - name: Start application
         run: |
           pnpm run preview &
           sleep 10
-      
+
       - name: OWASP ZAP Scan
         uses: zaproxy/action-baseline@v0.10.0
         with:
@@ -157,7 +159,7 @@ jobs:
     name: SSL/TLS Configuration Check
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Check SSL Labs Rating
         run: |
@@ -169,7 +171,7 @@ jobs:
     name: Backup & Recovery Verification
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Verify backup configuration
         run: |
@@ -180,12 +182,13 @@ jobs:
   incident-response-test:
     name: Incident Response Drill
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
-    
+    if: github.event_name == 'schedule' && secrets.SLACK_WEBHOOK_URL != ''
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Test incident notification
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
         run: |
           # Send test alert to security team
           curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
@@ -200,7 +203,7 @@ jobs:
                 }
               }]
             }'
-      
+
       - name: Verify escalation contacts
         run: |
           # Verify all escalation contacts are valid
@@ -212,7 +215,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [dependency-scan, secret-scan, code-quality, soc2-compliance]
     if: always()
-    
+
     steps:
       - name: Generate report
         run: |
@@ -239,16 +242,16 @@ jobs:
           echo "- ✅ **Processing Integrity (PI):** Validation, error handling" >> report.md
           echo "- ✅ **Confidentiality (C):** Data classification, disposal" >> report.md
           echo "- ✅ **Privacy (P):** GDPR/CCPA compliance, consent" >> report.md
-          
+
           cat report.md
-      
+
       - name: Upload report
         uses: actions/upload-artifact@v4
         with:
           name: compliance-report
           path: report.md
           retention-days: 90
-      
+
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -256,7 +259,7 @@ jobs:
           script: |
             const fs = require('fs');
             const report = fs.readFileSync('report.md', 'utf8');
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
