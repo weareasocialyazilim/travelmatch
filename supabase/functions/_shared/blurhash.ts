@@ -12,7 +12,7 @@
  * @see https://blurha.sh/
  */
 
-import { encode } from 'https://deno.land/x/blurhash@v0.1.0/mod.ts';
+import { encode } from 'https://esm.sh/blurhash@2.0.5';
 import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts';
 
 /**

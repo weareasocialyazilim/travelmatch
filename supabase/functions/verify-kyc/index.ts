@@ -1,8 +1,8 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
-import { createHash } from 'https://deno.land/std@0.168.0/hash/mod.ts';
+import { crypto } from 'https://deno.land/std@0.208.0/crypto/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,10 +23,13 @@ const kycLimiter = createRateLimiter(RateLimitPresets.auth);
 /**
  * Hash document number for audit logging (PII protection)
  */
-function hashDocumentNumber(documentNumber: string): string {
-  const hash = createHash('sha256');
-  hash.update(documentNumber);
-  return hash.toString('hex').substring(0, 16); // First 16 chars
+async function hashDocumentNumber(documentNumber: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(documentNumber);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex.substring(0, 16); // First 16 chars
 }
 
 serve(async (req) => {
@@ -88,7 +91,7 @@ serve(async (req) => {
       action: 'kyc_verification_attempt',
       metadata: {
         document_type: data.documentType,
-        document_number_hash: hashDocumentNumber(data.documentNumber),
+        document_number_hash: await hashDocumentNumber(data.documentNumber),
       },
     });
 
