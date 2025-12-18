@@ -1,9 +1,10 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
 import { ExpressAdapter } from '@bull-board/express';
+import crypto from 'crypto';
 import {
   KycJobSchema,
   ImageJobSchema,
@@ -24,6 +25,121 @@ const app = express();
 app.disable('x-powered-by');
 
 app.use(express.json());
+
+// ============================================================================
+// Authentication Middleware
+// ============================================================================
+
+/**
+ * Service-to-service authentication middleware
+ * Validates requests from internal services using shared secret
+ */
+const requireServiceAuth = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  const serviceKey = process.env.JOB_QUEUE_SERVICE_KEY;
+
+  if (!serviceKey) {
+    console.error('[Auth] JOB_QUEUE_SERVICE_KEY not configured');
+    return res.status(500).json({ error: 'Server misconfiguration' });
+  }
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing authorization header' });
+  }
+
+  const token = authHeader.substring(7);
+
+  // Constant-time comparison to prevent timing attacks
+  const isValid = crypto.timingSafeEqual(
+    Buffer.from(token),
+    Buffer.from(serviceKey)
+  );
+
+  if (!isValid) {
+    console.warn('[Auth] Invalid service key attempt', {
+      ip: req.ip,
+      path: req.path,
+    });
+    return res.status(403).json({ error: 'Invalid service key' });
+  }
+
+  next();
+};
+
+/**
+ * Admin authentication middleware for Bull Board
+ * Uses HTTP Basic Auth with admin credentials
+ */
+const requireAdminAuth = (req: Request, res: Response, next: NextFunction) => {
+  const adminUser = process.env.BULL_BOARD_ADMIN_USER || 'admin';
+  const adminPassword = process.env.BULL_BOARD_ADMIN_PASSWORD;
+
+  if (!adminPassword) {
+    console.error('[Auth] BULL_BOARD_ADMIN_PASSWORD not configured');
+    return res.status(500).json({ error: 'Admin panel not configured' });
+  }
+
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Job Queue Admin"');
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const base64Credentials = authHeader.substring(6);
+  const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+  const [username, password] = credentials.split(':');
+
+  const isValidUser = username === adminUser;
+  const isValidPassword = password && crypto.timingSafeEqual(
+    Buffer.from(password),
+    Buffer.from(adminPassword)
+  );
+
+  if (!isValidUser || !isValidPassword) {
+    console.warn('[Auth] Invalid admin login attempt', {
+      ip: req.ip,
+      username,
+    });
+    res.setHeader('WWW-Authenticate', 'Basic realm="Job Queue Admin"');
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
+  next();
+};
+
+/**
+ * Rate limiting middleware for job endpoints
+ */
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 100; // 100 requests per minute
+
+const rateLimit = (req: Request, res: Response, next: NextFunction) => {
+  const key = req.ip || 'unknown';
+  const now = Date.now();
+
+  const entry = rateLimitMap.get(key);
+
+  if (!entry || entry.resetAt < now) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return next();
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
+    res.setHeader('Retry-After', String(retryAfter));
+    res.setHeader('X-RateLimit-Remaining', '0');
+    return res.status(429).json({
+      error: 'Too many requests',
+      retryAfter,
+    });
+  }
+
+  entry.count++;
+  res.setHeader('X-RateLimit-Remaining', String(RATE_LIMIT_MAX - entry.count));
+  next();
+};
 
 // Create Redis connection
 const redis = new Redis(process.env.REDIS_URL!, {
@@ -54,7 +170,8 @@ createBullBoard({
   serverAdapter,
 });
 
-app.use('/admin/queues', serverAdapter.getRouter());
+// Bull Board with admin authentication
+app.use('/admin/queues', requireAdminAuth, serverAdapter.getRouter());
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
@@ -71,8 +188,8 @@ app.get('/health', (_req: Request, res: Response) => {
   });
 });
 
-// Add KYC verification job
-app.post('/jobs/kyc', async (req: Request, res: Response) => {
+// Add KYC verification job (protected endpoint)
+app.post('/jobs/kyc', requireServiceAuth, rateLimit, async (req: Request, res: Response) => {
   try {
     const data = KycJobSchema.parse(req.body);
 
@@ -97,8 +214,8 @@ app.post('/jobs/kyc', async (req: Request, res: Response) => {
   }
 });
 
-// Add image processing job
-app.post('/jobs/image', async (req: Request, res: Response) => {
+// Add image processing job (protected endpoint)
+app.post('/jobs/image', requireServiceAuth, rateLimit, async (req: Request, res: Response) => {
   try {
     const data = ImageJobSchema.parse(req.body);
 
@@ -118,8 +235,8 @@ app.post('/jobs/image', async (req: Request, res: Response) => {
   }
 });
 
-// Add email job
-app.post('/jobs/email', async (req: Request, res: Response) => {
+// Add email job (protected endpoint)
+app.post('/jobs/email', requireServiceAuth, rateLimit, async (req: Request, res: Response) => {
   try {
     const data = EmailJobSchema.parse(req.body);
 
@@ -142,8 +259,8 @@ app.post('/jobs/email', async (req: Request, res: Response) => {
   }
 });
 
-// Add notification job
-app.post('/jobs/notification', async (req: Request, res: Response) => {
+// Add notification job (protected endpoint)
+app.post('/jobs/notification', requireServiceAuth, rateLimit, async (req: Request, res: Response) => {
   try {
     const data = NotificationJobSchema.parse(req.body);
 
@@ -163,8 +280,8 @@ app.post('/jobs/notification', async (req: Request, res: Response) => {
   }
 });
 
-// Add analytics event job
-app.post('/jobs/analytics', async (req: Request, res: Response) => {
+// Add analytics event job (protected endpoint)
+app.post('/jobs/analytics', requireServiceAuth, rateLimit, async (req: Request, res: Response) => {
   try {
     const data = AnalyticsJobSchema.parse(req.body);
 
@@ -254,8 +371,8 @@ app.get('/stats', async (_req: Request, res: Response) => {
   }
 });
 
-// Clean completed jobs (manual cleanup)
-app.post('/admin/clean', async (req: Request, res: Response) => {
+// Clean completed jobs (admin only)
+app.post('/admin/clean', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { grace = 3600000 } = req.body; // Default: 1 hour
 
