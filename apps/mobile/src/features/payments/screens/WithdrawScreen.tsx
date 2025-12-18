@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,7 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { withdrawSchema, type WithdrawInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { ControlledInput } from '@/components/ui/ControlledInput';
+import { useWallet, useWithdraw, usePaymentMethods } from '../hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -29,8 +30,23 @@ type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 
 function WithdrawScreen({ navigation }: WithdrawScreenProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const availableBalance = 1250.0;
-  const pendingEscrow = 500.0;
+
+  // Fetch real wallet data
+  const { data: walletData, isLoading: walletLoading } = useWallet();
+  const { data: paymentMethods } = usePaymentMethods();
+  const withdrawMutation = useWithdraw();
+
+  // Get available balance and pending from wallet
+  const availableBalance = walletData?.balance ?? 0;
+  const pendingEscrow = walletData?.pendingBalance ?? 0;
+
+  // Get default bank account for withdrawals
+  const defaultBankAccount = useMemo(() => {
+    const methods = paymentMethods ?? [];
+    // Find bank account or card for withdrawal
+    return methods.find((m) => m.isDefault) ?? methods[0];
+  }, [paymentMethods]);
+
   const { biometricEnabled, biometricTypeName, authenticateForAction } = useBiometric();
   const { props: a11y, formatCurrency } = useAccessibility();
   
@@ -52,7 +68,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
     // Check if biometric is enabled and verify before proceeding
     if (biometricEnabled) {
       const verified = await authenticateForAction('Withdraw Funds');
-      
+
       if (!verified) {
         Alert.alert(
           'Authentication Required',
@@ -63,21 +79,43 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
       }
     }
 
+    // Validate payment method exists
+    if (!defaultBankAccount?.id) {
+      Alert.alert(
+        'No Payment Method',
+        'Please add a bank account or payment method to withdraw funds.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
     setIsSubmitting(true);
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Navigate to success screen with withdrawal details
-    navigation.navigate('Success', {
-      type: 'withdraw',
-      details: {
+
+    try {
+      // Call actual withdraw API
+      const result = await withdrawMutation.mutateAsync({
         amount: parseFloat(data.amount),
-        destination: 'Bank Account (••• 4242)',
-        estimatedArrival: '1-3 business days',
-        referenceId: 'WD-' + Date.now().toString().slice(-8),
-      },
-    });
-    setIsSubmitting(false);
+        paymentMethodId: defaultBankAccount.id,
+      });
+
+      // Navigate to success screen with withdrawal details
+      navigation.navigate('Success', {
+        type: 'withdraw',
+        details: {
+          amount: parseFloat(data.amount),
+          destination: defaultBankAccount.last4
+            ? `•••• ${defaultBankAccount.last4}`
+            : 'Your payment method',
+          estimatedArrival: '1-3 business days',
+          referenceId: result?.transactionId ?? `WD-${Date.now().toString().slice(-8)}`,
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Withdrawal failed';
+      Alert.alert('Withdrawal Failed', message, [{ text: 'OK' }]);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isSubmitDisabled = !canSubmitForm({ formState }, {
@@ -154,14 +192,20 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           <View style={styles.accountInfo}>
             <View style={styles.iconContainer}>
               <MaterialCommunityIcons
-                name="bank"
+                name={defaultBankAccount?.type === 'card' ? 'credit-card' : 'bank'}
                 size={24}
                 color={COLORS.text}
               />
             </View>
             <View style={styles.accountDetails}>
-              <Text style={styles.accountNumber}>•••• 1234</Text>
-              <Text style={styles.accountBank}>Bank of America</Text>
+              <Text style={styles.accountNumber}>
+                {defaultBankAccount?.last4
+                  ? `•••• ${defaultBankAccount.last4}`
+                  : 'No payment method'}
+              </Text>
+              <Text style={styles.accountBank}>
+                {defaultBankAccount?.brand ?? 'Add a payment method'}
+              </Text>
             </View>
           </View>
           <TouchableOpacity
