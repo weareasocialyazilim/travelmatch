@@ -7,7 +7,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 
-type MaskType = 'phone' | 'creditCard' | 'expiry' | 'cvv' | 'currency' | 'date';
+export type MaskType = 'phone' | 'creditCard' | 'expiry' | 'cvv' | 'currency' | 'date';
 
 interface InputMaskOptions {
   /** Type of mask to apply */

@@ -21,7 +21,7 @@ interface ReduceMotionResult {
   getSpringConfig: (normalConfig: SpringConfig) => SpringConfig;
 }
 
-interface SpringConfig {
+export interface SpringConfig {
   tension?: number;
   friction?: number;
   speed?: number;
