@@ -57,7 +57,7 @@ createBullBoard({
 app.use('/admin/queues', serverAdapter.getRouter());
 
 // Health check
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({
     status: 'healthy',
     redis: redis.status,
@@ -193,7 +193,7 @@ app.get('/jobs/:jobId', async (req: Request, res: Response) => {
     let job = null;
 
     for (const queue of queues) {
-      job = await queue.getJob(jobId);
+      job = await queue.getJob(jobId!);
       if (job) break;
     }
 
@@ -228,7 +228,7 @@ app.get('/jobs/:jobId', async (req: Request, res: Response) => {
 });
 
 // Get queue stats
-app.get('/stats', async (req: Request, res: Response) => {
+app.get('/stats', async (_req: Request, res: Response) => {
   try {
     const stats = await Promise.all([
       kycQueue.getJobCounts(),

@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react-native';
 import { usePaymentMethods } from '@/features/payments/hooks/usePaymentMethods';
 import { logger } from '@/utils/logger';
 
@@ -8,6 +8,11 @@ jest.mock('@/hooks/useScreenPerformance', () => ({
   useScreenPerformance: () => ({
     trackMount: jest.fn(),
     trackInteraction: jest.fn(),
+  }),
+}));
+jest.mock('@/context/ConfirmationContext', () => ({
+  useConfirmation: () => ({
+    showConfirmation: jest.fn().mockResolvedValue(true),
   }),
 }));
 

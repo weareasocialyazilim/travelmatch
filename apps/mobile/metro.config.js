@@ -7,8 +7,8 @@ const monorepoRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);
 
-// 1. Watch all files within the monorepo
-config.watchFolders = [monorepoRoot];
+// 1. Watch all files within the monorepo (include Expo's defaults)
+config.watchFolders = [...(config.watchFolders || []), monorepoRoot];
 
 // 2. Let Metro know where to resolve packages and in what order
 config.resolver.nodeModulesPaths = [
@@ -16,10 +16,22 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
-// 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
-config.resolver.disableHierarchicalLookup = true;
+// 3. Keep hierarchical lookup enabled for Expo compatibility (SDK 54+)
+config.resolver.disableHierarchicalLookup = false;
 
-// 4. Production optimization: Enhanced minification
+// 4. Redirect expo/AppEntry to our custom index.ts (fixes monorepo entry point issue)
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === 'expo/AppEntry' || moduleName === './node_modules/expo/AppEntry') {
+    return {
+      filePath: path.resolve(projectRoot, 'index.ts'),
+      type: 'sourceFile',
+    };
+  }
+  // Fallback to default resolution
+  return context.resolveRequest(context, moduleName, platform);
+};
+
+// 5. Production optimization: Enhanced minification
 config.transformer = {
   ...config.transformer,
   minifierConfig: {

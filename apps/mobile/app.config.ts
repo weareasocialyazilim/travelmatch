@@ -6,10 +6,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: 'travelmatch',
   version: '1.0.0',
   orientation: 'portrait',
+  // Custom entry point to fix AppEntry.js resolution in monorepo
+  entryPoint: './index.ts',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'travelmatch',
-  newArchEnabled: true,
+  newArchEnabled: false,
   splash: {
     image: './assets/splash-icon.png',
     resizeMode: 'contain',
@@ -68,6 +70,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-font',
+    'expo-secure-store',
+    '@react-native-community/datetimepicker',
     [
       '@rnmapbox/maps',
       {

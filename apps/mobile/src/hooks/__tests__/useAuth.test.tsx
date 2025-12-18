@@ -9,7 +9,7 @@ import { ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import * as authService from '@/services/supabaseAuthService';
-import { secureStorage, AUTH_STORAGE_KEYS } from '@/utils/secureStorage';
+import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '@/utils/secureStorage';
 import type { User } from '@/types/index';
 
 // Mock Supabase config first
@@ -33,12 +33,19 @@ const wrapper = ({ children }: { children: ReactNode }) => (
   <AuthProvider>{children}</AuthProvider>
 );
 
+// Use the same storage key as AuthContext (StorageKeys.PUBLIC.USER_PROFILE)
+const USER_STORAGE_KEY = StorageKeys.PUBLIC.USER_PROFILE;
+
 describe('useAuth', () => {
+  // mockUser must include all fields created by AuthContext.createUser
   const mockUser: User = {
     id: 'user-123',
     email: 'test@example.com',
     name: 'Test User',
     avatar: 'https://example.com/avatar.jpg',
+    role: 'Traveler',
+    kyc: 'Unverified',
+    location: { lat: 0, lng: 0 },
   };
 
   const mockSession = {
@@ -82,7 +89,7 @@ describe('useAuth', () => {
     it('should restore session from storage', async () => {
       // Mock stored data
       await AsyncStorage.setItem(
-        AUTH_STORAGE_KEYS.USER,
+        USER_STORAGE_KEY,
         JSON.stringify(mockUser),
       );
 
@@ -108,7 +115,7 @@ describe('useAuth', () => {
 
     it('should not restore expired session', async () => {
       await AsyncStorage.setItem(
-        AUTH_STORAGE_KEYS.USER,
+        USER_STORAGE_KEY,
         JSON.stringify(mockUser),
       );
 
@@ -252,7 +259,7 @@ describe('useAuth', () => {
       });
 
       // Verify AsyncStorage was called
-      const storedUser = await AsyncStorage.getItem(AUTH_STORAGE_KEYS.USER);
+      const storedUser = await AsyncStorage.getItem(USER_STORAGE_KEY);
       expect(storedUser).toBeTruthy();
       expect(JSON.parse(storedUser!)).toEqual(mockUser);
 
@@ -505,7 +512,7 @@ describe('useAuth', () => {
         await result.current.logout();
       });
 
-      const storedUser = await AsyncStorage.getItem(AUTH_STORAGE_KEYS.USER);
+      const storedUser = await AsyncStorage.getItem(USER_STORAGE_KEY);
       expect(storedUser).toBeNull();
       expect(secureStorage.deleteItems).toHaveBeenCalled();
     });
@@ -515,7 +522,7 @@ describe('useAuth', () => {
     it('should provide getAccessToken function', async () => {
       // Setup authenticated state with valid token
       await AsyncStorage.setItem(
-        AUTH_STORAGE_KEYS.USER,
+        USER_STORAGE_KEY,
         JSON.stringify(mockUser),
       );
 
@@ -626,7 +633,7 @@ describe('useAuth', () => {
       });
 
       await waitFor(async () => {
-        const stored = await AsyncStorage.getItem(AUTH_STORAGE_KEYS.USER);
+        const stored = await AsyncStorage.getItem(USER_STORAGE_KEY);
         const parsed = stored ? JSON.parse(stored) : null;
         expect(parsed?.name).toBe('Updated Name');
       });

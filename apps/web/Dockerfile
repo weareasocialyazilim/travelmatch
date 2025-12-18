@@ -3,6 +3,9 @@
 # ==========================================
 FROM node:20-alpine AS deps
 
+# Apply security updates (CVE fix: c-ares use-after-free)
+RUN apk update && apk upgrade --no-cache
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 

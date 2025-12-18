@@ -50,7 +50,9 @@
     "test:visual:ci": "turbo run chromatic:ci",
     "prepare": "husky",
     "validate:hooks": "node scripts/validate-husky-setup.js",
-    "tm": "node bin/tm.mjs"
+    "tm": "node bin/tm.mjs",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "bin": {
     "tm": "./bin/tm.mjs"
@@ -59,11 +61,11 @@
     "@anthropic-ai/sdk": "^0.71.2",
     "@faker-js/faker": "^9.3.0",
     "@supabase/supabase-js": "^2.39.0",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
     "dotenv": "^16.3.1",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^8.10.2",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.5",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "openai": "^6.10.0",
@@ -78,5 +80,21 @@
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.15.0"
+  "packageManager": "pnpm@8.15.0",
+  "dependencies": {
+    "expo": "~54.0.29",
+    "metro": "0.80.12",
+    "metro-cache": "0.80.12",
+    "metro-core": "0.80.12",
+    "metro-runtime": "0.80.12",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "react-native": "0.81.5"
+    }
+  }
 }

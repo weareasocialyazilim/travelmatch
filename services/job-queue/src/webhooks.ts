@@ -132,8 +132,8 @@ async function handleKycComplete(
 async function handleImageComplete(
   userId: string,
   status: string,
-  result: any,
-  error: any
+  _result: unknown,
+  error: unknown
 ): Promise<void> {
   if (status === 'completed') {
     console.log(`Image processing completed for user ${userId}`);
@@ -154,8 +154,8 @@ async function handleImageComplete(
 async function handleEmailComplete(
   userId: string,
   status: string,
-  result: any,
-  error: any
+  _result: unknown,
+  error: unknown
 ): Promise<void> {
   if (status === 'completed') {
     console.log(`Email sent successfully to user ${userId}`);
@@ -172,7 +172,7 @@ async function handleEmailComplete(
 /**
  * Health check endpoint
  */
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'healthy' });
 });
 
