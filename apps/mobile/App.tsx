@@ -34,6 +34,26 @@ import { pendingTransactionsService } from './src/services/pendingTransactionsSe
 import { storageMonitor } from './src/services/storageMonitor';
 import { PendingTransactionsModal } from './src/components/PendingTransactionsModal';
 import type { PendingPayment, PendingUpload } from './src/services/pendingTransactionsService';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://4e851e74a8a6ecab750e2f4a8933e6c8@o4510544957800448.ingest.de.sentry.io/4510550169354320',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Enable Logs
+  enableLogs: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -59,7 +79,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function App() {
+export default Sentry.wrap(function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [_isBackground, setIsBackground] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
@@ -268,4 +288,4 @@ export default function App() {
       </ErrorBoundary>
     </GestureHandlerRootView>
   );
-}
+});
