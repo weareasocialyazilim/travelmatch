@@ -98,8 +98,8 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         )}
 
         <View style={styles.featuresContainer}>
-          {plan.features.map((feature, index) => (
-            <View key={index} style={styles.featureRow}>
+          {plan.features.map((feature) => (
+            <View key={`${plan.id}-${feature.text}`} style={styles.featureRow}>
               <Icon name={feature.included ? "check-circle" : "close-circle"} size={16} color={feature.included ? COLORS.success : COLORS.textSecondary} />
               <Text style={[styles.featureText, !feature.included && styles.featureDisabled]}>{feature.text}</Text>
             </View>

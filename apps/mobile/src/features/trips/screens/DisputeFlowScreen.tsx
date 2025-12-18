@@ -174,15 +174,15 @@ export const DisputeFlowScreen: React.FC = () => {
       </Text>
 
       <View style={styles.uploadArea}>
-        {evidence.map((file, index) => (
-          <View key={index} style={styles.fileItem}>
+        {evidence.map((file) => (
+          <View key={file} style={styles.fileItem}>
             <MaterialCommunityIcons
               name="file-document-outline"
               size={24}
               color={COLORS.text}
             />
             <Text style={styles.fileName}>{file}</Text>
-            <TouchableOpacity onPress={() => handleRemoveFile(index)}>
+            <TouchableOpacity onPress={() => handleRemoveFile(evidence.indexOf(file))}>
               <MaterialCommunityIcons
                 name="close"
                 size={20}

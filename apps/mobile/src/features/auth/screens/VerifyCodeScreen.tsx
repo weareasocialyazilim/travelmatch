@@ -217,7 +217,7 @@ export const VerifyCodeScreen: React.FC = () => {
           <View style={styles.codeContainer}>
             {code.map((digit, index) => (
               <TextInput
-                key={index}
+                key={`code-input-${index}`}
                 ref={(ref) => (inputRefs.current[index] = ref)}
                 style={[
                   styles.codeInput,

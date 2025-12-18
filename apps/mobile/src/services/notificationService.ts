@@ -107,14 +107,14 @@ export const notificationService = {
         .eq('user_id', user.id)
         .eq('read', false);
 
-      const notifications: Notification[] = data.map((row: any) => ({
+      const notifications: Notification[] = data.map((row: Database['public']['Tables']['notifications']['Row']) => ({
         id: row.id,
         type: (row.type as NotificationType) || 'system',
         title: row.title,
         body: row.body || '',
-        data: row.data,
+        data: row.data as Record<string, unknown> | undefined,
         read: row.read || false,
-        createdAt: row.created_at,
+        createdAt: row.created_at || new Date().toISOString(),
         // We might need to fetch related entities if they are not in the row
         // For now, we'll leave them undefined or extract from data if available
       }));
@@ -283,7 +283,7 @@ export const notificationService = {
         toRecord(currentData?.notification_preferences) ?? {};
       const newPrefs = { ...currentPrefs, ...preferences } as Record<
         string,
-        any
+        unknown
       >;
 
       const { error } = await supabase
@@ -346,7 +346,9 @@ export const getNotificationColor = (type: NotificationType): string => {
   }
 };
 
-export const getNotificationRoute = (notification: Notification): any => {
+export const getNotificationRoute = (
+  notification: Notification,
+): { name: string; params?: Record<string, unknown> } | null => {
   switch (notification.type) {
     case 'message':
       return {

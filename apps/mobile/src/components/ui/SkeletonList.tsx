@@ -261,7 +261,7 @@ export const SkeletonList: React.FC<SkeletonListProps> = ({
   return (
     <View style={styles.container}>
       {Array.from({ length: count }, (_, i) => (
-        <SkeletonItem key={i} type={type} />
+        <SkeletonItem key={`skeleton-${type}-${i}`} type={type} />
       ))}
     </View>
   );

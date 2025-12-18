@@ -111,8 +111,8 @@ export const BlockConfirmation: React.FC<BlockConfirmationProps> = ({
             <Text style={styles.consequencesTitle}>
               What happens when you block someone:
             </Text>
-            {consequences.map((item, index) => (
-              <View key={index} style={styles.consequenceItem}>
+            {consequences.map((item) => (
+              <View key={item} style={styles.consequenceItem}>
                 <Ionicons
                   name="checkmark-circle"
                   size={18}

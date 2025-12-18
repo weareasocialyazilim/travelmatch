@@ -203,9 +203,9 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       <View style={styles.bottomSection}>
         {/* Pagination Dots */}
         <View style={styles.paginationContainer}>
-          {ONBOARDING_PAGES.map((_, index) => (
+          {ONBOARDING_PAGES.map((page, index) => (
             <View
-              key={index}
+              key={page.id}
               style={[
                 styles.dot,
                 index === currentIndex && styles.activeDot,

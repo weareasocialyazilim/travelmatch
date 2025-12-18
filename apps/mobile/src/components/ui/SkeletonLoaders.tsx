@@ -124,7 +124,7 @@ export const RequestCardSkeleton: React.FC = () => (
 export const MessagesListSkeleton: React.FC = () => (
   <View style={styles.listContainer}>
     {[1, 2, 3, 4, 5].map((i) => (
-      <ChatItemSkeleton key={i} />
+      <ChatItemSkeleton key={`chat-skeleton-${i}`} />
     ))}
   </View>
 );
@@ -135,7 +135,7 @@ export const MessagesListSkeleton: React.FC = () => (
 export const MomentsFeedSkeleton: React.FC = () => (
   <View style={styles.momentsGrid}>
     {[1, 2, 3, 4].map((i) => (
-      <View key={i} style={styles.momentGridItem}>
+      <View key={`moment-skeleton-${i}`} style={styles.momentGridItem}>
         <MomentCardSkeleton />
       </View>
     ))}
@@ -148,7 +148,7 @@ export const MomentsFeedSkeleton: React.FC = () => (
 export const RequestsListSkeleton: React.FC = () => (
   <View style={styles.listContainer}>
     {[1, 2, 3].map((i) => (
-      <RequestCardSkeleton key={i} />
+      <RequestCardSkeleton key={`request-skeleton-${i}`} />
     ))}
   </View>
 );

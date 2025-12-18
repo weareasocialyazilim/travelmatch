@@ -17,8 +17,13 @@ import { usePagination, type PaginatedResponse } from './usePagination';
 import type { Database } from '../types/database.types';
 
 // MomentRow type from the database - includes joined data from momentsService
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MomentRow = any; // Using any as the service returns dynamic joins
+type MomentRow = Database['public']['Tables']['moments']['Row'] & {
+  users?: Pick<Database['public']['Tables']['users']['Row'], 'full_name' | 'avatar_url' | 'rating' | 'review_count'> | null;
+  user?: Pick<Database['public']['Tables']['users']['Row'], 'full_name' | 'avatar_url' | 'rating' | 'review_count'> | null;
+  categories?: Record<string, unknown> | null;
+  favorites_count?: number;
+  trust_score?: number;
+};
 
 // Types
 export interface Moment {
@@ -145,31 +150,30 @@ const DEFAULT_PAGE_SIZE = 20;
 
 const mapToMoment = (row: MomentRow): Moment => {
   // Extract user data from the optimized join
-  const userData = row.users || row.user || {};
-  const categoryData = row.categories || {};
+  const userData = row.users || row.user || null;
 
   return {
     id: row.id,
     title: row.title,
-    description: row.description,
+    description: row.description || '',
     category: row.category,
     location: row.location,
     images: row.images || [],
-    pricePerGuest: row.price,
-    currency: row.currency,
-    maxGuests: row.max_guests,
-    duration: row.duration,
-    availability: row.availability || [],
+    pricePerGuest: row.price || 0,
+    currency: row.currency || 'USD',
+    maxGuests: row.max_participants || 1,
+    duration: `${row.duration_hours || 0} hours`,
+    availability: row.tags || [],
     hostId: row.user_id,
-    hostName: userData.name || 'Unknown',
-    hostAvatar: userData.avatar || '',
-    hostRating: userData.rating || userData.trust_score || 0,
-    hostReviewCount: userData.review_count || 0,
+    hostName: userData?.full_name || 'Unknown',
+    hostAvatar: userData?.avatar_url || '',
+    hostRating: userData?.rating || row.trust_score || 0,
+    hostReviewCount: userData?.review_count || 0,
     saves: row.favorites_count || 0,
     isSaved: false,
-    status: row.status,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    status: (row.status as 'active' | 'paused' | 'draft' | 'deleted' | 'completed') || 'active',
+    createdAt: row.created_at || new Date().toISOString(),
+    updatedAt: row.updated_at || new Date().toISOString(),
   };
 };
 
@@ -344,17 +348,19 @@ export const useMoments = (): UseMomentsReturn => {
       data: Partial<CreateMomentData>,
     ): Promise<Moment | null> => {
       try {
-        const updates: any = {};
-        if (data.title) updates.title = data.title;
-        if (data.description) updates.description = data.description;
-        if (data.category) updates.category = data.category;
-        if (data.location) updates.location = data.location;
-        if (data.images) updates.images = data.images;
-        if (data.pricePerGuest) updates.price = data.pricePerGuest;
-        if (data.currency) updates.currency = data.currency;
-        if (data.maxGuests) updates.max_guests = data.maxGuests;
-        if (data.duration) updates.duration = data.duration;
-        if (data.availability) updates.availability = data.availability;
+        const updates: Database['public']['Tables']['moments']['Update'] = {};
+        if (data.title !== undefined) updates.title = data.title;
+        if (data.description !== undefined) updates.description = data.description;
+        if (data.category !== undefined) updates.category = data.category;
+        if (data.location !== undefined) {
+          updates.location = typeof data.location === 'string'
+            ? data.location
+            : data.location.city;
+        }
+        if (data.images !== undefined) updates.images = data.images;
+        if (data.pricePerGuest !== undefined) updates.price = data.pricePerGuest;
+        if (data.currency !== undefined) updates.currency = data.currency;
+        if (data.maxGuests !== undefined) updates.max_participants = data.maxGuests;
 
         const { data: moment, error } = await momentsService.update(
           id,
@@ -571,7 +577,7 @@ export const useMoments = (): UseMomentsReturn => {
 
       if (!mountedRef.current) return;
 
-      const mappedMoments: Moment[] = data.map((row: any) => ({
+      const mappedMoments: Moment[] = data.map((row: MomentRow) => ({
         ...mapToMoment(row),
         isSaved: true,
       }));

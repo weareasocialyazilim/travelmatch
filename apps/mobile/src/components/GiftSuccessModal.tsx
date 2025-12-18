@@ -129,7 +129,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
           <View style={styles.confettiContainer}>
             {confettiAnims.map((anim, index) => (
               <Animated.View
-                key={index}
+                key={`confetti-${index}`}
                 style={[
                   styles.confetti,
                   {
