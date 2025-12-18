@@ -45,7 +45,7 @@ jobs:
         run: pnpm turbo run test
       
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1
+        uses: Infisical/secrets-action@v1.0.20
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
