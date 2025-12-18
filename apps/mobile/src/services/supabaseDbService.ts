@@ -10,6 +10,7 @@ import {
 } from '../config/supabase';
 import { callRpc } from './supabaseRpc';
 import { logger } from '../utils/logger';
+import type { Json } from '../types/database.types';
 
 type Tables = Database['public']['Tables'];
 
@@ -23,6 +24,46 @@ interface ListResult<T> {
   data: T[];
   count: number;
   error: Error | null;
+}
+
+// Type definitions for tables not yet in generated types
+interface FollowerRecord {
+  follower_id: string;
+}
+
+interface FollowingRecord {
+  following_id: string;
+}
+
+interface ReportRecord {
+  id: string;
+  reporter_id: string;
+  reported_user_id: string | null;
+  reported_moment_id: string | null;
+  reason: string;
+  description?: string;
+  status: 'pending' | 'reviewed' | 'resolved';
+  created_at: string;
+}
+
+interface BlockRecord {
+  id: string;
+  blocker_id: string;
+  blocked_id: string;
+  created_at: string;
+}
+
+interface TransactionInput {
+  type: string;
+  amount: number;
+  currency: string;
+  status?: 'pending' | 'completed' | 'failed' | 'refunded';
+  description?: string;
+  moment_id?: string;
+  sender_id?: string;
+  receiver_id?: string;
+  user_id: string;
+  metadata?: Json;
 }
 
 // Helpers to normalize supabase responses into our DbResult/ListResult shapes
@@ -126,7 +167,7 @@ export const usersService = {
     }
   },
 
-  async getFollowers(userId: string): Promise<ListResult<any>> {
+  async getFollowers(userId: string): Promise<ListResult<FollowerRecord>> {
     try {
       const { data, count, error } = await supabase
         .from('follows')
@@ -134,14 +175,14 @@ export const usersService = {
         .eq('following_id', userId);
 
       if (error) throw error;
-      return { data: data || [], count: count || 0, error: null };
+      return { data: (data as FollowerRecord[]) || [], count: count || 0, error: null };
     } catch (error) {
       logger.error('[DB] Get followers error:', error);
       return { data: [], count: 0, error: error as Error };
     }
   },
 
-  async getFollowing(userId: string): Promise<ListResult<any>> {
+  async getFollowing(userId: string): Promise<ListResult<FollowingRecord>> {
     try {
       const { data, count, error } = await supabase
         .from('follows')
@@ -149,7 +190,7 @@ export const usersService = {
         .eq('follower_id', userId);
 
       if (error) throw error;
-      return { data: data || [], count: count || 0, error: null };
+      return { data: (data as FollowingRecord[]) || [], count: count || 0, error: null };
     } catch (error) {
       logger.error('[DB] Get following error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -433,7 +474,7 @@ export const momentsService = {
 
       // Extract moments from the join result
       const moments =
-        data?.map((item: any) => item.moments).filter(Boolean) || [];
+        data?.map((item: { moments: Tables['moments']['Row'] }) => item.moments).filter(Boolean) || [];
 
       return { data: moments, count: count || 0, error: null };
     } catch (error) {
@@ -576,7 +617,7 @@ export const momentsService = {
 
   async getDeleted(
     userId: string,
-  ): Promise<{ data: any[] | null; error: Error | null }> {
+  ): Promise<{ data: Tables['moments']['Row'][] | null; error: Error | null }> {
     try {
       // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
@@ -1324,7 +1365,7 @@ export const notificationsService = {
  */
 export const moderationService = {
   // Reports
-  async createReport(report: any): Promise<DbResult<any>> {
+  async createReport(report: Omit<ReportRecord, 'id' | 'created_at'>): Promise<DbResult<ReportRecord>> {
     try {
       const { data, error } = await supabase
         .from('reports')
@@ -1333,7 +1374,7 @@ export const moderationService = {
         .single();
 
       if (error) throw error;
-      return okSingle<any>(data);
+      return okSingle<ReportRecord>(data);
     } catch (error) {
       logger.error('[DB] Create report error:', error);
       return { data: null, error: error as Error };
@@ -1357,7 +1398,7 @@ export const moderationService = {
   },
 
   // Blocks
-  async blockUser(block: any): Promise<DbResult<any>> {
+  async blockUser(block: Omit<BlockRecord, 'id' | 'created_at'>): Promise<DbResult<BlockRecord>> {
     try {
       const { data, error } = await supabase
         .from('blocks')
@@ -1366,7 +1407,7 @@ export const moderationService = {
         .single();
 
       if (error) throw error;
-      return { data, error: null };
+      return { data: data as BlockRecord, error: null };
     } catch (error) {
       logger.error('[DB] Block user error:', error);
       return { data: null, error: error as Error };
@@ -1463,15 +1504,14 @@ export const transactionsService = {
     }
   },
 
-  async get(id: string): Promise<DbResult<any>> {
+  async get(id: string): Promise<DbResult<Tables['transactions']['Row']>> {
     try {
       // Get current user for ownership verification
-      let user: any = null;
+      let user: { id: string } | null = null;
       try {
         if (supabase.auth && typeof supabase.auth.getUser === 'function') {
           // supabase.auth.getUser may not be mocked in unit tests; handle gracefully
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const authRes: any = await supabase.auth.getUser();
+          const authRes = await supabase.auth.getUser();
           user = authRes?.data?.user ?? null;
         }
       } catch (e) {
@@ -1528,7 +1568,7 @@ export const transactionsService = {
     }
   },
 
-  async create(transaction: any): Promise<DbResult<any>> {
+  async create(transaction: TransactionInput): Promise<DbResult<Tables['transactions']['Row']>> {
     try {
       const { data, error } = await supabase
         .from('transactions')
@@ -1538,7 +1578,7 @@ export const transactionsService = {
 
       if (error) throw error;
       logger.info('[DB] Transaction created:', data?.id);
-      return okSingle<any>(data);
+      return okSingle<Tables['transactions']['Row']>(data);
     } catch (error) {
       logger.error('[DB] Create transaction error:', error);
       return { data: null, error: error as Error };

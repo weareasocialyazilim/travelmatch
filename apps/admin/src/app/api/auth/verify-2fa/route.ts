@@ -5,17 +5,34 @@ import crypto from 'crypto';
 
 // Encryption helpers for TOTP secret
 const ALGORITHM = 'aes-256-gcm';
-const ENCRYPTION_KEY = process.env.TOTP_ENCRYPTION_KEY || 'default-32-char-encryption-key!';
+
+// Security: Encryption key and salt MUST be set via environment variables
+// Generate with: openssl rand -base64 32
+function getEncryptionConfig() {
+  const key = process.env.TOTP_ENCRYPTION_KEY;
+  const salt = process.env.TOTP_ENCRYPTION_SALT;
+  
+  if (!key || key.length < 32) {
+    throw new Error('TOTP_ENCRYPTION_KEY must be set and at least 32 characters');
+  }
+  
+  if (!salt || salt.length < 16) {
+    throw new Error('TOTP_ENCRYPTION_SALT must be set and at least 16 characters');
+  }
+  
+  return { key, salt };
+}
 
 function decrypt(encryptedData: string): string {
   try {
+    const { key, salt } = getEncryptionConfig();
     const [ivHex, authTagHex, encryptedHex] = encryptedData.split(':');
     const iv = Buffer.from(ivHex, 'hex');
     const authTag = Buffer.from(authTagHex, 'hex');
     const encrypted = Buffer.from(encryptedHex, 'hex');
 
-    const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
-    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+    const derivedKey = crypto.scryptSync(key, salt, 32);
+    const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
     decipher.setAuthTag(authTag);
 
     let decrypted = decipher.update(encrypted);

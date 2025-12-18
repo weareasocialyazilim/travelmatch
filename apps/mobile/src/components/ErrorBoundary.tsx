@@ -128,7 +128,7 @@ export class ErrorBoundary extends Component<
     // Determine error type from error message if fallbackType is generic
     let effectiveType = fallbackType;
     if (fallbackType === 'generic' && error) {
-      const errorMessage = error.message.toLowerCase();
+      const errorMessage = (error.message || '').toLowerCase();
       if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
         effectiveType = 'network';
       } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {

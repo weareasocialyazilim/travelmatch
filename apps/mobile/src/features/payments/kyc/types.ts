@@ -67,7 +67,7 @@ export interface KYCReviewScreenParams {
   data: VerificationData;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KYCPendingScreenParams {
   // No specific params needed - interface kept for type consistency
 }

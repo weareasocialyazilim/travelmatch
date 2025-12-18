@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -55,7 +49,6 @@ const MatchConfirmationScreen: React.FC = () => {
 
       <FlashList
         data={selectedGivers}
-        estimatedItemSize={100}
         renderItem={({ item }) => (
           <View style={styles.giverCard}>
             <Image source={{ uri: item.avatar }} style={styles.avatar} />

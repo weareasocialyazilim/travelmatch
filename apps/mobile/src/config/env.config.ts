@@ -1,19 +1,19 @@
 /**
  * Environment Variable Validation with Zod
- * 
+ *
  * Validates all environment variables at startup to prevent runtime errors.
  * Provides type-safe access to configuration across the app.
- * 
+ *
  * Security Features:
  * - Separates client-safe vs sensitive variables
  * - Validates required variables in production
  * - Prevents accidental exposure of secrets
  * - Type-safe configuration
- * 
+ *
  * Usage:
  * ```typescript
  * import { env } from '@/config/env.config';
- * 
+ *
  * // Type-safe access
  * const supabaseUrl = env.SUPABASE_URL;
  * const isDev = env.NODE_ENV === 'development';
@@ -29,7 +29,9 @@ import { logger } from '../utils/logger';
  */
 const clientEnvSchema = z.object({
   // App Configuration
-  APP_ENV: z.enum(['development', 'staging', 'production']).default('development'),
+  APP_ENV: z
+    .enum(['development', 'staging', 'production'])
+    .default('development'),
   APP_NAME: z.string().default('TravelMatch'),
   APP_VERSION: z.string().default('1.0.0'),
 
@@ -84,7 +86,9 @@ const _serverEnvSchema = z.object({
  */
 const envSchema = z.object({
   // Node environment
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
 
   // Merge client and server schemas
   ...clientEnvSchema.shape,
@@ -93,10 +97,7 @@ const envSchema = z.object({
 /**
  * Variables required in production
  */
-const REQUIRED_IN_PRODUCTION = [
-  'SUPABASE_URL',
-  'SUPABASE_ANON_KEY',
-] as const;
+const REQUIRED_IN_PRODUCTION = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
 
 /**
  * Sensitive keys that should NEVER use EXPO_PUBLIC_ prefix
@@ -107,6 +108,9 @@ const FORBIDDEN_PUBLIC_VARS = [
   'STRIPE_WEBHOOK_SECRET',
   'OPENAI_API_KEY',
   'CLOUDFLARE_STREAM_API_KEY',
+  'CLOUDFLARE_IMAGES_TOKEN', // API token for image uploads
+  'MAPBOX_SECRET_TOKEN', // Download token for native SDK
+  'MAPBOX_DOWNLOAD_TOKEN', // Build-time download token
   'GOOGLE_CLIENT_SECRET',
   'APPLE_CLIENT_SECRET',
   'UPSTASH_REDIS_REST_TOKEN',
@@ -146,10 +150,10 @@ function parseEnv() {
   if (exposedSecrets.length > 0) {
     throw new Error(
       `🚨 SECURITY ERROR: Sensitive variables exposed with EXPO_PUBLIC_ prefix!\n` +
-      `The following variables MUST NOT use EXPO_PUBLIC_:\n` +
-      exposedSecrets.map(k => `  - ${k}`).join('\n') +
-      `\n\nThese secrets would be embedded in the client bundle and publicly accessible.` +
-      `\nRemove the EXPO_PUBLIC_ prefix and access them server-side only.`
+        `The following variables MUST NOT use EXPO_PUBLIC_:\n` +
+        exposedSecrets.map((k) => `  - ${k}`).join('\n') +
+        `\n\nThese secrets would be embedded in the client bundle and publicly accessible.` +
+        `\nRemove the EXPO_PUBLIC_ prefix and access them server-side only.`,
     );
   }
 
@@ -159,13 +163,13 @@ function parseEnv() {
     // Production validation
     if (parsed.NODE_ENV === 'production') {
       const missing = REQUIRED_IN_PRODUCTION.filter(
-        (key) => !rawEnv[key as keyof typeof rawEnv]
+        (key) => !rawEnv[key as keyof typeof rawEnv],
       );
 
       if (missing.length > 0) {
         throw new Error(
           `🚨 Missing required environment variables in production:\n` +
-          missing.map(k => `  - EXPO_PUBLIC_${k}`).join('\n')
+            missing.map((k) => `  - EXPO_PUBLIC_${k}`).join('\n'),
         );
       }
     }
@@ -174,12 +178,14 @@ function parseEnv() {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorMessages = error.issues.map(
-        (issue) => `  ❌ ${issue.path.join('.')}: ${issue.message}`
+        (issue) => `  ❌ ${issue.path.join('.')}: ${issue.message}`,
       );
-      
+
       throw new Error(
-        `🚨 Invalid environment configuration:\n${errorMessages.join('\n')}\n\n` +
-        `Check your .env file and ensure all required variables are set.`
+        `🚨 Invalid environment configuration:\n${errorMessages.join(
+          '\n',
+        )}\n\n` +
+          `Check your .env file and ensure all required variables are set.`,
       );
     }
     throw error;

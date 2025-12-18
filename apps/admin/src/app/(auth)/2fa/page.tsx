@@ -47,7 +47,10 @@ export default function TwoFactorPage() {
     const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     const newCode = [...code];
     for (let i = 0; i < pastedData.length; i++) {
-      newCode[i] = pastedData[i];
+      const char = pastedData[i];
+      if (char !== undefined) {
+        newCode[i] = char;
+      }
     }
     setCode(newCode);
     inputRefs.current[Math.min(pastedData.length, 5)]?.focus();

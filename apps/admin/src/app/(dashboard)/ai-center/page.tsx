@@ -9,9 +9,6 @@ import {
   CheckCircle,
   XCircle,
   Users,
-  Image,
-  MessageSquare,
-  Shield,
   Target,
   Zap,
   BarChart3,
@@ -171,7 +168,7 @@ const contentDistribution = [
 ];
 
 export default function AICenterPage() {
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [_selectedModel, _setSelectedModel] = useState<string | null>(null);
 
   const getSeverityBadge = (severity: string) => {
     const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {

@@ -1,90 +1,66 @@
 /**
  * Validation Schemas
- * Zod ile tüm form ve API validationları
+ * Re-exports from @travelmatch/shared and mobile-specific schemas
+ * 
+ * @see packages/shared/src/schemas for base schemas
  */
 
 import { z } from 'zod';
 
-/**
- * Auth Schemas
- */
-export const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must be at least 8 characters'),
-});
+// Re-export all schemas from shared package
+export {
+  // Auth schemas
+  loginSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+  verifyEmailSchema,
+  verifyOtpSchema,
+  type LoginInput,
+  type RegisterInput,
+  type ForgotPasswordInput,
+  type ResetPasswordInput,
+  type ChangePasswordInput,
+  type VerifyEmailInput,
+  type VerifyOtpInput,
+  
+  // User schemas
+  updateProfileSchema,
+  type UpdateProfileInput,
+  
+  // Common schemas
+  emailSchema,
+  passwordSchema,
+  phoneSchema,
+  urlSchema,
+  uuidSchema,
+  usernameSchema,
+  currencySchema,
+  amountSchema,
+  paginationSchema,
+  cursorPaginationSchema,
+  dateRangeSchema,
+  searchSchema as baseSearchSchema,
+  sortSchema,
+  coordinatesSchema,
+  coordinatesSchema as coordinateSchema, // alias for backward compatibility
+  locationSearchSchema,
+  type PaginationInput,
+  type CursorPaginationInput,
+  type DateRangeInput,
+  type SearchInput as BaseSearchInput,
+  type SortInput,
+  type CoordinatesInput,
+  type LocationSearchInput,
+} from '../../../../packages/shared/src/schemas';
 
-export const registerSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, 'Name is required')
-      .min(2, 'Name must be at least 2 characters')
-      .max(50, 'Name must be less than 50 characters'),
-    email: z
-      .string()
-      .min(1, 'Email is required')
-      .email('Invalid email address'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
-
-export const forgotPasswordSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
-});
-
-export const resetPasswordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
+// =============================================================================
+// MOBILE-SPECIFIC SCHEMAS
+// =============================================================================
 
 /**
- * Profile Schemas
- */
-export const updateProfileSchema = z.object({
-  name: z
-    .string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name must be less than 50 characters')
-    .optional(),
-  bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
-  location: z
-    .string()
-    .max(100, 'Location must be less than 100 characters')
-    .optional(),
-  phone: z
-    .string()
-    .regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number')
-    .optional(),
-  dateOfBirth: z
-    .date()
-    .max(new Date(), 'Date of birth cannot be in the future')
-    .optional(),
-});
-
-/**
- * Moment Schemas
+ * Create Moment Schema
  */
 export const createMomentSchema = z.object({
   title: z
@@ -115,8 +91,11 @@ export const createMomentSchema = z.object({
 
 export const updateMomentSchema = createMomentSchema.partial();
 
+export type CreateMomentInput = z.infer<typeof createMomentSchema>;
+export type UpdateMomentInput = z.infer<typeof updateMomentSchema>;
+
 /**
- * Message Schemas
+ * Message Schema
  */
 export const sendMessageSchema = z.object({
   recipientId: z.string().min(1, 'Recipient is required'),
@@ -129,6 +108,8 @@ export const sendMessageSchema = z.object({
     .max(5, 'Maximum 5 attachments allowed')
     .optional(),
 });
+
+export type SendMessageInput = z.infer<typeof sendMessageSchema>;
 
 /**
  * Payment Schemas
@@ -153,8 +134,11 @@ export const addBankAccountSchema = z.object({
   bankName: z.string().min(1, 'Bank name is required'),
 });
 
+export type AddCardInput = z.infer<typeof addCardSchema>;
+export type AddBankAccountInput = z.infer<typeof addBankAccountSchema>;
+
 /**
- * Review Schemas
+ * Review Schema
  */
 export const createReviewSchema = z.object({
   rating: z
@@ -168,8 +152,10 @@ export const createReviewSchema = z.object({
     .optional(),
 });
 
+export type CreateReviewInput = z.infer<typeof createReviewSchema>;
+
 /**
- * Search Schemas
+ * Search Schema (mobile extended)
  */
 export const searchSchema = z
   .object({
@@ -191,10 +177,7 @@ export const searchSchema = z
       }
       return true;
     },
-    {
-      message: 'Min price must be less than max price',
-      path: ['maxPrice'],
-    },
+    { message: 'Min price must be less than max price', path: ['maxPrice'] },
   )
   .refine(
     (data) => {
@@ -203,28 +186,13 @@ export const searchSchema = z
       }
       return true;
     },
-    {
-      message: 'Start date must be before end date',
-      path: ['endDate'],
-    },
+    { message: 'Start date must be before end date', path: ['endDate'] },
   );
 
-/**
- * Type Exports
- */
-export type LoginInput = z.infer<typeof loginSchema>;
-export type RegisterInput = z.infer<typeof registerSchema>;
-export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
-export type CreateMomentInput = z.infer<typeof createMomentSchema>;
-export type UpdateMomentInput = z.infer<typeof updateMomentSchema>;
-export type SendMessageInput = z.infer<typeof sendMessageSchema>;
-export type AddCardInput = z.infer<typeof addCardSchema>;
-export type AddBankAccountInput = z.infer<typeof addBankAccountSchema>;
-export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type SearchInput = z.infer<typeof searchSchema>;
 
 /**
- * Report Schemas
+ * Report Schema
  */
 export const reportSchema = z.object({
   reason: z.enum([
@@ -247,7 +215,7 @@ export const reportSchema = z.object({
 export type ReportInput = z.infer<typeof reportSchema>;
 
 /**
- * Notification Settings Schema
+ * Settings Schemas
  */
 export const notificationSettingsSchema = z.object({
   pushEnabled: z.boolean(),
@@ -260,13 +228,6 @@ export const notificationSettingsSchema = z.object({
   paymentUpdates: z.boolean(),
 });
 
-export type NotificationSettingsInput = z.infer<
-  typeof notificationSettingsSchema
->;
-
-/**
- * Privacy Settings Schema
- */
 export const privacySettingsSchema = z.object({
   profileVisibility: z.enum(['public', 'friends', 'private']),
   showLocation: z.boolean(),
@@ -275,10 +236,11 @@ export const privacySettingsSchema = z.object({
   showActivityStatus: z.boolean(),
 });
 
+export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchema>;
 export type PrivacySettingsInput = z.infer<typeof privacySettingsSchema>;
 
 /**
- * Contact Form Schema
+ * Contact & Feedback Schemas
  */
 export const contactSchema = z.object({
   subject: z
@@ -293,11 +255,6 @@ export const contactSchema = z.object({
   email: z.string().email('Invalid email address').optional(),
 });
 
-export type ContactInput = z.infer<typeof contactSchema>;
-
-/**
- * Feedback Schema
- */
 export const feedbackSchema = z.object({
   type: z.enum(['bug', 'feature', 'improvement', 'other']),
   title: z
@@ -315,47 +272,11 @@ export const feedbackSchema = z.object({
     .optional(),
 });
 
+export type ContactInput = z.infer<typeof contactSchema>;
 export type FeedbackInput = z.infer<typeof feedbackSchema>;
 
 /**
- * Coordinate Schema (reusable)
- */
-export const coordinateSchema = z.object({
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
-});
-
-export type Coordinate = z.infer<typeof coordinateSchema>;
-
-/**
- * Date Range Schema (reusable)
- */
-export const dateRangeSchema = z
-  .object({
-    startDate: z.date(),
-    endDate: z.date(),
-  })
-  .refine((data) => data.startDate <= data.endDate, {
-    message: 'Start date must be before or equal to end date',
-    path: ['endDate'],
-  });
-
-export type DateRange = z.infer<typeof dateRangeSchema>;
-
-/**
- * Pagination Schema
- */
-export const paginationSchema = z.object({
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(20),
-  sortBy: z.string().optional(),
-  sortOrder: z.enum(['asc', 'desc']).default('desc'),
-});
-
-export type PaginationInput = z.infer<typeof paginationSchema>;
-
-/**
- * Withdrawal Schema
+ * Transaction Schemas
  */
 export const withdrawalSchema = z.object({
   amount: z.number().min(10, 'Minimum withdrawal amount is $10'),
@@ -363,11 +284,6 @@ export const withdrawalSchema = z.object({
   destinationId: z.string().min(1, 'Destination is required'),
 });
 
-export type WithdrawalInput = z.infer<typeof withdrawalSchema>;
-
-/**
- * Dispute Schema
- */
 export const disputeSchema = z.object({
   transactionId: z.string().min(1, 'Transaction ID is required'),
   reason: z.enum([
@@ -387,7 +303,12 @@ export const disputeSchema = z.object({
     .max(10, 'Maximum 10 evidence files allowed'),
 });
 
+export type WithdrawalInput = z.infer<typeof withdrawalSchema>;
 export type DisputeInput = z.infer<typeof disputeSchema>;
+
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
 
 /**
  * Helper function to validate and parse data

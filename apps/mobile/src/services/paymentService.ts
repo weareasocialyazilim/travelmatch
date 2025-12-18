@@ -7,7 +7,7 @@ import { supabase } from '../config/supabase';
 import { callRpc } from './supabaseRpc';
 import { logger } from '../utils/logger';
 import { transactionsService as dbTransactionsService } from './supabaseDbService';
-import type { Database } from '../types/database.types';
+import type { Database, Json } from '../types/database.types';
 import {
   PaymentMetadataSchema,
   type PaymentMetadata as _PaymentMetadata,
@@ -267,6 +267,7 @@ export const paymentService = {
     try {
       const { data, error } = await dbTransactionsService.get(transactionId);
       if (error) throw error;
+      if (!data) throw new Error('Transaction not found');
 
       // Validate and parse metadata
       const validatedMetadata = data.metadata
@@ -277,11 +278,11 @@ export const paymentService = {
         id: data.id,
         type: (data.type as TransactionType) || 'payment',
         amount: data.amount,
-        currency: data.currency,
+        currency: data.currency ?? 'USD',
         status: (data.status as PaymentStatus) || 'completed',
-        date: data.created_at,
-        description: data.description || '',
-        referenceId: data.moment_id,
+        date: data.created_at ?? new Date().toISOString(),
+        description: data.description ?? '',
+        referenceId: data.moment_id ?? undefined,
         metadata: validatedMetadata,
       };
 
@@ -532,10 +533,11 @@ export const paymentService = {
         type: 'payment',
         status: 'completed',
         description: data.description,
-        metadata: data.metadata,
+        metadata: data.metadata as Json,
       });
 
       if (error) throw error;
+      if (!transaction) throw new Error('Failed to create transaction');
 
       const validatedMetadata = transaction.metadata
         ? PaymentMetadataSchema.parse(transaction.metadata)
@@ -546,10 +548,10 @@ export const paymentService = {
           id: transaction.id,
           type: 'payment' as TransactionType,
           amount: transaction.amount,
-          currency: transaction.currency,
+          currency: transaction.currency ?? 'USD',
           status: 'completed',
-          date: transaction.created_at,
-          description: transaction.description || '',
+          date: transaction.created_at ?? new Date().toISOString(),
+          description: transaction.description ?? '',
           metadata: validatedMetadata,
         },
       };
@@ -584,16 +586,17 @@ export const paymentService = {
       });
 
       if (error) throw error;
+      if (!transaction) throw new Error('Failed to create withdrawal transaction');
 
       return {
         transaction: {
           id: transaction.id,
           type: 'withdrawal' as TransactionType,
           amount: transaction.amount,
-          currency: transaction.currency,
+          currency: transaction.currency ?? 'USD',
           status: 'pending',
-          date: transaction.created_at,
-          description: transaction.description || '',
+          date: transaction.created_at ?? new Date().toISOString(),
+          description: transaction.description ?? '',
         },
       };
     } catch (error) {

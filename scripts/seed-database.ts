@@ -100,6 +100,14 @@ async function seedUsers() {
   console.log('\n📝 Seeding users...');
   const users = [];
 
+  // Get test password from environment or generate a secure random one
+  const testPassword = process.env.SEED_TEST_PASSWORD;
+  if (!testPassword) {
+    console.error('❌ SEED_TEST_PASSWORD environment variable is required');
+    console.error('   Set it in .env or pass via CLI: SEED_TEST_PASSWORD=YourSecurePassword123!');
+    process.exit(1);
+  }
+
   for (let i = 0; i < CONFIG.USERS; i++) {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
@@ -108,7 +116,7 @@ async function seedUsers() {
     // Create auth user
     const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
       email,
-      password: 'Test1234!', // Same password for all test users
+      password: testPassword, // From environment variable
       email_confirm: true,
       user_metadata: {
         full_name: `${firstName} ${lastName}`,

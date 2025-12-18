@@ -21,10 +21,48 @@ from PIL import Image
 import mediapipe as mp
 from skimage.metrics import structural_similarity as ssim
 import logging
+import os
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+# Allowed domains for image downloads (SSRF prevention)
+ALLOWED_IMAGE_DOMAINS = [
+    'storage.googleapis.com',
+    'supabase.co',
+    'supabase.in',
+    'cloudflare.com',
+    'cdn.travelmatch.app',
+    'localhost',
+    '127.0.0.1',
+]
+
+# Allow additional domains via environment variable
+if os.getenv('ALLOWED_IMAGE_DOMAINS'):
+    ALLOWED_IMAGE_DOMAINS.extend(os.getenv('ALLOWED_IMAGE_DOMAINS').split(','))
+
+def is_allowed_url(url: str) -> bool:
+    """Validate URL to prevent SSRF attacks"""
+    try:
+        parsed = urlparse(url)
+        
+        # Only allow http and https schemes
+        if parsed.scheme not in ('http', 'https'):
+            return False
+        
+        # Check against allowed domains
+        hostname = parsed.hostname or ''
+        
+        # Check if hostname matches any allowed domain
+        for allowed in ALLOWED_IMAGE_DOMAINS:
+            if hostname == allowed or hostname.endswith('.' + allowed):
+                return True
+        
+        return False
+    except Exception:
+        return False
 
 # Initialize MediaPipe Face Detection
 mp_face_detection = mp.solutions.face_detection
@@ -48,7 +86,18 @@ class QualityScore(BaseModel):
     approved: bool
 
 def download_image(url: str) -> np.ndarray:
-    """Download image from URL and convert to numpy array"""
+    """Download image from URL and convert to numpy array
+    
+    Security: URL is validated against allowed domains to prevent SSRF
+    """
+    # SSRF Prevention: Validate URL before making request
+    if not is_allowed_url(url):
+        logger.warning(f"SSRF attempt blocked: {url}")
+        raise HTTPException(
+            status_code=400, 
+            detail="Invalid image URL. Only approved storage domains are allowed."
+        )
+    
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -60,6 +109,8 @@ def download_image(url: str) -> np.ndarray:
         image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
         
         return image
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Failed to download image: {e}")
         raise HTTPException(status_code=400, detail="Failed to download image")

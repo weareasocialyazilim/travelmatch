@@ -13,6 +13,7 @@ import {
   Alert,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
+import { documentDirectory, EncodingType } from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { supabase } from '@/config/supabase';
 import { callRpc } from '@/services/supabaseRpc';
@@ -142,11 +143,11 @@ const DataPrivacyScreen = () => {
                 URL.revokeObjectURL(url);
               } else {
                 // Mobile: Save to file and share
-                const fileUri = `${FileSystem.documentDirectory}${filename}`;
+                const fileUri = `${documentDirectory}${filename}`;
                 await FileSystem.writeAsStringAsync(
                   fileUri,
                   JSON.stringify(exportData, null, 2),
-                  { encoding: FileSystem.EncodingType.UTF8 },
+                  { encoding: EncodingType.UTF8 },
                 );
 
                 // Check if sharing is available

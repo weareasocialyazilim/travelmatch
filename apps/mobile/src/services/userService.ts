@@ -442,7 +442,7 @@ export const userService = {
     const myFollowingIds: Set<string> = new Set();
     const myFollowerIds: Set<string> = new Set();
 
-    const allFollowers = ((data as UserRow[]) || []).map((follower) => ({
+    const allFollowers = ((data as unknown as UserRow[]) || []).map((follower) => ({
       id: follower.id,
       name: follower.full_name || follower.name || 'Unknown',
       username: follower.email ? follower.email.split('@')[0] : '',
@@ -480,7 +480,7 @@ export const userService = {
     const myFollowingIds: Set<string> = new Set();
     const myFollowerIds: Set<string> = new Set();
 
-    const allFollowing = ((data as UserRow[]) || []).map((followingUser) => ({
+    const allFollowing = ((data as unknown as UserRow[]) || []).map((followingUser) => ({
       id: followingUser.id,
       name: followingUser.full_name || followingUser.name || 'Unknown',
       username: followingUser.email ? followingUser.email.split('@')[0] : '',

@@ -1,7 +1,8 @@
 /**
- * Cloudflare Images Service
+ * Cloudflare Images Service (Client-Safe)
  *
- * Automatic WebP pipeline for image optimization
+ * SECURITY: All upload/delete operations go through Edge Functions.
+ * Client only has access to public image URLs (no API tokens).
  *
  * Features:
  * - Automatic format conversion (JPEG/PNG → WebP)
@@ -10,24 +11,16 @@
  * - Lazy loading support
  * - Performance monitoring
  *
- * Setup:
- * 1. Create Cloudflare Images account
- * 2. Get API token and account ID
- * 3. Set environment variables:
- *    - CLOUDFLARE_ACCOUNT_ID
- *    - CLOUDFLARE_IMAGES_TOKEN
- *
  * @see https://developers.cloudflare.com/images/
  */
 
 import React from 'react';
 import { logger } from '../utils/logger';
+import { supabase } from './supabase';
 
-// Environment variables
-const CLOUDFLARE_ACCOUNT_ID = process.env.EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_ID || '';
-const CLOUDFLARE_ACCOUNT_HASH = process.env.EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_HASH || ''; // For imagedelivery.net URLs
-const CLOUDFLARE_IMAGES_TOKEN = process.env.CLOUDFLARE_IMAGES_TOKEN || '';
-const CLOUDFLARE_IMAGES_URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`;
+// Public environment variables only (safe for client bundle)
+const CLOUDFLARE_ACCOUNT_HASH =
+  process.env.EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_HASH || '';
 
 /**
  * Image variant configurations
@@ -64,8 +57,8 @@ interface CloudflareImageResponse {
 }
 
 /**
- * Upload image to Cloudflare Images
- * Automatically generates WebP variants
+ * Upload image to Cloudflare Images via Edge Function
+ * SECURITY: API token is stored server-side only
  */
 export async function uploadToCloudflare(
   imageData: Blob | File,
@@ -74,47 +67,46 @@ export async function uploadToCloudflare(
   const startTime = Date.now();
 
   try {
-    logger.info('[Cloudflare] Uploading image...', {
+    logger.info('[Cloudflare] Uploading image via Edge Function...', {
       size: imageData.size,
       type: imageData.type,
     });
 
-    const formData = new FormData();
-    formData.append('file', imageData);
+    // Convert Blob to base64 for Edge Function
+    const arrayBuffer = await imageData.arrayBuffer();
+    const base64 = btoa(
+      new Uint8Array(arrayBuffer).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        '',
+      ),
+    );
 
-    if (options.requireSignedURLs) {
-      formData.append('requireSignedURLs', 'true');
-    }
-
-    if (options.metadata) {
-      formData.append('metadata', JSON.stringify(options.metadata));
-    }
-
-    if (options.customId) {
-      formData.append('id', options.customId);
-    }
-
-    const response = await fetch(CLOUDFLARE_IMAGES_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${CLOUDFLARE_IMAGES_TOKEN}`,
+    // Call Edge Function (API token is server-side)
+    const { data, error } = await supabase.functions.invoke(
+      'upload-cloudflare-image',
+      {
+        body: {
+          imageBase64: base64,
+          mimeType: imageData.type || 'image/jpeg',
+          options: {
+            requireSignedURLs: options.requireSignedURLs,
+            metadata: options.metadata,
+            customId: options.customId,
+          },
+        },
       },
-      body: formData,
-    });
+    );
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Cloudflare upload failed: ${error}`);
+    if (error) {
+      throw new Error(`Upload failed: ${error.message}`);
     }
-
-    const result = await response.json();
 
     logger.info('[Cloudflare] Upload successful', {
-      id: result.result.id,
+      id: data.id,
       duration: Date.now() - startTime,
     });
 
-    return result.result;
+    return data;
   } catch (error) {
     logger.error('[Cloudflare] Upload failed:', error);
     throw error;
@@ -124,7 +116,7 @@ export async function uploadToCloudflare(
 /**
  * Get optimized image URL for specific variant
  * Automatically serves WebP format when supported by browser
- * 
+ *
  * @example
  * const url = getImageUrl(imageId, 'medium');
  * // Returns: https://imagedelivery.net/{account_hash}/{image_id}/medium
@@ -133,16 +125,17 @@ export function getImageUrl(
   imageId: string,
   variant: ImageVariant = 'medium',
 ): string {
+  if (!imageId) return '';
   return `https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_HASH}/${imageId}/${variant}`;
 }
 
 /**
  * Get responsive image URLs for all variants
  * Use for srcset in <img> tags
- * 
+ *
  * @example
  * const urls = getResponsiveUrls(imageId);
- * <img 
+ * <img
  *   src={urls.medium}
  *   srcset={`${urls.small} 320w, ${urls.medium} 640w, ${urls.large} 1280w`}
  * />
@@ -158,19 +151,20 @@ export function getResponsiveUrls(imageId: string) {
 }
 
 /**
- * Delete image from Cloudflare
+ * Delete image from Cloudflare via Edge Function
+ * SECURITY: API token is stored server-side only
  */
 export async function deleteFromCloudflare(imageId: string): Promise<void> {
   try {
-    const response = await fetch(`${CLOUDFLARE_IMAGES_URL}/${imageId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${CLOUDFLARE_IMAGES_TOKEN}`,
+    const { error } = await supabase.functions.invoke(
+      'delete-cloudflare-image',
+      {
+        body: { imageId },
       },
-    });
+    );
 
-    if (!response.ok) {
-      throw new Error(`Failed to delete image: ${imageId}`);
+    if (error) {
+      throw new Error(`Failed to delete image: ${error.message}`);
     }
 
     logger.info('[Cloudflare] Image deleted:', imageId);
@@ -181,24 +175,24 @@ export async function deleteFromCloudflare(imageId: string): Promise<void> {
 }
 
 /**
- * Get image details and variants
+ * Get image details and variants via Edge Function
  */
 export async function getImageDetails(
   imageId: string,
 ): Promise<CloudflareImageResponse> {
   try {
-    const response = await fetch(`${CLOUDFLARE_IMAGES_URL}/${imageId}`, {
-      headers: {
-        'Authorization': `Bearer ${CLOUDFLARE_IMAGES_TOKEN}`,
+    const { data, error } = await supabase.functions.invoke(
+      'get-cloudflare-image',
+      {
+        body: { imageId },
       },
-    });
+    );
 
-    if (!response.ok) {
-      throw new Error(`Failed to get image details: ${imageId}`);
+    if (error) {
+      throw new Error(`Failed to get image details: ${error.message}`);
     }
 
-    const result = await response.json();
-    return result.result;
+    return data;
   } catch (error) {
     logger.error('[Cloudflare] Get details failed:', error);
     throw error;
@@ -206,7 +200,7 @@ export async function getImageDetails(
 }
 
 /**
- * Batch upload images
+ * Batch upload images via Edge Function
  */
 export async function batchUpload(
   images: Array<{ data: Blob | File; metadata?: Record<string, string> }>,
@@ -218,7 +212,10 @@ export async function batchUpload(
   );
 
   const successful = results
-    .filter((r): r is PromiseFulfilledResult<CloudflareImageResponse> => r.status === 'fulfilled')
+    .filter(
+      (r): r is PromiseFulfilledResult<CloudflareImageResponse> =>
+        r.status === 'fulfilled',
+    )
     .map((r) => r.value);
 
   const failed = results.filter((r) => r.status === 'rejected');
@@ -279,7 +276,9 @@ export async function optimizeBeforeUpload(
   quality = 0.8,
 ): Promise<Blob> {
   // For React Native with expo-image-manipulator
-  const { manipulateAsync, SaveFormat } = await import('expo-image-manipulator');
+  const { manipulateAsync, SaveFormat } = await import(
+    'expo-image-manipulator'
+  );
 
   const manipulated = await manipulateAsync(
     imageUri,
@@ -303,7 +302,7 @@ export async function migrateFromSupabase(
     const response = await fetch(supabaseUrl);
     const blob = await response.blob();
 
-    // Upload to Cloudflare
+    // Upload to Cloudflare via Edge Function
     return await uploadToCloudflare(blob, { metadata });
   } catch (error) {
     logger.error('[Cloudflare] Migration failed:', error);
@@ -312,25 +311,22 @@ export async function migrateFromSupabase(
 }
 
 /**
- * Cloudflare Images configuration for Supabase Edge Functions
+ * Cloudflare Images public configuration
+ * SECURITY: No API tokens exposed - only public settings
  */
 export const cloudflareConfig = {
-  accountId: CLOUDFLARE_ACCOUNT_ID,
-  apiToken: CLOUDFLARE_IMAGES_TOKEN,
+  accountHash: CLOUDFLARE_ACCOUNT_HASH,
   variants: IMAGE_VARIANTS,
-  
+
   // Automatic WebP conversion
   formats: ['webp', 'avif', 'jpeg', 'png'] as const,
-  
+
   // Cache control
   cacheControl: {
     browserTTL: 31536000, // 1 year
     edgeTTL: 2592000, // 30 days
   },
-  
-  // Security
-  requireSignedURLs: false, // Set to true for private images
-  
+
   // Performance
   lazyLoading: true,
   preload: ['thumbnail', 'small'] as ImageVariant[],

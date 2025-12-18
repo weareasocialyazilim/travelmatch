@@ -86,7 +86,10 @@ const ProfileScreen: React.FC = () => {
               userProfile?.location?.city ||
               'Unknown Location',
         trustScore: authUser.trustScore || userProfile?.rating || 0,
-        momentsCount: myMoments.length || userProfile?.momentCount || PROFILE_DEFAULTS.MOMENTS_COUNT,
+        momentsCount:
+          myMoments.length ||
+          userProfile?.momentCount ||
+          PROFILE_DEFAULTS.MOMENTS_COUNT,
         exchangesCount:
           (userProfile?.giftsSent || 0) + (userProfile?.giftsReceived || 0),
         responseRate: PROFILE_DEFAULTS.RESPONSE_RATE, // Will be calculated from actual response data in future
@@ -136,7 +139,10 @@ const ProfileScreen: React.FC = () => {
     () => navigation.navigate('AppSettings'),
     [navigation],
   );
-  const handleWallet = useCallback(() => navigation.navigate('Wallet'), [navigation]);
+  const handleWallet = useCallback(
+    () => navigation.navigate('Wallet'),
+    [navigation],
+  );
   const handleMyGifts = useCallback(
     () => navigation.navigate('MyGifts'),
     [navigation],
@@ -178,20 +184,27 @@ const ProfileScreen: React.FC = () => {
         onPress: handleSavedMoments,
       },
     ],
-    [userData.giftsSentCount, userData.savedCount, handleMyGifts, handleSavedMoments],
+    [
+      userData.giftsSentCount,
+      userData.savedCount,
+      handleMyGifts,
+      handleSavedMoments,
+    ],
   );
 
   const handleMomentPress = useCallback(
     (moment: Moment) => {
       // Handle location which can be string or object
-      const locationObj = typeof moment.location === 'string'
-        ? { city: moment.location, country: '' }
-        : moment.location;
+      const locationObj =
+        typeof moment.location === 'string'
+          ? { city: moment.location, country: '' }
+          : moment.location;
 
       // Handle category which can be string or object
-      const categoryObj = typeof moment.category === 'string'
-        ? { id: moment.category, label: moment.category, emoji: '✨' }
-        : moment.category;
+      const categoryObj =
+        typeof moment.category === 'string'
+          ? { id: moment.category, label: moment.category, emoji: '✨' }
+          : moment.category;
 
       navigation.navigate('MomentDetail', {
         moment: {
@@ -224,7 +237,10 @@ const ProfileScreen: React.FC = () => {
 
   const renderMomentCard = useCallback(
     ({ item }: { item: Moment }) => (
-      <ProfileMomentCard moment={item} onPress={() => handleMomentPress(item)} />
+      <ProfileMomentCard
+        moment={item}
+        onPress={() => handleMomentPress(item)}
+      />
     ),
     [handleMomentPress],
   );
@@ -234,13 +250,13 @@ const ProfileScreen: React.FC = () => {
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* Offline Banner */}
         {!isConnected && (
-          <OfflineState 
-            compact 
+          <OfflineState
+            compact
             onRetry={refreshNetwork}
             message="İnternet bağlantısı yok"
           />
         )}
-        
+
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerSpacer} />
@@ -332,10 +348,11 @@ const ProfileScreen: React.FC = () => {
               <FlashList
                 data={displayedMoments}
                 renderItem={renderMomentCard}
-                estimatedItemSize={250}
                 numColumns={2}
                 scrollEnabled={false}
-                ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+                ItemSeparatorComponent={() => (
+                  <View style={styles.itemSeparator} />
+                )}
               />
             ) : (
               <EmptyState
@@ -351,7 +368,9 @@ const ProfileScreen: React.FC = () => {
                     : 'Completed moments will appear here'
                 }
                 actionLabel={
-                  activeTab === 'active' && isConnected ? 'Create Moment' : undefined
+                  activeTab === 'active' && isConnected
+                    ? 'Create Moment'
+                    : undefined
                 }
                 onAction={
                   activeTab === 'active' && isConnected
@@ -441,7 +460,7 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ErrorBoundary for profile screen
-export default withErrorBoundary(ProfileScreen, { 
+export default withErrorBoundary(ProfileScreen, {
   fallbackType: 'generic',
-  displayName: 'ProfileScreen' 
+  displayName: 'ProfileScreen',
 });

@@ -34,7 +34,9 @@
       "@/types/*": ["src/types/*"],
       "@/config/*": ["src/config/*"],
       "@/theme/*": ["src/theme/*"],
-      "@/navigation/*": ["src/navigation/*"]
+      "@/navigation/*": ["src/navigation/*"],
+      "@travelmatch/shared": ["../../packages/shared/src/index.ts"],
+      "@travelmatch/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": ["src/**/*", "src/types/*.d.ts", "index.ts", "App.tsx"],
@@ -53,30 +55,6 @@
     "src/services/userService.ts",
     "src/services/event-tracking.ts",
     "src/services/viral-loop-engine.ts",
-    "src/services/performance-monitor.ts",
-    // ✅ FIXED 2025-12-15: Payment screens (critical security)
-    // "src/features/payments/screens/GiftInboxScreen.tsx",
-    // "src/features/payments/screens/TransactionDetailScreen.tsx",
-    // "src/features/payments/screens/PaymentMethodsScreen.tsx",
-
-    // ✅ FIXED 2025-12-15: Profile, Settings, Trips screens
-    // "src/features/settings/screens/SafetyScreen.tsx",
-    // "src/features/profile/screens/DeletedMomentsScreen.tsx",
-    // "src/features/profile/screens/EditProfileScreen.tsx",
-    // "src/features/profile/screens/MyMomentsScreen.tsx",
-    // "src/features/profile/screens/SavedMomentsScreen.tsx",
-    // "src/features/profile/screens/ShareMomentScreen.tsx",
-    // "src/features/trips/screens/DiscoverScreen.tsx",
-    // "src/features/trips/screens/DisputeFlowScreen.tsx",
-    // "src/features/trips/screens/MatchConfirmationScreen.tsx"
-
-    // 🟡 REMAINING: Non-critical legacy code (6 files)
-    // Priority: Low | Timeline: 1 file per day | Risk: Low (deprecated/dev tools)
-    // - src/components/AccessibleVideoPlayer.tsx (accessibility edge cases)
-    // - src/components/AnalyticsDashboard.tsx (analytics types)
-    // - src/services/userService.ts (DEPRECATED - migrate to supabaseDbService)
-    // - src/services/event-tracking.ts (analytics types)
-    // - src/services/viral-loop-engine.ts (experimental feature, not in prod)
-    // - src/services/performance-monitor.ts (dev tool only)
+    "src/services/performance-monitor.ts"
   ]
 }

@@ -127,45 +127,56 @@ async function runAllTests() {
   console.log('AUTHENTICATION');
   console.log('='.repeat(80));
 
-  // Login - Valid credentials
-  const loginResult = await testEndpoint('Login with valid credentials', {
-    method: 'POST',
-    path: '/v1/auth/login',
-    body: {
-      email: 'test@example.com',
-      password: 'Test123456!',
-    },
-  });
+  // Test credentials MUST be provided via environment variables
+  // This ensures no secrets are hardcoded in the codebase
+  const testEmail = process.env.TEST_USER_EMAIL;
+  const testPassword = process.env.TEST_USER_PASSWORD;
   
-  printCurlCommand('Login', {
-    method: 'POST',
-    path: '/v1/auth/login',
-    body: {
-      email: 'test@example.com',
-      password: 'password123',
-    },
-  });
+  if (!testEmail || !testPassword) {
+    console.warn('⚠️  TEST_USER_EMAIL and TEST_USER_PASSWORD environment variables required');
+    console.warn('   Skipping authentication tests...');
+    console.warn('   Set these in .env.test or CI/CD secrets');
+  } else {
+    // Login - Valid credentials
+    const loginResult = await testEndpoint('Login with valid credentials', {
+      method: 'POST',
+      path: '/v1/auth/login',
+      body: {
+        email: testEmail,
+        password: testPassword,
+      },
+    });
+    
+    printCurlCommand('Login', {
+      method: 'POST',
+      path: '/v1/auth/login',
+      body: {
+        email: testEmail,
+        password: '<PASSWORD>', // Placeholder for documentation
+      },
+    });
 
-  // Login - Missing fields
-  await testEndpoint('Login with missing password', {
-    method: 'POST',
-    path: '/v1/auth/login',
-    body: {
-      email: 'test@example.com',
-    },
-    expectedStatus: 400,
-  });
+    // Login - Missing fields
+    await testEndpoint('Login with missing password', {
+      method: 'POST',
+      path: '/v1/auth/login',
+      body: {
+        email: 'test@example.com',
+      },
+      expectedStatus: 400,
+    });
 
-  // Login - Invalid credentials
-  await testEndpoint('Login with invalid credentials', {
-    method: 'POST',
-    path: '/v1/auth/login',
-    body: {
-      email: 'test@example.com',
-      password: 'wrongpassword',
-    },
-    expectedStatus: 401,
-  });
+    // Login - Invalid credentials (intentionally wrong password for negative test)
+    await testEndpoint('Login with invalid credentials', {
+      method: 'POST',
+      path: '/v1/auth/login',
+      body: {
+        email: testEmail,
+        password: 'deliberately_wrong_password', // Intentional for negative test
+      },
+      expectedStatus: 401,
+    });
+  }
 
   console.log('\n' + '='.repeat(80));
   console.log('USERS');
@@ -446,7 +457,7 @@ function generatePostmanCollection() {
                 mode: 'raw',
                 raw: JSON.stringify({
                   email: 'user@example.com',
-                  password: 'password123',
+                  password: '{{PASSWORD}}', // Use Postman environment variable
                 }, null, 2),
                 options: {
                   raw: {

@@ -5,6 +5,7 @@
 
 import { Platform as _Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
+import { cacheDirectory } from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
 
 // Image Types
@@ -195,11 +196,10 @@ export function calculateResizeDimensions(
  * Cache directory for images
  */
 const getImageCacheDir = () => {
-  const cacheDir = FileSystem.cacheDirectory;
-  if (!cacheDir) {
+  if (!cacheDirectory) {
     throw new Error('Cache directory not available');
   }
-  return `${cacheDir}images/`;
+  return `${cacheDirectory}images/`;
 };
 
 /**

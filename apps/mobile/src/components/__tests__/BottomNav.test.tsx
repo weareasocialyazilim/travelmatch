@@ -1,5 +1,9 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+
+// Unmock BottomNav to test the actual component
+jest.unmock('@/components/BottomNav');
+
 import BottomNav from '../BottomNav';
 
 // Mock navigation

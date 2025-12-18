@@ -6,10 +6,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: 'travelmatch',
   version: '1.0.0',
   orientation: 'portrait',
+  // Custom entry point to fix AppEntry.js resolution in monorepo
+  entryPoint: './index.ts',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'travelmatch',
-  newArchEnabled: true,
+  newArchEnabled: false,
   splash: {
     image: './assets/splash-icon.png',
     resizeMode: 'contain',
@@ -63,15 +65,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       '@sentry/react-native/expo',
       {
-        organization: process.env.SENTRY_ORG,
-        project: process.env.SENTRY_PROJECT,
+        organization: process.env.SENTRY_ORG || 'travelmatch-2p',
+        project: process.env.SENTRY_PROJECT || 'react-native',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
       },
     ],
     'expo-font',
+    'expo-secure-store',
+    '@react-native-community/datetimepicker',
     [
       '@rnmapbox/maps',
       {
-        RNMapboxMapsDownloadToken: process.env.EXPO_PUBLIC_MAPBOX_SECRET_TOKEN,
+        // Build-time only token - NOT bundled in client (no EXPO_PUBLIC_ prefix)
+        RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
       },
     ],
   ],

@@ -3,8 +3,9 @@
  * Displays featured/top picks items
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { COLORS } from '@/constants/colors';
 import { GiftInboxCard, type GiftInboxCardProps } from './GiftInboxCard';
 
@@ -19,6 +20,15 @@ export const TopPicksSection: React.FC<TopPicksSectionProps> = ({
   items,
   onItemPress,
 }) => {
+  const renderItem = useCallback(
+    ({ item }: { item: Omit<GiftInboxCardProps, 'onPress'> }) => (
+      <View style={styles.cardWrapper}>
+        <GiftInboxCard {...item} onPress={() => onItemPress?.(item.id)} />
+      </View>
+    ),
+    [onItemPress],
+  );
+
   if (items.length === 0) {
     return null;
   }
@@ -26,21 +36,16 @@ export const TopPicksSection: React.FC<TopPicksSectionProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      <FlatList
-        data={items}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.cardWrapper}>
-            <GiftInboxCard
-              {...item}
-              onPress={() => onItemPress?.(item.id)}
-            />
-          </View>
-        )}
-        contentContainerStyle={styles.listContent}
-      />
+      <View style={styles.listContainer}>
+        <FlashList
+          data={items}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+        />
+      </View>
     </View>
   );
 };
@@ -55,6 +60,9 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginBottom: 12,
     paddingHorizontal: 16,
+  },
+  listContainer: {
+    height: 200,
   },
   listContent: {
     paddingHorizontal: 16,

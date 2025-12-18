@@ -29,12 +29,17 @@ export function DeletedMomentsScreen() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: deletedMoments, isLoading, refetch, isRefetching } = useQuery({
+  const {
+    data: deletedMoments,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ['deleted-moments', user?.id],
     queryFn: async () => {
       const result = await supabaseDb.moments.getDeleted(user!.id);
       if (result.error) throw result.error;
-      return result.data as DeletedMoment[];
+      return result.data as unknown as DeletedMoment[];
     },
     enabled: !!user?.id,
   });
@@ -72,16 +77,13 @@ export function DeletedMomentsScreen() {
       {/* List */}
       <FlashList
         data={deletedMoments || []}
-        estimatedItemSize={150}
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
         renderItem={({ item }: { item: DeletedMoment }) => (
           <View style={styles.momentItem}>
             <View style={styles.momentInfo}>
-              <Text style={styles.momentTitle}>
-                {item.title}
-              </Text>
+              <Text style={styles.momentTitle}>{item.title}</Text>
               <Text style={styles.momentDescription} numberOfLines={2}>
                 {item.description}
               </Text>

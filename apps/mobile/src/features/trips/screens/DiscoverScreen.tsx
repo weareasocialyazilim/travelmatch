@@ -166,7 +166,8 @@ const DiscoverScreen = () => {
 
     if (selectedCategory !== 'all') {
       moments = moments.filter((m) => {
-        const categoryId = typeof m.category === 'string' ? m.category : m.category?.id;
+        const categoryId =
+          typeof m.category === 'string' ? m.category : m.category?.id;
         return categoryId?.toLowerCase() === selectedCategory;
       });
     }
@@ -217,7 +218,9 @@ const DiscoverScreen = () => {
   const handleMomentPress = useCallback(
     (moment: Moment) => {
       // Cast to any to bridge hook Moment and domain Moment types
-      navigation.navigate('MomentDetail', { moment: moment as unknown as import('@/types').Moment });
+      navigation.navigate('MomentDetail', {
+        moment: moment as unknown as import('@/types').Moment,
+      });
     },
     [navigation],
   );
@@ -292,8 +295,8 @@ const DiscoverScreen = () => {
 
       {/* Offline Banner at top */}
       {!isConnected && (
-        <OfflineState 
-          compact 
+        <OfflineState
+          compact
           onRetry={refreshNetwork}
           message="İnternet bağlantısı yok"
         />
@@ -306,7 +309,9 @@ const DiscoverScreen = () => {
         activeFiltersCount={activeFilterCount}
         onLocationPress={() => setShowLocationModal(true)}
         onFilterPress={() => setShowFilterModal(true)}
-        onViewModeToggle={() => setViewMode(viewMode === 'single' ? 'grid' : 'single')}
+        onViewModeToggle={() =>
+          setViewMode(viewMode === 'single' ? 'grid' : 'single')
+        }
       />
 
       <NetworkGuard
@@ -318,168 +323,169 @@ const DiscoverScreen = () => {
         onRetry={onRefresh}
       >
         <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing || loading}
-            onRefresh={onRefresh}
-            tintColor={COLORS.mint}
-          />
-        }
-        onScroll={({ nativeEvent }) => {
-          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-          const paddingToBottom = 50;
-          if (
-            layoutMeasurement.height + contentOffset.y >=
-            contentSize.height - paddingToBottom
-          ) {
-            handleLoadMore();
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing || loading}
+              onRefresh={onRefresh}
+              tintColor={COLORS.mint}
+            />
           }
-        }}
-        scrollEventThrottle={400}
-      >
-        {/* Stories */}
-        <FlashList
-          data={USER_STORIES}
-          renderItem={renderStoryItem}
-          estimatedItemSize={100}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.storiesContainer}
-        />
-
-        {/* Results Bar */}
-        <View style={styles.resultsBar}>
-          <Text style={styles.resultsText}>
-            {loading
-              ? 'Loading...'
-              : `${filteredMoments.length} moments nearby`}
-          </Text>
-          <View style={styles.viewToggle}>
-            <TouchableOpacity
-              style={[
-                styles.viewToggleButton,
-                viewMode === 'single' && styles.viewToggleButtonActive,
-              ]}
-              onPress={() => setViewMode('single')}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              {...a11y.button(
-                'Single column view',
-                'Display moments in a single column',
-                false
-              )}
-              accessibilityState={{ selected: viewMode === 'single' }}
-            >
-              <MaterialCommunityIcons
-                name="square-outline"
-                size={18}
-                color={
-                  viewMode === 'single' ? COLORS.white : COLORS.textSecondary
-                }
-                accessible={false}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.viewToggleButton,
-                viewMode === 'grid' && styles.viewToggleButtonActive,
-              ]}
-              onPress={() => setViewMode('grid')}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              {...a11y.button(
-                'Grid view',
-                'Display moments in a grid layout',
-                false
-              )}
-              accessibilityState={{ selected: viewMode === 'grid' }}
-            >
-              <MaterialCommunityIcons
-                name="view-grid-outline"
-                size={18}
-                color={
-                  viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
-                }
-                accessible={false}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Error State */}
-        {error && !loading && (
-          <View style={styles.errorContainer}>
-            <MaterialCommunityIcons
-              name="alert-circle-outline"
-              size={48}
-              color={COLORS.error}
-              accessible={false}
-            />
-            <Text 
-              style={styles.errorText}
-              {...a11y.alert(error)}
-            >
-              {error}
-            </Text>
-            <TouchableOpacity 
-              style={styles.retryButton} 
-              onPress={onRefresh}
-              {...a11y.button('Try Again', 'Reload moments')}
-            >
-              <Text style={styles.retryButtonText}>Try Again</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Loading Skeleton */}
-        {loading && filteredMoments.length === 0 && !error && (
-          <SkeletonList type="moment" count={4} show={loading} minDisplayTime={400} />
-        )}
-
-        {/* Moments List */}
-        {!error && filteredMoments.length > 0 && (
-          <View style={{ minHeight: 400 }}>
-            <FlashList
-              data={filteredMoments}
-              renderItem={renderMomentCard}
-              estimatedItemSize={viewMode === 'single' ? 400 : 200}
-              numColumns={viewMode === 'grid' ? 2 : 1}
-              key={viewMode}
-              contentContainerStyle={
-                viewMode === 'single'
-                  ? styles.singleListContainer
-                  : styles.gridContainer
-              }
-              onEndReached={handleLoadMore}
-              onEndReachedThreshold={0.5}
-              scrollEnabled={false}
-            />
-          </View>
-        )}
-
-        {/* Empty State */}
-        {!loading && !error && filteredMoments.length === 0 && (
-          <EmptyState
-            icon="compass-off-outline"
-            title="No moments found"
-            description="Try adjusting your filters or location"
-            actionLabel="Clear Filters"
-            onAction={clearFilters}
+          onScroll={({ nativeEvent }) => {
+            const { layoutMeasurement, contentOffset, contentSize } =
+              nativeEvent;
+            const paddingToBottom = 50;
+            if (
+              layoutMeasurement.height + contentOffset.y >=
+              contentSize.height - paddingToBottom
+            ) {
+              handleLoadMore();
+            }
+          }}
+          scrollEventThrottle={400}
+        >
+          {/* Stories */}
+          <FlashList
+            data={USER_STORIES}
+            renderItem={renderStoryItem}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.storiesContainer}
           />
-        )}
 
-        {/* Load More Indicator */}
-        {loading && filteredMoments.length > 0 && (
-          <View style={styles.loadMoreContainer}>
-            <ActivityIndicator size="small" color={COLORS.primary} />
-            <Text style={styles.loadMoreText}>Loading more...</Text>
+          {/* Results Bar */}
+          <View style={styles.resultsBar}>
+            <Text style={styles.resultsText}>
+              {loading
+                ? 'Loading...'
+                : `${filteredMoments.length} moments nearby`}
+            </Text>
+            <View style={styles.viewToggle}>
+              <TouchableOpacity
+                style={[
+                  styles.viewToggleButton,
+                  viewMode === 'single' && styles.viewToggleButtonActive,
+                ]}
+                onPress={() => setViewMode('single')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                {...a11y.button(
+                  'Single column view',
+                  'Display moments in a single column',
+                  false,
+                )}
+                accessibilityState={{ selected: viewMode === 'single' }}
+              >
+                <MaterialCommunityIcons
+                  name="square-outline"
+                  size={18}
+                  color={
+                    viewMode === 'single' ? COLORS.white : COLORS.textSecondary
+                  }
+                  accessible={false}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.viewToggleButton,
+                  viewMode === 'grid' && styles.viewToggleButtonActive,
+                ]}
+                onPress={() => setViewMode('grid')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                {...a11y.button(
+                  'Grid view',
+                  'Display moments in a grid layout',
+                  false,
+                )}
+                accessibilityState={{ selected: viewMode === 'grid' }}
+              >
+                <MaterialCommunityIcons
+                  name="view-grid-outline"
+                  size={18}
+                  color={
+                    viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
+                  }
+                  accessible={false}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-        )}
 
-        {/* Bottom Padding */}
-        {/* eslint-disable-next-line react-native/no-inline-styles */}
-        <View style={{ height: 100 }} />
-      </ScrollView>
+          {/* Error State */}
+          {error && !loading && (
+            <View style={styles.errorContainer}>
+              <MaterialCommunityIcons
+                name="alert-circle-outline"
+                size={48}
+                color={COLORS.error}
+                accessible={false}
+              />
+              <Text style={styles.errorText} {...a11y.alert(error)}>
+                {error}
+              </Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={onRefresh}
+                {...a11y.button('Try Again', 'Reload moments')}
+              >
+                <Text style={styles.retryButtonText}>Try Again</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Loading Skeleton */}
+          {loading && filteredMoments.length === 0 && !error && (
+            <SkeletonList
+              type="moment"
+              count={4}
+              show={loading}
+              minDisplayTime={400}
+            />
+          )}
+
+          {/* Moments List */}
+          {!error && filteredMoments.length > 0 && (
+            <View style={{ minHeight: 400 }}>
+              <FlashList
+                data={filteredMoments}
+                renderItem={renderMomentCard}
+                numColumns={viewMode === 'grid' ? 2 : 1}
+                key={viewMode}
+                contentContainerStyle={
+                  viewMode === 'single'
+                    ? styles.singleListContainer
+                    : styles.gridContainer
+                }
+                onEndReached={handleLoadMore}
+                onEndReachedThreshold={0.5}
+                scrollEnabled={false}
+              />
+            </View>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && filteredMoments.length === 0 && (
+            <EmptyState
+              icon="compass-off-outline"
+              title="No moments found"
+              description="Try adjusting your filters or location"
+              actionLabel="Clear Filters"
+              onAction={clearFilters}
+            />
+          )}
+
+          {/* Load More Indicator */}
+          {loading && filteredMoments.length > 0 && (
+            <View style={styles.loadMoreContainer}>
+              <ActivityIndicator size="small" color={COLORS.primary} />
+              <Text style={styles.loadMoreText}>Loading more...</Text>
+            </View>
+          )}
+
+          {/* Bottom Padding */}
+          {/* eslint-disable-next-line react-native/no-inline-styles */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
       </NetworkGuard>
 
       {/* Modals - Using extracted components */}
@@ -682,7 +688,7 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ErrorBoundary for critical home screen
-export default withErrorBoundary(DiscoverScreen, { 
+export default withErrorBoundary(DiscoverScreen, {
   fallbackType: 'generic',
-  displayName: 'DiscoverScreen' 
+  displayName: 'DiscoverScreen',
 });

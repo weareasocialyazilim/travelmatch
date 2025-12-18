@@ -61,7 +61,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
     throw new Error(`Onfido applicant creation failed: ${applicantResponse.statusText}`);
   }
 
-  const applicant = await applicantResponse.json();
+  const applicant = await applicantResponse.json() as { id: string };
 
   // 2. Upload document (front image)
   const documentFormData = new FormData();
@@ -83,7 +83,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
     throw new Error(`Onfido document upload failed: ${documentResponse.statusText}`);
   }
 
-  const document = await documentResponse.json();
+  const document = await documentResponse.json() as { id: string };
 
   // 3. Create check (document + identity verification)
   const checkResponse = await fetch('https://api.onfido.com/v3/checks', {
@@ -102,7 +102,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
     throw new Error(`Onfido check creation failed: ${checkResponse.statusText}`);
   }
 
-  const check = await checkResponse.json();
+  const check = await checkResponse.json() as { id: string };
 
   // 4. Poll for results (in production, use webhooks)
   let attempts = 0;
@@ -183,7 +183,7 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
     throw new Error(`Stripe session creation failed: ${sessionResponse.statusText}`);
   }
 
-  const session = await sessionResponse.json();
+  const session = await sessionResponse.json() as { id: string; livemode: boolean };
 
   // 2. Submit document (in production, use Stripe's client SDK)
   // This is simplified - actual implementation would use Stripe Identity SDK

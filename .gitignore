@@ -40,6 +40,7 @@ yarn-error.*
 .env.development
 .env.staging
 .env.production
+.env.test
 
 # typescript
 *.tsbuildinfo
@@ -97,6 +98,9 @@ desktop.ini
 # Next.js
 .next/
 out/
+
+# Turborepo
+.turbo/
 
 # Package manager lockfiles in app directories (root lockfile is committed)
 apps/**/package-lock.json

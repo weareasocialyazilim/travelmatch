@@ -1,9 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import {
-  StyleSheet,
-  AppState,
-  Platform,
-} from 'react-native';
+import { StyleSheet, AppState, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -33,7 +29,37 @@ import { sessionManager } from './src/services/sessionManager';
 import { pendingTransactionsService } from './src/services/pendingTransactionsService';
 import { storageMonitor } from './src/services/storageMonitor';
 import { PendingTransactionsModal } from './src/components/PendingTransactionsModal';
-import type { PendingPayment, PendingUpload } from './src/services/pendingTransactionsService';
+import type {
+  PendingPayment,
+  PendingUpload,
+} from './src/services/pendingTransactionsService';
+import * as Sentry from '@sentry/react-native';
+import Constants from 'expo-constants';
+
+Sentry.init({
+  dsn:
+    Constants.expoConfig?.extra?.sentryDsn ||
+    process.env.EXPO_PUBLIC_SENTRY_DSN ||
+    'https://4e851e74a8a6ecab750e2f4a8933e6c8@o4510544957800448.ingest.de.sentry.io/4510550169354320',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Enable Logs
+  enableLogs: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [
+    Sentry.mobileReplayIntegration(),
+    Sentry.feedbackIntegration(),
+  ],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -59,7 +85,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function App() {
+export default Sentry.wrap(function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [_isBackground, setIsBackground] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
@@ -75,10 +101,13 @@ export default function App() {
         // 1. Security Check: Root/Jailbreak Detection (Warning Only)
         const isRooted = await Device.isRootedExperimentalAsync();
         if (isRooted) {
-          logger.warn('App', 'Device is rooted/jailbroken - security risk. Data security may be compromised.');
+          logger.warn(
+            'App',
+            'Device is rooted/jailbroken - security risk. Data security may be compromised.',
+          );
           // Continue with app initialization - warning logged
         }
-        
+
         // Note: Screenshot protection is now handled per-screen via useScreenSecurity() hook
         // Applied to: WithdrawScreen, GiftScreen, PaymentMethodScreen, BankAccountScreen
 
@@ -87,19 +116,26 @@ export default function App() {
           await migrateSensitiveDataToSecure();
           logger.info('App', 'Sensitive data migration completed');
         } catch (migrationError) {
-          logger.warn('App', 'Data migration failed (may already be migrated)', migrationError);
+          logger.warn(
+            'App',
+            'Data migration failed (may already be migrated)',
+            migrationError,
+          );
         }
 
         // 3. Session: Initialize and validate stored session
         const sessionState = await sessionManager.initialize();
         logger.info('App', `Session state: ${sessionState}`);
-        
+
         // If session is expired, try to refresh automatically
         if (sessionState === 'expired') {
           logger.info('App', 'Attempting automatic session refresh');
           const isValid = await sessionManager.isSessionValid();
           if (!isValid) {
-            logger.warn('App', 'Session refresh failed - user needs to re-login');
+            logger.warn(
+              'App',
+              'Session refresh failed - user needs to re-login',
+            );
           } else {
             logger.info('App', 'Session refreshed successfully');
           }
@@ -107,7 +143,7 @@ export default function App() {
 
         // 4. Initialize Services
         messageService.init();
-        
+
         // Initialize cache service with size limits and cleanup
         await cacheService.initialize();
         logger.info('CacheService initialized with 50MB limit');
@@ -140,10 +176,15 @@ export default function App() {
         logger.info('Storage monitor initialized');
 
         // 7. Check Pending Transactions (app crash recovery)
-        const { hasPayments, hasUploads } = await pendingTransactionsService.checkPendingOnStartup();
+        const { hasPayments, hasUploads } =
+          await pendingTransactionsService.checkPendingOnStartup();
         if (hasPayments || hasUploads) {
-          logger.info('App', `Found pending transactions - payments: ${hasPayments}, uploads: ${hasUploads}`);
-          const payments = await pendingTransactionsService.getPendingPayments();
+          logger.info(
+            'App',
+            `Found pending transactions - payments: ${hasPayments}, uploads: ${hasUploads}`,
+          );
+          const payments =
+            await pendingTransactionsService.getPendingPayments();
           const uploads = await pendingTransactionsService.getPendingUploads();
           setPendingPayments(payments);
           setPendingUploads(uploads);
@@ -191,7 +232,7 @@ export default function App() {
     // TODO: Navigate to payment screen with pre-filled data
     // For now, just dismiss
     await pendingTransactionsService.removePendingPayment(payment.id);
-    setPendingPayments(prev => prev.filter(p => p.id !== payment.id));
+    setPendingPayments((prev) => prev.filter((p) => p.id !== payment.id));
   }, []);
 
   const handleResumeUpload = useCallback(async (upload: PendingUpload) => {
@@ -206,13 +247,13 @@ export default function App() {
   const handleDismissPayment = useCallback(async (paymentId: string) => {
     logger.info('App', `Dismissing payment: ${paymentId}`);
     await pendingTransactionsService.removePendingPayment(paymentId);
-    setPendingPayments(prev => prev.filter(p => p.id !== paymentId));
+    setPendingPayments((prev) => prev.filter((p) => p.id !== paymentId));
   }, []);
 
   const handleDismissUpload = useCallback(async (uploadId: string) => {
     logger.info('App', `Dismissing upload: ${uploadId}`);
     await pendingTransactionsService.removePendingUpload(uploadId);
-    setPendingUploads(prev => prev.filter(u => u.id !== uploadId));
+    setPendingUploads((prev) => prev.filter((u) => u.id !== uploadId));
   }, []);
 
   const handleClosePendingModal = useCallback(() => {
@@ -268,4 +309,4 @@ export default function App() {
       </ErrorBoundary>
     </GestureHandlerRootView>
   );
-}
+});

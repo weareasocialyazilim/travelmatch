@@ -1,0 +1,187 @@
+name: Database Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      dry_run:
+        description: 'Dry run (show changes without applying)'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  validate-migrations:
+    name: Validate Migrations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Validate migration files
+        run: |
+          echo "## Migration Validation Report" > migration-report.md
+          echo "Date: $(date)" >> migration-report.md
+          echo "" >> migration-report.md
+
+          # List pending migrations
+          echo "### Migration Files" >> migration-report.md
+          echo '```' >> migration-report.md
+          ls -la supabase/migrations/ 2>/dev/null || echo "No migrations found"
+          echo '```' >> migration-report.md
+
+          # Check for syntax errors in SQL files
+          echo "" >> migration-report.md
+          echo "### Syntax Check" >> migration-report.md
+          for file in supabase/migrations/*.sql; do
+            if [ -f "$file" ]; then
+              # Basic SQL syntax check
+              if grep -qE "^(CREATE|ALTER|DROP|INSERT|UPDATE|DELETE|SELECT)" "$file"; then
+                echo "✅ $file - Valid SQL structure" >> migration-report.md
+              else
+                echo "⚠️ $file - Check SQL structure" >> migration-report.md
+              fi
+            fi
+          done
+
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-validation
+          path: migration-report.md
+          retention-days: 30
+
+  check-rls-policies:
+    name: Check RLS Policies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Analyze RLS coverage
+        run: |
+          echo "## RLS Policy Analysis" > rls-report.md
+          echo "" >> rls-report.md
+
+          # Find tables without RLS
+          echo "### Tables with RLS enabled (from migrations)" >> rls-report.md
+          echo '```sql' >> rls-report.md
+          grep -r "ALTER TABLE.*ENABLE ROW LEVEL SECURITY" supabase/migrations/ 2>/dev/null || echo "No RLS found in migrations"
+          echo '```' >> rls-report.md
+
+          echo "" >> rls-report.md
+          echo "### RLS Policies defined" >> rls-report.md
+          echo '```sql' >> rls-report.md
+          grep -r "CREATE POLICY" supabase/migrations/ 2>/dev/null | head -30 || echo "No policies found"
+          echo '```' >> rls-report.md
+
+      - name: Upload RLS report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rls-analysis
+          path: rls-report.md
+          retention-days: 30
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [validate-migrations, check-rls-policies]
+    if: github.event.inputs.environment == 'staging' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.15
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-slug: travelmatch
+          env-slug: dev
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link to project
+        run: |
+          supabase link --project-ref bjikxgtbptrvawkguypv
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Show pending migrations (dry run)
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "Dry run - showing pending migrations..."
+          supabase db diff --linked 2>/dev/null || echo "No diff available"
+        continue-on-error: true
+
+      - name: Apply migrations
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          supabase db push --linked
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [validate-migrations, check-rls-policies]
+    if: github.event.inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.15
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-slug: travelmatch
+          env-slug: prod
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link to production project
+        run: |
+          supabase link --project-ref bjikxgtbptrvawkguypv
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Create backup before migration
+        run: |
+          echo "⚠️ Production migration - ensure backup exists"
+          echo "Backup should be created via Supabase Dashboard before proceeding"
+
+      - name: Show pending migrations (dry run)
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "Dry run - showing pending migrations for production..."
+          supabase db diff --linked 2>/dev/null || echo "No diff available"
+        continue-on-error: true
+
+      - name: Apply migrations to production
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          echo "🚨 Applying migrations to PRODUCTION"
+          supabase db push --linked
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}

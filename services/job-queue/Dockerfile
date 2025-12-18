@@ -1,6 +1,9 @@
 # Use Node.js 20 Alpine for smaller image size
 FROM node:20-alpine AS base
 
+# Apply security updates (CVE fix: c-ares use-after-free)
+RUN apk update && apk upgrade --no-cache
+
 # Install pnpm globally
 RUN npm install -g pnpm
 

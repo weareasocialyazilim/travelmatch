@@ -1,43 +1,25 @@
 /**
  * User Schemas
- * Validation schemas for user-related operations
+ * Validation schemas for user profile operations
+ * 
+ * Note: Auth schemas (login, register, password reset) are in auth.ts
  */
 
 import { z } from 'zod';
-
-/**
- * Login schema
- */
-export const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
-
-export type LoginInput = z.infer<typeof loginSchema>;
-
-/**
- * Register schema
- */
-export const registerSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  phone: z.string().optional(),
-});
-
-export type RegisterInput = z.infer<typeof registerSchema>;
+import { phoneSchema, coordinatesSchema } from './common';
 
 /**
  * Update profile schema
  */
 export const updateProfileSchema = z.object({
-  full_name: z.string().min(2).optional(),
-  bio: z.string().max(500).optional(),
+  full_name: z.string().min(2, 'Name must be at least 2 characters').max(50).optional(),
+  bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
   avatar_url: z.string().url().optional(),
+  phone: phoneSchema.optional(),
+  date_of_birth: z.string().datetime().optional(),
   languages: z.array(z.string()).optional(),
-  location: z.object({
-    latitude: z.number(),
-    longitude: z.number(),
+  interests: z.array(z.string()).max(10, 'Maximum 10 interests allowed').optional(),
+  location: coordinatesSchema.extend({
     city: z.string().optional(),
     country: z.string().optional(),
   }).optional(),

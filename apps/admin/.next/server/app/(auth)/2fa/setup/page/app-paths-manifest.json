@@ -1,0 +1,3 @@
+{
+  "/(auth)/2fa/setup/page": "app/(auth)/2fa/setup/page.js"
+}

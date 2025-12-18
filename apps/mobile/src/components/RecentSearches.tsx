@@ -3,14 +3,9 @@
  * Displays recent search history with clear functionality
  */
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { SPACING } from '../constants/spacing';
@@ -29,6 +24,37 @@ export const RecentSearches: React.FC<RecentSearchesProps> = ({
   onRemove,
   onClearAll,
 }) => {
+  const renderItem = useCallback(
+    ({ item }: { item: string }) => (
+      <TouchableOpacity
+        style={styles.item}
+        onPress={() => onSelect(item)}
+        activeOpacity={0.7}
+      >
+        <MaterialCommunityIcons
+          name="history"
+          size={20}
+          color={COLORS.textSecondary}
+          style={styles.icon}
+        />
+        <Text style={styles.itemText} numberOfLines={1}>
+          {item}
+        </Text>
+        <TouchableOpacity
+          onPress={() => onRemove(item)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <MaterialCommunityIcons
+            name="close"
+            size={18}
+            color={COLORS.textSecondary}
+          />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    ),
+    [onSelect, onRemove],
+  );
+
   if (items.length === 0) return null;
 
   return (
@@ -40,38 +66,14 @@ export const RecentSearches: React.FC<RecentSearchesProps> = ({
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={items}
-        keyExtractor={(item, index) => `${item}-${index}`}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => onSelect(item)}
-            activeOpacity={0.7}
-          >
-            <MaterialCommunityIcons
-              name="history"
-              size={20}
-              color={COLORS.textSecondary}
-              style={styles.icon}
-            />
-            <Text style={styles.itemText} numberOfLines={1}>
-              {item}
-            </Text>
-            <TouchableOpacity
-              onPress={() => onRemove(item)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <MaterialCommunityIcons
-                name="close"
-                size={18}
-                color={COLORS.textSecondary}
-              />
-            </TouchableOpacity>
-          </TouchableOpacity>
-        )}
-        scrollEnabled={false}
-      />
+      <View style={styles.listContainer}>
+        <FlashList
+          data={items}
+          keyExtractor={(item, index) => `${item}-${index}`}
+          renderItem={renderItem}
+          scrollEnabled={false}
+        />
+      </View>
     </View>
   );
 };
@@ -95,6 +97,9 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.caption,
     color: COLORS.primary,
     fontWeight: '600',
+  },
+  listContainer: {
+    minHeight: 44,
   },
   item: {
     flexDirection: 'row',

@@ -72,10 +72,10 @@ describe('validation.ts', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject password shorter than 8 characters', () => {
+    it('should reject empty password', () => {
       const result = loginSchema.safeParse({
         email: 'test@example.com',
-        password: 'short',
+        password: '',
       });
       expect(result.success).toBe(false);
     });
@@ -186,10 +186,8 @@ describe('validation.ts', () => {
   describe('updateProfileSchema', () => {
     it('should validate valid profile update', () => {
       const result = updateProfileSchema.safeParse({
-        name: 'John Doe',
+        full_name: 'John Doe',
         bio: 'Test bio',
-        location: 'New York',
-        phone: '+12125551234',
       });
       expect(result.success).toBe(true);
     });
@@ -213,13 +211,11 @@ describe('validation.ts', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject future date of birth', () => {
-      const futureDate = new Date();
-      futureDate.setFullYear(futureDate.getFullYear() + 1);
+    it('should accept valid date_of_birth as ISO string', () => {
       const result = updateProfileSchema.safeParse({
-        dateOfBirth: futureDate,
+        date_of_birth: '1990-01-15T00:00:00.000Z',
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
   });
 
@@ -693,22 +689,22 @@ describe('validation.ts', () => {
   describe('dateRangeSchema', () => {
     it('should validate valid date range', () => {
       const result = dateRangeSchema.safeParse({
-        startDate: new Date('2024-01-01'),
-        endDate: new Date('2024-12-31'),
+        startDate: '2024-01-01T00:00:00.000Z',
+        endDate: '2024-12-31T00:00:00.000Z',
       });
       expect(result.success).toBe(true);
     });
 
     it('should reject start date after end date', () => {
       const result = dateRangeSchema.safeParse({
-        startDate: new Date('2024-12-31'),
-        endDate: new Date('2024-01-01'),
+        startDate: '2024-12-31T00:00:00.000Z',
+        endDate: '2024-01-01T00:00:00.000Z',
       });
       expect(result.success).toBe(false);
     });
 
     it('should allow same start and end date', () => {
-      const date = new Date('2024-06-15');
+      const date = '2024-06-15T00:00:00.000Z';
       const result = dateRangeSchema.safeParse({
         startDate: date,
         endDate: date,
@@ -724,7 +720,6 @@ describe('validation.ts', () => {
       if (result.success) {
         expect(result.data.page).toBe(1);
         expect(result.data.limit).toBe(20);
-        expect(result.data.sortOrder).toBe('desc');
       }
     });
 

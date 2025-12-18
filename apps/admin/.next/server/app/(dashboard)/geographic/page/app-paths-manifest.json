@@ -1,0 +1,3 @@
+{
+  "/(dashboard)/geographic/page": "app/(dashboard)/geographic/page.js"
+}
