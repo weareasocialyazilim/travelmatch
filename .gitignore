@@ -93,3 +93,12 @@ desktop.ini
 .vscode/
 .idea/
 *.sublime-*
+
+# Next.js
+.next/
+out/
+
+# Package manager lockfiles in app directories (root lockfile is committed)
+apps/**/package-lock.json
+apps/**/yarn.lock
+apps/**/pnpm-lock.yaml
