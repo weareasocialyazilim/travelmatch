@@ -94,3 +94,7 @@ desktop.ini
 .vscode/
 .idea/
 *.sublime-*.turbo/
+
+.env.local
+
+.env.local

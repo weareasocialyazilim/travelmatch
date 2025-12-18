@@ -65,8 +65,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       '@sentry/react-native/expo',
       {
-        organization: process.env.SENTRY_ORG,
-        project: process.env.SENTRY_PROJECT,
+        organization: process.env.SENTRY_ORG || 'travelmatch-2p',
+        project: process.env.SENTRY_PROJECT || 'react-native',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
       },
     ],
     'expo-font',

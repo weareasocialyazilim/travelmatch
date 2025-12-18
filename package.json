@@ -84,6 +84,7 @@
   },
   "packageManager": "pnpm@9.15.9",
   "dependencies": {
+    "@sentry/react-native": "~7.8.0",
     "expo": "~54.0.29",
     "metro": "0.83.3",
     "metro-cache": "0.83.3",
