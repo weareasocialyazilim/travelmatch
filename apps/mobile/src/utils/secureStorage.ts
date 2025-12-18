@@ -159,10 +159,13 @@ export const StorageKeys = {
  * @deprecated Use StorageKeys.SECURE instead
  * @security These are KEY NAMES for AsyncStorage, not actual secrets.
  * Legacy keys kept for migration purposes only.
- * @snyk-ignore CWE-547 - These are storage key identifiers, not secrets
+ * 
+ * deepcode ignore HardcodedNonCryptoSecret: These are storage key identifiers/names, not actual secret values
+ * snyk:ignore CWE-547
  */
 const legacyKey = (name: string) => name;
 export const AUTH_STORAGE_KEYS = {
+  // deepcode ignore HardcodedNonCryptoSecret: Storage key name, not a secret
   ACCESS_TOKEN: legacyKey('auth_access_token'), // Key name for migration
   REFRESH_TOKEN: legacyKey('auth_refresh_token'), // Key name for migration
   TOKEN_EXPIRES_AT: legacyKey('auth_token_expires'),
