@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -71,7 +72,8 @@ export const WaitingForCodeScreen: React.FC = () => {
       }
       setResendTimer(RESEND_COOLDOWN);
     } catch (error) {
-      // Error handling - show alert if needed
+      const message = error instanceof Error ? error.message : 'Failed to resend code';
+      Alert.alert('Error', message);
     } finally {
       setIsResending(false);
     }
