@@ -26,6 +26,24 @@ import {
   TrendingUp,
   Activity,
   Siren,
+  Bug,
+  Star,
+  HeartHandshake,
+  UsersRound,
+  Code,
+  BookOpen,
+  Lightbulb,
+  CalendarDays,
+  Building2,
+  Languages,
+  Trophy,
+  Wallet,
+  Accessibility,
+  Heart,
+  Leaf,
+  ClipboardCheck,
+  FileEdit,
+  Target,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -76,6 +94,12 @@ const managementNavItems: NavItem[] = [
     icon: AlertTriangle,
     resource: 'disputes',
   },
+  {
+    title: 'Creators',
+    href: '/creators',
+    icon: Star,
+    resource: 'users',
+  },
 ];
 
 const operationsNavItems: NavItem[] = [
@@ -92,9 +116,21 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
+    title: 'Fiyatlandırma',
+    href: '/pricing',
+    icon: Wallet,
+    resource: 'transactions',
+  },
+  {
     title: 'Güvenlik',
     href: '/trust-safety',
     icon: Shield,
+    resource: 'reports',
+  },
+  {
+    title: 'Güvenlik Merkezi',
+    href: '/safety-center',
+    icon: HeartHandshake,
     resource: 'reports',
   },
   {
@@ -103,6 +139,15 @@ const operationsNavItems: NavItem[] = [
     icon: MessageSquare,
     resource: 'reports',
   },
+  {
+    title: 'Müşteri Başarısı',
+    href: '/customer-success',
+    icon: Heart,
+    resource: 'users',
+  },
+];
+
+const analyticsNavItems: NavItem[] = [
   {
     title: 'Analitik',
     href: '/analytics',
@@ -113,6 +158,12 @@ const operationsNavItems: NavItem[] = [
     title: 'Coğrafya',
     href: '/geographic',
     icon: Globe,
+    resource: 'analytics',
+  },
+  {
+    title: 'Rekabet',
+    href: '/competitive',
+    icon: Target,
     resource: 'analytics',
   },
   {
@@ -128,10 +179,16 @@ const operationsNavItems: NavItem[] = [
     resource: 'settings',
   },
   {
-    title: 'Entegrasyonlar',
-    href: '/integrations',
-    icon: Plug,
-    resource: 'integrations',
+    title: 'Hatalar',
+    href: '/errors',
+    icon: Bug,
+    resource: 'settings',
+  },
+  {
+    title: 'QA Merkezi',
+    href: '/qa-center',
+    icon: ClipboardCheck,
+    resource: 'analytics',
   },
 ];
 
@@ -149,6 +206,66 @@ const growthNavItems: NavItem[] = [
     resource: 'users',
   },
   {
+    title: 'Etkinlikler',
+    href: '/events',
+    icon: CalendarDays,
+    resource: 'users',
+  },
+  {
+    title: 'Gamification',
+    href: '/gamification',
+    icon: Trophy,
+    resource: 'users',
+  },
+  {
+    title: 'Promosyonlar',
+    href: '/promos',
+    icon: Gift,
+    resource: 'users',
+  },
+  {
+    title: 'Partnerler',
+    href: '/partners',
+    icon: Building2,
+    resource: 'users',
+  },
+];
+
+const contentNavItems: NavItem[] = [
+  {
+    title: 'Editorial',
+    href: '/editorial',
+    icon: FileEdit,
+    resource: 'moments',
+  },
+  {
+    title: 'Bilgi Bankası',
+    href: '/knowledge-base',
+    icon: BookOpen,
+    resource: 'settings',
+  },
+  {
+    title: 'Geri Bildirim',
+    href: '/feedback',
+    icon: Lightbulb,
+    resource: 'users',
+  },
+  {
+    title: 'Yerelleştirme',
+    href: '/localization',
+    icon: Languages,
+    resource: 'settings',
+  },
+  {
+    title: 'Erişilebilirlik',
+    href: '/accessibility',
+    icon: Accessibility,
+    resource: 'settings',
+  },
+];
+
+const techNavItems: NavItem[] = [
+  {
     title: 'AI Center',
     href: '/ai-center',
     icon: Brain,
@@ -161,14 +278,32 @@ const growthNavItems: NavItem[] = [
     resource: 'settings',
   },
   {
-    title: 'Promosyonlar',
-    href: '/promos',
-    icon: Gift,
-    resource: 'users',
+    title: 'Entegrasyonlar',
+    href: '/integrations',
+    icon: Plug,
+    resource: 'integrations',
+  },
+  {
+    title: 'Dev Tools',
+    href: '/dev-tools',
+    icon: Code,
+    resource: 'settings',
+  },
+  {
+    title: 'ESG Dashboard',
+    href: '/esg',
+    icon: Leaf,
+    resource: 'analytics',
   },
 ];
 
 const settingsNavItems: NavItem[] = [
+  {
+    title: 'Ekip',
+    href: '/team',
+    icon: UsersRound,
+    resource: 'admin_users',
+  },
   {
     title: 'Admin Kullanıcıları',
     href: '/admin-users',
@@ -301,7 +436,13 @@ export function Sidebar() {
           <Separator />
           <NavSection title="Operasyon" items={operationsNavItems} />
           <Separator />
+          <NavSection title="Analitik" items={analyticsNavItems} />
+          <Separator />
           <NavSection title="Büyüme" items={growthNavItems} />
+          <Separator />
+          <NavSection title="İçerik" items={contentNavItems} />
+          <Separator />
+          <NavSection title="Teknoloji" items={techNavItems} />
           <Separator />
           <NavSection title="Sistem" items={settingsNavItems} />
         </div>
