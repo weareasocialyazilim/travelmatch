@@ -645,7 +645,6 @@ try {
 // pruneExpiredEntries -> cleanExpired
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (imageCacheManager as any).pruneExpiredEntries = async function () {
-  // @ts-expect-error access private method for test compatibility
   return (
     (await (imageCacheManager as any).cleanExpired?.()) || Promise.resolve()
   );
@@ -655,13 +654,11 @@ try {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (imageCacheManager as any).cleanupDiskCache = async function () {
   // Prefer evictLRU to reclaim space; fall back to cleaning expired entries
-  // @ts-expect-error access private method for test compatibility
   try {
     return await (imageCacheManager as any).evictLRU?.(
       Math.max(1, (imageCacheManager as any).config?.maxDiskCacheSizeMB * 0.8),
     );
   } catch {
-    // @ts-expect-error access private method for test compatibility
     return await (imageCacheManager as any).cleanExpired?.();
   }
 };
@@ -678,7 +675,6 @@ try {
   cloudflareId?: string,
 ) {
   if (!cloudflareId) return;
-  // @ts-expect-error access private method for test compatibility
   return await (imageCacheManager as any).prefetchVariants?.(
     cloudflareId,
     undefined,
