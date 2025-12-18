@@ -1,9 +1,11 @@
 /**
  * Example: Moments Feed with Skeleton + Preload + Offline Cache
+ * Using FlashList for optimal scroll performance
  */
 
 import React from 'react';
-import { FlatList, RefreshControl } from 'react-native';
+import { RefreshControl } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FeedSkeleton, MomentCardSkeleton } from '../components/skeletons';
 import { useImagePreload } from '../services/imagePreloader';
@@ -64,10 +66,11 @@ export function MomentsFeedScreen() {
   }
 
   return (
-    <FlatList
+    <FlashList
       data={moments}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <MomentCard moment={item} />}
+      estimatedItemSize={200}
       onEndReached={handleLoadMore}
       onEndReachedThreshold={0.5}
       onScroll={handleScroll}

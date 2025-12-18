@@ -1,17 +1,17 @@
 /**
- * Optimized FlatList Component
- * Pre-configured FlatList with performance optimizations
+ * Optimized FlashList Component
+ * Pre-configured FlashList with performance optimizations
+ * Using Shopify's FlashList for better scroll performance
  */
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import {
-  FlatList,
-  type FlatListProps,
   type ViewToken,
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { FlashList, type FlashListProps } from '@shopify/flash-list';
 import { COLORS } from '../../constants/colors';
 
 // Default keyExtractor
@@ -22,27 +22,10 @@ const defaultKeyExtractor = <T extends { id?: string | number }>(
   return item.id?.toString() ?? index.toString();
 };
 
-// Optimized item layout calculator for fixed height items
-export const getItemLayout = (itemHeight: number, separatorHeight = 0) => {
-  return (_data: unknown, index: number) => ({
-    length: itemHeight + separatorHeight,
-    offset: (itemHeight + separatorHeight) * index,
-    index,
-  });
-};
-
 interface OptimizedFlatListProps<T>
-  extends Omit<FlatListProps<T>, 'keyExtractor'> {
-  /** Fixed item height for getItemLayout optimization */
-  itemHeight?: number;
-  /** Separator height if using ItemSeparatorComponent */
-  separatorHeight?: number;
-  /** Custom key extractor, defaults to using item.id or index */
-  keyExtractor?: (item: T, index: number) => string;
-  /** Enable pull to refresh */
-  onRefresh?: () => void;
-  /** Is refreshing */
-  refreshing?: boolean;
+  extends Omit<FlashListProps<T>, 'estimatedItemSize'> {
+  /** Estimated item size (height for vertical, width for horizontal) - REQUIRED for FlashList */
+  estimatedItemSize?: number;
   /** Loading more indicator */
   isLoadingMore?: boolean;
   /** Empty state message */
@@ -60,8 +43,7 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
   {
     data,
     renderItem,
-    itemHeight,
-    separatorHeight = 0,
+    estimatedItemSize = 80,
     keyExtractor = defaultKeyExtractor,
     onRefresh,
     refreshing = false,
@@ -71,16 +53,8 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
     onViewableItemsChanged,
     ...props
   }: OptimizedFlatListProps<T>,
-  ref: React.Ref<FlatList<T>>,
+  ref: React.Ref<FlashList<T>>,
 ) {
-  // Memoized getItemLayout for fixed height items
-  const memoizedGetItemLayout = useMemo(() => {
-    if (itemHeight) {
-      return getItemLayout(itemHeight, separatorHeight);
-    }
-    return undefined;
-  }, [itemHeight, separatorHeight]);
-
   // Viewability config
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
@@ -110,18 +84,12 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
   );
 
   return (
-    <FlatList
+    <FlashList
       ref={ref}
       data={data}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      getItemLayout={memoizedGetItemLayout}
-      // Performance optimizations
-      removeClippedSubviews={true}
-      maxToRenderPerBatch={10}
-      windowSize={5}
-      initialNumToRender={10}
-      updateCellsBatchingPeriod={50}
+      estimatedItemSize={estimatedItemSize}
       // Pull to refresh
       onRefresh={onRefresh}
       refreshing={refreshing}
@@ -131,9 +99,6 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
       // Components
       ListEmptyComponent={ListEmptyComponent}
       ListFooterComponent={ListFooterComponent}
-      // Accessibility
-      accessible={true}
-      accessibilityRole="list"
       {...props}
     />
   );
@@ -143,7 +108,7 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
 export const OptimizedFlatList = memo(
   React.forwardRef(OptimizedFlatListInner),
 ) as <T extends { id?: string | number }>(
-  props: OptimizedFlatListProps<T> & { ref?: React.Ref<FlatList<T>> },
+  props: OptimizedFlatListProps<T> & { ref?: React.Ref<FlashList<T>> },
 ) => React.ReactElement;
 
 /**

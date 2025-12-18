@@ -8,13 +8,13 @@ import type { ImageSourcePropType } from 'react-native';
 import {
   Animated,
   Dimensions,
-  FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
   Dimensions.get('window');
@@ -45,7 +45,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
+  const flashListRef = useRef<FlashList<OnboardingPage>>(null);
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
   
@@ -100,7 +100,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     ]).start(() => {
       if (currentIndex < ONBOARDING_PAGES.length - 1) {
         const nextIndex = currentIndex + 1;
-        flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+        flashListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
         setCurrentIndex(nextIndex);
         
         // Track page view
@@ -178,10 +178,11 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.contentWrapper}>
-        <FlatList<OnboardingPage>
-          ref={flatListRef}
+        <FlashList<OnboardingPage>
+          ref={flashListRef}
           data={ONBOARDING_PAGES}
           renderItem={renderPage}
+          estimatedItemSize={SCREEN_WIDTH}
           horizontal
           pagingEnabled
           bounces={false}
@@ -194,7 +195,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           }}
           scrollEnabled={true}
           style={styles.flatList}
-          {...HORIZONTAL_LIST_CONFIG}
           showsHorizontalScrollIndicator={false}
         />
       </View>

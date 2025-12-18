@@ -1,81 +1,34 @@
-export type Role = 'Traveler' | 'Local';
-export type KYCStatus = 'Unverified' | 'Pending' | 'Verified';
+/**
+ * Core Types - Mobile App
+ *
+ * Re-exports canonical types from @travelmatch/shared package.
+ * Use adapters.ts to normalize API responses to these types.
+ *
+ * @see {@link @travelmatch/shared/types/core} for canonical definitions
+ * @see {@link ./adapters} for API normalization functions
+ */
 
-export interface UserLocation {
-  lat: number;
-  lng: number;
-  city?: string;
-  country?: string;
-}
+// Re-export all core types from shared package
+export type {
+  Role,
+  KYCStatus,
+  UserLocation,
+  User,
+  GiftItem,
+  GestureStatus,
+  GestureTier,
+  GestureProof,
+  Gesture,
+  Place,
+} from '@travelmatch/shared';
 
-export interface User {
-  id: string;
-  name: string;
-  username?: string;
-  age?: number;
-  email?: string;
-  phoneNumber?: string;
-  photoUrl?: string;
-  profilePhoto?: string; // Alternative photo field
-  avatar?: string | null;
-  avatarUrl?: string | null; // Alternative avatar field
-  bio?: string;
-  role: Role;
-  type?: 'traveler' | 'local';
-  kyc: KYCStatus;
-  location: UserLocation | string;
-  trustScore?: number | null;
-  isVerified?: boolean | null;
-  interests?: string[];
-  createdAt?: string | null;
-  lastActive?: string | null;
-  travelDays?: number;
-  visitingUntil?: string | null;
-}
+/**
+ * Legacy type aliases for backward compatibility
+ * @deprecated Use types from @travelmatch/shared instead
+ */
 
-export interface GiftItem {
-  id: string;
-  placeId: string;
-  placeName: string;
-  title: string;
-  type: 'coffee' | 'ticket' | 'dinner' | 'other';
-  icon?: string;
-}
+// UserLocation with lat/lng aliases (still supported in shared)
+// No need to redefine
 
-// ProofType and Proof are now exported from domain.ts
-
-// Gesture proof field is typed inline to avoid circular dependency
-export interface Gesture {
-  id: string;
-  giverId: string;
-  receiverId: string;
-  item: GiftItem;
-  amountUSD?: number; // UI'da gösterme
-  tier: 'low' | 'mid' | 'high';
-  state:
-    | 'created'
-    | 'awaiting_approval'
-    | 'in_escrow'
-    | 'proof_pending'
-    | 'verified'
-    | 'refunded'
-    | 'under_review';
-  expiresAt: string;
-  proof?: {
-    id: string;
-    type: string;
-    mediaUrl?: string;
-    status: string;
-    createdAt: string;
-  };
-}
-
-export interface Place {
-  id: string;
-  name: string;
-  address: string;
-  distance: string;
-  logo?: string;
-  lat: number;
-  lng: number;
-}
+// Legacy Gesture state type (now consolidated in GestureStatus)
+// No need to redefine

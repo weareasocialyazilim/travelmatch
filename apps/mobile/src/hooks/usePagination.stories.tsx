@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
-import { View, Text, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ActivityIndicator, RefreshControl } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { usePagination } from '../hooks/usePagination';
 
 // Mock moment data
@@ -133,10 +134,11 @@ const PaginatedList = ({ totalItems = 100 }: { totalItems?: number }) => {
         </Text>
       </View>
       
-      <FlatList
+      <FlashList
         data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        estimatedItemSize={90}
         onEndReached={() => {
           if (hasMore && !loading) {
             loadMore();
