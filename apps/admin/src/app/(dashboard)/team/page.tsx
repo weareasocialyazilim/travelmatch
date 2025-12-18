@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering - this page has interactive components
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
 import {
   Users,

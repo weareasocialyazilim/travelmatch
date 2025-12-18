@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, ShieldCheck, Copy, Check, QrCode } from 'lucide-react';
+import { Loader2, ShieldCheck, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -97,7 +97,10 @@ export default function TwoFactorSetupPage() {
     const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     const newCode = [...code];
     for (let i = 0; i < pastedData.length; i++) {
-      newCode[i] = pastedData[i];
+      const char = pastedData[i];
+      if (char !== undefined) {
+        newCode[i] = char;
+      }
     }
     setCode(newCode);
     inputRefs.current[Math.min(pastedData.length, 5)]?.focus();

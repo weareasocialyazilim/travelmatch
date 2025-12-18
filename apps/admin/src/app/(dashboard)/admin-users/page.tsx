@@ -5,11 +5,8 @@ import {
   Users,
   Plus,
   Shield,
-  Mail,
-  Calendar,
   MoreHorizontal,
   Edit,
-  Trash2,
   Key,
   UserX,
   CheckCircle,
@@ -17,7 +14,6 @@ import {
   Clock,
   Activity,
   Eye,
-  Copy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -163,15 +159,15 @@ export default function AdminUsersPage() {
     setIsCreateOpen(false);
   };
 
-  const handleDeactivate = (userId: string) => {
+  const handleDeactivate = (_userId: string) => {
     toast.success('Kullanıcı devre dışı bırakıldı');
   };
 
-  const handleResetPassword = (userId: string) => {
+  const handleResetPassword = (_userId: string) => {
     toast.success('Şifre sıfırlama e-postası gönderildi');
   };
 
-  const handleReset2FA = (userId: string) => {
+  const handleReset2FA = (_userId: string) => {
     toast.success('2FA sıfırlandı');
   };
 

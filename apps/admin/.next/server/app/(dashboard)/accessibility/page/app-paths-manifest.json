@@ -1,0 +1,3 @@
+{
+  "/(dashboard)/accessibility/page": "app/(dashboard)/accessibility/page.js"
+}

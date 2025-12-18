@@ -9,24 +9,29 @@ const ALGORITHM = 'aes-256-gcm';
 
 // Security: Encryption key and salt MUST be set via environment variables
 // Generate with: openssl rand -base64 32
-const ENCRYPTION_KEY = process.env.TOTP_ENCRYPTION_KEY;
-const ENCRYPTION_SALT = process.env.TOTP_ENCRYPTION_SALT;
-
-if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length < 32) {
-  throw new Error('TOTP_ENCRYPTION_KEY must be set and at least 32 characters');
-}
-
-if (!ENCRYPTION_SALT || ENCRYPTION_SALT.length < 16) {
-  throw new Error('TOTP_ENCRYPTION_SALT must be set and at least 16 characters');
+function getEncryptionConfig() {
+  const key = process.env.TOTP_ENCRYPTION_KEY;
+  const salt = process.env.TOTP_ENCRYPTION_SALT;
+  
+  if (!key || key.length < 32) {
+    throw new Error('TOTP_ENCRYPTION_KEY must be set and at least 32 characters');
+  }
+  
+  if (!salt || salt.length < 16) {
+    throw new Error('TOTP_ENCRYPTION_SALT must be set and at least 16 characters');
+  }
+  
+  return { key, salt };
 }
 
 /**
  * Encrypt TOTP secret using AES-256-GCM
  */
 function encrypt(plaintext: string): string {
+  const { key, salt } = getEncryptionConfig();
   const iv = crypto.randomBytes(16);
-  const key = crypto.scryptSync(ENCRYPTION_KEY!, ENCRYPTION_SALT!, 32);
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+  const derivedKey = crypto.scryptSync(key, salt, 32);
+  const cipher = crypto.createCipheriv(ALGORITHM, derivedKey, iv);
 
   let encrypted = cipher.update(plaintext, 'utf8');
   encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -183,13 +188,14 @@ export async function POST(request: NextRequest) {
     // Decrypt and verify the TOTP code
     let isValid = false;
     try {
+      const { key, salt } = getEncryptionConfig();
       const [ivHex, authTagHex, encryptedHex] = adminUser.totp_secret.split(':');
       const iv = Buffer.from(ivHex, 'hex');
       const authTag = Buffer.from(authTagHex, 'hex');
       const encrypted = Buffer.from(encryptedHex, 'hex');
 
-      const key = crypto.scryptSync(ENCRYPTION_KEY!, ENCRYPTION_SALT!, 32);
-      const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+      const derivedKey = crypto.scryptSync(key, salt, 32);
+      const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
       decipher.setAuthTag(authTag);
 
       let decrypted = decipher.update(encrypted);
@@ -309,13 +315,14 @@ export async function DELETE(request: NextRequest) {
     // Decrypt and verify the TOTP code before disabling
     let isValid = false;
     try {
+      const { key, salt } = getEncryptionConfig();
       const [ivHex, authTagHex, encryptedHex] = adminUser.totp_secret.split(':');
       const iv = Buffer.from(ivHex, 'hex');
       const authTag = Buffer.from(authTagHex, 'hex');
       const encrypted = Buffer.from(encryptedHex, 'hex');
 
-      const key = crypto.scryptSync(ENCRYPTION_KEY!, ENCRYPTION_SALT!, 32);
-      const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+      const derivedKey = crypto.scryptSync(key, salt, 32);
+      const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
       decipher.setAuthTag(authTag);
 
       let decrypted = decipher.update(encrypted);
