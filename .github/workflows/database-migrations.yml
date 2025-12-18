@@ -101,7 +101,7 @@ jobs:
     needs: [validate-migrations, check-rls-policies]
     if: github.event.inputs.environment == 'staging' || github.event_name == 'push'
     runs-on: ubuntu-latest
-    # environment: staging  # Enable after creating GitHub Environment
+    environment: staging
     steps:
       - uses: actions/checkout@v4
 
@@ -143,7 +143,7 @@ jobs:
     needs: [validate-migrations, check-rls-policies]
     if: github.event.inputs.environment == 'production'
     runs-on: ubuntu-latest
-    # environment: production  # Enable after creating GitHub Environment
+    environment: production
     steps:
       - uses: actions/checkout@v4
 
