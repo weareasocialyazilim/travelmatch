@@ -1,5 +1,3 @@
-# Deployment workflow for TravelMatch
-# Triggers on release publication for production builds and submissions
 name: Deploy
 
 on:
@@ -8,56 +6,36 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '9'
 
 jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: \${{ env.NODE_VERSION }}
           cache: 'pnpm'
-          
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
+      - uses: expo/expo-github-action@v8
         with:
           expo-version: latest
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          
-      - name: Build for Production
-        run: eas build --platform all --profile production --non-interactive
-        
-      - name: Submit to App Stores
-        run: eas submit --platform all --profile production --non-interactive
+          token: \${{ secrets.EXPO_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+      - run: eas build --platform all --profile production --non-interactive
+      - run: eas submit --platform all --profile production --non-interactive
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_ID: \${{ secrets.APPLE_ID }}
+          ASC_APP_ID: \${{ secrets.ASC_APP_ID }}
+          APPLE_TEAM_ID: \${{ secrets.APPLE_TEAM_ID }}
 
   notify-deployment:
     name: Notify Deployment
     runs-on: ubuntu-latest
     needs: [deploy-production]
-    
     steps:
-      - name: Deployment Success
-        run: |
+      - run: |
           echo "🚀 Production deployment completed!"
           echo "Release: \${{ github.event.release.tag_name }}"
-          echo "Changelog: \${{ github.event.release.body }}"
