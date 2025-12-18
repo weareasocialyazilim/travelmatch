@@ -31,6 +31,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9
+          environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -40,12 +49,10 @@ jobs:
       - run: pnpm test -- --ci --coverage --maxWorkers=2
       - uses: codecov/codecov-action@v4
         continue-on-error: true
-        env:
-          CODECOV_TOKEN: \${{ secrets.CODECOV_TOKEN }}
         with:
           file: ./coverage/lcov.info
           fail_ci_if_error: false
-          token: \${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
 
   build:
     name: Build Check

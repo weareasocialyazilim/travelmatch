@@ -44,12 +44,21 @@ jobs:
       - name: Test
         run: pnpm turbo run test
       
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9
+          environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage/coverage-final.json
           flags: unittests
           name: codecov-umbrella
+          token: ${{ env.CODECOV_TOKEN }}
 
   build-mobile:
     runs-on: ubuntu-latest
