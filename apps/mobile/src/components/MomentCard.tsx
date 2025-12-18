@@ -16,6 +16,7 @@ import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
 import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
+import { DEFAULT_IMAGES } from '../constants/defaultValues';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePressScale } from '../utils/animations';
 import { useToast } from '@/context/ToastContext';
@@ -148,7 +149,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                 {...getAvatarImageProps(
                   moment.user || {},
                   IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                  'https://via.placeholder.com/150'
+                  DEFAULT_IMAGES.AVATAR_LARGE
                 )}
                 contentFit="cover"
                 style={styles.userAvatar}

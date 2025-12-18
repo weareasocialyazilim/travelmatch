@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LoadingState } from '@/components/LoadingState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import type { Moment as ApiMoment } from '@/types/api';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -209,7 +210,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
                   <Image
                     source={{
                       uri:
-                        moment.images?.[0] || 'https://via.placeholder.com/70',
+                        moment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER,
                     }}
                     style={styles.momentImage}
                   />

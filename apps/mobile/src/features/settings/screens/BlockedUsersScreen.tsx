@@ -11,6 +11,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -42,13 +43,13 @@ const MOCK_BLOCKED_USERS: BlockedUser[] = __DEV__
         id: '1',
         name: 'John Doe',
         role: 'Traveler / Local',
-        avatarUrl: 'https://via.placeholder.com/48',
+        avatarUrl: DEFAULT_IMAGES.AVATAR_SMALL,
       },
       {
         id: '2',
         name: 'Jane Smith',
         role: 'Traveler',
-        avatarUrl: 'https://via.placeholder.com/48',
+        avatarUrl: DEFAULT_IMAGES.AVATAR_SMALL,
       },
     ]
   : [];

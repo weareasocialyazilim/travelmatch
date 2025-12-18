@@ -10,6 +10,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -162,7 +163,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
       otherUser: {
         id: escrowId,
         name: receiverName,
-        avatar: receiverAvatar || 'https://via.placeholder.com/100',
+        avatar: receiverAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
         isVerified: true,
         type: 'local',
         role: 'Local',
@@ -177,7 +178,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
       otherUser: {
         id: escrowId,
         name: receiverName,
-        avatar: receiverAvatar || 'https://via.placeholder.com/100',
+        avatar: receiverAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
         isVerified: true,
         type: 'local',
         role: 'Local',
@@ -215,7 +216,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
           <View style={styles.receiverInfo}>
             <Image
               source={{
-                uri: receiverAvatar || 'https://via.placeholder.com/100',
+                uri: receiverAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
               }}
               style={styles.receiverAvatar}
             />

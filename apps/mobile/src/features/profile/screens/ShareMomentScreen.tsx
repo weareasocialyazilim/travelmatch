@@ -13,6 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { logger } from '@/utils/logger';
 import { useMoments } from '@/hooks/useMoments';
 import type { Moment } from '@/hooks/useMoments';
@@ -237,7 +238,7 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
       <View style={styles.previewSection}>
         <View style={styles.previewCard}>
           <Image
-            source={{ uri: displayMoment.images?.[0] || 'https://via.placeholder.com/400' }}
+            source={{ uri: displayMoment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER }}
             style={styles.previewImage}
           />
           <View style={styles.previewInfo}>
