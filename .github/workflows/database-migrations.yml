@@ -21,9 +21,6 @@ on:
         default: true
         type: boolean
 
-env:
-  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
 jobs:
   validate-migrations:
     name: Validate Migrations
@@ -104,7 +101,7 @@ jobs:
     needs: [validate-migrations, check-rls-policies]
     if: github.event.inputs.environment == 'staging' || github.event_name == 'push'
     runs-on: ubuntu-latest
-    environment: staging
+    # environment: staging  # Enable after creating GitHub Environment
     steps:
       - uses: actions/checkout@v4
 
@@ -146,7 +143,7 @@ jobs:
     needs: [validate-migrations, check-rls-policies]
     if: github.event.inputs.environment == 'production'
     runs-on: ubuntu-latest
-    environment: production
+    # environment: production  # Enable after creating GitHub Environment
     steps:
       - uses: actions/checkout@v4
 
