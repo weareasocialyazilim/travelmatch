@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -36,6 +36,7 @@ import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { NetworkGuard } from '../../../components/NetworkGuard';
+import { useDiscoverStore } from '@/stores/discoverStore';
 
 // Import modular components
 import type {
@@ -64,37 +65,52 @@ const DiscoverScreen = () => {
     setFilters,
   } = useMoments();
 
-  // UI States
-  const [viewMode, setViewMode] = useState<ViewMode>('single');
-  const [refreshing, setRefreshing] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
-  const [showStoryViewer, setShowStoryViewer] = useState(false);
-  const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
-    null,
-  );
+  // Zustand Store - All UI and Filter State
+  const {
+    // UI State
+    viewMode,
+    refreshing,
+    showFilterModal,
+    showLocationModal,
+    showStoryViewer,
+    selectedStoryUser,
 
-  // Story viewer states
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [currentUserIndex, setCurrentUserIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+    // Story Viewer State
+    currentStoryIndex,
+    currentUserIndex,
+    isPaused,
 
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('nearest');
-  const [maxDistance, setMaxDistance] = useState(50);
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: 0,
-    max: 500,
-  });
+    // Filter State
+    selectedCategory,
+    sortBy,
+    maxDistance,
+    priceRange,
 
-  // Location state
-  const [selectedLocation, setSelectedLocation] = useState('San Francisco, CA');
-  const [recentLocations, setRecentLocations] = useState([
-    'New York, NY',
-    'Los Angeles, CA',
-    'Chicago, IL',
-  ]);
+    // Location State
+    selectedLocation,
+    recentLocations,
+
+    // Actions
+    setViewMode,
+    setRefreshing,
+    openFilterModal,
+    closeFilterModal,
+    openLocationModal,
+    closeLocationModal,
+    openStoryViewer,
+    closeStoryViewer,
+    setCurrentStoryIndex,
+    setCurrentUserIndex,
+    setSelectedStoryUser,
+    setIsPaused,
+    setSelectedCategory,
+    setSortBy,
+    setMaxDistance,
+    setPriceRange,
+    resetFilters,
+    addRecentLocation,
+    getActiveFilterCount,
+  } = useDiscoverStore();
 
   // Refresh handler with haptic feedback
   const onRefresh = useCallback(async () => {
@@ -117,7 +133,7 @@ const DiscoverScreen = () => {
     const currentUserStories = selectedStoryUser.stories;
 
     if (currentStoryIndex < currentUserStories.length - 1) {
-      setCurrentStoryIndex((prev) => prev + 1);
+      setCurrentStoryIndex(currentStoryIndex + 1);
     } else {
       const nextUserIndex = currentUserIndex + 1;
       if (nextUserIndex < USER_STORIES.length) {
@@ -128,14 +144,13 @@ const DiscoverScreen = () => {
         closeStoryViewer();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, setCurrentStoryIndex, setCurrentUserIndex, setSelectedStoryUser, closeStoryViewer]);
 
   const goToPreviousStory = useCallback(() => {
     if (!selectedStoryUser) return;
 
     if (currentStoryIndex > 0) {
-      setCurrentStoryIndex((prev) => prev - 1);
+      setCurrentStoryIndex(currentStoryIndex - 1);
     } else {
       const prevUserIndex = currentUserIndex - 1;
       if (prevUserIndex >= 0) {
@@ -145,15 +160,7 @@ const DiscoverScreen = () => {
         setCurrentStoryIndex(prevUser.stories.length - 1);
       }
     }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
-
-  const closeStoryViewer = useCallback(() => {
-    setShowStoryViewer(false);
-    setSelectedStoryUser(null);
-    setCurrentStoryIndex(0);
-    setCurrentUserIndex(0);
-    setIsPaused(false);
-  }, []);
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, setCurrentStoryIndex, setCurrentUserIndex, setSelectedStoryUser]);
 
   // Use API moments
   const baseMoments = useMemo(() => {
@@ -227,43 +234,25 @@ const DiscoverScreen = () => {
 
   const handleStoryPress = useCallback((user: UserStory) => {
     const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
-    setCurrentUserIndex(userIndex);
-    setSelectedStoryUser(user);
-    setCurrentStoryIndex(0);
-    setShowStoryViewer(true);
-  }, []);
+    openStoryViewer(user, userIndex);
+  }, [openStoryViewer]);
 
   const handleLocationSelect = useCallback(
     (location: string) => {
-      if (
-        selectedLocation !== location &&
-        !recentLocations.includes(selectedLocation)
-      ) {
-        setRecentLocations((prev) => [selectedLocation, ...prev.slice(0, 2)]);
-      }
-      setSelectedLocation(location);
-      setShowLocationModal(false);
+      addRecentLocation(location);
+      closeLocationModal();
     },
-    [selectedLocation, recentLocations],
+    [addRecentLocation, closeLocationModal],
   );
 
-  // Active filter count
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (selectedCategory !== 'all') count++;
-    if (sortBy !== 'nearest') count++;
-    if (maxDistance !== 50) count++;
-    if (priceRange.min !== 0 || priceRange.max !== 500) count++;
-    return count;
-  }, [selectedCategory, sortBy, maxDistance, priceRange]);
-
-  // Clear all filters
-  const clearFilters = useCallback(() => {
-    setSelectedCategory('all');
-    setSortBy('nearest');
-    setMaxDistance(50);
-    setPriceRange({ min: 0, max: 500 });
-  }, []);
+  // Active filter count - computed from store (memoized)
+  const activeFilterCount = useMemo(() => getActiveFilterCount(), [
+    selectedCategory,
+    sortBy,
+    maxDistance,
+    priceRange,
+    getActiveFilterCount,
+  ]);
 
   // Memoized render functions
   const renderStoryItem = useCallback(
@@ -307,8 +296,8 @@ const DiscoverScreen = () => {
         location={selectedLocation}
         viewMode={viewMode}
         activeFiltersCount={activeFilterCount}
-        onLocationPress={() => setShowLocationModal(true)}
-        onFilterPress={() => setShowFilterModal(true)}
+        onLocationPress={openLocationModal}
+        onFilterPress={openFilterModal}
         onViewModeToggle={() =>
           setViewMode(viewMode === 'single' ? 'grid' : 'single')
         }
@@ -452,7 +441,7 @@ const DiscoverScreen = () => {
                 title="No moments found"
                 description="Try adjusting your filters or location"
                 actionLabel="Clear Filters"
-                onAction={clearFilters}
+                onAction={resetFilters}
               />
             ) : null
           }
@@ -475,7 +464,7 @@ const DiscoverScreen = () => {
       {/* Modals - Using extracted components */}
       <LocationModal
         visible={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
+        onClose={closeLocationModal}
         onLocationSelect={handleLocationSelect}
         selectedLocation={selectedLocation}
         recentLocations={recentLocations}
@@ -485,7 +474,7 @@ const DiscoverScreen = () => {
 
       <FilterModal
         visible={showFilterModal}
-        onClose={() => setShowFilterModal(false)}
+        onClose={closeFilterModal}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         sortBy={sortBy}

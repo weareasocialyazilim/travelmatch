@@ -1142,40 +1142,90 @@ export const conversationsService = {
     }
   },
 
+  /**
+   * Get or create a conversation between participants
+   * RACE CONDITION FIX: Uses database-level upsert with ON CONFLICT
+   * to prevent duplicate conversations when concurrent requests occur
+   */
   async getOrCreate(
     participantIds: string[],
   ): Promise<DbResult<Tables['conversations']['Row']>> {
     try {
-      // First, try to find existing conversation
-      // SECURITY: Explicit column selection - never use select('*')
-      const { data: existing } = await supabase
-        .from('conversations')
-        .select(
-          `
-          id,
-          participant_ids,
-          last_message_id,
-          created_at,
-          updated_at,
-          last_message_at,
-          last_message_preview
-        `,
-        )
-        .contains('participant_ids', participantIds)
-        .single();
+      // Sort participant IDs to ensure consistent ordering for deduplication
+      const sortedParticipantIds = [...participantIds].sort();
 
-      if (existing) {
-        return okSingle<Tables['conversations']['Row']>(existing);
+      // Use RPC function for atomic get-or-create operation
+      // This prevents race conditions where two users create duplicate conversations
+      const { data, error } = await supabase.rpc('get_or_create_conversation', {
+        p_participant_ids: sortedParticipantIds,
+      });
+
+      if (error) {
+        // Fallback to manual upsert if RPC not available
+        logger.warn('[DB] RPC get_or_create_conversation failed, using fallback', error);
+
+        // Try to find existing first with sorted IDs
+        const { data: existing } = await supabase
+          .from('conversations')
+          .select(
+            `
+            id,
+            participant_ids,
+            last_message_id,
+            created_at,
+            updated_at,
+            last_message_at,
+            last_message_preview
+          `,
+          )
+          .contains('participant_ids', sortedParticipantIds)
+          .single();
+
+        if (existing) {
+          return okSingle<Tables['conversations']['Row']>(existing);
+        }
+
+        // Create new conversation with upsert behavior
+        // The database should have a unique constraint on sorted participant_ids
+        const { data: newConversation, error: insertError } = await supabase
+          .from('conversations')
+          .upsert(
+            { participant_ids: sortedParticipantIds },
+            {
+              onConflict: 'participant_ids',
+              ignoreDuplicates: true
+            }
+          )
+          .select()
+          .single();
+
+        if (insertError) {
+          // If upsert fails due to conflict, fetch the existing one
+          const { data: existingAfterConflict } = await supabase
+            .from('conversations')
+            .select(
+              `
+              id,
+              participant_ids,
+              last_message_id,
+              created_at,
+              updated_at,
+              last_message_at,
+              last_message_preview
+            `,
+            )
+            .contains('participant_ids', sortedParticipantIds)
+            .single();
+
+          if (existingAfterConflict) {
+            return okSingle<Tables['conversations']['Row']>(existingAfterConflict);
+          }
+          throw insertError;
+        }
+
+        return okSingle<Tables['conversations']['Row']>(newConversation);
       }
 
-      // Create new conversation
-      const { data, error } = await supabase
-        .from('conversations')
-        .insert({ participant_ids: participantIds })
-        .select()
-        .single();
-
-      if (error) throw error;
       return okSingle<Tables['conversations']['Row']>(data);
     } catch (error) {
       logger.error('[DB] Get/Create conversation error:', error);

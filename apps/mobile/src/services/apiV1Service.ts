@@ -1,9 +1,9 @@
 /**
  * API v1 Client Service
- * 
+ *
  * Wrapper for calling the new API v1 endpoints
  * Gradually migrate from direct edge function calls to v1 API
- * 
+ *
  * FEATURES:
  * - Offline handling: Checks network before making requests
  * - Auto token refresh: Refreshes expired tokens on 401
@@ -200,9 +200,45 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
+// API Response Types
+interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  username: string;
+  avatar: string;
+  bio?: string;
+  verified: boolean;
+}
+
+interface Moment {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  status: string;
+  created_at: string;
+}
+
+interface Request {
+  id: string;
+  moment_id: string;
+  user_id: string;
+  status: string;
+  message?: string;
+  created_at: string;
+}
+
+interface LoginResponse {
+  user: User;
+  session: Session;
+}
+
 /**
  * API v1 Service Methods
- * 
+ *
  * Gradually migrate to these methods from direct Supabase calls
  */
 export const apiV1Service = {
@@ -210,10 +246,7 @@ export const apiV1Service = {
   // AUTH
   // ============================================
   async login(email: string, password: string) {
-    return apiClient.post<{
-      user: User;
-      session: Session;
-    }>('/auth/login', { email, password });
+import type { Database } from '../types/database.types';
   },
 
   async logout() {
@@ -224,12 +257,12 @@ export const apiV1Service = {
   // USERS
   // ============================================
   async getUser(userId: string) {
-    return apiClient.get<Database['public']['Tables']['users']['Row']>(`/users/${userId}`);
+import type { Database } from '../types/database.types';
   },
 
   async getUserMoments(userId: string) {
     return apiClient.get<{
-      moments: Database['public']['Tables']['moments']['Row'][];
+import type { Database } from '../types/database.types';
       count: number;
     }>(`/users/${userId}/moments`);
   },
@@ -249,7 +282,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      moments: Database['public']['Tables']['moments']['Row'][];
+import type { Database } from '../types/database.types';
       pagination: {
         total: number;
         limit: number;
@@ -260,7 +293,7 @@ export const apiV1Service = {
   },
 
   async getMoment(momentId: string) {
-    return apiClient.get<Database['public']['Tables']['moments']['Row']>(`/moments/${momentId}`);
+import type { Database } from '../types/database.types';
   },
 
   // ============================================
@@ -278,7 +311,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      requests: Database['public']['Tables']['requests']['Row'][];
+import type { Database } from '../types/database.types';
       count: number;
     }>(`/requests${query ? `?${query}` : ''}`);
   },

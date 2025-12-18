@@ -116,6 +116,47 @@ export interface FollowUser {
   isFollowedBy: boolean;
 }
 
+// GDPR Export Data Types
+export interface UserDataExport {
+  exportDate: string;
+  userId: string;
+  profile: {
+    email: string;
+    name: string;
+    username: string;
+    bio?: string;
+    location?: Record<string, string>;
+    languages: string[];
+    interests: string[];
+    created_at: string;
+  };
+  moments: Array<{
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    created_at: string;
+  }>;
+  transactions: Array<{
+    id: string;
+    amount: number;
+    currency: string;
+    type: string;
+    created_at: string;
+  }>;
+  messages: Array<{
+    id: string;
+    content: string;
+    created_at: string;
+  }>;
+  metadata: {
+    profileCount: number;
+    momentsCount: number;
+    transactionsCount: number;
+    messagesCount: number;
+  };
+}
+
 // Lightweight DB user shape used for mapping - includes snake_case fields returned from PostgREST
 type DBUserRowLike = Partial<{
   id: string;
@@ -729,7 +770,7 @@ export const userService = {
    * Export user data (GDPR Article 20 - Right to Data Portability)
    * Calls Supabase Edge Function to generate comprehensive data export
    */
-  exportData: async (): Promise<{ data: any; error: Error | null }> => {
+  exportData: async (): Promise<{ data: UserDataExport | null; error: Error | null }> => {
     try {
       const {
         data: { session },

@@ -98,11 +98,38 @@ export const useStableCallback = <T extends (...args: unknown[]) => unknown>(
 };
 
 /**
- * FlatList Optimization Helpers
+ * FlashList Optimization Helpers
+ * FlashList handles most optimizations automatically
+ */
+export const flashListOptimizations = {
+  /**
+   * Key extractor - works with both FlatList and FlashList
+   */
+  keyExtractor: <T extends { id?: string | number }>(
+    item: T,
+    index: number,
+  ) => {
+    return item.id?.toString() ?? index.toString();
+  },
+
+  /**
+   * Common estimated item sizes
+   */
+  estimatedSizes: {
+    small: 60,
+    medium: 120,
+    large: 200,
+    extraLarge: 420,
+  },
+};
+
+/**
+ * @deprecated Use flashListOptimizations instead. FlashList doesn't need these props.
+ * FlatList Optimization Helpers (Legacy)
  */
 export const flatListOptimizations = {
   /**
-   * Get item layout for fixed height items
+   * @deprecated FlashList doesn't use getItemLayout
    */
   getItemLayout: (itemHeight: number) => (_data: unknown, index: number) => ({
     length: itemHeight,
@@ -121,7 +148,7 @@ export const flatListOptimizations = {
   },
 
   /**
-   * Default optimization props
+   * @deprecated FlashList doesn't need these manual optimization props
    */
   defaultProps: {
     removeClippedSubviews: true,
