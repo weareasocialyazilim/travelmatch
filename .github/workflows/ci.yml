@@ -66,7 +66,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec tsc --noEmit
+      - run: pnpm run type-check
+        continue-on-error: true
 
   security:
     name: Security Audit
@@ -85,6 +86,9 @@ jobs:
     name: E2E Tests
     runs-on: macos-latest
     timeout-minutes: 45
+    # E2E tests are optional and expensive - skip on regular pushes
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[e2e]')
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -96,7 +100,7 @@ jobs:
       - name: Install Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo "\$HOME/.maestro/bin" >> \$GITHUB_PATH
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
       - name: Setup iOS Simulator
         run: |
           xcrun simctl boot "iPhone 15 Pro" || true

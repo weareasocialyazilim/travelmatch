@@ -132,20 +132,20 @@ jobs:
           script: |
             const fs = require('fs');
             const metrics = JSON.parse(fs.readFileSync('viral-metrics.json', 'utf8'));
-            
+
             const comment = `
             ## 🚀 Viral Metrics Report
-            
+
             | Metric | Current | Target | Status |
             |--------|---------|--------|--------|
             | K-Factor | ${metrics.kFactor.toFixed(2)} | 1.0+ | ${metrics.kFactor >= 1.0 ? '✅' : '⚠️'} |
             | Share Rate | ${(metrics.shareRate * 100).toFixed(1)}% | 25%+ | ${metrics.shareRate >= 0.25 ? '✅' : '⚠️'} |
             | Conversion Rate | ${(metrics.conversionRate * 100).toFixed(1)}% | 10%+ | ${metrics.conversionRate >= 0.1 ? '✅' : '⚠️'} |
             | Viral Cycle Time | ${metrics.cycleTime}h | <48h | ${metrics.cycleTime < 48 ? '✅' : '⚠️'} |
-            
+
             ${metrics.kFactor >= 1.0 ? '🎉 **Viral growth achieved!**' : '💡 **Optimization needed for viral growth**'}
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

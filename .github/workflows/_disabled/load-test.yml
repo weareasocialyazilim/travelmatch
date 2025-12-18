@@ -14,10 +14,10 @@ on:
           - standard
           - spike
           - stress
-  
+
   # Run weekly on staging
   schedule:
-    - cron: '0 2 * * 0'  # Every Sunday at 2 AM
+    - cron: '0 2 * * 0' # Every Sunday at 2 AM
 
   # Run on release branches
   push:
@@ -29,11 +29,11 @@ jobs:
     name: Run Load Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Install k6
         run: |
           sudo gpg -k
@@ -41,17 +41,17 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
           sudo apt-get update
           sudo apt-get install k6
-      
+
       - name: Verify k6 installation
         run: k6 version
-      
+
       - name: Run load test
         env:
           BASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           TEST_TYPE="${{ github.event.inputs.test_type || 'quick' }}"
-          
+
           case $TEST_TYPE in
             quick)
               k6 run --vus 100 --duration 1m tests/load/api-load-test.js
@@ -66,7 +66,7 @@ jobs:
               k6 run tests/load/stress-test.js
               ;;
           esac
-      
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
@@ -75,7 +75,7 @@ jobs:
           path: |
             summary.json
             *-results.json
-      
+
       - name: Comment on PR (if applicable)
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -83,29 +83,29 @@ jobs:
           script: |
             const fs = require('fs');
             const summary = JSON.parse(fs.readFileSync('summary.json', 'utf8'));
-            
+
             const reqRate = summary.metrics.http_reqs.values.rate.toFixed(2);
             const p95 = summary.metrics.http_req_duration.values['p(95)'].toFixed(2);
             const errorRate = (summary.metrics.errors?.values.rate * 100 || 0).toFixed(2);
-            
+
             const comment = `## Load Test Results
-            
+
             | Metric | Value | Target | Status |
             |--------|-------|--------|--------|
             | Request Rate | ${reqRate} req/s | > 500 req/s | ${reqRate > 500 ? '✅' : '❌'} |
             | p95 Latency | ${p95}ms | < 100ms | ${p95 < 100 ? '✅' : '❌'} |
             | Error Rate | ${errorRate}% | < 1% | ${errorRate < 1 ? '✅' : '❌'} |
-            
+
             [View full results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
             });
-      
+
       - name: Fail if thresholds not met
         run: |
           if [ -f summary.json ]; then

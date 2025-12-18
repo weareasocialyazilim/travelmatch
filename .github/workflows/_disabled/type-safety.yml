@@ -26,35 +26,35 @@ jobs:
   check-type-drift:
     name: Check Type Drift
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          
+
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
-          
+
       - name: Generate fresh types from remote
         if: env.SUPABASE_ACCESS_TOKEN != ''
         run: |
           supabase link --project-ref ${{ env.SUPABASE_PROJECT_ID }}
           supabase gen types typescript --linked > apps/mobile/src/types/database.generated.ts
-          
+
       - name: Check for type drift
         id: drift-check
         run: |
@@ -72,17 +72,17 @@ jobs:
             echo "drift=skip" >> $GITHUB_OUTPUT
             echo "⏭️ Skipping drift check (no Supabase access token)"
           fi
-          
+
       - name: Run TypeScript type check
         run: pnpm --filter @travelmatch/mobile type-check
-        
+
       - name: Validate db.ts exports
         run: |
           cd apps/mobile
           # Check that db.ts compiles without errors
           npx tsc --noEmit src/types/db.ts --skipLibCheck
           echo "✅ db.ts exports are valid"
-          
+
       - name: Comment on PR (if drift detected)
         if: github.event_name == 'pull_request' && steps.drift-check.outputs.drift == 'true'
         uses: actions/github-script@v7
@@ -108,17 +108,17 @@ jobs:
     name: Migration Safety Check
     runs-on: ubuntu-latest
     if: contains(github.event.head_commit.message, 'migration') || contains(github.event.pull_request.title, 'migration')
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Check migration idempotency
         run: |
           echo "🔍 Checking migrations for idempotency patterns..."
-          
+
           # Find all SQL migrations
           for file in supabase/migrations/*.sql; do
             echo "Checking $file..."
@@ -141,13 +141,13 @@ jobs:
               echo "⚠️  Warning: $file has DROP without IF EXISTS"
             fi
           done
-          
+
           echo "✅ Migration safety check complete"
-          
+
       - name: Verify RLS enabled on new tables
         run: |
           echo "🛡️ Checking RLS enforcement..."
-          
+
           for file in supabase/migrations/*.sql; do
             # Find tables created in this migration
             tables=$(grep -oE "CREATE TABLE (IF NOT EXISTS )?[a-z_]+" "$file" | awk '{print $NF}')
@@ -159,7 +159,7 @@ jobs:
               fi
             done
           done
-          
+
           echo "✅ RLS check complete"
 
   notify-on-failure:
@@ -167,7 +167,7 @@ jobs:
     needs: [check-type-drift, migration-safety]
     if: failure()
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Send Slack notification
         if: secrets.SLACK_WEBHOOK_URL != ''
