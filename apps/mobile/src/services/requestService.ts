@@ -1,17 +1,4 @@
 /**
-      let query = supabase
-        .from('requests')
-        .select('*, users(*), moments(*)', { count: 'exact' });
-
-      if (filters?.status) {
-        query = query.eq('status', filters.status);
-      }
-
-      const { data, count, error } = await query.order('created_at', {
-        ascending: false,
-      });
-      if (error) throw error;
-/**
  * Request Service
  * Gift requests, bookings, and related operations
  */
@@ -262,6 +249,7 @@ export const requestService = {
 
   /**
    * Get requests I received (as host)
+   * Optimized: Uses inner join filter instead of client-side filtering
    */
   getReceivedRequests: async (
     filters?: Omit<RequestFilters, 'role'>,
@@ -272,19 +260,33 @@ export const requestService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, count, error } = await supabase
+      // First get user's moment IDs to filter requests server-side
+      const { data: userMoments } = await supabase
+        .from('moments')
+        .select('id')
+        .eq('user_id', user.id);
+
+      const momentIds = (userMoments || []).map((m) => m.id);
+
+      if (momentIds.length === 0) {
+        return { requests: [], total: 0 };
+      }
+
+      // Query requests only for user's moments (server-side filter)
+      let query = supabase
         .from('requests')
         .select('*, users(*), moments(*)', { count: 'exact' })
-        .order('created_at', { ascending: false });
+        .in('moment_id', momentIds);
+
+      if (filters?.status) {
+        query = query.eq('status', filters.status);
+      }
+
+      const { data, count, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Filter by moment owner (host)
-      const filtered = (data || []).filter(
-        (row) => ((row as RequestWithRelations)?.moments?.user_id ?? '') === user.id,
-      );
-
-      const requests: GiftRequest[] = filtered.map((row) => {
+      const requests: GiftRequest[] = (data || []).map((row) => {
         const r = row as RequestWithRelations;
         return {
           id: r.id,
@@ -314,7 +316,7 @@ export const requestService = {
         };
       });
 
-      return { requests, total: filtered.length || 0 };
+      return { requests, total: count || requests.length };
     } catch (error) {
       logger.error('Get received requests error:', error);
       return { requests: [], total: 0 };
