@@ -27,11 +27,7 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
-  },
+  // Note: Server Actions are always enabled in Next.js 15+
 };
 
 module.exports = nextConfig;
