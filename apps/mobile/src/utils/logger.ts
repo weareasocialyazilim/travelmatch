@@ -413,10 +413,10 @@ class Logger {
       if (this.config.jsonFormat && (!__DEV__ || isJest)) {
         // eslint-disable-next-line no-console
         const glConsole = (globalThis as any).console || console;
-        glConsole.info && glConsole.info(this.formatJSON('debug', message, args));
+        if (glConsole.info) glConsole.info(this.formatJSON('debug', message, args));
       } else {
         const glConsole = (globalThis as any).console || console;
-        glConsole.info && glConsole.info(this.formatMessage('debug', message), ...args);
+        if (glConsole.info) glConsole.info(this.formatMessage('debug', message), ...args);
       }
     }
   }
@@ -514,9 +514,9 @@ class Logger {
   group(label: string, callback: () => void): void {
     if (this.shouldLog('debug')) {
       const glConsole = (globalThis as any).console || console;
-      glConsole.group && glConsole.group(this.formatMessage('debug', label));
+      if (glConsole.group) glConsole.group(this.formatMessage('debug', label));
       callback();
-      glConsole.groupEnd && glConsole.groupEnd();
+      if (glConsole.groupEnd) glConsole.groupEnd();
     }
   }
 
@@ -527,12 +527,12 @@ class Logger {
     if (this.shouldLog('debug')) {
       const glConsole = (globalThis as any).console || console;
       // Log data at INFO level so it's visible in standard logs
-      glConsole.info && glConsole.info(this.formatMessage('info', label), String(label));
+      if (glConsole.info) glConsole.info(this.formatMessage('info', label), String(label));
       // Sanitize table data before logging
       const tableData = Array.isArray(data)
         ? (data as any[]).map((d) => this.sanitizeData(d))
         : this.sanitizeData(data as any);
-      glConsole.table && glConsole.table(tableData);
+      if (glConsole.table) glConsole.table(tableData);
     }
   }
 
@@ -544,7 +544,7 @@ class Logger {
     if (this.shouldLog('debug') || isJest) {
       this.timers.set(label, performance.now());
       const glConsole = (globalThis as any).console || console;
-      glConsole.time && glConsole.time(this.formatMessage('debug', `⏱️ ${label}`));
+      if (glConsole.time) glConsole.time(this.formatMessage('debug', `⏱️ ${label}`));
     }
   }
 
@@ -560,16 +560,16 @@ class Logger {
         const duration = performance.now() - startTime;
         this.timers.delete(label);
         const glConsole = (globalThis as any).console || console;
-        glConsole.timeEnd && glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
+        if (glConsole.timeEnd) glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
         // Also surface duration via info so tests can assert
         const durationMsg = this.formatMessage('info', `${label} ${Math.round(duration)}ms`);
-        glConsole.info && glConsole.info(durationMsg);
+        if (glConsole.info) glConsole.info(durationMsg);
         // mirror
-        glConsole.log && glConsole.log(durationMsg);
+        if (glConsole.log) glConsole.log(durationMsg);
         return duration;
       }
       const glConsole = (globalThis as any).console || console;
-      glConsole.timeEnd && glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
+      if (glConsole.timeEnd) glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
       // If this instance is the library default singleton, return 0 for missing timers
       // Otherwise return undefined so test-created instances can assert undefined.
       // The singleton exported below sets `__isDefault = true` on the instance.
