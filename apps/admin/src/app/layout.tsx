@@ -1,12 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
+// Force all routes to be dynamically rendered - admin panel requires authentication
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'TravelMatch Admin',
@@ -23,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
