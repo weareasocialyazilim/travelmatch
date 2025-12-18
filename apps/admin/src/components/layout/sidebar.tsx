@@ -16,6 +16,12 @@ import {
   ChevronRight,
   ListTodo,
   Plug,
+  Bell,
+  Megaphone,
+  Brain,
+  Zap,
+  Gift,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -101,7 +107,46 @@ const operationsNavItems: NavItem[] = [
   },
 ];
 
+const growthNavItems: NavItem[] = [
+  {
+    title: 'Bildirimler',
+    href: '/notifications',
+    icon: Bell,
+    resource: 'users',
+  },
+  {
+    title: 'Kampanyalar',
+    href: '/campaigns',
+    icon: Megaphone,
+    resource: 'users',
+  },
+  {
+    title: 'AI Center',
+    href: '/ai-center',
+    icon: Brain,
+    resource: 'analytics',
+  },
+  {
+    title: 'Otomasyon',
+    href: '/automation',
+    icon: Zap,
+    resource: 'settings',
+  },
+  {
+    title: 'Promosyonlar',
+    href: '/promos',
+    icon: Gift,
+    resource: 'users',
+  },
+];
+
 const settingsNavItems: NavItem[] = [
+  {
+    title: 'Admin Kullanıcıları',
+    href: '/admin-users',
+    icon: UserCog,
+    resource: 'admin_users',
+  },
   {
     title: 'Ayarlar',
     href: '/settings',
@@ -227,6 +272,8 @@ export function Sidebar() {
           <NavSection title="Yönetim" items={managementNavItems} />
           <Separator />
           <NavSection title="Operasyon" items={operationsNavItems} />
+          <Separator />
+          <NavSection title="Büyüme" items={growthNavItems} />
           <Separator />
           <NavSection title="Sistem" items={settingsNavItems} />
         </div>
