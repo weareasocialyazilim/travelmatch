@@ -300,12 +300,13 @@ export const profileApi = {
   },
 
   /**
-   * Moment sil
+   * Moment sil (soft delete)
    */
   deleteMoment: async (momentId: string) => {
     const { error } = await supabase
       .from('moments')
       .update({
+        deleted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       } as import('@/types/database.types').Database['public']['Tables']['moments']['Update'])
       .eq('id', momentId);

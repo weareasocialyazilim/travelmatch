@@ -137,9 +137,9 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
         <View style={styles.bottomContent}>
           {/* Page Indicators */}
           <View style={styles.pageIndicators}>
-            {images.map((_, index) => (
+            {images.map((image, index) => (
               <View
-                key={index}
+                key={image}
                 style={[
                   styles.pageIndicator,
                   index === currentIndex

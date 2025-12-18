@@ -11,9 +11,11 @@
  */
 
 import NetInfo from '@react-native-community/netinfo';
+import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { sessionManager } from './sessionManager';
+import type { Database } from '../types/database.types';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const API_BASE_URL = `${SUPABASE_URL}/functions/v1/api/v1`;
@@ -81,7 +83,7 @@ class ApiClient {
   async request<T>(
     method: string,
     path: string,
-    body?: any,
+    body?: unknown,
     isRetry = false,
   ): Promise<ApiResponse<T>> {
     try {
@@ -179,15 +181,15 @@ class ApiClient {
     return this.request<T>('GET', path);
   }
 
-  post<T>(path: string, body: any) {
+  post<T>(path: string, body: unknown) {
     return this.request<T>('POST', path, body);
   }
 
-  put<T>(path: string, body: any) {
+  put<T>(path: string, body: unknown) {
     return this.request<T>('PUT', path, body);
   }
 
-  patch<T>(path: string, body: any) {
+  patch<T>(path: string, body: unknown) {
     return this.request<T>('PATCH', path, body);
   }
 
@@ -209,8 +211,8 @@ export const apiV1Service = {
   // ============================================
   async login(email: string, password: string) {
     return apiClient.post<{
-      user: any;
-      session: any;
+      user: User;
+      session: Session;
     }>('/auth/login', { email, password });
   },
 
@@ -222,12 +224,12 @@ export const apiV1Service = {
   // USERS
   // ============================================
   async getUser(userId: string) {
-    return apiClient.get<any>(`/users/${userId}`);
+    return apiClient.get<Database['public']['Tables']['users']['Row']>(`/users/${userId}`);
   },
 
   async getUserMoments(userId: string) {
     return apiClient.get<{
-      moments: any[];
+      moments: Database['public']['Tables']['moments']['Row'][];
       count: number;
     }>(`/users/${userId}/moments`);
   },
@@ -247,7 +249,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      moments: any[];
+      moments: Database['public']['Tables']['moments']['Row'][];
       pagination: {
         total: number;
         limit: number;
@@ -258,7 +260,7 @@ export const apiV1Service = {
   },
 
   async getMoment(momentId: string) {
-    return apiClient.get<any>(`/moments/${momentId}`);
+    return apiClient.get<Database['public']['Tables']['moments']['Row']>(`/moments/${momentId}`);
   },
 
   // ============================================
@@ -276,7 +278,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      requests: any[];
+      requests: Database['public']['Tables']['requests']['Row'][];
       count: number;
     }>(`/requests${query ? `?${query}` : ''}`);
   },

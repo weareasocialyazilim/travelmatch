@@ -52,11 +52,23 @@ app.post('/webhooks/job-complete', async (req, res) => {
     }
 
     res.json({ success: true });
-  } catch (err: any) {
+  } catch (err) {
     console.error('Webhook error:', err);
-    res.status(500).json({ error: err.message });
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: errorMessage });
   }
 });
+
+interface KycResult {
+  status: 'verified' | 'rejected' | 'pending';
+  provider?: string;
+  rejectionReasons?: string[];
+}
+
+interface JobError {
+  message?: string;
+  code?: string;
+}
 
 /**
  * Handle KYC verification completion
@@ -64,8 +76,8 @@ app.post('/webhooks/job-complete', async (req, res) => {
 async function handleKycComplete(
   userId: string,
   status: string,
-  result: any,
-  error: any
+  result: KycResult | null,
+  error: JobError | null
 ): Promise<void> {
   if (status === 'completed') {
     // Update user KYC status

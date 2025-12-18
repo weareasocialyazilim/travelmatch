@@ -96,9 +96,9 @@ export const LocationModal: React.FC<LocationModalProps> = ({
             {recentLocations.length > 0 && (
               <View style={styles.locationSection}>
                 <Text style={styles.locationSectionTitle}>Recent</Text>
-                {recentLocations.map((loc, index) => (
+                {recentLocations.map((loc) => (
                   <TouchableOpacity
-                    key={index}
+                    key={loc}
                     style={styles.locationOption}
                     onPress={() => handleLocationSelect(loc)}
                   >

@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   RefreshControl,
   StatusBar,
   ActivityIndicator,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
@@ -322,9 +322,20 @@ const DiscoverScreen = () => {
         }
         onRetry={onRefresh}
       >
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
+        {/* Main FlashList - avoids VirtualizedList nesting warning */}
+        <FlashList
+          data={filteredMoments}
+          renderItem={renderMomentCard}
+          numColumns={viewMode === 'grid' ? 2 : 1}
+          key={viewMode}
+          estimatedItemSize={viewMode === 'grid' ? 200 : 350}
+          contentContainerStyle={
+            viewMode === 'single'
+              ? styles.singleListContainer
+              : styles.gridContainer
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl
               refreshing={refreshing || loading}
@@ -332,160 +343,133 @@ const DiscoverScreen = () => {
               tintColor={COLORS.mint}
             />
           }
-          onScroll={({ nativeEvent }) => {
-            const { layoutMeasurement, contentOffset, contentSize } =
-              nativeEvent;
-            const paddingToBottom = 50;
-            if (
-              layoutMeasurement.height + contentOffset.y >=
-              contentSize.height - paddingToBottom
-            ) {
-              handleLoadMore();
-            }
-          }}
-          scrollEventThrottle={400}
-        >
-          {/* Stories */}
-          <FlashList
-            data={USER_STORIES}
-            renderItem={renderStoryItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.storiesContainer}
-          />
-
-          {/* Results Bar */}
-          <View style={styles.resultsBar}>
-            <Text style={styles.resultsText}>
-              {loading
-                ? 'Loading...'
-                : `${filteredMoments.length} moments nearby`}
-            </Text>
-            <View style={styles.viewToggle}>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'single' && styles.viewToggleButtonActive,
-                ]}
-                onPress={() => setViewMode('single')}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                {...a11y.button(
-                  'Single column view',
-                  'Display moments in a single column',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'single' }}
-              >
-                <MaterialCommunityIcons
-                  name="square-outline"
-                  size={18}
-                  color={
-                    viewMode === 'single' ? COLORS.white : COLORS.textSecondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'grid' && styles.viewToggleButtonActive,
-                ]}
-                onPress={() => setViewMode('grid')}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                {...a11y.button(
-                  'Grid view',
-                  'Display moments in a grid layout',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'grid' }}
-              >
-                <MaterialCommunityIcons
-                  name="view-grid-outline"
-                  size={18}
-                  color={
-                    viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Error State */}
-          {error && !loading && (
-            <View style={styles.errorContainer}>
-              <MaterialCommunityIcons
-                name="alert-circle-outline"
-                size={48}
-                color={COLORS.error}
-                accessible={false}
+          ListHeaderComponent={
+            <>
+              {/* Stories - Horizontal FlatList (not FlashList to avoid nesting) */}
+              <FlatList
+                data={USER_STORIES}
+                renderItem={renderStoryItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.storiesContainer}
               />
-              <Text style={styles.errorText} {...a11y.alert(error)}>
-                {error}
-              </Text>
-              <TouchableOpacity
-                style={styles.retryButton}
-                onPress={onRefresh}
-                {...a11y.button('Try Again', 'Reload moments')}
-              >
-                <Text style={styles.retryButtonText}>Try Again</Text>
-              </TouchableOpacity>
-            </View>
-          )}
 
-          {/* Loading Skeleton */}
-          {loading && filteredMoments.length === 0 && !error && (
-            <SkeletonList
-              type="moment"
-              count={4}
-              show={loading}
-              minDisplayTime={400}
-            />
-          )}
+              {/* Results Bar */}
+              <View style={styles.resultsBar}>
+                <Text style={styles.resultsText}>
+                  {loading
+                    ? 'Loading...'
+                    : `${filteredMoments.length} moments nearby`}
+                </Text>
+                <View style={styles.viewToggle}>
+                  <TouchableOpacity
+                    style={[
+                      styles.viewToggleButton,
+                      viewMode === 'single' && styles.viewToggleButtonActive,
+                    ]}
+                    onPress={() => setViewMode('single')}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    {...a11y.button(
+                      'Single column view',
+                      'Display moments in a single column',
+                      false,
+                    )}
+                    accessibilityState={{ selected: viewMode === 'single' }}
+                  >
+                    <MaterialCommunityIcons
+                      name="square-outline"
+                      size={18}
+                      color={
+                        viewMode === 'single' ? COLORS.white : COLORS.textSecondary
+                      }
+                      accessible={false}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.viewToggleButton,
+                      viewMode === 'grid' && styles.viewToggleButtonActive,
+                    ]}
+                    onPress={() => setViewMode('grid')}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    {...a11y.button(
+                      'Grid view',
+                      'Display moments in a grid layout',
+                      false,
+                    )}
+                    accessibilityState={{ selected: viewMode === 'grid' }}
+                  >
+                    <MaterialCommunityIcons
+                      name="view-grid-outline"
+                      size={18}
+                      color={
+                        viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
+                      }
+                      accessible={false}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-          {/* Moments List */}
-          {!error && filteredMoments.length > 0 && (
-            <View style={{ minHeight: 400 }}>
-              <FlashList
-                data={filteredMoments}
-                renderItem={renderMomentCard}
-                numColumns={viewMode === 'grid' ? 2 : 1}
-                key={viewMode}
-                contentContainerStyle={
-                  viewMode === 'single'
-                    ? styles.singleListContainer
-                    : styles.gridContainer
-                }
-                onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.5}
-                scrollEnabled={false}
+              {/* Error State */}
+              {error && !loading && (
+                <View style={styles.errorContainer}>
+                  <MaterialCommunityIcons
+                    name="alert-circle-outline"
+                    size={48}
+                    color={COLORS.error}
+                    accessible={false}
+                  />
+                  <Text style={styles.errorText} {...a11y.alert(error)}>
+                    {error}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.retryButton}
+                    onPress={onRefresh}
+                    {...a11y.button('Try Again', 'Reload moments')}
+                  >
+                    <Text style={styles.retryButtonText}>Try Again</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Loading Skeleton */}
+              {loading && filteredMoments.length === 0 && !error && (
+                <SkeletonList
+                  type="moment"
+                  count={4}
+                  show={loading}
+                  minDisplayTime={400}
+                />
+              )}
+            </>
+          }
+          ListEmptyComponent={
+            !loading && !error ? (
+              <EmptyState
+                icon="compass-off-outline"
+                title="No moments found"
+                description="Try adjusting your filters or location"
+                actionLabel="Clear Filters"
+                onAction={clearFilters}
               />
-            </View>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && filteredMoments.length === 0 && (
-            <EmptyState
-              icon="compass-off-outline"
-              title="No moments found"
-              description="Try adjusting your filters or location"
-              actionLabel="Clear Filters"
-              onAction={clearFilters}
-            />
-          )}
-
-          {/* Load More Indicator */}
-          {loading && filteredMoments.length > 0 && (
-            <View style={styles.loadMoreContainer}>
-              <ActivityIndicator size="small" color={COLORS.primary} />
-              <Text style={styles.loadMoreText}>Loading more...</Text>
-            </View>
-          )}
-
-          {/* Bottom Padding */}
-          {/* eslint-disable-next-line react-native/no-inline-styles */}
-          <View style={{ height: 100 }} />
-        </ScrollView>
+            ) : null
+          }
+          ListFooterComponent={
+            <>
+              {/* Load More Indicator */}
+              {loading && filteredMoments.length > 0 && (
+                <View style={styles.loadMoreContainer}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={styles.loadMoreText}>Loading more...</Text>
+                </View>
+              )}
+              {/* Bottom Padding */}
+              <View style={styles.bottomPadding} />
+            </>
+          }
+        />
       </NetworkGuard>
 
       {/* Modals - Using extracted components */}
@@ -576,8 +560,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  scrollView: {
-    flex: 1,
+  bottomPadding: {
+    height: 100,
   },
 
   // Results Bar

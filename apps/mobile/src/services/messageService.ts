@@ -180,6 +180,27 @@ export const messageService = {
 
       const userMap = new Map(users?.map((u) => [u.id, u]));
 
+      // Fetch unread counts for all conversations in batch
+      const conversationIds = data.map((row) => row.id);
+      let unreadCountMap = new Map<string, number>();
+
+      if (conversationIds.length > 0) {
+        const { data: unreadCounts, error: unreadError } = await supabase
+          .from('messages')
+          .select('conversation_id')
+          .in('conversation_id', conversationIds)
+          .neq('sender_id', user.id)
+          .is('read_at', null);
+
+        if (!unreadError && unreadCounts) {
+          // Count unread messages per conversation
+          unreadCounts.forEach((msg) => {
+            const currentCount = unreadCountMap.get(msg.conversation_id) || 0;
+            unreadCountMap.set(msg.conversation_id, currentCount + 1);
+          });
+        }
+      }
+
       // Map DB rows to UI Conversation type
       const conversations: Conversation[] = data.map((row) => {
         const otherUserId =
@@ -198,7 +219,7 @@ export const messageService = {
           participantVerified: otherUser?.verified || false,
           lastMessage: lastMessage?.content || '',
           lastMessageAt: row.updated_at,
-          unreadCount: 0, // Needs calculation
+          unreadCount: unreadCountMap.get(row.id) || 0,
           momentId: undefined, // Would need separate join
         };
       });
@@ -303,7 +324,7 @@ export const messageService = {
         conversationId: message.conversation_id,
         senderId: message.sender_id,
         content: message.content,
-        type: data.type as Message['type'], // Use original type for UI
+        type: data.type as MessageType, // Use original type for UI
         imageUrl: data.imageUrl,
         location: data.location,
         createdAt: message.created_at,
@@ -375,12 +396,12 @@ export const messageService = {
             conversationId: msg.conversation_id,
             senderId: msg.sender_id,
             content,
-            type: msgType as Message['type'],
+            type: msgType as MessageType,
             imageUrl: undefined,
             location: undefined,
             createdAt: msg.created_at,
             readAt: msg.read_at || undefined,
-            status: (msg.read_at ? 'read' : 'delivered') as Message['status'],
+            status: (msg.read_at ? 'read' : 'delivered') as MessageStatus,
           };
         }),
       );
@@ -401,10 +422,51 @@ export const messageService = {
   /**
    * Mark messages as read
    */
-  markAsRead: (_conversationId: string) => {
-    // In a real app, you'd find unread messages in this conversation and mark them
-    // For now, we'll just return success as the DB service requires message IDs
-    return { success: true };
+  markAsRead: async (conversationId: string) => {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        return { success: false, error: 'Not authenticated' };
+      }
+
+      // Find all unread messages in this conversation that weren't sent by current user
+      const { data: unreadMessages, error: fetchError } = await supabase
+        .from('messages')
+        .select('id')
+        .eq('conversation_id', conversationId)
+        .neq('sender_id', user.id)
+        .is('read_at', null);
+
+      if (fetchError) {
+        logger.error('Failed to fetch unread messages', fetchError);
+        return { success: false, error: fetchError.message };
+      }
+
+      if (!unreadMessages || unreadMessages.length === 0) {
+        return { success: true }; // No unread messages
+      }
+
+      // Mark them as read
+      const messageIds = unreadMessages.map((m) => m.id);
+      const { error: updateError } = await supabase
+        .from('messages')
+        .update({ read_at: new Date().toISOString() })
+        .in('id', messageIds);
+
+      if (updateError) {
+        logger.error('Failed to mark messages as read', updateError);
+        return { success: false, error: updateError.message };
+      }
+
+      logger.info('Marked messages as read', {
+        conversationId,
+        count: messageIds.length,
+      });
+      return { success: true };
+    } catch (error) {
+      logger.error('Error marking messages as read', error as Error);
+      return { success: false, error: 'Failed to mark messages as read' };
+    }
   },
 
   /**
@@ -463,33 +525,163 @@ export const messageService = {
   /**
    * Archive a conversation
    */
-  archiveConversation: (_conversationId: string) => {
-    return { success: true };
+  archiveConversation: async (conversationId: string) => {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        return { success: false, error: 'Not authenticated' };
+      }
+
+      // Update conversation to set archived_at timestamp
+      const { error } = await supabase
+        .from('conversations')
+        .update({ archived_at: new Date().toISOString() })
+        .eq('id', conversationId)
+        .contains('participant_ids', [user.id]);
+
+      if (error) {
+        logger.error('Failed to archive conversation', error);
+        return { success: false, error: error.message };
+      }
+
+      logger.info('Archived conversation', { conversationId });
+      return { success: true };
+    } catch (error) {
+      logger.error('Error archiving conversation', error as Error);
+      return { success: false, error: 'Failed to archive conversation' };
+    }
   },
 
   /**
    * Unarchive a conversation
    */
-  unarchiveConversation: (_conversationId: string) => {
-    return { success: true };
+  unarchiveConversation: async (conversationId: string) => {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        return { success: false, error: 'Not authenticated' };
+      }
+
+      // Update conversation to clear archived_at timestamp
+      const { error } = await supabase
+        .from('conversations')
+        .update({ archived_at: null })
+        .eq('id', conversationId)
+        .contains('participant_ids', [user.id]);
+
+      if (error) {
+        logger.error('Failed to unarchive conversation', error);
+        return { success: false, error: error.message };
+      }
+
+      logger.info('Unarchived conversation', { conversationId });
+      return { success: true };
+    } catch (error) {
+      logger.error('Error unarchiving conversation', error as Error);
+      return { success: false, error: 'Failed to unarchive conversation' };
+    }
   },
 
   /**
    * Get archived conversations
    */
-  getArchivedConversations: (_params?: {
+  getArchivedConversations: async (params?: {
     page?: number;
     pageSize?: number;
-  }) => {
-    return { conversations: [], total: 0, page: 1, pageSize: 20 };
+  }): Promise<ConversationsResponse> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const pageSize = params?.pageSize || 20;
+      const page = params?.page || 1;
+      const offset = (page - 1) * pageSize;
+
+      // Fetch archived conversations for current user
+      const { data, count, error } = await supabase
+        .from('conversations')
+        .select('*', { count: 'exact' })
+        .contains('participant_ids', [user.id])
+        .not('archived_at', 'is', null)
+        .order('updated_at', { ascending: false })
+        .range(offset, offset + pageSize - 1);
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        return { conversations: [], total: 0, page, pageSize };
+      }
+
+      // Get participant details
+      const otherUserIds = new Set<string>();
+      data.forEach((row) => {
+        const otherId = row.participant_ids.find(
+          (id: string) => id !== user.id,
+        );
+        if (otherId) otherUserIds.add(otherId);
+      });
+
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, full_name, avatar_url, verified')
+        .in('id', Array.from(otherUserIds));
+
+      const userMap = new Map(users?.map((u) => [u.id, u]));
+
+      const conversations: Conversation[] = data.map((row) => {
+        const otherUserId =
+          row.participant_ids.find((id: string) => id !== user.id) || 'unknown';
+        const otherUser = userMap.get(otherUserId);
+
+        return {
+          id: row.id,
+          participantId: otherUserId,
+          participantName: otherUser?.full_name || 'Unknown User',
+          participantAvatar: otherUser?.avatar_url || '',
+          participantVerified: otherUser?.verified || false,
+          lastMessage: '',
+          lastMessageAt: row.updated_at,
+          unreadCount: 0,
+          momentId: undefined,
+        };
+      });
+
+      return { conversations, total: count ?? 0, page, pageSize };
+    } catch (error) {
+      logger.error('Get archived conversations error:', error);
+      return { conversations: [], total: 0, page: 1, pageSize: 20 };
+    }
   },
 
   /**
    * Send typing indicator
    */
-  sendTypingIndicator: (_conversationId: string, _isTyping: boolean) => {
-    // Real-time typing indicators usually go through Supabase Realtime channels directly
-    return { success: true };
+  sendTypingIndicator: async (conversationId: string, isTyping: boolean) => {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        return { success: false };
+      }
+
+      // Broadcast typing indicator through Supabase Realtime channel
+      const channel = supabase.channel(`conversation:${conversationId}`);
+      await channel.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: {
+          userId: user.id,
+          isTyping,
+          timestamp: new Date().toISOString(),
+        },
+      });
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Error sending typing indicator', error as Error);
+      return { success: false };
+    }
   },
 };
 

@@ -15,6 +15,7 @@ import {
 } from '@/components/moment-detail';
 import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -70,7 +71,7 @@ const MomentDetailScreen: React.FC = () => {
     avatar:
       userSource?.avatar ||
       (userSource as { photoUrl?: string })?.photoUrl ||
-      'https://via.placeholder.com/150',
+      DEFAULT_IMAGES.AVATAR_LARGE,
     type: userSource?.type || 'traveler',
     isVerified: userSource?.isVerified || false,
     location: userSource?.location || 'Unknown',
@@ -288,7 +289,7 @@ const MomentDetailScreen: React.FC = () => {
         },
         user: {
           name: momentUser.name,
-          avatar: momentUser.avatar || 'https://via.placeholder.com/150',
+          avatar: momentUser.avatar || DEFAULT_IMAGES.AVATAR_LARGE,
           type: (momentUser.type as 'traveler' | 'local') || 'traveler',
           location:
             typeof momentUser.location === 'string'

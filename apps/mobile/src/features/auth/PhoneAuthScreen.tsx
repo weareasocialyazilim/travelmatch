@@ -157,7 +157,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
       <View style={styles.otpContainer}>
         {otp.map((digit, index) => (
           <TextInput
-            key={index}
+            key={`otp-input-${index}`}
             ref={(ref) => {
               otpInputs.current[index] = ref;
             }}

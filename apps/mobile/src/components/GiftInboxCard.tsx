@@ -6,6 +6,7 @@
 import React, { memo, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 
 export interface GiftInboxCardProps {
   id: string;
@@ -55,7 +56,7 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
 
     // Memoize avatar source
     const avatarSource = useMemo(
-      () => ({ uri: senderAvatar || 'https://via.placeholder.com/40' }),
+      () => ({ uri: senderAvatar || DEFAULT_IMAGES.AVATAR_SMALL }),
       [senderAvatar],
     );
 

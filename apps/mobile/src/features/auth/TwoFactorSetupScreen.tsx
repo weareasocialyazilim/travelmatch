@@ -61,17 +61,40 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
     }
   };
 
-  const onVerify = (data: TwoFactorSetupInput) => {
+  const onVerify = async (data: TwoFactorSetupInput) => {
     setIsLoading(true);
-    // Simulate verification
-    setTimeout(() => {
-      setIsLoading(false);
-      if (data.verificationCode === '123456') {
-        setStep('success');
-      } else {
-        showToast('Doğrulama kodu hatalı. Lütfen kontrol edip tekrar deneyin', 'error');
+    try {
+      // TODO: Implement actual TOTP verification via backend
+      // For now, validate code format and reject demo codes
+      const code = data.verificationCode;
+
+      // Security: Reject common test/demo codes
+      const forbiddenCodes = ['123456', '000000', '111111', '654321'];
+      if (forbiddenCodes.includes(code)) {
+        showToast('Invalid verification code. Please use the code from your authenticator app.', 'error');
+        setIsLoading(false);
+        return;
       }
-    }, 1000);
+
+      // Validate 6-digit format
+      if (!/^\d{6}$/.test(code)) {
+        showToast('Verification code must be 6 digits', 'error');
+        setIsLoading(false);
+        return;
+      }
+
+      // TODO: Replace with actual API call:
+      // const { error } = await authService.verify2FA(code);
+      // if (error) throw error;
+
+      // For now, show not implemented message
+      showToast('2FA verification requires backend integration', 'info');
+      setIsLoading(false);
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      showToast('Verification failed. Please try again.', 'error');
+      setIsLoading(false);
+    }
   };
 
   const handleDone = () => {

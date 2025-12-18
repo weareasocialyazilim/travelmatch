@@ -228,7 +228,7 @@ export const exportDataCache = {
   /**
    * Set export data with automatic expiration
    */
-  async set(userId: string, data: any): Promise<void> {
+  async set(userId: string, data: unknown): Promise<void> {
     const key = getCacheKey(CACHE_PREFIX.EXPORT, userId);
     await setCache(key, data, CACHE_TTL.WEEK);
   },
@@ -236,7 +236,7 @@ export const exportDataCache = {
   /**
    * Get cached export data
    */
-  async get(userId: string): Promise<any | null> {
+  async get(userId: string): Promise<unknown | null> {
     const key = getCacheKey(CACHE_PREFIX.EXPORT, userId);
     return await getCache(key);
   },
@@ -279,7 +279,7 @@ export const queryCache = {
   /**
    * Cache query results
    */
-  async set(queryKey: string, results: any, ttl: number = CACHE_TTL.MEDIUM): Promise<void> {
+  async set(queryKey: string, results: unknown, ttl: number = CACHE_TTL.MEDIUM): Promise<void> {
     const key = getCacheKey(CACHE_PREFIX.QUERY, queryKey);
     await setCache(key, results, ttl);
   },
@@ -287,7 +287,7 @@ export const queryCache = {
   /**
    * Get cached query results
    */
-  async get(queryKey: string): Promise<any | null> {
+  async get(queryKey: string): Promise<unknown | null> {
     const key = getCacheKey(CACHE_PREFIX.QUERY, queryKey);
     return await getCache(key);
   },
@@ -305,12 +305,12 @@ export const queryCache = {
  * Session cache
  */
 export const sessionCache = {
-  async set(sessionId: string, data: any, ttl: number = CACHE_TTL.DAY): Promise<void> {
+  async set(sessionId: string, data: unknown, ttl: number = CACHE_TTL.DAY): Promise<void> {
     const key = getCacheKey(CACHE_PREFIX.SESSION, sessionId);
     await setCache(key, data, ttl);
   },
 
-  async get(sessionId: string): Promise<any | null> {
+  async get(sessionId: string): Promise<unknown | null> {
     const key = getCacheKey(CACHE_PREFIX.SESSION, sessionId);
     return await getCache(key);
   },

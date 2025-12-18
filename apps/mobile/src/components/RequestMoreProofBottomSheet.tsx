@@ -74,7 +74,7 @@ export default function RequestMoreProofBottomSheet({
             <View style={styles.optionsContainer}>
               {PROOF_ISSUES.map((issue, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={issue}
                   style={[
                     styles.radioOption,
                     selectedReason === index &&

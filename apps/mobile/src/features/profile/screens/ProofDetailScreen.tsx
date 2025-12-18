@@ -122,9 +122,9 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
                 setActiveImageIndex(index);
               }}
             >
-              {proof.images.map((image: string, index: number) => (
+              {proof.images.map((image: string) => (
                 <Image
-                  key={index}
+                  key={image}
                   source={{ uri: image }}
                   style={styles.proofImage}
                   resizeMode="cover"
@@ -135,9 +135,9 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
             {/* Image Indicators */}
             {proof.images.length > 1 && (
               <View style={styles.imageIndicators}>
-                {proof.images.map((_: string, index: number) => (
+                {proof.images.map((image: string, index: number) => (
                   <View
-                    key={index}
+                    key={image}
                     style={[
                       styles.indicator,
                       activeImageIndex === index && styles.activeIndicator,

@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { useMoments } from '@/hooks/useMoments';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { Moment as MomentType } from '../types';
@@ -59,8 +60,8 @@ const MyMomentsScreen: React.FC = () => {
       id: moment.id,
       title: moment.title,
       story: moment.description || `Experience ${moment.title}`,
-      imageUrl: moment.images?.[0] || 'https://via.placeholder.com/150',
-      image: moment.images?.[0] || 'https://via.placeholder.com/150',
+      imageUrl: moment.images?.[0] || DEFAULT_IMAGES.AVATAR_LARGE,
+      image: moment.images?.[0] || DEFAULT_IMAGES.AVATAR_LARGE,
       price: moment.pricePerGuest,
       status: moment.status,
       location: {
