@@ -140,7 +140,12 @@ serve(async (req) => {
     }
 
     // Build Cloudflare purge payload
-    const purgePayload: any = {};
+    interface CloudflarePurgePayload {
+      purge_everything?: boolean;
+      files?: string[];
+      tags?: string[];
+    }
+    const purgePayload: CloudflarePurgePayload = {};
 
     if (purgeEverything) {
       purgePayload.purge_everything = true;

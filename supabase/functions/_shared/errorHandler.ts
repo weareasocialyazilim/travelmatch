@@ -209,11 +209,17 @@ export function createValidationError(
   );
 }
 
+interface ExternalApiError {
+  message?: string;
+  type?: string;
+  code?: string;
+}
+
 /**
  * Parse and standardize external API errors
  */
 export function parseExternalError(
-  error: any,
+  error: ExternalApiError,
   service: 'stripe' | 'geocoding' | 'other',
 ): ErrorResponse {
   const serviceCodeMap = {
@@ -252,10 +258,15 @@ export function handleUnexpectedError(error: unknown): ErrorResponse {
   );
 }
 
+interface SupabaseAuthError {
+  code?: string;
+  message?: string;
+}
+
 /**
  * Check if error is a known Supabase auth error
  */
-export function handleSupabaseAuthError(error: any): ErrorResponse {
+export function handleSupabaseAuthError(error: SupabaseAuthError): ErrorResponse {
   const authErrorMap: Record<string, ErrorCode> = {
     'invalid_credentials': ErrorCode.INVALID_CREDENTIALS,
     'user_not_found': ErrorCode.NOT_FOUND,

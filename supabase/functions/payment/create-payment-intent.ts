@@ -12,7 +12,7 @@
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
 
@@ -68,10 +68,10 @@ function checkRateLimit(userId: string): boolean {
  * Log audit event to database
  */
 async function logAudit(
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
   action: string,
-  metadata: Record<string, any>,
+  metadata: Record<string, unknown>,
 ) {
   try {
     await supabase.from('audit_logs').insert({
@@ -89,7 +89,7 @@ async function logAudit(
  * Invalidate payment-related cache
  */
 async function invalidatePaymentCache(
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
   momentId: string,
 ) {

@@ -193,10 +193,16 @@ function calculatePeakActivityHours(
     .map((h) => h.hour);
 }
 
+interface TrendingStats {
+  hours_since_creation?: number;
+  views?: number;
+  gifts?: number;
+}
+
 /**
  * Calculate trending score
  */
-function calculateTrendingScore(stats: any): number {
+function calculateTrendingScore(stats: TrendingStats | null): number {
   const hoursSinceCreation = stats?.hours_since_creation || 1;
   const views = stats?.views || 0;
   const gifts = stats?.gifts || 0;
