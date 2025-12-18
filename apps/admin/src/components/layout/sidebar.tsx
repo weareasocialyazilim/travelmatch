@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ListTodo,
+  Plug,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -91,6 +92,12 @@ const operationsNavItems: NavItem[] = [
     href: '/analytics',
     icon: BarChart3,
     resource: 'analytics',
+  },
+  {
+    title: 'Entegrasyonlar',
+    href: '/integrations',
+    icon: Plug,
+    resource: 'integrations',
   },
 ];
 
