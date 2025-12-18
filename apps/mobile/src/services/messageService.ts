@@ -324,7 +324,7 @@ export const messageService = {
         conversationId: message.conversation_id,
         senderId: message.sender_id,
         content: message.content,
-        type: data.type as Message['type'], // Use original type for UI
+        type: data.type as MessageType, // Use original type for UI
         imageUrl: data.imageUrl,
         location: data.location,
         createdAt: message.created_at,
@@ -396,12 +396,12 @@ export const messageService = {
             conversationId: msg.conversation_id,
             senderId: msg.sender_id,
             content,
-            type: msgType as Message['type'],
+            type: msgType as MessageType,
             imageUrl: undefined,
             location: undefined,
             createdAt: msg.created_at,
             readAt: msg.read_at || undefined,
-            status: (msg.read_at ? 'read' : 'delivered') as Message['status'],
+            status: (msg.read_at ? 'read' : 'delivered') as MessageStatus,
           };
         }),
       );

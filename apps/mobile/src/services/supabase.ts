@@ -12,6 +12,10 @@ export { default as supabaseAuth } from './supabaseAuthService';
 export {
   signUpWithEmail,
   signInWithEmail,
+  signInWithPhone,
+  verifyPhoneOtp,
+  signInWithMagicLink,
+  verifyEmailOtp,
   signInWithOAuth,
   signOut,
   getSession,

@@ -224,6 +224,135 @@ export const handleOAuthCallback = async (
 };
 
 /**
+ * Send OTP to phone for authentication
+ */
+export const signInWithPhone = async (
+  phone: string,
+): Promise<{ error: AuthError | null }> => {
+  if (!isSupabaseConfigured()) {
+    return { error: { message: 'Supabase not configured' } as AuthError };
+  }
+
+  try {
+    const { error } = await auth.signInWithOtp({
+      phone,
+    });
+
+    if (error) {
+      logger.error('[Auth] Phone OTP error:', error);
+      return { error };
+    }
+
+    logger.info('[Auth] OTP sent to phone');
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] Phone OTP exception:', error);
+    return { error: error as AuthError };
+  }
+};
+
+/**
+ * Verify phone OTP code
+ */
+export const verifyPhoneOtp = async (
+  phone: string,
+  token: string,
+): Promise<AuthResult> => {
+  if (!isSupabaseConfigured()) {
+    return {
+      user: null,
+      session: null,
+      error: { message: 'Supabase not configured' } as AuthError,
+    };
+  }
+
+  try {
+    const { data, error } = await auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms',
+    });
+
+    if (error) {
+      logger.error('[Auth] Verify phone OTP error:', error);
+      return { user: null, session: null, error };
+    }
+
+    logger.info('[Auth] Phone OTP verified', { userId: data.user?.id });
+    return { user: data.user, session: data.session, error: null };
+  } catch (error) {
+    logger.error('[Auth] Verify phone OTP exception:', error);
+    return { user: null, session: null, error: error as AuthError };
+  }
+};
+
+/**
+ * Send magic link to email for passwordless authentication
+ */
+export const signInWithMagicLink = async (
+  email: string,
+): Promise<{ error: AuthError | null }> => {
+  if (!isSupabaseConfigured()) {
+    return { error: { message: 'Supabase not configured' } as AuthError };
+  }
+
+  try {
+    const { error } = await auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: 'travelmatch://auth/callback',
+      },
+    });
+
+    if (error) {
+      logger.error('[Auth] Magic link error:', error);
+      return { error };
+    }
+
+    logger.info('[Auth] Magic link sent to email');
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] Magic link exception:', error);
+    return { error: error as AuthError };
+  }
+};
+
+/**
+ * Verify email OTP code (for email verification)
+ */
+export const verifyEmailOtp = async (
+  email: string,
+  token: string,
+): Promise<AuthResult> => {
+  if (!isSupabaseConfigured()) {
+    return {
+      user: null,
+      session: null,
+      error: { message: 'Supabase not configured' } as AuthError,
+    };
+  }
+
+  try {
+    const { data, error } = await auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    });
+
+    if (error) {
+      logger.error('[Auth] Verify email OTP error:', error);
+      return { user: null, session: null, error };
+    }
+
+    logger.info('[Auth] Email OTP verified', { userId: data.user?.id });
+    return { user: data.user, session: data.session, error: null };
+  } catch (error) {
+    logger.error('[Auth] Verify email OTP exception:', error);
+    return { user: null, session: null, error: error as AuthError };
+  }
+};
+
+/**
  * Request password reset
  */
 export const resetPassword = async (
@@ -350,6 +479,10 @@ export const onAuthStateChange = (
 export default {
   signUpWithEmail,
   signInWithEmail,
+  signInWithPhone,
+  verifyPhoneOtp,
+  signInWithMagicLink,
+  verifyEmailOtp,
   signInWithOAuth,
   handleOAuthCallback,
   signOut,
