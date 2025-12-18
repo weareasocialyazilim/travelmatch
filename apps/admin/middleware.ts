@@ -86,19 +86,18 @@ export async function middleware(request: NextRequest) {
     '/automation',
     '/integrations',
     '/dev-tools',
-    '/esg',
+    '/feature-flags',
     '/geographic',
-    '/competitive',
     '/ops-center',
     '/incidents',
     '/errors',
-    '/qa-center',
     '/editorial',
     '/knowledge-base',
     '/feedback',
     '/localization',
     '/accessibility',
     '/creators',
+    '/audit-logs',
   ];
 
   const isProtectedRoute = protectedRoutes.some(

@@ -40,10 +40,9 @@ import {
   Wallet,
   Accessibility,
   Heart,
-  Leaf,
-  ClipboardCheck,
   FileEdit,
-  Target,
+  History,
+  Flag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -161,12 +160,6 @@ const analyticsNavItems: NavItem[] = [
     resource: 'analytics',
   },
   {
-    title: 'Rekabet',
-    href: '/competitive',
-    icon: Target,
-    resource: 'analytics',
-  },
-  {
     title: 'Ops Merkezi',
     href: '/ops-center',
     icon: Activity,
@@ -183,12 +176,6 @@ const analyticsNavItems: NavItem[] = [
     href: '/errors',
     icon: Bug,
     resource: 'settings',
-  },
-  {
-    title: 'QA Merkezi',
-    href: '/qa-center',
-    icon: ClipboardCheck,
-    resource: 'analytics',
   },
 ];
 
@@ -290,10 +277,10 @@ const techNavItems: NavItem[] = [
     resource: 'settings',
   },
   {
-    title: 'ESG Dashboard',
-    href: '/esg',
-    icon: Leaf,
-    resource: 'analytics',
+    title: 'Feature Flags',
+    href: '/feature-flags',
+    icon: Flag,
+    resource: 'settings',
   },
 ];
 
@@ -308,6 +295,12 @@ const settingsNavItems: NavItem[] = [
     title: 'Admin Kullanıcıları',
     href: '/admin-users',
     icon: UserCog,
+    resource: 'admin_users',
+  },
+  {
+    title: 'Audit Logs',
+    href: '/audit-logs',
+    icon: History,
     resource: 'admin_users',
   },
   {
