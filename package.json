@@ -78,9 +78,9 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@8.15.0",
+  "packageManager": "pnpm@9.15.9",
   "dependencies": {
     "expo": "~54.0.29",
     "metro": "0.83.3",
