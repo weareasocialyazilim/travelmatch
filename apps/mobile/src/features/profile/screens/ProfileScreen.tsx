@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
@@ -291,9 +290,12 @@ const ProfileScreen: React.FC = () => {
           </View>
         </View>
 
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
+        {/* Main FlashList - avoids VirtualizedList nesting warning */}
+        <FlashList
+          data={displayedMoments}
+          renderItem={renderMomentCard}
+          numColumns={2}
+          estimatedItemSize={180}
           refreshControl={
             <RefreshControl
               refreshing={myMomentsLoading}
@@ -301,60 +303,57 @@ const ProfileScreen: React.FC = () => {
               tintColor={COLORS.coral}
             />
           }
-        >
-          {/* Profile Info Section */}
-          <ProfileHeaderSection
-            avatarUrl={userData.avatarUrl}
-            userName={userData.name}
-            location={userData.location}
-            isVerified={userData.isVerified}
-            trustScore={userData.trustScore}
-            onAvatarPress={handleEditProfile}
-            onTrustGardenPress={handleTrustGarden}
-          />
-
-          {/* Stats Row */}
-          <View style={styles.profileSection}>
-            <StatsRow
-              momentsCount={userData.momentsCount}
-              exchangesCount={userData.exchangesCount}
-              responseRate={userData.responseRate}
-              onMomentsPress={handleMyMoments}
-              onExchangesPress={handleMyGifts}
-            />
-          </View>
-
-          {/* Wallet Card */}
-          <WalletCard balance={userData.walletBalance} onPress={handleWallet} />
-
-          {/* Quick Links */}
-          <QuickLinks links={quickLinksData} />
-
-          {/* Moments Tabs */}
-          <MomentsTabs
-            activeTab={activeTab}
-            activeMomentsCount={userData.activeMoments}
-            pastMomentsCount={userData.completedMoments}
-            onTabChange={setActiveTab}
-          />
-
-          {/* Moments Grid */}
-          <View style={styles.momentsGrid}>
-            {myMomentsLoading && myMoments.length === 0 ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={COLORS.coral} />
-              </View>
-            ) : displayedMoments.length > 0 ? (
-              <FlashList
-                data={displayedMoments}
-                renderItem={renderMomentCard}
-                numColumns={2}
-                scrollEnabled={false}
-                ItemSeparatorComponent={() => (
-                  <View style={styles.itemSeparator} />
-                )}
+          ListHeaderComponent={
+            <>
+              {/* Profile Info Section */}
+              <ProfileHeaderSection
+                avatarUrl={userData.avatarUrl}
+                userName={userData.name}
+                location={userData.location}
+                isVerified={userData.isVerified}
+                trustScore={userData.trustScore}
+                onAvatarPress={handleEditProfile}
+                onTrustGardenPress={handleTrustGarden}
               />
-            ) : (
+
+              {/* Stats Row */}
+              <View style={styles.profileSection}>
+                <StatsRow
+                  momentsCount={userData.momentsCount}
+                  exchangesCount={userData.exchangesCount}
+                  responseRate={userData.responseRate}
+                  onMomentsPress={handleMyMoments}
+                  onExchangesPress={handleMyGifts}
+                />
+              </View>
+
+              {/* Wallet Card */}
+              <WalletCard balance={userData.walletBalance} onPress={handleWallet} />
+
+              {/* Quick Links */}
+              <QuickLinks links={quickLinksData} />
+
+              {/* Moments Tabs */}
+              <MomentsTabs
+                activeTab={activeTab}
+                activeMomentsCount={userData.activeMoments}
+                pastMomentsCount={userData.completedMoments}
+                onTabChange={setActiveTab}
+              />
+
+              {/* Loading State */}
+              {myMomentsLoading && myMoments.length === 0 && (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color={COLORS.coral} />
+                </View>
+              )}
+
+              {/* Moments Grid Header */}
+              <View style={styles.momentsGridHeader} />
+            </>
+          }
+          ListEmptyComponent={
+            !myMomentsLoading ? (
               <EmptyState
                 icon={activeTab === 'active' ? 'map-marker-plus' : 'history'}
                 title={
@@ -378,11 +377,14 @@ const ProfileScreen: React.FC = () => {
                     : undefined
                 }
               />
-            )}
-          </View>
-
-          <View style={styles.bottomSpacer} />
-        </ScrollView>
+            ) : null
+          }
+          ItemSeparatorComponent={() => (
+            <View style={styles.itemSeparator} />
+          )}
+          ListFooterComponent={<View style={styles.bottomSpacer} />}
+          contentContainerStyle={styles.listContent}
+        />
       </SafeAreaView>
 
       <BottomNav activeTab="Profile" />
@@ -425,8 +427,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scrollView: {
-    flex: 1,
+  listContent: {
+    paddingHorizontal: 0,
+  },
+  momentsGridHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
 
   // Profile Section - Reused for stats row wrapper
