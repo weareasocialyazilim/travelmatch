@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired
   const { data: { session } } = await supabase.auth.getSession();
 
-  // Protected routes
+  // All protected dashboard routes
   const protectedRoutes = [
     '/queue',
     '/dashboard',
@@ -66,10 +66,39 @@ export async function middleware(request: NextRequest) {
     '/moments',
     '/disputes',
     '/finance',
+    '/revenue',
+    '/pricing',
     '/settings',
     '/analytics',
     '/support',
     '/trust-safety',
+    '/safety-center',
+    '/customer-success',
+    '/admin-users',
+    '/team',
+    '/notifications',
+    '/campaigns',
+    '/events',
+    '/gamification',
+    '/promos',
+    '/partners',
+    '/ai-center',
+    '/automation',
+    '/integrations',
+    '/dev-tools',
+    '/esg',
+    '/geographic',
+    '/competitive',
+    '/ops-center',
+    '/incidents',
+    '/errors',
+    '/qa-center',
+    '/editorial',
+    '/knowledge-base',
+    '/feedback',
+    '/localization',
+    '/accessibility',
+    '/creators',
   ];
 
   const isProtectedRoute = protectedRoutes.some(
@@ -83,6 +112,15 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname === '/login' ||
     request.nextUrl.pathname.startsWith('/2fa');
 
+  // Root redirect
+  if (request.nextUrl.pathname === '/') {
+    if (session) {
+      return NextResponse.redirect(new URL('/queue', request.url));
+    } else {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
   // Redirect unauthenticated users to login
   if (isProtectedRoute && !session) {
     const loginUrl = new URL('/login', request.url);
@@ -92,9 +130,6 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (isAuthRoute && session) {
-    // Check if they need to complete 2FA
-    // This would need to be checked against the admin_users table
-    // For now, redirect to queue
     const redirectUrl = new URL('/queue', request.url);
     return NextResponse.redirect(redirectUrl);
   }

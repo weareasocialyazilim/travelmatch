@@ -218,3 +218,249 @@ export interface FilterOptions {
   page?: number;
   limit?: number;
 }
+
+// Notification Campaign
+export interface NotificationCampaign {
+  id: string;
+  title: string;
+  message: string;
+  type: 'push' | 'email' | 'in_app' | 'sms';
+  target_audience: {
+    segments?: string[];
+    filters?: Record<string, unknown>;
+    user_ids?: string[];
+  };
+  scheduled_at: string | null;
+  sent_at: string | null;
+  status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'cancelled';
+  sent_count: number;
+  opened_count: number;
+  clicked_count: number;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Marketing Campaign
+export interface MarketingCampaign {
+  id: string;
+  name: string;
+  description: string;
+  type: 'email' | 'push' | 'social' | 'display' | 'influencer';
+  target_audience: Record<string, unknown>;
+  budget: number;
+  spent: number;
+  start_date: string;
+  end_date: string;
+  status: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  ctr: number;
+  conversion_rate: number;
+  roi: number;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Report (User Report)
+export interface Report {
+  id: string;
+  reporter_id: string;
+  reporter?: AppUser;
+  reported_id: string;
+  reported?: AppUser;
+  type: 'spam' | 'harassment' | 'fake_profile' | 'inappropriate_content' | 'scam' | 'safety' | 'other';
+  reason: string;
+  description: string;
+  evidence: string[];
+  status: 'pending' | 'reviewing' | 'resolved' | 'dismissed' | 'escalated';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  assigned_to: string | null;
+  resolution: string | null;
+  action_taken: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Support Ticket
+export interface SupportTicket {
+  id: string;
+  user_id: string;
+  user?: AppUser;
+  category: 'account' | 'payment' | 'technical' | 'safety' | 'general' | 'feedback';
+  subject: string;
+  description: string;
+  status: 'open' | 'in_progress' | 'waiting_user' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  assigned_to: string | null;
+  assigned_admin?: AdminUser;
+  resolution: string | null;
+  rating: number | null;
+  feedback: string | null;
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
+}
+
+// Analytics Metrics
+export interface AnalyticsMetrics {
+  totalUsers: number;
+  newUsers: number;
+  activeUsers: number;
+  dau: number;
+  mau: number;
+  totalMatches: number;
+  matchRate: number;
+  totalMessages: number;
+  avgMessagesPerMatch: number;
+  totalRevenue: number;
+  mrr: number;
+  arr: number;
+  avgRevenuePerUser: number;
+  ltv: number;
+  churnRate: number;
+  conversionRate: number;
+  premiumConversionRate: number;
+}
+
+// Geographic Data
+export interface GeoData {
+  country: string;
+  city?: string;
+  users: number;
+  activeUsers: number;
+  revenue: number;
+  growth: number;
+}
+
+// Creator (Influencer)
+export interface Creator {
+  id: string;
+  user_id: string;
+  user?: AppUser;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  followers: number;
+  engagement_rate: number;
+  total_earnings: number;
+  moments_count: number;
+  avg_moment_views: number;
+  referrals: number;
+  status: 'pending' | 'active' | 'paused' | 'terminated';
+  joined_at: string;
+  last_active_at: string;
+}
+
+// Partner (B2B)
+export interface Partner {
+  id: string;
+  company_name: string;
+  contact_name: string;
+  contact_email: string;
+  type: 'hotel' | 'airline' | 'tour_operator' | 'travel_agency' | 'other';
+  tier: 'basic' | 'premium' | 'enterprise';
+  commission_rate: number;
+  total_bookings: number;
+  total_revenue: number;
+  status: 'pending' | 'active' | 'suspended' | 'terminated';
+  contract_start: string;
+  contract_end: string;
+  created_at: string;
+}
+
+// Event/Campaign
+export interface Event {
+  id: string;
+  name: string;
+  description: string;
+  type: 'seasonal' | 'promotional' | 'community' | 'partner';
+  start_date: string;
+  end_date: string;
+  status: 'draft' | 'scheduled' | 'active' | 'completed' | 'cancelled';
+  participants: number;
+  target_participants: number;
+  budget: number;
+  spent: number;
+  rewards: Record<string, unknown>;
+  created_by: string;
+  created_at: string;
+}
+
+// Gamification
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon_url: string;
+  category: 'travel' | 'social' | 'achievement' | 'special';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  requirements: Record<string, unknown>;
+  points: number;
+  total_awarded: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface Challenge {
+  id: string;
+  name: string;
+  description: string;
+  type: 'daily' | 'weekly' | 'monthly' | 'special';
+  requirements: Record<string, unknown>;
+  rewards: Record<string, unknown>;
+  start_date: string;
+  end_date: string;
+  participants: number;
+  completions: number;
+  is_active: boolean;
+}
+
+// ESG Metrics
+export interface ESGMetrics {
+  environmental: {
+    carbonFootprint: number;
+    renewableEnergy: number;
+    wasteRecycling: number;
+    waterUsage: number;
+  };
+  social: {
+    diversityScore: number;
+    employeeSatisfaction: number;
+    communityImpact: number;
+    accessibilityScore: number;
+  };
+  governance: {
+    dataPrivacyScore: number;
+    ethicsScore: number;
+    transparencyScore: number;
+    complianceScore: number;
+  };
+  overallScore: number;
+}
+
+// QA Metrics
+export interface QAMetrics {
+  overallScore: number;
+  auditsCompleted: number;
+  issuesFound: number;
+  issuesResolved: number;
+  avgResolutionTime: number;
+  customerSatisfaction: number;
+}
+
+// Pricing Rule
+export interface PricingRule {
+  id: string;
+  name: string;
+  type: 'surge' | 'discount' | 'regional' | 'segment';
+  conditions: Record<string, unknown>;
+  adjustment: number;
+  adjustment_type: 'percentage' | 'fixed';
+  priority: number;
+  is_active: boolean;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string;
+}
