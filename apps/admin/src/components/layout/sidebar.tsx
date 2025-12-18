@@ -22,6 +22,10 @@ import {
   Zap,
   Gift,
   UserCog,
+  Globe,
+  TrendingUp,
+  Activity,
+  Siren,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -82,6 +86,12 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
+    title: 'Gelir Analizi',
+    href: '/revenue',
+    icon: TrendingUp,
+    resource: 'transactions',
+  },
+  {
     title: 'Güvenlik',
     href: '/trust-safety',
     icon: Shield,
@@ -98,6 +108,24 @@ const operationsNavItems: NavItem[] = [
     href: '/analytics',
     icon: BarChart3,
     resource: 'analytics',
+  },
+  {
+    title: 'Coğrafya',
+    href: '/geographic',
+    icon: Globe,
+    resource: 'analytics',
+  },
+  {
+    title: 'Ops Merkezi',
+    href: '/ops-center',
+    icon: Activity,
+    resource: 'analytics',
+  },
+  {
+    title: 'Olaylar',
+    href: '/incidents',
+    icon: Siren,
+    resource: 'settings',
   },
   {
     title: 'Entegrasyonlar',
