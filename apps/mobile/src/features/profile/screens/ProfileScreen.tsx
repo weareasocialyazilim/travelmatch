@@ -447,11 +447,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  // Moments Grid
-  momentsGrid: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
   loadingContainer: {
     paddingVertical: 40,
     alignItems: 'center',
