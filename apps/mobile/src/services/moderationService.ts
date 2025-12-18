@@ -139,16 +139,27 @@ export const moderationService = {
       );
       if (error) throw error;
 
-      const reports: Report[] = data.map((row: any) => ({
+      type ReportRow = {
+        id: string;
+        reporter_id: string;
+        reported_moment_id: string | null;
+        reported_user_id: string | null;
+        reason: string;
+        description: string | null;
+        status: string;
+        created_at: string;
+        resolved_at: string | null;
+      };
+      const reports: Report[] = data.map((row: ReportRow) => ({
         id: row.id,
         reporterId: row.reporter_id,
         targetType: row.reported_moment_id ? 'moment' : 'user', // Simplified
-        targetId: row.reported_moment_id || row.reported_user_id,
+        targetId: row.reported_moment_id || row.reported_user_id || '',
         reason: row.reason as ReportReason,
         description: row.description || '',
-        status: row.status,
+        status: row.status as Report['status'],
         createdAt: row.created_at,
-        resolvedAt: row.resolved_at,
+        resolvedAt: row.resolved_at ?? undefined,
       }));
 
       return { reports, total: count || 0 };
@@ -219,7 +230,13 @@ export const moderationService = {
       );
       if (error) throw error;
 
-      const blockedUsers: BlockedUser[] = data.map((row: any) => ({
+      type BlockedRow = {
+        id: string;
+        blocked_id: string;
+        created_at: string;
+        blocked?: { full_name?: string; avatar_url?: string } | null;
+      };
+      const blockedUsers: BlockedUser[] = data.map((row: BlockedRow) => ({
         id: row.id,
         userId: row.blocked_id,
         userName: row.blocked?.full_name || 'User',
