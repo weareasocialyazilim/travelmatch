@@ -13,105 +13,107 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build packages
         run: pnpm turbo run build
-      
+
       - name: Type check
         run: pnpm turbo run type-check
-      
+
       - name: Lint
         run: pnpm turbo run lint
-      
+
       - name: Test
         run: pnpm turbo run test
-      
+
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.20
+        uses: Infisical/secrets-action@v1.0.15
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-id: cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9
-          environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-      
+          project-slug: travelmatch
+          env-slug: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+        continue-on-error: true
+
       - name: Upload coverage
         uses: codecov/codecov-action@v4
+        continue-on-error: true
         with:
           files: ./coverage/coverage-final.json
           flags: unittests
           name: codecov-umbrella
-          token: ${{ env.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build-mobile:
     runs-on: ubuntu-latest
     needs: build-and-test
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build mobile app
         run: cd apps/mobile && pnpm run build
         env:
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL || 'https://example.supabase.co' }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'dummy-key' }}
+          EXPO_PUBLIC_SUPABASE_URL: https://gwmvgheaoqkbqzshufts.supabase.co
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3bXZnaGVhb3FrYnF6c2h1ZnRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3NTM0NzAsImV4cCI6MjA0NzMyOTQ3MH0.placeholder
 
   build-admin:
     runs-on: ubuntu-latest
     needs: build-and-test
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build admin panel
         run: cd apps/admin && pnpm run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://example.supabase.co' }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'dummy-key' }}
-      
+          VITE_SUPABASE_URL: https://gwmvgheaoqkbqzshufts.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3bXZnaGVhb3FrYnF6c2h1ZnRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3NTM0NzAsImV4cCI6MjA0NzMyOTQ3MH0.placeholder
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -121,29 +123,34 @@ jobs:
   deploy-edge-functions:
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: github.ref == 'refs/heads/main'
-    
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
-      
+
       - name: Deploy edge functions
         run: |
+          if [ -z "$SUPABASE_PROJECT_REF" ]; then
+            echo "⚠️ SUPABASE_PROJECT_REF not set, skipping deployment"
+            exit 0
+          fi
           # Deploy payment services
-          supabase functions deploy process-payment --project-ref ${{ secrets.SUPABASE_PROJECT_REF || 'dummy-ref' }}
-          
+          supabase functions deploy process-payment --project-ref $SUPABASE_PROJECT_REF
+
           # Deploy ML services
-          supabase functions deploy proof-validator --project-ref ${{ secrets.SUPABASE_PROJECT_REF || 'dummy-ref' }}
-          supabase functions deploy moment-suggestions --project-ref ${{ secrets.SUPABASE_PROJECT_REF || 'dummy-ref' }}
-          supabase functions deploy smart-notifications --project-ref ${{ secrets.SUPABASE_PROJECT_REF || 'dummy-ref' }}
-          supabase functions deploy real-time-insights --project-ref ${{ secrets.SUPABASE_PROJECT_REF || 'dummy-ref' }}
+          supabase functions deploy proof-validator --project-ref $SUPABASE_PROJECT_REF
+          supabase functions deploy moment-suggestions --project-ref $SUPABASE_PROJECT_REF
+          supabase functions deploy smart-notifications --project-ref $SUPABASE_PROJECT_REF
+          supabase functions deploy real-time-insights --project-ref $SUPABASE_PROJECT_REF
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN || '' }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || '' }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET || '' }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
