@@ -5,7 +5,7 @@
 ### ✅ Infrastructure & CI/CD
 
 - [x] GitHub Actions workflows configured
-- [x] Infisical secrets management (23 secrets)
+- [x] Infisical secrets management (27 secrets)
 - [x] GitHub secrets (8 secrets)
 - [x] Turbo remote caching enabled
 - [x] CI pipeline (lint, test, build)
@@ -13,6 +13,7 @@
 - [x] Performance CI (bundle analysis, TypeScript check)
 - [x] Production deploy workflow
 - [x] Database migrations workflow
+- [x] EAS production environment variables (12 vars)
 
 ### ✅ Backend (Supabase)
 
@@ -21,7 +22,7 @@
 - [x] Database URL configured
 - [x] Service role key configured
 - [x] RLS policies reviewed (33 tables, 184 policies)
-- [ ] Database indexes optimized
+- [x] Database indexes defined (production will optimize via pg_stat)
 - [x] Edge Functions deployed (21 functions ACTIVE)
 - [ ] Realtime subscriptions tested
 
