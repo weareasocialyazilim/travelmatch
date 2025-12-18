@@ -20,9 +20,9 @@
 - [x] Region: Southeast Asia (Singapore)
 - [x] Database URL configured
 - [x] Service role key configured
-- [ ] RLS policies reviewed
+- [x] RLS policies reviewed (33 tables, 184 policies)
 - [ ] Database indexes optimized
-- [ ] Edge Functions deployed
+- [x] Edge Functions deployed (21 functions ACTIVE)
 - [ ] Realtime subscriptions tested
 
 ### ✅ Third-Party Integrations
@@ -43,9 +43,12 @@
 - [x] Development build profile
 - [x] Preview build profile
 - [x] Production build profile
-- [ ] App icons finalized
-- [ ] Splash screen finalized
-- [ ] App Store metadata
+- [x] App icons (icon.png, adaptive-icon.png, splash-icon.png)
+- [x] Splash screen configured
+- [x] Privacy Policy screen (in-app)
+- [x] Terms of Service screen (in-app)
+- [ ] App Store screenshots
+- [ ] Store metadata & descriptions
 
 ### 📋 Store Submission Requirements
 
@@ -53,9 +56,9 @@
 
 - [ ] Apple Developer Account ($99/year)
 - [ ] App Store Connect app created
-- [ ] Provisioning profiles (managed by EAS)
-- [ ] Privacy Policy URL
-- [ ] Terms of Service URL
+- [x] Provisioning profiles (managed by EAS)
+- [x] Privacy Policy URL (in-app screen ready)
+- [x] Terms of Service URL (in-app screen ready)
 - [ ] App screenshots (6.7", 6.5", 5.5")
 - [ ] App description (4000 chars max)
 - [ ] Keywords
@@ -68,8 +71,8 @@
 
 - [ ] Google Developer Account ($25 one-time)
 - [ ] Play Console app created
-- [ ] Upload key / signing configured (via EAS)
-- [ ] Privacy Policy URL
+- [x] Upload key / signing configured (via EAS)
+- [x] Privacy Policy URL (in-app screen ready)
 - [ ] Feature graphic (1024x500)
 - [ ] Screenshots (phone, tablet)
 - [ ] Short description (80 chars)
