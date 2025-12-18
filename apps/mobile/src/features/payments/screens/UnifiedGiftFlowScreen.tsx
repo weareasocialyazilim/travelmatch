@@ -30,7 +30,6 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import { usePaymentMethods, useCreatePaymentIntent } from '../hooks/usePayments';
-import { paymentsApi } from '@/services/paymentsApi';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { Moment } from '../types';
 import type { StackScreenProps } from '@react-navigation/stack';
