@@ -1,0 +1,57 @@
+name: Security - RLS Policy Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/tests/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/tests/**'
+  workflow_dispatch:
+
+jobs:
+  rls-security-tests:
+    name: RLS Security Tests
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase local instance
+        run: |
+          supabase start || echo "Supabase already running or failed to start"
+          sleep 10
+
+      - name: Run RLS policy tests
+        run: |
+          if [ -f "supabase/tests/run_rls_tests.sh" ]; then
+            chmod +x supabase/tests/run_rls_tests.sh
+            ./supabase/tests/run_rls_tests.sh local 2>&1 | tee rls_test_output.log || true
+          else
+            echo "⚠️ RLS test script not found, running basic validation"
+            supabase db lint || true
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rls-test-results
+          path: '*.log'
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop || true

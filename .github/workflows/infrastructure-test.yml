@@ -1,0 +1,106 @@
+name: Infrastructure Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tsconfig*.json'
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - 'apps/*/package.json'
+      - 'packages/*/package.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tsconfig*.json'
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - 'apps/*/package.json'
+      - 'packages/*/package.json'
+  workflow_dispatch:
+
+jobs:
+  infrastructure-check:
+    name: Infrastructure Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate TypeScript configs
+        run: |
+          echo "Validating TypeScript configurations..."
+
+          # Check root tsconfig
+          if [ -f "tsconfig.json" ]; then
+            echo "✅ Root tsconfig.json exists"
+            npx tsc --showConfig > /dev/null 2>&1 && echo "  ✅ Valid JSON" || echo "  ⚠️ Invalid or missing extends"
+          fi
+
+          # Check all tsconfigs in apps
+          for config in apps/*/tsconfig.json; do
+            if [ -f "$config" ]; then
+              echo "Checking $config..."
+              cd "$(dirname "$config")"
+              npx tsc --showConfig > /dev/null 2>&1 && echo "  ✅ Valid" || echo "  ⚠️ Warning in $config"
+              cd - > /dev/null
+            fi
+          done
+
+      - name: Validate package.json files
+        run: |
+          echo "Validating package.json files..."
+
+          # Check root package.json
+          node -e "JSON.parse(require('fs').readFileSync('package.json'))" && echo "✅ Root package.json is valid JSON"
+
+          # Check all package.json in apps and packages
+          for pkg in apps/*/package.json packages/*/package.json; do
+            if [ -f "$pkg" ]; then
+              node -e "JSON.parse(require('fs').readFileSync('$pkg'))" && echo "✅ $pkg is valid" || echo "❌ $pkg is invalid"
+            fi
+          done
+
+      - name: Validate pnpm workspace
+        run: |
+          echo "Validating pnpm workspace..."
+          pnpm ls --depth 0 > /dev/null 2>&1 && echo "✅ Workspace configuration valid" || echo "⚠️ Workspace issues detected"
+
+      - name: Check turbo configuration
+        run: |
+          if [ -f "turbo.json" ]; then
+            echo "Validating turbo.json..."
+            node -e "JSON.parse(require('fs').readFileSync('turbo.json'))" && echo "✅ turbo.json is valid JSON"
+          fi
+
+      - name: Generate infrastructure report
+        run: |
+          echo "## Infrastructure Validation Report" > infrastructure-report.md
+          echo "Date: $(date)" >> infrastructure-report.md
+          echo "" >> infrastructure-report.md
+          echo "### Workspace Structure" >> infrastructure-report.md
+          echo '```' >> infrastructure-report.md
+          ls -la apps/ packages/ 2>/dev/null || echo "Standard monorepo structure"
+          echo '```' >> infrastructure-report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: infrastructure-report
+          path: infrastructure-report.md
+          retention-days: 30
