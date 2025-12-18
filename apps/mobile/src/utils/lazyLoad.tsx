@@ -68,7 +68,6 @@ export function withLazy<P extends object>(
 
   const LazyComponentWrapper = (props: P) => (
     <Suspense fallback={fallback ?? <DefaultLoadingFallback />}>
-      {/* @ts-expect-error - React lazy component props typing */}
       <LazyComponent {...props} />
     </Suspense>
   );

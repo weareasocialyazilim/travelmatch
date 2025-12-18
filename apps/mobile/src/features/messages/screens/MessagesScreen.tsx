@@ -262,7 +262,12 @@ const MessagesScreen: React.FC = () => {
             />
           </View>
         </View>
-        <SkeletonList type="chat" count={6} show={isLoading} minDisplayTime={300} />
+        <SkeletonList
+          type="chat"
+          count={6}
+          show={isLoading}
+          minDisplayTime={300}
+        />
         <BottomNav activeTab="Messages" messagesBadge={0} />
       </SafeAreaView>
     );
@@ -283,58 +288,57 @@ const MessagesScreen: React.FC = () => {
   }
 
   return (
-    <NetworkGuard 
+    <NetworkGuard
       offlineMessage={
         conversations.length > 0
-          ? "Son yüklenen mesajları gösteriyorsunuz"
-          : "Mesajları görmek için internet bağlantısı gerekli"
+          ? 'Son yüklenen mesajları gösteriyorsunuz'
+          : 'Mesajları görmek için internet bağlantısı gerekli'
       }
       onRetry={refreshConversations}
     >
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* Search Bar - No title header */}
         <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <MaterialCommunityIcons
-            name="magnify"
-            size={20}
-            color={COLORS.textSecondary}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search conversations..."
-            placeholderTextColor={COLORS.textSecondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <MaterialCommunityIcons
-                name="close-circle"
-                size={18}
-                color={COLORS.textSecondary}
-              />
-            </TouchableOpacity>
-          )}
+          <View style={styles.searchBar}>
+            <MaterialCommunityIcons
+              name="magnify"
+              size={20}
+              color={COLORS.textSecondary}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search conversations..."
+              placeholderTextColor={COLORS.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <MaterialCommunityIcons
+                  name="close-circle"
+                  size={18}
+                  color={COLORS.textSecondary}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
 
-      {/* Chat List */}
-      <FlashList
-        data={filteredChats}
-        renderItem={renderChatItem}
-        estimatedItemSize={90}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
-        }
-        ListEmptyComponent={renderEmptyState}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+        {/* Chat List */}
+        <FlashList
+          data={filteredChats}
+          renderItem={renderChatItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={renderEmptyState}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
 
-      <BottomNav activeTab="Messages" messagesBadge={totalUnreadCount} />
-    </SafeAreaView>
+        <BottomNav activeTab="Messages" messagesBadge={totalUnreadCount} />
+      </SafeAreaView>
     </NetworkGuard>
   );
 };
@@ -511,7 +515,7 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ErrorBoundary for critical messaging functionality
-export default withErrorBoundary(MessagesScreen, { 
+export default withErrorBoundary(MessagesScreen, {
   fallbackType: 'generic',
-  displayName: 'MessagesScreen' 
+  displayName: 'MessagesScreen',
 });

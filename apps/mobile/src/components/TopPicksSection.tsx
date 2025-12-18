@@ -23,10 +23,7 @@ export const TopPicksSection: React.FC<TopPicksSectionProps> = ({
   const renderItem = useCallback(
     ({ item }: { item: Omit<GiftInboxCardProps, 'onPress'> }) => (
       <View style={styles.cardWrapper}>
-        <GiftInboxCard
-          {...item}
-          onPress={() => onItemPress?.(item.id)}
-        />
+        <GiftInboxCard {...item} onPress={() => onItemPress?.(item.id)} />
       </View>
     ),
     [onItemPress],
@@ -46,7 +43,6 @@ export const TopPicksSection: React.FC<TopPicksSectionProps> = ({
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          estimatedItemSize={292}
           contentContainerStyle={styles.listContent}
         />
       </View>

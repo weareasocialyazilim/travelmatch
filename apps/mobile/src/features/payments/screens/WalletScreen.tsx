@@ -103,7 +103,7 @@ const WalletScreen = () => {
 
   // Memoized render function for transaction items
   const renderTransactionItem = useCallback(
-    ({ item: transaction }: { item: typeof filteredTransactions[0] }) => (
+    ({ item: transaction }: { item: (typeof filteredTransactions)[0] }) => (
       <TouchableOpacity
         style={styles.transactionItem}
         onPress={() =>
@@ -134,8 +134,7 @@ const WalletScreen = () => {
               transaction.isPositive && styles.transactionAmountPositive,
             ]}
           >
-            {transaction.isPositive ? '+' : '-'}$
-            {transaction.amount.toFixed(2)}
+            {transaction.isPositive ? '+' : '-'}${transaction.amount.toFixed(2)}
           </Text>
           {transaction.hasProofLoop && (
             <View style={styles.proofLoopBadge}>
@@ -291,7 +290,6 @@ const WalletScreen = () => {
           <FlashList
             data={filteredTransactions}
             renderItem={renderTransactionItem}
-            estimatedItemSize={70}
             ListEmptyComponent={renderEmptyState}
             scrollEnabled={false}
           />

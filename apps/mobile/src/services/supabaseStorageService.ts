@@ -4,6 +4,7 @@
  */
 
 import * as FileSystem from 'expo-file-system';
+import { cacheDirectory, EncodingType } from 'expo-file-system/legacy';
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 import { logger } from '../utils/logger';
 
@@ -146,13 +147,13 @@ export const downloadFile = async (
 
     // Save to local cache using expo-file-system
     const fileName = path.split('/').pop() || 'download';
-    const localPath = `${FileSystem.cacheDirectory}${fileName}`;
+    const localPath = `${cacheDirectory}${fileName}`;
 
     const arrayBuffer = await data.arrayBuffer();
     const base64 = encode(arrayBuffer);
 
     await FileSystem.writeAsStringAsync(localPath, base64, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: EncodingType.Base64,
     });
 
     return { localUri: localPath, error: null };

@@ -4,12 +4,7 @@
  */
 
 import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
@@ -76,7 +71,6 @@ export const RecentSearches: React.FC<RecentSearchesProps> = ({
           data={items}
           keyExtractor={(item, index) => `${item}-${index}`}
           renderItem={renderItem}
-          estimatedItemSize={44}
           scrollEnabled={false}
         />
       </View>

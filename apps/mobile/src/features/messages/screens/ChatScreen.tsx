@@ -32,7 +32,11 @@ const ChatScreen: React.FC = () => {
 
   // Escrow logic: System automatically verifies proof
   const isSender = true; // In real app: check if currentUserId === chat.senderId
-  const proofStatus = 'verified' as 'pending' | 'verified' | 'rejected' | 'disputed';
+  const proofStatus = 'verified' as
+    | 'pending'
+    | 'verified'
+    | 'rejected'
+    | 'disputed';
 
   const {
     messageText,
@@ -98,57 +102,56 @@ const ChatScreen: React.FC = () => {
     <NetworkGuard>
       <SafeAreaView style={styles.container} edges={['top']}>
         <ChatHeader
-        otherUser={otherUser}
-        onBack={() => navigation.goBack()}
-        onUserPress={() =>
-          navigation.navigate('ProfileDetail', { userId: otherUser.id })
-        }
-        onMomentPress={handleMomentPress}
-        onMorePress={() => {
-          logger.debug('More button pressed - opening chat options');
-          setShowChatOptions(true);
-        }}
-      />
-
-      <KeyboardAvoidingView
-        style={styles.chatContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        <FlashList<Message>
-          data={messages}
-          renderItem={renderMessage}
-          estimatedItemSize={120}
-          contentContainerStyle={styles.messagesList}
-          {...CHAT_LIST_CONFIG}
+          otherUser={otherUser}
+          onBack={() => navigation.goBack()}
+          onUserPress={() =>
+            navigation.navigate('ProfileDetail', { userId: otherUser.id })
+          }
+          onMomentPress={handleMomentPress}
+          onMorePress={() => {
+            logger.debug('More button pressed - opening chat options');
+            setShowChatOptions(true);
+          }}
         />
 
-        <ChatInputBar
-          messageText={messageText}
-          onTextChange={setMessageText}
-          onSend={handleSend}
-          onAttachPress={() => setShowAttachmentSheet(true)}
-          isTyping={isAnyoneTyping}
-          isSending={isSending}
+        <KeyboardAvoidingView
+          style={styles.chatContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <FlashList<Message>
+            data={messages}
+            renderItem={renderMessage}
+            contentContainerStyle={styles.messagesList}
+            {...CHAT_LIST_CONFIG}
+          />
+
+          <ChatInputBar
+            messageText={messageText}
+            onTextChange={setMessageText}
+            onSend={handleSend}
+            onAttachPress={() => setShowAttachmentSheet(true)}
+            isTyping={isAnyoneTyping}
+            isSending={isSending}
+          />
+        </KeyboardAvoidingView>
+
+        <ChatAttachmentBottomSheet
+          visible={showAttachmentSheet}
+          onClose={() => setShowAttachmentSheet(false)}
+          onPhotoVideo={handlePhotoVideo}
+          onGift={() => handleGift(navigation)}
         />
-      </KeyboardAvoidingView>
 
-      <ChatAttachmentBottomSheet
-        visible={showAttachmentSheet}
-        onClose={() => setShowAttachmentSheet(false)}
-        onPhotoVideo={handlePhotoVideo}
-        onGift={() => handleGift(navigation)}
-      />
-
-      <ReportBlockBottomSheet
-        visible={showChatOptions}
-        onClose={() => setShowChatOptions(false)}
-        onSubmit={(action, reason, details) =>
-          handleChatAction(action, reason ?? '', details ?? '', navigation)
-        }
-        targetType="user"
-      />
-    </SafeAreaView>
+        <ReportBlockBottomSheet
+          visible={showChatOptions}
+          onClose={() => setShowChatOptions(false)}
+          onSubmit={(action, reason, details) =>
+            handleChatAction(action, reason ?? '', details ?? '', navigation)
+          }
+          targetType="user"
+        />
+      </SafeAreaView>
     </NetworkGuard>
   );
 };
@@ -169,7 +172,7 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ErrorBoundary for critical chat functionality
-export default withErrorBoundary(ChatScreen, { 
+export default withErrorBoundary(ChatScreen, {
   fallbackType: 'generic',
-  displayName: 'ChatScreen' 
+  displayName: 'ChatScreen',
 });

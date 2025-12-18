@@ -1,8 +1,8 @@
 /**
  * Image Cache Manager
- * 
+ *
  * Advanced caching strategy combining Cloudflare CDN + local storage
- * 
+ *
  * Features:
  * - Multi-tier caching (Memory → Disk → Cloudflare CDN → Network)
  * - Automatic WebP conversion via Cloudflare
@@ -11,18 +11,19 @@
  * - Offline support with fallback images
  * - Cache size management
  * - Performance monitoring
- * 
+ *
  * Cache Strategy:
  * 1. Check memory cache (instant)
  * 2. Check disk cache (fast)
  * 3. Fetch from Cloudflare CDN (optimized)
  * 4. Fallback to original URL (slow)
- * 
+ *
  * @see https://docs.expo.dev/versions/latest/sdk/filesystem/
  */
 
 import React from 'react';
 import * as FileSystem from 'expo-file-system';
+import { cacheDirectory } from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { logger } from '../utils/logger';
@@ -84,7 +85,7 @@ const DEFAULT_CONFIG: CacheConfig = {
   cloudflareFallback: true,
 };
 
-const CACHE_DIR = `${FileSystem.cacheDirectory}images/`;
+const CACHE_DIR = `${cacheDirectory}images/`;
 const METADATA_KEY = '@image_cache_metadata';
 const STATS_KEY = '@image_cache_stats';
 
@@ -93,7 +94,10 @@ const STATS_KEY = '@image_cache_stats';
 // ============================================================================
 
 class MemoryCache {
-  private cache = new Map<string, { data: string; size: number; timestamp: number }>();
+  private cache = new Map<
+    string,
+    { data: string; size: number; timestamp: number }
+  >();
   private maxSize: number;
   private currentSize = 0;
 
@@ -242,7 +246,10 @@ class ImageCacheManager {
           options.cloudflareId,
           options.variant || 'medium',
         );
-        const cloudflareImage = await this.fetchAndCache(cloudflareUrl, cacheKey);
+        const cloudflareImage = await this.fetchAndCache(
+          cloudflareUrl,
+          cacheKey,
+        );
         this.recordHit('cloudflare');
 
         // Prefetch other variants
@@ -252,7 +259,10 @@ class ImageCacheManager {
 
         return cloudflareImage;
       } catch (error) {
-        logger.warn('[ImageCache] Cloudflare fetch failed, falling back:', error);
+        logger.warn(
+          '[ImageCache] Cloudflare fetch failed, falling back:',
+          error,
+        );
       }
     }
 
@@ -329,7 +339,10 @@ class ImageCacheManager {
   /**
    * Clear cache
    */
-  async clearCache(options?: { memory?: boolean; disk?: boolean }): Promise<void> {
+  async clearCache(options?: {
+    memory?: boolean;
+    disk?: boolean;
+  }): Promise<void> {
     const clearMemory = options?.memory ?? true;
     const clearDisk = options?.disk ?? true;
 
@@ -348,7 +361,10 @@ class ImageCacheManager {
       }
     }
 
-    logger.info('[ImageCache] Cache cleared', { memory: clearMemory, disk: clearDisk });
+    logger.info('[ImageCache] Cache cleared', {
+      memory: clearMemory,
+      disk: clearDisk,
+    });
   }
 
   /**
@@ -362,7 +378,8 @@ class ImageCacheManager {
       memorySize: this.memoryCache.getSize(),
       totalEntries: this.metadata.size,
       hitRate: this.totalRequests > 0 ? this.totalHits / this.totalRequests : 0,
-      missRate: this.totalRequests > 0 ? 1 - this.totalHits / this.totalRequests : 0,
+      missRate:
+        this.totalRequests > 0 ? 1 - this.totalHits / this.totalRequests : 0,
     };
   }
 
@@ -395,7 +412,9 @@ class ImageCacheManager {
     await this.saveMetadata();
     this.stats.diskSize -= freedSpace;
 
-    logger.info('[ImageCache] Evicted LRU:', { freedMB: freedSpace / 1024 / 1024 });
+    logger.info('[ImageCache] Evicted LRU:', {
+      freedMB: freedSpace / 1024 / 1024,
+    });
   }
 
   // ==========================================================================
@@ -408,12 +427,15 @@ class ImageCacheManager {
     }
   }
 
-  private async getCacheKey(uri: string, variant?: ImageVariant): Promise<string> {
+  private async getCacheKey(
+    uri: string,
+    variant?: ImageVariant,
+  ): Promise<string> {
     const key = variant ? `${uri}:${variant}` : uri;
     // Simple hash function (djb2)
     let hash = 5381;
     for (let i = 0; i < key.length; i++) {
-      hash = ((hash << 5) + hash) + key.charCodeAt(i);
+      hash = (hash << 5) + hash + key.charCodeAt(i);
     }
     return Math.abs(hash).toString(16);
   }
@@ -423,7 +445,10 @@ class ImageCacheManager {
       const localPath = `${CACHE_DIR}${cacheKey}`;
 
       // Download
-      const { uri: downloadedUri } = await FileSystem.downloadAsync(url, localPath);
+      const { uri: downloadedUri } = await FileSystem.downloadAsync(
+        url,
+        localPath,
+      );
 
       // Get file size
       const fileInfo = await FileSystem.getInfoAsync(downloadedUri);
@@ -594,8 +619,10 @@ class ImageCacheManager {
 export const imageCacheManager = new ImageCacheManager();
 // Auto-initialize when not running under Jest so tests can control init.
 try {
-  const isJest = typeof (globalThis as any).jest !== 'undefined' ||
-    (typeof process !== 'undefined' && Boolean((process.env as any).JEST_WORKER_ID));
+  const isJest =
+    typeof (globalThis as any).jest !== 'undefined' ||
+    (typeof process !== 'undefined' &&
+      Boolean((process.env as any).JEST_WORKER_ID));
   if (!isJest) {
     void imageCacheManager.initialize().catch((error) => {
       logger.error('[ImageCache] Auto-init failed:', error);
@@ -608,26 +635,33 @@ try {
 // Provide legacy-compatible public helpers used by tests and older code
 // These delegate to the internal implementations.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(imageCacheManager as any).clear = async function (options?: { memory?: boolean; disk?: boolean }) {
+(imageCacheManager as any).clear = async function (options?: {
+  memory?: boolean;
+  disk?: boolean;
+}) {
   return await imageCacheManager.clearCache(options);
 };
 
 // pruneExpiredEntries -> cleanExpired
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (imageCacheManager as any).pruneExpiredEntries = async function () {
-  // @ts-ignore access private method for test compatibility
-  return await (imageCacheManager as any).cleanExpired?.() || Promise.resolve();
+  // @ts-expect-error access private method for test compatibility
+  return (
+    (await (imageCacheManager as any).cleanExpired?.()) || Promise.resolve()
+  );
 };
 
 // cleanupDiskCache helper
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (imageCacheManager as any).cleanupDiskCache = async function () {
   // Prefer evictLRU to reclaim space; fall back to cleaning expired entries
-  // @ts-ignore
+  // @ts-expect-error access private method for test compatibility
   try {
-    return await (imageCacheManager as any).evictLRU?.(Math.max(1, (imageCacheManager as any).config?.maxDiskCacheSizeMB * 0.8))
+    return await (imageCacheManager as any).evictLRU?.(
+      Math.max(1, (imageCacheManager as any).config?.maxDiskCacheSizeMB * 0.8),
+    );
   } catch {
-    // @ts-ignore
+    // @ts-expect-error access private method for test compatibility
     return await (imageCacheManager as any).cleanExpired?.();
   }
 };
@@ -639,10 +673,16 @@ try {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(imageCacheManager as any).prefetchResponsiveVariants = async function (uri: string, cloudflareId?: string) {
+(imageCacheManager as any).prefetchResponsiveVariants = async function (
+  uri: string,
+  cloudflareId?: string,
+) {
   if (!cloudflareId) return;
-  // @ts-ignore
-  return await (imageCacheManager as any).prefetchVariants?.(cloudflareId, undefined);
+  // @ts-expect-error access private method for test compatibility
+  return await (imageCacheManager as any).prefetchVariants?.(
+    cloudflareId,
+    undefined,
+  );
 };
 
 // ============================================================================

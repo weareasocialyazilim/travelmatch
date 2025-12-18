@@ -98,3 +98,6 @@ desktop.ini
 .env.local
 
 .env.local
+
+# Turborepo
+.turbo
