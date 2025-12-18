@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
+import { getAdminSession } from '@/lib/auth';
 import { authenticator } from 'otplib';
 import crypto from 'crypto';
-import { getServerSession } from '@/lib/session';
 
 // Encryption helpers for TOTP secret
 const ALGORITHM = 'aes-256-gcm';
@@ -51,7 +51,7 @@ function generateQRCodeURL(secret: string, email: string): string {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getAdminSession();
 
     if (!session) {
       return NextResponse.json(
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     const { data: adminUser, error: userError } = await supabase
       .from('admin_users')
       .select('id, email, totp_enabled')
-      .eq('id', session.id)
+      .eq('id', session.admin.id)
       .eq('is_active', true)
       .single();
 
@@ -97,14 +97,14 @@ export async function GET(request: NextRequest) {
         totp_secret: encryptedSecret,
         totp_enabled: false, // Will be enabled after verification
       })
-      .eq('id', session.id);
+      .eq('id', session.admin.id);
 
     // Log audit event
     const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
     await supabase.from('audit_logs').insert({
-      admin_id: session.id,
+      admin_id: session.admin.id,
       action: '2fa_setup_initiated',
       ip_address: clientIp,
       user_agent: userAgent,
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getAdminSession();
 
     if (!session) {
       return NextResponse.json(
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     const { data: adminUser, error: userError } = await supabase
       .from('admin_users')
       .select('id, totp_secret, totp_enabled')
-      .eq('id', session.id)
+      .eq('id', session.admin.id)
       .eq('is_active', true)
       .single();
 
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
     if (!isValid) {
       // Log failed attempt
       await supabase.from('audit_logs').insert({
-        admin_id: session.id,
+        admin_id: session.admin.id,
         action: '2fa_setup_verification_failed',
         ip_address: clientIp,
         user_agent: userAgent,
@@ -235,11 +235,11 @@ export async function POST(request: NextRequest) {
     await supabase
       .from('admin_users')
       .update({ totp_enabled: true })
-      .eq('id', session.id);
+      .eq('id', session.admin.id);
 
     // Log successful setup
     await supabase.from('audit_logs').insert({
-      admin_id: session.id,
+      admin_id: session.admin.id,
       action: '2fa_enabled',
       ip_address: clientIp,
       user_agent: userAgent,
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getAdminSession();
 
     if (!session) {
       return NextResponse.json(
@@ -288,7 +288,7 @@ export async function DELETE(request: NextRequest) {
     const { data: adminUser, error: userError } = await supabase
       .from('admin_users')
       .select('id, totp_secret, totp_enabled')
-      .eq('id', session.id)
+      .eq('id', session.admin.id)
       .eq('is_active', true)
       .single();
 
@@ -345,14 +345,14 @@ export async function DELETE(request: NextRequest) {
         totp_enabled: false,
         totp_secret: null,
       })
-      .eq('id', session.id);
+      .eq('id', session.admin.id);
 
     // Log
     const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
     await supabase.from('audit_logs').insert({
-      admin_id: session.id,
+      admin_id: session.admin.id,
       action: '2fa_disabled',
       ip_address: clientIp,
       user_agent: userAgent,
