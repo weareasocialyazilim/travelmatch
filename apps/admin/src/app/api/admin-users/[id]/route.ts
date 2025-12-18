@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 
+interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  is_active: boolean;
+  requires_2fa: boolean;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -55,15 +67,17 @@ export async function PATCH(
     const supabase = createServiceClient();
 
     // Get current admin user
-    const { data: currentAdmin, error: fetchError } = await supabase
+    const { data: currentAdminData, error: fetchError } = await supabase
       .from('admin_users')
       .select('*')
       .eq('id', id)
       .single();
 
-    if (fetchError || !currentAdmin) {
+    if (fetchError || !currentAdminData) {
       return NextResponse.json({ error: 'Admin kullanıcı bulunamadı' }, { status: 404 });
     }
+
+    const currentAdmin = currentAdminData as AdminUser;
 
     // Prevent self-demotion for super_admin
     if (
@@ -80,15 +94,16 @@ export async function PATCH(
 
     // Allowed update fields
     const allowedFields = ['name', 'role', 'is_active', 'requires_2fa', 'avatar_url'];
-    const updateData: Record<string, unknown> = {};
+    const updateData: Partial<AdminUser> = {};
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = body[field];
+        (updateData as Record<string, unknown>)[field] = body[field];
       }
     }
 
-    const { data: admin, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: admin, error } = await (supabase as any)
       .from('admin_users')
       .update(updateData)
       .eq('id', id)
@@ -153,7 +168,8 @@ export async function DELETE(
       .single();
 
     // Soft delete by setting is_active to false
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('admin_users')
       .update({ is_active: false })
       .eq('id', id);

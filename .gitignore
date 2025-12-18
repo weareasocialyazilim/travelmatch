@@ -93,11 +93,16 @@ desktop.ini
 # IDE
 .vscode/
 .idea/
-*.sublime-*.turbo/
+*.sublime-*
 
-.env.local
-
-.env.local
+# Next.js
+.next/
+out/
 
 # Turborepo
-.turbo
+.turbo/
+
+# Package manager lockfiles in app directories (root lockfile is committed)
+apps/**/package-lock.json
+apps/**/yarn.lock
+apps/**/pnpm-lock.yaml

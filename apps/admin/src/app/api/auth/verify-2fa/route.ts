@@ -66,19 +66,23 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user with TOTP secret
-    const { data: adminUser, error: userError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: adminUserData, error: userError } = await (supabase as any)
       .from('admin_users')
       .select('id, totp_secret, totp_enabled')
       .eq('id', userId)
       .eq('is_active', true)
       .single();
 
-    if (userError || !adminUser) {
+    if (userError || !adminUserData) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
         { status: 404 }
       );
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adminUser = adminUserData as any;
 
     if (!adminUser.totp_enabled || !adminUser.totp_secret) {
       return NextResponse.json(
@@ -114,7 +118,8 @@ export async function POST(request: NextRequest) {
 
     if (!isValid) {
       // Log failed attempt
-      await supabase.from('audit_logs').insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('audit_logs').insert({
         admin_id: userId,
         action: '2fa_verification_failed',
         ip_address: clientIp,
@@ -128,7 +133,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Log successful verification
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('audit_logs').insert({
       admin_id: userId,
       action: '2fa_verification_success',
       ip_address: clientIp,
@@ -136,7 +142,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Update last login timestamp
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('admin_users')
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', userId);
@@ -146,7 +153,8 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Store session
-    await supabase.from('admin_sessions').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('admin_sessions').insert({
       admin_id: userId,
       session_token: crypto.createHash('sha256').update(sessionToken).digest('hex'),
       ip_address: clientIp,

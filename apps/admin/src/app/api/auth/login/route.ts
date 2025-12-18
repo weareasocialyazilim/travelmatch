@@ -18,19 +18,23 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Find admin user by email
-    const { data: adminUser, error: userError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: adminUserData, error: userError } = await (supabase as any)
       .from('admin_users')
       .select('*')
       .eq('email', email)
       .eq('is_active', true)
       .single();
 
-    if (userError || !adminUser) {
+    if (userError || !adminUserData) {
       return NextResponse.json(
         { error: 'Geçersiz kimlik bilgileri' },
         { status: 401 }
       );
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adminUser = adminUserData as any;
 
     // Authenticate with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -52,7 +56,8 @@ export async function POST(request: NextRequest) {
       const tokenHash = crypto.createHash('sha256').update(tempToken).digest('hex');
 
       // Store temp session
-      await supabase.from('admin_sessions').insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('admin_sessions').insert({
         admin_id: adminUser.id,
         token_hash: tokenHash,
         ip_address: request.headers.get('x-forwarded-for') || request.ip,
@@ -72,7 +77,8 @@ export async function POST(request: NextRequest) {
     const sessionHash = crypto.createHash('sha256').update(sessionToken).digest('hex');
 
     // Store session
-    await supabase.from('admin_sessions').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('admin_sessions').insert({
       admin_id: adminUser.id,
       token_hash: sessionHash,
       ip_address: request.headers.get('x-forwarded-for') || request.ip,
@@ -81,7 +87,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Update last login
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('admin_users')
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', adminUser.id);
@@ -97,7 +104,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Get role permissions
-    const { data: permissions } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: permissions } = await (supabase as any)
       .from('role_permissions')
       .select('resource, action')
       .eq('role', adminUser.role);
