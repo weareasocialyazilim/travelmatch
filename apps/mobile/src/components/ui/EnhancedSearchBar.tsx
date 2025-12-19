@@ -186,7 +186,6 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                 </View>
               )}
               keyboardShouldPersistTaps="handled"
-              estimatedItemSize={ITEM_HEIGHTS.SMALL}
             />
           </View>
         </View>

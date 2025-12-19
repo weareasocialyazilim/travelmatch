@@ -271,12 +271,12 @@ export const paymentService = {
         id: row.id,
         type: (row.type as TransactionType) || 'payment', // Simple cast
         amount: row.amount,
-        currency: row.currency,
+        currency: row.currency ?? 'USD',
         status: (row.status as PaymentStatus) || 'completed',
-        date: row.created_at,
+        date: row.created_at ?? new Date().toISOString(),
         description: row.description || '',
-        referenceId: row.moment_id,
-        metadata: row.metadata,
+        referenceId: row.moment_id ?? undefined,
+        metadata: row.metadata as Transaction['metadata'],
       }));
 
       return { transactions, total: count };
@@ -311,7 +311,7 @@ export const paymentService = {
         date: data.created_at ?? new Date().toISOString(),
         description: data.description ?? '',
         referenceId: data.moment_id ?? undefined,
-        metadata: validatedMetadata,
+        metadata: validatedMetadata as Transaction['metadata'],
       };
 
       return { transaction };
@@ -580,7 +580,7 @@ export const paymentService = {
           status: 'completed',
           date: transaction.created_at ?? new Date().toISOString(),
           description: transaction.description ?? '',
-          metadata: validatedMetadata,
+          metadata: validatedMetadata as Transaction['metadata'],
         },
       };
     } catch (error) {

@@ -496,6 +496,8 @@ export const checkRelationship = async (
   conditions: Record<string, unknown>,
 ) => {
   const { data, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Dynamic table name for generic helper
     .from(table)
     .select('id')
     .match(conditions)
@@ -512,7 +514,11 @@ export const getCount = async (
   table: string,
   filters?: Record<string, unknown>,
 ) => {
-  let query = supabase.from(table).select('*', { count: 'exact', head: true });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - Dynamic table name for generic helper
+  let query = supabase
+    .from(table as any)
+    .select('*', { count: 'exact', head: true });
 
   if (filters) {
     query = query.match(filters);

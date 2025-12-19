@@ -13,7 +13,10 @@ type UserRow = Database['public']['Tables']['users']['Row'];
 type MomentRow = Database['public']['Tables']['moments']['Row'];
 
 // Partial types for joined data (Supabase returns nullable when joined)
-type JoinedUser = Pick<UserRow, 'full_name' | 'avatar_url' | 'rating' | 'verified' | 'location'>;
+type JoinedUser = Pick<
+  UserRow,
+  'full_name' | 'avatar_url' | 'rating' | 'verified' | 'location'
+>;
 type JoinedMoment = Pick<MomentRow, 'title' | 'images' | 'user_id'>;
 
 // Request row with joined relations
@@ -138,13 +141,17 @@ export const requestService = {
         type: 'gift_request',
       } as unknown as Database['public']['Tables']['requests']['Insert'];
 
-      const { data: newRequest, error } = await dbRequestsService.create(
-        requestData,
-      );
+      const { data: newRequest, error } =
+        await dbRequestsService.create(requestData);
       if (error) throw error;
 
-      const dbTotal = (newRequest as Database['public']['Tables']['requests']['Row'] & { total_price?: number })?.total_price;
-      const computedTotal = Number(momentRow.price || 0) * Number(data.guestCount || 0);
+      const dbTotal = (
+        newRequest as Database['public']['Tables']['requests']['Row'] & {
+          total_price?: number;
+        }
+      )?.total_price;
+      const computedTotal =
+        Number(momentRow.price || 0) * Number(data.guestCount || 0);
 
       const request: GiftRequest = {
         id: newRequest!.id,
@@ -282,12 +289,14 @@ export const requestService = {
         query = query.eq('status', filters.status);
       }
 
-      const { data, count, error } = await query.order('created_at', { ascending: false });
+      const { data, count, error } = await query.order('created_at', {
+        ascending: false,
+      });
 
       if (error) throw error;
 
       const requests: GiftRequest[] = (data || []).map((row) => {
-        const r = row as RequestWithRelations;
+        const r = row as unknown as RequestWithRelations;
         return {
           id: r.id,
           type: 'gift_request',

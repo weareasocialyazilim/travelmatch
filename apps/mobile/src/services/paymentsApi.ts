@@ -179,16 +179,19 @@ export const paymentsApi = {
         description: string | null;
         metadata: unknown;
       };
-      return (data || []).map((tx: TransactionRow) => ({
-        id: tx.id,
-        type: tx.type as TransactionRecord['type'],
-        amount: tx.amount,
-        currency: tx.currency ?? '',
-        status: tx.status as TransactionRecord['status'],
-        createdAt: tx.created_at ?? '',
-        description: tx.description ?? undefined,
-        metadata: toRecord(tx.metadata),
-      }));
+      return (data || []).map((tx) => {
+        const t = tx as unknown as TransactionRow;
+        return {
+          id: t.id,
+          type: t.type as TransactionRecord['type'],
+          amount: t.amount,
+          currency: t.currency ?? '',
+          status: t.status as TransactionRecord['status'],
+          createdAt: t.created_at ?? '',
+          description: t.description ?? undefined,
+          metadata: toRecord(t.metadata),
+        };
+      });
     } catch (error) {
       logger.error('Failed to get transaction history', { error });
       throw error;

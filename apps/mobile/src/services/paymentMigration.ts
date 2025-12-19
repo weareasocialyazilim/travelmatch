@@ -653,7 +653,8 @@ class PaymentMigrationService {
    */
   private async logMigrationError(error: any): Promise<void> {
     try {
-      await supabase.from('migration_errors').insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('migration_errors').insert({
         error_type: error.error_type,
         error_message: error.error_message,
         metadata: error.metadata,
@@ -669,7 +670,8 @@ class PaymentMigrationService {
    */
   private async logReconciliationIssue(issue: any): Promise<void> {
     try {
-      await supabase.from('reconciliation_issues').insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('reconciliation_issues').insert({
         type: issue.type,
         legacy_transaction: issue.legacy_transaction,
         supabase_transaction: issue.supabase_transaction,

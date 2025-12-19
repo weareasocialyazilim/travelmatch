@@ -1445,7 +1445,11 @@ export const moderationService = {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return { data: data || [], count: count || 0, error: null };
+      return {
+        data: (data || []) as unknown as ReportRecord[],
+        count: count || 0,
+        error: null,
+      };
     } catch (error) {
       logger.error('[DB] List reports error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -1500,7 +1504,11 @@ export const moderationService = {
         .eq('blocker_id', userId);
 
       if (error) throw error;
-      return { data: data || [], count: count || 0, error: null };
+      return {
+        data: (data || []) as unknown as BlockedUserRecord[],
+        count: count || 0,
+        error: null,
+      };
     } catch (error) {
       logger.error('[DB] List blocked users error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -1556,7 +1564,11 @@ export const transactionsService = {
       const { data, count, error } = await query;
 
       if (error) throw error;
-      return { data: data || [], count: count || 0, error: null };
+      return {
+        data: (data || []) as unknown as TransactionRecord[],
+        count: count || 0,
+        error: null,
+      };
     } catch (error) {
       logger.error('[DB] List transactions error:', error);
       return { data: [], count: 0, error: error as Error };

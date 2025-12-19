@@ -101,13 +101,17 @@ export const reviewService = {
 
       // Determine who is being reviewed
       // If I am the host, I review the user. If I am the user, I review the host.
-      type RequestRow = { moment_id: string; host_id: string | null; user_id: string };
+      type RequestRow = {
+        moment_id: string;
+        host_id: string | null;
+        user_id: string;
+      };
       const reqRow = request as RequestRow;
       let reviewedId = '';
       if (user.id === reqRow.host_id) {
         reviewedId = reqRow.user_id;
       } else if (user.id === reqRow.user_id) {
-        reviewedId = reqRow.host_id;
+        reviewedId = reqRow.host_id ?? '';
       } else {
         throw new Error('Not authorized to review this request');
       }
@@ -247,22 +251,25 @@ export const reviewService = {
 
       if (error) throw error;
 
-      const reviews: Review[] = (data || []).map((row: ReviewRowLike) => ({
-        id: row.id as string,
-        rating: row.rating as number,
-        comment: (row.comment as string) || '',
-        reviewerId: row.reviewer_id as string,
-        reviewerName: 'Me',
-        reviewerAvatar: '',
-        revieweeId: row.reviewed_id as string,
-        revieweeName: '',
-        momentId: row.moment_id as string,
-        momentTitle: row.moment?.title || '',
-        requestId: '',
-        createdAt: row.created_at as string,
-        isVerified: true,
-        isEdited: false,
-      }));
+      const reviews: Review[] = (data || []).map((row) => {
+        const r = row as unknown as ReviewRowLike;
+        return {
+          id: r.id as string,
+          rating: r.rating as number,
+          comment: (r.comment as string) || '',
+          reviewerId: r.reviewer_id as string,
+          reviewerName: 'Me',
+          reviewerAvatar: '',
+          revieweeId: r.reviewed_id as string,
+          revieweeName: '',
+          momentId: r.moment_id as string,
+          momentTitle: r.moment?.title || '',
+          requestId: '',
+          createdAt: r.created_at as string,
+          isVerified: true,
+          isEdited: false,
+        };
+      });
 
       return { reviews, total: count || 0 };
     } catch (error) {

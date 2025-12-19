@@ -7,7 +7,7 @@ import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { notificationsService as dbNotificationsService } from './supabaseDbService';
 import { toRecord } from '../utils/jsonHelper';
-import type { Database } from '../types/database.types';
+import type { Database, Json } from '../types/database.types';
 
 // Types
 export type NotificationType =
@@ -107,17 +107,19 @@ export const notificationService = {
         .eq('user_id', user.id)
         .eq('read', false);
 
-      const notifications: Notification[] = data.map((row: Database['public']['Tables']['notifications']['Row']) => ({
-        id: row.id,
-        type: (row.type as NotificationType) || 'system',
-        title: row.title,
-        body: row.body || '',
-        data: row.data as Record<string, unknown> | undefined,
-        read: row.read || false,
-        createdAt: row.created_at || new Date().toISOString(),
-        // We might need to fetch related entities if they are not in the row
-        // For now, we'll leave them undefined or extract from data if available
-      }));
+      const notifications: Notification[] = data.map(
+        (row: Database['public']['Tables']['notifications']['Row']) => ({
+          id: row.id,
+          type: (row.type as NotificationType) || 'system',
+          title: row.title,
+          body: row.body || '',
+          data: row.data as Record<string, unknown> | undefined,
+          read: row.read || false,
+          createdAt: row.created_at || new Date().toISOString(),
+          // We might need to fetch related entities if they are not in the row
+          // For now, we'll leave them undefined or extract from data if available
+        }),
+      );
 
       return { notifications, total: count, unreadCount: unreadCount || 0 };
     } catch (error) {
@@ -288,7 +290,7 @@ export const notificationService = {
 
       const { error } = await supabase
         .from('users')
-        .update({ notification_preferences: newPrefs })
+        .update({ notification_preferences: newPrefs as unknown as Json })
         .eq('id', user.id);
 
       if (error) throw error;
