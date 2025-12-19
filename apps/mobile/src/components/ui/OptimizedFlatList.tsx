@@ -3,7 +3,7 @@
  * Pre-configured FlashList with performance optimizations
  * Using Shopify's FlashList for better scroll performance
  */
-import React, { memo, useCallback, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import {
   type ViewToken,
   View,
@@ -11,7 +11,11 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import { FlashList, type FlashListProps } from '@shopify/flash-list';
+import {
+  FlashList,
+  type FlashListProps,
+  type FlashListRef,
+} from '@shopify/flash-list';
 import { COLORS } from '../../constants/colors';
 
 // Default keyExtractor
@@ -22,10 +26,7 @@ const defaultKeyExtractor = <T extends { id?: string | number }>(
   return item.id?.toString() ?? index.toString();
 };
 
-interface OptimizedFlatListProps<T>
-  extends Omit<FlashListProps<T>, 'estimatedItemSize'> {
-  /** Estimated item size (height for vertical, width for horizontal) - REQUIRED for FlashList */
-  estimatedItemSize?: number;
+interface OptimizedFlatListProps<T> extends FlashListProps<T> {
   /** Loading more indicator */
   isLoadingMore?: boolean;
   /** Empty state message */
@@ -43,7 +44,6 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
   {
     data,
     renderItem,
-    estimatedItemSize = 80,
     keyExtractor = defaultKeyExtractor,
     onRefresh,
     refreshing = false,
@@ -53,7 +53,7 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
     onViewableItemsChanged,
     ...props
   }: OptimizedFlatListProps<T>,
-  ref: React.Ref<FlashList<T>>,
+  ref: React.ForwardedRef<FlashListRef<T>>,
 ) {
   // Viewability config
   const viewabilityConfig = useRef({
@@ -89,7 +89,6 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
       data={data}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      estimatedItemSize={estimatedItemSize}
       // Pull to refresh
       onRefresh={onRefresh}
       refreshing={refreshing}
@@ -108,7 +107,9 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
 export const OptimizedFlatList = memo(
   React.forwardRef(OptimizedFlatListInner),
 ) as <T extends { id?: string | number }>(
-  props: OptimizedFlatListProps<T> & { ref?: React.Ref<FlashList<T>> },
+  props: OptimizedFlatListProps<T> & {
+    ref?: React.ForwardedRef<FlashListRef<T>>;
+  },
 ) => React.ReactElement;
 
 /**

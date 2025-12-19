@@ -3,7 +3,7 @@
  * Displays a single gift item in the inbox
  */
 
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { DEFAULT_IMAGES } from '@/constants/defaultValues';
@@ -46,7 +46,10 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
     onPress,
   }) => {
     // Memoize formatted amount
-    const formattedAmount = useMemo(() => `${currency} ${amount.toFixed(2)}`, [currency, amount]);
+    const formattedAmount = useMemo(
+      () => `${currency} ${amount.toFixed(2)}`,
+      [currency, amount],
+    );
 
     // Memoize status badge style
     const statusBadgeStyle = useMemo(
@@ -61,7 +64,11 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
     );
 
     return (
-      <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
         <View style={styles.header}>
           <Image source={avatarSource} style={styles.avatar} />
           <View style={styles.headerInfo}>

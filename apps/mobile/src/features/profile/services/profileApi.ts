@@ -1,16 +1,17 @@
 import { supabase } from '@/config/supabase';
 
 export interface UpdateProfileDto {
-  username?: string;
   full_name?: string;
   avatar_url?: string;
   bio?: string;
+  location?: string;
 }
 
 /**
  * Profile API Service
  *
  * Kullanıcı profili yönetimi için API çağrıları
+ * Uses 'users' table from database
  */
 export const profileApi = {
   /**
@@ -19,18 +20,18 @@ export const profileApi = {
   getById: async (userId: string) => {
     // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
-      .from('profiles')
+      .from('users')
       .select(
         `
         id,
-        username,
+        email,
         full_name,
         avatar_url,
         bio,
         location,
-        is_verified,
+        verified,
         rating,
-        reviews_count,
+        review_count,
         created_at,
         updated_at
       `,
@@ -54,18 +55,18 @@ export const profileApi = {
 
     // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
-      .from('profiles')
+      .from('users')
       .select(
         `
         id,
-        username,
+        email,
         full_name,
         avatar_url,
         bio,
         location,
-        is_verified,
+        verified,
         rating,
-        reviews_count,
+        review_count,
         created_at,
         updated_at
       `,
@@ -87,7 +88,7 @@ export const profileApi = {
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
-      .from('profiles')
+      .from('users')
       .update(updates)
       .eq('id', user.id)
       .select()
@@ -129,8 +130,8 @@ export const profileApi = {
    */
   getReputation: async (userId: string) => {
     const { data, error } = await supabase
-      .from('profiles')
-      .select('trust_score, is_verified, created_at')
+      .from('users')
+      .select('verified, created_at, rating')
       .eq('id', userId)
       .single();
 
@@ -140,98 +141,40 @@ export const profileApi = {
     const { count: reviewsCount } = await supabase
       .from('reviews')
       .select('*', { count: 'exact', head: true })
-      .eq('reviewed_user_id', userId);
-
-    // Get completed trips count
-    const { count: tripsCount } = await supabase
-      .from('trip_participants')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('status', 'completed');
+      .eq('reviewed_id', userId);
 
     const row = data as {
-      trust_score?: number;
-      is_verified?: boolean;
+      verified?: boolean;
       created_at?: string;
+      rating?: number;
     } | null;
 
     return {
-      trust_score: row?.trust_score,
-      is_verified: row?.is_verified,
+      rating: row?.rating,
+      verified: row?.verified,
       reviews_count: reviewsCount || 0,
-      trips_count: tripsCount || 0,
       member_since: row?.created_at,
     };
   },
 
   /**
-   * Trust score detayları
-   */
-  getTrustScore: async (userId: string) => {
-    // SECURITY: Explicit column selection - never use select('*')
-    const { data, error } = await supabase
-      .from('trust_scores')
-      .select(
-        `
-        id,
-        user_id,
-        score,
-        factors,
-        created_at,
-        updated_at
-      `,
-      )
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  /**
-   * Proof history getir
-   */
-  getProofHistory: async (userId: string) => {
-    // SECURITY: Explicit column selection - never use select('*')
-    const { data, error } = await supabase
-      .from('proofs')
-      .select(
-        `
-        id,
-        user_id,
-        type,
-        status,
-        file_url,
-        created_at,
-        verified_at
-      `,
-      )
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
-  },
-
-  /**
    * Moment'ları getir
-   * ✅ BlurHash: Includes image_id, image_blur_hash and uploaded_images JOIN
    */
   getMoments: async (userId: string) => {
     const { data, error } = await supabase
       .from('moments')
       .select(
         `
-        *,
-        profiles(*),
-        uploaded_images!moments_image_id_fkey(
-          id,
-          blur_hash,
-          url,
-          variants
-        )
+        id,
+        user_id,
+        title,
+        description,
+        location,
+        date,
+        category,
+        images,
+        created_at,
+        updated_at
       `,
       )
       .eq('user_id', userId)
@@ -323,7 +266,7 @@ export const profileApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { error } = await supabase.from('blocked_users').insert({
+    const { error } = await supabase.from('blocks').insert({
       blocker_id: user.id,
       blocked_id: userId,
     });
@@ -341,7 +284,7 @@ export const profileApi = {
     if (!user) throw new Error('User not authenticated');
 
     const { error } = await supabase
-      .from('blocked_users')
+      .from('blocks')
       .delete()
       .eq('blocker_id', user.id)
       .eq('blocked_id', userId);

@@ -295,7 +295,6 @@ const ProfileScreen: React.FC = () => {
           data={displayedMoments}
           renderItem={renderMomentCard}
           numColumns={2}
-          estimatedItemSize={180}
           refreshControl={
             <RefreshControl
               refreshing={myMomentsLoading}
@@ -328,7 +327,10 @@ const ProfileScreen: React.FC = () => {
               </View>
 
               {/* Wallet Card */}
-              <WalletCard balance={userData.walletBalance} onPress={handleWallet} />
+              <WalletCard
+                balance={userData.walletBalance}
+                onPress={handleWallet}
+              />
 
               {/* Quick Links */}
               <QuickLinks links={quickLinksData} />
@@ -379,9 +381,7 @@ const ProfileScreen: React.FC = () => {
               />
             ) : null
           }
-          ItemSeparatorComponent={() => (
-            <View style={styles.itemSeparator} />
-          )}
+          ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
           ListFooterComponent={<View style={styles.bottomSpacer} />}
           contentContainerStyle={styles.listContent}
         />

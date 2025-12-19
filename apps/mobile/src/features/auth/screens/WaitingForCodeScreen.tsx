@@ -9,23 +9,26 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { signInWithPhone, signInWithMagicLink } from '@/services/supabaseAuthService';
+import {
+  signInWithPhone,
+  signInWithMagicLink,
+} from '@/services/supabaseAuthService';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-
-type RouteParams = {
-  WaitingForCode: {
-    verificationType: 'phone' | 'email';
-    contact: string;
-  };
-};
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 const RESEND_COOLDOWN = 60; // seconds
 
+type WaitingForCodeNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'WaitingForCode'
+>;
+
 export const WaitingForCodeScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const route = useRoute<RouteProp<RouteParams, 'WaitingForCode'>>();
+  const navigation = useNavigation<WaitingForCodeNavigationProp>();
+  const route = useRoute<RouteProp<RootStackParamList, 'WaitingForCode'>>();
   const [resendTimer, setResendTimer] = useState(RESEND_COOLDOWN);
   const [isResending, setIsResending] = useState(false);
 
@@ -72,7 +75,8 @@ export const WaitingForCodeScreen: React.FC = () => {
       }
       setResendTimer(RESEND_COOLDOWN);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to resend code';
+      const message =
+        error instanceof Error ? error.message : 'Failed to resend code';
       Alert.alert('Error', message);
     } finally {
       setIsResending(false);
@@ -80,10 +84,10 @@ export const WaitingForCodeScreen: React.FC = () => {
   }, [verificationType, contact, resendTimer, isResending]);
 
   const handleEnterCode = () => {
-    navigation.navigate('VerifyCode' as never, {
+    navigation.navigate('VerifyCode', {
       verificationType,
       contact,
-    } as never);
+    });
   };
 
   const handleChangeContact = () => {
@@ -98,7 +102,11 @@ export const WaitingForCodeScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Verification</Text>
         <View style={styles.placeholder} />
@@ -109,7 +117,11 @@ export const WaitingForCodeScreen: React.FC = () => {
         <View style={styles.iconContainer}>
           <View style={styles.iconBackground}>
             <MaterialCommunityIcons
-              name={verificationType === 'phone' ? 'cellphone-message' : 'email-send'}
+              name={
+                verificationType === 'phone'
+                  ? 'cellphone-message'
+                  : 'email-outline'
+              }
               size={48}
               color={COLORS.primary}
             />
@@ -121,7 +133,9 @@ export const WaitingForCodeScreen: React.FC = () => {
           />
         </View>
 
-        <Text style={styles.title}>Check Your {verificationType === 'phone' ? 'Phone' : 'Email'}</Text>
+        <Text style={styles.title}>
+          Check Your {verificationType === 'phone' ? 'Phone' : 'Email'}
+        </Text>
 
         <Text style={styles.description}>
           We've sent a verification code to{'\n'}
@@ -139,7 +153,11 @@ export const WaitingForCodeScreen: React.FC = () => {
           style={styles.enterCodeButton}
           onPress={handleEnterCode}
         >
-          <MaterialCommunityIcons name="numeric" size={20} color={COLORS.white} />
+          <MaterialCommunityIcons
+            name="numeric"
+            size={20}
+            color={COLORS.white}
+          />
           <Text style={styles.enterCodeButtonText}>Enter Code</Text>
         </TouchableOpacity>
 
@@ -147,9 +165,7 @@ export const WaitingForCodeScreen: React.FC = () => {
         <View style={styles.resendContainer}>
           <Text style={styles.resendText}>Didn't receive the code?</Text>
           {resendTimer > 0 ? (
-            <Text style={styles.resendTimer}>
-              Resend in {resendTimer}s
-            </Text>
+            <Text style={styles.resendTimer}>Resend in {resendTimer}s</Text>
           ) : (
             <TouchableOpacity
               onPress={handleResend}

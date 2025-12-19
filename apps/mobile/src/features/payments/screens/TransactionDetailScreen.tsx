@@ -41,9 +41,8 @@ export const TransactionDetailScreen: React.FC<
         return;
       }
       try {
-        const { transaction } = await paymentService.getTransaction(
-          transactionId,
-        );
+        const { transaction } =
+          await paymentService.getTransaction(transactionId);
         setTransaction(transaction);
       } catch (_error) {
         logger.error('Failed to fetch transaction', _error);
@@ -132,18 +131,55 @@ export const TransactionDetailScreen: React.FC<
   }
 
   // Map transaction data for display
+  const metadata = transaction.metadata || {};
+
+  // Safely access metadata values - they can be primitive types or null
+  const recipientValue = metadata['recipient'];
+  const paymentMethodValue = metadata['paymentMethod'];
+  const feesValue = metadata['fees'];
+
+  // Type guard functions with proper parameter types
+  const parseRecipient = (): {
+    name: string;
+    avatar: string | null;
+    id?: string;
+  } => {
+    if (
+      recipientValue &&
+      typeof recipientValue === 'object' &&
+      'name' in recipientValue
+    ) {
+      const r = recipientValue as Record<string, unknown>;
+      return {
+        name: String(r['name'] ?? 'Unknown'),
+        avatar: r['avatar'] ? String(r['avatar']) : null,
+        id: r['id'] ? String(r['id']) : undefined,
+      };
+    }
+    return { name: 'Unknown', avatar: null };
+  };
+
+  const parsePaymentMethod = (): { type: string; last4: string } => {
+    if (
+      paymentMethodValue &&
+      typeof paymentMethodValue === 'object' &&
+      'type' in paymentMethodValue
+    ) {
+      const pm = paymentMethodValue as Record<string, unknown>;
+      return {
+        type: String(pm['type'] ?? 'card'),
+        last4: String(pm['last4'] ?? '****'),
+      };
+    }
+    return { type: 'card', last4: '****' };
+  };
+
   const displayTransaction = {
     ...transaction,
-    recipient: transaction.metadata?.recipient || {
-      name: 'Unknown',
-      avatar: null,
-    },
-    paymentMethod: transaction.metadata?.paymentMethod || {
-      type: 'card',
-      last4: '****',
-    },
-    fees: transaction.metadata?.fees || 0,
-    total: transaction.amount + (transaction.metadata?.fees || 0),
+    recipient: parseRecipient(),
+    paymentMethod: parsePaymentMethod(),
+    fees: typeof feesValue === 'number' ? feesValue : 0,
+    total: transaction.amount + (typeof feesValue === 'number' ? feesValue : 0),
     reference: transaction.id,
   };
 
@@ -638,7 +674,9 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ScreenErrorBoundary for critical transaction functionality
-const TransactionDetailScreenWithErrorBoundary = (props: TransactionDetailScreenProps) => (
+const TransactionDetailScreenWithErrorBoundary = (
+  props: TransactionDetailScreenProps,
+) => (
   <ScreenErrorBoundary>
     <TransactionDetailScreen {...props} />
   </ScreenErrorBoundary>

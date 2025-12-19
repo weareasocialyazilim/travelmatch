@@ -29,11 +29,13 @@ export interface User {
   fullName?: string; // Alternative/display name
   username?: string;
   age?: number;
+  avatar?: string; // Alias for avatarUrl (backward compatibility)
   avatarUrl?: string; // Canonical avatar field
   phoneNumber?: string; // Canonical phone field
   bio?: string;
   role: Role;
   type?: 'traveler' | 'local'; // Alternative role representation
+  kyc?: string; // Alias for kycStatus (backward compatibility)
   kycStatus: KYCStatus; // Canonical KYC field
   isVerified?: boolean; // Derived from KYC status
   languages?: string[];

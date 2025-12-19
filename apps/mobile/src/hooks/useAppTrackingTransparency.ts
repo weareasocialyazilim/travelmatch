@@ -17,7 +17,7 @@ export type TrackingStatus =
   | 'authorized'
   | 'unavailable';
 
-interface ATTResult {
+export interface ATTResult {
   status: TrackingStatus;
   isTrackingEnabled: boolean;
   isLoading: boolean;
@@ -219,7 +219,7 @@ export const showTrackingExplanation = (): Promise<boolean> => {
           onPress: () => resolve(true),
         },
       ],
-      { cancelable: false }
+      { cancelable: false },
     );
   });
 };

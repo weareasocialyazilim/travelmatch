@@ -21,6 +21,7 @@ import { LoadingState } from '@/components/LoadingState';
 import SocialButton from '@/components/SocialButton';
 import { emailAuthSchema, type EmailAuthInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
+import { a11yProps } from '@/utils/accessibility';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -64,6 +65,7 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
+          {...a11yProps.button('Go back', 'Return to previous screen')}
         >
           <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
@@ -107,7 +109,10 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
           <Controller
             control={control}
             name="email"
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Email address</Text>
                 <TextInput
@@ -121,9 +126,7 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
-                {error && (
-                  <Text style={styles.errorText}>{error.message}</Text>
-                )}
+                {error && <Text style={styles.errorText}>{error.message}</Text>}
               </View>
             )}
           />
@@ -134,11 +137,17 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.continueButton,
-              (!canSubmitForm({ formState }) || loading) && styles.continueButtonDisabled,
+              (!canSubmitForm({ formState }) || loading) &&
+                styles.continueButtonDisabled,
             ]}
             onPress={handleSubmit(handleContinue)}
             disabled={!canSubmitForm({ formState }) || loading}
             activeOpacity={0.8}
+            {...a11yProps.button(
+              loading ? 'Sending code' : 'Continue to next step',
+              'Send verification code to email',
+              !canSubmitForm({ formState }) || loading,
+            )}
           >
             <Text style={styles.continueButtonText}>
               {loading ? 'Sending...' : 'Continue'}

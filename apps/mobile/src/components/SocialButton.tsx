@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -47,7 +47,10 @@ const SocialButton: React.FC<SocialButtonProps> = memo(
     const config = useMemo(() => providerConfig[provider], [provider]);
 
     // Memoize display text
-    const displayText = useMemo(() => label || config.text, [label, config.text]);
+    const displayText = useMemo(
+      () => label || config.text,
+      [label, config.text],
+    );
 
     if (size === 'icon') {
       return (

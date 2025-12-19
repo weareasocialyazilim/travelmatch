@@ -2,6 +2,7 @@
 
 exports[`FormComponents FormInput - Snapshots should match snapshot for basic input 1`] = `
 <RCTView
+  ref={null}
   style={
     {
       "marginBottom": 16,
@@ -9,6 +10,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for basic in
   }
 >
   <RCTText
+    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -22,6 +24,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for basic in
     Email
   </RCTText>
   <RCTView
+    ref={null}
     style={
       {
         "alignItems": "center",
@@ -49,6 +52,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for basic in
       onFocus={[Function]}
       placeholder="Enter email"
       placeholderTextColor="#9CA3AF"
+      ref={null}
       secureTextEntry={false}
       style={
         [
@@ -71,6 +75,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for basic in
 
 exports[`FormComponents FormInput - Snapshots should match snapshot for disabled 1`] = `
 <RCTView
+  ref={null}
   style={
     {
       "marginBottom": 16,
@@ -78,6 +83,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for disabled
   }
 >
   <RCTText
+    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -91,6 +97,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for disabled
     Email
   </RCTText>
   <RCTView
+    ref={null}
     style={
       {
         "alignItems": "center",
@@ -118,6 +125,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for disabled
       onChange={[Function]}
       onFocus={[Function]}
       placeholderTextColor="#9CA3AF"
+      ref={null}
       secureTextEntry={false}
       style={
         [
@@ -140,6 +148,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for disabled
 
 exports[`FormComponents FormInput - Snapshots should match snapshot for multiline 1`] = `
 <RCTView
+  ref={null}
   style={
     {
       "marginBottom": 16,
@@ -147,6 +156,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for multilin
   }
 >
   <RCTText
+    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -160,6 +170,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for multilin
     Description
   </RCTText>
   <RCTView
+    ref={null}
     style={
       {
         "alignItems": "flex-start",
@@ -187,6 +198,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for multilin
       onChange={[Function]}
       onFocus={[Function]}
       placeholderTextColor="#9CA3AF"
+      ref={null}
       secureTextEntry={false}
       style={
         [
@@ -212,6 +224,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for multilin
 
 exports[`FormComponents FormInput - Snapshots should match snapshot with error 1`] = `
 <RCTView
+  ref={null}
   style={
     {
       "marginBottom": 16,
@@ -219,6 +232,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
   }
 >
   <RCTText
+    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -232,6 +246,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
     Email
   </RCTText>
   <RCTView
+    ref={null}
     style={
       {
         "alignItems": "center",
@@ -258,6 +273,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
       onChange={[Function]}
       onFocus={[Function]}
       placeholderTextColor="#9CA3AF"
+      ref={null}
       secureTextEntry={false}
       style={
         [
@@ -276,6 +292,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
     />
   </RCTView>
   <RCTView
+    ref={null}
     style={
       {
         "alignItems": "center",
@@ -288,12 +305,14 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
     <RCTText
       color="#EF4444"
       name="alert-circle"
+      ref={null}
       size={14}
       testID="RCTText"
     >
       alert-circle
     </RCTText>
     <RCTText
+      ref={null}
       style={
         {
           "color": "#EF4444",

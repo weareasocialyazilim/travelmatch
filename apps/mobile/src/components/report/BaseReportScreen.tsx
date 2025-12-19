@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -87,21 +87,25 @@ export function BaseReportScreen<T extends string = string>({
   radioPosition = 'right',
   testID = 'base-report-screen',
 }: BaseReportScreenProps<T>): React.JSX.Element {
-  const { control, handleSubmit, formState, setValue, watch } = useForm<ReportInput>({
-    resolver: zodResolver(reportSchema),
-    mode: 'onChange',
-    defaultValues: {
-      reason: '',
-      details: '',
-    },
-  });
+  const { control, handleSubmit, formState, setValue, watch } =
+    useForm<ReportInput>({
+      resolver: zodResolver(reportSchema),
+      mode: 'onChange',
+      defaultValues: {
+        reason: '',
+        details: '',
+      },
+    });
 
   const selectedReason = watch('reason') as T | '';
 
-  const onFormSubmit = useCallback((data: ReportInput) => {
-    if (!data.reason) return;
-    onSubmit(data.reason as T, data.details || '');
-  }, [onSubmit]);
+  const onFormSubmit = useCallback(
+    (data: ReportInput) => {
+      if (!data.reason) return;
+      onSubmit(data.reason as T, data.details || '');
+    },
+    [onSubmit],
+  );
 
   const renderRadio = (isSelected: boolean) => (
     <View style={[styles.radio, isSelected && styles.radioSelected]}>
@@ -172,7 +176,10 @@ export function BaseReportScreen<T extends string = string>({
         <Controller
           control={control}
           name="details"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View style={styles.textFieldContainer}>
               <Text style={styles.textFieldLabel}>{detailsLabel}</Text>
               <TextInput
@@ -187,9 +194,7 @@ export function BaseReportScreen<T extends string = string>({
                 onBlur={onBlur}
                 testID={`${testID}-details-input`}
               />
-              {error && (
-                <Text style={styles.errorText}>{error.message}</Text>
-              )}
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
         />

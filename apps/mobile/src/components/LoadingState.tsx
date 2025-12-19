@@ -24,8 +24,8 @@ export type LoadingType = 'skeleton' | 'spinner' | 'overlay';
 /**
  * Loading State Props
  */
-interface LoadingStateProps {
-  type: LoadingType;
+export interface LoadingStateProps {
+  type?: LoadingType;
   count?: number; // For skeleton
   message?: string; // For overlay
   color?: string;
@@ -60,10 +60,19 @@ SkeletonItem.displayName = 'SkeletonItem';
  * <LoadingState type="overlay" message="Loading your trips..." />
  */
 export const LoadingState: React.FC<LoadingStateProps> = memo(
-  ({ type, count = 3, message, color = COLORS.primary, size = 'large' }) => {
+  ({
+    type = 'spinner',
+    count = 3,
+    message,
+    color = COLORS.primary,
+    size = 'large',
+  }) => {
     // Memoize skeleton items array to prevent recreation
     const skeletonItems = useMemo(
-      () => Array.from({ length: count }, (_, index) => <SkeletonItem key={`skeleton-${index}`} />),
+      () =>
+        Array.from({ length: count }, (_, index) => (
+          <SkeletonItem key={`skeleton-${index}`} />
+        )),
       [count],
     );
 
@@ -84,7 +93,9 @@ export const LoadingState: React.FC<LoadingStateProps> = memo(
             <View style={styles.overlayContainer}>
               <View style={styles.overlayContent}>
                 <ActivityIndicator size="large" color={color} />
-                {message && <Text style={styles.overlayMessage}>{message}</Text>}
+                {message && (
+                  <Text style={styles.overlayMessage}>{message}</Text>
+                )}
               </View>
             </View>
           </Modal>

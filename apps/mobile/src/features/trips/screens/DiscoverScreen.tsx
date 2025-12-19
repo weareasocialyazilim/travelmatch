@@ -130,7 +130,10 @@ const DiscoverScreen = () => {
   }, [refreshMoments]);
 
   // PERFORMANCE: Memoized view mode handlers
-  const handleSingleView = useCallback(() => setViewMode('single'), [setViewMode]);
+  const handleSingleView = useCallback(
+    () => setViewMode('single'),
+    [setViewMode],
+  );
   const handleGridView = useCallback(() => setViewMode('grid'), [setViewMode]);
 
   // Story navigation handlers
@@ -144,14 +147,23 @@ const DiscoverScreen = () => {
     } else {
       const nextUserIndex = currentUserIndex + 1;
       if (nextUserIndex < USER_STORIES.length) {
+        const nextUser = USER_STORIES[nextUserIndex];
         setCurrentUserIndex(nextUserIndex);
-        setSelectedStoryUser(USER_STORIES[nextUserIndex]);
+        setSelectedStoryUser(nextUser ?? null);
         setCurrentStoryIndex(0);
       } else {
         closeStoryViewer();
       }
     }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, setCurrentStoryIndex, setCurrentUserIndex, setSelectedStoryUser, closeStoryViewer]);
+  }, [
+    selectedStoryUser,
+    currentStoryIndex,
+    currentUserIndex,
+    setCurrentStoryIndex,
+    setCurrentUserIndex,
+    setSelectedStoryUser,
+    closeStoryViewer,
+  ]);
 
   const goToPreviousStory = useCallback(() => {
     if (!selectedStoryUser) return;
@@ -162,16 +174,32 @@ const DiscoverScreen = () => {
       const prevUserIndex = currentUserIndex - 1;
       if (prevUserIndex >= 0) {
         const prevUser = USER_STORIES[prevUserIndex];
-        setCurrentUserIndex(prevUserIndex);
-        setSelectedStoryUser(prevUser);
-        setCurrentStoryIndex(prevUser.stories.length - 1);
+        if (prevUser) {
+          setCurrentUserIndex(prevUserIndex);
+          setSelectedStoryUser(prevUser);
+          setCurrentStoryIndex(prevUser.stories.length - 1);
+        }
       }
     }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, setCurrentStoryIndex, setCurrentUserIndex, setSelectedStoryUser]);
+  }, [
+    selectedStoryUser,
+    currentStoryIndex,
+    currentUserIndex,
+    setCurrentStoryIndex,
+    setCurrentUserIndex,
+    setSelectedStoryUser,
+  ]);
 
   // PERFORMANCE: Memoized story view handler
   const handleViewMoment = useCallback(
-    (story: { id: string; title: string; imageUrl: string; price: number; description: string; location: string }) => {
+    (story: {
+      id: string;
+      title: string;
+      imageUrl: string;
+      price: number;
+      description: string;
+      location: string;
+    }) => {
       closeStoryViewer();
       const domainMoment: DomainMoment = {
         id: story.id,
@@ -279,10 +307,13 @@ const DiscoverScreen = () => {
     [navigation],
   );
 
-  const handleStoryPress = useCallback((user: UserStory) => {
-    const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
-    openStoryViewer(user, userIndex);
-  }, [openStoryViewer]);
+  const handleStoryPress = useCallback(
+    (user: UserStory) => {
+      const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
+      openStoryViewer(user, userIndex);
+    },
+    [openStoryViewer],
+  );
 
   const handleLocationSelect = useCallback(
     (location: string) => {
@@ -293,13 +324,10 @@ const DiscoverScreen = () => {
   );
 
   // Active filter count - computed from store (memoized)
-  const activeFilterCount = useMemo(() => getActiveFilterCount(), [
-    selectedCategory,
-    sortBy,
-    maxDistance,
-    priceRange,
-    getActiveFilterCount,
-  ]);
+  const activeFilterCount = useMemo(
+    () => getActiveFilterCount(),
+    [selectedCategory, sortBy, maxDistance, priceRange, getActiveFilterCount],
+  );
 
   // Memoized render functions
   const renderStoryItem = useCallback(
@@ -364,7 +392,6 @@ const DiscoverScreen = () => {
           renderItem={renderMomentCard}
           numColumns={viewMode === 'grid' ? 2 : 1}
           key={viewMode}
-          estimatedItemSize={viewMode === 'grid' ? 200 : 350}
           contentContainerStyle={
             viewMode === 'single'
               ? styles.singleListContainer
@@ -417,7 +444,9 @@ const DiscoverScreen = () => {
                       name="square-outline"
                       size={18}
                       color={
-                        viewMode === 'single' ? COLORS.white : COLORS.textSecondary
+                        viewMode === 'single'
+                          ? COLORS.white
+                          : COLORS.textSecondary
                       }
                       accessible={false}
                     />
@@ -440,7 +469,9 @@ const DiscoverScreen = () => {
                       name="view-grid-outline"
                       size={18}
                       color={
-                        viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
+                        viewMode === 'grid'
+                          ? COLORS.white
+                          : COLORS.textSecondary
                       }
                       accessible={false}
                     />

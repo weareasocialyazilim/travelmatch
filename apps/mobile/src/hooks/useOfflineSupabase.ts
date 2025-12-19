@@ -51,7 +51,8 @@ const checkOnline = async (): Promise<boolean> => {
 export const useOfflineSupabase = () => {
   const query = useCallback((table: string) => {
     // Create a proxy that checks online status before each query
-    const baseQuery = supabase.from(table);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseQuery = supabase.from(table as any);
 
     return new Proxy(baseQuery, {
       get(target, prop) {

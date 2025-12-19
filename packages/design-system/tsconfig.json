@@ -20,7 +20,11 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["jest"]
+    "types": ["jest"],
+    "paths": {
+      "@travelmatch/shared": ["../shared/src/index.ts"],
+      "@travelmatch/shared/*": ["../shared/src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

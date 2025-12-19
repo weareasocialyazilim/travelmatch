@@ -17,7 +17,7 @@ jobs:
   rls-security-tests:
     name: RLS Security Tests
     runs-on: ubuntu-latest
-    continue-on-error: true
+    # SECURITY: RLS tests MUST pass - removed continue-on-error
 
     steps:
       - name: Checkout code

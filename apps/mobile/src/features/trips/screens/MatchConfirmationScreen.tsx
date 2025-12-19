@@ -6,6 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
 import { COLORS } from '@/constants/colors';
+import { a11yProps } from '@/utils/accessibility';
 import { RADII } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
 import { SPACING } from '../constants/spacing';
@@ -36,7 +37,10 @@ const MatchConfirmationScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {loading && <LoadingState type="overlay" message="Confirming..." />}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          {...a11yProps.button('Go back', 'Return to previous screen')}
+        >
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
@@ -50,8 +54,16 @@ const MatchConfirmationScreen: React.FC = () => {
       <FlashList
         data={selectedGivers}
         renderItem={({ item }) => (
-          <View style={styles.giverCard}>
-            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+          <View
+            style={styles.giverCard}
+            accessible={true}
+            accessibilityLabel={`${item.name}, offering $${item.amount.toFixed(2)}`}
+          >
+            <Image
+              source={{ uri: item.avatar }}
+              style={styles.avatar}
+              {...a11yProps.image(`${item.name}'s profile photo`)}
+            />
             <View style={styles.giverInfo}>
               <Text style={styles.giverName}>{item.name}</Text>
               <Text style={styles.giverAmount}>${item.amount.toFixed(2)}</Text>
@@ -62,7 +74,14 @@ const MatchConfirmationScreen: React.FC = () => {
       />
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPress={handleConfirm}
+          {...a11yProps.button(
+            `Confirm ${selectedGivers.length} matches`,
+            'Finalize selected matches',
+          )}
+        >
           <Text style={styles.confirmButtonText}>Confirm</Text>
         </TouchableOpacity>
       </View>

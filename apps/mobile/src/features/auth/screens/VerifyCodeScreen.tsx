@@ -67,7 +67,10 @@ export const VerifyCodeScreen: React.FC = () => {
     }
 
     // Auto-submit when all digits entered
-    if (newCode.every((digit) => digit !== '') && newCode.join('').length === CODE_LENGTH) {
+    if (
+      newCode.every((digit) => digit !== '') &&
+      newCode.join('').length === CODE_LENGTH
+    ) {
       handleVerify(newCode.join(''));
     }
   };
@@ -94,7 +97,10 @@ export const VerifyCodeScreen: React.FC = () => {
       }
 
       if (result.error) {
-        Alert.alert('Error', result.error.message || 'Invalid verification code');
+        Alert.alert(
+          'Error',
+          result.error.message || 'Invalid verification code',
+        );
         setCode(Array(CODE_LENGTH).fill(''));
         inputRefs.current[0]?.focus();
         return;
@@ -102,23 +108,19 @@ export const VerifyCodeScreen: React.FC = () => {
 
       if (result.session) {
         // Successfully authenticated
-        Alert.alert(
-          'Success',
-          'Your account has been verified!',
-          [
-            {
-              text: 'Continue',
-              onPress: () => {
-                // Navigation will be handled by auth state change
-              },
+        Alert.alert('Success', 'Your account has been verified!', [
+          {
+            text: 'Continue',
+            onPress: () => {
+              // Navigation will be handled by auth state change
             },
-          ]
-        );
+          },
+        ]);
       }
     } catch (error) {
       Alert.alert(
         'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error ? error.message : 'An unexpected error occurred',
       );
       setCode(Array(CODE_LENGTH).fill(''));
       inputRefs.current[0]?.focus();
@@ -152,7 +154,7 @@ export const VerifyCodeScreen: React.FC = () => {
     } catch (error) {
       Alert.alert(
         'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error ? error.message : 'An unexpected error occurred',
       );
     } finally {
       setIsLoading(false);
@@ -168,8 +170,10 @@ export const VerifyCodeScreen: React.FC = () => {
       return contact;
     }
     // Mask email for display
-    const [local, domain] = contact.split('@');
-    if (local.length > 2) {
+    const parts = contact.split('@');
+    const local = parts[0];
+    const domain = parts[1];
+    if (local && local.length > 2 && domain) {
       return `${local.slice(0, 2)}***@${domain}`;
     }
     return contact;
@@ -191,7 +195,11 @@ export const VerifyCodeScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Verify Code</Text>
           <View style={styles.placeholder} />
@@ -201,7 +209,11 @@ export const VerifyCodeScreen: React.FC = () => {
           {/* Icon */}
           <View style={styles.iconContainer}>
             <MaterialCommunityIcons
-              name={verificationType === 'phone' ? 'message-text-lock' : 'email-lock'}
+              name={
+                verificationType === 'phone'
+                  ? 'message-text-lock'
+                  : 'email-lock'
+              }
               size={64}
               color={COLORS.primary}
             />
@@ -218,14 +230,18 @@ export const VerifyCodeScreen: React.FC = () => {
             {code.map((digit, index) => (
               <TextInput
                 key={`code-input-${index}`}
-                ref={(ref) => (inputRefs.current[index] = ref)}
+                ref={(ref) => {
+                  inputRefs.current[index] = ref;
+                }}
                 style={[
                   styles.codeInput,
                   digit ? styles.codeInputFilled : null,
                 ]}
                 value={digit}
                 onChangeText={(value) => handleCodeChange(value, index)}
-                onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
+                onKeyPress={({ nativeEvent }) =>
+                  handleKeyPress(nativeEvent.key, index)
+                }
                 keyboardType="number-pad"
                 maxLength={1}
                 selectTextOnFocus
@@ -254,9 +270,7 @@ export const VerifyCodeScreen: React.FC = () => {
                 <Text style={styles.resendLink}>Resend Code</Text>
               </TouchableOpacity>
             ) : (
-              <Text style={styles.resendTimer}>
-                Resend in {resendTimer}s
-              </Text>
+              <Text style={styles.resendTimer}>Resend in {resendTimer}s</Text>
             )}
           </View>
 

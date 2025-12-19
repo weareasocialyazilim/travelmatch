@@ -39,7 +39,7 @@ export interface ApiResponse<T> {
  */
 class ApiClient {
   private sessionExpiredCallback: (() => void) | null = null;
-  
+
   /**
    * Set callback for session expired events
    * Used to trigger navigation to session expired screen
@@ -47,7 +47,7 @@ class ApiClient {
   setSessionExpiredCallback(callback: () => void) {
     this.sessionExpiredCallback = callback;
   }
-  
+
   /**
    * Check if device is online
    * Returns false if offline, preventing unnecessary requests
@@ -55,12 +55,13 @@ class ApiClient {
   private async checkNetwork(): Promise<boolean> {
     try {
       const netState = await NetInfo.fetch();
-      const isConnected = netState.isConnected === true && netState.isInternetReachable !== false;
-      
+      const isConnected =
+        netState.isConnected === true && netState.isInternetReachable !== false;
+
       if (!isConnected) {
         logger.warn('[API v1] Offline - request blocked');
       }
-      
+
       return isConnected;
     } catch (error) {
       // If NetInfo fails, assume connected (fail-open)
@@ -71,12 +72,12 @@ class ApiClient {
 
   private async getHeaders(useToken?: string): Promise<HeadersInit> {
     // Use provided token or get from session manager
-    const token = useToken || await sessionManager.getValidToken();
-    
+    const token = useToken || (await sessionManager.getValidToken());
+
     return {
       'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+      Authorization: token ? `Bearer ${token}` : '',
+      apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
     };
   }
 
@@ -94,7 +95,8 @@ class ApiClient {
           success: false,
           error: {
             code: 'NETWORK_ERROR',
-            message: 'İnternet bağlantısı yok. Lütfen bağlantınızı kontrol edin.',
+            message:
+              'İnternet bağlantısı yok. Lütfen bağlantınızı kontrol edin.',
           },
         };
       }
@@ -117,10 +119,10 @@ class ApiClient {
       // ============================================
       if (response.status === 401 && !isRetry) {
         logger.warn('[API v1] 401 Unauthorized - attempting token refresh');
-        
+
         // Try to refresh token
         const newToken = await sessionManager.getValidToken();
-        
+
         if (newToken) {
           // Retry request with new token
           logger.info('[API v1] Token refreshed, retrying request');
@@ -128,12 +130,12 @@ class ApiClient {
         } else {
           // Refresh failed - session expired
           logger.error('[API v1] Token refresh failed - session expired');
-          
+
           // Trigger session expired callback
           if (this.sessionExpiredCallback) {
             this.sessionExpiredCallback();
           }
-          
+
           return {
             success: false,
             error: {
@@ -159,18 +161,21 @@ class ApiClient {
       return data as ApiResponse<T>;
     } catch (error) {
       logger.error('[API v1] Request failed:', error);
-      
+
       // Better error messaging for network errors
-      const isNetworkError = error instanceof TypeError && 
+      const isNetworkError =
+        error instanceof TypeError &&
         (error.message.includes('Network') || error.message.includes('fetch'));
-      
+
       return {
         success: false,
         error: {
           code: isNetworkError ? 'NETWORK_ERROR' : 'REQUEST_ERROR',
-          message: isNetworkError 
+          message: isNetworkError
             ? 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.'
-            : (error instanceof Error ? error.message : 'Request failed'),
+            : error instanceof Error
+              ? error.message
+              : 'Request failed',
         },
       };
     }
@@ -246,7 +251,7 @@ export const apiV1Service = {
   // AUTH
   // ============================================
   async login(email: string, password: string) {
-import type { Database } from '../types/database.types';
+    return apiClient.post<LoginResponse>('/auth/login', { email, password });
   },
 
   async logout() {
@@ -257,12 +262,12 @@ import type { Database } from '../types/database.types';
   // USERS
   // ============================================
   async getUser(userId: string) {
-import type { Database } from '../types/database.types';
+    return apiClient.get<UserProfile>(`/users/${userId}`);
   },
 
   async getUserMoments(userId: string) {
     return apiClient.get<{
-import type { Database } from '../types/database.types';
+      moments: Moment[];
       count: number;
     }>(`/users/${userId}/moments`);
   },
@@ -282,7 +287,7 @@ import type { Database } from '../types/database.types';
 
     const query = queryParams.toString();
     return apiClient.get<{
-import type { Database } from '../types/database.types';
+      moments: Moment[];
       pagination: {
         total: number;
         limit: number;
@@ -293,7 +298,7 @@ import type { Database } from '../types/database.types';
   },
 
   async getMoment(momentId: string) {
-import type { Database } from '../types/database.types';
+    return apiClient.get<Moment>(`/moments/${momentId}`);
   },
 
   // ============================================
@@ -311,7 +316,7 @@ import type { Database } from '../types/database.types';
 
     const query = queryParams.toString();
     return apiClient.get<{
-import type { Database } from '../types/database.types';
+      requests: Request[];
       count: number;
     }>(`/requests${query ? `?${query}` : ''}`);
   },
@@ -319,7 +324,7 @@ import type { Database } from '../types/database.types';
 
 /**
  * Migration Examples
- * 
+ *
  * BEFORE (Direct Supabase call):
  * ```typescript
  * const { data, error } = await supabase
@@ -327,7 +332,7 @@ import type { Database } from '../types/database.types';
  *   .select('*')
  *   .eq('category', 'food');
  * ```
- * 
+ *
  * AFTER (API v1):
  * ```typescript
  * const response = await apiV1Service.listMoments({ category: 'food' });
@@ -335,7 +340,7 @@ import type { Database } from '../types/database.types';
  *   const moments = response.data?.moments;
  * }
  * ```
- * 
+ *
  * Benefits:
  * 1. Consistent error handling
  * 2. Standardized response format

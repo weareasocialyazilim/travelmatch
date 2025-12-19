@@ -1,32 +1,32 @@
 /**
  * Stripe Webhook Handler Edge Function
- * 
+ *
  * Security Features:
  * - Webhook signature verification
  * - Idempotent processing
  * - Automatic retry handling
  * - Audit logging
  * - Cache invalidation
- * 
+ *
  * Handles events:
  * - payment_intent.succeeded
  * - payment_intent.payment_failed
  * - charge.refunded
  * - customer.subscription.created/updated/deleted
- * 
+ *
  * @see https://stripe.com/docs/webhooks
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  createClient,
+  SupabaseClient,
+} from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 
 // CORS headers (webhooks from Stripe don't need CORS, but keeping for consistency)
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'stripe-signature, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+// Note: Stripe webhooks come from Stripe servers, not browsers
 
 /**
  * Log audit event
@@ -56,7 +56,7 @@ async function invalidateUserPaymentCache(
 ) {
   try {
     const timestamp = new Date().toISOString();
-    
+
     await supabase.from('cache_invalidation').insert([
       { cache_key: `wallet:${userId}`, invalidated_at: timestamp },
       { cache_key: `transactions:${userId}`, invalidated_at: timestamp },
@@ -331,7 +331,7 @@ serve(async (req) => {
     // Initialize Stripe
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-    
+
     if (!stripeSecretKey || !webhookSecret) {
       throw new Error('Stripe configuration missing');
     }
@@ -344,7 +344,7 @@ serve(async (req) => {
     // Initialize Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
+
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Supabase configuration missing');
     }
@@ -356,7 +356,10 @@ serve(async (req) => {
     if (!signature) {
       return new Response(
         JSON.stringify({ error: 'Missing stripe signature' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -367,10 +370,10 @@ serve(async (req) => {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
-      return new Response(
-        JSON.stringify({ error: 'Invalid signature' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Check idempotency - prevent duplicate processing
@@ -387,15 +390,24 @@ serve(async (req) => {
 
     switch (event.type) {
       case 'payment_intent.succeeded':
-        await handlePaymentSucceeded(supabase, event.data.object as Stripe.PaymentIntent);
+        await handlePaymentSucceeded(
+          supabase,
+          event.data.object as Stripe.PaymentIntent,
+        );
         break;
 
       case 'payment_intent.payment_failed':
-        await handlePaymentFailed(supabase, event.data.object as Stripe.PaymentIntent);
+        await handlePaymentFailed(
+          supabase,
+          event.data.object as Stripe.PaymentIntent,
+        );
         break;
 
       case 'charge.refunded':
-        await handleChargeRefunded(supabase, event.data.object as Stripe.Charge);
+        await handleChargeRefunded(
+          supabase,
+          event.data.object as Stripe.Charge,
+        );
         break;
 
       default:
@@ -405,15 +417,17 @@ serve(async (req) => {
     // Mark event as processed
     await markEventProcessed(supabase, event.id, event.type);
 
-    return new Response(
-      JSON.stringify({ received: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return new Response(JSON.stringify({ received: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Webhook processing error:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
     );
   }
 });

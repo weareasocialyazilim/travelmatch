@@ -51,7 +51,7 @@ export interface ApiUser {
   is_verified?: boolean;
   languages?: string[];
   interests?: string[];
-  location?: any;
+  location?: ApiUserLocation | string;
   member_since?: string;
   total_gifts_given?: number;
   total_gifts_received?: number;
@@ -78,7 +78,7 @@ export interface ApiGesture {
   moment_id?: string;
   giver_id?: string;
   receiver_id?: string;
-  item?: any;
+  item?: { name?: string; description?: string; value?: number };
   amount?: number;
   amount_usd?: number;
   currency?: string;
@@ -86,7 +86,7 @@ export interface ApiGesture {
   status?: string;
   state?: string;
   message?: string;
-  proof?: any;
+  proof?: ApiProof;
   expires_at?: string;
   created_at?: string;
   completed_at?: string;
@@ -119,7 +119,7 @@ export interface ApiProof {
   images?: string[];
   video?: string;
   media_url?: string;
-  location?: any;
+  location?: ApiUserLocation;
   status: string;
   verification_method?: string;
   verification_status?: string;
@@ -143,10 +143,10 @@ export interface ApiTransaction {
   currency?: string;
   sender_id?: string;
   receiver_id?: string;
-  from_user?: any;
-  to_user?: any;
-  giver?: any;
-  receiver?: any;
+  from_user?: ApiUser;
+  to_user?: ApiUser;
+  giver?: ApiUser;
+  receiver?: ApiUser;
   moment_id?: string;
   proof_id?: string;
   payment_method?: string;
@@ -160,10 +160,150 @@ export interface ApiTransaction {
   failure_reason?: string;
 }
 
+export interface ApiPlace {
+  id: string;
+  name: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  lat?: number;
+  lng?: number;
+  city?: string;
+  country?: string;
+  distance?: number;
+  logo?: string;
+}
+
+export interface ApiGiftItem {
+  id: string;
+  place_id?: string;
+  placeId?: string;
+  place_name?: string;
+  placeName?: string;
+  name?: string;
+  title?: string;
+  emoji?: string;
+  icon?: string;
+  category?: string;
+  type?: string;
+  typical_price?: number;
+  typicalPrice?: number;
+  description?: string;
+}
+
+export interface ApiProofStory {
+  id: string;
+  proof_id?: string;
+  proofId?: string;
+  user_id?: string;
+  userId?: string;
+  type?: string;
+  author?: ApiUser;
+  title?: string;
+  description?: string;
+  content?: string;
+  media_url?: string;
+  mediaUrl?: string;
+  media_type?: string;
+  mediaType?: string;
+  images?: string[];
+  location?: ApiUserLocation;
+  stats?: {
+    views?: number;
+    likes?: number;
+    shares?: number;
+    comments?: number;
+  };
+  date?: string;
+  expires_at?: string;
+  expiresAt?: string;
+  created_at?: string;
+  createdAt?: string;
+}
+
+export interface ApiGiverSlot {
+  id: string;
+  position?: number;
+  slot_number?: number;
+  giver?: ApiUser & { amount?: number; message?: string };
+  is_filled?: boolean;
+  isFilled?: boolean;
+  amount?: number;
+  amount_contributed?: number;
+  message?: string;
+  timestamp?: string;
+}
+
+export interface ApiMomentUser {
+  id: string;
+  name?: string;
+  avatar?: string;
+  avatar_url?: string;
+  role?: string;
+  type?: string;
+  location?: string;
+  travel_days?: number;
+  travelDays?: number;
+  is_verified?: boolean;
+  isVerified?: boolean;
+  visiting_until?: string;
+  visitingUntil?: string;
+}
+
+export interface ApiMomentLocation {
+  name?: string;
+  city?: string;
+  country?: string;
+  coordinates?: {
+    lat?: number;
+    lng?: number;
+    latitude?: number;
+    longitude?: number;
+  };
+}
+
+export interface ApiMoment {
+  id: string;
+  user?: ApiMomentUser;
+  creator?: ApiMomentUser;
+  title?: string;
+  story?: string;
+  description?: string;
+  image?: string;
+  image_url?: string;
+  imageUrl?: string;
+  images?: string[];
+  price?: number;
+  price_per_guest?: number;
+  pricePerGuest?: number;
+  location?: ApiMomentLocation;
+  place?: string;
+  availability?: string;
+  gift_count?: number;
+  giftCount?: number;
+  distance?: number;
+  status?: string;
+  date?: string;
+  completed_date?: string;
+  completedDate?: string;
+  rating?: number;
+  request_count?: number;
+  requestCount?: number;
+  category?: { id: string; label: string; emoji: string };
+  date_range?: string;
+  dateRange?: string;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
+}
+
 /**
  * Normalize user location from API response
  */
-export function normalizeUserLocationFromAPI(location: ApiUserLocation | string | undefined): UserLocation | string | undefined {
+export function normalizeUserLocationFromAPI(
+  location: ApiUserLocation | string | undefined,
+): UserLocation | string | undefined {
   if (!location) return undefined;
   if (typeof location === 'string') return location;
 
@@ -189,13 +329,19 @@ export function normalizeUserFromAPI(apiUser: ApiUser): User {
     fullName: apiUser.full_name ?? apiUser.name,
     username: apiUser.username,
     age: apiUser.age,
-    avatarUrl: apiUser.avatar_url ?? apiUser.avatar ?? apiUser.photo_url ?? apiUser.profile_photo,
+    avatarUrl:
+      apiUser.avatar_url ??
+      apiUser.avatar ??
+      apiUser.photo_url ??
+      apiUser.profile_photo,
     phoneNumber: apiUser.phone_number ?? apiUser.phone,
     bio: apiUser.bio,
     role: apiUser.role ?? (apiUser.type === 'traveler' ? 'Traveler' : 'Local'),
     type: apiUser.type,
     kycStatus: apiUser.kyc_status ?? apiUser.kyc ?? 'Unverified',
-    isVerified: apiUser.is_verified ?? (apiUser.kyc_status === 'Verified' || apiUser.kyc === 'Verified'),
+    isVerified:
+      apiUser.is_verified ??
+      (apiUser.kyc_status === 'Verified' || apiUser.kyc === 'Verified'),
     languages: apiUser.languages,
     interests: apiUser.interests,
     location: location,
@@ -214,7 +360,7 @@ export function normalizeUserFromAPI(apiUser: ApiUser): User {
 /**
  * Normalize gift item from API response
  */
-export function normalizeGiftItemFromAPI(apiItem: any): GiftItem {
+export function normalizeGiftItemFromAPI(apiItem: ApiGiftItem): GiftItem {
   return {
     id: apiItem.id,
     placeId: apiItem.place_id ?? apiItem.placeId,
@@ -239,7 +385,9 @@ export function normalizeGestureFromAPI(apiGesture: ApiGesture): Gesture {
     momentId: apiGesture.moment_id,
     giverId: apiGesture.giver_id ?? '',
     receiverId: apiGesture.receiver_id ?? '',
-    item: apiGesture.item ? normalizeGiftItemFromAPI(apiGesture.item) : undefined,
+    item: apiGesture.item
+      ? normalizeGiftItemFromAPI(apiGesture.item)
+      : undefined,
     amount: apiGesture.amount,
     amountUSD: apiGesture.amount_usd ?? apiGesture.amount,
     currency: apiGesture.currency ?? 'USD',
@@ -247,13 +395,15 @@ export function normalizeGestureFromAPI(apiGesture: ApiGesture): Gesture {
     status: (apiGesture.status ?? apiGesture.state ?? 'pending') as any,
     state: (apiGesture.state ?? apiGesture.status ?? 'pending') as any,
     message: apiGesture.message,
-    proof: apiGesture.proof ? {
-      id: apiGesture.proof.id,
-      type: apiGesture.proof.type,
-      mediaUrl: apiGesture.proof.media_url ?? apiGesture.proof.mediaUrl,
-      status: apiGesture.proof.status,
-      createdAt: apiGesture.proof.created_at ?? apiGesture.proof.createdAt,
-    } : undefined,
+    proof: apiGesture.proof
+      ? {
+          id: apiGesture.proof.id,
+          type: apiGesture.proof.type,
+          mediaUrl: apiGesture.proof.media_url ?? apiGesture.proof.mediaUrl,
+          status: apiGesture.proof.status,
+          createdAt: apiGesture.proof.created_at ?? apiGesture.proof.createdAt,
+        }
+      : undefined,
     expiresAt: apiGesture.expires_at,
     createdAt: apiGesture.created_at,
     completedAt: apiGesture.completed_at,
@@ -264,7 +414,7 @@ export function normalizeGestureFromAPI(apiGesture: ApiGesture): Gesture {
 /**
  * Normalize place from API response
  */
-export function normalizePlaceFromAPI(apiPlace: any): Place {
+export function normalizePlaceFromAPI(apiPlace: ApiPlace): Place {
   return {
     id: apiPlace.id,
     name: apiPlace.name,
@@ -301,9 +451,23 @@ export function normalizeMessageFromAPI(apiMessage: ApiMessage): Message {
 /**
  * Normalize proof location from API response
  */
-export function normalizeProofLocationFromAPI(location: any): ProofLocation | string | undefined {
+export function normalizeProofLocationFromAPI(
+  location: ApiUserLocation | string | undefined,
+): ProofLocation | undefined {
   if (!location) return undefined;
-  if (typeof location === 'string') return location;
+  if (typeof location === 'string') {
+    // If location is a string, create a minimal ProofLocation with just address
+    return {
+      latitude: 0,
+      longitude: 0,
+      lat: 0,
+      lng: 0,
+      address: location,
+      city: undefined,
+      country: undefined,
+      name: location,
+    };
+  }
 
   return {
     latitude: location.latitude ?? location.lat,
@@ -351,7 +515,9 @@ export function normalizeProofFromAPI(apiProof: ApiProof): Proof {
 /**
  * Normalize transaction participant from API response
  */
-export function normalizeTransactionParticipantFromAPI(participant: any): TransactionParticipant | undefined {
+export function normalizeTransactionParticipantFromAPI(
+  participant: Partial<ApiUser> | undefined,
+): TransactionParticipant | undefined {
   if (!participant) return undefined;
 
   return {
@@ -365,7 +531,9 @@ export function normalizeTransactionParticipantFromAPI(participant: any): Transa
 /**
  * Normalize transaction from API response
  */
-export function normalizeTransactionFromAPI(apiTransaction: ApiTransaction): Transaction {
+export function normalizeTransactionFromAPI(
+  apiTransaction: ApiTransaction,
+): Transaction {
   return {
     id: apiTransaction.id,
     transactionId: apiTransaction.transaction_id ?? apiTransaction.id,
@@ -377,8 +545,12 @@ export function normalizeTransactionFromAPI(apiTransaction: ApiTransaction): Tra
     receiverId: apiTransaction.receiver_id,
     fromUser: normalizeTransactionParticipantFromAPI(apiTransaction.from_user),
     toUser: normalizeTransactionParticipantFromAPI(apiTransaction.to_user),
-    giver: normalizeTransactionParticipantFromAPI(apiTransaction.giver ?? apiTransaction.from_user),
-    receiver: normalizeTransactionParticipantFromAPI(apiTransaction.receiver ?? apiTransaction.to_user),
+    giver: normalizeTransactionParticipantFromAPI(
+      apiTransaction.giver ?? apiTransaction.from_user,
+    ),
+    receiver: normalizeTransactionParticipantFromAPI(
+      apiTransaction.receiver ?? apiTransaction.to_user,
+    ),
     momentId: apiTransaction.moment_id,
     proofId: apiTransaction.proof_id,
     paymentMethod: apiTransaction.payment_method,
@@ -396,7 +568,9 @@ export function normalizeTransactionFromAPI(apiTransaction: ApiTransaction): Tra
 /**
  * Normalize proof story author from API response
  */
-export function normalizeProofStoryAuthorFromAPI(author: any): ProofStoryAuthor | undefined {
+export function normalizeProofStoryAuthorFromAPI(
+  author: Partial<ApiUser> | undefined,
+): ProofStoryAuthor | undefined {
   if (!author) return undefined;
 
   return {
@@ -411,7 +585,9 @@ export function normalizeProofStoryAuthorFromAPI(author: any): ProofStoryAuthor 
 /**
  * Normalize proof story from API response
  */
-export function normalizeProofStoryFromAPI(apiStory: any): ProofStory {
+export function normalizeProofStoryFromAPI(
+  apiStory: ApiProofStory,
+): ProofStory {
   return {
     id: apiStory.id,
     proofId: apiStory.proof_id ?? apiStory.proofId,
@@ -425,12 +601,14 @@ export function normalizeProofStoryFromAPI(apiStory: any): ProofStory {
     mediaType: apiStory.media_type ?? apiStory.mediaType,
     images: apiStory.images,
     location: normalizeProofLocationFromAPI(apiStory.location),
-    stats: apiStory.stats ? {
-      views: apiStory.stats.views,
-      likes: apiStory.stats.likes,
-      shares: apiStory.stats.shares ?? apiStory.stats.comments,
-      comments: apiStory.stats.comments,
-    } : undefined,
+    stats: apiStory.stats
+      ? {
+          views: apiStory.stats.views,
+          likes: apiStory.stats.likes,
+          shares: apiStory.stats.shares ?? apiStory.stats.comments,
+          comments: apiStory.stats.comments,
+        }
+      : undefined,
     date: apiStory.date,
     expiresAt: apiStory.expires_at ?? apiStory.expiresAt,
     createdAt: apiStory.created_at ?? apiStory.createdAt ?? null,
@@ -440,7 +618,16 @@ export function normalizeProofStoryFromAPI(apiStory: any): ProofStory {
 /**
  * Normalize giver info from API response
  */
-export function normalizeGiverInfoFromAPI(giver: any): GiverInfo | undefined {
+export function normalizeGiverInfoFromAPI(
+  giver:
+    | (Partial<ApiUser> & {
+        amount?: number;
+        message?: number;
+        trust_score?: number;
+        trustScore?: number;
+      })
+    | undefined,
+): GiverInfo | undefined {
   if (!giver) return undefined;
 
   return {
@@ -457,7 +644,7 @@ export function normalizeGiverInfoFromAPI(giver: any): GiverInfo | undefined {
 /**
  * Normalize giver slot from API response
  */
-export function normalizeGiverSlotFromAPI(apiSlot: any): GiverSlot {
+export function normalizeGiverSlotFromAPI(apiSlot: ApiGiverSlot): GiverSlot {
   return {
     id: apiSlot.id,
     position: apiSlot.position ?? apiSlot.slot_number,
@@ -474,7 +661,9 @@ export function normalizeGiverSlotFromAPI(apiSlot: any): GiverSlot {
 /**
  * Normalize moment user from API response
  */
-export function normalizeMomentUserFromAPI(user: any): MomentUser | undefined {
+export function normalizeMomentUserFromAPI(
+  user: ApiMomentUser | undefined,
+): MomentUser | undefined {
   if (!user) return undefined;
 
   return {
@@ -494,24 +683,28 @@ export function normalizeMomentUserFromAPI(user: any): MomentUser | undefined {
 /**
  * Normalize moment location from API response
  */
-export function normalizeMomentLocationFromAPI(location: any): MomentLocation | undefined {
+export function normalizeMomentLocationFromAPI(
+  location: ApiMomentLocation | undefined,
+): MomentLocation | undefined {
   if (!location) return undefined;
 
   return {
     name: location.name,
     city: location.city,
     country: location.country,
-    coordinates: location.coordinates ? {
-      lat: location.coordinates.lat ?? location.coordinates.latitude,
-      lng: location.coordinates.lng ?? location.coordinates.longitude,
-    } : undefined,
+    coordinates: location.coordinates
+      ? {
+          lat: location.coordinates.lat ?? location.coordinates.latitude,
+          lng: location.coordinates.lng ?? location.coordinates.longitude,
+        }
+      : undefined,
   };
 }
 
 /**
  * Normalize moment from API response
  */
-export function normalizeMomentFromAPI(apiMoment: any): Moment {
+export function normalizeMomentFromAPI(apiMoment: ApiMoment): Moment {
   return {
     id: apiMoment.id,
     user: normalizeMomentUserFromAPI(apiMoment.user ?? apiMoment.creator),
@@ -523,7 +716,8 @@ export function normalizeMomentFromAPI(apiMoment: any): Moment {
     imageUrl: apiMoment.image_url ?? apiMoment.imageUrl ?? apiMoment.image,
     images: apiMoment.images,
     price: apiMoment.price ?? apiMoment.price_per_guest ?? 0,
-    pricePerGuest: apiMoment.price_per_guest ?? apiMoment.pricePerGuest ?? apiMoment.price,
+    pricePerGuest:
+      apiMoment.price_per_guest ?? apiMoment.pricePerGuest ?? apiMoment.price,
     location: normalizeMomentLocationFromAPI(apiMoment.location),
     place: apiMoment.place,
     availability: apiMoment.availability,
@@ -534,11 +728,13 @@ export function normalizeMomentFromAPI(apiMoment: any): Moment {
     completedDate: apiMoment.completed_date ?? apiMoment.completedDate,
     rating: apiMoment.rating,
     requestCount: apiMoment.request_count ?? apiMoment.requestCount,
-    category: apiMoment.category ? {
-      id: apiMoment.category.id,
-      label: apiMoment.category.label,
-      emoji: apiMoment.category.emoji,
-    } : undefined,
+    category: apiMoment.category
+      ? {
+          id: apiMoment.category.id,
+          label: apiMoment.category.label,
+          emoji: apiMoment.category.emoji,
+        }
+      : undefined,
     dateRange: apiMoment.date_range ?? apiMoment.dateRange,
     createdAt: apiMoment.created_at ?? apiMoment.createdAt,
     updatedAt: apiMoment.updated_at ?? apiMoment.updatedAt,
@@ -550,12 +746,17 @@ export function normalizeMomentFromAPI(apiMoment: any): Moment {
  */
 export const normalizeArrayFromAPI = {
   users: (apiUsers: ApiUser[]) => apiUsers.map(normalizeUserFromAPI),
-  gestures: (apiGestures: ApiGesture[]) => apiGestures.map(normalizeGestureFromAPI),
-  messages: (apiMessages: ApiMessage[]) => apiMessages.map(normalizeMessageFromAPI),
+  gestures: (apiGestures: ApiGesture[]) =>
+    apiGestures.map(normalizeGestureFromAPI),
+  messages: (apiMessages: ApiMessage[]) =>
+    apiMessages.map(normalizeMessageFromAPI),
   proofs: (apiProofs: ApiProof[]) => apiProofs.map(normalizeProofFromAPI),
-  transactions: (apiTransactions: ApiTransaction[]) => apiTransactions.map(normalizeTransactionFromAPI),
-  proofStories: (apiStories: any[]) => apiStories.map(normalizeProofStoryFromAPI),
-  giverSlots: (apiSlots: any[]) => apiSlots.map(normalizeGiverSlotFromAPI),
-  moments: (apiMoments: any[]) => apiMoments.map(normalizeMomentFromAPI),
-  places: (apiPlaces: any[]) => apiPlaces.map(normalizePlaceFromAPI),
+  transactions: (apiTransactions: ApiTransaction[]) =>
+    apiTransactions.map(normalizeTransactionFromAPI),
+  proofStories: (apiStories: ApiProofStory[]) =>
+    apiStories.map(normalizeProofStoryFromAPI),
+  giverSlots: (apiSlots: ApiGiverSlot[]) =>
+    apiSlots.map(normalizeGiverSlotFromAPI),
+  moments: (apiMoments: ApiMoment[]) => apiMoments.map(normalizeMomentFromAPI),
+  places: (apiPlaces: ApiPlace[]) => apiPlaces.map(normalizePlaceFromAPI),
 };

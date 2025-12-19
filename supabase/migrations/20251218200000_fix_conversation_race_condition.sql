@@ -2,10 +2,10 @@
 -- Creates atomic get_or_create_conversation function and unique constraint
 -- Prevents duplicate conversations when concurrent requests occur
 
--- 1. Create unique index on sorted participant_ids to prevent duplicates
--- Using a hash of sorted array for efficient lookups
-CREATE INDEX IF NOT EXISTS idx_conversations_participant_ids_hash
-ON conversations USING btree (md5(array_to_string(participant_ids, ',')));
+-- 1. Create GIN index on participant_ids for efficient array lookups
+-- Note: Hash index on md5() removed because md5() is not IMMUTABLE in index context
+CREATE INDEX IF NOT EXISTS idx_conversations_participant_ids_gin
+ON conversations USING gin (participant_ids);
 
 -- 2. Create atomic get_or_create_conversation function
 -- Uses advisory lock to prevent race conditions

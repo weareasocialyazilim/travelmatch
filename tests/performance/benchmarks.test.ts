@@ -13,13 +13,12 @@
  * - Bundle size
  */
 
-import { renderHook, act } from '@testing-library/react-hooks';
-import { render, waitFor } from '@testing-library/react-native';
+import { renderHook, act, render, waitFor } from '@testing-library/react-native';
 import { performance } from 'perf_hooks';
 import React from 'react';
 
 // Mock screens and components
-import { DiscoverScreen } from '../../apps/mobile/src/features/discover/screens/DiscoverScreen';
+import { DiscoverScreen } from '../../apps/mobile/src/features/trips/screens/DiscoverScreen';
 import { ChatScreen } from '../../apps/mobile/src/features/messages/screens/ChatScreen';
 import { ProfileScreen } from '../../apps/mobile/src/features/profile/screens/ProfileScreen';
 import { useMoments } from '../../apps/mobile/src/hooks/useMoments';

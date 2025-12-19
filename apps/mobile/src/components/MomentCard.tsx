@@ -1,16 +1,14 @@
 import React, { memo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Share,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { OptimizedImage } from './ui/OptimizedImage';
 import { analytics } from '../services/analytics';
-import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../utils/cloudflareImageHelpers';
+import {
+  getMomentImageProps,
+  getAvatarImageProps,
+  IMAGE_VARIANTS_BY_CONTEXT,
+} from '../utils/cloudflareImageHelpers';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
@@ -120,7 +118,10 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         <Animated.View style={[styles.card, cardScale]}>
           <View style={styles.cardImageContainer}>
             <OptimizedImage
-              {...getMomentImageProps(moment, IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE)}
+              {...getMomentImageProps(
+                moment,
+                IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE,
+              )}
               contentFit="cover"
               style={styles.cardImage}
               transition={200}
@@ -149,7 +150,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                 {...getAvatarImageProps(
                   moment.user || {},
                   IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                  DEFAULT_IMAGES.AVATAR_LARGE
+                  DEFAULT_IMAGES.AVATAR_LARGE,
                 )}
                 contentFit="cover"
                 style={styles.userAvatar}
@@ -175,7 +176,9 @@ const MomentCard: React.FC<MomentCardProps> = memo(
             <Text style={styles.cardTitle} numberOfLines={2}>
               {moment.title}
             </Text>
-            <Text style={styles.cardLocation}>{moment.location.city}</Text>
+            <Text style={styles.cardLocation}>
+              {moment.location?.city ?? ''}
+            </Text>
 
             <View style={styles.cardDetails}>
               <View style={styles.detailItem}>
@@ -185,7 +188,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                   color={COLORS.textSecondary}
                 />
                 <Text style={styles.detailText} numberOfLines={1}>
-                  {moment.location.name}
+                  {moment.location?.name ?? ''}
                 </Text>
               </View>
               <View style={styles.detailItem}>

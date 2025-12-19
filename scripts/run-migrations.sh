@@ -1,11 +1,16 @@
 #!/bin/bash
 # Supabase Production Migration Runner
 # Uses Management API to execute SQL
+#
+# SECURITY: Credentials MUST be provided via environment variables
+# Never commit tokens or secrets to version control!
 
 set -e
 
-PROJECT_REF="bjikxgtbptrvawkguypv"
-ACCESS_TOKEN="sbp_9a6ad7e105b0ad9ae37cb9aea7968f3cfb070a38"
+# Required environment variables - fail if not set
+PROJECT_REF="${SUPABASE_PROJECT_REF:?Error: SUPABASE_PROJECT_REF environment variable is required}"
+ACCESS_TOKEN="${SUPABASE_ACCESS_TOKEN:?Error: SUPABASE_ACCESS_TOKEN environment variable is required}"
+
 API_URL="https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query"
 MIGRATIONS_DIR="supabase/migrations"
 

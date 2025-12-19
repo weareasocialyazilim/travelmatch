@@ -64,33 +64,24 @@ export const ChangePasswordScreen: React.FC = () => {
   const onSubmit = async (data: ChangePasswordInput) => {
     setIsLoading(true);
     try {
-      const { error } = await userService.changePassword({
+      await userService.changePassword({
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
 
-      if (error) {
-        Alert.alert('Error', error.message || 'Failed to change password');
-        return;
-      }
-
-      Alert.alert(
-        'Success',
-        'Your password has been changed successfully.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              reset();
-              navigation.goBack();
-            },
+      Alert.alert('Success', 'Your password has been changed successfully.', [
+        {
+          text: 'OK',
+          onPress: () => {
+            reset();
+            navigation.goBack();
           },
-        ]
-      );
+        },
+      ]);
     } catch (error) {
       Alert.alert(
         'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error ? error.message : 'An unexpected error occurred',
       );
     } finally {
       setIsLoading(false);
@@ -113,7 +104,11 @@ export const ChangePasswordScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Change Password</Text>
           <View style={styles.placeholder} />
@@ -217,7 +212,10 @@ export const ChangePasswordScreen: React.FC = () => {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[styles.submitButton, !isValid && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              !isValid && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit(onSubmit)}
             disabled={!isValid}
           >

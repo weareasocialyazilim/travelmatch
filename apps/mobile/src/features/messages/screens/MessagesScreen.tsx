@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   View,
   Text,
@@ -109,9 +115,7 @@ const MessagesScreen: React.FC = () => {
       }
 
       if (isTyping) {
-        setTypingConversations(
-          (prev) => new Set([...prev, conversationId]),
-        );
+        setTypingConversations((prev) => new Set([...prev, conversationId]));
 
         // Auto-remove after 5 seconds with proper cleanup tracking
         const timeoutId = setTimeout(() => {
@@ -173,10 +177,12 @@ const MessagesScreen: React.FC = () => {
         otherUser: {
           id: conversation.participantId || '',
           name: conversation.participantName || 'User',
-          avatar: conversation.participantAvatar,
-          isVerified: conversation.participantVerified,
+          avatar: conversation.participantAvatar ?? undefined,
+          isVerified: conversation.participantVerified ?? undefined,
           role: 'Traveler',
           kyc: 'Verified',
+          kycStatus: 'Verified',
+          email: '',
           location: '',
         },
         conversationId: conversation.id,

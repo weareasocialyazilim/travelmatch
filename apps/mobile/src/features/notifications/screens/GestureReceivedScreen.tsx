@@ -72,8 +72,8 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
           status === 'pending_verification'
             ? 'current'
             : status === 'verified'
-            ? 'completed'
-            : 'pending',
+              ? 'completed'
+              : 'pending',
         time: status === 'verified' ? '1 day ago' : undefined,
       },
       {
@@ -109,12 +109,14 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
       navigation.navigate('Chat', {
         otherUser: {
           id: gestureId,
+          email: '',
           name: senderName || 'Anonymous',
           avatar: senderAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
           isVerified: true,
           type: 'traveler',
           role: 'Traveler',
           kyc: 'Verified',
+          kycStatus: 'Verified',
           location: '',
         },
       });

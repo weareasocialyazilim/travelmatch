@@ -3,15 +3,17 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 
 const QuerySchema = z.object({
-  since_version: z.string().transform((v) => parseInt(v, 10)).default('0'),
-  limit: z.string().transform((v) => parseInt(v, 10)).default('100'),
+  since_version: z
+    .string()
+    .transform((v) => parseInt(v, 10))
+    .default('0'),
+  limit: z
+    .string()
+    .transform((v) => parseInt(v, 10))
+    .default('100'),
 });
 
 serve(async (req) => {
@@ -30,10 +32,13 @@ serve(async (req) => {
     // Get user from JWT
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      );
     }
 
     const supabaseClient = createClient(
@@ -43,7 +48,7 @@ serve(async (req) => {
         global: {
           headers: { Authorization: authHeader },
         },
-      }
+      },
     );
 
     const {
@@ -76,7 +81,7 @@ serve(async (req) => {
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -96,7 +101,7 @@ serve(async (req) => {
         {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -144,7 +149,7 @@ serve(async (req) => {
       {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   } catch (error) {
     console.error('Feed delta error:', error);
@@ -158,7 +163,7 @@ serve(async (req) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -170,7 +175,7 @@ serve(async (req) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });

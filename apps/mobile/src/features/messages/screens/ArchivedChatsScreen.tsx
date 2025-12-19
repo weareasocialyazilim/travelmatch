@@ -29,9 +29,9 @@ interface ArchivedChat {
 }
 
 export const ArchivedChatsScreen: React.FC = () => {
-    const { showToast: _showToast } = useToast();
+  const { showToast: _showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
-const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([
     {
@@ -92,12 +92,14 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     navigation.navigate('Chat', {
       otherUser: {
         id: chat.id,
+        email: '',
         name: chat.name,
         avatar: chat.avatar,
         isVerified: chat.isVerified,
         type: 'traveler',
         role: 'Traveler',
         kyc: chat.isVerified ? 'Verified' : 'Unverified',
+        kycStatus: chat.isVerified ? 'Verified' : 'Unverified',
         location: 'Unknown',
       },
     });

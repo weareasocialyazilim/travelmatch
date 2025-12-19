@@ -2,25 +2,28 @@
 
 /**
  * Stripe Webhook Handler Edge Function
- * 
+ *
  * Security Features:
  * - Webhook signature verification
  * - Idempotent processing
  * - Automatic retry handling
  * - Audit logging
  * - Cache invalidation
- * 
+ *
  * Handles events:
  * - payment_intent.succeeded
  * - payment_intent.payment_failed
  * - charge.refunded
  * - customer.subscription.created/updated/deleted
- * 
+ *
  * @see https://stripe.com/docs/webhooks
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  createClient,
+  SupabaseClient,
+} from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 import {
   ErrorCode,
@@ -30,13 +33,10 @@ import {
   toHttpSuccessResponse,
   handleUnexpectedError,
 } from '../_shared/errorHandler.ts';
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 
 // CORS headers (webhooks from Stripe don't need CORS, but keeping for consistency)
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'stripe-signature, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+// Note: Stripe webhooks come from Stripe servers, not browsers, so CORS is not strictly needed
 
 /**
  * Log audit event
@@ -66,7 +66,7 @@ async function invalidateUserPaymentCache(
 ) {
   try {
     const timestamp = new Date().toISOString();
-    
+
     await supabase.from('cache_invalidation').insert([
       { cache_key: `wallet:${userId}`, invalidated_at: timestamp },
       { cache_key: `transactions:${userId}`, invalidated_at: timestamp },
@@ -341,7 +341,7 @@ serve(async (req) => {
     // Initialize Stripe
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-    
+
     if (!stripeSecretKey || !webhookSecret) {
       const error = createErrorResponse(
         'Stripe configuration missing',
@@ -358,7 +358,7 @@ serve(async (req) => {
     // Initialize Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
+
     if (!supabaseUrl || !supabaseServiceKey) {
       const error = createErrorResponse(
         'Supabase configuration missing',
@@ -408,15 +408,24 @@ serve(async (req) => {
 
     switch (event.type) {
       case 'payment_intent.succeeded':
-        await handlePaymentSucceeded(supabase, event.data.object as Stripe.PaymentIntent);
+        await handlePaymentSucceeded(
+          supabase,
+          event.data.object as Stripe.PaymentIntent,
+        );
         break;
 
       case 'payment_intent.payment_failed':
-        await handlePaymentFailed(supabase, event.data.object as Stripe.PaymentIntent);
+        await handlePaymentFailed(
+          supabase,
+          event.data.object as Stripe.PaymentIntent,
+        );
         break;
 
       case 'charge.refunded':
-        await handleChargeRefunded(supabase, event.data.object as Stripe.Charge);
+        await handleChargeRefunded(
+          supabase,
+          event.data.object as Stripe.Charge,
+        );
         break;
 
       default:

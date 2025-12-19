@@ -51,13 +51,17 @@ const DataPrivacyScreen = () => {
   }, []);
 
   const loadConsentSettings = async () => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await supabase
-        .from('profiles')
+        .from('users')
         .select(
           'gdpr_consent_at, marketing_consent, analytics_consent, privacy_policy_version, terms_accepted_at',
         )
-        .eq('id', user?.id)
+        .eq('id', user.id)
         .single();
 
       if (res.error) throw res.error;
@@ -83,10 +87,14 @@ const DataPrivacyScreen = () => {
     consentType: 'marketing' | 'analytics',
     value: boolean,
   ) => {
+    if (!user?.id) {
+      showToast('You must be logged in to update preferences', 'error');
+      return;
+    }
     try {
       // Record consent in history
-      const { data: rpcData, error } = await callRpc('record_consent', {
-        target_user_id: user?.id,
+      const { error } = await callRpc('record_consent', {
+        target_user_id: user.id,
         consent_type: consentType,
         consented: value,
         version: '1.0',
@@ -173,11 +181,9 @@ const DataPrivacyScreen = () => {
                 'Export Completed',
                 `Your data export includes:\n\n` +
                   `• Profile information\n` +
-                  `• ${exportData.metadata.totalMoments} moments\n` +
-                  `• ${exportData.metadata.totalRequests} requests\n` +
-                  `• ${exportData.metadata.totalMessages} messages\n` +
-                  `• ${exportData.metadata.totalTransactions} transactions\n` +
-                  `• ${exportData.metadata.totalReviews} reviews\n\n` +
+                  `• ${exportData?.metadata.momentsCount ?? 0} moments\n` +
+                  `• ${exportData?.metadata.messagesCount ?? 0} messages\n` +
+                  `• ${exportData?.metadata.transactionsCount ?? 0} transactions\n\n` +
                   `This file is valid for 7 days as per GDPR requirements.`,
                 [{ text: 'OK' }],
               );
@@ -251,6 +257,10 @@ const DataPrivacyScreen = () => {
   };
 
   const handleViewConsentHistory = async () => {
+    if (!user?.id) {
+      showToast('You must be logged in', 'error');
+      return;
+    }
     try {
       // SECURITY: Explicit column selection
       const { data, error } = await supabase
@@ -266,7 +276,7 @@ const DataPrivacyScreen = () => {
           created_at
         `,
         )
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

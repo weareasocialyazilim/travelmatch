@@ -27,14 +27,6 @@ interface ListResult<T> {
 }
 
 // Type definitions for tables not yet in generated types
-interface FollowerRecord {
-  follower_id: string;
-}
-
-interface FollowingRecord {
-  following_id: string;
-}
-
 interface ReportRecord {
   id: string;
   reporter_id: string;
@@ -161,16 +153,14 @@ export const usersService = {
 
     try {
       // SECURITY: Explicit column selection for user data
-      // Include aggregate counts for moments, followers, following and reviews
+      // Include aggregate counts for moments and reviews
       const { data, error } = await supabase
         .from('users')
         .select(
           `
-          id, email, name, avatar_url, bio, location, public_key, created_at, updated_at,
+          id, email, full_name, avatar_url, bio, location, created_at, updated_at,
           moments_count:moments!user_id(count),
-          followers_count:follows!following_id(count),
-          following_count:follows!follower_id(count),
-          reviews_count:reviews!reviewed_user_id(count)
+          reviews_count:reviews!reviewed_id(count)
         `,
         )
         .eq('id', id)
@@ -201,96 +191,6 @@ export const usersService = {
     } catch (error) {
       logger.error('[DB] Update user error:', error);
       return { data: null, error: error as Error };
-    }
-  },
-
-  async follow(
-    followerId: string,
-    followingId: string,
-  ): Promise<{ error: Error | null }> {
-    try {
-      const { error } = await supabase
-        .from('follows')
-        .insert({ follower_id: followerId, following_id: followingId });
-
-      if (error) throw error;
-      return { error: null };
-    } catch (error) {
-      logger.error('[DB] Follow user error:', error);
-      return { error: error as Error };
-    }
-  },
-
-  async unfollow(
-    followerId: string,
-    followingId: string,
-  ): Promise<{ error: Error | null }> {
-    try {
-      const { error } = await supabase
-        .from('follows')
-        .delete()
-        .eq('follower_id', followerId)
-        .eq('following_id', followingId);
-
-      if (error) throw error;
-      return { error: null };
-    } catch (error) {
-      logger.error('[DB] Unfollow user error:', error);
-      return { error: error as Error };
-    }
-  },
-
-  async getFollowers(userId: string): Promise<ListResult<FollowerRecord>> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('follower_id', { count: 'exact' })
-        .eq('following_id', userId);
-
-      if (error) throw error;
-      return { data: (data as FollowerRecord[]) || [], count: count || 0, error: null };
-    } catch (error) {
-      logger.error('[DB] Get followers error:', error);
-      return { data: [], count: 0, error: error as Error };
-    }
-  },
-
-  async getFollowing(userId: string): Promise<ListResult<FollowingRecord>> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('following_id', { count: 'exact' })
-        .eq('follower_id', userId);
-
-      if (error) throw error;
-      return { data: (data as FollowingRecord[]) || [], count: count || 0, error: null };
-    } catch (error) {
-      logger.error('[DB] Get following error:', error);
-      return { data: [], count: 0, error: error as Error };
-    }
-  },
-
-  async checkFollowStatus(
-    followerId: string,
-    followingId: string,
-  ): Promise<{ isFollowing: boolean; error: Error | null }> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact' })
-        .eq('follower_id', followerId)
-        .eq('following_id', followingId);
-
-      if (error) throw error;
-
-      const isFollowing = !!(
-        (Array.isArray(data) && data.length > 0) || (typeof count === 'number' && count > 0)
-      );
-
-      return { isFollowing, error: null };
-    } catch (error) {
-      logger.error('[DB] Check follow status error:', error);
-      return { isFollowing: false, error: error as Error };
     }
   },
 
@@ -436,7 +336,13 @@ export const momentsService = {
       const { data, count, error } = await query;
 
       if (error) throw error;
-      return okList<any>(data || [], count);
+      // Type assertion: data includes joined user and category data
+      return okList<
+        Tables['moments']['Row'] & {
+          users: Partial<Tables['users']['Row']> | null;
+          categories: { id: string; name: string; emoji: string } | null;
+        }
+      >(data || [], count);
     } catch (error) {
       logger.error('[DB] List moments error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -547,7 +453,9 @@ export const momentsService = {
 
       // Extract moments from the join result
       const moments =
-        data?.map((item: { moments: Tables['moments']['Row'] }) => item.moments).filter(Boolean) || [];
+        data
+          ?.map((item: { moments: Tables['moments']['Row'] }) => item.moments)
+          .filter(Boolean) || [];
 
       return { data: moments, count: count || 0, error: null };
     } catch (error) {
@@ -637,7 +545,7 @@ export const momentsService = {
         .single();
 
       if (error) throw error;
-      return okSingle<any>(data);
+      return okSingle<Tables['moments']['Row']>(data);
     } catch (error) {
       logger.error('[DB] Update moment error:', error);
       return { data: null, error: error as Error };
@@ -779,7 +687,7 @@ export const momentsService = {
         .limit(options?.limit || 20);
 
       if (error) throw error;
-      return okList<any>(data || [], count);
+      return okList<Tables['moments']['Row']>(data || [], count);
     } catch (error) {
       logger.error('[DB] Search moments error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -921,11 +829,13 @@ export const momentsService = {
       let nextCursor: string | null = null;
       if (hasMore && items.length > 0) {
         const lastItem = items[items.length - 1];
-        const cursorPayload = JSON.stringify({
-          created_at: lastItem.created_at,
-          id: lastItem.id,
-        });
-        nextCursor = Buffer.from(cursorPayload).toString('base64');
+        if (lastItem) {
+          const cursorPayload = JSON.stringify({
+            created_at: lastItem.created_at,
+            id: lastItem.id,
+          });
+          nextCursor = Buffer.from(cursorPayload).toString('base64');
+        }
       }
 
       return {
@@ -1011,7 +921,7 @@ export const requestsService = {
       });
 
       if (error) throw error;
-      return okList<any>(data || [], count);
+      return okList<RequestRecord>(data || [], count);
     } catch (error) {
       logger.error('[DB] List requests error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -1208,7 +1118,22 @@ export const conversationsService = {
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-      return okList<any>(data || [], count);
+      // Type includes nested messages with sender info
+      return okList<
+        Tables['conversations']['Row'] & {
+          messages: Array<{
+            id: string;
+            content: string;
+            created_at: string;
+            read_at: string | null;
+            sender: {
+              id: string;
+              full_name: string | null;
+              avatar_url: string | null;
+            } | null;
+          }>;
+        }
+      >(data || [], count);
     } catch (error) {
       logger.error('[DB] List conversations error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -1235,7 +1160,10 @@ export const conversationsService = {
 
       if (error) {
         // Fallback to manual upsert if RPC not available
-        logger.warn('[DB] RPC get_or_create_conversation failed, using fallback', error);
+        logger.warn(
+          '[DB] RPC get_or_create_conversation failed, using fallback',
+          error,
+        );
 
         // Try to find existing first with sorted IDs
         const { data: existing } = await supabase
@@ -1266,8 +1194,8 @@ export const conversationsService = {
             { participant_ids: sortedParticipantIds },
             {
               onConflict: 'participant_ids',
-              ignoreDuplicates: true
-            }
+              ignoreDuplicates: true,
+            },
           )
           .select()
           .single();
@@ -1291,7 +1219,9 @@ export const conversationsService = {
             .single();
 
           if (existingAfterConflict) {
-            return okSingle<Tables['conversations']['Row']>(existingAfterConflict);
+            return okSingle<Tables['conversations']['Row']>(
+              existingAfterConflict,
+            );
           }
           throw insertError;
         }
@@ -1488,7 +1418,9 @@ export const notificationsService = {
  */
 export const moderationService = {
   // Reports
-  async createReport(report: Omit<ReportRecord, 'id' | 'created_at'>): Promise<DbResult<ReportRecord>> {
+  async createReport(
+    report: Omit<ReportRecord, 'id' | 'created_at'>,
+  ): Promise<DbResult<ReportRecord>> {
     try {
       const { data, error } = await supabase
         .from('reports')
@@ -1521,7 +1453,9 @@ export const moderationService = {
   },
 
   // Blocks
-  async blockUser(block: Omit<BlockRecord, 'id' | 'created_at'>): Promise<DbResult<BlockRecord>> {
+  async blockUser(
+    block: Omit<BlockRecord, 'id' | 'created_at'>,
+  ): Promise<DbResult<BlockRecord>> {
     try {
       const { data, error } = await supabase
         .from('blocks')
@@ -1556,7 +1490,9 @@ export const moderationService = {
     }
   },
 
-  async listBlockedUsers(userId: string): Promise<ListResult<BlockedUserRecord>> {
+  async listBlockedUsers(
+    userId: string,
+  ): Promise<ListResult<BlockedUserRecord>> {
     try {
       const { data, count, error } = await supabase
         .from('blocks')
@@ -1691,7 +1627,9 @@ export const transactionsService = {
     }
   },
 
-  async create(transaction: TransactionInput): Promise<DbResult<Tables['transactions']['Row']>> {
+  async create(
+    transaction: TransactionInput,
+  ): Promise<DbResult<Tables['transactions']['Row']>> {
     try {
       const { data, error } = await supabase
         .from('transactions')
@@ -1750,7 +1688,9 @@ export const subscriptionsService = {
     }
   },
 
-  async getUserSubscription(userId: string): Promise<DbResult<UserSubscriptionWithPlan>> {
+  async getUserSubscription(
+    userId: string,
+  ): Promise<DbResult<UserSubscriptionWithPlan>> {
     try {
       const { data, error } = await supabase
         .from('user_subscriptions')

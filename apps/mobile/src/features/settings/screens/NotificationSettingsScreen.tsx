@@ -135,9 +135,10 @@ export const NotificationSettingsScreen: React.FC<
 
   const toggleSetting = async (sectionIndex: number, settingId: string) => {
     const newSections = [...sections];
-    const setting = newSections[sectionIndex].settings.find(
-      (s) => s.id === settingId,
-    );
+    const section = newSections[sectionIndex];
+    if (!section) return;
+
+    const setting = section.settings.find((s) => s.id === settingId);
     if (setting) {
       setting.value = !setting.value;
       setSections(newSections);

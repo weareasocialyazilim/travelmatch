@@ -307,28 +307,41 @@ WITH CHECK (
 );
 
 -- 2.2 Fix user_achievements - Validate user and achievement type
-DROP POLICY IF EXISTS "Service role only for achievement inserts" ON user_achievements;
-CREATE POLICY "Service role validated achievement inserts"
-ON user_achievements FOR INSERT
-TO service_role
-WITH CHECK (
-  user_id IS NOT NULL AND
-  EXISTS (SELECT 1 FROM users WHERE id = user_id) AND
-  achievement_type IS NOT NULL AND
-  achievement_type != ''
-);
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'user_achievements') THEN
+    DROP POLICY IF EXISTS "Service role only for achievement inserts" ON user_achievements;
+    CREATE POLICY "Service role validated achievement inserts"
+    ON user_achievements FOR INSERT
+    TO service_role
+    WITH CHECK (
+      user_id IS NOT NULL AND
+      EXISTS (SELECT 1 FROM users WHERE id = user_id) AND
+      achievement_type IS NOT NULL AND
+      achievement_type != ''
+    );
+  ELSE
+    RAISE NOTICE 'user_achievements table does not exist, skipping policy';
+  END IF;
+END $$;
 
 -- 2.3 Fix activity_logs - Validate user for logged actions
-DROP POLICY IF EXISTS "Service role only for activity log inserts" ON activity_logs;
-CREATE POLICY "Service role validated activity log inserts"
-ON activity_logs FOR INSERT
-TO service_role
-WITH CHECK (
-  -- user_id can be null for system events, but if provided must be valid
-  (user_id IS NULL OR EXISTS (SELECT 1 FROM users WHERE id = user_id)) AND
-  action IS NOT NULL AND
-  action != ''
-);
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'activity_logs') THEN
+    DROP POLICY IF EXISTS "Service role only for activity log inserts" ON activity_logs;
+    CREATE POLICY "Service role validated activity log inserts"
+    ON activity_logs FOR INSERT
+    TO service_role
+    WITH CHECK (
+      (user_id IS NULL OR EXISTS (SELECT 1 FROM users WHERE id = user_id)) AND
+      action IS NOT NULL AND
+      action != ''
+    );
+  ELSE
+    RAISE NOTICE 'activity_logs table does not exist, skipping policy';
+  END IF;
+END $$;
 
 -- 2.4 Fix video_transcriptions if exists
 DO $$

@@ -16,21 +16,23 @@ CREATE TABLE IF NOT EXISTS public.kyc_verifications (
 );
 
 -- Create index on user_id for fast lookups
-CREATE INDEX idx_kyc_verifications_user_id ON public.kyc_verifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_kyc_verifications_user_id ON public.kyc_verifications(user_id);
 
 -- Create index on created_at for recent verifications
-CREATE INDEX idx_kyc_verifications_created_at ON public.kyc_verifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_kyc_verifications_created_at ON public.kyc_verifications(created_at DESC);
 
 -- Enable Row Level Security
 ALTER TABLE public.kyc_verifications ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can view their own verification history
+DROP POLICY IF EXISTS "Users can view their own KYC verifications" ON public.kyc_verifications;
 CREATE POLICY "Users can view their own KYC verifications"
   ON public.kyc_verifications
   FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Policy: Service role can insert/update verification records
+DROP POLICY IF EXISTS "Service role can manage KYC verifications" ON public.kyc_verifications;
 CREATE POLICY "Service role can manage KYC verifications"
   ON public.kyc_verifications
   FOR ALL
@@ -45,6 +47,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_kyc_verifications_updated_at ON public.kyc_verifications;
 CREATE TRIGGER update_kyc_verifications_updated_at
   BEFORE UPDATE ON public.kyc_verifications
   FOR EACH ROW

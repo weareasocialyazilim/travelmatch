@@ -1,4 +1,5 @@
 import express from 'express';
+import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
@@ -9,7 +10,93 @@ const app = express();
 // Security: Disable X-Powered-By header to prevent information disclosure
 app.disable('x-powered-by');
 
-app.use(express.json());
+// Parse raw body for signature verification before JSON parsing
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      // Store raw body for signature verification
+      (req as express.Request & { rawBody?: Buffer }).rawBody = buf;
+    },
+  }),
+);
+
+// ============================================================================
+// Webhook Signature Verification
+// ============================================================================
+
+const WEBHOOK_SECRET = process.env.WEBHOOK_SIGNING_SECRET;
+
+/**
+ * Verify webhook signature using HMAC-SHA256
+ * Prevents unauthorized webhook calls from manipulating system state
+ */
+function verifyWebhookSignature(req: express.Request): boolean {
+  if (!WEBHOOK_SECRET) {
+    console.warn(
+      '[Webhook] WEBHOOK_SIGNING_SECRET not configured - skipping verification in development',
+    );
+    return process.env.NODE_ENV === 'development';
+  }
+
+  const signature = req.headers['x-webhook-signature'] as string | undefined;
+  const timestamp = req.headers['x-webhook-timestamp'] as string | undefined;
+
+  if (!signature || !timestamp) {
+    console.error('[Webhook] Missing signature or timestamp headers');
+    return false;
+  }
+
+  // Prevent replay attacks - reject requests older than 5 minutes
+  const requestTime = parseInt(timestamp, 10);
+  const currentTime = Math.floor(Date.now() / 1000);
+  if (Math.abs(currentTime - requestTime) > 300) {
+    console.error('[Webhook] Request timestamp too old or in future');
+    return false;
+  }
+
+  // Get raw body for signature calculation
+  const rawBody = (req as express.Request & { rawBody?: Buffer }).rawBody;
+  if (!rawBody) {
+    console.error('[Webhook] No raw body available for signature verification');
+    return false;
+  }
+
+  // Calculate expected signature
+  const payload = `${timestamp}.${rawBody.toString('utf8')}`;
+  const expectedSignature = crypto
+    .createHmac('sha256', WEBHOOK_SECRET)
+    .update(payload)
+    .digest('hex');
+
+  // Constant-time comparison to prevent timing attacks
+  const signatureBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expectedSignature);
+
+  if (signatureBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
+}
+
+/**
+ * Middleware to verify webhook signatures
+ */
+function requireWebhookAuth(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+): void {
+  if (!verifyWebhookSignature(req)) {
+    console.error('[Webhook] Invalid signature', {
+      ip: req.ip,
+      path: req.path,
+    });
+    res.status(401).json({ error: 'Invalid webhook signature' });
+    return;
+  }
+  next();
+}
 
 // Initialize Supabase client with service role key
 const supabase = createClient(
@@ -20,18 +107,21 @@ const supabase = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
+  },
 );
 
 /**
  * Webhook endpoint for job completion notifications
  * Called by workers when jobs complete (success or failure)
+ * SECURITY: Protected by webhook signature verification
  */
-app.post('/webhooks/job-complete', async (req, res) => {
+app.post('/webhooks/job-complete', requireWebhookAuth, async (req, res) => {
   try {
     const { jobId, userId, type, status, result, error } = req.body;
 
-    console.log(`Webhook received: ${type} job ${jobId} for user ${userId} - ${status}`);
+    console.log(
+      `Webhook received: ${type} job ${jobId} for user ${userId} - ${status}`,
+    );
 
     // Handle different job types
     switch (type) {
@@ -77,7 +167,7 @@ async function handleKycComplete(
   userId: string,
   status: string,
   result: KycResult | null,
-  error: JobError | null
+  error: JobError | null,
 ): Promise<void> {
   if (status === 'completed') {
     // Update user KYC status
@@ -93,7 +183,10 @@ async function handleKycComplete(
     await supabase.from('notifications').insert({
       user_id: userId,
       type: 'kyc_update',
-      title: result.status === 'verified' ? 'KYC Verified ✓' : 'KYC Verification Failed',
+      title:
+        result.status === 'verified'
+          ? 'KYC Verified ✓'
+          : 'KYC Verification Failed',
       body:
         result.status === 'verified'
           ? 'Your identity has been verified successfully!'
@@ -131,10 +224,14 @@ async function handleKycComplete(
     });
 
     // Sanitize error for logging to prevent log injection
-    const sanitizedError = typeof error === 'string' 
-      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
-      : JSON.stringify(error).slice(0, 500);
-    console.error(`KYC verification failed for user ${userId}:`, sanitizedError);
+    const sanitizedError =
+      typeof error === 'string'
+        ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500)
+        : JSON.stringify(error).slice(0, 500);
+    console.error(
+      `KYC verification failed for user ${userId}:`,
+      sanitizedError,
+    );
   }
 }
 
@@ -145,7 +242,7 @@ async function handleImageComplete(
   userId: string,
   status: string,
   _result: unknown,
-  error: unknown
+  error: unknown,
 ): Promise<void> {
   if (status === 'completed') {
     console.log(`Image processing completed for user ${userId}`);
@@ -153,10 +250,14 @@ async function handleImageComplete(
     // Send notification if needed
   } else {
     // Sanitize error for logging to prevent log injection
-    const sanitizedError = typeof error === 'string' 
-      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
-      : JSON.stringify(error).slice(0, 500);
-    console.error(`Image processing failed for user ${userId}:`, sanitizedError);
+    const sanitizedError =
+      typeof error === 'string'
+        ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500)
+        : JSON.stringify(error).slice(0, 500);
+    console.error(
+      `Image processing failed for user ${userId}:`,
+      sanitizedError,
+    );
   }
 }
 
@@ -167,15 +268,16 @@ async function handleEmailComplete(
   userId: string,
   status: string,
   _result: unknown,
-  error: unknown
+  error: unknown,
 ): Promise<void> {
   if (status === 'completed') {
     console.log(`Email sent successfully to user ${userId}`);
   } else {
     // Sanitize error for logging to prevent log injection
-    const sanitizedError = typeof error === 'string' 
-      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
-      : JSON.stringify(error).slice(0, 500);
+    const sanitizedError =
+      typeof error === 'string'
+        ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500)
+        : JSON.stringify(error).slice(0, 500);
     console.error(`Email sending failed for user ${userId}:`, sanitizedError);
     // Retry logic or alert admin
   }

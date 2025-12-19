@@ -48,18 +48,12 @@ export const ForgotPasswordScreen: React.FC = () => {
   const onSubmit = async (data: ForgotPasswordInput) => {
     setIsLoading(true);
     try {
-      const { error } = await userService.requestPasswordReset(data.email);
-
-      if (error) {
-        Alert.alert('Error', error.message || 'Failed to send reset email');
-        return;
-      }
-
+      await userService.requestPasswordReset(data.email);
       setEmailSent(true);
     } catch (error) {
       Alert.alert(
         'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error ? error.message : 'An unexpected error occurred',
       );
     } finally {
       setIsLoading(false);
@@ -135,7 +129,11 @@ export const ForgotPasswordScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Forgot Password</Text>
           <View style={styles.placeholder} />
@@ -177,7 +175,10 @@ export const ForgotPasswordScreen: React.FC = () => {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[styles.submitButton, !isValid && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              !isValid && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit(onSubmit)}
             disabled={!isValid}
           >

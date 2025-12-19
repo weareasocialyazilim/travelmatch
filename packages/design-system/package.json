@@ -22,6 +22,7 @@
     "validate": "pnpm run lint && pnpm run type-check && pnpm run test:ci && pnpm run test-storybook:ci"
   },
   "dependencies": {
+    "@travelmatch/shared": "workspace:^",
     "zod": "^4.2.1"
   },
   "devDependencies": {

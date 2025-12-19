@@ -1,6 +1,6 @@
 /**
  * Realtime Context Integration Tests
- * 
+ *
  * Tests for RealtimeContext provider including:
  * - Connection state management
  * - Presence tracking (online users)
@@ -8,7 +8,7 @@
  * - Typing indicators
  * - Notification subscriptions
  * - App state transitions
- * 
+ *
  * Coverage:
  * - Context initialization
  * - Online/offline user tracking
@@ -20,19 +20,34 @@
 // @ts-nocheck - React context and hooks mock types
 
 import React from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react-hooks';
+import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { AppState } from 'react-native';
-import { RealtimeProvider, useRealtime, useTypingIndicator } from '../../apps/mobile/src/context/RealtimeContext';
+import {
+  RealtimeProvider,
+  useRealtime,
+  useTypingIndicator,
+} from '../../apps/mobile/src/context/RealtimeContext';
 import { supabase } from '../../apps/mobile/src/config/supabase';
 import { useAuth } from '../../apps/mobile/src/context/AuthContext';
 
-// Mock dependencies
-jest.mock('../../apps/mobile/src/config/supabase');
-jest.mock('../../apps/mobile/src/context/AuthContext');
-jest.mock('react-native/Libraries/AppState/AppState', () => ({
-  currentState: 'active',
-  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+// Mock dependencies with factory functions
+jest.mock('../../apps/mobile/src/config/supabase', () => ({
+  supabase: {
+    channel: jest.fn(),
+    removeChannel: jest.fn(),
+  },
 }));
+
+jest.mock('../../apps/mobile/src/context/AuthContext', () => ({
+  useAuth: jest.fn(),
+}));
+
+// Mock AppState from react-native
+const mockAppState = {
+  currentState: 'active' as const,
+  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+};
+jest.mock('react-native/Libraries/AppState/AppState', () => mockAppState);
 
 describe('RealtimeContext', () => {
   let mockChannel;
@@ -49,7 +64,7 @@ describe('RealtimeContext', () => {
     jest.clearAllMocks();
 
     // Mock auth
-    (useAuth ).mockReturnValue({
+    useAuth.mockReturnValue({
       user: mockUser,
       isAuthenticated: true,
     });
@@ -73,8 +88,8 @@ describe('RealtimeContext', () => {
       send: jest.fn(),
     };
 
-    (supabase.channel ).mockReturnValue(mockChannel);
-    (supabase.removeChannel ).mockImplementation(() => {});
+    supabase.channel.mockReturnValue(mockChannel);
+    supabase.removeChannel.mockImplementation(() => {});
   });
 
   // ===========================
@@ -109,13 +124,13 @@ describe('RealtimeContext', () => {
                 key: mockUser.id,
               },
             },
-          })
+          }),
         );
       });
     });
 
     it('should not setup presence when not authenticated', () => {
-      (useAuth ).mockReturnValue({
+      useAuth.mockReturnValue({
         user: null,
         isAuthenticated: false,
       });
@@ -249,7 +264,7 @@ describe('RealtimeContext', () => {
 
       await waitFor(() => {
         expect(handler).toHaveBeenCalledWith(
-          expect.objectContaining({ userId: 'user-456', isOnline: true })
+          expect.objectContaining({ userId: 'user-456', isOnline: true }),
         );
       });
     });
@@ -281,7 +296,7 @@ describe('RealtimeContext', () => {
             userId: 'user-789',
             isOnline: false,
             lastSeen: expect.any(String),
-          })
+          }),
         );
       });
     });
@@ -417,7 +432,7 @@ describe('RealtimeContext', () => {
             conversationId: 'conv-123',
             isTyping: true,
           }),
-        })
+        }),
       );
     });
 
@@ -441,7 +456,7 @@ describe('RealtimeContext', () => {
           payload: expect.objectContaining({
             isTyping: false,
           }),
-        })
+        }),
       );
     });
 
@@ -450,10 +465,9 @@ describe('RealtimeContext', () => {
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
-      const { result } = renderHook(
-        () => useTypingIndicator('conv-123'),
-        { wrapper }
-      );
+      const { result } = renderHook(() => useTypingIndicator('conv-123'), {
+        wrapper,
+      });
 
       // Would need to emit typing events and check state
       expect(result.current).toHaveProperty('typingUserIds');
@@ -566,7 +580,7 @@ describe('RealtimeContext', () => {
 
       // Simulate app going to background
       act(() => {
-        const listener = (AppState.addEventListener ).mock.calls[0][1];
+        const listener = AppState.addEventListener.mock.calls[0][1];
         listener('background');
       });
 
@@ -583,7 +597,7 @@ describe('RealtimeContext', () => {
 
       // Simulate app returning to foreground
       act(() => {
-        const listener = (AppState.addEventListener ).mock.calls[0][1];
+        const listener = AppState.addEventListener.mock.calls[0][1];
         listener('active');
       });
 
@@ -638,7 +652,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should handle missing user ID in presence', async () => {
-      (useAuth ).mockReturnValue({
+      useAuth.mockReturnValue({
         user: { id: null },
         isAuthenticated: true,
       });

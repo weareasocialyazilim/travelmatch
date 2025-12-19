@@ -86,13 +86,17 @@ const ReputationScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.ReputationScreen })),
 );
 const TrustGardenDetailScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.TrustGardenDetailScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.TrustGardenDetailScreen,
+  })),
 );
 import { TrustNotesScreen, ProfileDetailScreen } from '../features/profile';
 
 // Proof system screens
 const ProofHistoryScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.ProofHistoryScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.ProofHistoryScreen,
+  })),
 );
 const ProofFlowScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.ProofFlowScreen })),
@@ -106,25 +110,35 @@ const MyMomentsScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.MyMomentsScreen })),
 );
 const CreateMomentScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.CreateMomentScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.CreateMomentScreen,
+  })),
 );
 const MomentDetailScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.MomentDetailScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.MomentDetailScreen,
+  })),
 );
 const MomentGalleryScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.MomentGalleryScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.MomentGalleryScreen,
+  })),
 );
 const ShareMomentScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.ShareMomentScreen })),
 );
 const SavedMomentsScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.SavedMomentsScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.SavedMomentsScreen,
+  })),
 );
 const EditMomentScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.EditMomentScreen })),
 );
 const ReportMomentScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.ReportMomentScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.ReportMomentScreen,
+  })),
 );
 
 // ===================================
@@ -209,8 +223,14 @@ export type RootStackParamList = {
   PhoneAuth: undefined;
   EmailAuth: undefined;
   ForgotPassword: undefined;
-  VerifyCode: undefined;
-  WaitingForCode: undefined;
+  VerifyCode: {
+    verificationType: 'phone' | 'email';
+    contact: string;
+  };
+  WaitingForCode: {
+    verificationType: 'phone' | 'email';
+    contact: string;
+  };
   SuccessConfirmation: undefined;
   SetPassword: undefined;
   TwoFactorSetup: undefined;
@@ -259,7 +279,11 @@ export type RootStackParamList = {
   ProofDetail: { proofId: string };
 
   // Approval & Matching
-  ReceiverApproval: { momentTitle: string; totalAmount: number; momentId: string };
+  ReceiverApproval: {
+    momentTitle: string;
+    totalAmount: number;
+    momentId: string;
+  };
   MatchConfirmation: { selectedGivers: SelectedGiver[] };
 
   // Communication
@@ -430,7 +454,7 @@ const AppNavigator = () => {
     };
     checkOnboarding();
   }, []);
-  
+
   // Setup session expired callback for API client
   useEffect(() => {
     apiClient.setSessionExpiredCallback(() => {
@@ -440,7 +464,7 @@ const AppNavigator = () => {
         (navigationRef.navigate as (name: string) => void)('SessionExpired');
       }
     });
-    
+
     // Setup deep link handler with navigation
     if (navigationRef.current) {
       deepLinkHandler.setNavigation(navigationRef.current);
@@ -513,7 +537,10 @@ const AppNavigator = () => {
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="SessionExpired" component={SessionExpiredScreen} />
+            <Stack.Screen
+              name="SessionExpired"
+              component={SessionExpiredScreen}
+            />
             <Stack.Screen name="LinkNotFound" component={LinkNotFoundScreen} />
             <Stack.Screen name="LinkExpired" component={LinkExpiredScreen} />
             <Stack.Screen name="LinkInvalid" component={LinkInvalidScreen} />

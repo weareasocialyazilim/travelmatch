@@ -193,7 +193,6 @@ const WalletScreen = () => {
       <FlashList
         data={filteredTransactions}
         renderItem={renderTransactionItem}
-        estimatedItemSize={72}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
         }

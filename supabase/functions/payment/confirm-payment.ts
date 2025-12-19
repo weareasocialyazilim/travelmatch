@@ -1,8 +1,8 @@
 /**
  * Confirm Payment Edge Function
- * 
+ *
  * Confirms a Stripe Payment Intent and processes the payment
- * 
+ *
  * Security Features:
  * - Authentication required
  * - Payment ownership verification
@@ -15,13 +15,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+import { getCorsHeaders } from '../_shared/security-middleware.ts';
 
 const ConfirmPaymentSchema = z.object({
   paymentIntentId: z.string().min(1, 'Payment intent ID required'),
@@ -102,7 +96,10 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -112,23 +109,24 @@ serve(async (req) => {
     } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
 
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Check rate limit
     if (!checkRateLimit(user.id)) {
-      return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded' }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Validate request
     const body = await req.json();
-    const validatedData: ConfirmPaymentRequest = ConfirmPaymentSchema.parse(body);
+    const validatedData: ConfirmPaymentRequest =
+      ConfirmPaymentSchema.parse(body);
 
     // Retrieve payment intent from Stripe
     const paymentIntent = await stripe.paymentIntents.retrieve(
@@ -139,7 +137,10 @@ serve(async (req) => {
     if (paymentIntent.metadata.supabase_user_id !== user.id) {
       return new Response(
         JSON.stringify({ error: 'Payment intent does not belong to user' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -197,7 +198,10 @@ serve(async (req) => {
           error: 'Validation error',
           details: error.errors,
         }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -207,7 +211,10 @@ serve(async (req) => {
           error: error.message || 'Payment processing error',
           type: error.type,
         }),
-        { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -215,7 +222,10 @@ serve(async (req) => {
       JSON.stringify({
         error: error.message || 'Internal server error',
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
     );
   }
 });

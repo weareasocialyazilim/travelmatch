@@ -170,4 +170,4 @@ export const colors = {
 export type Colors = typeof colors;
 
 // Re-export shared colors for convenience
-export { SHARED_COLORS as COLORS } from '@travelmatch/shared';
+export { COLORS } from '@travelmatch/shared';

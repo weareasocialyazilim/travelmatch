@@ -15,6 +15,7 @@ import { COLORS } from '@/constants/colors';
 import { twoFactorSetupSchema, type TwoFactorSetupInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
+import { a11yProps } from '@/utils/accessibility';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -31,11 +32,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [_secretKey, _setSecretKey] = useState<string | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    formState,
-  } = useForm<TwoFactorSetupInput>({
+  const { control, handleSubmit, formState } = useForm<TwoFactorSetupInput>({
     resolver: zodResolver(twoFactorSetupSchema),
     mode: 'onChange',
     defaultValues: {
@@ -71,7 +68,10 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       // Security: Reject common test/demo codes
       const forbiddenCodes = ['123456', '000000', '111111', '654321'];
       if (forbiddenCodes.includes(code)) {
-        showToast('Invalid verification code. Please use the code from your authenticator app.', 'error');
+        showToast(
+          'Invalid verification code. Please use the code from your authenticator app.',
+          'error',
+        );
         setIsLoading(false);
         return;
       }
@@ -153,6 +153,13 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
         onPress={handleSendCode}
         disabled={isLoading}
         activeOpacity={0.8}
+        {...a11yProps.button(
+          isLoading
+            ? 'Setting up two-factor authentication'
+            : 'Enable two-factor authentication',
+          'Send verification code to your phone',
+          isLoading,
+        )}
       >
         <Text style={styles.primaryButtonText}>
           {isLoading ? 'Setting up...' : 'Enable 2FA'}
@@ -179,7 +186,10 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       <Controller
         control={control}
         name="verificationCode"
-        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
           <>
             <TextInput
               style={[styles.codeInput, error && styles.codeInputError]}
@@ -204,6 +214,11 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
         onPress={handleSubmit(onVerify)}
         disabled={isLoading || !canSubmitForm({ formState })}
         activeOpacity={0.8}
+        {...a11yProps.button(
+          isLoading ? 'Verifying code' : 'Verify code',
+          'Submit verification code',
+          isLoading || !canSubmitForm({ formState }),
+        )}
       >
         <Text style={styles.primaryButtonText}>
           {isLoading ? 'Verifying...' : 'Verify Code'}
@@ -214,6 +229,10 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
         style={styles.secondaryButton}
         onPress={() => showToast('A new code has been sent', 'success')}
         activeOpacity={0.7}
+        {...a11yProps.button(
+          'Resend verification code',
+          'Request a new verification code',
+        )}
       >
         <Text style={styles.secondaryButtonText}>Resend Code</Text>
       </TouchableOpacity>
@@ -249,6 +268,10 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
         style={styles.primaryButton}
         onPress={handleDone}
         activeOpacity={0.8}
+        {...a11yProps.button(
+          'Done',
+          'Complete two-factor authentication setup',
+        )}
       >
         <Text style={styles.primaryButtonText}>Done</Text>
       </TouchableOpacity>
@@ -263,6 +286,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
           style={styles.headerButton}
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
+          {...a11yProps.button('Go back', 'Return to previous screen')}
         >
           <MaterialCommunityIcons
             name="arrow-left"

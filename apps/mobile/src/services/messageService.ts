@@ -388,8 +388,8 @@ export const messageService = {
             msg.type === 'system'
               ? 'system'
               : msg.type === 'image'
-              ? 'image'
-              : 'text';
+                ? 'image'
+                : 'text';
 
           return {
             id: msg.id,

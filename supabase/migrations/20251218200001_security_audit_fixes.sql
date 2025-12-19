@@ -83,6 +83,15 @@ CREATE INDEX IF NOT EXISTS idx_kyc_verifications_status
   ON public.kyc_verifications(status)
   WHERE status IN ('pending', 'processing', 'pending_review');
 
+-- Add provider_check_id column if not exists, then create index
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                 WHERE table_name = 'kyc_verifications' AND column_name = 'provider_check_id') THEN
+    ALTER TABLE public.kyc_verifications ADD COLUMN provider_check_id TEXT;
+  END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_kyc_verifications_provider_check
   ON public.kyc_verifications(provider, provider_check_id);
 
@@ -139,7 +148,7 @@ CREATE POLICY "Service role only for webhook events" ON public.processed_webhook
 
 -- 6. Cleanup job for expired 2FA codes (run daily via pg_cron)
 -- Note: Requires pg_cron extension to be enabled
-DO $$
+DO $cronblock$
 BEGIN
   -- Check if pg_cron is available
   IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
@@ -150,13 +159,13 @@ BEGIN
     PERFORM cron.schedule(
       'cleanup-expired-2fa-codes',
       '0 3 * * *',
-      $$DELETE FROM public.used_2fa_codes WHERE expires_at < NOW()$$
+      'DELETE FROM public.used_2fa_codes WHERE expires_at < NOW()'
     );
   END IF;
 EXCEPTION WHEN OTHERS THEN
   -- pg_cron not available, skip scheduling
   RAISE NOTICE 'pg_cron not available, skipping 2FA cleanup job scheduling';
-END $$;
+END $cronblock$;
 
 -- 7. Update updated_at trigger for kyc_verifications
 CREATE OR REPLACE FUNCTION update_kyc_updated_at()

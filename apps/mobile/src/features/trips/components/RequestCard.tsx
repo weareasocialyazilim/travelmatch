@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -13,101 +13,122 @@ interface RequestCardProps {
   onDecline: (item: RequestItem) => void;
 }
 
-export const RequestCard = ({ item, onAccept, onDecline }: RequestCardProps) => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+export const RequestCard = memo(
+  ({ item, onAccept, onDecline }: RequestCardProps) => {
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  return (
-    <View style={styles.requestCard}>
-      {/* Header */}
-      <View style={styles.cardHeader}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('ProfileDetail', { userId: item.person.id })}
-          style={styles.avatarContainer}
-        >
-          <Image source={{ uri: item.person.avatar }} style={styles.avatar} />
-          {item.person.isVerified && (
-            <View style={styles.verifiedBadge}>
-              <MaterialCommunityIcons name="check-decagram" size={12} color={COLORS.primary} />
-            </View>
-          )}
-        </TouchableOpacity>
-
-        <View style={styles.headerInfo}>
-          <View style={styles.nameRow}>
-            <Text style={styles.personName}>
-              {item.person.name}, {item.person.age}
-            </Text>
-            <Text style={styles.categoryInline}>
-              {item.momentEmoji} {item.momentTitle}
-            </Text>
-            {item.isNew && <View style={styles.newDot} />}
-          </View>
-          <View style={styles.metaRow}>
-            <MaterialCommunityIcons name="star" size={12} color={COLORS.gold} />
-            <Text style={styles.rating}>{item.person.rating}</Text>
-            <Text style={styles.separator}>•</Text>
-            <Text style={styles.city}>{item.person.city}</Text>
-            <Text style={styles.separator}>•</Text>
-            <Text style={styles.timeAgo}>{item.timeAgo}</Text>
-          </View>
-        </View>
-
-        <View style={styles.amountBadge}>
-          <Text style={styles.amountText}>€{item.amount}</Text>
-        </View>
-      </View>
-
-      {/* Message */}
-      <Text style={styles.message} numberOfLines={1}>
-        &quot;{item.message}&quot;
-      </Text>
-
-      {/* Actions Row */}
-      <View style={styles.actionsRow}>
-        {item.proofRequired && (
-          <View
-            style={[
-              styles.proofStatusCompact,
-              item.proofUploaded && styles.proofUploadedCompact,
-            ]}
+    return (
+      <View style={styles.requestCard}>
+        {/* Header */}
+        <View style={styles.cardHeader}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ProfileDetail', { userId: item.person.id })
+            }
+            style={styles.avatarContainer}
           >
-            <MaterialCommunityIcons
-              name={item.proofUploaded ? 'check-circle' : 'alert-circle-outline'}
-              size={14}
-              color={item.proofUploaded ? COLORS.success : COLORS.warning}
-            />
-            <Text
+            <Image source={{ uri: item.person.avatar }} style={styles.avatar} />
+            {item.person.isVerified && (
+              <View style={styles.verifiedBadge}>
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={12}
+                  color={COLORS.primary}
+                />
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.headerInfo}>
+            <View style={styles.nameRow}>
+              <Text style={styles.personName}>
+                {item.person.name}, {item.person.age}
+              </Text>
+              <Text style={styles.categoryInline}>
+                {item.momentEmoji} {item.momentTitle}
+              </Text>
+              {item.isNew && <View style={styles.newDot} />}
+            </View>
+            <View style={styles.metaRow}>
+              <MaterialCommunityIcons
+                name="star"
+                size={12}
+                color={COLORS.gold}
+              />
+              <Text style={styles.rating}>{item.person.rating}</Text>
+              <Text style={styles.separator}>•</Text>
+              <Text style={styles.city}>{item.person.city}</Text>
+              <Text style={styles.separator}>•</Text>
+              <Text style={styles.timeAgo}>{item.timeAgo}</Text>
+            </View>
+          </View>
+
+          <View style={styles.amountBadge}>
+            <Text style={styles.amountText}>€{item.amount}</Text>
+          </View>
+        </View>
+
+        {/* Message */}
+        <Text style={styles.message} numberOfLines={1}>
+          &quot;{item.message}&quot;
+        </Text>
+
+        {/* Actions Row */}
+        <View style={styles.actionsRow}>
+          {item.proofRequired && (
+            <View
               style={[
-                styles.proofTextCompact,
-                item.proofUploaded && styles.proofTextUploadedCompact,
+                styles.proofStatusCompact,
+                item.proofUploaded && styles.proofUploadedCompact,
               ]}
             >
-              {item.proofUploaded ? 'Proof Uploaded' : 'Proof Required'}
-            </Text>
+              <MaterialCommunityIcons
+                name={
+                  item.proofUploaded ? 'check-circle' : 'alert-circle-outline'
+                }
+                size={14}
+                color={item.proofUploaded ? COLORS.success : COLORS.warning}
+              />
+              <Text
+                style={[
+                  styles.proofTextCompact,
+                  item.proofUploaded && styles.proofTextUploadedCompact,
+                ]}
+              >
+                {item.proofUploaded ? 'Proof Uploaded' : 'Proof Required'}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.declineButton}
+              onPress={() => onDecline(item)}
+            >
+              <Text style={styles.declineButtonText}>Decline</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.acceptButton,
+                item.proofRequired &&
+                  !item.proofUploaded &&
+                  styles.acceptButtonDisabled,
+              ]}
+              onPress={() => onAccept(item)}
+            >
+              <Text style={styles.acceptButtonText}>
+                {item.proofRequired && !item.proofUploaded
+                  ? 'Upload Proof'
+                  : 'Accept'}
+              </Text>
+            </TouchableOpacity>
           </View>
-        )}
-
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.declineButton} onPress={() => onDecline(item)}>
-            <Text style={styles.declineButtonText}>Decline</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.acceptButton,
-              item.proofRequired && !item.proofUploaded && styles.acceptButtonDisabled,
-            ]}
-            onPress={() => onAccept(item)}
-          >
-            <Text style={styles.acceptButtonText}>
-              {item.proofRequired && !item.proofUploaded ? 'Upload Proof' : 'Accept'}
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   requestCard: {
@@ -263,3 +284,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+RequestCard.displayName = 'RequestCard';

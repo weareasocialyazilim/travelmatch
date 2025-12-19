@@ -33,7 +33,11 @@ import React, {
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '../services/supabaseAuthService';
-import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '../utils/secureStorage';
+import {
+  secureStorage,
+  AUTH_STORAGE_KEYS,
+  StorageKeys,
+} from '../utils/secureStorage';
 import { logger } from '../utils/logger';
 import type { User, KYCStatus, Role } from '../types/index';
 
@@ -51,8 +55,8 @@ const createUser = (data: {
   name: data.name || '',
   avatar: data.avatar,
   role: 'Traveler' as Role,
-  kyc: 'Unverified' as KYCStatus,
-  location: { lat: 0, lng: 0 },
+  kycStatus: 'Unverified' as KYCStatus,
+  location: { latitude: 0, longitude: 0 },
 });
 
 /**
@@ -506,7 +510,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const newUser = createUser({
         id: authUser.id,
         email: authUser.email || '',
-        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
+        name:
+          authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
         avatar: authUser.user_metadata?.avatar_url,
       });
 

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -20,25 +21,33 @@ import { LoadingState } from '@/components/LoadingState';
 import { signInWithPhone } from '@/services/supabaseAuthService';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 const phoneSchema = z.object({
   phone: z
     .string()
     .min(10, 'Phone number must be at least 10 digits')
-    .regex(/^\+?[1-9]\d{9,14}$/, 'Please enter a valid phone number with country code (e.g., +1234567890)'),
+    .regex(
+      /^\+?[1-9]\d{9,14}$/,
+      'Please enter a valid phone number with country code (e.g., +1234567890)',
+    ),
 });
 
 type PhoneInput = z.infer<typeof phoneSchema>;
 
+type PhoneAuthNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'PhoneAuth'
+>;
+
 export const PhoneAuthScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<PhoneAuthNavigationProp>();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isValid },
-    getValues,
   } = useForm<PhoneInput>({
     resolver: zodResolver(phoneSchema),
     mode: 'onChange',
@@ -53,19 +62,22 @@ export const PhoneAuthScreen: React.FC = () => {
       const { error } = await signInWithPhone(data.phone);
 
       if (error) {
-        Alert.alert('Error', error.message || 'Failed to send verification code');
+        Alert.alert(
+          'Error',
+          error.message || 'Failed to send verification code',
+        );
         return;
       }
 
       // Navigate to verification screen with phone number
-      navigation.navigate('VerifyCode' as never, {
+      navigation.navigate('VerifyCode', {
         verificationType: 'phone',
         contact: data.phone,
-      } as never);
+      });
     } catch (error) {
       Alert.alert(
         'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error ? error.message : 'An unexpected error occurred',
       );
     } finally {
       setIsLoading(false);
@@ -88,7 +100,11 @@ export const PhoneAuthScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Phone Authentication</Text>
           <View style={styles.placeholder} />
@@ -133,7 +149,10 @@ export const PhoneAuthScreen: React.FC = () => {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[styles.submitButton, !isValid && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              !isValid && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit(onSubmit)}
             disabled={!isValid}
           >
@@ -147,7 +166,11 @@ export const PhoneAuthScreen: React.FC = () => {
               style={styles.alternativeButton}
               onPress={() => navigation.navigate('EmailAuth' as never)}
             >
-              <MaterialCommunityIcons name="email" size={20} color={COLORS.primary} />
+              <MaterialCommunityIcons
+                name="email"
+                size={20}
+                color={COLORS.primary}
+              />
               <Text style={styles.alternativeButtonText}>Email</Text>
             </TouchableOpacity>
           </View>
