@@ -152,7 +152,7 @@ describe('FormComponents', () => {
   describe('FormInput - User Interactions', () => {
     it('should call onChangeText when text changes', () => {
       const onChangeText = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={onChangeText}
@@ -160,13 +160,13 @@ describe('FormComponents', () => {
         />
       );
       
-      fireEvent.changeText(getByTestID('email-input'), 'test@example.com');
+      fireEvent.changeText(getByTestId('email-input'), 'test@example.com');
       expect(onChangeText).toHaveBeenCalledWith('test@example.com');
     });
 
     it('should call onFocus when input receives focus', () => {
       const onFocus = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -175,13 +175,13 @@ describe('FormComponents', () => {
         />
       );
       
-      fireEvent(getByTestID('email-input'), 'focus');
+      fireEvent(getByTestId('email-input'), 'focus');
       expect(onFocus).toHaveBeenCalled();
     });
 
     it('should call onBlur when input loses focus', () => {
       const onBlur = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -190,13 +190,13 @@ describe('FormComponents', () => {
         />
       );
       
-      fireEvent(getByTestID('email-input'), 'blur');
+      fireEvent(getByTestId('email-input'), 'blur');
       expect(onBlur).toHaveBeenCalled();
     });
 
     it('should call onRightIconPress when right icon pressed', () => {
       const onRightIconPress = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -206,14 +206,14 @@ describe('FormComponents', () => {
         />
       );
       
-      const iconButton = getByTestID('password-input-right-icon');
+      const iconButton = getByTestId('password-input-right-icon');
       fireEvent.press(iconButton);
       expect(onRightIconPress).toHaveBeenCalled();
     });
 
     it('should call onSubmitEditing when return key pressed', () => {
       const onSubmitEditing = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -223,14 +223,14 @@ describe('FormComponents', () => {
         />
       );
       
-      fireEvent(getByTestID('email-input'), 'submitEditing');
+      fireEvent(getByTestId('email-input'), 'submitEditing');
       expect(onSubmitEditing).toHaveBeenCalled();
     });
   });
 
   describe('FormInput - Password Mode', () => {
     it('should hide text when secureTextEntry is true', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value="password123"
           onChangeText={() => {}}
@@ -239,12 +239,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('password-input');
+      const input = getByTestId('password-input');
       expect(input.props.secureTextEntry).toBe(true);
     });
 
     it('should toggle password visibility when eye icon clicked', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value="password123"
           onChangeText={() => {}}
@@ -254,10 +254,10 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('password-input');
+      const input = getByTestId('password-input');
       expect(input.props.secureTextEntry).toBe(true);
       
-      const iconButton = getByTestID('password-input-right-icon');
+      const iconButton = getByTestId('password-input-right-icon');
       fireEvent.press(iconButton);
       
       waitFor(() => {
@@ -268,7 +268,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - Keyboard Types', () => {
     it('should set email keyboard type', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -277,12 +277,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.keyboardType).toBe('email-address');
     });
 
     it('should set numeric keyboard type', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -291,12 +291,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('phone-input');
+      const input = getByTestId('phone-input');
       expect(input.props.keyboardType).toBe('numeric');
     });
 
     it('should set phone-pad keyboard type', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -305,14 +305,14 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('phone-input');
+      const input = getByTestId('phone-input');
       expect(input.props.keyboardType).toBe('phone-pad');
     });
   });
 
   describe('FormInput - Multiline Mode', () => {
     it('should render as multiline when multiline prop set', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -322,13 +322,13 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('description-input');
+      const input = getByTestId('description-input');
       expect(input.props.multiline).toBe(true);
       expect(input.props.numberOfLines).toBe(4);
     });
 
     it('should apply multiline styles', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -337,7 +337,7 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('description-input');
+      const input = getByTestId('description-input');
       expect(input).toBeTruthy();
     });
 
@@ -357,7 +357,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - Disabled State', () => {
     it('should render as disabled when editable is false', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value="Disabled"
           onChangeText={() => {}}
@@ -366,13 +366,13 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('disabled-input');
+      const input = getByTestId('disabled-input');
       expect(input.props.editable).toBe(false);
     });
 
     it('should not call onChangeText when disabled', () => {
       const onChangeText = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value="Disabled"
           onChangeText={onChangeText}
@@ -381,12 +381,12 @@ describe('FormComponents', () => {
         />
       );
       
-      fireEvent.changeText(getByTestID('disabled-input'), 'New Text');
+      fireEvent.changeText(getByTestId('disabled-input'), 'New Text');
       expect(onChangeText).not.toHaveBeenCalled();
     });
 
     it('should apply disabled styles', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value="Disabled"
           onChangeText={() => {}}
@@ -395,14 +395,14 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('disabled-input');
+      const input = getByTestId('disabled-input');
       expect(input).toBeTruthy();
     });
   });
 
   describe('FormInput - AutoCapitalize', () => {
     it('should set autoCapitalize to none for email', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -411,12 +411,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.autoCapitalize).toBe('none');
     });
 
     it('should set autoCapitalize to words for name', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -425,14 +425,14 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('name-input');
+      const input = getByTestId('name-input');
       expect(input.props.autoCapitalize).toBe('words');
     });
   });
 
   describe('FormInput - AutoComplete', () => {
     it('should set autoComplete for email', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -441,12 +441,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.autoComplete).toBe('email');
     });
 
     it('should set autoComplete for password', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -455,12 +455,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('password-input');
+      const input = getByTestId('password-input');
       expect(input.props.autoComplete).toBe('password');
     });
 
     it('should set autoComplete to off', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -469,14 +469,14 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('custom-input');
+      const input = getByTestId('custom-input');
       expect(input.props.autoComplete).toBe('off');
     });
   });
 
   describe('FormInput - Focus Management', () => {
     it('should update focus state on focus', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -484,7 +484,7 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       fireEvent(input, 'focus');
       
       // Check if focus styles are applied
@@ -492,7 +492,7 @@ describe('FormComponents', () => {
     });
 
     it('should update focus state on blur', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -500,7 +500,7 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       fireEvent(input, 'focus');
       fireEvent(input, 'blur');
       
@@ -511,7 +511,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - Return Key Types', () => {
     it('should set return key to done', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -520,12 +520,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.returnKeyType).toBe('done');
     });
 
     it('should set return key to next', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -534,12 +534,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.returnKeyType).toBe('next');
     });
 
     it('should set return key to send', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -548,7 +548,7 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('message-input');
+      const input = getByTestId('message-input');
       expect(input.props.returnKeyType).toBe('send');
     });
   });
@@ -580,7 +580,7 @@ describe('FormComponents', () => {
     });
 
     it('should announce error to screen readers', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           error="Email is required"
@@ -590,7 +590,7 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input).toBeTruthy();
       // Should have accessibilityHint with error
     });
@@ -598,7 +598,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - Edge Cases', () => {
     it('should handle empty value', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value=""
           onChangeText={() => {}}
@@ -606,12 +606,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.value).toBe('');
     });
 
     it('should handle null value', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value={null}
           onChangeText={() => {}}
@@ -619,12 +619,12 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.value).toBeFalsy();
     });
 
     it('should handle undefined value', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value={undefined}
           onChangeText={() => {}}
@@ -632,13 +632,13 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.value).toBeFalsy();
     });
 
     it('should handle very long text', () => {
       const longText = 'a'.repeat(1000);
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value={longText}
           onChangeText={() => {}}
@@ -646,13 +646,13 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.value).toBe(longText);
     });
 
     it('should handle special characters', () => {
       const specialChars = '!@#$%^&*()_+-={}[]|:;"<>,.?/~`';
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value={specialChars}
           onChangeText={() => {}}
@@ -660,13 +660,13 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('email-input');
+      const input = getByTestId('email-input');
       expect(input.props.value).toBe(specialChars);
     });
 
     it('should handle emoji input', () => {
       const emoji = '😀🎉🌟💯';
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <FormInput
           value={emoji}
           onChangeText={() => {}}
@@ -674,7 +674,7 @@ describe('FormComponents', () => {
         />
       );
       
-      const input = getByTestID('message-input');
+      const input = getByTestId('message-input');
       expect(input.props.value).toBe(emoji);
     });
   });

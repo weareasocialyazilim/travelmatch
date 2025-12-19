@@ -61,7 +61,7 @@ describe('GenericBottomSheet', () => {
     });
 
     it('should render without title', () => {
-      const { getByText, queryByTestID } = render(
+      const { getByText, queryByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -72,11 +72,11 @@ describe('GenericBottomSheet', () => {
       );
       
       expect(getByText('Content Only')).toBeTruthy();
-      expect(queryByTestID('bottom-sheet-header')).toBeNull();
+      expect(queryByTestId('bottom-sheet-header')).toBeNull();
     });
 
     it('should render drag handle when showHandle is true', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -87,11 +87,11 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(getByTestID('bottom-sheet-handle')).toBeTruthy();
+      expect(getByTestId('bottom-sheet-handle')).toBeTruthy();
     });
 
     it('should not render drag handle when showHandle is false', () => {
-      const { queryByTestID } = render(
+      const { queryByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -102,11 +102,11 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(queryByTestID('bottom-sheet-handle')).toBeNull();
+      expect(queryByTestId('bottom-sheet-handle')).toBeNull();
     });
 
     it('should render close button when showCloseButton is true', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -117,13 +117,13 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(getByTestID('close-button')).toBeTruthy();
+      expect(getByTestId('close-button')).toBeTruthy();
     });
   });
 
   describe('Height Presets', () => {
     it('should apply small height preset', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -134,13 +134,13 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet).toBeTruthy();
       // Should have 30% of screen height
     });
 
     it('should apply medium height preset', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -151,13 +151,13 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet).toBeTruthy();
       // Should have 50% of screen height
     });
 
     it('should apply large height preset', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -168,13 +168,13 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet).toBeTruthy();
       // Should have 75% of screen height
     });
 
     it('should apply full height preset', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -185,13 +185,13 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet).toBeTruthy();
       // Should have 90% of screen height
     });
 
     it('should accept custom height number', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -202,7 +202,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet).toBeTruthy();
     });
   });
@@ -210,7 +210,7 @@ describe('GenericBottomSheet', () => {
   describe('User Interactions', () => {
     it('should call onClose when backdrop pressed and dismissible', () => {
       const onClose = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={onClose}
@@ -220,7 +220,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const backdrop = getByTestID('backdrop');
+      const backdrop = getByTestId('backdrop');
       fireEvent.press(backdrop);
       
       expect(onClose).toHaveBeenCalled();
@@ -228,7 +228,7 @@ describe('GenericBottomSheet', () => {
 
     it('should not call onClose when backdrop pressed and not dismissible', () => {
       const onClose = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={onClose}
@@ -238,7 +238,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const backdrop = getByTestID('backdrop');
+      const backdrop = getByTestId('backdrop');
       fireEvent.press(backdrop);
       
       expect(onClose).not.toHaveBeenCalled();
@@ -246,7 +246,7 @@ describe('GenericBottomSheet', () => {
 
     it('should call onClose when close button pressed', () => {
       const onClose = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={onClose}
@@ -257,7 +257,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const closeButton = getByTestID('close-button');
+      const closeButton = getByTestId('close-button');
       fireEvent.press(closeButton);
       
       expect(onClose).toHaveBeenCalled();
@@ -265,7 +265,7 @@ describe('GenericBottomSheet', () => {
 
     it('should handle swipe down to dismiss', async () => {
       const onClose = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={onClose}
@@ -276,7 +276,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       
       // Simulate swipe down
       fireEvent(sheet, 'panResponderMove', {
@@ -293,7 +293,7 @@ describe('GenericBottomSheet', () => {
 
     it('should not dismiss on small swipe', () => {
       const onClose = jest.fn();
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={onClose}
@@ -304,7 +304,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       
       // Simulate small swipe
       fireEvent(sheet, 'panResponderMove', {
@@ -320,7 +320,7 @@ describe('GenericBottomSheet', () => {
 
   describe('Keyboard Behavior', () => {
     it('should wrap content in KeyboardAvoidingView when keyboardAware', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -331,11 +331,11 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(getByTestID('bottom-sheet-keyboard-avoiding')).toBeTruthy();
+      expect(getByTestId('bottom-sheet-keyboard-avoiding')).toBeTruthy();
     });
 
     it('should not use KeyboardAvoidingView when not keyboardAware', () => {
-      const { queryByTestID } = render(
+      const { queryByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -346,13 +346,13 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(queryByTestID('bottom-sheet-keyboard-avoiding')).toBeNull();
+      expect(queryByTestId('bottom-sheet-keyboard-avoiding')).toBeNull();
     });
   });
 
   describe('Scrollable Content', () => {
     it('should wrap content in ScrollView when scrollable', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -363,11 +363,11 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(getByTestID('bottom-sheet-scroll-view')).toBeTruthy();
+      expect(getByTestId('bottom-sheet-scroll-view')).toBeTruthy();
     });
 
     it('should not use ScrollView when not scrollable', () => {
-      const { queryByTestID } = render(
+      const { queryByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -378,7 +378,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(queryByTestID('bottom-sheet-scroll-view')).toBeNull();
+      expect(queryByTestId('bottom-sheet-scroll-view')).toBeNull();
     });
   });
 
@@ -458,14 +458,14 @@ describe('GenericBottomSheet', () => {
         );
       };
       
-      const { getByTestID, queryByTestID } = render(<TestComponent />);
+      const { getByTestId, queryByTestId } = render(<TestComponent />);
       
-      expect(queryByTestID('bottom-sheet')).toBeNull();
+      expect(queryByTestId('bottom-sheet')).toBeNull();
       
-      fireEvent.press(getByTestID('open-button'));
+      fireEvent.press(getByTestId('open-button'));
       
       await waitFor(() => {
-        expect(getByTestID('bottom-sheet')).toBeTruthy();
+        expect(getByTestId('bottom-sheet')).toBeTruthy();
       });
     });
 
@@ -489,21 +489,21 @@ describe('GenericBottomSheet', () => {
         );
       };
       
-      const { getByTestID, queryByTestID } = render(<TestComponent />);
+      const { getByTestId, queryByTestId } = render(<TestComponent />);
       
-      expect(getByTestID('bottom-sheet')).toBeTruthy();
+      expect(getByTestId('bottom-sheet')).toBeTruthy();
       
-      fireEvent.press(getByTestID('close-button'));
+      fireEvent.press(getByTestId('close-button'));
       
       await waitFor(() => {
-        expect(queryByTestID('bottom-sheet')).toBeNull();
+        expect(queryByTestId('bottom-sheet')).toBeNull();
       });
     });
   });
 
   describe('Accessibility', () => {
     it('should have proper accessibility label', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -514,12 +514,12 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet.props.accessibilityLabel).toBe('Test Sheet');
     });
 
     it('should use title as accessibility label if not provided', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -530,12 +530,12 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet.props.accessibilityLabel).toBe('Test Title');
     });
 
     it('should be accessible', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -545,12 +545,12 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet.props.accessible).toBe(true);
     });
 
     it('should announce content changes to screen readers', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -561,7 +561,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      const sheet = getByTestID('bottom-sheet');
+      const sheet = getByTestId('bottom-sheet');
       expect(sheet.props.accessibilityLiveRegion).toBe('polite');
     });
   });
@@ -587,8 +587,8 @@ describe('GenericBottomSheet', () => {
         );
       };
       
-      const { getByTestID } = render(<TestComponent />);
-      const button = getByTestID('toggle-button');
+      const { getByTestId } = render(<TestComponent />);
+      const button = getByTestId('toggle-button');
       
       for (let i = 0; i < 10; i++) {
         fireEvent.press(button);
@@ -596,12 +596,12 @@ describe('GenericBottomSheet', () => {
       
       await waitFor(() => {
         // Should handle rapid toggles without crashing
-        expect(getByTestID('toggle-button')).toBeTruthy();
+        expect(getByTestId('toggle-button')).toBeTruthy();
       });
     });
 
     it('should handle empty children', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -611,7 +611,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(getByTestID('bottom-sheet')).toBeTruthy();
+      expect(getByTestId('bottom-sheet')).toBeTruthy();
     });
 
     it('should handle very long content', () => {
@@ -619,7 +619,7 @@ describe('GenericBottomSheet', () => {
         <Text key={i}>Line {i}</Text>
       ));
       
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
           onClose={() => {}}
@@ -630,7 +630,7 @@ describe('GenericBottomSheet', () => {
         </GenericBottomSheet>
       );
       
-      expect(getByTestID('bottom-sheet')).toBeTruthy();
+      expect(getByTestId('bottom-sheet')).toBeTruthy();
     });
   });
 });
@@ -732,7 +732,7 @@ describe('ConfirmationBottomSheet', () => {
 
   describe('Destructive Actions', () => {
     it('should show destructive styling for confirm button', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <ConfirmationBottomSheet
           visible={true}
           onClose={() => {}}
@@ -744,7 +744,7 @@ describe('ConfirmationBottomSheet', () => {
         />
       );
       
-      const confirmButton = getByTestID('confirm-button');
+      const confirmButton = getByTestId('confirm-button');
       expect(confirmButton).toBeTruthy();
       // Should have destructive styles (red color)
     });
@@ -752,7 +752,7 @@ describe('ConfirmationBottomSheet', () => {
 
   describe('Loading State', () => {
     it('should disable buttons when loading', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <ConfirmationBottomSheet
           visible={true}
           onClose={() => {}}
@@ -763,12 +763,12 @@ describe('ConfirmationBottomSheet', () => {
         />
       );
       
-      const confirmButton = getByTestID('confirm-button');
+      const confirmButton = getByTestId('confirm-button');
       expect(confirmButton.props.disabled).toBe(true);
     });
 
     it('should show loading indicator on confirm button', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <ConfirmationBottomSheet
           visible={true}
           onClose={() => {}}
@@ -779,7 +779,7 @@ describe('ConfirmationBottomSheet', () => {
         />
       );
       
-      expect(getByTestID('loading-indicator')).toBeTruthy();
+      expect(getByTestId('loading-indicator')).toBeTruthy();
     });
   });
 });
@@ -823,7 +823,7 @@ describe('SelectionBottomSheet', () => {
     });
 
     it('should render option icons', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <SelectionBottomSheet
           visible={true}
           onClose={() => {}}
@@ -833,8 +833,8 @@ describe('SelectionBottomSheet', () => {
         />
       );
       
-      expect(getByTestID('option-icon-check')).toBeTruthy();
-      expect(getByTestID('option-icon-star')).toBeTruthy();
+      expect(getByTestId('option-icon-check')).toBeTruthy();
+      expect(getByTestId('option-icon-star')).toBeTruthy();
     });
   });
 
@@ -856,7 +856,7 @@ describe('SelectionBottomSheet', () => {
     });
 
     it('should highlight selected option', () => {
-      const { getByTestID } = render(
+      const { getByTestId } = render(
         <SelectionBottomSheet
           visible={true}
           onClose={() => {}}
@@ -867,7 +867,7 @@ describe('SelectionBottomSheet', () => {
         />
       );
       
-      const selectedOption = getByTestID('option-option2');
+      const selectedOption = getByTestId('option-option2');
       expect(selectedOption).toBeTruthy();
       // Should have selected styles
     });

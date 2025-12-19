@@ -409,7 +409,10 @@ describe('MomentCard', () => {
       );
 
       const avatar = getByLabelText("John Doe's avatar");
-      expect(avatar.props.source).toEqual('https://via.placeholder.com/150');
+      // The component uses a base64 SVG placeholder instead of external URL
+      expect(avatar.props.source).toMatch(
+        /^data:image\/svg\+xml;base64,|https:\/\//,
+      );
     });
 
     it('should handle unverified users', () => {
