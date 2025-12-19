@@ -7,8 +7,7 @@
 -- Uses FOR UPDATE locks to prevent race conditions
 -- SECURITY: Caller must be the sender (prevents spoofing)
 -- ============================================
-
-DROP FUNCTION IF EXISTS public.atomic_transfer(UUID, UUID, DECIMAL, UUID, TEXT);
+-- Note: DROP removed because CREATE OR REPLACE handles updates
 
 CREATE OR REPLACE FUNCTION public.atomic_transfer(
   p_sender_id UUID,
@@ -154,7 +153,3 @@ EXCEPTION
     RETURN jsonb_build_object('success', false, 'error', SQLERRM);
 END;
 $func$;
-
-GRANT EXECUTE ON FUNCTION public.atomic_transfer TO authenticated;
-
-COMMENT ON FUNCTION public.atomic_transfer IS 'Atomically transfers funds between two users with FOR UPDATE locks to prevent race conditions.';

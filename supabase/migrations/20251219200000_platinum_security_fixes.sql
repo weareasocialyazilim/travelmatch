@@ -156,38 +156,8 @@ BEGIN
   END IF;
 END $$;
 
--- ============================================
--- 5. DATABASE INDEXES FOR PERFORMANCE
--- D2-014: Missing indexes identified in audit
--- ============================================
-
--- Escrow transactions indexes
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_escrow_transactions_moment_id
-ON escrow_transactions(moment_id);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_escrow_transactions_status_created
-ON escrow_transactions(status, created_at);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_escrow_transactions_expires
-ON escrow_transactions(expires_at) WHERE status = 'pending';
-
--- Moments performance indexes
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_moments_status_created
-ON moments(status, created_at);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_moments_user_status
-ON moments(user_id, status);
-
--- Messages performance indexes
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_messages_conversation_created
-ON messages(conversation_id, created_at);
-
--- Proof verifications indexes
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_proof_verifications_moment_status
-ON proof_verifications(moment_id, status);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_proof_verifications_user_status
-ON proof_verifications(user_id, status);
+-- Note: Performance indexes moved to separate migration (20251219200002)
+-- to avoid CONCURRENTLY issues within transactions
 
 -- ============================================
 -- 6. 2FA REPLAY PROTECTION TABLE
@@ -297,32 +267,18 @@ END;
 $$;
 
 -- ============================================
--- 7. AUDIT LOG ENTRY
+-- 7. AUDIT LOG ENTRY (Skipped - FK constraint requires real user)
+-- Migration audit logged via RAISE NOTICE instead
 -- ============================================
 
 DO $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'audit_logs') THEN
-    INSERT INTO audit_logs (user_id, action, metadata, ip_address, created_at)
-    VALUES (
-      '00000000-0000-0000-0000-000000000000'::uuid,
-      'security_migration.platinum_standard',
-      jsonb_build_object(
-        'version', '20251219_platinum_security',
-        'fixes_applied', ARRAY[
-          'D1-002: Balance functions restricted',
-          'D1-003: RLS WITH CHECK(true) fixed',
-          'D1-004: Reviews USING(true) fixed',
-          'D1-007: Cache invalidation restricted',
-          'D1-013: 2FA replay protection added',
-          'D2-014: Performance indexes added'
-        ],
-        'applied_at', NOW()
-      ),
-      '0.0.0.0'::inet,
-      NOW()
-    );
-  END IF;
+  RAISE NOTICE '✅ PLATINUM SECURITY MIGRATION APPLIED:';
+  RAISE NOTICE '  - D1-002: Balance functions restricted';
+  RAISE NOTICE '  - D1-003: RLS WITH CHECK(true) fixed';
+  RAISE NOTICE '  - D1-004: Reviews USING(true) fixed';
+  RAISE NOTICE '  - D1-007: Cache invalidation restricted';
+  RAISE NOTICE '  - D1-013: 2FA replay protection added';
 END $$;
 
 -- ============================================
