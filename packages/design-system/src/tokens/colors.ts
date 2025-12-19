@@ -11,8 +11,53 @@
  * - Accent: Lavender (#9B59B6) - Premium, unique experiences
  */
 
-// Import shared colors as the canonical source
-import { COLORS as SHARED_COLORS } from '@travelmatch/shared';
+// ============================================================================
+// BASE COLOR PALETTE
+// ============================================================================
+
+const palette = {
+  // Brand Colors
+  coral: '#FF6B6B',
+  mint: '#4ECDC4',
+  lavender: '#9B59B6',
+  sky: '#3498DB',
+  peach: '#FFEAA7',
+
+  // Semantic
+  warning: '#FFE66D',
+  error: '#FF6B6B',
+  info: '#4A90E2',
+
+  // Grayscale
+  white: '#FFFFFF',
+  black: '#000000',
+  gray50: '#FAFAFA',
+  gray100: '#F5F5F5',
+  gray200: '#EEEEEE',
+  gray300: '#E0E0E0',
+  gray400: '#BDBDBD',
+  gray500: '#9E9E9E',
+  gray600: '#757575',
+  gray700: '#616161',
+  gray800: '#424242',
+  gray900: '#212121',
+
+  // Backgrounds
+  background: '#F8F9FA',
+  backgroundDark: '#121212',
+
+  // Text
+  text: '#212121',
+  textSecondary: '#757575',
+  textDisabled: '#9E9E9E',
+
+  // Border
+  border: '#E0E0E0',
+} as const;
+
+// ============================================================================
+// EXPORTED COLORS OBJECT
+// ============================================================================
 
 export const colors = {
   // Primary Colors - TravelMatch Coral
@@ -22,7 +67,7 @@ export const colors = {
     200: '#FFC1C1',
     300: '#FFA3A3',
     400: '#FF8A8A',
-    500: SHARED_COLORS.primary, // #FF6B6B - Main brand color
+    500: palette.coral,
     600: '#E85555',
     700: '#D14040',
     800: '#BA2C2C',
@@ -36,7 +81,7 @@ export const colors = {
     200: '#A3EBE3',
     300: '#75E0D5',
     400: '#5CD9CB',
-    500: SHARED_COLORS.success, // #4ECDC4 - Main mint
+    500: palette.mint,
     600: '#3EB8B0',
     700: '#2EA39C',
     800: '#1F8E88',
@@ -50,7 +95,7 @@ export const colors = {
     200: '#D7BBEB',
     300: '#C39AE0',
     400: '#AF78D6',
-    500: SHARED_COLORS.lavender, // #9B59B6 - Main accent
+    500: palette.lavender,
     600: '#8647A3',
     700: '#713590',
     800: '#5C237D',
@@ -64,7 +109,7 @@ export const colors = {
     200: '#A3EBE3',
     300: '#75E0D5',
     400: '#5CD9CB',
-    500: SHARED_COLORS.success, // #4ECDC4
+    500: palette.mint,
     600: '#3EB8B0',
     700: '#2EA39C',
     800: '#1F8E88',
@@ -77,7 +122,7 @@ export const colors = {
     200: '#FFF9C1',
     300: '#FFF6A3',
     400: '#FFF084',
-    500: SHARED_COLORS.warning, // #FFE66D
+    500: palette.warning,
     600: '#E6CF5A',
     700: '#CCB847',
     800: '#B3A134',
@@ -90,7 +135,7 @@ export const colors = {
     200: '#FFC1C1',
     300: '#FFA3A3',
     400: '#FF8A8A',
-    500: SHARED_COLORS.error, // #FF6B6B
+    500: palette.error,
     600: '#E85555',
     700: '#D14040',
     800: '#BA2C2C',
@@ -103,51 +148,51 @@ export const colors = {
     200: '#ADD6FF',
     300: '#85C2FF',
     400: '#5CADFF',
-    500: SHARED_COLORS.info, // #4A90E2
+    500: palette.info,
     600: '#3A7ACC',
     700: '#2A65B6',
     800: '#1A50A0',
     900: '#0A3B8A',
   },
 
-  // Neutral Colors - Using shared grayscale
+  // Neutral Colors
   neutral: {
-    0: SHARED_COLORS.white,
-    50: SHARED_COLORS.gray50,
-    100: SHARED_COLORS.gray100,
-    200: SHARED_COLORS.gray200,
-    300: SHARED_COLORS.gray300,
-    400: SHARED_COLORS.gray400,
-    500: SHARED_COLORS.gray500,
-    600: SHARED_COLORS.gray600,
-    700: SHARED_COLORS.gray700,
-    800: SHARED_COLORS.gray800,
-    900: SHARED_COLORS.gray900,
-    1000: SHARED_COLORS.black,
+    0: palette.white,
+    50: palette.gray50,
+    100: palette.gray100,
+    200: palette.gray200,
+    300: palette.gray300,
+    400: palette.gray400,
+    500: palette.gray500,
+    600: palette.gray600,
+    700: palette.gray700,
+    800: palette.gray800,
+    900: palette.gray900,
+    1000: palette.black,
   },
 
   // Background Colors
   background: {
-    primary: SHARED_COLORS.white,
-    secondary: SHARED_COLORS.background,
-    tertiary: SHARED_COLORS.gray100,
-    dark: '#121212',
+    primary: palette.white,
+    secondary: palette.background,
+    tertiary: palette.gray100,
+    dark: palette.backgroundDark,
     darkSecondary: '#1E1E1E',
   },
 
   // Text Colors
   text: {
-    primary: SHARED_COLORS.text,
-    secondary: SHARED_COLORS.textSecondary,
-    disabled: SHARED_COLORS.textDisabled,
-    inverse: SHARED_COLORS.white,
+    primary: palette.text,
+    secondary: palette.textSecondary,
+    disabled: palette.textDisabled,
+    inverse: palette.white,
   },
 
   // Border Colors
   border: {
-    light: SHARED_COLORS.gray200,
-    medium: SHARED_COLORS.border,
-    dark: SHARED_COLORS.gray600,
+    light: palette.gray200,
+    medium: palette.border,
+    dark: palette.gray600,
   },
 
   // Overlay Colors
@@ -159,15 +204,15 @@ export const colors = {
 
   // Brand accent colors (for quick access)
   brand: {
-    coral: SHARED_COLORS.coral,
-    mint: SHARED_COLORS.mint,
-    lavender: SHARED_COLORS.lavender,
-    sky: SHARED_COLORS.sky,
-    peach: SHARED_COLORS.peach,
+    coral: palette.coral,
+    mint: palette.mint,
+    lavender: palette.lavender,
+    sky: palette.sky,
+    peach: palette.peach,
   },
 } as const;
 
 export type Colors = typeof colors;
 
-// Re-export shared colors for convenience
-export { COLORS } from '@travelmatch/shared';
+// Export palette for direct access if needed
+export { palette as COLORS };

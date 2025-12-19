@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         requester:profiles!disputes_requester_id_fkey(id, display_name, avatar_url),
         responder:profiles!disputes_responder_id_fkey(id, display_name, avatar_url)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -57,7 +57,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Disputes query error:', error);
-      return NextResponse.json({ error: 'Anlaşmazlıklar yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Anlaşmazlıklar yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -96,29 +99,45 @@ export async function POST(request: NextRequest) {
     if (!requester_id || !responder_id || !request_id || !reason) {
       return NextResponse.json(
         { error: 'Gerekli alanlar eksik' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const supabase = createServiceClient();
 
-    const { data: dispute, error } = await supabase
+    // Use type assertion since the database schema differs from API expectations
+    const sb = supabase as unknown as {
+      from: (table: string) => {
+        insert: (data: Record<string, unknown>) => {
+          select: () => {
+            single: () => Promise<{
+              data: { id: string } | null;
+              error: unknown;
+            }>;
+          };
+        };
+      };
+    };
+
+    const { data: dispute, error } = await sb
       .from('disputes')
       .insert({
-        requester_id,
-        responder_id,
-        request_id,
+        reporter_id: requester_id,
+        reported_user_id: responder_id,
+        transaction_id: request_id,
         reason,
         description,
-        priority,
         status: 'pending',
       })
       .select()
       .single();
 
-    if (error) {
+    if (error || !dispute) {
       console.error('Dispute creation error:', error);
-      return NextResponse.json({ error: 'Anlaşmazlık oluşturulamadı' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Anlaşmazlık oluşturulamadı' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -130,7 +149,7 @@ export async function POST(request: NextRequest) {
       null,
       dispute,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ dispute }, { status: 201 });

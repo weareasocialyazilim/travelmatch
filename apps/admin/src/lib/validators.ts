@@ -36,7 +36,15 @@ export const loginSchema = z.object({
 export const createAdminUserSchema = z.object({
   email: emailSchema,
   name: z.string().min(2, 'İsim en az 2 karakter olmalı'),
-  role: z.enum(['super_admin', 'manager', 'moderator', 'finance', 'marketing', 'support', 'viewer']),
+  role: z.enum([
+    'super_admin',
+    'manager',
+    'moderator',
+    'finance',
+    'marketing',
+    'support',
+    'viewer',
+  ]),
   requires_2fa: z.boolean().default(true),
 });
 
@@ -46,7 +54,9 @@ export const createAdminUserSchema = z.object({
 export const updateUserSchema = z.object({
   full_name: z.string().min(2, 'İsim en az 2 karakter olmalı').optional(),
   status: z.enum(['active', 'suspended', 'banned', 'pending']).optional(),
-  kyc_status: z.enum(['not_started', 'pending', 'verified', 'rejected']).optional(),
+  kyc_status: z
+    .enum(['not_started', 'pending', 'verified', 'rejected'])
+    .optional(),
 });
 
 /**
@@ -68,7 +78,10 @@ export const createTaskSchema = z.object({
   resource_type: z.string(),
   resource_id: z.string().uuid(),
   assigned_to: z.string().uuid().optional(),
-  due_date: z.string().datetime().optional(),
+  due_date: z
+    .string()
+    .datetime({ message: 'Geçerli bir tarih girin' })
+    .optional(),
 });
 
 /**
@@ -76,7 +89,15 @@ export const createTaskSchema = z.object({
  */
 export const createReportSchema = z.object({
   reported_id: z.string().uuid('Geçerli bir kullanıcı ID gerekli'),
-  type: z.enum(['spam', 'harassment', 'fake_profile', 'inappropriate_content', 'scam', 'safety', 'other']),
+  type: z.enum([
+    'spam',
+    'harassment',
+    'fake_profile',
+    'inappropriate_content',
+    'scam',
+    'safety',
+    'other',
+  ]),
   reason: z.string().min(10, 'Sebep en az 10 karakter olmalı'),
   description: z.string().min(20, 'Açıklama en az 20 karakter olmalı'),
   evidence: z.array(z.string().url()).optional(),
@@ -86,15 +107,24 @@ export const createReportSchema = z.object({
  * Notification campaign schema
  */
 export const notificationCampaignSchema = z.object({
-  title: z.string().min(5, 'Başlık en az 5 karakter olmalı').max(100, 'Başlık en fazla 100 karakter olabilir'),
-  message: z.string().min(10, 'Mesaj en az 10 karakter olmalı').max(500, 'Mesaj en fazla 500 karakter olabilir'),
+  title: z
+    .string()
+    .min(5, 'Başlık en az 5 karakter olmalı')
+    .max(100, 'Başlık en fazla 100 karakter olabilir'),
+  message: z
+    .string()
+    .min(10, 'Mesaj en az 10 karakter olmalı')
+    .max(500, 'Mesaj en fazla 500 karakter olabilir'),
   type: z.enum(['push', 'email', 'in_app', 'sms']),
   target_audience: z.object({
     segments: z.array(z.string()).optional(),
-    filters: z.record(z.unknown()).optional(),
+    filters: z.record(z.string(), z.unknown()).optional(),
     user_ids: z.array(z.string().uuid()).optional(),
   }),
-  scheduled_at: z.string().datetime().optional(),
+  scheduled_at: z
+    .string()
+    .datetime({ message: 'Geçerli bir tarih/saat formatı girin' })
+    .optional(),
 });
 
 /**
@@ -105,9 +135,11 @@ export const marketingCampaignSchema = z.object({
   description: z.string().min(20, 'Açıklama en az 20 karakter olmalı'),
   type: z.enum(['email', 'push', 'social', 'display', 'influencer']),
   budget: z.number().min(0, 'Bütçe negatif olamaz'),
-  start_date: z.string().datetime(),
-  end_date: z.string().datetime(),
-  target_audience: z.record(z.unknown()),
+  start_date: z
+    .string()
+    .datetime({ message: 'Geçerli bir başlangıç tarihi girin' }),
+  end_date: z.string().datetime({ message: 'Geçerli bir bitiş tarihi girin' }),
+  target_audience: z.record(z.string(), z.unknown()),
 });
 
 /**
@@ -115,7 +147,9 @@ export const marketingCampaignSchema = z.object({
  */
 export const resolveDisputeSchema = z.object({
   resolution: z.string().min(20, 'Çözüm açıklaması en az 20 karakter olmalı'),
-  action_taken: z.enum(['warning', 'suspension', 'ban', 'no_action', 'refund']).optional(),
+  action_taken: z
+    .enum(['warning', 'suspension', 'ban', 'no_action', 'refund'])
+    .optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -123,6 +157,8 @@ export type CreateAdminUserInput = z.infer<typeof createAdminUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type CreateReportInput = z.infer<typeof createReportSchema>;
-export type NotificationCampaignInput = z.infer<typeof notificationCampaignSchema>;
+export type NotificationCampaignInput = z.infer<
+  typeof notificationCampaignSchema
+>;
 export type MarketingCampaignInput = z.infer<typeof marketingCampaignSchema>;
 export type ResolveDisputeInput = z.infer<typeof resolveDisputeSchema>;

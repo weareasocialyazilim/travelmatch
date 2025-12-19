@@ -21,7 +21,13 @@ import {
   ArrowDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -48,14 +54,45 @@ const realtimeMetrics = {
 // Simulate activity feed
 const generateActivity = () => {
   const types = [
-    { type: 'user_signup', icon: Users, message: 'Yeni kullanıcı kaydı', color: 'text-blue-500' },
-    { type: 'match', icon: Heart, message: 'Yeni eşleşme', color: 'text-pink-500' },
-    { type: 'moment', icon: Camera, message: 'Yeni moment paylaşıldı', color: 'text-purple-500' },
-    { type: 'message', icon: MessageSquare, message: 'Mesaj gönderildi', color: 'text-green-500' },
-    { type: 'payment', icon: CreditCard, message: 'Ödeme alındı', color: 'text-emerald-500' },
-    { type: 'report', icon: AlertTriangle, message: 'Şikayet oluşturuldu', color: 'text-orange-500' },
-  ];
-  const randomType = types[Math.floor(Math.random() * types.length)];
+    {
+      type: 'user_signup',
+      icon: Users,
+      message: 'Yeni kullanıcı kaydı',
+      color: 'text-blue-500',
+    },
+    {
+      type: 'match',
+      icon: Heart,
+      message: 'Yeni eşleşme',
+      color: 'text-pink-500',
+    },
+    {
+      type: 'moment',
+      icon: Camera,
+      message: 'Yeni moment paylaşıldı',
+      color: 'text-purple-500',
+    },
+    {
+      type: 'message',
+      icon: MessageSquare,
+      message: 'Mesaj gönderildi',
+      color: 'text-green-500',
+    },
+    {
+      type: 'payment',
+      icon: CreditCard,
+      message: 'Ödeme alındı',
+      color: 'text-emerald-500',
+    },
+    {
+      type: 'report',
+      icon: AlertTriangle,
+      message: 'Şikayet oluşturuldu',
+      color: 'text-orange-500',
+    },
+  ] as const;
+  const randomType =
+    types[Math.floor(Math.random() * types.length)] ?? types[0];
   return {
     id: Math.random().toString(36).substr(2, 9),
     ...randomType,
@@ -65,7 +102,9 @@ const generateActivity = () => {
 };
 
 export default function OpsCenterPage() {
-  const [activities, setActivities] = useState<ReturnType<typeof generateActivity>[]>([]);
+  const [activities, setActivities] = useState<
+    ReturnType<typeof generateActivity>[]
+  >([]);
   const [isLive, setIsLive] = useState(true);
 
   // Simulate real-time activity feed
@@ -103,8 +142,12 @@ export default function OpsCenterPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Operasyon Merkezi</h1>
-          <p className="text-muted-foreground">Canlı sistem durumu ve aktivite akışı</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Operasyon Merkezi
+          </h1>
+          <p className="text-muted-foreground">
+            Canlı sistem durumu ve aktivite akışı
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -113,7 +156,11 @@ export default function OpsCenterPage() {
             onClick={() => setIsLive(!isLive)}
           >
             <Circle
-              className={`mr-2 h-2 w-2 ${isLive ? 'fill-red-500 text-red-500 animate-pulse' : 'fill-gray-500 text-gray-500'}`}
+              className={`mr-2 h-2 w-2 ${
+                isLive
+                  ? 'fill-red-500 text-red-500 animate-pulse'
+                  : 'fill-gray-500 text-gray-500'
+              }`}
             />
             {isLive ? 'Canlı' : 'Duraklatıldı'}
           </Button>
@@ -149,7 +196,9 @@ export default function OpsCenterPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Mesaj/dk</p>
-                <p className="text-2xl font-bold">{realtimeMetrics.messagesPerMinute}</p>
+                <p className="text-2xl font-bold">
+                  {realtimeMetrics.messagesPerMinute}
+                </p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
                 <MessageSquare className="h-5 w-5 text-blue-600" />
@@ -162,7 +211,9 @@ export default function OpsCenterPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Eşleşme/dk</p>
-                <p className="text-2xl font-bold">{realtimeMetrics.matchesPerMinute}</p>
+                <p className="text-2xl font-bold">
+                  {realtimeMetrics.matchesPerMinute}
+                </p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
                 <Heart className="h-5 w-5 text-pink-600" />
@@ -175,7 +226,9 @@ export default function OpsCenterPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Moment/dk</p>
-                <p className="text-2xl font-bold">{realtimeMetrics.momentsPerMinute}</p>
+                <p className="text-2xl font-bold">
+                  {realtimeMetrics.momentsPerMinute}
+                </p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
                 <Camera className="h-5 w-5 text-purple-600" />
@@ -188,7 +241,9 @@ export default function OpsCenterPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Ödeme/dk</p>
-                <p className="text-2xl font-bold">{realtimeMetrics.paymentsPerMinute}</p>
+                <p className="text-2xl font-bold">
+                  {realtimeMetrics.paymentsPerMinute}
+                </p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
                 <CreditCard className="h-5 w-5 text-emerald-600" />
@@ -223,13 +278,27 @@ export default function OpsCenterPage() {
               {Object.entries(systemHealth).map(([key, data]) => (
                 <div key={key} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`h-2 w-2 rounded-full ${getStatusColor(data.status)}`} />
+                    <div
+                      className={`h-2 w-2 rounded-full ${getStatusColor(
+                        data.status,
+                      )}`}
+                    />
                     <div className="flex items-center gap-2">
-                      {key === 'api' && <Server className="h-4 w-4 text-muted-foreground" />}
-                      {key === 'database' && <Database className="h-4 w-4 text-muted-foreground" />}
-                      {key === 'cache' && <Activity className="h-4 w-4 text-muted-foreground" />}
-                      {key === 'storage' && <Server className="h-4 w-4 text-muted-foreground" />}
-                      {key === 'cdn' && <Globe className="h-4 w-4 text-muted-foreground" />}
+                      {key === 'api' && (
+                        <Server className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      {key === 'database' && (
+                        <Database className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      {key === 'cache' && (
+                        <Activity className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      {key === 'storage' && (
+                        <Server className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      {key === 'cdn' && (
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                      )}
                       <span className="font-medium capitalize">{key}</span>
                     </div>
                   </div>
@@ -288,7 +357,9 @@ export default function OpsCenterPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Canlı Aktivite</CardTitle>
-                <CardDescription>Gerçek zamanlı platform aktivitesi</CardDescription>
+                <CardDescription>
+                  Gerçek zamanlı platform aktivitesi
+                </CardDescription>
               </div>
               {isLive && (
                 <Badge variant="outline" className="gap-1">
@@ -305,17 +376,24 @@ export default function OpsCenterPage() {
                   <div
                     key={activity.id}
                     className={`flex items-center gap-3 rounded-lg border p-3 transition-all ${
-                      index === 0 && isLive ? 'bg-primary/5 border-primary/20' : ''
+                      index === 0 && isLive
+                        ? 'bg-primary/5 border-primary/20'
+                        : ''
                     }`}
                   >
                     <div
                       className={`flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ${activity.color}`}
                     >
-                      <activity.icon className="h-4 w-4" />
+                      {(() => {
+                        const Icon = activity.icon;
+                        return <Icon className="h-4 w-4" />;
+                      })()}
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">{activity.message}</p>
-                      <p className="text-xs text-muted-foreground">{activity.details}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {activity.details}
+                      </p>
                     </div>
                     <span className="text-xs text-muted-foreground">
                       {new Date(activity.timestamp).toLocaleTimeString('tr-TR')}

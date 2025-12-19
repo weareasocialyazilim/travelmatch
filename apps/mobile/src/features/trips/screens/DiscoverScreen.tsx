@@ -388,6 +388,7 @@ const DiscoverScreen = () => {
       >
         {/* Main FlashList - avoids VirtualizedList nesting warning */}
         <FlashList
+          testID="moments-list"
           data={filteredMoments}
           renderItem={renderMomentCard}
           numColumns={viewMode === 'grid' ? 2 : 1}
@@ -508,6 +509,7 @@ const DiscoverScreen = () => {
                   count={4}
                   show={loading}
                   minDisplayTime={400}
+                  testID="loading-indicator"
                 />
               )}
             </>

@@ -37,7 +37,13 @@ import {
   AreaChart,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -139,7 +145,9 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Günlük Aktif Kullanıcı</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Günlük Aktif Kullanıcı
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -181,7 +189,9 @@ export default function AnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Retention (D7)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Retention (D7)
+            </CardTitle>
             <Repeat className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -216,7 +226,10 @@ export default function AnalyticsPage() {
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={dailyActiveUsers}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        className="stroke-muted"
+                      />
                       <XAxis dataKey="date" className="text-xs" />
                       <YAxis className="text-xs" />
                       <Tooltip
@@ -259,7 +272,10 @@ export default function AnalyticsPage() {
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={revenueData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        className="stroke-muted"
+                      />
                       <XAxis dataKey="date" className="text-xs" />
                       <YAxis className="text-xs" />
                       <Tooltip
@@ -268,13 +284,20 @@ export default function AnalyticsPage() {
                           border: '1px solid hsl(var(--border))',
                           borderRadius: '8px',
                         }}
-                        formatter={(value: number, name: string) => [
-                          name === 'revenue' ? formatCurrency(value) : value,
+                        formatter={(value, name) => [
+                          name === 'revenue'
+                            ? formatCurrency(value as number)
+                            : value,
                           name === 'revenue' ? 'Gelir' : 'İşlem',
                         ]}
                       />
                       <Legend />
-                      <Bar dataKey="revenue" name="Gelir" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                      <Bar
+                        dataKey="revenue"
+                        name="Gelir"
+                        fill="#22c55e"
+                        radius={[4, 4, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -336,7 +359,10 @@ export default function AnalyticsPage() {
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={retentionData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        className="stroke-muted"
+                      />
                       <XAxis dataKey="day" className="text-xs" />
                       <YAxis className="text-xs" unit="%" />
                       <Tooltip
@@ -371,10 +397,14 @@ export default function AnalyticsPage() {
                     <div key={city.city} className="space-y-1">
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">{index + 1}.</span>
+                          <span className="text-muted-foreground">
+                            {index + 1}.
+                          </span>
                           <span>{city.city}</span>
                         </div>
-                        <span className="font-medium">{formatNumber(city.users)}</span>
+                        <span className="font-medium">
+                          {formatNumber(city.users)}
+                        </span>
                       </div>
                       <div className="h-2 overflow-hidden rounded-full bg-muted">
                         <div
@@ -395,7 +425,9 @@ export default function AnalyticsPage() {
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Yeni Kayıtlar</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Yeni Kayıtlar
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">234</div>
@@ -404,7 +436,9 @@ export default function AnalyticsPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Aktif Oturumlar</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Aktif Oturumlar
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">1,847</div>
@@ -413,7 +447,9 @@ export default function AnalyticsPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Ort. Oturum Süresi</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Ort. Oturum Süresi
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">12.4 dk</div>
@@ -422,7 +458,9 @@ export default function AnalyticsPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Churn Oranı</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Churn Oranı
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">2.3%</div>
@@ -437,10 +475,14 @@ export default function AnalyticsPage() {
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Aylık Gelir</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Aylık Gelir
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(324500)}</div>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(324500)}
+                </div>
                 <p className="text-xs text-green-600">+18% geçen aydan</p>
               </CardContent>
             </Card>
@@ -450,7 +492,9 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{formatCurrency(24.5)}</div>
-                <p className="text-xs text-muted-foreground">Kullanıcı başına</p>
+                <p className="text-xs text-muted-foreground">
+                  Kullanıcı başına
+                </p>
               </CardContent>
             </Card>
             <Card>
@@ -459,12 +503,16 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{formatCurrency(156)}</div>
-                <p className="text-xs text-muted-foreground">Yaşam boyu değer</p>
+                <p className="text-xs text-muted-foreground">
+                  Yaşam boyu değer
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">İade Oranı</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  İade Oranı
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">1.8%</div>
@@ -480,7 +528,9 @@ export default function AnalyticsPage() {
             {contentStats.map((stat) => (
               <Card key={stat.metric}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">{stat.metric}</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    {stat.metric}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stat.value}</div>
@@ -490,7 +540,11 @@ export default function AnalyticsPage() {
                     ) : (
                       <ArrowDownRight className="mr-1 h-3 w-3 text-red-600" />
                     )}
-                    <span className={stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}>
+                    <span
+                      className={
+                        stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                      }
+                    >
                       {stat.change}
                     </span>
                   </div>

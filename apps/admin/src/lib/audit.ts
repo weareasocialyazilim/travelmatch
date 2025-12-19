@@ -1,4 +1,8 @@
 import { getClient } from './supabase';
+import type { Database, Json } from '@/types/database';
+
+type AdminAuditLogInsert =
+  Database['public']['Tables']['admin_audit_logs']['Insert'];
 
 export interface AuditLogEntry {
   action: string;
@@ -17,21 +21,22 @@ export async function logAuditAction(
   metadata?: {
     ip_address?: string;
     user_agent?: string;
-  }
+  },
 ): Promise<void> {
   const supabase = getClient();
 
   try {
-    await supabase.from('audit_logs').insert({
+    const insertData: AdminAuditLogInsert = {
       admin_id: adminId,
       action: entry.action,
-      resource_type: entry.resource_type,
-      resource_id: entry.resource_id,
-      old_value: entry.old_value,
-      new_value: entry.new_value,
-      ip_address: metadata?.ip_address,
-      user_agent: metadata?.user_agent,
-    });
+      resource_type: entry.resource_type ?? null,
+      resource_id: entry.resource_id ?? null,
+      old_value: (entry.old_value ?? null) as Json,
+      new_value: (entry.new_value ?? null) as Json,
+      ip_address: metadata?.ip_address ?? null,
+      user_agent: metadata?.user_agent ?? null,
+    };
+    await supabase.from('admin_audit_logs').insert(insertData);
   } catch (error) {
     console.error('Failed to log audit action:', error);
     // Don't throw - audit logging should not break the main operation
@@ -99,7 +104,10 @@ export type AuditAction = (typeof AuditActions)[keyof typeof AuditActions];
  */
 export function withAudit<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
-  getAuditEntry: (args: Parameters<T>, result: Awaited<ReturnType<T>>) => AuditLogEntry
+  getAuditEntry: (
+    args: Parameters<T>,
+    result: Awaited<ReturnType<T>>,
+  ) => AuditLogEntry,
 ): T {
   return (async (...args: Parameters<T>) => {
     const result = await fn(...args);

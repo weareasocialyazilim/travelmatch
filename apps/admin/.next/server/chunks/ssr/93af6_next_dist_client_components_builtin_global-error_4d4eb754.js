@@ -1,3 +1,0 @@
-module.exports=[73233,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(45499);a.n(d("[project]/Documents/travelmatch-new/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},51515,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(45499);a.n(d("[project]/Documents/travelmatch-new/node_modules/next/dist/client/components/builtin/global-error.js"))},28345,a=>{"use strict";a.i(73233);var b=a.i(51515);a.n(b)}];
-
-//# sourceMappingURL=93af6_next_dist_client_components_builtin_global-error_4d4eb754.js.map

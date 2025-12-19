@@ -21,16 +21,25 @@
 
 import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react-native';
-import { AppState } from 'react-native';
-import {
-  RealtimeProvider,
-  useRealtime,
-  useTypingIndicator,
-} from '../../apps/mobile/src/context/RealtimeContext';
-import { supabase } from '../../apps/mobile/src/config/supabase';
-import { useAuth } from '../../apps/mobile/src/context/AuthContext';
 
-// Mock dependencies with factory functions
+// Mock react-native AppState - don't use requireActual due to ESM issues
+jest.mock('react-native', () => ({
+  AppState: {
+    currentState: 'active',
+    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+  },
+  View: 'View',
+  Text: 'Text',
+  StyleSheet: {
+    create: (styles: any) => styles,
+  },
+  Platform: {
+    OS: 'ios',
+    select: (obj: any) => obj.ios || obj.default,
+  },
+}));
+
+// Mock dependencies with factory functions BEFORE imports
 jest.mock('../../apps/mobile/src/config/supabase', () => ({
   supabase: {
     channel: jest.fn(),
@@ -42,12 +51,24 @@ jest.mock('../../apps/mobile/src/context/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
-// Mock AppState from react-native
-const mockAppState = {
-  currentState: 'active' as const,
-  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-};
-jest.mock('react-native/Libraries/AppState/AppState', () => mockAppState);
+jest.mock('../../apps/mobile/src/utils/logger', () => ({
+  logger: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  },
+}));
+
+// Now import components that depend on mocked modules
+import { AppState } from 'react-native';
+import {
+  RealtimeProvider,
+  useRealtime,
+  useTypingIndicator,
+} from '../../apps/mobile/src/context/RealtimeContext';
+import { supabase } from '../../apps/mobile/src/config/supabase';
+import { useAuth } from '../../apps/mobile/src/context/AuthContext';
 
 describe('RealtimeContext', () => {
   let mockChannel;
@@ -69,7 +90,7 @@ describe('RealtimeContext', () => {
       isAuthenticated: true,
     });
 
-    // Mock channel
+    // Mock channel with all required methods
     mockChannel = {
       on: jest.fn((type, config, handler) => {
         if (type === 'presence') {
@@ -85,7 +106,9 @@ describe('RealtimeContext', () => {
       }),
       unsubscribe: jest.fn(),
       presenceState: jest.fn(() => ({})),
-      send: jest.fn(),
+      send: jest.fn().mockResolvedValue('ok'),
+      track: jest.fn().mockResolvedValue('ok'),
+      untrack: jest.fn().mockResolvedValue('ok'),
     };
 
     supabase.channel.mockReturnValue(mockChannel);

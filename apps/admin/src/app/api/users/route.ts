@@ -25,23 +25,27 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     let query = supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact' })
       .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
     // Search by name or email
     if (search) {
-      query = query.or(`display_name.ilike.%${search}%,email.ilike.%${search}%`);
+      query = query.or(
+        `display_name.ilike.%${search}%,email.ilike.%${search}%`,
+      );
     }
 
     // Filter by status
     if (status === 'active') {
       query = query.eq('is_active', true);
     } else if (status === 'suspended') {
-      query = query.eq('is_suspended', true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = (query as any).eq('is_suspended', true);
     } else if (status === 'banned') {
-      query = query.eq('is_banned', true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = (query as any).eq('is_banned', true);
     }
 
     // Filter by verification
@@ -55,7 +59,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Users query error:', error);
-      return NextResponse.json({ error: 'Kullanıcılar yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Kullanıcılar yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({

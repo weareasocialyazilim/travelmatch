@@ -54,6 +54,7 @@ module.exports = {
     '/__tests__\\.backup/',
     '/tests\\.backup/',
     '\\.helper\\.tsx?$',
+    '/__tests__/helpers/',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

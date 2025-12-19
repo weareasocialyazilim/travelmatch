@@ -12,15 +12,19 @@ const ALGORITHM = 'aes-256-gcm';
 function getEncryptionConfig() {
   const key = process.env.TOTP_ENCRYPTION_KEY;
   const salt = process.env.TOTP_ENCRYPTION_SALT;
-  
+
   if (!key || key.length < 32) {
-    throw new Error('TOTP_ENCRYPTION_KEY must be set and at least 32 characters');
+    throw new Error(
+      'TOTP_ENCRYPTION_KEY must be set and at least 32 characters',
+    );
   }
-  
+
   if (!salt || salt.length < 16) {
-    throw new Error('TOTP_ENCRYPTION_SALT must be set and at least 16 characters');
+    throw new Error(
+      'TOTP_ENCRYPTION_SALT must be set and at least 16 characters',
+    );
   }
-  
+
   return { key, salt };
 }
 
@@ -38,7 +42,9 @@ function encrypt(plaintext: string): string {
   const authTag = cipher.getAuthTag();
 
   // Format: iv:authTag:encryptedData (all hex encoded)
-  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString('hex')}`;
+  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString(
+    'hex',
+  )}`;
 }
 
 /**
@@ -47,7 +53,9 @@ function encrypt(plaintext: string): string {
 function generateQRCodeURL(secret: string, email: string): string {
   const issuer = 'TravelMatch Admin';
   const otpauthURL = authenticator.keyuri(email, issuer, secret);
-  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthURL)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+    otpauthURL,
+  )}`;
 }
 
 /**
@@ -61,7 +69,7 @@ export async function GET(request: NextRequest) {
     if (!session) {
       return NextResponse.json(
         { success: false, error: 'Oturum açmanız gerekiyor' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -78,14 +86,14 @@ export async function GET(request: NextRequest) {
     if (userError || !adminUser) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (adminUser.totp_enabled) {
       return NextResponse.json(
         { success: false, error: '2FA zaten aktif' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -105,7 +113,9 @@ export async function GET(request: NextRequest) {
       .eq('id', session.admin.id);
 
     // Log audit event
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
+    const clientIp =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
     await supabase.from('audit_logs').insert({
@@ -125,7 +135,7 @@ export async function GET(request: NextRequest) {
     console.error('2FA setup error:', error);
     return NextResponse.json(
       { success: false, error: '2FA kurulumu başarısız' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -141,7 +151,7 @@ export async function POST(request: NextRequest) {
     if (!session) {
       return NextResponse.json(
         { success: false, error: 'Oturum açmanız gerekiyor' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -150,7 +160,7 @@ export async function POST(request: NextRequest) {
     if (!code || !/^\d{6}$/.test(code)) {
       return NextResponse.json(
         { success: false, error: 'Geçerli bir 6 haneli kod girin' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -167,21 +177,21 @@ export async function POST(request: NextRequest) {
     if (userError || !adminUser) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (adminUser.totp_enabled) {
       return NextResponse.json(
         { success: false, error: '2FA zaten aktif' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!adminUser.totp_secret) {
       return NextResponse.json(
         { success: false, error: 'Önce 2FA kurulumunu başlatın' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -189,10 +199,14 @@ export async function POST(request: NextRequest) {
     let isValid = false;
     try {
       const { key, salt } = getEncryptionConfig();
-      const [ivHex, authTagHex, encryptedHex] = adminUser.totp_secret.split(':');
-      const iv = Buffer.from(ivHex, 'hex');
-      const authTag = Buffer.from(authTagHex, 'hex');
-      const encrypted = Buffer.from(encryptedHex, 'hex');
+      const parts = adminUser.totp_secret.split(':');
+      if (parts.length !== 3) {
+        throw new Error('Invalid TOTP secret format');
+      }
+      const [ivHex, authTagHex, encryptedHex] = parts;
+      const iv = Buffer.from(ivHex!, 'hex');
+      const authTag = Buffer.from(authTagHex!, 'hex');
+      const encrypted = Buffer.from(encryptedHex!, 'hex');
 
       const derivedKey = crypto.scryptSync(key, salt, 32);
       const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
@@ -215,11 +229,13 @@ export async function POST(request: NextRequest) {
       console.error('TOTP decryption error:', decryptError);
       return NextResponse.json(
         { success: false, error: 'Doğrulama işlemi başarısız' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
+    const clientIp =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
     if (!isValid) {
@@ -233,7 +249,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         { success: false, error: 'Geçersiz doğrulama kodu' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -259,7 +275,7 @@ export async function POST(request: NextRequest) {
     console.error('2FA setup verification error:', error);
     return NextResponse.json(
       { success: false, error: '2FA doğrulama işlemi başarısız' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -275,7 +291,7 @@ export async function DELETE(request: NextRequest) {
     if (!session) {
       return NextResponse.json(
         { success: false, error: 'Oturum açmanız gerekiyor' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -284,7 +300,7 @@ export async function DELETE(request: NextRequest) {
     if (!code || !/^\d{6}$/.test(code)) {
       return NextResponse.json(
         { success: false, error: 'Geçerli bir 6 haneli kod girin' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -301,14 +317,14 @@ export async function DELETE(request: NextRequest) {
     if (userError || !adminUser) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (!adminUser.totp_enabled || !adminUser.totp_secret) {
       return NextResponse.json(
         { success: false, error: '2FA zaten kapalı' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -316,10 +332,14 @@ export async function DELETE(request: NextRequest) {
     let isValid = false;
     try {
       const { key, salt } = getEncryptionConfig();
-      const [ivHex, authTagHex, encryptedHex] = adminUser.totp_secret.split(':');
-      const iv = Buffer.from(ivHex, 'hex');
-      const authTag = Buffer.from(authTagHex, 'hex');
-      const encrypted = Buffer.from(encryptedHex, 'hex');
+      const parts = adminUser.totp_secret.split(':');
+      if (parts.length !== 3) {
+        throw new Error('Invalid TOTP secret format');
+      }
+      const [ivHex, authTagHex, encryptedHex] = parts;
+      const iv = Buffer.from(ivHex!, 'hex');
+      const authTag = Buffer.from(authTagHex!, 'hex');
+      const encrypted = Buffer.from(encryptedHex!, 'hex');
 
       const derivedKey = crypto.scryptSync(key, salt, 32);
       const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
@@ -334,14 +354,14 @@ export async function DELETE(request: NextRequest) {
     } catch {
       return NextResponse.json(
         { success: false, error: 'Doğrulama işlemi başarısız' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     if (!isValid) {
       return NextResponse.json(
         { success: false, error: 'Geçersiz doğrulama kodu' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -355,7 +375,9 @@ export async function DELETE(request: NextRequest) {
       .eq('id', session.admin.id);
 
     // Log
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
+    const clientIp =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
     await supabase.from('audit_logs').insert({
@@ -373,7 +395,7 @@ export async function DELETE(request: NextRequest) {
     console.error('2FA disable error:', error);
     return NextResponse.json(
       { success: false, error: '2FA devre dışı bırakma başarısız' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
