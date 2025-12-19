@@ -8,8 +8,6 @@
 -- unauthorized transfers on behalf of other users.
 -- ============================================
 
-BEGIN;
-
 -- Drop existing function if exists
 DROP FUNCTION IF EXISTS public.atomic_transfer(UUID, UUID, DECIMAL, UUID, TEXT);
 
@@ -162,5 +160,3 @@ GRANT EXECUTE ON FUNCTION public.atomic_transfer TO authenticated;
 
 -- Grant to service_role for system operations
 GRANT EXECUTE ON FUNCTION public.atomic_transfer TO service_role;
-
-COMMIT;
