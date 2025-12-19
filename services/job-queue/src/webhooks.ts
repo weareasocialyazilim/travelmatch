@@ -109,7 +109,9 @@ async function handleKycComplete(
         result.status === 'verified'
           ? 'Your identity has been verified successfully!'
           : `Verification ${result.status}. ${
-              result.rejectionReasons?.join(', ') || ''
+              Array.isArray(result.rejectionReasons)
+                ? result.rejectionReasons.join(', ')
+                : ''
             }`,
       data: {
         status: result.status,

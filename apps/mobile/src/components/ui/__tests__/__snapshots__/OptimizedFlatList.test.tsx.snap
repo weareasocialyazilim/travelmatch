@@ -7,11 +7,58 @@ exports[`OptimizedFlatList Snapshots should match snapshot for empty list 1`] = 
   ref={null}
   refresh={[Function]}
   testID="moments-list"
+  viewabilityConfig={
+    {
+      "itemVisiblePercentThreshold": 50,
+      "minimumViewTime": 300,
+    }
+  }
 >
   <RCTView
     ref={null}
     testID="list-view"
-  />
+  >
+    <RCTView
+      ref={null}
+      style={
+        {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "minHeight": 200,
+          "padding": 32,
+        }
+      }
+    >
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#1A1A1A",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "marginBottom": 8,
+          }
+        }
+        testID="RCTText"
+      >
+        No Items
+      </RCTText>
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#666666",
+            "fontSize": 14,
+            "textAlign": "center",
+          }
+        }
+        testID="RCTText"
+      >
+        Add items
+      </RCTText>
+    </RCTView>
+  </RCTView>
 </RCTView>
 `;
 
@@ -22,6 +69,12 @@ exports[`OptimizedFlatList Snapshots should match snapshot for list with items 1
   ref={null}
   refresh={[Function]}
   testID="moments-list"
+  viewabilityConfig={
+    {
+      "itemVisiblePercentThreshold": 50,
+      "minimumViewTime": 300,
+    }
+  }
 >
   <RCTView
     ref={null}
@@ -123,6 +176,12 @@ exports[`OptimizedFlatList Snapshots should match snapshot for loading state 1`]
   ref={null}
   refresh={[Function]}
   testID="moments-list"
+  viewabilityConfig={
+    {
+      "itemVisiblePercentThreshold": 50,
+      "minimumViewTime": 300,
+    }
+  }
 >
   <RCTView
     ref={null}
@@ -298,6 +357,23 @@ exports[`OptimizedFlatList Snapshots should match snapshot for loading state 1`]
         Description for item 9
       </RCTText>
     </RCTView>
+  </RCTView>
+  <RCTView
+    ref={null}
+    style={
+      {
+        "alignItems": "center",
+        "padding": 16,
+      }
+    }
+    testID="loading-more-indicator"
+  >
+    <RCTActivityIndicator
+      color="#A6E5C1"
+      ref={null}
+      size="small"
+      testID="RCTActivityIndicator"
+    />
   </RCTView>
 </RCTView>
 `;

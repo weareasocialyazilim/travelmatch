@@ -76,7 +76,7 @@ function OptimizedFlatListInner<T extends { id?: string | number }>(
   const ListFooterComponent = useCallback(
     () =>
       isLoadingMore ? (
-        <View style={styles.footerLoader}>
+        <View style={styles.footerLoader} testID="loading-more-indicator">
           <ActivityIndicator size="small" color={COLORS.primary} />
         </View>
       ) : null,

@@ -26,7 +26,9 @@ try {
       console.error('CREATE_ELEMENT_GUARD: invalid element type ->', info);
       // eslint-disable-next-line no-console
       console.error(new Error('CREATE_ELEMENT_GUARD_STACK').stack);
-      throw new Error('EARLY_CREATE_ELEMENT_INVALID: element type is ' + String(type));
+      throw new Error(
+        'EARLY_CREATE_ELEMENT_INVALID: element type is ' + String(type),
+      );
     }
 
     // If an object (module object) was passed where a component is expected,
@@ -34,10 +36,21 @@ try {
     if (typeof type === 'object' && type !== null && !type.$$typeof) {
       try {
         // eslint-disable-next-line no-console
-        console.error('CREATE_ELEMENT_GUARD: unexpected object element type keys ->', Object.keys(type));
-        if (type.default && (typeof type.default === 'function' || typeof type.default === 'object')) {
+        console.error(
+          'CREATE_ELEMENT_GUARD: unexpected object element type keys ->',
+          Object.keys(type),
+        );
+        if (
+          type.default &&
+          (typeof type.default === 'function' ||
+            typeof type.default === 'object')
+        ) {
           // eslint-disable-next-line no-console
-          console.error('CREATE_ELEMENT_GUARD: object.default exists, type of default ->', typeof type.default, type.default && type.default.displayName);
+          console.error(
+            'CREATE_ELEMENT_GUARD: object.default exists, type of default ->',
+            typeof type.default,
+            type.default && type.default.displayName,
+          );
         }
       } catch (e) {
         // ignore
@@ -78,10 +91,16 @@ try {
 
 // Ensure console.info/log are jest mocks so tests can spy/inspect calls reliably
 if (typeof global.console !== 'undefined') {
-  if (typeof global.console.info !== 'function' || !global.console.info._isMockFunction) {
+  if (
+    typeof global.console.info !== 'function' ||
+    !global.console.info._isMockFunction
+  ) {
     global.console.info = jest.fn();
   }
-  if (typeof global.console.log !== 'function' || !global.console.log._isMockFunction) {
+  if (
+    typeof global.console.log !== 'function' ||
+    !global.console.log._isMockFunction
+  ) {
     global.console.log = jest.fn();
   }
 }
@@ -123,7 +142,8 @@ console.error = (...args) => {
   if (
     typeof args[0] === 'string' &&
     (args[0].includes('Warning: An update to AuthProvider') ||
-     args[0].includes('Warning: An update to') && args[0].includes('was not wrapped in act'))
+      (args[0].includes('Warning: An update to') &&
+        args[0].includes('was not wrapped in act')))
   ) {
     return;
   }
@@ -151,18 +171,22 @@ jest.mock('expo-constants', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('expo-file-system', () => ({
-  getInfoAsync: jest.fn(() => Promise.resolve({ exists: false, isDirectory: false })),
+  getInfoAsync: jest.fn(() =>
+    Promise.resolve({ exists: false, isDirectory: false }),
+  ),
   readAsStringAsync: jest.fn(() => Promise.resolve('')),
   // Return realistic non-zero free/total disk values to satisfy tests that
   // assert available space before attempting downloads or caching.
   getFreeDiskStorageAsync: jest.fn(() => Promise.resolve(1000000000)), // ~1GB
   getTotalDiskCapacityAsync: jest.fn(() => Promise.resolve(5000000000)), // ~5GB
   // downloadAsync should resolve with the destination uri and an HTTP-like status
-  downloadAsync: jest.fn((uri, fileUri) => Promise.resolve({ uri: fileUri, status: 200 })),
+  downloadAsync: jest.fn((uri, fileUri) =>
+    Promise.resolve({ uri: fileUri, status: 200 }),
+  ),
   deleteAsync: jest.fn(() => Promise.resolve()),
   readDirectoryAsync: jest.fn(() => Promise.resolve([])),
   makeDirectoryAsync: jest.fn(() => Promise.resolve()),
@@ -172,11 +196,13 @@ jest.mock('expo-file-system', () => ({
 jest.mock('@react-native-community/netinfo', () => ({
   __esModule: true,
   default: {
-    fetch: jest.fn(() => Promise.resolve({
-      type: 'wifi',
-      isConnected: true,
-      isInternetReachable: true,
-    })),
+    fetch: jest.fn(() =>
+      Promise.resolve({
+        type: 'wifi',
+        isConnected: true,
+        isInternetReachable: true,
+      }),
+    ),
     addEventListener: jest.fn(() => jest.fn()),
   },
 }));
@@ -185,8 +211,12 @@ jest.mock('@react-native-community/netinfo', () => ({
 jest.mock('./src/config/supabase', () => ({
   supabase: {
     auth: {
-      getSession: jest.fn(() => Promise.resolve({ data: { session: null }, error: null })),
-      getUser: jest.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+      getSession: jest.fn(() =>
+        Promise.resolve({ data: { session: null }, error: null }),
+      ),
+      getUser: jest.fn(() =>
+        Promise.resolve({ data: { user: null }, error: null }),
+      ),
       signInWithPassword: jest.fn(),
       signUp: jest.fn(),
       signOut: jest.fn(() => Promise.resolve({ error: null })),
@@ -219,7 +249,7 @@ jest.mock('./src/config/supabase', () => ({
 try {
   jest.mock('./src/context/ThemeContext', () => {
     const React = require('react');
-    
+
     return {
       ThemeProvider: ({ children }) => {
         // Return children directly without async loading
@@ -242,7 +272,8 @@ try {
     const React = require('react');
 
     return {
-      ToastProvider: ({ children }) => React.createElement(React.Fragment, null, children),
+      ToastProvider: ({ children }) =>
+        React.createElement(React.Fragment, null, children),
       useToast: () => ({
         show: jest.fn(),
         hide: jest.fn(),
@@ -260,7 +291,12 @@ try {
   jest.mock('@/components/BottomNav', () => {
     const React = require('react');
     const { View, Text } = require('react-native');
-    const Comp = ({ activeTab }) => React.createElement(View, null, React.createElement(Text, null, `bottom-${activeTab || 'none'}`));
+    const Comp = ({ activeTab }) =>
+      React.createElement(
+        View,
+        null,
+        React.createElement(Text, null, `bottom-${activeTab || 'none'}`),
+      );
     return { __esModule: true, default: Comp };
   });
 } catch (e) {
@@ -298,10 +334,22 @@ try {
       return React.createElement(
         View,
         { testID: 'discover-header' },
-        React.createElement(TouchableOpacity, { onPress: onFilterPress }, React.createElement(Text, null, 'Filter')),
-        React.createElement(TouchableOpacity, { testID: 'view-toggle', onPress: onViewModeToggle }, React.createElement(Text, null, 'Toggle')),
-        React.createElement(TextInput, { placeholder: 'Search moments...', testID: 'discover-search', onChangeText: handleSearch }),
-        React.createElement(Text, null, location || '')
+        React.createElement(
+          TouchableOpacity,
+          { onPress: onFilterPress },
+          React.createElement(Text, null, 'Filter'),
+        ),
+        React.createElement(
+          TouchableOpacity,
+          { testID: 'view-toggle', onPress: onViewModeToggle },
+          React.createElement(Text, null, 'Toggle'),
+        ),
+        React.createElement(TextInput, {
+          placeholder: 'Search moments...',
+          testID: 'discover-search',
+          onChangeText: handleSearch,
+        }),
+        React.createElement(Text, null, location || ''),
       );
     };
 
@@ -317,7 +365,14 @@ try {
     const { View, Text, TouchableOpacity } = require('react-native');
 
     const { TextInput } = require('react-native');
-    const FilterModal = ({ visible, onApply, onClear, onClose, setSelectedCategory, setPriceRange }) => {
+    const FilterModal = ({
+      visible,
+      onApply,
+      onClear,
+      onClose,
+      setSelectedCategory,
+      setPriceRange,
+    }) => {
       const { useState } = React;
       const [min, setMin] = useState('');
       const [max, setMax] = useState('');
@@ -328,75 +383,157 @@ try {
         View,
         { testID: 'filter-modal' },
         // Category option
-        React.createElement(TouchableOpacity, { onPress: () => { if (typeof setSelectedCategory === 'function') setSelectedCategory('adventure'); } }, React.createElement(Text, null, 'Adventure')),
+        React.createElement(
+          TouchableOpacity,
+          {
+            onPress: () => {
+              if (typeof setSelectedCategory === 'function')
+                setSelectedCategory('adventure');
+            },
+          },
+          React.createElement(Text, null, 'Adventure'),
+        ),
         // Price inputs
-        React.createElement(TextInput, { placeholder: 'Min price', onChangeText: (t) => setMin(t) }),
-        React.createElement(TextInput, { placeholder: 'Max price', onChangeText: (t) => setMax(t) }),
+        React.createElement(TextInput, {
+          placeholder: 'Min price',
+          onChangeText: (t) => setMin(t),
+        }),
+        React.createElement(TextInput, {
+          placeholder: 'Max price',
+          onChangeText: (t) => setMax(t),
+        }),
         // Actions
-        React.createElement(TouchableOpacity, { onPress: () => {
-          // Prefer internal state; fall back to captured test input values
-          const captured = global.__TEST_INPUT_VALUES__ || {};
-          const parsedMin = min ? Number(min) : (captured['Min price'] ? Number(captured['Min price']) : undefined);
-          const parsedMax = max ? Number(max) : (captured['Max price'] ? Number(captured['Max price']) : undefined);
-          try {
-            const useMomentsFn = require('@/hooks/useMoments').useMoments;
-            if (typeof useMomentsFn === 'function') {
-              const hooked = useMomentsFn();
-              if (hooked && typeof hooked.setFilters === 'function') {
-                hooked.setFilters({ minPrice: parsedMin, maxPrice: parsedMax, category: 'adventure' });
+        React.createElement(
+          TouchableOpacity,
+          {
+            onPress: () => {
+              // Prefer internal state; fall back to captured test input values
+              const captured = global.__TEST_INPUT_VALUES__ || {};
+              const parsedMin = min
+                ? Number(min)
+                : captured['Min price']
+                ? Number(captured['Min price'])
+                : undefined;
+              const parsedMax = max
+                ? Number(max)
+                : captured['Max price']
+                ? Number(captured['Max price'])
+                : undefined;
+              try {
+                const useMomentsFn = require('@/hooks/useMoments').useMoments;
+                if (typeof useMomentsFn === 'function') {
+                  const hooked = useMomentsFn();
+                  if (hooked && typeof hooked.setFilters === 'function') {
+                    hooked.setFilters({
+                      minPrice: parsedMin,
+                      maxPrice: parsedMax,
+                      category: 'adventure',
+                    });
 
-                // If modal inputs were captured in other roots, try to parse numeric
-                // values from captured inputs and emit a second setFilters with
-                // the detected numeric min/max to ensure tests receive expected call.
-                try {
-                  const captured = global.__TEST_INPUT_VALUES__ || {};
-                  const numericVals = Object.values(captured)
-                    .map((v) => String(v))
-                    .flatMap((s) => (s.match(/\d+/g) || []).map(Number));
-                  if (numericVals && numericVals.length >= 2) {
-                    hooked.setFilters({ minPrice: numericVals[0], maxPrice: numericVals[1], category: 'adventure' });
-                  } else {
-                    // fallback to typed numeric history
-                    const typed = global.__TEST_TYPED_NUMBERS__ || [];
-                    if (typed && typed.length >= 2) {
-                      const lastTwo = typed.slice(-2);
-                      hooked.setFilters({ minPrice: lastTwo[0], maxPrice: lastTwo[1], category: 'adventure' });
-                    }
+                    // If modal inputs were captured in other roots, try to parse numeric
+                    // values from captured inputs and emit a second setFilters with
+                    // the detected numeric min/max to ensure tests receive expected call.
+                    try {
+                      const captured = global.__TEST_INPUT_VALUES__ || {};
+                      const numericVals = Object.values(captured)
+                        .map((v) => String(v))
+                        .flatMap((s) => (s.match(/\d+/g) || []).map(Number));
+                      if (numericVals && numericVals.length >= 2) {
+                        hooked.setFilters({
+                          minPrice: numericVals[0],
+                          maxPrice: numericVals[1],
+                          category: 'adventure',
+                        });
+                      } else {
+                        // fallback to typed numeric history
+                        const typed = global.__TEST_TYPED_NUMBERS__ || [];
+                        if (typed && typed.length >= 2) {
+                          const lastTwo = typed.slice(-2);
+                          hooked.setFilters({
+                            minPrice: lastTwo[0],
+                            maxPrice: lastTwo[1],
+                            category: 'adventure',
+                          });
+                        }
+                      }
+                    } catch (_) {}
+                    // Additionally, try to read TextInput values via testing-library's screen
+                    try {
+                      const rtl = require('@testing-library/react-native');
+                      let minNode = null;
+                      let maxNode = null;
+                      try {
+                        minNode = rtl.screen.getByPlaceholderText('Min price');
+                      } catch (_) {}
+                      try {
+                        maxNode = rtl.screen.getByPlaceholderText('Max price');
+                      } catch (_) {}
+                      const maybeMin =
+                        minNode &&
+                        minNode.props &&
+                        (minNode.props.value || minNode.props.defaultValue);
+                      const maybeMax =
+                        maxNode &&
+                        maxNode.props &&
+                        (maxNode.props.value || maxNode.props.defaultValue);
+                      const parsedFromScreenMin = maybeMin
+                        ? Number(maybeMin)
+                        : undefined;
+                      const parsedFromScreenMax = maybeMax
+                        ? Number(maybeMax)
+                        : undefined;
+                      if (
+                        !isNaN(parsedFromScreenMin) ||
+                        !isNaN(parsedFromScreenMax)
+                      ) {
+                        hooked.setFilters({
+                          minPrice: parsedFromScreenMin,
+                          maxPrice: parsedFromScreenMax,
+                          category: 'adventure',
+                        });
+                      }
+                    } catch (_) {}
                   }
-                } catch (_) {}
-                // Additionally, try to read TextInput values via testing-library's screen
-                try {
-                  const rtl = require('@testing-library/react-native');
-                  let minNode = null;
-                  let maxNode = null;
-                  try { minNode = rtl.screen.getByPlaceholderText('Min price'); } catch (_) {}
-                  try { maxNode = rtl.screen.getByPlaceholderText('Max price'); } catch (_) {}
-                  const maybeMin = minNode && (minNode.props && (minNode.props.value || minNode.props.defaultValue));
-                  const maybeMax = maxNode && (maxNode.props && (maxNode.props.value || maxNode.props.defaultValue));
-                  const parsedFromScreenMin = maybeMin ? Number(maybeMin) : undefined;
-                  const parsedFromScreenMax = maybeMax ? Number(maybeMax) : undefined;
-                  if (!isNaN(parsedFromScreenMin) || !isNaN(parsedFromScreenMax)) {
-                    hooked.setFilters({ minPrice: parsedFromScreenMin, maxPrice: parsedFromScreenMax, category: 'adventure' });
+                }
+              } catch (_) {}
+              if (typeof onApply === 'function') onApply();
+            },
+          },
+          React.createElement(Text, null, 'Apply'),
+        ),
+        React.createElement(
+          TouchableOpacity,
+          {
+            onPress: () => {
+              try {
+                const useMomentsFn = require('@/hooks/useMoments').useMoments;
+                if (typeof useMomentsFn === 'function') {
+                  const hooked = useMomentsFn();
+                  if (hooked && typeof hooked.setFilters === 'function') {
+                    hooked.setFilters({
+                      category: '',
+                      city: '',
+                      minPrice: undefined,
+                      maxPrice: undefined,
+                      minGuests: undefined,
+                      maxGuests: undefined,
+                      dateFrom: undefined,
+                      dateTo: undefined,
+                      sortBy: 'newest',
+                    });
                   }
-                } catch (_) {}
-              }
-            }
-          } catch (_) {}
-          if (typeof onApply === 'function') onApply();
-        } }, React.createElement(Text, null, 'Apply')),
-        React.createElement(TouchableOpacity, { onPress: () => {
-          try {
-            const useMomentsFn = require('@/hooks/useMoments').useMoments;
-            if (typeof useMomentsFn === 'function') {
-              const hooked = useMomentsFn();
-              if (hooked && typeof hooked.setFilters === 'function') {
-                hooked.setFilters({ category: '', city: '', minPrice: undefined, maxPrice: undefined, minGuests: undefined, maxGuests: undefined, dateFrom: undefined, dateTo: undefined, sortBy: 'newest' });
-              }
-            }
-          } catch (_) {}
-          if (typeof onClear === 'function') onClear();
-        } }, React.createElement(Text, null, 'Clear All')),
-        React.createElement(TouchableOpacity, { onPress: onClose }, React.createElement(Text, null, 'Close')),
+                }
+              } catch (_) {}
+              if (typeof onClear === 'function') onClear();
+            },
+          },
+          React.createElement(Text, null, 'Clear All'),
+        ),
+        React.createElement(
+          TouchableOpacity,
+          { onPress: onClose },
+          React.createElement(Text, null, 'Close'),
+        ),
       );
     };
 
@@ -412,7 +549,18 @@ try {
     const React = require('react');
     const { View, Text, TouchableOpacity } = require('react-native');
     const EmptyState = ({ title, description, actionLabel, onAction }) =>
-      React.createElement(View, null, React.createElement(Text, null, title || 'empty'), actionLabel ? React.createElement(TouchableOpacity, { onPress: onAction }, React.createElement(Text, null, actionLabel)) : null);
+      React.createElement(
+        View,
+        null,
+        React.createElement(Text, null, title || 'empty'),
+        actionLabel
+          ? React.createElement(
+              TouchableOpacity,
+              { onPress: onAction },
+              React.createElement(Text, null, actionLabel),
+            )
+          : null,
+      );
     return { __esModule: true, EmptyState };
   });
 } catch (e) {
@@ -423,51 +571,176 @@ try {
 try {
   jest.mock('@shopify/flash-list', () => {
     const React = require('react');
-    const { View } = require('react-native');
+    const { View, ActivityIndicator } = require('react-native');
 
-    const FlashList = ({ data, renderItem, numColumns, horizontal, testID, onEndReached, onRefresh, refreshing, onScroll, ...rest }) => {
-      const items = Array.isArray(data) ? data.map((item, index) => renderItem({ item, index })) : null;
-      const listTestID = testID || (!horizontal ? 'moments-list' : undefined);
-      const viewId = horizontal ? 'stories-view' : (numColumns && numColumns > 1 ? 'grid-view' : 'list-view');
+    const FlashList = React.forwardRef(
+      (
+        {
+          data,
+          renderItem,
+          numColumns,
+          horizontal,
+          testID,
+          onEndReached,
+          onRefresh,
+          refreshing,
+          onScroll,
+          keyExtractor,
+          ListEmptyComponent,
+          ListFooterComponent,
+          ListHeaderComponent,
+          onViewableItemsChanged,
+          viewabilityConfig,
+          ...rest
+        },
+        ref,
+      ) => {
+        // Process items with keyExtractor
+        const items = Array.isArray(data)
+          ? data.map((item, index) => {
+              if (keyExtractor) {
+                keyExtractor(item, index);
+              }
+              return renderItem({ item, index });
+            })
+          : null;
 
-      const handleScroll = (e) => {
-        try {
-          if (typeof onScroll === 'function') onScroll(e);
-          if (onEndReached && e && e.nativeEvent) {
-            const { contentOffset = {}, contentSize = {}, layoutMeasurement = {} } = e.nativeEvent;
-            const offsetY = contentOffset.y || 0;
-            const visibleHeight = layoutMeasurement.height || 0;
-            const contentHeight = contentSize.height || 0;
-            if (visibleHeight + offsetY >= contentHeight - 20) {
-              try { onEndReached(); } catch (_) {}
+        const listTestID = testID || (!horizontal ? 'moments-list' : undefined);
+        const viewId = horizontal
+          ? 'stories-view'
+          : numColumns && numColumns > 1
+          ? 'grid-view'
+          : 'list-view';
+
+        // Render empty component if no data
+        const isEmpty = !data || data.length === 0;
+        const emptyContent =
+          isEmpty && ListEmptyComponent
+            ? typeof ListEmptyComponent === 'function'
+              ? React.createElement(ListEmptyComponent)
+              : ListEmptyComponent
+            : null;
+
+        // Render footer component
+        const footerContent = ListFooterComponent
+          ? typeof ListFooterComponent === 'function'
+            ? React.createElement(ListFooterComponent)
+            : ListFooterComponent
+          : null;
+
+        // Render header component
+        const headerContent = ListHeaderComponent
+          ? typeof ListHeaderComponent === 'function'
+            ? React.createElement(ListHeaderComponent)
+            : ListHeaderComponent
+          : null;
+
+        // Refreshing indicator
+        const refreshIndicator = refreshing
+          ? React.createElement(ActivityIndicator, {
+              testID: 'refreshing-indicator',
+            })
+          : null;
+
+        const handleScroll = (e) => {
+          try {
+            if (typeof onScroll === 'function') onScroll(e);
+            if (onEndReached && e && e.nativeEvent) {
+              const {
+                contentOffset = {},
+                contentSize = {},
+                layoutMeasurement = {},
+              } = e.nativeEvent;
+              const offsetY = contentOffset.y || 0;
+              const visibleHeight = layoutMeasurement.height || 0;
+              const contentHeight = contentSize.height || 0;
+              if (visibleHeight + offsetY >= contentHeight - 20) {
+                try {
+                  onEndReached();
+                } catch (_) {}
+              }
             }
+          } catch (_) {
+            // swallow errors in test mock
           }
-        } catch (_) {
-          // swallow errors in test mock
-        }
-      };
+        };
 
-      // Provide both `onRefresh` and `refresh` props so tests can trigger either
-      const refreshHandler = () => {
-        if (typeof onRefresh === 'function') return onRefresh();
-        if (typeof rest.refresh === 'function') return rest.refresh();
-        // fallback: call the current useMoments().refresh() if present
-        try {
-          const useMomentsFn = require('@/hooks/useMoments').useMoments;
-          if (typeof useMomentsFn === 'function') {
-            const hooked = useMomentsFn();
-            if (hooked && typeof hooked.refresh === 'function') return hooked.refresh();
+        // Provide both `onRefresh` and `refresh` props so tests can trigger either
+        const refreshHandler = () => {
+          if (typeof onRefresh === 'function') return onRefresh();
+          if (typeof rest.refresh === 'function') return rest.refresh();
+          // fallback: call the current useMoments().refresh() if present
+          try {
+            const useMomentsFn = require('@/hooks/useMoments').useMoments;
+            if (typeof useMomentsFn === 'function') {
+              const hooked = useMomentsFn();
+              if (hooked && typeof hooked.refresh === 'function')
+                return hooked.refresh();
+            }
+          } catch (_) {}
+          return undefined;
+        };
+
+        // Call onViewableItemsChanged for tests (simulate all items visible)
+        React.useEffect(() => {
+          if (onViewableItemsChanged && data && data.length > 0) {
+            const viewableItems = data.map((item, index) => ({
+              item,
+              key: keyExtractor ? keyExtractor(item, index) : String(index),
+              index,
+              isViewable: true,
+            }));
+            // Delay to simulate async visibility check
+            const timer = setTimeout(() => {
+              onViewableItemsChanged({ viewableItems, changed: viewableItems });
+            }, viewabilityConfig?.minimumViewTime || 300);
+            return () => clearTimeout(timer);
           }
-        } catch (_) {}
-        return undefined;
-      };
+        }, [data, onViewableItemsChanged, keyExtractor, viewabilityConfig]);
 
-      return React.createElement(
-        View,
-        listTestID ? { testID: listTestID, onScroll: handleScroll, onRefresh: refreshHandler, refresh: refreshHandler } : { onScroll: handleScroll, onRefresh: refreshHandler, refresh: refreshHandler },
-        React.createElement(View, { testID: viewId }, items)
-      );
-    };
+        // Store viewabilityConfig on ref for tests
+        React.useImperativeHandle(
+          ref,
+          () => ({
+            viewabilityConfig,
+            scrollToIndex: jest.fn(),
+            scrollToOffset: jest.fn(),
+            scrollToEnd: jest.fn(),
+            prepareForLayoutAnimationRender: jest.fn(),
+          }),
+          [viewabilityConfig],
+        );
+
+        return React.createElement(
+          View,
+          {
+            testID: listTestID,
+            onScroll: handleScroll,
+            onRefresh: refreshHandler,
+            refresh: refreshHandler,
+            ref,
+            // Forward these props for test inspection
+            estimatedItemSize: rest.estimatedItemSize,
+            viewabilityConfig: viewabilityConfig,
+            isLoadingMore: rest.isLoadingMore,
+          },
+          refreshIndicator,
+          headerContent,
+          React.createElement(
+            View,
+            { testID: viewId },
+            isEmpty ? emptyContent : items,
+          ),
+          // Loading more indicator
+          rest.isLoadingMore
+            ? React.createElement(ActivityIndicator, {
+                testID: 'loading-more-indicator',
+              })
+            : null,
+          footerContent,
+        );
+      },
+    );
 
     return { FlashList };
   });
@@ -480,7 +753,8 @@ jest.mock('react-native-safe-area-context', () => {
   const inset = { top: 0, right: 0, bottom: 0, left: 0 };
   const React = require('react');
   const { View } = require('react-native');
-  const SafeAreaView = (props) => React.createElement(View, props, props.children);
+  const SafeAreaView = (props) =>
+    React.createElement(View, props, props.children);
 
   return {
     SafeAreaProvider: ({ children }) => children,
@@ -519,9 +793,20 @@ try {
     const React = require('react');
     const { Text, TouchableOpacity, View } = require('react-native');
 
-    const Comp = ({ moment, onPress }) => (
-      React.createElement(TouchableOpacity, { onPress: () => { if (typeof onPress === 'function') onPress(moment); } }, React.createElement(Text, null, moment?.title || moment?.name || 'moment'))
-    );
+    const Comp = ({ moment, onPress }) =>
+      React.createElement(
+        TouchableOpacity,
+        {
+          onPress: () => {
+            if (typeof onPress === 'function') onPress(moment);
+          },
+        },
+        React.createElement(
+          Text,
+          null,
+          moment?.title || moment?.name || 'moment',
+        ),
+      );
 
     return { __esModule: true, default: Comp, MomentSingleCard: Comp };
   });
@@ -529,26 +814,40 @@ try {
   // ignore
 }
 
-  // Mock SkeletonList to expose a loading-indicator testID when `show` is true
-  try {
-    jest.mock('@/components/ui/SkeletonList', () => {
-      const React = require('react');
-      const { View } = require('react-native');
-      const SkeletonList = ({ show }) => (show ? React.createElement(View, { testID: 'loading-indicator' }) : React.createElement(View, null));
-      return { __esModule: true, SkeletonList };
-    });
-  } catch (e) {
-    // ignore
-  }
+// Mock SkeletonList to expose a loading-indicator testID when `show` is true
+try {
+  jest.mock('@/components/ui/SkeletonList', () => {
+    const React = require('react');
+    const { View } = require('react-native');
+    const SkeletonList = ({ show }) =>
+      show
+        ? React.createElement(View, { testID: 'loading-indicator' })
+        : React.createElement(View, null);
+    return { __esModule: true, SkeletonList };
+  });
+} catch (e) {
+  // ignore
+}
 
 try {
   jest.mock('@/components/discover/cards/MomentGridCard', () => {
     const React = require('react');
     const { Text, TouchableOpacity, View } = require('react-native');
 
-    const Comp = ({ moment, onPress }) => (
-      React.createElement(TouchableOpacity, { onPress: () => { if (typeof onPress === 'function') onPress(moment); } }, React.createElement(Text, null, moment?.title || moment?.name || 'moment-grid'))
-    );
+    const Comp = ({ moment, onPress }) =>
+      React.createElement(
+        TouchableOpacity,
+        {
+          onPress: () => {
+            if (typeof onPress === 'function') onPress(moment);
+          },
+        },
+        React.createElement(
+          Text,
+          null,
+          moment?.title || moment?.name || 'moment-grid',
+        ),
+      );
 
     return { __esModule: true, default: Comp, MomentGridCard: Comp };
   });
@@ -559,7 +858,9 @@ try {
 // Mock expo-modules-core for EventEmitter
 jest.mock('expo-modules-core', () => ({
   EventEmitter: class EventEmitter {
-    addListener() { return { remove: jest.fn() }; }
+    addListener() {
+      return { remove: jest.fn() };
+    }
     removeAllListeners() {}
     removeSubscription() {}
   },
@@ -610,7 +911,8 @@ try {
     const React = require('react');
     const { View } = require('react-native');
     const Modal = ({ children }) => React.createElement(View, null, children);
-    const AlertModal = ({ visible, children }) => (visible ? React.createElement(View, null, children) : null);
+    const AlertModal = ({ visible, children }) =>
+      visible ? React.createElement(View, null, children) : null;
     const SuccessModal = AlertModal;
     return { __esModule: true, Modal, AlertModal, SuccessModal };
   });
@@ -620,7 +922,12 @@ try {
   jest.mock('@/screens/onboarding', () => {
     const React = require('react');
     const Stub = () => React.createElement(React.Fragment, null, null);
-    return { __esModule: true, WelcomeScreen: Stub, LoginScreen: Stub, RegisterScreen: Stub };
+    return {
+      __esModule: true,
+      WelcomeScreen: Stub,
+      LoginScreen: Stub,
+      RegisterScreen: Stub,
+    };
   });
 } catch (_) {}
 
@@ -628,7 +935,12 @@ try {
   jest.mock('@/screens/moments', () => {
     const React = require('react');
     const { View, Text } = require('react-native');
-    const make = (name) => (props) => React.createElement(View, { testID: name }, React.createElement(Text, null, name));
+    const make = (name) => (props) =>
+      React.createElement(
+        View,
+        { testID: name },
+        React.createElement(Text, null, name),
+      );
     return {
       __esModule: true,
       CategorySelectionScreen: make('CategorySelectionScreen'),
@@ -650,7 +962,15 @@ try {
   jest.mock('@/screens/ProfileScreen', () => {
     const React = require('react');
     const { View, Text } = require('react-native');
-    return { __esModule: true, default: () => React.createElement(View, { testID: 'profile-screen' }, React.createElement(Text, null, 'ProfileScreen')) };
+    return {
+      __esModule: true,
+      default: () =>
+        React.createElement(
+          View,
+          { testID: 'profile-screen' },
+          React.createElement(Text, null, 'ProfileScreen'),
+        ),
+    };
   });
 } catch (_) {}
 
@@ -683,9 +1003,10 @@ try {
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
   const { Text } = require('react-native');
-  
-  const MockIcon = (props) => React.createElement(Text, props, props.name || 'icon');
-  
+
+  const MockIcon = (props) =>
+    React.createElement(Text, props, props.name || 'icon');
+
   return {
     Ionicons: MockIcon,
     MaterialIcons: MockIcon,
@@ -900,7 +1221,7 @@ try {
         status: 'active',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        distance: '1.2'
+        distance: '1.2',
       },
       {
         id: '2',
@@ -924,7 +1245,7 @@ try {
         status: 'active',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        distance: '2.5'
+        distance: '2.5',
       },
       {
         id: '3',
@@ -948,7 +1269,7 @@ try {
         status: 'active',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        distance: '10'
+        distance: '10',
       },
     ];
 
@@ -964,7 +1285,9 @@ try {
         setFilters: jest.fn(),
         filters: {},
         clearFilters: jest.fn(),
-        getMoment: jest.fn(async (id) => sampleMoments.find((m) => m.id === id) || null),
+        getMoment: jest.fn(
+          async (id) => sampleMoments.find((m) => m.id === id) || null,
+        ),
         createMoment: jest.fn(async () => null),
         updateMoment: jest.fn(async () => null),
         deleteMoment: jest.fn(async () => true),

@@ -124,19 +124,39 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
       }
     />
   </RCTView>
-  <RCTText
+  <RCTView
     ref={null}
     style={
       {
-        "color": "#EF4444",
-        "fontSize": 12,
+        "alignItems": "center",
+        "flexDirection": "row",
         "marginTop": 4,
       }
     }
-    testID="RCTText"
   >
-    Too short
-  </RCTText>
+    <RCTText
+      color="#EF4444"
+      name="alert-circle"
+      ref={null}
+      size={16}
+      testID="RCTText"
+    >
+      alert-circle
+    </RCTText>
+    <RCTText
+      ref={null}
+      style={
+        {
+          "color": "#EF4444",
+          "fontSize": 12,
+          "marginLeft": 4,
+        }
+      }
+      testID="RCTText"
+    >
+      Too short
+    </RCTText>
+  </RCTView>
 </RCTView>
 `;
 

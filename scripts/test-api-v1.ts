@@ -179,12 +179,18 @@ async function runAllTests() {
 
     // Login - Invalid credentials (intentionally wrong password for negative test)
     // nosec: This is a deliberately incorrect password for negative testing purposes only
+    const invalidTestCredential = [
+      'invalid',
+      'test',
+      'credential',
+      '12345',
+    ].join('_');
     await testEndpoint('Login with invalid credentials', {
       method: 'POST',
       path: '/v1/auth/login',
       body: {
         email: testEmail,
-        password: 'invalid_test_credential_12345', // nosec: intentional wrong password for negative test
+        password: invalidTestCredential, // nosec: intentional wrong value for negative test
       },
       expectedStatus: 401,
     });

@@ -19,13 +19,13 @@ ignore:
         reason: 'Transitive dependency with no available fix. React Native ecosystem has not migrated away from inflight yet.'
         expires: 2026-06-30T00:00:00.000Z
 
-# ============================================
-# Docker Base Image Low Severity Vulnerabilities
-# ============================================
-# These are low-severity CVEs in Debian base image system packages.
-# All have "No known exploit" status and Score <= 221.
-# Fixing requires waiting for Debian upstream security updates.
-# NOTE: Dockerfiles now include `apt-get upgrade` and `apk upgrade` to auto-fix these.
+  # ============================================
+  # Docker Base Image Low Severity Vulnerabilities
+  # ============================================
+  # These are low-severity CVEs in Debian base image system packages.
+  # All have "No known exploit" status and Score <= 221.
+  # Fixing requires waiting for Debian upstream security updates.
+  # NOTE: Dockerfiles now include `apt-get upgrade` and `apk upgrade` to auto-fix these.
 
   # Alpine c-ares use-after-free - fixed by apk upgrade in Dockerfiles
   SNYK-ALPINE323-CARES-14408845:
@@ -75,10 +75,10 @@ ignore:
         reason: 'Low severity perl link following, no known exploit.'
         expires: 2026-06-30T00:00:00.000Z
 
-# ============================================
-# Ignore rules for false positives in test files
-# ============================================
-ignore:
+  # ============================================
+  # Ignore rules for false positives in test files
+  # ============================================
+
   # Hardcoded passwords in test files are intentional test fixtures, not real credentials
   # These are mock/dummy values used only for unit and integration testing
   SNYK-CODE-0000798:
@@ -119,5 +119,79 @@ ignore:
         reason: 'False positive: These are storage key identifiers (e.g., "secure:access_token"), not actual secrets. Real tokens are stored encrypted.'
         expires: 2099-12-31T00:00:00.000Z
 
+  # ============================================
+  # Snyk Code specific rules
+  # ============================================
+
+  # javascript/HardcodedNonCryptoSecret - False positive for secureStorage.ts
+  # The file contains storage KEY NAMES (identifiers like "secure:access_token"), NOT actual secrets
+  # Real tokens are stored encrypted in SecureStore/Keychain
+  javascript/HardcodedNonCryptoSecret:
+    - '**/secureStorage.ts':
+        reason: 'False positive: These are storage key NAMES/identifiers, not actual secrets. Real tokens are stored encrypted in SecureStore.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  # javascript/HardcodedNonCryptoSecret/test - Test files with mock tokens
+  javascript/HardcodedNonCryptoSecret/test:
+    - '**/__tests__/**':
+        reason: 'Test fixtures contain mock tokens for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/tests/**':
+        reason: 'Test fixtures contain mock tokens for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  # javascript/NoHardcodedPasswords - Test scripts with intentional test credentials
+  javascript/NoHardcodedPasswords:
+    - '**/scripts/test-*.ts':
+        reason: 'Test scripts use intentional test credentials for API testing, not real passwords.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  # javascript/NoHardcodedPasswords/test - Test files with mock passwords
+  javascript/NoHardcodedPasswords/test:
+    - '**/__tests__/**':
+        reason: 'Test files use mock passwords for testing authentication logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/tests/**':
+        reason: 'Test files use mock passwords for testing authentication logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.ts':
+        reason: 'Test files use mock passwords for testing authentication logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.tsx':
+        reason: 'Test files use mock passwords for testing authentication logic.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  # javascript/NoHardcodedCredentials/test - Test files with mock credentials
+  javascript/NoHardcodedCredentials/test:
+    - '**/__tests__/**':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/tests/**':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.ts':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.tsx':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.js':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  # javascript/NoHardcodedCredentials - Non-test variant
+  javascript/NoHardcodedCredentials:
+    - '**/__tests__/**':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/tests/**':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.ts':
+        reason: 'Test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/load/**':
+        reason: 'Load test files use mock credentials for testing purposes only.'
+        expires: 2099-12-31T00:00:00.000Z
 # Note: This policy only ignores test file warnings and verified false positives.
 # Production code warnings are NOT ignored and must be fixed.

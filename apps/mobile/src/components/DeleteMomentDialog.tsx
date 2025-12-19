@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 
@@ -38,13 +45,21 @@ export function DeleteMomentDialog({
             style={styles.closeButton}
             disabled={isDeleting}
           >
-            <MaterialCommunityIcons name="close" size={24} color={COLORS.textSecondary} />
+            <MaterialCommunityIcons
+              name="close"
+              size={24}
+              color={COLORS.textSecondary}
+            />
           </TouchableOpacity>
 
           {/* Icon */}
           <View style={styles.iconContainer}>
             <View style={styles.iconBackground}>
-              <MaterialCommunityIcons name="alert" size={32} color={COLORS.warning} />
+              <MaterialCommunityIcons
+                name="alert"
+                size={32}
+                color={COLORS.warning}
+              />
             </View>
           </View>
 
@@ -60,8 +75,8 @@ export function DeleteMomentDialog({
 
           <Text style={styles.description}>
             This moment will be deleted but can be{' '}
-            <Text style={styles.highlight}>restored within 90 days</Text>.
-            After 90 days, it will be permanently removed.
+            <Text style={styles.highlight}>restored within 90 days</Text>. After
+            90 days, it will be permanently removed.
           </Text>
 
           {/* Action Buttons */}
@@ -80,10 +95,17 @@ export function DeleteMomentDialog({
               style={[styles.deleteButton, isDeleting && styles.disabledButton]}
             >
               {isDeleting ? (
-                <ActivityIndicator size="small" color={COLORS.white} />
+                <>
+                  <ActivityIndicator size="small" color={COLORS.white} />
+                  <Text style={styles.deleteButtonText}>Deleting...</Text>
+                </>
               ) : (
                 <>
-                  <MaterialCommunityIcons name="trash-can-outline" size={18} color={COLORS.white} />
+                  <MaterialCommunityIcons
+                    name="trash-can-outline"
+                    size={18}
+                    color={COLORS.white}
+                  />
                   <Text style={styles.deleteButtonText}>Delete</Text>
                 </>
               )}

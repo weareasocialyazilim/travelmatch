@@ -35,6 +35,8 @@ interface InputProps extends TextInputProps {
   required?: boolean;
   /** Show success checkmark (for validation) */
   showSuccess?: boolean;
+  /** Test ID for the input */
+  testID?: string;
 }
 
 /**
@@ -80,6 +82,9 @@ export const Input: React.FC<InputProps> = memo(
     secureTextEntry,
     onFocus: onFocusProp,
     onBlur: onBlurProp,
+    required,
+    showSuccess,
+    testID,
     ...rest
   }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -115,8 +120,16 @@ export const Input: React.FC<InputProps> = memo(
     );
 
     return (
-      <View style={[styles.container, containerStyle]}>
-        {label && <Text style={styles.label}>{label}</Text>}
+      <View
+        style={[styles.container, containerStyle]}
+        testID={testID ? `${testID}-container` : undefined}
+      >
+        {label && (
+          <Text style={styles.label}>
+            {label}
+            {required && <Text style={styles.requiredAsterisk}>*</Text>}
+          </Text>
+        )}
 
         <View
           style={[
@@ -137,6 +150,7 @@ export const Input: React.FC<InputProps> = memo(
 
           <TextInput
             {...rest}
+            testID={testID}
             style={[
               styles.input,
               leftIcon && styles.inputWithLeftIcon,
@@ -181,7 +195,32 @@ export const Input: React.FC<InputProps> = memo(
           )}
         </View>
 
-        {error && <Text style={styles.error}>{error}</Text>}
+        {/* Success indicator */}
+        {showSuccess && !error && (
+          <View
+            style={styles.successContainer}
+            testID={testID ? `${testID}-success-icon` : undefined}
+          >
+            <MaterialCommunityIcons
+              name="check-circle"
+              size={16}
+              color={COLORS.success || '#22C55E'}
+            />
+          </View>
+        )}
+
+        {/* Error icon and message */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <MaterialCommunityIcons
+              name="alert-circle"
+              size={16}
+              color={COLORS.error}
+              testID={testID ? `${testID}-error-icon` : undefined}
+            />
+            <Text style={styles.error}>{error}</Text>
+          </View>
+        )}
         {hint && !error && <Text style={styles.hint}>{hint}</Text>}
       </View>
     );
@@ -234,10 +273,24 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     padding: 4,
   },
+  requiredAsterisk: {
+    color: COLORS.error,
+    marginLeft: 2,
+  },
+  successContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   error: {
     fontSize: 12,
     color: COLORS.error,
-    marginTop: 4,
+    marginLeft: 4,
   },
   hint: {
     fontSize: 12,

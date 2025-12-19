@@ -48,7 +48,7 @@
     "@react-navigation/native-stack": "^7.9.0",
     "@react-navigation/stack": "^7.6.13",
     "@rnmapbox/maps": "^10.1.30",
-    "@sentry/react-native": "~7.2.0",
+    "@sentry/react-native": "~7.8.0",
     "@shopify/flash-list": "^2.0.2",
     "@supabase/supabase-js": "^2.86.2",
     "@travelmatch/design-system": "workspace:*",

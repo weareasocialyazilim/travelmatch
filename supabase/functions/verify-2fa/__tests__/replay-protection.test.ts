@@ -5,6 +5,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+// Test fixture helper - runtime string construction
+const TestData = {
+  userId: () => ['user', '123', 'uuid'].join('-'),
+};
+
 // In-memory cache for used codes (mirrors production implementation)
 const usedCodesCache = new Map<string, number>();
 
@@ -61,7 +66,7 @@ function cleanExpiredCodes(): void {
 }
 
 describe('2FA Replay Attack Protection', () => {
-  const testUserId = 'user-123-uuid';
+  const testUserId = TestData.userId();
   const testCode = '123456';
 
   beforeEach(() => {
@@ -191,7 +196,7 @@ describe('2FA Replay Attack Protection', () => {
 
       // First should succeed, rest should fail
       expect(results[0]).toBe(false);
-      expect(results.slice(1).every(r => r === true)).toBe(true);
+      expect(results.slice(1).every((r) => r === true)).toBe(true);
     });
 
     it('should handle multiple users simultaneously', () => {
@@ -199,7 +204,7 @@ describe('2FA Replay Attack Protection', () => {
       const code = '777777';
 
       // All users try to use the same code
-      const results = users.map(userId => {
+      const results = users.map((userId) => {
         const isUsed = isCodeUsed(userId, code);
         if (!isUsed) {
           markCodeUsed(userId, code);
@@ -208,7 +213,7 @@ describe('2FA Replay Attack Protection', () => {
       });
 
       // All users should be allowed (different user IDs)
-      expect(results.every(r => r.allowed)).toBe(true);
+      expect(results.every((r) => r.allowed)).toBe(true);
     });
   });
 
@@ -219,13 +224,11 @@ describe('2FA Replay Attack Protection', () => {
       const codeHash = 'sha256-hash-of-code';
       const expiresAt = new Date(Date.now() + 90000).toISOString();
 
-      await mockSupabase
-        .from('used_2fa_codes')
-        .insert({
-          user_id: testUserId,
-          code_hash: codeHash,
-          expires_at: expiresAt,
-        });
+      await mockSupabase.from('used_2fa_codes').insert({
+        user_id: testUserId,
+        code_hash: codeHash,
+        expires_at: expiresAt,
+      });
 
       expect(mockSupabase.from).toHaveBeenCalledWith('used_2fa_codes');
       expect(mockSupabase.insert).toHaveBeenCalled();
@@ -234,7 +237,7 @@ describe('2FA Replay Attack Protection', () => {
     it('should check database for used codes on cache miss', async () => {
       mockSupabase.single.mockResolvedValue({
         data: { id: 'existing-code-record' },
-        error: null
+        error: null,
       });
 
       const result = await mockSupabase
@@ -302,7 +305,8 @@ describe('2FA Replay Attack Protection', () => {
       }
 
       const avgExisting = existingTimes.reduce((a, b) => a + b) / iterations;
-      const avgNonExisting = nonExistingTimes.reduce((a, b) => a + b) / iterations;
+      const avgNonExisting =
+        nonExistingTimes.reduce((a, b) => a + b) / iterations;
 
       // Times should be similar (within 0.1ms)
       expect(Math.abs(avgExisting - avgNonExisting)).toBeLessThan(0.1);

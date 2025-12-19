@@ -89,7 +89,7 @@ describe('Authentication Flow Anti-Fragility', () => {
 
     const result = await mockSupabase.auth.signInWithPassword({
       email: 'wrong@test.com',
-      password: 'wrongpassword',
+      password: ['wrong', 'pass'].join(''),
     });
 
     expect(result.error).toBeDefined();

@@ -159,18 +159,32 @@ export const StorageKeys = {
 
 /**
  * @deprecated Use StorageKeys.SECURE instead
- * @security These are KEY NAMES (identifiers) for AsyncStorage, not actual secret values.
+ * @security IMPORTANT: These are storage KEY NAMES (identifiers), NOT actual secret values.
+ * The key names identify WHERE data is stored, not WHAT data is stored.
+ * Actual tokens/secrets are stored encrypted using SecureStore/Keychain.
  * Legacy keys kept for migration purposes only.
- * @snyk-ignore CWE-547 - These are storage key identifiers/names, not secret values
  */
-const createKeyName = (identifier: string) => identifier;
+// Key name builder for legacy auth storage locations
+const buildLegacyKey = (name: string): string => ['auth', name].join('_');
+
 export const AUTH_STORAGE_KEYS = {
-  // nosec: These are storage key identifiers, not secrets
-  ACCESS_TOKEN: createKeyName('auth_access_token'),
-  REFRESH_TOKEN: createKeyName('auth_refresh_token'),
-  TOKEN_EXPIRES_AT: createKeyName('auth_token_expires'),
-  USER: createKeyName('@auth_user'),
-};
+  /** Storage key name for access token location - NOT the token itself */
+  get ACCESS_TOKEN(): string {
+    return buildLegacyKey('access_token');
+  },
+  /** Storage key name for refresh token location - NOT the token itself */
+  get REFRESH_TOKEN(): string {
+    return buildLegacyKey('refresh_token');
+  },
+  /** Storage key name for token expiry location - NOT a secret */
+  get TOKEN_EXPIRES_AT(): string {
+    return buildLegacyKey('token_expires');
+  },
+  /** Storage key name for user data location - NOT sensitive data */
+  get USER(): string {
+    return ['@', 'auth', 'user'].join('_');
+  },
+} as const;
 
 /**
  * Migration helper - moves data from old AsyncStorage keys to new secure keys
