@@ -84,6 +84,7 @@ jobs:
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -101,14 +102,14 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Build iOS
         run: |
           cd apps/mobile
           eas build --platform ios --profile production --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
 
   build-android:
@@ -126,6 +127,7 @@ jobs:
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -143,14 +145,14 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Build Android
         run: |
           cd apps/mobile
           eas build --platform android --profile production --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
 
   submit-ios:
@@ -168,19 +170,20 @@ jobs:
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Submit to App Store
         run: |
           cd apps/mobile
           eas submit --platform ios --latest --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
 
   submit-android:
     name: Submit to Play Store
@@ -197,19 +200,20 @@ jobs:
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Submit to Play Store
         run: |
           cd apps/mobile
           eas submit --platform android --latest --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
 
   notify-success:
     name: Notify Deployment Success

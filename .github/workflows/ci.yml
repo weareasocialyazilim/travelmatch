@@ -38,7 +38,8 @@ jobs:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
-          env-slug: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+          env-slug: ${{ github.ref_name == 'main' && 'prod' || 'staging' }}
+          export-type: env
         continue-on-error: true # OK: Optional secret management service
 
       - uses: pnpm/action-setup@v4
@@ -53,7 +54,7 @@ jobs:
         with:
           file: ./coverage/lcov.info
           fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
 
   build:
     name: Build Check

@@ -1,6 +1,6 @@
 /**
  * Offline-First Caching with React Query + MMKV
- * 
+ *
  * Features:
  * - Fast in-memory cache (React Query)
  * - Persistent storage (MMKV - faster than AsyncStorage)
@@ -45,7 +45,7 @@ async function generateEncryptionKey(): Promise<string> {
   // Hash to create a consistent 32-byte key
   const hash = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
-    combined
+    combined,
   );
 
   return hash;
@@ -88,25 +88,25 @@ const CACHE_CONFIG = {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 60 * 60 * 1000, // 1 hour (formerly cacheTime)
   },
-  
+
   // Moments feed (cache for 1 minute, keep stale for 10 minutes)
   moments: {
     staleTime: 1 * 60 * 1000, // 1 minute
     gcTime: 10 * 60 * 1000, // 10 minutes
   },
-  
+
   // Matches (cache for 2 minutes, keep stale for 30 minutes)
   matches: {
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
   },
-  
+
   // Messages (cache for 30 seconds, keep stale for 5 minutes)
   messages: {
     staleTime: 30 * 1000, // 30 seconds
     gcTime: 5 * 60 * 1000, // 5 minutes
   },
-  
+
   // Static data (cache for 1 hour, keep stale for 24 hours)
   static: {
     staleTime: 60 * 60 * 1000, // 1 hour
@@ -120,7 +120,7 @@ export const queryClient = new QueryClient({
     queries: {
       // Use stale data when offline
       networkMode: 'offlineFirst',
-      
+
       // Retry with exponential backoff
       retry: (failureCount, error: Error & { status?: number }) => {
         // Don't retry on 4xx errors
@@ -131,30 +131,30 @@ export const queryClient = new QueryClient({
         return failureCount < 3;
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      
+
       // Default cache times
       staleTime: CACHE_CONFIG.moments.staleTime,
       gcTime: CACHE_CONFIG.moments.gcTime,
-      
+
       // Refetch on window focus (when app comes to foreground)
       refetchOnWindowFocus: true,
-      
+
       // Refetch on reconnect
       refetchOnReconnect: true,
-      
+
       // Don't refetch on mount if data is fresh
       refetchOnMount: false,
     },
     mutations: {
       // Queue mutations when offline
       networkMode: 'offlineFirst',
-      
+
       // Retry failed mutations
       retry: 3,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
-  
+
   queryCache: new QueryCache({
     onError: (error, query) => {
       logger.error('[Cache] Query error', { queryKey: query.queryKey, error });
@@ -163,13 +163,18 @@ export const queryClient = new QueryClient({
       logger.debug('[Cache] Query success', { queryKey: query.queryKey });
     },
   }),
-  
+
   mutationCache: new MutationCache({
     onError: (error, variables, context, mutation) => {
-      logger.error('[Cache] Mutation error', { mutationKey: mutation.options.mutationKey, error });
+      logger.error('[Cache] Mutation error', {
+        mutationKey: mutation.options.mutationKey,
+        error,
+      });
     },
     onSuccess: (data, variables, context, mutation) => {
-      logger.debug('[Cache] Mutation success', { mutationKey: mutation.options.mutationKey });
+      logger.debug('[Cache] Mutation success', {
+        mutationKey: mutation.options.mutationKey,
+      });
     },
   }),
 });
@@ -180,9 +185,9 @@ let isOnline = true;
 NetInfo.addEventListener((state) => {
   const wasOnline = isOnline;
   isOnline = state.isConnected ?? false;
-  
+
   logger.info('[Network] Status changed', { isOnline });
-  
+
   // When coming back online, refetch all active queries
   if (!wasOnline && isOnline) {
     logger.info('[Network] Reconnected - refetching queries');
@@ -197,26 +202,26 @@ export const cacheUtils = {
    */
   async prefetchForOffline(userId: string) {
     logger.debug('[Cache] Prefetching data for offline use...', { userId });
-    
+
     // Prefetch user profile
     await queryClient.prefetchQuery({
       queryKey: ['profile', userId],
       // Query function will be provided by hooks
     });
-    
+
     // Prefetch moments feed (first page)
     await queryClient.prefetchQuery({
       queryKey: ['moments', 'feed'],
     });
-    
+
     // Prefetch matches
     await queryClient.prefetchQuery({
       queryKey: ['matches'],
     });
-    
+
     logger.debug('[Cache] Prefetch complete');
   },
-  
+
   /**
    * Clear all cache
    */
@@ -225,7 +230,7 @@ export const cacheUtils = {
     queryClient.clear();
     mmkvStorage.clearAll();
   },
-  
+
   /**
    * Clear specific cache by key pattern
    */
@@ -233,27 +238,27 @@ export const cacheUtils = {
     logger.debug('[Cache] Clearing cache by pattern', { pattern });
     queryClient.removeQueries({ queryKey: pattern });
   },
-  
+
   /**
    * Get cache size
    */
   getCacheSize(): { entries: number; sizeBytes: number } {
     const allKeys = mmkvStorage.getAllKeys();
     let totalSize = 0;
-    
+
     allKeys.forEach((key) => {
       const value = mmkvStorage.getString(key);
       if (value) {
         totalSize += new Blob([value]).size;
       }
     });
-    
+
     return {
       entries: allKeys.length,
       sizeBytes: totalSize,
     };
   },
-  
+
   /**
    * Invalidate cache (force refetch on next access)
    */
@@ -261,28 +266,28 @@ export const cacheUtils = {
     logger.debug('[Cache] Invalidating', { queryKey });
     queryClient.invalidateQueries({ queryKey });
   },
-  
+
   /**
    * Set custom data in cache
    */
   setQueryData<T>(queryKey: string[], data: T) {
     queryClient.setQueryData(queryKey, data);
   },
-  
+
   /**
    * Get data from cache
    */
   getQueryData<T>(queryKey: string[]): T | undefined {
     return queryClient.getQueryData(queryKey);
   },
-  
+
   /**
    * Check if query is cached
    */
   isCached(queryKey: string[]): boolean {
     return queryClient.getQueryState(queryKey) !== undefined;
   },
-  
+
   /**
    * Get network status
    */
@@ -300,14 +305,14 @@ export function optimisticUpdate<T>(
   updater: (old: T | undefined) => T,
   options?: {
     onError?: (error: Error, previousData: T | undefined) => void;
-  }
+  },
 ) {
   // Save previous data for rollback
   const previousData = queryClient.getQueryData<T>(queryKey);
-  
+
   // Optimistically update cache
   queryClient.setQueryData<T>(queryKey, updater);
-  
+
   return {
     // Rollback on error
     rollback: () => {
@@ -342,44 +347,47 @@ export const cacheKeys = {
 };
 
 // Mutation queue for offline support
-const mutationQueue: Array<{
+interface QueuedMutation {
   id: string;
-  mutation: () => Promise<any>;
+  mutation: () => Promise<unknown>;
   retryCount: number;
-}> = [];
+}
+const mutationQueue: QueuedMutation[] = [];
 
 export const offlineMutations = {
   /**
    * Add mutation to queue (will be executed when online)
    */
-  queue(id: string, mutation: () => Promise<any>) {
+  queue(id: string, mutation: () => Promise<unknown>) {
     mutationQueue.push({ id, mutation, retryCount: 0 });
     logger.debug('[Offline] Queued mutation', { id });
-    
+
     // Try to process immediately if online
     if (isOnline) {
       this.processQueue();
     }
   },
-  
+
   /**
    * Process queued mutations
    */
   async processQueue() {
     if (!isOnline || mutationQueue.length === 0) return;
-    
-    logger.debug('[Offline] Processing mutation queue', { count: mutationQueue.length });
-    
+
+    logger.debug('[Offline] Processing mutation queue', {
+      count: mutationQueue.length,
+    });
+
     const toProcess = [...mutationQueue];
     mutationQueue.length = 0;
-    
+
     for (const item of toProcess) {
       try {
         await item.mutation();
         logger.debug('[Offline] Processed mutation', { id: item.id });
       } catch (error) {
         logger.error('[Offline] Mutation failed', { id: item.id, error });
-        
+
         // Retry up to 3 times
         if (item.retryCount < 3) {
           mutationQueue.push({ ...item, retryCount: item.retryCount + 1 });
@@ -387,7 +395,7 @@ export const offlineMutations = {
       }
     }
   },
-  
+
   /**
    * Clear queue
    */

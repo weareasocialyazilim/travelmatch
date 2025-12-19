@@ -25,6 +25,7 @@ import {
 } from './cacheInvalidationService';
 import { toJson, toRecord } from '../utils/jsonHelper';
 import type { Database } from '../types/database.types';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // Types
 export interface PaymentIntent {
@@ -469,7 +470,11 @@ class SecurePaymentService {
   /**
    * Subscribe to real-time payment updates
    */
-  subscribeToPaymentUpdates(callback: (payload: any) => void): () => void {
+  subscribeToPaymentUpdates(
+    callback: (
+      payload: RealtimePostgresChangesPayload<Record<string, unknown>>,
+    ) => void,
+  ): () => void {
     const channel = supabase
       .channel('payment-updates')
       .on(

@@ -50,7 +50,7 @@ SkeletonItem.displayName = 'SkeletonItem';
  * Loading State Component
  *
  * @example
- * // Skeleton loading
+ * // Skeleton loading (DEFAULT - better UX)
  * <LoadingState type="skeleton" count={5} />
  *
  * // Spinner loading
@@ -61,7 +61,7 @@ SkeletonItem.displayName = 'SkeletonItem';
  */
 export const LoadingState: React.FC<LoadingStateProps> = memo(
   ({
-    type = 'spinner',
+    type = 'skeleton', // D2-004 FIX: Default to skeleton for better UX
     count = 3,
     message,
     color = COLORS.primary,

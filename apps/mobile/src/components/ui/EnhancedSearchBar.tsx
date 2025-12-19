@@ -166,7 +166,9 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                       color={COLORS.textSecondary}
                       style={styles.suggestionIcon}
                     />
-                    <Text style={[styles.suggestionText, { color: COLORS.text }]}>
+                    <Text
+                      style={[styles.suggestionText, { color: COLORS.text }]}
+                    >
                       {item}
                     </Text>
                   </TouchableOpacity>
@@ -187,7 +189,6 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
               estimatedItemSize={ITEM_HEIGHTS.SMALL}
             />
           </View>
-          />
         </View>
       )}
     </View>

@@ -26,6 +26,7 @@ export type PaymentMetadata = z.infer<typeof PaymentMetadataSchema>;
 
 /**
  * Transaction Type Schema
+ * Note: TransactionType type is exported from types/domain.ts
  */
 export const TransactionTypeSchema = z.enum([
   'payment',
@@ -35,10 +36,9 @@ export const TransactionTypeSchema = z.enum([
   'gift',
 ]);
 
-export type TransactionType = z.infer<typeof TransactionTypeSchema>;
-
 /**
  * Transaction Status Schema
+ * Note: TransactionStatus type is exported from types/domain.ts
  */
 export const TransactionStatusSchema = z.enum([
   'pending',
@@ -48,8 +48,6 @@ export const TransactionStatusSchema = z.enum([
   'cancelled',
   'refunded',
 ]);
-
-export type TransactionStatus = z.infer<typeof TransactionStatusSchema>;
 
 /**
  * Payment Method Schema

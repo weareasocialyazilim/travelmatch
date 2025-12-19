@@ -113,7 +113,7 @@ describe('ErrorBoundary', () => {
       // Retry button should exist
       const retryButton = screen.getByText('Tekrar Dene');
       expect(retryButton).toBeTruthy();
-
+      
       // Verify button is pressable (doesn't throw)
       fireEvent.press(retryButton);
     });
@@ -602,8 +602,7 @@ describe('ErrorBoundary', () => {
 
   describe('Debug Mode', () => {
     it('should show debug info in development mode', () => {
-      const originalEnv = (global as unknown as Record<string, unknown>)
-        .__DEV__;
+      const originalEnv = __DEV__;
       (global as unknown as Record<string, unknown>).__DEV__ = true;
 
       render(
@@ -620,8 +619,7 @@ describe('ErrorBoundary', () => {
     });
 
     it('should hide debug info in production mode', () => {
-      const originalEnv = (global as unknown as Record<string, unknown>)
-        .__DEV__;
+      const originalEnv = __DEV__;
       (global as unknown as Record<string, unknown>).__DEV__ = false;
 
       render(

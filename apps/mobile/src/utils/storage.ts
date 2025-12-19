@@ -24,7 +24,9 @@ async function getOrCreateEncryptionKey(): Promise<string> {
 
   try {
     // Try to get existing key from SecureStore
-    const existingKey = await SecureStore.getItemAsync(ENCRYPTION_KEY_STORAGE_KEY);
+    const existingKey = await SecureStore.getItemAsync(
+      ENCRYPTION_KEY_STORAGE_KEY,
+    );
 
     if (existingKey) {
       encryptionKey = existingKey;
@@ -34,7 +36,7 @@ async function getOrCreateEncryptionKey(): Promise<string> {
     // Generate new cryptographically secure key
     const newKey = await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
-      `travelmatch_${Date.now()}_${Math.random().toString(36)}`
+      `travelmatch_${Date.now()}_${Math.random().toString(36)}`,
     );
 
     // Store key securely (hardware-backed)
@@ -45,9 +47,19 @@ async function getOrCreateEncryptionKey(): Promise<string> {
     encryptionKey = newKey;
     return newKey;
   } catch (error) {
-    console.warn('[MMKV] Failed to get/create encryption key, using fallback:', error);
-    // Fallback for simulators/emulators where SecureStore might not work
-    const fallbackKey = 'travelmatch_dev_fallback_key_32chars';
+    console.warn('[MMKV] Failed to get/create encryption key:', error);
+
+    // SECURITY FIX (D1-002): Generate random fallback instead of hardcoded value
+    // This handles simulator/emulator environments where SecureStore may not work
+    // In production, this should rarely if ever be reached
+    const randomBytes = await Crypto.getRandomBytesAsync(32);
+    const fallbackKey = Array.from(randomBytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    console.warn(
+      '[MMKV] Using randomly generated fallback key (not persisted)',
+    );
     encryptionKey = fallbackKey;
     return fallbackKey;
   }
@@ -81,7 +93,9 @@ function getStorage(): MMKV {
   if (!storageInstance) {
     // Create unencrypted instance as fallback (for sync access before init)
     // This will be replaced once initializeStorage is called
-    console.warn('[MMKV] Storage accessed before initialization, using unencrypted fallback');
+    console.warn(
+      '[MMKV] Storage accessed before initialization, using unencrypted fallback',
+    );
     return new MMKV({ id: 'travelmatch-storage-temp' });
   }
   return storageInstance;
@@ -91,7 +105,8 @@ function getStorage(): MMKV {
 // Will use encrypted instance once initialized
 export const storage = {
   get: () => getStorage(),
-  set: (key: string, value: string | number | boolean) => getStorage().set(key, value),
+  set: (key: string, value: string | number | boolean) =>
+    getStorage().set(key, value),
   getString: (key: string) => getStorage().getString(key),
   getNumber: (key: string) => getStorage().getNumber(key),
   getBoolean: (key: string) => getStorage().getBoolean(key),
