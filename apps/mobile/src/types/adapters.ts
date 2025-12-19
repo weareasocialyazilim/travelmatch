@@ -78,7 +78,7 @@ export interface ApiGesture {
   moment_id?: string;
   giver_id?: string;
   receiver_id?: string;
-  item?: { name?: string; description?: string; value?: number };
+  item?: { id?: string; name?: string; description?: string; value?: number };
   amount?: number;
   amount_usd?: number;
   currency?: string;
@@ -225,7 +225,7 @@ export interface ApiGiverSlot {
   id: string;
   position?: number;
   slot_number?: number;
-  giver?: ApiUser & { amount?: number; message?: string };
+  giver?: ApiUser & { amount?: number; message?: string | number };
   is_filled?: boolean;
   isFilled?: boolean;
   amount?: number;
@@ -361,6 +361,13 @@ export function normalizeUserFromAPI(apiUser: ApiUser): User {
  * Normalize gift item from API response
  */
 export function normalizeGiftItemFromAPI(apiItem: ApiGiftItem): GiftItem {
+  const validTypes = ['coffee', 'ticket', 'dinner', 'other'] as const;
+  const normalizedType =
+    apiItem.type &&
+    validTypes.includes(apiItem.type as (typeof validTypes)[number])
+      ? (apiItem.type as 'coffee' | 'ticket' | 'dinner' | 'other')
+      : undefined;
+
   return {
     id: apiItem.id,
     placeId: apiItem.place_id ?? apiItem.placeId,
@@ -370,7 +377,7 @@ export function normalizeGiftItemFromAPI(apiItem: ApiGiftItem): GiftItem {
     emoji: apiItem.emoji,
     icon: apiItem.icon,
     category: apiItem.category,
-    type: apiItem.type,
+    type: normalizedType,
     typicalPrice: apiItem.typical_price ?? apiItem.typicalPrice,
     description: apiItem.description,
   };
@@ -385,9 +392,10 @@ export function normalizeGestureFromAPI(apiGesture: ApiGesture): Gesture {
     momentId: apiGesture.moment_id,
     giverId: apiGesture.giver_id ?? '',
     receiverId: apiGesture.receiver_id ?? '',
-    item: apiGesture.item
-      ? normalizeGiftItemFromAPI(apiGesture.item)
-      : undefined,
+    item:
+      apiGesture.item && apiGesture.item.id
+        ? normalizeGiftItemFromAPI(apiGesture.item as ApiGiftItem)
+        : undefined,
     amount: apiGesture.amount,
     amountUSD: apiGesture.amount_usd ?? apiGesture.amount,
     currency: apiGesture.currency ?? 'USD',
@@ -396,13 +404,13 @@ export function normalizeGestureFromAPI(apiGesture: ApiGesture): Gesture {
     state: (apiGesture.state ?? apiGesture.status ?? 'pending') as any,
     message: apiGesture.message,
     proof: apiGesture.proof
-      ? {
+      ? ({
           id: apiGesture.proof.id,
-          type: apiGesture.proof.type,
-          mediaUrl: apiGesture.proof.media_url ?? apiGesture.proof.mediaUrl,
-          status: apiGesture.proof.status,
-          createdAt: apiGesture.proof.created_at ?? apiGesture.proof.createdAt,
-        }
+          type: apiGesture.proof.type ?? '',
+          mediaUrl: apiGesture.proof.media_url,
+          status: apiGesture.proof.status ?? '',
+          createdAt: apiGesture.proof.created_at ?? '',
+        } as const)
       : undefined,
     expiresAt: apiGesture.expires_at,
     createdAt: apiGesture.created_at,
@@ -415,6 +423,13 @@ export function normalizeGestureFromAPI(apiGesture: ApiGesture): Gesture {
  * Normalize place from API response
  */
 export function normalizePlaceFromAPI(apiPlace: ApiPlace): Place {
+  // Convert numeric distance to formatted string (e.g., "1.5 km")
+  const formatDistance = (dist: number | undefined): string | undefined => {
+    if (dist === undefined) return undefined;
+    if (dist < 1) return `${Math.round(dist * 1000)} m`;
+    return `${dist.toFixed(1)} km`;
+  };
+
   return {
     id: apiPlace.id,
     name: apiPlace.name,
@@ -423,7 +438,7 @@ export function normalizePlaceFromAPI(apiPlace: ApiPlace): Place {
     longitude: apiPlace.longitude ?? apiPlace.lng,
     city: apiPlace.city,
     country: apiPlace.country,
-    distance: apiPlace.distance,
+    distance: formatDistance(apiPlace.distance),
     logo: apiPlace.logo,
   };
 }
@@ -477,7 +492,7 @@ export function normalizeProofLocationFromAPI(
     address: location.address,
     city: location.city,
     country: location.country,
-    name: location.name,
+    name: (location as ApiUserLocation & { name?: string }).name,
   };
 }
 
@@ -521,8 +536,8 @@ export function normalizeTransactionParticipantFromAPI(
   if (!participant) return undefined;
 
   return {
-    id: participant.id,
-    name: participant.name,
+    id: participant.id ?? '',
+    name: participant.name ?? participant.full_name ?? '',
     avatar: participant.avatar ?? participant.avatar_url,
     avatarUrl: participant.avatar_url ?? participant.avatar,
   };
@@ -574,11 +589,11 @@ export function normalizeProofStoryAuthorFromAPI(
   if (!author) return undefined;
 
   return {
-    id: author.id,
-    name: author.name,
+    id: author.id ?? '',
+    name: author.name ?? author.full_name ?? '',
     avatar: author.avatar ?? author.avatar_url,
     avatarUrl: author.avatar_url ?? author.avatar,
-    trustScore: author.trust_score ?? author.trustScore,
+    trustScore: author.trust_score,
   };
 }
 
@@ -588,17 +603,34 @@ export function normalizeProofStoryAuthorFromAPI(
 export function normalizeProofStoryFromAPI(
   apiStory: ApiProofStory,
 ): ProofStory {
+  // Validate type field
+  const validTypes = ['micro-kindness', 'verified-experience'] as const;
+  const normalizedType =
+    apiStory.type &&
+    validTypes.includes(apiStory.type as (typeof validTypes)[number])
+      ? (apiStory.type as 'micro-kindness' | 'verified-experience')
+      : undefined;
+
+  // Validate media type
+  const validMediaTypes = ['image', 'video'] as const;
+  const mediaType = apiStory.media_type ?? apiStory.mediaType;
+  const normalizedMediaType =
+    mediaType &&
+    validMediaTypes.includes(mediaType as (typeof validMediaTypes)[number])
+      ? (mediaType as 'image' | 'video')
+      : undefined;
+
   return {
     id: apiStory.id,
-    proofId: apiStory.proof_id ?? apiStory.proofId,
+    proofId: apiStory.proof_id ?? apiStory.proofId ?? apiStory.id,
     userId: apiStory.user_id ?? apiStory.userId,
-    type: apiStory.type,
+    type: normalizedType,
     author: normalizeProofStoryAuthorFromAPI(apiStory.author),
     title: apiStory.title,
     description: apiStory.description,
     content: apiStory.content,
     mediaUrl: apiStory.media_url ?? apiStory.mediaUrl,
-    mediaType: apiStory.media_type ?? apiStory.mediaType,
+    mediaType: normalizedMediaType,
     images: apiStory.images,
     location: normalizeProofLocationFromAPI(apiStory.location),
     stats: apiStory.stats
@@ -622,7 +654,7 @@ export function normalizeGiverInfoFromAPI(
   giver:
     | (Partial<ApiUser> & {
         amount?: number;
-        message?: number;
+        message?: string | number;
         trust_score?: number;
         trustScore?: number;
       })
@@ -631,12 +663,15 @@ export function normalizeGiverInfoFromAPI(
   if (!giver) return undefined;
 
   return {
-    id: giver.id,
-    name: giver.name,
+    id: giver.id ?? '',
+    name: giver.name ?? giver.full_name ?? '',
     avatar: giver.avatar ?? giver.avatar_url,
     avatarUrl: giver.avatar_url ?? giver.avatar,
     amount: giver.amount,
-    message: giver.message,
+    message:
+      typeof giver.message === 'string'
+        ? giver.message
+        : giver.message?.toString(),
     trustScore: giver.trust_score ?? giver.trustScore,
   };
 }
@@ -666,13 +701,20 @@ export function normalizeMomentUserFromAPI(
 ): MomentUser | undefined {
   if (!user) return undefined;
 
+  // Validate type field
+  const validTypes = ['traveler', 'local'] as const;
+  const normalizedType =
+    user.type && validTypes.includes(user.type as (typeof validTypes)[number])
+      ? (user.type as 'traveler' | 'local')
+      : undefined;
+
   return {
     id: user.id,
-    name: user.name,
+    name: user.name ?? '',
     avatar: user.avatar ?? user.avatar_url,
     avatarUrl: user.avatar_url ?? user.avatar,
     role: user.role,
-    type: user.type,
+    type: normalizedType,
     location: user.location,
     travelDays: user.travel_days ?? user.travelDays,
     isVerified: user.is_verified ?? user.isVerified,
@@ -688,14 +730,20 @@ export function normalizeMomentLocationFromAPI(
 ): MomentLocation | undefined {
   if (!location) return undefined;
 
+  // Only include coordinates if both lat and lng are valid numbers
+  const lat = location.coordinates?.lat ?? location.coordinates?.latitude;
+  const lng = location.coordinates?.lng ?? location.coordinates?.longitude;
+  const hasValidCoordinates =
+    typeof lat === 'number' && typeof lng === 'number';
+
   return {
     name: location.name,
     city: location.city,
     country: location.country,
-    coordinates: location.coordinates
+    coordinates: hasValidCoordinates
       ? {
-          lat: location.coordinates.lat ?? location.coordinates.latitude,
-          lng: location.coordinates.lng ?? location.coordinates.longitude,
+          lat: lat!,
+          lng: lng!,
         }
       : undefined,
   };
@@ -705,11 +753,61 @@ export function normalizeMomentLocationFromAPI(
  * Normalize moment from API response
  */
 export function normalizeMomentFromAPI(apiMoment: ApiMoment): Moment {
+  // Convert numeric distance to formatted string
+  const formatDistance = (dist: number | undefined): string | undefined => {
+    if (dist === undefined) return undefined;
+    if (dist < 1) return `${Math.round(dist * 1000)} m`;
+    return `${dist.toFixed(1)} km`;
+  };
+
+  // Validate status field
+  const validStatuses = [
+    'active',
+    'pending',
+    'completed',
+    'paused',
+    'draft',
+    'deleted',
+  ] as const;
+  const normalizedStatus =
+    apiMoment.status &&
+    validStatuses.includes(apiMoment.status as (typeof validStatuses)[number])
+      ? (apiMoment.status as
+          | 'active'
+          | 'pending'
+          | 'completed'
+          | 'paused'
+          | 'draft'
+          | 'deleted')
+      : undefined;
+
+  // Parse dateRange if it's a string
+  const parseDateRange = (
+    range: string | { start?: string; end?: string } | undefined,
+  ): { start: Date; end: Date } | undefined => {
+    if (!range) return undefined;
+    if (typeof range === 'string') {
+      // Try to parse as JSON or date string
+      try {
+        const parsed = JSON.parse(range);
+        if (parsed.start && parsed.end) {
+          return { start: new Date(parsed.start), end: new Date(parsed.end) };
+        }
+      } catch {
+        // Not JSON, might be a single date
+        return undefined;
+      }
+    } else if (range.start && range.end) {
+      return { start: new Date(range.start), end: new Date(range.end) };
+    }
+    return undefined;
+  };
+
   return {
     id: apiMoment.id,
     user: normalizeMomentUserFromAPI(apiMoment.user ?? apiMoment.creator),
     creator: normalizeMomentUserFromAPI(apiMoment.creator ?? apiMoment.user),
-    title: apiMoment.title,
+    title: apiMoment.title ?? '',
     story: apiMoment.story ?? apiMoment.description,
     description: apiMoment.description ?? apiMoment.story,
     image: apiMoment.image ?? apiMoment.image_url ?? apiMoment.imageUrl,
@@ -722,8 +820,8 @@ export function normalizeMomentFromAPI(apiMoment: ApiMoment): Moment {
     place: apiMoment.place,
     availability: apiMoment.availability,
     giftCount: apiMoment.gift_count ?? apiMoment.giftCount,
-    distance: apiMoment.distance,
-    status: apiMoment.status,
+    distance: formatDistance(apiMoment.distance),
+    status: normalizedStatus,
     date: apiMoment.date,
     completedDate: apiMoment.completed_date ?? apiMoment.completedDate,
     rating: apiMoment.rating,
@@ -735,7 +833,7 @@ export function normalizeMomentFromAPI(apiMoment: ApiMoment): Moment {
           emoji: apiMoment.category.emoji,
         }
       : undefined,
-    dateRange: apiMoment.date_range ?? apiMoment.dateRange,
+    dateRange: parseDateRange(apiMoment.date_range ?? apiMoment.dateRange),
     createdAt: apiMoment.created_at ?? apiMoment.createdAt,
     updatedAt: apiMoment.updated_at ?? apiMoment.updatedAt,
   };

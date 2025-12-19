@@ -9,9 +9,7 @@ export {
   PaymentMetadataSchema,
   type PaymentMetadata,
   TransactionTypeSchema,
-  type TransactionType,
   TransactionStatusSchema,
-  type TransactionStatus,
   PaymentMethodSchema,
   type PaymentMethod,
   CreateTransactionSchema,
@@ -19,3 +17,6 @@ export {
   WalletSchema,
   type Wallet,
 } from '@travelmatch/shared/schemas';
+
+// Re-export types from shared types
+export type { TransactionType, TransactionStatus } from '@travelmatch/shared';

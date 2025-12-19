@@ -182,7 +182,7 @@ export const messageService = {
 
       // Fetch unread counts for all conversations in batch
       const conversationIds = data.map((row) => row.id);
-      let unreadCountMap = new Map<string, number>();
+      const unreadCountMap = new Map<string, number>();
 
       if (conversationIds.length > 0) {
         const { data: unreadCounts, error: unreadError } = await supabase
