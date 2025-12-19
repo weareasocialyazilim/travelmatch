@@ -53,6 +53,79 @@ interface BlockRecord {
   created_at: string;
 }
 
+// Extended block record with user details
+interface BlockedUserRecord extends BlockRecord {
+  blocked: Tables['users']['Row'] | null;
+}
+
+// Transaction record from database
+interface TransactionRecord {
+  id: string;
+  user_id: string;
+  type: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  description: string | null;
+  moment_id: string | null;
+  sender_id: string | null;
+  receiver_id: string | null;
+  metadata: Json | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Subscription plan
+interface PlanRecord {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  currency: string;
+  interval: 'month' | 'year';
+  features: string[];
+  is_active: boolean;
+  created_at: string;
+}
+
+// User subscription
+interface SubscriptionRecord {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  status: 'active' | 'cancelled' | 'expired' | 'past_due';
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// User subscription with plan details
+interface UserSubscriptionWithPlan extends SubscriptionRecord {
+  plan: PlanRecord | null;
+}
+
+// Request record with related user data
+interface RequestRecord {
+  id: string;
+  message: string | null;
+  status: 'pending' | 'accepted' | 'declined' | 'completed';
+  created_at: string;
+  requester: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+    rating: number | null;
+    verified: boolean;
+  } | null;
+  moment: {
+    id: string;
+    title: string | null;
+    location: string | null;
+  } | null;
+}
+
 interface TransactionInput {
   type: string;
   amount: number;
@@ -883,7 +956,7 @@ export const requestsService = {
     momentId?: string;
     userId?: string;
     status?: string;
-  }): Promise<ListResult<any>> {
+  }): Promise<ListResult<RequestRecord>> {
     if (!isSupabaseConfigured()) {
       return {
         data: [],
@@ -1431,7 +1504,7 @@ export const moderationService = {
     }
   },
 
-  async listReports(userId: string): Promise<ListResult<any>> {
+  async listReports(userId: string): Promise<ListResult<ReportRecord>> {
     try {
       const { data, count, error } = await supabase
         .from('reports')
@@ -1483,7 +1556,7 @@ export const moderationService = {
     }
   },
 
-  async listBlockedUsers(userId: string): Promise<ListResult<any>> {
+  async listBlockedUsers(userId: string): Promise<ListResult<BlockedUserRecord>> {
     try {
       const { data, count, error } = await supabase
         .from('blocks')
@@ -1512,7 +1585,7 @@ export const transactionsService = {
       startDate?: string;
       endDate?: string;
     },
-  ): Promise<ListResult<any>> {
+  ): Promise<ListResult<TransactionRecord>> {
     if (!isSupabaseConfigured()) {
       return {
         data: [],
@@ -1640,7 +1713,7 @@ export const transactionsService = {
  * Subscriptions Service
  */
 export const subscriptionsService = {
-  async getPlans(): Promise<ListResult<any>> {
+  async getPlans(): Promise<ListResult<PlanRecord>> {
     if (!isSupabaseConfigured()) {
       return {
         data: [],
@@ -1670,14 +1743,14 @@ export const subscriptionsService = {
         .order('price');
 
       if (error) throw error;
-      return okList<any>(data || [], data?.length);
+      return okList<PlanRecord>(data || [], data?.length);
     } catch (error) {
       logger.error('[DB] Get plans error:', error);
       return { data: [], count: 0, error: error as Error };
     }
   },
 
-  async getUserSubscription(userId: string): Promise<DbResult<any>> {
+  async getUserSubscription(userId: string): Promise<DbResult<UserSubscriptionWithPlan>> {
     try {
       const { data, error } = await supabase
         .from('user_subscriptions')
@@ -1687,7 +1760,7 @@ export const subscriptionsService = {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      return okSingle<any>(data);
+      return okSingle<UserSubscriptionWithPlan>(data);
     } catch (error) {
       logger.error('[DB] Get user subscription error:', error);
       return { data: null, error: error as Error };

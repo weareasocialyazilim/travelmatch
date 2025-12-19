@@ -49,6 +49,9 @@ import type { Moment } from '@/hooks/useMoments';
 import type { Moment as DomainMoment } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
 
+// PERFORMANCE: Constants outside component to prevent re-creation
+const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
+
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
@@ -126,6 +129,10 @@ const DiscoverScreen = () => {
     }
   }, [refreshMoments]);
 
+  // PERFORMANCE: Memoized view mode handlers
+  const handleSingleView = useCallback(() => setViewMode('single'), [setViewMode]);
+  const handleGridView = useCallback(() => setViewMode('grid'), [setViewMode]);
+
   // Story navigation handlers
   const goToNextStory = useCallback(() => {
     if (!selectedStoryUser) return;
@@ -161,6 +168,46 @@ const DiscoverScreen = () => {
       }
     }
   }, [selectedStoryUser, currentStoryIndex, currentUserIndex, setCurrentStoryIndex, setCurrentUserIndex, setSelectedStoryUser]);
+
+  // PERFORMANCE: Memoized story view handler
+  const handleViewMoment = useCallback(
+    (story: { id: string; title: string; imageUrl: string; price: number; description: string; location: string }) => {
+      closeStoryViewer();
+      const domainMoment: DomainMoment = {
+        id: story.id,
+        title: story.title,
+        imageUrl: story.imageUrl,
+        image: story.imageUrl,
+        price: story.price,
+        story: story.description,
+        location: { city: story.location, country: '' },
+        category: { id: 'experience', label: 'Experience', emoji: '✨' },
+        user: selectedStoryUser
+          ? {
+              id: selectedStoryUser.id || '',
+              name: selectedStoryUser.name,
+              avatar: selectedStoryUser.avatar,
+              isVerified: false,
+              location: '',
+              type: 'traveler',
+              travelDays: 0,
+            }
+          : {
+              id: '',
+              name: 'Unknown',
+              avatar: '',
+              isVerified: false,
+              location: '',
+              type: 'traveler',
+              travelDays: 0,
+            },
+        availability: 'Available',
+        giftCount: 0,
+      };
+      navigation.navigate('MomentDetail', { moment: domainMoment });
+    },
+    [closeStoryViewer, selectedStoryUser, navigation],
+  );
 
   // Use API moments
   const baseMoments = useMemo(() => {
@@ -357,8 +404,8 @@ const DiscoverScreen = () => {
                       styles.viewToggleButton,
                       viewMode === 'single' && styles.viewToggleButtonActive,
                     ]}
-                    onPress={() => setViewMode('single')}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    onPress={handleSingleView}
+                    hitSlop={HIT_SLOP}
                     {...a11y.button(
                       'Single column view',
                       'Display moments in a single column',
@@ -380,8 +427,8 @@ const DiscoverScreen = () => {
                       styles.viewToggleButton,
                       viewMode === 'grid' && styles.viewToggleButtonActive,
                     ]}
-                    onPress={() => setViewMode('grid')}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    onPress={handleGridView}
+                    hitSlop={HIT_SLOP}
                     {...a11y.button(
                       'Grid view',
                       'Display moments in a grid layout',
@@ -492,44 +539,7 @@ const DiscoverScreen = () => {
         onClose={closeStoryViewer}
         onNextStory={goToNextStory}
         onPreviousStory={goToPreviousStory}
-        onViewMoment={(story) => {
-          closeStoryViewer();
-          // Convert story to moment format for navigation
-          const domainMoment: DomainMoment = {
-            id: story.id,
-            title: story.title,
-            imageUrl: story.imageUrl,
-            image: story.imageUrl,
-            price: story.price,
-            story: story.description,
-            location: { city: story.location, country: '' },
-            category: { id: 'experience', label: 'Experience', emoji: '✨' },
-            user: selectedStoryUser
-              ? {
-                  id: selectedStoryUser.id || '',
-                  name: selectedStoryUser.name,
-                  avatar: selectedStoryUser.avatar,
-                  isVerified: false,
-                  location: '',
-                  type: 'traveler',
-                  travelDays: 0,
-                }
-              : {
-                  id: '',
-                  name: 'Unknown',
-                  avatar: '',
-                  isVerified: false,
-                  location: '',
-                  type: 'traveler',
-                  travelDays: 0,
-                },
-            availability: 'Available',
-            giftCount: 0,
-          };
-          navigation.navigate('MomentDetail', {
-            moment: domainMoment,
-          });
-        }}
+        onViewMoment={handleViewMoment}
         onUserPress={(userId) => {
           // Handle user profile navigation
           logger.debug('Navigate to user:', userId);
