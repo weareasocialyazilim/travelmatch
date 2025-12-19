@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -65,6 +65,20 @@ const MessagesScreen: React.FC = () => {
     new Set(),
   );
 
+  // MEMORY LEAK FIX: Track timeouts for cleanup
+  const typingTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  // MEMORY LEAK FIX: Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      // Clear all pending timeouts when component unmounts
+      typingTimeoutsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      typingTimeoutsRef.current.clear();
+    };
+  }, []);
+
   // Fetch conversations on mount
   useEffect(() => {
     refreshConversations();
@@ -81,35 +95,52 @@ const MessagesScreen: React.FC = () => {
   );
 
   // Listen for typing indicators
-  useRealtimeEvent<{
-    conversationId: string;
-    userId: string;
-    isTyping: boolean;
-  }>(
-    'message:typing',
-    (data) => {
-      if (data.isTyping) {
+  // MEMORY LEAK FIX: Properly track and cleanup timeouts
+  const handleTypingEvent = useCallback(
+    (data: { conversationId: string; userId: string; isTyping: boolean }) => {
+      const { conversationId, isTyping } = data;
+
+      // Clear any existing timeout for this conversation
+      const existingTimeout = typingTimeoutsRef.current.get(conversationId);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+        typingTimeoutsRef.current.delete(conversationId);
+      }
+
+      if (isTyping) {
         setTypingConversations(
-          (prev) => new Set([...prev, data.conversationId]),
+          (prev) => new Set([...prev, conversationId]),
         );
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
+
+        // Auto-remove after 5 seconds with proper cleanup tracking
+        const timeoutId = setTimeout(() => {
           setTypingConversations((prev) => {
             const next = new Set(prev);
-            next.delete(data.conversationId);
+            next.delete(conversationId);
             return next;
           });
+          // Remove from tracking map after execution
+          typingTimeoutsRef.current.delete(conversationId);
         }, 5000);
+
+        // Track this timeout for cleanup
+        typingTimeoutsRef.current.set(conversationId, timeoutId);
       } else {
         setTypingConversations((prev) => {
           const next = new Set(prev);
-          next.delete(data.conversationId);
+          next.delete(conversationId);
           return next;
         });
       }
     },
     [],
   );
+
+  useRealtimeEvent<{
+    conversationId: string;
+    userId: string;
+    isTyping: boolean;
+  }>('message:typing', handleTypingEvent, [handleTypingEvent]);
 
   const totalUnreadCount = useMemo(
     () => conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0),

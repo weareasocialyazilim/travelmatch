@@ -67,7 +67,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run type-check
-        continue-on-error: true
+        # SECURITY: Type check MUST pass - no bypass allowed
 
   security:
     name: Security Audit
@@ -79,8 +79,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-      - run: pnpm audit --audit-level=high
-        continue-on-error: true
+      - run: pnpm audit --audit-level=critical
+        # SECURITY: Critical vulnerabilities MUST be fixed before merge
 
   e2e:
     name: E2E Tests
