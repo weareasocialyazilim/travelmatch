@@ -151,7 +151,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
 
           <FlatList<string>
             data={searchHistory}
-            keyExtractor={(item, index) => `${item}-${index}`}
+            keyExtractor={(item) => `history-${item}`}
             renderItem={({ item }) => (
               <View style={styles.suggestionRow}>
                 <TouchableOpacity

@@ -164,104 +164,112 @@ const MessagesScreen: React.FC = () => {
     refreshConversations();
   }, [refreshConversations]);
 
-  const handleChatPress = (conversation: Conversation) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('Chat', {
-      otherUser: {
-        id: conversation.participantId || '',
-        name: conversation.participantName || 'User',
-        avatar: conversation.participantAvatar,
-        isVerified: conversation.participantVerified,
-        role: 'Traveler',
-        kyc: 'Verified',
-        location: '',
-      },
-      conversationId: conversation.id,
-    });
-  };
+  // PERFORMANCE: Memoized chat press handler
+  const handleChatPress = useCallback(
+    (conversation: Conversation) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      navigation.navigate('Chat', {
+        otherUser: {
+          id: conversation.participantId || '',
+          name: conversation.participantName || 'User',
+          avatar: conversation.participantAvatar,
+          isVerified: conversation.participantVerified,
+          role: 'Traveler',
+          kyc: 'Verified',
+          location: '',
+        },
+        conversationId: conversation.id,
+      });
+    },
+    [navigation],
+  );
 
-  const renderChatItem = ({ item }: { item: Conversation }) => {
-    const isOnline = item.participantId
-      ? isUserOnline(item.participantId)
-      : false;
-    const isTyping = typingConversations.has(item.id);
+  // PERFORMANCE: Memoized render function for FlashList
+  const renderChatItem = useCallback(
+    ({ item }: { item: Conversation }) => {
+      const isOnline = item.participantId
+        ? isUserOnline(item.participantId)
+        : false;
+      const isTyping = typingConversations.has(item.id);
 
-    return (
-      <TouchableOpacity
-        style={styles.chatItem}
-        onPress={() => handleChatPress(item)}
-        activeOpacity={0.7}
-        accessibilityLabel={`Chat with ${item.participantName || 'User'}${
-          item.unreadCount ? `, ${item.unreadCount} unread messages` : ''
-        }`}
-        accessibilityRole="button"
-        accessibilityHint="Opens conversation"
-      >
-        {/* Avatar */}
-        <View style={styles.avatarContainer}>
-          <Image
-            source={{
-              uri: item.participantAvatar || 'https://via.placeholder.com/100',
-            }}
-            style={styles.avatar}
-            accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
-          />
-          {isOnline && <View style={styles.onlineIndicator} />}
-        </View>
-
-        {/* Content */}
-        <View style={styles.chatContent}>
-          <View style={styles.chatHeader}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.personName}>
-                {item.participantName || 'User'}
-              </Text>
-              {item.participantVerified && (
-                <MaterialCommunityIcons
-                  name="check-decagram"
-                  size={14}
-                  color={COLORS.primary}
-                />
-              )}
-            </View>
-            <Text style={styles.timeText}>
-              {item.lastMessageAt ? formatTimeAgo(item.lastMessageAt) : ''}
-            </Text>
+      return (
+        <TouchableOpacity
+          style={styles.chatItem}
+          onPress={() => handleChatPress(item)}
+          activeOpacity={0.7}
+          accessibilityLabel={`Chat with ${item.participantName || 'User'}${
+            item.unreadCount ? `, ${item.unreadCount} unread messages` : ''
+          }`}
+          accessibilityRole="button"
+          accessibilityHint="Opens conversation"
+        >
+          {/* Avatar */}
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{
+                uri: item.participantAvatar || 'https://via.placeholder.com/100',
+              }}
+              style={styles.avatar}
+              accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
+            />
+            {isOnline && <View style={styles.onlineIndicator} />}
           </View>
 
-          {/* Moment Badge */}
-          {item.momentId && (
-            <View style={styles.momentBadge}>
-              <Text style={styles.momentEmoji}>✨</Text>
-              <Text style={styles.momentTitle}>{item.momentTitle}</Text>
-            </View>
-          )}
-
-          {/* Last Message */}
-          <View style={styles.messageRow}>
-            {isTyping ? (
-              <Text style={styles.typingText}>typing...</Text>
-            ) : (
-              <Text
-                style={[
-                  styles.lastMessage,
-                  (item.unreadCount || 0) > 0 && styles.lastMessageUnread,
-                ]}
-                numberOfLines={1}
-              >
-                {item.lastMessage || 'Start a conversation'}
+          {/* Content */}
+          <View style={styles.chatContent}>
+            <View style={styles.chatHeader}>
+              <View style={styles.nameContainer}>
+                <Text style={styles.personName}>
+                  {item.participantName || 'User'}
+                </Text>
+                {item.participantVerified && (
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={14}
+                    color={COLORS.primary}
+                  />
+                )}
+              </View>
+              <Text style={styles.timeText}>
+                {item.lastMessageAt ? formatTimeAgo(item.lastMessageAt) : ''}
               </Text>
-            )}
-            {(item.unreadCount || 0) > 0 && (
-              <View style={styles.unreadBadge}>
-                <Text style={styles.unreadText}>{item.unreadCount}</Text>
+            </View>
+
+            {/* Moment Badge */}
+            {item.momentId && (
+              <View style={styles.momentBadge}>
+                <Text style={styles.momentEmoji}>✨</Text>
+                <Text style={styles.momentTitle}>{item.momentTitle}</Text>
               </View>
             )}
+
+            {/* Last Message */}
+            <View style={styles.messageRow}>
+              {isTyping ? (
+                <Text style={styles.typingText}>typing...</Text>
+              ) : (
+                <Text
+                  style={[
+                    styles.lastMessage,
+                    (item.unreadCount || 0) > 0 && styles.lastMessageUnread,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {item.lastMessage || 'Start a conversation'}
+                </Text>
+              )}
+              {(item.unreadCount || 0) > 0 && (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadText}>{item.unreadCount}</Text>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+        </TouchableOpacity>
+      );
+    },
+    [handleChatPress, isUserOnline, typingConversations],
+  );
 
   const renderEmptyState = () => (
     <EmptyState

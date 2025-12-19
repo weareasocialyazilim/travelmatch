@@ -69,7 +69,7 @@ export const RecentSearches: React.FC<RecentSearchesProps> = ({
       <View style={styles.listContainer}>
         <FlashList
           data={items}
-          keyExtractor={(item, index) => `${item}-${index}`}
+          keyExtractor={(item) => `recent-search-${item}`}
           renderItem={renderItem}
           scrollEnabled={false}
         />
