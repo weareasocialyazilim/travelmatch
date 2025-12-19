@@ -3,82 +3,88 @@
  * Tests for MMKV encryption with SecureStore-backed keys
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
 // Mock SecureStore
 const mockSecureStore = {
-  getItemAsync: vi.fn(),
-  setItemAsync: vi.fn(),
-  deleteItemAsync: vi.fn(),
+  getItemAsync: jest.fn(),
+  setItemAsync: jest.fn(),
+  deleteItemAsync: jest.fn(),
   WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY',
 };
 
 // Mock Crypto
 const mockCrypto = {
-  digestStringAsync: vi.fn(),
+  digestStringAsync: jest.fn(),
   CryptoDigestAlgorithm: {
     SHA256: 'SHA256',
   },
 };
 
-// Mock MMKV
-const mockMMKV = vi.fn().mockImplementation((config) => ({
-  set: vi.fn(),
-  getString: vi.fn(),
-  getBoolean: vi.fn(),
-  getNumber: vi.fn(),
-  delete: vi.fn(),
-  clearAll: vi.fn(),
-  getAllKeys: vi.fn().mockReturnValue([]),
-  contains: vi.fn(),
+// Mock MMKV - must create fresh mocks for each instance
+const createMockMMKVInstance = (config?: { encryptionKey?: string }) => ({
+  set: jest.fn(),
+  getString: jest.fn(),
+  getBoolean: jest.fn(),
+  getNumber: jest.fn(),
+  delete: jest.fn(),
+  clearAll: jest.fn(),
+  getAllKeys: jest.fn().mockReturnValue([]),
+  contains: jest.fn(),
   encryptionKey: config?.encryptionKey,
-}));
+});
 
-vi.mock('expo-secure-store', () => mockSecureStore);
-vi.mock('expo-crypto', () => mockCrypto);
-vi.mock('react-native-mmkv', () => ({ MMKV: mockMMKV }));
+const mockMMKV = jest
+  .fn()
+  .mockImplementation((config) => createMockMMKVInstance(config));
+
+jest.mock('expo-secure-store', () => mockSecureStore);
+jest.mock('expo-crypto', () => mockCrypto);
+jest.mock('react-native-mmkv', () => ({ MMKV: mockMMKV }));
 
 describe('Storage Encryption', () => {
   const ENCRYPTION_KEY_STORAGE_KEY = 'travelmatch_mmkv_encryption_key';
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('Encryption Key Generation', () => {
     it('should generate a new encryption key if none exists', async () => {
       // Mock: no existing key
       mockSecureStore.getItemAsync.mockResolvedValue(null);
-      mockCrypto.digestStringAsync.mockResolvedValue('generated-sha256-hash-key');
+      mockCrypto.digestStringAsync.mockResolvedValue(
+        'generated-sha256-hash-key',
+      );
 
       // Simulate getOrCreateEncryptionKey logic
-      const existingKey = await mockSecureStore.getItemAsync(ENCRYPTION_KEY_STORAGE_KEY);
+      const existingKey = await mockSecureStore.getItemAsync(
+        ENCRYPTION_KEY_STORAGE_KEY,
+      );
 
       if (!existingKey) {
         const newKey = await mockCrypto.digestStringAsync(
           mockCrypto.CryptoDigestAlgorithm.SHA256,
-          `travelmatch_${Date.now()}_${Math.random().toString(36)}`
+          `travelmatch_${Date.now()}_${Math.random().toString(36)}`,
         );
 
-        await mockSecureStore.setItemAsync(
-          ENCRYPTION_KEY_STORAGE_KEY,
-          newKey,
-          { keychainAccessible: mockSecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY }
-        );
+        await mockSecureStore.setItemAsync(ENCRYPTION_KEY_STORAGE_KEY, newKey, {
+          keychainAccessible: mockSecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+        });
       }
 
-      expect(mockSecureStore.getItemAsync).toHaveBeenCalledWith(ENCRYPTION_KEY_STORAGE_KEY);
+      expect(mockSecureStore.getItemAsync).toHaveBeenCalledWith(
+        ENCRYPTION_KEY_STORAGE_KEY,
+      );
       expect(mockCrypto.digestStringAsync).toHaveBeenCalled();
       expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
         ENCRYPTION_KEY_STORAGE_KEY,
         'generated-sha256-hash-key',
         expect.objectContaining({
-          keychainAccessible: mockSecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
-        })
+          keychainAccessible: mockSecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+        }),
       );
     });
 
@@ -86,7 +92,9 @@ describe('Storage Encryption', () => {
       const existingKey = 'existing-encryption-key-from-secure-store';
       mockSecureStore.getItemAsync.mockResolvedValue(existingKey);
 
-      const key = await mockSecureStore.getItemAsync(ENCRYPTION_KEY_STORAGE_KEY);
+      const key = await mockSecureStore.getItemAsync(
+        ENCRYPTION_KEY_STORAGE_KEY,
+      );
 
       expect(key).toBe(existingKey);
       expect(mockCrypto.digestStringAsync).not.toHaveBeenCalled();
@@ -99,12 +107,12 @@ describe('Storage Encryption', () => {
 
       await mockCrypto.digestStringAsync(
         mockCrypto.CryptoDigestAlgorithm.SHA256,
-        'test-input'
+        'test-input',
       );
 
       expect(mockCrypto.digestStringAsync).toHaveBeenCalledWith(
         'SHA256',
-        expect.any(String)
+        expect.any(String),
       );
     });
   });
@@ -122,7 +130,7 @@ describe('Storage Encryption', () => {
         expect.objectContaining({
           id: 'travelmatch-storage',
           encryptionKey: encryptionKey,
-        })
+        }),
       );
     });
 
@@ -131,7 +139,9 @@ describe('Storage Encryption', () => {
       const storage = new mockMMKV({ encryptionKey });
 
       // Verify MMKV doesn't store the key as a value
-      expect(storage.getString).not.toHaveBeenCalledWith(ENCRYPTION_KEY_STORAGE_KEY);
+      expect(storage.getString).not.toHaveBeenCalledWith(
+        ENCRYPTION_KEY_STORAGE_KEY,
+      );
     });
   });
 
@@ -143,20 +153,22 @@ describe('Storage Encryption', () => {
       await mockSecureStore.setItemAsync(
         ENCRYPTION_KEY_STORAGE_KEY,
         'new-key',
-        { keychainAccessible: mockSecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY }
+        { keychainAccessible: mockSecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY },
       );
 
       expect(mockSecureStore.setItemAsync).toHaveBeenCalledWith(
         expect.any(String),
         expect.any(String),
         expect.objectContaining({
-          keychainAccessible: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY'
-        })
+          keychainAccessible: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY',
+        }),
       );
     });
 
     it('should handle SecureStore errors gracefully', async () => {
-      mockSecureStore.getItemAsync.mockRejectedValue(new Error('SecureStore not available'));
+      mockSecureStore.getItemAsync.mockRejectedValue(
+        new Error('SecureStore not available'),
+      );
 
       let fallbackKey: string | null = null;
       try {
@@ -177,8 +189,12 @@ describe('Storage Encryption', () => {
 
       // Generate multiple keys
       for (let i = 0; i < 100; i++) {
-        const uniquePart = `travelmatch_${Date.now()}_${Math.random().toString(36)}`;
-        mockCrypto.digestStringAsync.mockResolvedValueOnce(`hash-${i}-${uniquePart}`);
+        const uniquePart = `travelmatch_${Date.now()}_${Math.random().toString(
+          36,
+        )}`;
+        mockCrypto.digestStringAsync.mockResolvedValueOnce(
+          `hash-${i}-${uniquePart}`,
+        );
         const key = await mockCrypto.digestStringAsync('SHA256', uniquePart);
         keys.add(key);
       }
@@ -197,18 +213,24 @@ describe('Storage Encryption', () => {
 
   describe('Data Protection', () => {
     it('should encrypt sensitive data when stored', () => {
-      const storage = new mockMMKV({ encryptionKey: 'test-key' });
+      const storage = createMockMMKVInstance({ encryptionKey: 'test-key' });
 
       // Store sensitive data
       storage.set('user_token', 'sensitive-jwt-token');
       storage.set('payment_info', JSON.stringify({ last4: '1234' }));
 
-      expect(storage.set).toHaveBeenCalledWith('user_token', 'sensitive-jwt-token');
-      expect(storage.set).toHaveBeenCalledWith('payment_info', expect.any(String));
+      expect(storage.set).toHaveBeenCalledWith(
+        'user_token',
+        'sensitive-jwt-token',
+      );
+      expect(storage.set).toHaveBeenCalledWith(
+        'payment_info',
+        expect.any(String),
+      );
     });
 
     it('should clear all data on logout', () => {
-      const storage = new mockMMKV({ encryptionKey: 'test-key' });
+      const storage = createMockMMKVInstance({ encryptionKey: 'test-key' });
 
       storage.clearAll();
 
@@ -220,12 +242,12 @@ describe('Storage Encryption', () => {
 describe('Migration from Unencrypted Storage', () => {
   it('should handle migration from AsyncStorage', async () => {
     const mockAsyncStorage = {
-      getAllKeys: vi.fn().mockResolvedValue(['key1', 'key2']),
-      multiGet: vi.fn().mockResolvedValue([
+      getAllKeys: jest.fn().mockResolvedValue(['key1', 'key2']),
+      multiGet: jest.fn().mockResolvedValue([
         ['key1', 'value1'],
         ['key2', 'value2'],
       ]),
-      multiRemove: vi.fn().mockResolvedValue(undefined),
+      multiRemove: jest.fn().mockResolvedValue(undefined),
     };
 
     // Simulate migration
