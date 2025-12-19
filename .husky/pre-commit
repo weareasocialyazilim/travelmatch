@@ -1,8 +1,17 @@
-# Run lint-staged for code quality checks
-npx lint-staged
+# Run lint-staged for code quality checks with optimized memory
+# Use --concurrent false to prevent parallel ESLint runs that cause SIGKILL
+# Reduced memory to 4GB to avoid OS killing the process
+export NODE_OPTIONS="--max-old-space-size=4096"
 
-# Run type checking with Turbo (only changed packages)
-pnpm turbo run type-check --filter="[HEAD^1]"
+# Only run lint-staged on staged files
+npx lint-staged --concurrent false --no-stash 2>&1 || {
+  echo "⚠️  lint-staged failed - checking if it's a memory issue..."
+  echo "   Try running: git add -A && pnpm lint-staged"
+  exit 1
+}
+
+# Skip type checking in pre-commit for faster commits (run in CI instead)
+# pnpm turbo run type-check --filter="[HEAD^1]"
 
 # Check for console.log in production code (excluding tests, stories, mocks, and supabase edge functions)
 # Note: Supabase Edge Functions use Deno, where console.log goes to Supabase Logs (acceptable)

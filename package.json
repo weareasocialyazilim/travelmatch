@@ -49,6 +49,7 @@
     "test:visual": "turbo run chromatic",
     "test:visual:ci": "turbo run chromatic:ci",
     "prepare": "husky",
+    "lint-staged": "NODE_OPTIONS='--max-old-space-size=4096' npx lint-staged --concurrent false --no-stash --debug",
     "validate:hooks": "node scripts/validate-husky-setup.js",
     "tm": "node bin/tm.mjs",
     "android": "expo run:android",

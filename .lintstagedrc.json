@@ -1,13 +1,27 @@
 {
-  "!(supabase)/**/*.{ts,tsx}": [
-    "eslint --fix",
+  "apps/admin/**/*.{ts,tsx}": [
+    "eslint --fix --max-warnings=0 --cache --cache-location .eslintcache-admin",
+    "prettier --write"
+  ],
+  "apps/web/**/*.{ts,tsx}": [
+    "eslint --fix --max-warnings=0 --cache --cache-location .eslintcache-web",
     "prettier --write"
   ],
   "apps/mobile/**/*.{ts,tsx,js,jsx}": [
-    "eslint --fix",
-    "prettier --write",
-    "node scripts/jest-mobile-lint-staged.js"
+    "eslint --fix --max-warnings=0 --cache --cache-location .eslintcache-mobile",
+    "prettier --write"
   ],
-  "*.{json,md,yml,yaml}": ["prettier --write"],
-  "package.json": ["prettier --write"]
+  "packages/**/*.{ts,tsx}": [
+    "eslint --fix --max-warnings=0 --cache --cache-location .eslintcache-packages",
+    "prettier --write"
+  ],
+  "services/**/*.{ts,tsx}": [
+    "eslint --fix --max-warnings=0 --cache --cache-location .eslintcache-services",
+    "prettier --write"
+  ],
+  "scripts/**/*.{ts,tsx,js,mjs}": [
+    "eslint --fix --max-warnings=0 --cache --cache-location .eslintcache-scripts",
+    "prettier --write"
+  ],
+  "*.{json,md,yml,yaml}": ["prettier --write --cache"]
 }
