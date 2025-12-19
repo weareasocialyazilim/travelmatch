@@ -8,6 +8,7 @@ import {
   IMAGE_VARIANTS_BY_CONTEXT,
 } from '../../../utils/cloudflareImageHelpers';
 import { COLORS } from '../../../constants/colors';
+import { DEFAULT_IMAGES } from '../../../constants/defaultValues';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
 
 interface MomentGridCardProps {
@@ -19,7 +20,7 @@ interface MomentGridCardProps {
 const MomentGridCard: React.FC<MomentGridCardProps> = memo(
   ({ moment, index, onPress }) => {
     const imageUrl =
-      moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
+      moment.image || moment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER;
     const hostName = moment.hostName || 'Anonymous';
     const price = moment.price ?? moment.pricePerGuest ?? 0;
     const locationCity =
@@ -67,7 +68,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
                 {...getAvatarImageProps(
                   hostUser,
                   IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                  'https://via.placeholder.com/24',
+                  DEFAULT_IMAGES.AVATAR_SMALL,
                 )}
                 contentFit="cover"
                 style={styles.gridAvatar}

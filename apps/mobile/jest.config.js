@@ -7,7 +7,7 @@ module.exports = {
   testTimeout: 10000, // Increased from default 5000ms
   // Override setupFiles to avoid React Native's setup.js with Flow types
   setupFiles: ['<rootDir>/jest.setup.mobile.js'],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.root-backup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.afterEnv.js'],
   transform: {
     ...jestExpoPreset.transform,
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],

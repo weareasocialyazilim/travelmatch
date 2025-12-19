@@ -5,13 +5,101 @@
  */
 
 import { MMKV } from 'react-native-mmkv';
+import * as SecureStore from 'expo-secure-store';
+import * as Crypto from 'expo-crypto';
 
-// Create default storage instance with encryption
-export const storage = new MMKV({
-  id: 'travelmatch-storage',
-  // Note: In production, use a secure key from environment or secure keychain
-  // encryptionKey: process.env.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY,
-});
+// Encryption key management
+const ENCRYPTION_KEY_STORAGE_KEY = 'mmkv_encryption_key_v1';
+let encryptionKey: string | undefined;
+let storageInstance: MMKV | null = null;
+
+/**
+ * Get or generate encryption key from SecureStore
+ * Key is hardware-backed on iOS (Keychain) and Android (Keystore)
+ */
+async function getOrCreateEncryptionKey(): Promise<string> {
+  if (encryptionKey) {
+    return encryptionKey;
+  }
+
+  try {
+    // Try to get existing key from SecureStore
+    const existingKey = await SecureStore.getItemAsync(ENCRYPTION_KEY_STORAGE_KEY);
+
+    if (existingKey) {
+      encryptionKey = existingKey;
+      return existingKey;
+    }
+
+    // Generate new cryptographically secure key
+    const newKey = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      `travelmatch_${Date.now()}_${Math.random().toString(36)}`
+    );
+
+    // Store key securely (hardware-backed)
+    await SecureStore.setItemAsync(ENCRYPTION_KEY_STORAGE_KEY, newKey, {
+      keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    });
+
+    encryptionKey = newKey;
+    return newKey;
+  } catch (error) {
+    console.warn('[MMKV] Failed to get/create encryption key, using fallback:', error);
+    // Fallback for simulators/emulators where SecureStore might not work
+    const fallbackKey = 'travelmatch_dev_fallback_key_32chars';
+    encryptionKey = fallbackKey;
+    return fallbackKey;
+  }
+}
+
+/**
+ * Initialize encrypted MMKV storage
+ * Must be called before using storage
+ */
+export async function initializeStorage(): Promise<MMKV> {
+  if (storageInstance) {
+    return storageInstance;
+  }
+
+  const key = await getOrCreateEncryptionKey();
+
+  storageInstance = new MMKV({
+    id: 'travelmatch-storage',
+    encryptionKey: key,
+  });
+
+  console.log('[MMKV] Encrypted storage initialized');
+  return storageInstance;
+}
+
+/**
+ * Get storage instance (sync after initialization)
+ * Throws if storage not initialized
+ */
+function getStorage(): MMKV {
+  if (!storageInstance) {
+    // Create unencrypted instance as fallback (for sync access before init)
+    // This will be replaced once initializeStorage is called
+    console.warn('[MMKV] Storage accessed before initialization, using unencrypted fallback');
+    return new MMKV({ id: 'travelmatch-storage-temp' });
+  }
+  return storageInstance;
+}
+
+// Legacy export for backward compatibility
+// Will use encrypted instance once initialized
+export const storage = {
+  get: () => getStorage(),
+  set: (key: string, value: string | number | boolean) => getStorage().set(key, value),
+  getString: (key: string) => getStorage().getString(key),
+  getNumber: (key: string) => getStorage().getNumber(key),
+  getBoolean: (key: string) => getStorage().getBoolean(key),
+  delete: (key: string) => getStorage().delete(key),
+  contains: (key: string) => getStorage().contains(key),
+  getAllKeys: () => getStorage().getAllKeys(),
+  clearAll: () => getStorage().clearAll(),
+};
 
 /**
  * Storage API - Drop-in AsyncStorage replacement

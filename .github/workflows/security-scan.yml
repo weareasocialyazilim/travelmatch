@@ -9,6 +9,11 @@ on:
     # Run every Monday at 9 AM
     - cron: '0 9 * * 1'
 
+# Explicit permissions - principle of least privilege
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   secret-scan:
     name: TruffleHog Secret Scanning
@@ -16,12 +21,12 @@ jobs:
     # SECURITY: Secret scanning MUST pass - leaked secrets are critical
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0 # Fetch all history for all branches
 
       - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@main
+        uses: trufflesecurity/trufflehog@8d63f3f83407fb1215caa8e4d2ce8888b55f6e7a # v3.63.2
         # SECURITY: Verified secrets MUST block the pipeline
         with:
           path: ./
@@ -35,15 +40,15 @@ jobs:
     # SECURITY: Dependency vulnerabilities MUST be addressed
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: '20'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v4.0.0
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -59,21 +64,21 @@ jobs:
     if: ${{ secrets.SNYK_TOKEN != '' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: '20'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v4.0.0
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
+        uses: snyk/actions/node@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
         # SECURITY: High severity vulns MUST be fixed
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -89,12 +94,12 @@ jobs:
       security-events: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@2e230e8fe0ad3a14a340ad0815ddb96d03a2e4d7 # v3.24.9
         with:
           languages: javascript, typescript
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@2e230e8fe0ad3a14a340ad0815ddb96d03a2e4d7 # v3.24.9

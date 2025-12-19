@@ -20,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { editProfileSchema, type EditProfileInput } from '@/utils/forms';
@@ -39,7 +40,7 @@ const EditProfileScreen = () => {
       avatarUrl:
         user?.profilePhoto ||
         user?.avatarUrl ||
-        'https://via.placeholder.com/150',
+        DEFAULT_IMAGES.AVATAR_LARGE,
       name: user?.name || '',
       username: user?.username || '',
       bio: user?.bio || '',

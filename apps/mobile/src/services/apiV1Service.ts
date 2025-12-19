@@ -1,9 +1,9 @@
 /**
  * API v1 Client Service
- * 
+ *
  * Wrapper for calling the new API v1 endpoints
  * Gradually migrate from direct edge function calls to v1 API
- * 
+ *
  * FEATURES:
  * - Offline handling: Checks network before making requests
  * - Auto token refresh: Refreshes expired tokens on 401
@@ -11,9 +11,11 @@
  */
 
 import NetInfo from '@react-native-community/netinfo';
+import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { sessionManager } from './sessionManager';
+import type { Database } from '../types/database.types';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const API_BASE_URL = `${SUPABASE_URL}/functions/v1/api/v1`;
@@ -81,7 +83,7 @@ class ApiClient {
   async request<T>(
     method: string,
     path: string,
-    body?: any,
+    body?: unknown,
     isRetry = false,
   ): Promise<ApiResponse<T>> {
     try {
@@ -179,15 +181,15 @@ class ApiClient {
     return this.request<T>('GET', path);
   }
 
-  post<T>(path: string, body: any) {
+  post<T>(path: string, body: unknown) {
     return this.request<T>('POST', path, body);
   }
 
-  put<T>(path: string, body: any) {
+  put<T>(path: string, body: unknown) {
     return this.request<T>('PUT', path, body);
   }
 
-  patch<T>(path: string, body: any) {
+  patch<T>(path: string, body: unknown) {
     return this.request<T>('PATCH', path, body);
   }
 
@@ -198,9 +200,45 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
+// API Response Types
+interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  username: string;
+  avatar: string;
+  bio?: string;
+  verified: boolean;
+}
+
+interface Moment {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  status: string;
+  created_at: string;
+}
+
+interface Request {
+  id: string;
+  moment_id: string;
+  user_id: string;
+  status: string;
+  message?: string;
+  created_at: string;
+}
+
+interface LoginResponse {
+  user: User;
+  session: Session;
+}
+
 /**
  * API v1 Service Methods
- * 
+ *
  * Gradually migrate to these methods from direct Supabase calls
  */
 export const apiV1Service = {
@@ -208,10 +246,7 @@ export const apiV1Service = {
   // AUTH
   // ============================================
   async login(email: string, password: string) {
-    return apiClient.post<{
-      user: any;
-      session: any;
-    }>('/auth/login', { email, password });
+import type { Database } from '../types/database.types';
   },
 
   async logout() {
@@ -222,12 +257,12 @@ export const apiV1Service = {
   // USERS
   // ============================================
   async getUser(userId: string) {
-    return apiClient.get<any>(`/users/${userId}`);
+import type { Database } from '../types/database.types';
   },
 
   async getUserMoments(userId: string) {
     return apiClient.get<{
-      moments: any[];
+import type { Database } from '../types/database.types';
       count: number;
     }>(`/users/${userId}/moments`);
   },
@@ -247,7 +282,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      moments: any[];
+import type { Database } from '../types/database.types';
       pagination: {
         total: number;
         limit: number;
@@ -258,7 +293,7 @@ export const apiV1Service = {
   },
 
   async getMoment(momentId: string) {
-    return apiClient.get<any>(`/moments/${momentId}`);
+import type { Database } from '../types/database.types';
   },
 
   // ============================================
@@ -276,7 +311,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      requests: any[];
+import type { Database } from '../types/database.types';
       count: number;
     }>(`/requests${query ? `?${query}` : ''}`);
   },

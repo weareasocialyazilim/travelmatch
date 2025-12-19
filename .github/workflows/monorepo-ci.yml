@@ -85,8 +85,9 @@ jobs:
       - name: Build mobile app
         run: cd apps/mobile && pnpm run build
         env:
-          EXPO_PUBLIC_SUPABASE_URL: https://gwmvgheaoqkbqzshufts.supabase.co
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3bXZnaGVhb3FrYnF6c2h1ZnRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3NTM0NzAsImV4cCI6MjA0NzMyOTQ3MH0.placeholder
+          # SECURITY: Credentials pulled from GitHub Secrets (not hardcoded)
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
 
   build-admin:
     runs-on: ubuntu-latest
@@ -111,8 +112,9 @@ jobs:
       - name: Build admin panel
         run: cd apps/admin && pnpm run build
         env:
-          VITE_SUPABASE_URL: https://gwmvgheaoqkbqzshufts.supabase.co
-          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3bXZnaGVhb3FrYnF6c2h1ZnRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3NTM0NzAsImV4cCI6MjA0NzMyOTQ3MH0.placeholder
+          # SECURITY: Credentials pulled from GitHub Secrets (not hardcoded)
+          VITE_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3

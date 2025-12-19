@@ -132,7 +132,7 @@ export const VerifyCodeScreen: React.FC = () => {
           <View style={styles.otpContainer}>
             {code.map((digit, index) => (
               <TextInput
-                key={index}
+                key={`otp-input-${index}`}
                 ref={(ref) => {
                   inputRefs.current[index] = ref;
                 }}

@@ -18,6 +18,7 @@ import { SkeletonList } from '@/components/ui';
 import { FadeInView as _FadeInView } from '@/components/AnimatedComponents';
 import BottomNav from '@/components/BottomNav';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { useRealtime, useRealtimeEvent } from '@/context/RealtimeContext';
 import { useMessages } from '@/hooks/useMessages';
@@ -207,7 +208,7 @@ const MessagesScreen: React.FC = () => {
           <View style={styles.avatarContainer}>
             <Image
               source={{
-                uri: item.participantAvatar || 'https://via.placeholder.com/100',
+                uri: item.participantAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
               }}
               style={styles.avatar}
               accessibilityLabel={`${item.participantName || 'User'}'s avatar`}

@@ -1,13 +1,13 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   RefreshControl,
   StatusBar,
   ActivityIndicator,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
@@ -36,6 +36,7 @@ import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { NetworkGuard } from '../../../components/NetworkGuard';
+import { useDiscoverStore } from '@/stores/discoverStore';
 
 // Import modular components
 import type {
@@ -50,8 +51,6 @@ import type { NavigationProp } from '@react-navigation/native';
 
 // PERFORMANCE: Constants outside component to prevent re-creation
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
-const BOTTOM_PADDING_STYLE = { height: 100 };
-const MIN_LIST_HEIGHT_STYLE = { minHeight: 400 };
 
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -69,37 +68,52 @@ const DiscoverScreen = () => {
     setFilters,
   } = useMoments();
 
-  // UI States
-  const [viewMode, setViewMode] = useState<ViewMode>('single');
-  const [refreshing, setRefreshing] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
-  const [showStoryViewer, setShowStoryViewer] = useState(false);
-  const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
-    null,
-  );
+  // Zustand Store - All UI and Filter State
+  const {
+    // UI State
+    viewMode,
+    refreshing,
+    showFilterModal,
+    showLocationModal,
+    showStoryViewer,
+    selectedStoryUser,
 
-  // Story viewer states
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [currentUserIndex, setCurrentUserIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+    // Story Viewer State
+    currentStoryIndex,
+    currentUserIndex,
+    isPaused,
 
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('nearest');
-  const [maxDistance, setMaxDistance] = useState(50);
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: 0,
-    max: 500,
-  });
+    // Filter State
+    selectedCategory,
+    sortBy,
+    maxDistance,
+    priceRange,
 
-  // Location state
-  const [selectedLocation, setSelectedLocation] = useState('San Francisco, CA');
-  const [recentLocations, setRecentLocations] = useState([
-    'New York, NY',
-    'Los Angeles, CA',
-    'Chicago, IL',
-  ]);
+    // Location State
+    selectedLocation,
+    recentLocations,
+
+    // Actions
+    setViewMode,
+    setRefreshing,
+    openFilterModal,
+    closeFilterModal,
+    openLocationModal,
+    closeLocationModal,
+    openStoryViewer,
+    closeStoryViewer,
+    setCurrentStoryIndex,
+    setCurrentUserIndex,
+    setSelectedStoryUser,
+    setIsPaused,
+    setSelectedCategory,
+    setSortBy,
+    setMaxDistance,
+    setPriceRange,
+    resetFilters,
+    addRecentLocation,
+    getActiveFilterCount,
+  } = useDiscoverStore();
 
   // Refresh handler with haptic feedback
   const onRefresh = useCallback(async () => {
@@ -116,12 +130,8 @@ const DiscoverScreen = () => {
   }, [refreshMoments]);
 
   // PERFORMANCE: Memoized view mode handlers
-  const handleSingleView = useCallback(() => setViewMode('single'), []);
-  const handleGridView = useCallback(() => setViewMode('grid'), []);
-
-  // PERFORMANCE: Memoized modal handlers
-  const closeLocationModal = useCallback(() => setShowLocationModal(false), []);
-  const closeFilterModal = useCallback(() => setShowFilterModal(false), []);
+  const handleSingleView = useCallback(() => setViewMode('single'), [setViewMode]);
+  const handleGridView = useCallback(() => setViewMode('grid'), [setViewMode]);
 
   // Story navigation handlers
   const goToNextStory = useCallback(() => {
@@ -130,7 +140,7 @@ const DiscoverScreen = () => {
     const currentUserStories = selectedStoryUser.stories;
 
     if (currentStoryIndex < currentUserStories.length - 1) {
-      setCurrentStoryIndex((prev) => prev + 1);
+      setCurrentStoryIndex(currentStoryIndex + 1);
     } else {
       const nextUserIndex = currentUserIndex + 1;
       if (nextUserIndex < USER_STORIES.length) {
@@ -141,14 +151,13 @@ const DiscoverScreen = () => {
         closeStoryViewer();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, setCurrentStoryIndex, setCurrentUserIndex, setSelectedStoryUser, closeStoryViewer]);
 
   const goToPreviousStory = useCallback(() => {
     if (!selectedStoryUser) return;
 
     if (currentStoryIndex > 0) {
-      setCurrentStoryIndex((prev) => prev - 1);
+      setCurrentStoryIndex(currentStoryIndex - 1);
     } else {
       const prevUserIndex = currentUserIndex - 1;
       if (prevUserIndex >= 0) {
@@ -158,15 +167,7 @@ const DiscoverScreen = () => {
         setCurrentStoryIndex(prevUser.stories.length - 1);
       }
     }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
-
-  const closeStoryViewer = useCallback(() => {
-    setShowStoryViewer(false);
-    setSelectedStoryUser(null);
-    setCurrentStoryIndex(0);
-    setCurrentUserIndex(0);
-    setIsPaused(false);
-  }, []);
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, setCurrentStoryIndex, setCurrentUserIndex, setSelectedStoryUser]);
 
   // PERFORMANCE: Memoized story view handler
   const handleViewMoment = useCallback(
@@ -280,43 +281,25 @@ const DiscoverScreen = () => {
 
   const handleStoryPress = useCallback((user: UserStory) => {
     const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
-    setCurrentUserIndex(userIndex);
-    setSelectedStoryUser(user);
-    setCurrentStoryIndex(0);
-    setShowStoryViewer(true);
-  }, []);
+    openStoryViewer(user, userIndex);
+  }, [openStoryViewer]);
 
   const handleLocationSelect = useCallback(
     (location: string) => {
-      if (
-        selectedLocation !== location &&
-        !recentLocations.includes(selectedLocation)
-      ) {
-        setRecentLocations((prev) => [selectedLocation, ...prev.slice(0, 2)]);
-      }
-      setSelectedLocation(location);
-      setShowLocationModal(false);
+      addRecentLocation(location);
+      closeLocationModal();
     },
-    [selectedLocation, recentLocations],
+    [addRecentLocation, closeLocationModal],
   );
 
-  // Active filter count
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (selectedCategory !== 'all') count++;
-    if (sortBy !== 'nearest') count++;
-    if (maxDistance !== 50) count++;
-    if (priceRange.min !== 0 || priceRange.max !== 500) count++;
-    return count;
-  }, [selectedCategory, sortBy, maxDistance, priceRange]);
-
-  // Clear all filters
-  const clearFilters = useCallback(() => {
-    setSelectedCategory('all');
-    setSortBy('nearest');
-    setMaxDistance(50);
-    setPriceRange({ min: 0, max: 500 });
-  }, []);
+  // Active filter count - computed from store (memoized)
+  const activeFilterCount = useMemo(() => getActiveFilterCount(), [
+    selectedCategory,
+    sortBy,
+    maxDistance,
+    priceRange,
+    getActiveFilterCount,
+  ]);
 
   // Memoized render functions
   const renderStoryItem = useCallback(
@@ -360,8 +343,8 @@ const DiscoverScreen = () => {
         location={selectedLocation}
         viewMode={viewMode}
         activeFiltersCount={activeFilterCount}
-        onLocationPress={() => setShowLocationModal(true)}
-        onFilterPress={() => setShowFilterModal(true)}
+        onLocationPress={openLocationModal}
+        onFilterPress={openFilterModal}
         onViewModeToggle={() =>
           setViewMode(viewMode === 'single' ? 'grid' : 'single')
         }
@@ -375,9 +358,20 @@ const DiscoverScreen = () => {
         }
         onRetry={onRefresh}
       >
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
+        {/* Main FlashList - avoids VirtualizedList nesting warning */}
+        <FlashList
+          data={filteredMoments}
+          renderItem={renderMomentCard}
+          numColumns={viewMode === 'grid' ? 2 : 1}
+          key={viewMode}
+          estimatedItemSize={viewMode === 'grid' ? 200 : 350}
+          contentContainerStyle={
+            viewMode === 'single'
+              ? styles.singleListContainer
+              : styles.gridContainer
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl
               refreshing={refreshing || loading}
@@ -385,159 +379,133 @@ const DiscoverScreen = () => {
               tintColor={COLORS.mint}
             />
           }
-          onScroll={({ nativeEvent }) => {
-            const { layoutMeasurement, contentOffset, contentSize } =
-              nativeEvent;
-            const paddingToBottom = 50;
-            if (
-              layoutMeasurement.height + contentOffset.y >=
-              contentSize.height - paddingToBottom
-            ) {
-              handleLoadMore();
-            }
-          }}
-          scrollEventThrottle={400}
-        >
-          {/* Stories */}
-          <FlashList
-            data={USER_STORIES}
-            renderItem={renderStoryItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.storiesContainer}
-          />
-
-          {/* Results Bar */}
-          <View style={styles.resultsBar}>
-            <Text style={styles.resultsText}>
-              {loading
-                ? 'Loading...'
-                : `${filteredMoments.length} moments nearby`}
-            </Text>
-            <View style={styles.viewToggle}>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'single' && styles.viewToggleButtonActive,
-                ]}
-                onPress={handleSingleView}
-                hitSlop={HIT_SLOP}
-                {...a11y.button(
-                  'Single column view',
-                  'Display moments in a single column',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'single' }}
-              >
-                <MaterialCommunityIcons
-                  name="square-outline"
-                  size={18}
-                  color={
-                    viewMode === 'single' ? COLORS.white : COLORS.textSecondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'grid' && styles.viewToggleButtonActive,
-                ]}
-                onPress={handleGridView}
-                hitSlop={HIT_SLOP}
-                {...a11y.button(
-                  'Grid view',
-                  'Display moments in a grid layout',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'grid' }}
-              >
-                <MaterialCommunityIcons
-                  name="view-grid-outline"
-                  size={18}
-                  color={
-                    viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Error State */}
-          {error && !loading && (
-            <View style={styles.errorContainer}>
-              <MaterialCommunityIcons
-                name="alert-circle-outline"
-                size={48}
-                color={COLORS.error}
-                accessible={false}
+          ListHeaderComponent={
+            <>
+              {/* Stories - Horizontal FlatList (not FlashList to avoid nesting) */}
+              <FlatList
+                data={USER_STORIES}
+                renderItem={renderStoryItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.storiesContainer}
               />
-              <Text style={styles.errorText} {...a11y.alert(error)}>
-                {error}
-              </Text>
-              <TouchableOpacity
-                style={styles.retryButton}
-                onPress={onRefresh}
-                {...a11y.button('Try Again', 'Reload moments')}
-              >
-                <Text style={styles.retryButtonText}>Try Again</Text>
-              </TouchableOpacity>
-            </View>
-          )}
 
-          {/* Loading Skeleton */}
-          {loading && filteredMoments.length === 0 && !error && (
-            <SkeletonList
-              type="moment"
-              count={4}
-              show={loading}
-              minDisplayTime={400}
-            />
-          )}
+              {/* Results Bar */}
+              <View style={styles.resultsBar}>
+                <Text style={styles.resultsText}>
+                  {loading
+                    ? 'Loading...'
+                    : `${filteredMoments.length} moments nearby`}
+                </Text>
+                <View style={styles.viewToggle}>
+                  <TouchableOpacity
+                    style={[
+                      styles.viewToggleButton,
+                      viewMode === 'single' && styles.viewToggleButtonActive,
+                    ]}
+                    onPress={handleSingleView}
+                    hitSlop={HIT_SLOP}
+                    {...a11y.button(
+                      'Single column view',
+                      'Display moments in a single column',
+                      false,
+                    )}
+                    accessibilityState={{ selected: viewMode === 'single' }}
+                  >
+                    <MaterialCommunityIcons
+                      name="square-outline"
+                      size={18}
+                      color={
+                        viewMode === 'single' ? COLORS.white : COLORS.textSecondary
+                      }
+                      accessible={false}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.viewToggleButton,
+                      viewMode === 'grid' && styles.viewToggleButtonActive,
+                    ]}
+                    onPress={handleGridView}
+                    hitSlop={HIT_SLOP}
+                    {...a11y.button(
+                      'Grid view',
+                      'Display moments in a grid layout',
+                      false,
+                    )}
+                    accessibilityState={{ selected: viewMode === 'grid' }}
+                  >
+                    <MaterialCommunityIcons
+                      name="view-grid-outline"
+                      size={18}
+                      color={
+                        viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
+                      }
+                      accessible={false}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-          {/* Moments List */}
-          {!error && filteredMoments.length > 0 && (
-            <View style={MIN_LIST_HEIGHT_STYLE}>
-              <FlashList
-                data={filteredMoments}
-                renderItem={renderMomentCard}
-                numColumns={viewMode === 'grid' ? 2 : 1}
-                key={viewMode}
-                contentContainerStyle={
-                  viewMode === 'single'
-                    ? styles.singleListContainer
-                    : styles.gridContainer
-                }
-                onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.5}
-                scrollEnabled={false}
+              {/* Error State */}
+              {error && !loading && (
+                <View style={styles.errorContainer}>
+                  <MaterialCommunityIcons
+                    name="alert-circle-outline"
+                    size={48}
+                    color={COLORS.error}
+                    accessible={false}
+                  />
+                  <Text style={styles.errorText} {...a11y.alert(error)}>
+                    {error}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.retryButton}
+                    onPress={onRefresh}
+                    {...a11y.button('Try Again', 'Reload moments')}
+                  >
+                    <Text style={styles.retryButtonText}>Try Again</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Loading Skeleton */}
+              {loading && filteredMoments.length === 0 && !error && (
+                <SkeletonList
+                  type="moment"
+                  count={4}
+                  show={loading}
+                  minDisplayTime={400}
+                />
+              )}
+            </>
+          }
+          ListEmptyComponent={
+            !loading && !error ? (
+              <EmptyState
+                icon="compass-off-outline"
+                title="No moments found"
+                description="Try adjusting your filters or location"
+                actionLabel="Clear Filters"
+                onAction={resetFilters}
               />
-            </View>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && filteredMoments.length === 0 && (
-            <EmptyState
-              icon="compass-off-outline"
-              title="No moments found"
-              description="Try adjusting your filters or location"
-              actionLabel="Clear Filters"
-              onAction={clearFilters}
-            />
-          )}
-
-          {/* Load More Indicator */}
-          {loading && filteredMoments.length > 0 && (
-            <View style={styles.loadMoreContainer}>
-              <ActivityIndicator size="small" color={COLORS.primary} />
-              <Text style={styles.loadMoreText}>Loading more...</Text>
-            </View>
-          )}
-
-          {/* Bottom Padding */}
-          <View style={BOTTOM_PADDING_STYLE} />
-        </ScrollView>
+            ) : null
+          }
+          ListFooterComponent={
+            <>
+              {/* Load More Indicator */}
+              {loading && filteredMoments.length > 0 && (
+                <View style={styles.loadMoreContainer}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={styles.loadMoreText}>Loading more...</Text>
+                </View>
+              )}
+              {/* Bottom Padding */}
+              <View style={styles.bottomPadding} />
+            </>
+          }
+        />
       </NetworkGuard>
 
       {/* Modals - Using extracted components */}
@@ -591,8 +559,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  scrollView: {
-    flex: 1,
+  bottomPadding: {
+    height: 100,
   },
 
   // Results Bar

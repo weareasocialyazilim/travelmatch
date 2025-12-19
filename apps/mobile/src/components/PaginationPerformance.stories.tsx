@@ -1,8 +1,9 @@
 /**
  * Storybook Performance Testing Examples
- * 
+ *
  * This file demonstrates how to test cursor pagination performance
  * vs offset pagination performance using Storybook controls.
+ * Using FlashList for optimal scroll performance.
  */
 
 import type { Meta, StoryObj } from '@storybook/react-native';
@@ -10,10 +11,10 @@ import React from 'react';
 import {
   View,
   Text,
-  FlatList,
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { usePagination } from '../hooks/usePagination';
 
 // Mock data generator
@@ -199,10 +200,11 @@ const PerformanceTest = ({
         </View>
       </View>
 
-      <FlatList
+      <FlashList
         data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        estimatedItemSize={70}
         onEndReached={() => {
           if (hasMore && !loading) {
             loadMore();

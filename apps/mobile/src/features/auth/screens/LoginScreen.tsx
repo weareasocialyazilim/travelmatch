@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
 import { useBiometric } from '@/context/BiometricAuthContext';
+import { getSession } from '@/services/supabaseAuthService';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { loginSchema, type LoginInput } from '@/utils/forms';
@@ -64,13 +65,23 @@ export const LoginScreen: React.FC = () => {
       const success = await authenticateForAppLaunch();
 
       if (success) {
-        // User authenticated with biometric, proceed with login
-        // In a real app, you would retrieve stored credentials and call login
-        // For now, we'll just show a success message
-        showToast(
-          biometricTypeName + ' ile başarıyla giriş yaptınız',
-          'success',
-        );
+        // Biometric verified - check if there's an existing Supabase session
+        const { session, error } = await getSession();
+
+        if (session && !error) {
+          // Session exists - navigation will be handled by auth state change
+          showToast(
+            biometricTypeName + ' ile başarıyla giriş yaptınız',
+            'success',
+          );
+          // AuthContext will detect the session and update state automatically
+        } else {
+          // No session - user needs to login with password first
+          showToast(
+            'Önce email ve şifre ile giriş yapmanız gerekiyor. Daha sonra biyometrik giriş kullanabilirsiniz.',
+            'info',
+          );
+        }
       } else {
         showToast(
           biometricTypeName +

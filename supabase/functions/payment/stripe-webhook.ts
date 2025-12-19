@@ -18,7 +18,7 @@
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 
 // CORS headers (webhooks from Stripe don't need CORS, but keeping for consistency)
@@ -32,9 +32,9 @@ const corsHeaders = {
  * Log audit event
  */
 async function logAudit(
-  supabase: any,
+  supabase: SupabaseClient,
   action: string,
-  metadata: Record<string, any>,
+  metadata: Record<string, unknown>,
 ) {
   try {
     await supabase.from('audit_logs').insert({
@@ -51,7 +51,7 @@ async function logAudit(
  * Invalidate payment-related cache for user
  */
 async function invalidateUserPaymentCache(
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
 ) {
   try {
@@ -71,7 +71,7 @@ async function invalidateUserPaymentCache(
  * Check if event was already processed (idempotency)
  */
 async function isEventProcessed(
-  supabase: any,
+  supabase: SupabaseClient,
   eventId: string,
 ): Promise<boolean> {
   const { data } = await supabase
@@ -87,7 +87,7 @@ async function isEventProcessed(
  * Mark event as processed
  */
 async function markEventProcessed(
-  supabase: any,
+  supabase: SupabaseClient,
   eventId: string,
   eventType: string,
 ) {
@@ -106,7 +106,7 @@ async function markEventProcessed(
  * Handle payment_intent.succeeded event
  */
 async function handlePaymentSucceeded(
-  supabase: any,
+  supabase: SupabaseClient,
   paymentIntent: Stripe.PaymentIntent,
 ) {
   const userId = paymentIntent.metadata.supabase_user_id;
@@ -175,7 +175,7 @@ async function handlePaymentSucceeded(
  * Handle payment_intent.payment_failed event
  */
 async function handlePaymentFailed(
-  supabase: any,
+  supabase: SupabaseClient,
   paymentIntent: Stripe.PaymentIntent,
 ) {
   const userId = paymentIntent.metadata.supabase_user_id;
@@ -229,7 +229,7 @@ async function handlePaymentFailed(
  * Handle charge.refunded event
  */
 async function handleChargeRefunded(
-  supabase: any,
+  supabase: SupabaseClient,
   charge: Stripe.Charge,
 ) {
   const paymentIntentId = charge.payment_intent as string;

@@ -1,143 +1,153 @@
 /**
  * Design Tokens - Colors
- * Manually managed design tokens for TravelMatch
- * Update these values to maintain brand consistency
+ * UNIFIED TravelMatch Brand Colors
+ *
+ * IMPORTANT: This file is the CANONICAL source of truth for colors.
+ * All platforms (mobile, web, admin) should import from here.
+ *
+ * Brand Identity:
+ * - Primary: Coral (#FF6B6B) - Warmth, adventure, passion
+ * - Secondary: Mint (#4ECDC4) - Trust, freshness, growth
+ * - Accent: Lavender (#9B59B6) - Premium, unique experiences
  */
 
+// Import shared colors as the canonical source
+import { COLORS as SHARED_COLORS } from '@travelmatch/shared';
+
 export const colors = {
-  // Primary Colors
+  // Primary Colors - TravelMatch Coral
   primary: {
-    50: '#E3F2FD',
-    100: '#BBDEFB',
-    200: '#90CAF9',
-    300: '#64B5F6',
-    400: '#42A5F5',
-    500: '#2196F3', // Main primary
-    600: '#1E88E5',
-    700: '#1976D2',
-    800: '#1565C0',
-    900: '#0D47A1',
+    50: '#FFF0F0',
+    100: '#FFE0E0',
+    200: '#FFC1C1',
+    300: '#FFA3A3',
+    400: '#FF8A8A',
+    500: SHARED_COLORS.primary, // #FF6B6B - Main brand color
+    600: '#E85555',
+    700: '#D14040',
+    800: '#BA2C2C',
+    900: '#8B1F1F',
   },
 
-  // Secondary Colors
+  // Secondary Colors - TravelMatch Mint
   secondary: {
-    50: '#FCE4EC',
-    100: '#F8BBD0',
-    200: '#F48FB1',
-    300: '#F06292',
-    400: '#EC407A',
-    500: '#E91E63', // Main secondary
-    600: '#D81B60',
-    700: '#C2185B',
-    800: '#AD1457',
-    900: '#880E4F',
+    50: '#E8FAF8',
+    100: '#D1F5F1',
+    200: '#A3EBE3',
+    300: '#75E0D5',
+    400: '#5CD9CB',
+    500: SHARED_COLORS.success, // #4ECDC4 - Main mint
+    600: '#3EB8B0',
+    700: '#2EA39C',
+    800: '#1F8E88',
+    900: '#106963',
   },
 
-  // Accent Colors
+  // Accent Colors - TravelMatch Lavender
   accent: {
-    50: '#FFF3E0',
-    100: '#FFE0B2',
-    200: '#FFCC80',
-    300: '#FFB74D',
-    400: '#FFA726',
-    500: '#FF9800', // Main accent
-    600: '#FB8C00',
-    700: '#F57C00',
-    800: '#EF6C00',
-    900: '#E65100',
+    50: '#F5EEFA',
+    100: '#EBDDF5',
+    200: '#D7BBEB',
+    300: '#C39AE0',
+    400: '#AF78D6',
+    500: SHARED_COLORS.lavender, // #9B59B6 - Main accent
+    600: '#8647A3',
+    700: '#713590',
+    800: '#5C237D',
+    900: '#47116A',
   },
 
   // Semantic Colors
   success: {
-    50: '#E8F5E9',
-    100: '#C8E6C9',
-    200: '#A5D6A7',
-    300: '#81C784',
-    400: '#66BB6A',
-    500: '#4CAF50', // Main success
-    600: '#43A047',
-    700: '#388E3C',
-    800: '#2E7D32',
-    900: '#1B5E20',
+    50: '#E8FAF8',
+    100: '#D1F5F1',
+    200: '#A3EBE3',
+    300: '#75E0D5',
+    400: '#5CD9CB',
+    500: SHARED_COLORS.success, // #4ECDC4
+    600: '#3EB8B0',
+    700: '#2EA39C',
+    800: '#1F8E88',
+    900: '#106963',
   },
 
   warning: {
-    50: '#FFF8E1',
-    100: '#FFECB3',
-    200: '#FFE082',
-    300: '#FFD54F',
-    400: '#FFCA28',
-    500: '#FFC107', // Main warning
-    600: '#FFB300',
-    700: '#FFA000',
-    800: '#FF8F00',
-    900: '#FF6F00',
+    50: '#FFFEF0',
+    100: '#FFFCE0',
+    200: '#FFF9C1',
+    300: '#FFF6A3',
+    400: '#FFF084',
+    500: SHARED_COLORS.warning, // #FFE66D
+    600: '#E6CF5A',
+    700: '#CCB847',
+    800: '#B3A134',
+    900: '#998A21',
   },
 
   error: {
-    50: '#FFEBEE',
-    100: '#FFCDD2',
-    200: '#EF9A9A',
-    300: '#E57373',
-    400: '#EF5350',
-    500: '#F44336', // Main error
-    600: '#E53935',
-    700: '#D32F2F',
-    800: '#C62828',
-    900: '#B71C1C',
+    50: '#FFF0F0',
+    100: '#FFE0E0',
+    200: '#FFC1C1',
+    300: '#FFA3A3',
+    400: '#FF8A8A',
+    500: SHARED_COLORS.error, // #FF6B6B
+    600: '#E85555',
+    700: '#D14040',
+    800: '#BA2C2C',
+    900: '#8B1F1F',
   },
 
   info: {
-    50: '#E1F5FE',
-    100: '#B3E5FC',
-    200: '#81D4FA',
-    300: '#4FC3F7',
-    400: '#29B6F6',
-    500: '#03A9F4', // Main info
-    600: '#039BE5',
-    700: '#0288D1',
-    800: '#0277BD',
-    900: '#01579B',
+    50: '#EBF5FF',
+    100: '#D6EBFF',
+    200: '#ADD6FF',
+    300: '#85C2FF',
+    400: '#5CADFF',
+    500: SHARED_COLORS.info, // #4A90E2
+    600: '#3A7ACC',
+    700: '#2A65B6',
+    800: '#1A50A0',
+    900: '#0A3B8A',
   },
 
-  // Neutral Colors
+  // Neutral Colors - Using shared grayscale
   neutral: {
-    0: '#FFFFFF',
-    50: '#FAFAFA',
-    100: '#F5F5F5',
-    200: '#EEEEEE',
-    300: '#E0E0E0',
-    400: '#BDBDBD',
-    500: '#9E9E9E',
-    600: '#757575',
-    700: '#616161',
-    800: '#424242',
-    900: '#212121',
-    1000: '#000000',
+    0: SHARED_COLORS.white,
+    50: SHARED_COLORS.gray50,
+    100: SHARED_COLORS.gray100,
+    200: SHARED_COLORS.gray200,
+    300: SHARED_COLORS.gray300,
+    400: SHARED_COLORS.gray400,
+    500: SHARED_COLORS.gray500,
+    600: SHARED_COLORS.gray600,
+    700: SHARED_COLORS.gray700,
+    800: SHARED_COLORS.gray800,
+    900: SHARED_COLORS.gray900,
+    1000: SHARED_COLORS.black,
   },
 
   // Background Colors
   background: {
-    primary: '#FFFFFF',
-    secondary: '#F5F5F5',
-    tertiary: '#EEEEEE',
+    primary: SHARED_COLORS.white,
+    secondary: SHARED_COLORS.background,
+    tertiary: SHARED_COLORS.gray100,
     dark: '#121212',
     darkSecondary: '#1E1E1E',
   },
 
   // Text Colors
   text: {
-    primary: '#212121',
-    secondary: '#757575',
-    disabled: '#BDBDBD',
-    inverse: '#FFFFFF',
+    primary: SHARED_COLORS.text,
+    secondary: SHARED_COLORS.textSecondary,
+    disabled: SHARED_COLORS.textDisabled,
+    inverse: SHARED_COLORS.white,
   },
 
   // Border Colors
   border: {
-    light: '#E0E0E0',
-    medium: '#BDBDBD',
-    dark: '#757575',
+    light: SHARED_COLORS.gray200,
+    medium: SHARED_COLORS.border,
+    dark: SHARED_COLORS.gray600,
   },
 
   // Overlay Colors
@@ -146,6 +156,18 @@ export const colors = {
     medium: 'rgba(0, 0, 0, 0.3)',
     dark: 'rgba(0, 0, 0, 0.6)',
   },
+
+  // Brand accent colors (for quick access)
+  brand: {
+    coral: SHARED_COLORS.coral,
+    mint: SHARED_COLORS.mint,
+    lavender: SHARED_COLORS.lavender,
+    sky: SHARED_COLORS.sky,
+    peach: SHARED_COLORS.peach,
+  },
 } as const;
 
 export type Colors = typeof colors;
+
+// Re-export shared colors for convenience
+export { SHARED_COLORS as COLORS } from '@travelmatch/shared';

@@ -2,6 +2,19 @@ import { logger } from '../utils/logger';
 import PostHog from 'posthog-react-native';
 import * as Sentry from '@sentry/react-native';
 
+// Analytics property types - support primitive values and nested objects
+type AnalyticsPropertyValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | string[]
+  | number[]
+  | Record<string, string | number | boolean | null | undefined>;
+
+type AnalyticsProperties = Record<string, AnalyticsPropertyValue>;
+
 /**
  * Analytics Service
  * Centralized analytics tracking with PostHog + Sentry
@@ -70,7 +83,7 @@ class AnalyticsService {
    * Track a custom event
    * Sends to both PostHog and Sentry breadcrumbs
    */
-  public trackEvent(eventName: string, properties?: Record<string, any>) {
+  public trackEvent(eventName: string, properties?: AnalyticsProperties) {
     if (!this.initialized) {
       logger.warn('[Analytics] Not initialized, skipping event:', eventName);
       return;
@@ -97,7 +110,7 @@ class AnalyticsService {
   /**
    * Track a screen view
    */
-  public trackScreen(screenName: string, properties?: Record<string, any>) {
+  public trackScreen(screenName: string, properties?: AnalyticsProperties) {
     if (!this.initialized) return;
 
     try {
@@ -119,7 +132,7 @@ class AnalyticsService {
   /**
    * Alias for trackScreen
    */
-  public screen(screenName: string, properties?: Record<string, any>) {
+  public screen(screenName: string, properties?: AnalyticsProperties) {
     this.trackScreen(screenName, properties);
   }
 
@@ -127,7 +140,7 @@ class AnalyticsService {
    * Identify a user
    * Sets user context in both PostHog and Sentry
    */
-  public identify(userId: string, traits?: Record<string, any>) {
+  public identify(userId: string, traits?: AnalyticsProperties) {
     if (!this.initialized) return;
 
     try {
@@ -170,7 +183,7 @@ class AnalyticsService {
   public trackTiming(
     metricName: string,
     duration: number,
-    properties?: Record<string, any>,
+    properties?: AnalyticsProperties,
   ) {
     if (!this.initialized) return;
 
@@ -203,7 +216,7 @@ class AnalyticsService {
    * Set user properties
    * Updates user traits without changing distinct_id
    */
-  public setUserProperties(properties: Record<string, any>) {
+  public setUserProperties(properties: AnalyticsProperties) {
     if (!this.initialized) return;
 
     try {

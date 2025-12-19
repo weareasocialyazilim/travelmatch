@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
 import { supabase } from '@/config/supabase';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { LAYOUT } from '@/constants/layout';
 import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
@@ -243,7 +244,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
                       source={{
                         uri:
                           slot.giver.avatar ||
-                          'https://via.placeholder.com/150',
+                          DEFAULT_IMAGES.AVATAR_LARGE,
                       }}
                       style={styles.giverAvatar}
                     />

@@ -3,7 +3,11 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+  TransitionPresets,
+} from '@react-navigation/stack';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';
 import { lazyLoad } from '../utils/lazyLoad';
@@ -470,25 +474,38 @@ const AppNavigator = () => {
             initialRouteName={initialRoute}
             screenOptions={{
               headerShown: false,
-              cardStyleInterpolator: ({ current: { progress } }) => ({
-                cardStyle: {
-                  opacity: progress,
-                },
-              }),
+              // DEFCON 3.4 FIX: Enable proper iOS swipe-to-go-back gesture
+              gestureEnabled: true,
+              gestureDirection: 'horizontal',
+              // Use standard iOS horizontal slide animation that works with gestures
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+              // Faster, smoother transitions
               transitionSpec: {
                 open: {
-                  animation: 'timing',
+                  animation: 'spring',
                   config: {
-                    duration: 200,
+                    stiffness: 1000,
+                    damping: 500,
+                    mass: 3,
+                    overshootClamping: true,
+                    restDisplacementThreshold: 10,
+                    restSpeedThreshold: 10,
                   },
                 },
                 close: {
-                  animation: 'timing',
+                  animation: 'spring',
                   config: {
-                    duration: 200,
+                    stiffness: 1000,
+                    damping: 500,
+                    mass: 3,
+                    overshootClamping: true,
+                    restDisplacementThreshold: 10,
+                    restSpeedThreshold: 10,
                   },
                 },
               },
+              // Gesture response config
+              gestureResponseDistance: 50, // iOS default edge distance
             }}
           >
             {/* Onboarding & Auth */}
@@ -506,12 +523,22 @@ const AppNavigator = () => {
               name="ForgotPassword"
               component={ForgotPasswordScreen}
             />
-            <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
+            {/* DEFCON 3.4: Disable gesture for critical auth flows */}
+            <Stack.Screen
+              name="SetPassword"
+              component={SetPasswordScreen}
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen
               name="TwoFactorSetup"
               component={TwoFactorSetupScreen}
+              options={{ gestureEnabled: false }}
             />
-            <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
+            <Stack.Screen
+              name="VerifyCode"
+              component={VerifyCodeScreen}
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen
               name="WaitingForCode"
               component={WaitingForCodeScreen}
@@ -586,9 +613,11 @@ const AppNavigator = () => {
               component={TransactionDetailScreen}
             />
             <Stack.Screen name="RefundPolicy" component={RefundPolicyScreen} />
+            {/* DEFCON 3.4: Disable gesture for payment flows */}
             <Stack.Screen
               name="RefundRequest"
               component={RefundRequestScreen}
+              options={{ gestureEnabled: false }}
             />
 
             {/* Escrow & Gesture Tracking */}
@@ -640,12 +669,22 @@ const AppNavigator = () => {
               name="KYCDocumentType"
               component={KYCDocumentTypeScreen}
             />
+            {/* DEFCON 3.4: Disable gesture for KYC flow to prevent losing progress */}
             <Stack.Screen
               name="KYCDocumentCapture"
               component={KYCDocumentCaptureScreen}
+              options={{ gestureEnabled: false }}
             />
-            <Stack.Screen name="KYCSelfie" component={KYCSelfieScreen} />
-            <Stack.Screen name="KYCReview" component={KYCReviewScreen} />
+            <Stack.Screen
+              name="KYCSelfie"
+              component={KYCSelfieScreen}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="KYCReview"
+              component={KYCReviewScreen}
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen name="KYCPending" component={KYCPendingScreen} />
 
             {/* Social & Invite */}
@@ -668,8 +707,12 @@ const AppNavigator = () => {
             />
             <Stack.Screen name="PaymentsKYC" component={PaymentsKYCScreen} />
 
-            {/* Withdraw */}
-            <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+            {/* Withdraw - DEFCON 3.4: Disable gesture for payment flow */}
+            <Stack.Screen
+              name="Withdraw"
+              component={WithdrawScreen}
+              options={{ gestureEnabled: false }}
+            />
 
             {/* Moment Publishing */}
             {/* <Stack.Screen
@@ -722,9 +765,11 @@ const AppNavigator = () => {
               component={BookingDetailScreen}
             />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
+            {/* DEFCON 3.4: Disable gesture for payment flow */}
             <Stack.Screen
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
+              options={{ gestureEnabled: false }}
             />
 
             {/* Footer Pages */}

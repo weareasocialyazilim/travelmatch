@@ -63,7 +63,7 @@ export const LoadingState: React.FC<LoadingStateProps> = memo(
   ({ type, count = 3, message, color = COLORS.primary, size = 'large' }) => {
     // Memoize skeleton items array to prevent recreation
     const skeletonItems = useMemo(
-      () => Array.from({ length: count }, (_, index) => <SkeletonItem key={index} />),
+      () => Array.from({ length: count }, (_, index) => <SkeletonItem key={`skeleton-${index}`} />),
       [count],
     );
 
