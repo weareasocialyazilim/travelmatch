@@ -8,10 +8,7 @@
 -- unauthorized transfers on behalf of other users.
 -- ============================================
 
--- Drop existing function if exists
-DROP FUNCTION IF EXISTS public.atomic_transfer(UUID, UUID, DECIMAL, UUID, TEXT);
-
--- Create atomic transfer function with transaction safety AND auth check
+-- Create or replace atomic transfer function with transaction safety AND auth check
 CREATE OR REPLACE FUNCTION public.atomic_transfer(
   p_sender_id UUID,
   p_recipient_id UUID,
@@ -148,15 +145,3 @@ EXCEPTION
     RAISE EXCEPTION 'Transfer failed: %', SQLERRM;
 END;
 $$;
-
--- Add function comment
-COMMENT ON FUNCTION public.atomic_transfer IS
-'Atomically transfers funds between users with row-level locking.
-SECURITY: Validates auth.uid() matches sender_id to prevent unauthorized transfers.
-Called by: transfer-funds edge function, paymentService.ts';
-
--- Grant execute to authenticated users (they can only transfer their own funds due to auth check)
-GRANT EXECUTE ON FUNCTION public.atomic_transfer TO authenticated;
-
--- Grant to service_role for system operations
-GRANT EXECUTE ON FUNCTION public.atomic_transfer TO service_role;
