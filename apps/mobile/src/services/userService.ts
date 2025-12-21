@@ -10,11 +10,6 @@ import { encryptionService } from './encryptionService';
 import { usersService as dbUsersService } from './supabaseDbService';
 import type { Database } from '../types/database.types';
 import { uploadFile } from './supabaseStorageService';
-import {
-  NotificationPreferencesSchema,
-  PrivacySettingsSchema,
-  UpdateUserProfileSchema,
-} from '../schemas/user.schema';
 import { isNotNull } from '../types/guards';
 import type {
   UserRow,

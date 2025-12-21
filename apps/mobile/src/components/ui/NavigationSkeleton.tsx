@@ -11,7 +11,8 @@ import { View, StyleSheet, Dimensions, Platform } from 'react-native';
 import { Skeleton } from './Skeleton';
 import { COLORS } from '@travelmatch/shared';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
+  Dimensions.get('window');
 
 /**
  * Generic screen skeleton with header and content areas
@@ -20,11 +21,7 @@ export const ScreenSkeleton: React.FC<{
   showHeader?: boolean;
   showTabBar?: boolean;
   contentType?: 'list' | 'grid' | 'detail' | 'form';
-}> = ({
-  showHeader = true,
-  showTabBar = true,
-  contentType = 'list',
-}) => {
+}> = ({ showHeader = true, showTabBar = true, contentType = 'list' }) => {
   return (
     <View style={styles.container}>
       {showHeader && <HeaderSkeleton />}
@@ -97,7 +94,9 @@ export const ListSkeleton: React.FC<{ count?: number }> = ({ count = 5 }) => (
 /**
  * Grid content skeleton (for discover, explore)
  */
-export const GridSkeleton: React.FC<{ columns?: number }> = ({ columns = 2 }) => {
+export const GridSkeleton: React.FC<{ columns?: number }> = ({
+  columns = 2,
+}) => {
   const itemWidth = (SCREEN_WIDTH - 48) / columns;
   const itemHeight = itemWidth * 1.3;
 
@@ -238,7 +237,12 @@ export const ProfileSkeleton: React.FC = () => (
         {[1, 2, 3].map((i) => (
           <View key={i} style={styles.statItem}>
             <Skeleton width={40} height={20} borderRadius={4} />
-            <Skeleton width={50} height={12} borderRadius={4} style={styles.mt4} />
+            <Skeleton
+              width={50}
+              height={12}
+              borderRadius={4}
+              style={styles.mt4}
+            />
           </View>
         ))}
       </View>

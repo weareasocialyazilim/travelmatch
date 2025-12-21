@@ -54,7 +54,7 @@ export const SUPABASE_REGIONS = {
 type RegionKey = keyof typeof SUPABASE_REGIONS;
 
 // Connection pool for each region
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const connectionPools = new Map<
   RegionKey,
   SupabaseClient<any, 'public', any>
@@ -73,7 +73,7 @@ const healthStatus = new Map<RegionKey, HealthStatus>();
 /**
  * Get Supabase client for specific region
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export function getRegionalClient(
   region: RegionKey,
 ): SupabaseClient<any, 'public', any> {
@@ -149,7 +149,7 @@ export async function getOptimalClient(userLocation?: {
 /**
  * Get client by country code
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export function getClientByCountry(
   countryCode: string,
 ): SupabaseClient<any, 'public', any> {
@@ -264,7 +264,7 @@ function calculateDistance(
  * Retries with fallback regions if primary fails
  */
 export async function withFailover<T>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   operation: (client: SupabaseClient<any, 'public', any>) => Promise<T>,
   _userLocation?: { lat: number; lon: number },
 ): Promise<T> {

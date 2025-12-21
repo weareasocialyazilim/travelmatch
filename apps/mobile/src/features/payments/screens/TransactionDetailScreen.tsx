@@ -41,8 +41,9 @@ export const TransactionDetailScreen: React.FC<
         return;
       }
       try {
-        const { transaction } =
-          await paymentService.getTransaction(transactionId);
+        const { transaction } = await paymentService.getTransaction(
+          transactionId,
+        );
         setTransaction(transaction);
       } catch (_error) {
         logger.error('Failed to fetch transaction', _error);
@@ -97,12 +98,7 @@ export const TransactionDetailScreen: React.FC<
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View
-          style={[
-            styles.container,
-            { justifyContent: 'center', alignItems: 'center' },
-          ]}
-        >
+        <View style={[styles.container, styles.centeredContainer]}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
@@ -112,18 +108,13 @@ export const TransactionDetailScreen: React.FC<
   if (!transaction) {
     return (
       <SafeAreaView style={styles.container}>
-        <View
-          style={[
-            styles.container,
-            { justifyContent: 'center', alignItems: 'center' },
-          ]}
-        >
-          <Text style={{ color: COLORS.text }}>Transaction not found</Text>
+        <View style={[styles.container, styles.centeredContainer]}>
+          <Text style={styles.messageText}>Transaction not found</Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{ marginTop: 20 }}
+            style={styles.goBackButton}
           >
-            <Text style={{ color: COLORS.primary }}>Go Back</Text>
+            <Text style={styles.goBackButtonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -345,22 +336,6 @@ export const TransactionDetailScreen: React.FC<
 };
 
 const styles = StyleSheet.create({
-  actionButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    flexDirection: 'row',
-    marginBottom: LAYOUT.padding,
-    padding: LAYOUT.padding * 1.5,
-    ...VALUES.shadow,
-  },
-  actionButtonText: {
-    color: COLORS.text,
-    flex: 1,
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '600',
-    marginLeft: LAYOUT.padding,
-  },
   actions: {
     marginTop: LAYOUT.padding * 2,
   },
@@ -369,27 +344,6 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '800',
     marginBottom: LAYOUT.padding / 2,
-  },
-  amountCard: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    marginBottom: LAYOUT.padding * 2,
-    marginTop: LAYOUT.padding * 2,
-    padding: LAYOUT.padding * 3,
-    ...VALUES.shadow,
-  },
-  amountLabel: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '500',
-    marginBottom: LAYOUT.padding / 2,
-  },
-  amountValue: {
-    color: COLORS.text,
-    fontSize: 48,
-    fontWeight: '800',
-    marginBottom: LAYOUT.padding,
   },
   avatar: {
     borderRadius: 24,
@@ -410,36 +364,6 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     ...TYPOGRAPHY.bodySmall,
     marginTop: LAYOUT.padding / 2,
-  },
-  descriptionValue: {
-    textAlign: 'left',
-  },
-  detailLabel: {
-    color: COLORS.textSecondary,
-    flex: 1,
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '500',
-  },
-  detailRow: {
-    alignItems: 'flex-start',
-    borderBottomColor: COLORS.border,
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: LAYOUT.padding,
-  },
-  detailValue: {
-    color: COLORS.text,
-    flex: 1,
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
-    textAlign: 'right',
-  },
-  detailsCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    padding: LAYOUT.padding * 1.5,
-    ...VALUES.shadow,
   },
   divider: {
     backgroundColor: COLORS.border,
@@ -473,67 +397,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: LAYOUT.padding / 2,
   },
-  helpCard: {
-    alignItems: 'center',
-    backgroundColor: COLORS.info + '20',
-    borderRadius: VALUES.borderRadius,
-    flexDirection: 'row',
-    marginTop: LAYOUT.padding,
-    padding: LAYOUT.padding * 1.5,
-  },
-  helpContent: {
-    flex: 1,
-    marginLeft: LAYOUT.padding,
-  },
-  helpText: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.caption,
-    fontWeight: '400',
-  },
-  helpTitle: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '700',
-    marginBottom: LAYOUT.padding / 4,
-  },
   label: {
     color: COLORS.textSecondary,
     ...TYPOGRAPHY.bodySmall,
     flex: 1,
-  },
-  participantAvatar: {
-    borderRadius: 20,
-    height: 40,
-    marginRight: LAYOUT.padding,
-    width: 40,
-  },
-  participantCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    marginBottom: LAYOUT.padding,
-    padding: LAYOUT.padding * 1.5,
-    ...VALUES.shadow,
-  },
-  participantInfo: {
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  participantLabel: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginBottom: LAYOUT.padding,
-  },
-  participantLabelText: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.caption,
-    fontWeight: '600',
-    marginLeft: LAYOUT.padding / 2,
-    textTransform: 'uppercase',
-  },
-  participantName: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '600',
   },
   paymentMethodContainer: {
     alignItems: 'center',
@@ -547,29 +414,6 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     marginLeft: LAYOUT.padding,
-  },
-  proofCard: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    flexDirection: 'row',
-    padding: LAYOUT.padding * 1.5,
-    ...VALUES.shadow,
-  },
-  proofInfo: {
-    flex: 1,
-    marginLeft: LAYOUT.padding,
-  },
-  proofSubtitle: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.caption,
-    fontWeight: '400',
-  },
-  proofTitle: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '700',
-    marginBottom: LAYOUT.padding / 4,
   },
   recipientContainer: {
     alignItems: 'center',
@@ -602,9 +446,6 @@ const styles = StyleSheet.create({
     paddingBottom: LAYOUT.padding * 4,
     paddingHorizontal: LAYOUT.padding * 2,
   },
-  scrollView: {
-    flex: 1,
-  },
   section: {
     marginBottom: LAYOUT.padding * 2,
   },
@@ -614,19 +455,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: LAYOUT.padding * 1.5,
   },
-  shareButton: {
-    padding: LAYOUT.padding / 2,
-  },
   spacer: {
     width: 40,
-  },
-  statusBadge: {
-    alignItems: 'center',
-    borderRadius: VALUES.borderRadius / 2,
-    flexDirection: 'row',
-    marginBottom: LAYOUT.padding * 2,
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
   },
   statusCard: {
     alignItems: 'center',
@@ -659,17 +489,24 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '800',
   },
-  transactionTitle: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.h4,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
   value: {
     color: COLORS.text,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     textAlign: 'right',
+  },
+  centeredContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  messageText: {
+    color: COLORS.text,
+  },
+  goBackButton: {
+    marginTop: 20,
+  },
+  goBackButtonText: {
+    color: COLORS.primary,
   },
 });
 

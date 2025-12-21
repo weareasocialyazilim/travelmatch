@@ -31,7 +31,7 @@ const TestCredentials = {
 // Jest hoists mock calls, but factory functions run later
 
 // Mock auth implementation - exported for test access
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const _mockAuthImpl = {
   signInWithPassword: jest.fn(),
   signUp: jest.fn(),
@@ -42,7 +42,7 @@ const _mockAuthImpl = {
 };
 
 // Mock supabase implementation
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const _mockFromChainFactory = () => ({
   select: jest.fn().mockReturnThis(),
   insert: jest.fn().mockReturnThis(),

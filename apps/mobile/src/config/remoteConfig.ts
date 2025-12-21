@@ -71,7 +71,7 @@ export const fetchRemoteConfig = async (): Promise<Partial<FeatureFlags>> => {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+     
     const data: RemoteConfigResponse = await response.json();
 
     // Cache the response

@@ -39,11 +39,7 @@ import { NetworkGuard } from '../../../components/NetworkGuard';
 import { useDiscoverStore } from '@/stores/discoverStore';
 
 // Import modular components
-import type {
-  ViewMode,
-  UserStory,
-  PriceRange,
-} from '@/components/discover/types';
+import type { UserStory } from '@/components/discover/types';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { Moment } from '@/hooks/useMoments';
 import type { Moment as DomainMoment } from '@/types';
@@ -55,7 +51,7 @@ const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
-  const { props: a11y, announce } = useAccessibility();
+  const { props: a11y, announce: _announce } = useAccessibility();
 
   // Use moments hook for data fetching
   const {
@@ -122,12 +118,12 @@ const DiscoverScreen = () => {
     try {
       await refreshMoments();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setRefreshing(false);
     }
-  }, [refreshMoments]);
+  }, [refreshMoments, setRefreshing]);
 
   // PERFORMANCE: Memoized view mode handlers
   const handleSingleView = useCallback(
@@ -326,7 +322,7 @@ const DiscoverScreen = () => {
   // Active filter count - computed from store (memoized)
   const activeFilterCount = useMemo(
     () => getActiveFilterCount(),
-    [selectedCategory, sortBy, maxDistance, priceRange, getActiveFilterCount],
+    [getActiveFilterCount],
   );
 
   // Memoized render functions
@@ -660,26 +656,6 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: COLORS.white,
     fontWeight: '600',
-  },
-
-  // Empty State
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginTop: 16,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginTop: 8,
   },
 
   // Load More

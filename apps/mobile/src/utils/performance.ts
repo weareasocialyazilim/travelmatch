@@ -300,7 +300,7 @@ class PerformanceMonitorClass {
     // @ts-expect-error - performance.memory is non-standard but available in React Native
     if (performance.memory) {
       // @ts-expect-error - performance.memory types
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+       
       const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
       const usage =
         ((usedJSHeapSize as number) / (totalJSHeapSize as number)) * 100;

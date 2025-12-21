@@ -22,7 +22,11 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { withdrawSchema, type WithdrawInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { ControlledInput } from '@/components/ui/ControlledInput';
-import { useWallet, useWithdraw, usePaymentMethods } from '../hooks/usePayments';
+import {
+  useWallet,
+  useWithdraw,
+  usePaymentMethods,
+} from '../hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -32,7 +36,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch real wallet data
-  const { data: walletData, isLoading: walletLoading } = useWallet();
+  const { data: walletData, isLoading: _walletLoading } = useWallet();
   const { data: paymentMethods } = usePaymentMethods();
   const withdrawMutation = useWithdraw();
 
@@ -47,9 +51,10 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
     return methods.find((m) => m.isDefault) ?? methods[0];
   }, [paymentMethods]);
 
-  const { biometricEnabled, biometricTypeName, authenticateForAction } = useBiometric();
+  const { biometricEnabled, biometricTypeName, authenticateForAction } =
+    useBiometric();
   const { props: a11y, formatCurrency } = useAccessibility();
-  
+
   // Enable screenshot protection for this sensitive screen
   useScreenSecurity();
 
@@ -73,7 +78,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         Alert.alert(
           'Authentication Required',
           `Please verify with ${biometricTypeName} to withdraw funds.`,
-          [{ text: 'OK' }]
+          [{ text: 'OK' }],
         );
         return;
       }
@@ -84,7 +89,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
       Alert.alert(
         'No Payment Method',
         'Please add a bank account or payment method to withdraw funds.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
       return;
     }
@@ -107,21 +112,26 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             ? `•••• ${defaultBankAccount.last4}`
             : 'Your payment method',
           estimatedArrival: '1-3 business days',
-          referenceId: result?.transactionId ?? `WD-${Date.now().toString().slice(-8)}`,
+          referenceId:
+            result?.transactionId ?? `WD-${Date.now().toString().slice(-8)}`,
         },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Withdrawal failed';
+      const message =
+        error instanceof Error ? error.message : 'Withdrawal failed';
       Alert.alert('Withdrawal Failed', message, [{ text: 'OK' }]);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState }, {
-    requireDirty: false,
-    requireValid: true,
-  });
+  const isSubmitDisabled = !canSubmitForm(
+    { formState },
+    {
+      requireDirty: false,
+      requireValid: true,
+    },
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -139,10 +149,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             accessible={false}
           />
         </TouchableOpacity>
-        <Text 
-          style={styles.headerTitle}
-          {...a11y.header('Withdraw')}
-        >
+        <Text style={styles.headerTitle} {...a11y.header('Withdraw')}>
           Withdraw
         </Text>
         <View style={styles.backButton} />
@@ -159,14 +166,14 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             {...a11y.image('Balance card background')}
           />
           <View style={styles.balanceOverlay}>
-            <Text 
+            <Text
               style={styles.balanceLabel}
               accessible={true}
               accessibilityLabel="Available to withdraw"
             >
               Available to withdraw
             </Text>
-            <Text 
+            <Text
               style={styles.balanceAmount}
               accessible={true}
               accessibilityLabel={formatCurrency(availableBalance)}
@@ -177,10 +184,12 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         </View>
 
         {/* Pending Escrow */}
-        <View 
+        <View
           style={styles.infoRow}
           accessible={true}
-          accessibilityLabel={`Pending in escrow: ${formatCurrency(pendingEscrow)}`}
+          accessibilityLabel={`Pending in escrow: ${formatCurrency(
+            pendingEscrow,
+          )}`}
         >
           <Text style={styles.infoLabel}>Pending in escrow</Text>
           <Text style={styles.infoValue}>${pendingEscrow.toFixed(2)}</Text>
@@ -192,7 +201,9 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           <View style={styles.accountInfo}>
             <View style={styles.iconContainer}>
               <MaterialCommunityIcons
-                name={defaultBankAccount?.type === 'card' ? 'credit-card' : 'bank'}
+                name={
+                  defaultBankAccount?.type === 'card' ? 'credit-card' : 'bank'
+                }
                 size={24}
                 color={COLORS.text}
               />
@@ -223,7 +234,10 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <Controller
           control={control}
           name="amount"
-          render={({ field: { onChange: _onChange, onBlur: _onBlur, value: _value }, fieldState: { error: _error } }) => (
+          render={({
+            field: { onChange: _onChange, onBlur: _onBlur, value: _value },
+            fieldState: { error: _error },
+          }) => (
             <View style={styles.inputWrapper}>
               <ControlledInput
                 name="amount"
@@ -239,7 +253,10 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <Controller
           control={control}
           name="note"
-          render={({ field: { onChange: _onChange2, onBlur: _onBlur2, value: _value2 }, fieldState: { error: _error2 } }) => (
+          render={({
+            field: { onChange: _onChange2, onBlur: _onBlur2, value: _value2 },
+            fieldState: { error: _error2 },
+          }) => (
             <View style={styles.inputWrapper}>
               <ControlledInput
                 name="note"
@@ -258,14 +275,16 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
       {/* Footer */}
       <View style={styles.footer}>
         {isSubmitting && (
-          <Text 
+          <Text
             style={styles.processingWarning}
-            {...a11y.alert('Processing withdrawal. This may take a few seconds.')}
+            {...a11y.alert(
+              'Processing withdrawal. This may take a few seconds.',
+            )}
           >
             Processing withdrawal. This may take a few seconds.
           </Text>
         )}
-        <Text 
+        <Text
           style={styles.footerText}
           accessible={true}
           accessibilityLabel="Payouts typically arrive in 1 to 3 business days"
@@ -274,7 +293,10 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         </Text>
         <TouchableOpacity
           testID="withdraw-button"
-          style={[styles.confirmButton, (isSubmitDisabled || isSubmitting) && styles.confirmButtonDisabled]}
+          style={[
+            styles.confirmButton,
+            (isSubmitDisabled || isSubmitting) && styles.confirmButtonDisabled,
+          ]}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitDisabled || isSubmitting}
           {...a11y.button(
@@ -282,12 +304,16 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             biometricEnabled
               ? `This will require ${biometricTypeName} verification`
               : 'Process withdrawal to your bank account',
-            isSubmitDisabled || isSubmitting
+            isSubmitDisabled || isSubmitting,
           )}
         >
           {isSubmitting ? (
             <>
-              <ActivityIndicator size="small" color={COLORS.white} style={{ marginRight: 8 }} />
+              <ActivityIndicator
+                size="small"
+                color={COLORS.white}
+                style={styles.buttonActivityIndicator}
+              />
               <Text style={styles.confirmButtonText}>Processing...</Text>
             </>
           ) : (
@@ -435,18 +461,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.text,
   },
-  input: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
   bottomSpacer: {
     height: 24,
   },
@@ -485,6 +499,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
     fontWeight: '600',
+  },
+  buttonActivityIndicator: {
+    marginRight: 8,
   },
 });
 

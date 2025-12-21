@@ -3,7 +3,7 @@
  * Search with autocomplete and recent searches
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   TextInput,
@@ -20,11 +20,6 @@ import { spacing } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSearchStore } from '../../stores/searchStore';
-import {
-  VERTICAL_LIST_CONFIG,
-  ITEM_HEIGHTS,
-  createGetItemLayout,
-} from '../../utils/listOptimization';
 import { useDebounce } from '../../utils/performance';
 
 interface EnhancedSearchBarProps {

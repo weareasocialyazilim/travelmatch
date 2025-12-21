@@ -53,7 +53,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Dynamic onboarding pages from i18n
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   const iconImage =
     require('../../../../assets/icon.png') as ImageSourcePropType;
 

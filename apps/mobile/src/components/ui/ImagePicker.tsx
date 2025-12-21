@@ -72,7 +72,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages([image]);
         }
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to pick image from camera', 'error');
     }
   };
@@ -104,7 +104,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages(validImages);
         }
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to pick image from gallery', 'error');
     }
   };
@@ -120,7 +120,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
       // Clear after successful upload
       setSelectedImages([]);
-    } catch (error) {
+    } catch {
       // Error handled by hook
     }
   };

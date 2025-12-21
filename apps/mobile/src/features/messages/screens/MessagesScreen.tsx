@@ -77,12 +77,13 @@ const MessagesScreen: React.FC = () => {
 
   // MEMORY LEAK FIX: Cleanup all timeouts on unmount
   useEffect(() => {
+    const timeouts = typingTimeoutsRef.current;
     return () => {
       // Clear all pending timeouts when component unmounts
-      typingTimeoutsRef.current.forEach((timeoutId) => {
+      timeouts.forEach((timeoutId) => {
         clearTimeout(timeoutId);
       });
-      typingTimeoutsRef.current.clear();
+      timeouts.clear();
     };
   }, []);
 
@@ -417,38 +418,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.background,
     flex: 1,
-  },
-  discoverButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    marginTop: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-  },
-  discoverButtonText: {
-    color: COLORS.white,
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-  },
-  emptyState: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-    paddingTop: 80,
-  },
-  emptySubtitle: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.body,
-    lineHeight: 22,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  emptyTitle: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.h3,
-    fontWeight: '600',
-    marginTop: 16,
   },
   lastMessage: {
     color: COLORS.textSecondary,

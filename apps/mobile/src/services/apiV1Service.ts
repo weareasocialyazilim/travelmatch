@@ -12,10 +12,8 @@
 
 import NetInfo from '@react-native-community/netinfo';
 import type { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { sessionManager } from './sessionManager';
-import type { Database } from '../types/database.types';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const API_BASE_URL = `${SUPABASE_URL}/functions/v1/api/v1`;
@@ -174,8 +172,8 @@ class ApiClient {
           message: isNetworkError
             ? 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.'
             : error instanceof Error
-              ? error.message
-              : 'Request failed',
+            ? error.message
+            : 'Request failed',
         },
       };
     }

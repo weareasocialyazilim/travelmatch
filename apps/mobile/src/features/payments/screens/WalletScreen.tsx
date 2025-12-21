@@ -72,7 +72,7 @@ const WalletScreen = () => {
       await refreshBalance();
       await loadTransactions();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   };

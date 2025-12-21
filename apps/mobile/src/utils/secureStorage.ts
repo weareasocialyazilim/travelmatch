@@ -45,7 +45,7 @@ export const secureStorage = {
     try {
       await AsyncStorage.setItem(`@secure_${key}`, value);
       return;
-    } catch (asyncErr) {
+    } catch {
       // As a last resort, persist to MMKV Storage
       await Storage.setItem(`@secure_${key}`, value);
     }
@@ -204,7 +204,7 @@ export async function migrateSensitiveDataToSecure(): Promise<void> {
         await Storage.removeItem(old);
         // Migration successful (removed console.log for production)
       }
-    } catch (error) {
+    } catch {
       // Migration failed (removed console.error for production)
       // Error is silently ignored to avoid breaking app startup
     }

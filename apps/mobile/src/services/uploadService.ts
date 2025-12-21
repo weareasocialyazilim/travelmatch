@@ -310,7 +310,7 @@ const checkRateLimit = async (userId: string): Promise<boolean> => {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
     const { count, error } = await supabase
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+       
       // @ts-ignore - file_uploads table not yet in generated types
       .from('file_uploads' as any)
       .select('*', { count: 'exact', head: true })

@@ -253,7 +253,7 @@ class DeepLinkHandler {
           error: errorMessage,
         };
       }
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: 'Parametre doğrulama hatası',

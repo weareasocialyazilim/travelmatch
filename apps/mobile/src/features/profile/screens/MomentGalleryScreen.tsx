@@ -48,7 +48,7 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
     const fetchImages = async () => {
       if (!momentId) return;
       try {
-        const { data, error } = await supabase
+        const { data, error: _error } = await supabase
           .from('moments')
           .select('images')
           .eq('id', momentId)
@@ -89,12 +89,12 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
   if (images.length === 0) {
     return (
       <View style={[styles.container, styles.center]}>
-        <Text style={{ color: COLORS.white }}>No images found</Text>
+        <Text style={styles.emptyMessageText}>No images found</Text>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={{ marginTop: 20 }}
+          style={styles.goBackButton}
         >
-          <Text style={{ color: COLORS.primary }}>Go Back</Text>
+          <Text style={styles.goBackButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -255,5 +255,14 @@ const styles = StyleSheet.create({
   },
   touchAreaRight: {
     right: 0,
+  },
+  emptyMessageText: {
+    color: COLORS.white,
+  },
+  goBackButton: {
+    marginTop: 20,
+  },
+  goBackButtonText: {
+    color: COLORS.primary,
   },
 });

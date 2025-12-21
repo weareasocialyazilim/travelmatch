@@ -169,7 +169,7 @@ export const useMemoryMonitor = (componentName: string) => {
     // @ts-expect-error - performance.memory is non-standard
     if (typeof performance !== 'undefined' && performance.memory) {
       // @ts-expect-error - performance.memory types
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+       
       const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
       const usage = (
         ((usedJSHeapSize as number) / (totalJSHeapSize as number)) *

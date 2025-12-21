@@ -8,7 +8,6 @@ import {
   Image,
   TextInput,
   Platform,
-  // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
   KeyboardAvoidingView,
   ActivityIndicator,
@@ -105,10 +104,11 @@ const EditProfileScreen = () => {
     setCheckingUsername(true);
     const timer = setTimeout(async () => {
       try {
-        const isAvailable =
-          await userService.checkUsernameAvailability(username);
+        const isAvailable = await userService.checkUsernameAvailability(
+          username,
+        );
         setUsernameAvailable(isAvailable);
-      } catch (error) {
+      } catch {
         // Ignore error
       } finally {
         setCheckingUsername(false);
@@ -164,7 +164,7 @@ const EditProfileScreen = () => {
           setAvatarUri(result.assets[0].uri);
         }
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to pick image', 'error');
     }
   };
@@ -199,7 +199,7 @@ const EditProfileScreen = () => {
       Alert.alert('Success', 'Profile updated successfully', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
-    } catch (error) {
+    } catch {
       showToast('Failed to update profile', 'error');
     }
   };

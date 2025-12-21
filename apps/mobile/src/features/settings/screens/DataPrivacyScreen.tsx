@@ -183,7 +183,9 @@ const DataPrivacyScreen = () => {
                   `• Profile information\n` +
                   `• ${exportData?.metadata.momentsCount ?? 0} moments\n` +
                   `• ${exportData?.metadata.messagesCount ?? 0} messages\n` +
-                  `• ${exportData?.metadata.transactionsCount ?? 0} transactions\n\n` +
+                  `• ${
+                    exportData?.metadata.transactionsCount ?? 0
+                  } transactions\n\n` +
                   `This file is valid for 7 days as per GDPR requirements.`,
                 [{ text: 'OK' }],
               );
@@ -222,7 +224,7 @@ const DataPrivacyScreen = () => {
           onPress: async () => {
             setDeleteLoading(true);
             try {
-              const { data: rpcData2, error } = await callRpc(
+              const { data: _rpcData2, error } = await callRpc(
                 'schedule_account_deletion',
                 {
                   target_user_id: user?.id,

@@ -11,8 +11,6 @@ import type { Database } from '../../types/database.types';
 // Type aliases for convenience
 type Tables = Database['public']['Tables'];
 type Moment = Tables['moments']['Row'];
-type User = Tables['users']['Row'];
-type Request = Tables['requests']['Row'];
 
 /**
  * ============================================
@@ -496,7 +494,7 @@ export const checkRelationship = async (
   conditions: Record<string, unknown>,
 ) => {
   const { data, error } = await supabase
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
     // @ts-ignore - Dynamic table name for generic helper
     .from(table)
     .select('id')
@@ -514,7 +512,6 @@ export const getCount = async (
   table: string,
   filters?: Record<string, unknown>,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore - Dynamic table name for generic helper
   let query = supabase
     .from(table as any)

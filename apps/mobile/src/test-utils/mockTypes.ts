@@ -5,7 +5,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
 // Extend Jest's type definitions for mocked Supabase
+
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
       toHaveBeenCalledWithSupabase(): R;

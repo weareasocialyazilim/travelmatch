@@ -158,7 +158,7 @@ function calculateDistance(
 
 // Cloudflare Workers edge function
 // Note: This code is designed to run in Cloudflare Workers environment
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const edgeHandler = {
   async fetch(
     request: Request,
@@ -179,7 +179,7 @@ export const edgeHandler = {
     // Generate and sanitize cache key to prevent injection attacks
     const rawCacheKey = strategy.cacheKey(request);
     // Sanitize: only allow alphanumeric, dash, underscore, colon, slash
-    const cacheKey = rawCacheKey.replace(/[^a-zA-Z0-9\-_:\/]/g, '');
+    const cacheKey = rawCacheKey.replace(/[^a-zA-Z0-9\-_:/]/g, '');
 
     // caches.default is Cloudflare Workers API
     const cache = (caches as unknown as { default: Cache }).default;

@@ -337,7 +337,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       const handlers = handlersRef.current.get(event);
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
+       
       if (!handlers) return () => {};
       handlers.add(handler as EventHandler);
 

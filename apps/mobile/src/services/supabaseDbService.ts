@@ -559,7 +559,7 @@ export const momentsService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await callRpc('soft_delete', {
+      const { data: _data, error } = await callRpc('soft_delete', {
         table_name: 'moments',
         record_id: id,
         user_id: user.id,
@@ -581,7 +581,7 @@ export const momentsService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await callRpc('restore_deleted', {
+      const { data: _data, error } = await callRpc('restore_deleted', {
         table_name: 'moments',
         record_id: id,
         user_id: user.id,
@@ -1585,7 +1585,7 @@ export const transactionsService = {
           const authRes = await supabase.auth.getUser();
           user = authRes?.data?.user ?? null;
         }
-      } catch (e) {
+      } catch {
         // If auth lookup fails (e.g., not mocked), proceed without user enforcement
         user = null;
       }

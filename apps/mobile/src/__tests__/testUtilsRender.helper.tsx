@@ -118,7 +118,7 @@ const customRender = (
   // If the root UI element carries a `navigation` prop, expose it on global
   // for the test navigation mock in `jest.setup` so `useNavigation` returns it.
   // Avoid try/catch for lint cleanliness — access safely via guards.
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+   
   // @ts-ignore
   if (ui && ui.props && ui.props.navigation) {
     // @ts-ignore

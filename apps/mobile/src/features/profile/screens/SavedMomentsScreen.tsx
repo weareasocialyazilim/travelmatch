@@ -16,7 +16,6 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
 import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { useMoments, type Moment } from '@/hooks/useMoments';
-import type { Moment as ApiMoment } from '@/types/api';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackNavigationProp } from '@react-navigation/stack';
 

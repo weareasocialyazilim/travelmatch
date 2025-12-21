@@ -4,7 +4,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Share,  Image,
+  Share,
+  Image,
   Clipboard,
   Linking,
   Alert,
@@ -32,8 +33,8 @@ interface ShareOption {
 }
 
 export const ShareMomentScreen: React.FC = () => {
-    const { showToast } = useToast();
-const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { showToast } = useToast();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<ShareMomentScreenProps>();
   const { momentId } = route.params;
   const { getMoment } = useMoments();
@@ -88,7 +89,7 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
         url: shareUrl,
         title: displayMoment.title,
       });
-    } catch (error) {
+    } catch {
       showToast('Could not share this moment', 'error');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -238,14 +239,19 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
       <View style={styles.previewSection}>
         <View style={styles.previewCard}>
           <Image
-            source={{ uri: displayMoment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER }}
+            source={{
+              uri:
+                displayMoment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER,
+            }}
             style={styles.previewImage}
           />
           <View style={styles.previewInfo}>
             <Text style={styles.previewTitle} numberOfLines={2}>
               {displayMoment.title}
             </Text>
-            <Text style={styles.previewPrice}>${displayMoment.pricePerGuest}</Text>
+            <Text style={styles.previewPrice}>
+              ${displayMoment.pricePerGuest}
+            </Text>
           </View>
         </View>
       </View>
@@ -319,9 +325,7 @@ const navigation = useNavigation<NavigationProp<RootStackParamList>>();
       <View style={styles.qrSection}>
         <TouchableOpacity
           style={styles.qrButton}
-          onPress={() =>
-            showToast('QR code would be displayed here', 'info')
-          }
+          onPress={() => showToast('QR code would be displayed here', 'info')}
         >
           <MaterialCommunityIcons
             name="qrcode"

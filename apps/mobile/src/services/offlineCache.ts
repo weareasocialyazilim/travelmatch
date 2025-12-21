@@ -21,6 +21,7 @@ import { logger } from '../utils/logger';
 import * as Application from 'expo-application';
 import * as Crypto from 'expo-crypto';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function generateEncryptionKey(): Promise<string> {
   // Combine device-specific identifiers for a unique key
   // Note: These are async calls in newer expo versions

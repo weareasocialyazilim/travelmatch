@@ -51,7 +51,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setStep('verify');
       showToast('Doğrulama kodu telefonunuza gönderildi', 'success');
-    } catch (error) {
+    } catch {
       showToast('Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setIsLoading(false);

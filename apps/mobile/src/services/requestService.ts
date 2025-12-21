@@ -141,11 +141,12 @@ export const requestService = {
         type: 'gift_request',
       } as unknown as Database['public']['Tables']['requests']['Insert'];
 
-      const { data: newRequest, error } =
-        await dbRequestsService.create(requestData);
+      const { data: newRequest, error } = await dbRequestsService.create(
+        requestData,
+      );
       if (error) throw error;
 
-      const dbTotal = (
+      const _dbTotal = (
         newRequest as Database['public']['Tables']['requests']['Row'] & {
           total_price?: number;
         }

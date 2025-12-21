@@ -1,18 +1,18 @@
 /**
  * Image CDN Service
  * Cloudflare Images integration for optimized image delivery
- * 
+ *
  * 🔒 SECURITY WARNING:
  * CLOUDFLARE_IMAGES_TOKEN should NOT be in EXPO_PUBLIC_* variables!
  * This service should ONLY handle image delivery (reading), not uploads.
  * Image uploads must be done via Supabase Edge Functions (server-side).
- * 
+ *
  * Features:
  * - Automatic WebP/AVIF conversion
  * - On-the-fly resizing and optimization
  * - Global CDN delivery
  * - 60-80% faster image loads
- * 
+ *
  * Usage:
  * 1. Upload images via server-side API
  * 2. Get optimized delivery URLs
@@ -59,10 +59,10 @@ export function isCloudflareImagesEnabled(): boolean {
 
 /**
  * 🔒 DEPRECATED: Upload image to Cloudflare Images CDN
- * 
+ *
  * @deprecated This function exposes sensitive tokens in client code.
  * Use the server-side upload endpoint instead:
- * 
+ *
  * ```typescript
  * // ✅ SECURE: Upload via Supabase Edge Function
  * const response = await fetch(
@@ -80,11 +80,11 @@ export function isCloudflareImagesEnabled(): boolean {
  */
 export async function uploadToCloudflare(
   imageUri: string,
-  options: ImageUploadOptions = {}
+  _options: ImageUploadOptions = {},
 ): Promise<CloudflareUploadResult> {
   throw new Error(
     '🔒 SECURITY: Image uploads must be done server-side. ' +
-    'Use Supabase Edge Function: /functions/v1/upload-image'
+      'Use Supabase Edge Function: /functions/v1/upload-image',
   );
 }
 
@@ -94,14 +94,14 @@ export async function uploadToCloudflare(
 export function getCloudflareImageURL(
   imageId: string,
   size: ImageSize = 'medium',
-  format?: 'auto' | 'webp' | 'avif' | 'jpeg' | 'png'
+  format?: 'auto' | 'webp' | 'avif' | 'jpeg' | 'png',
 ): string {
   if (!CLOUDFLARE_ACCOUNT_ID) {
     logger.warn('Cloudflare Images not configured, cannot generate URL');
     return '';
   }
 
-  const dimensions = ImageSizes[size];
+  const _dimensions = ImageSizes[size];
   const variant = `${size}`;
 
   // Build URL with transformations
@@ -120,7 +120,7 @@ export function getCloudflareImageURL(
  */
 export function getResponsiveSrcSet(
   imageId: string,
-  sizes: ImageSize[] = ['thumbnail', 'medium', 'large']
+  sizes: ImageSize[] = ['thumbnail', 'medium', 'large'],
 ): string {
   if (!CLOUDFLARE_ACCOUNT_ID) {
     return '';
@@ -137,14 +137,14 @@ export function getResponsiveSrcSet(
 
 /**
  * 🔒 DEPRECATED: Delete image from Cloudflare Images CDN
- * 
+ *
  * @deprecated This function requires sensitive tokens that must be server-side only.
  * Use the server-side delete endpoint instead via Supabase Edge Function.
  */
 export async function deleteFromCloudflare(_imageId: string): Promise<void> {
   throw new Error(
     '🔒 SECURITY: Image deletion must be done server-side. ' +
-    'Use Supabase Edge Function: /functions/v1/delete-image'
+      'Use Supabase Edge Function: /functions/v1/delete-image',
   );
 }
 
@@ -155,7 +155,7 @@ export async function deleteFromCloudflare(_imageId: string): Promise<void> {
 export async function uploadImageWithCDN(
   imageUri: string,
   bucket: string,
-  options: ImageUploadOptions = {}
+  options: ImageUploadOptions = {},
 ): Promise<{ url: string; id: string; provider: 'cloudflare' | 'supabase' }> {
   // Try Cloudflare first if configured
   if (isCloudflareImagesEnabled()) {
@@ -169,13 +169,19 @@ export async function uploadImageWithCDN(
         provider: 'cloudflare',
       };
     } catch (error) {
-      logger.warn('Cloudflare upload failed, falling back to Supabase', { error });
+      logger.warn('Cloudflare upload failed, falling back to Supabase', {
+        error,
+      });
     }
   }
 
   // Fallback to Supabase Storage
   const { uploadFile } = await import('./supabaseStorageService');
-  const { url, error } = await uploadFile(bucket as 'avatars' | 'moments' | 'proofs' | 'messages', imageUri, 'image');
+  const { url, error } = await uploadFile(
+    bucket as 'avatars' | 'moments' | 'proofs' | 'messages',
+    imageUri,
+    'image',
+  );
 
   if (error) {
     throw error;
@@ -193,7 +199,7 @@ export async function uploadImageWithCDN(
  */
 export function getOptimizedImageURL(
   imageId: string,
-  size: ImageSize = 'medium'
+  size: ImageSize = 'medium',
 ): string {
   // If imageId looks like a Cloudflare ID (no slashes), use Cloudflare
   if (!imageId.includes('/') && isCloudflareImagesEnabled()) {

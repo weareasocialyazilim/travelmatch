@@ -39,7 +39,6 @@ export const WelcomeScreen: React.FC<{
           {/* Illustration */}
           <View style={styles.illustrationContainer}>
             <Image
-              // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
               source={require('../../../../assets/icon.png')}
               style={styles.illustration}
               resizeMode="contain"
@@ -61,22 +60,15 @@ export const WelcomeScreen: React.FC<{
           <View style={styles.buttonContainer}>
             {/* Apple Sign In (Mock) */}
             <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                styles.appleButton,
-              ]}
+              style={[styles.primaryButton, styles.appleButton]}
               onPress={() => navigation.navigate('Register')} // Mock action
               activeOpacity={0.8}
             >
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
+              <View style={styles.appleButtonContent}>
                 {/* Use text icon for now as we don't have Apple icon asset guaranteed */}
-                <Text style={[styles.primaryButtonText, { marginRight: 8 }]}>
+                <Text
+                  style={[styles.primaryButtonText, styles.appleIconMargin]}
+                >
                   
                 </Text>
                 <Text style={styles.primaryButtonText}>
@@ -215,7 +207,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  appleIconText: {
+  appleIconMargin: {
     marginRight: 8,
   },
   footerText: {

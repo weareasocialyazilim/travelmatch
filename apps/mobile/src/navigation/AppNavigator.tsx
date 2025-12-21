@@ -6,7 +6,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import {
   createStackNavigator,
   CardStyleInterpolators,
-  TransitionPresets,
 } from '@react-navigation/stack';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';

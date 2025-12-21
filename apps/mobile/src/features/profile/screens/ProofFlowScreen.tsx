@@ -6,7 +6,7 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Image, // eslint-disable-next-line react-native/split-platform-components
+  Image,
   ActionSheetIOS,
   Platform,
   Alert,
@@ -82,7 +82,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   navigation,
 }) => {
   const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [loading, setLoading] = useState(false);
 
@@ -230,7 +230,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         });
 
         Alert.alert('Location Set', locationName);
-      } catch (error) {
+      } catch {
         showToast('Could not get current location', 'error');
       }
     };
@@ -283,7 +283,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     );
   };
 
-  const onSubmit = (data: ProofInput) => {
+  const onSubmit = (_data: ProofInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {

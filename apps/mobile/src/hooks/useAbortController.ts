@@ -11,11 +11,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { logger } from '../utils/logger';
 
-interface AbortControllerState {
-  controller: AbortController;
-  signal: AbortSignal;
-}
-
 /**
  * Hook for managing AbortController lifecycle
  *
@@ -106,22 +101,19 @@ export const useAbortController = () => {
  * ```
  */
 export const useAbortableFetch = <T>() => {
-  const { signal, abort, reset, isAborted } = useAbortController();
+  const { signal: _signal, abort, reset, isAborted } = useAbortController();
   const loadingRef = useRef(false);
 
   const fetchWithAbort = useCallback(
-    async (
-      url: string,
-      options?: RequestInit
-    ): Promise<T | null> => {
+    async (url: string, options?: RequestInit): Promise<T | null> => {
       // Reset controller for new request
-      const newController = reset();
+      const _newController = reset();
       loadingRef.current = true;
 
       try {
         const response = await fetch(url, {
           ...options,
-          signal: newController.signal,
+          signal: _newController.signal,
         });
 
         if (!response.ok) {
@@ -140,7 +132,7 @@ export const useAbortableFetch = <T>() => {
         loadingRef.current = false;
       }
     },
-    [reset]
+    [reset],
   );
 
   return {
@@ -173,7 +165,7 @@ export const useTimeoutPromise = (defaultTimeout: number = 10000) => {
   const withTimeout = useCallback(
     async <T>(
       promise: Promise<T>,
-      timeout: number = defaultTimeout
+      timeout: number = defaultTimeout,
     ): Promise<T> => {
       const newController = reset();
 
@@ -191,7 +183,7 @@ export const useTimeoutPromise = (defaultTimeout: number = 10000) => {
 
       return Promise.race([promise, timeoutPromise]);
     },
-    [reset, defaultTimeout]
+    [reset, defaultTimeout],
   );
 
   return {

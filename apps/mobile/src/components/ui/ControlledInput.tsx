@@ -29,7 +29,7 @@ interface ControlledInputProps<T extends FieldValues> extends Omit<
 }
 
 interface InputWithValidationProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   InputComponent: React.ComponentType<any>;
   onChange: (text: string) => void;
   onBlur: () => void;

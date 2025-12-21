@@ -108,7 +108,7 @@ class CacheService {
     const now = Date.now();
 
     // Compress large data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let finalData: any = data;
     let compressed = false;
     let size = calculateSize(data);

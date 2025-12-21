@@ -41,7 +41,7 @@ describe('logger.ts - simplified', () => {
       return mockConsoleWarn.mock.calls.slice().reverse();
     // Fallback to Logger.__testLogs (collected by Logger during Jest)
     // Represent each entry as [entry] to match console.mock.calls shape
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const LoggerClass = require('@/utils/logger').Logger;
     if (
       Array.isArray(LoggerClass.__testLogs) &&

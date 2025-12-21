@@ -59,7 +59,7 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       await Clipboard.setStringAsync(momentUrl);
       showToast('Link copied to clipboard!', 'success');
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Link kopyalanamadı', 'error');
     }
   };
@@ -78,7 +78,9 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
 
   const handleWhatsApp = async () => {
     try {
-      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(`${momentTitle}\n${momentUrl}`)}`;
+      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(
+        `${momentTitle}\n${momentUrl}`,
+      )}`;
       const canOpen = await Linking.canOpenURL(whatsappUrl);
 
       if (canOpen) {

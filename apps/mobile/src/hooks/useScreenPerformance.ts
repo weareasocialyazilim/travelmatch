@@ -44,7 +44,7 @@ export const useScreenPerformance = (screenName: string) => {
     });
 
     if (typeof global.performance !== 'undefined') {
-      // eslint-disable-next-line no-console
+       
       logger.debug(`📊 [Performance] ${screenName}:`, {
         mountTime: mountDuration,
         timestamp: new Date().toISOString(),

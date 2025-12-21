@@ -388,7 +388,7 @@ class Logger {
     // that call flushRemoteLogs() without awaiting still observe breadcrumbs)
     try {
       // Try synchronous require (works in Jest where modules are mocked)
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+       
       // @ts-ignore
       const Sentry = require('@sentry/react-native');
       logs.forEach((log) => {
@@ -421,7 +421,7 @@ class Logger {
     const isJest = this.isJestEnv();
     if (this.shouldLog('debug')) {
       if (this.config.jsonFormat && (!isDev || isJest)) {
-        // eslint-disable-next-line no-console
+         
         const glConsole = (globalThis as any).console || console;
         if (glConsole.info)
           glConsole.info(this.formatJSON('debug', message, args));

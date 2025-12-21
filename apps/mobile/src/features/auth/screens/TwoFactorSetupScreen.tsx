@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -95,7 +95,8 @@ export const TwoFactorSetupScreen: React.FC = () => {
         setVerificationCode('');
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Verification failed';
+      const message =
+        err instanceof Error ? err.message : 'Verification failed';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -120,22 +121,40 @@ export const TwoFactorSetupScreen: React.FC = () => {
       <Text style={styles.title}>Enable Two-Factor Authentication</Text>
 
       <Text style={styles.description}>
-        Add an extra layer of security to your account. You'll need an authenticator
-        app like Google Authenticator or Authy.
+        Add an extra layer of security to your account. You'll need an
+        authenticator app like Google Authenticator or Authy.
       </Text>
 
       <View style={styles.benefitsList}>
         <View style={styles.benefitItem}>
-          <MaterialCommunityIcons name="check-circle" size={24} color={COLORS.success} />
-          <Text style={styles.benefitText}>Protect against unauthorized access</Text>
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={24}
+            color={COLORS.success}
+          />
+          <Text style={styles.benefitText}>
+            Protect against unauthorized access
+          </Text>
         </View>
         <View style={styles.benefitItem}>
-          <MaterialCommunityIcons name="check-circle" size={24} color={COLORS.success} />
-          <Text style={styles.benefitText}>Secure your payments and wallet</Text>
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={24}
+            color={COLORS.success}
+          />
+          <Text style={styles.benefitText}>
+            Secure your payments and wallet
+          </Text>
         </View>
         <View style={styles.benefitItem}>
-          <MaterialCommunityIcons name="check-circle" size={24} color={COLORS.success} />
-          <Text style={styles.benefitText}>Get verified badge on your profile</Text>
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={24}
+            color={COLORS.success}
+          />
+          <Text style={styles.benefitText}>
+            Get verified badge on your profile
+          </Text>
         </View>
       </View>
 
@@ -177,7 +196,11 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
       <TouchableOpacity style={styles.secretContainer} onPress={copySecret}>
         <Text style={styles.secretText}>{secret}</Text>
-        <MaterialCommunityIcons name="content-copy" size={20} color={COLORS.primary} />
+        <MaterialCommunityIcons
+          name="content-copy"
+          size={20}
+          color={COLORS.primary}
+        />
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -214,7 +237,10 @@ export const TwoFactorSetupScreen: React.FC = () => {
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <TouchableOpacity
-        style={[styles.primaryButton, verificationCode.length !== 6 && styles.buttonDisabled]}
+        style={[
+          styles.primaryButton,
+          verificationCode.length !== 6 && styles.buttonDisabled,
+        ]}
         onPress={handleVerify}
         disabled={isLoading || verificationCode.length !== 6}
       >
@@ -225,10 +251,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.backLink}
-        onPress={() => setStep('qr')}
-      >
+      <TouchableOpacity style={styles.backLink} onPress={() => setStep('qr')}>
         <Text style={styles.backLinkText}>Go back to QR code</Text>
       </TouchableOpacity>
     </View>
@@ -247,15 +270,15 @@ export const TwoFactorSetupScreen: React.FC = () => {
       <Text style={styles.successTitle}>2FA Enabled!</Text>
 
       <Text style={styles.successDescription}>
-        Your account is now protected with two-factor authentication.
-        You'll need to enter a code from your authenticator app when signing in.
+        Your account is now protected with two-factor authentication. You'll
+        need to enter a code from your authenticator app when signing in.
       </Text>
 
       <View style={styles.warningBox}>
         <MaterialCommunityIcons name="alert" size={24} color={COLORS.warning} />
         <Text style={styles.warningText}>
-          Save your secret key in a safe place. You'll need it if you lose access
-          to your authenticator app.
+          Save your secret key in a safe place. You'll need it if you lose
+          access to your authenticator app.
         </Text>
       </View>
 
@@ -276,7 +299,11 @@ export const TwoFactorSetupScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Two-Factor Authentication</Text>
         <View style={styles.placeholder} />

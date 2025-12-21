@@ -49,10 +49,6 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     marginBottom: 24,
   },
-  illustration: {
-    width: '100%',
-    height: '100%',
-  },
   textBlock: {
     alignItems: 'center',
     gap: 8,

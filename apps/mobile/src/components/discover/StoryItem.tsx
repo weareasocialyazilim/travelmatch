@@ -22,7 +22,7 @@ export const StoryItem: React.FC<StoryItemProps> = memo(
         avatarCloudflareId: it.avatarCloudflareId,
         avatarBlurHash: it.avatarBlurHash,
       };
-    }, [item.avatar, item]);
+    }, [item]);
 
     // Memoize press handler to prevent recreating on every render
     const handlePress = useCallback(() => {
