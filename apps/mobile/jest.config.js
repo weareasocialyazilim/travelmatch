@@ -78,4 +78,20 @@ module.exports = {
       lines: 80,
     },
   },
+  // JUnit reporter for Codecov Test Analytics
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        outputDirectory: './coverage',
+        outputName: 'junit.xml',
+        suiteName: 'TravelMatch Mobile Tests',
+        classNameTemplate: '{classname}',
+        titleTemplate: '{title}',
+        ancestorSeparator: ' › ',
+        usePathForSuiteName: true,
+      },
+    ],
+  ],
 };

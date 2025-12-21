@@ -71,4 +71,21 @@ module.exports = {
   // Clear mocks between tests
   clearMocks: true,
   resetMocks: true,
+  
+  // JUnit reporter for Codecov Test Analytics
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        outputDirectory: './coverage',
+        outputName: 'junit.xml',
+        suiteName: 'TravelMatch Design System Tests',
+        classNameTemplate: '{classname}',
+        titleTemplate: '{title}',
+        ancestorSeparator: ' › ',
+        usePathForSuiteName: true,
+      },
+    ],
+  ],
 };

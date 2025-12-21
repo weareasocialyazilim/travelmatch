@@ -14,7 +14,7 @@ type Listener = { remove?: () => void; unsubscribe?: () => void };
  * Tracks timers, listeners, and subscriptions to detect leaks
  *
  * @example
- * const { timers, listeners } = useMemoryLeakDetector('HomeScreen');
+ * const { timers, listeners } = useMemoryLeakDetector('DiscoverScreen');
  *
  * const timer = setTimeout(() => {}, 1000);
  * timers.current.push(timer);

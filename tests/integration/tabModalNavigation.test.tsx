@@ -1,8 +1,8 @@
 /**
  * Tab and Modal Navigation Tests
- * 
+ *
  * Tests for tab navigation flows and modal stack management
- * 
+ *
  * Coverage:
  * - Tab switching and state preservation
  * - Tab navigation listeners
@@ -27,10 +27,10 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 // Mock screens for testing
-function HomeScreen({ navigation }: any) {
+function DiscoverScreen({ navigation }: any) {
   return (
     <View>
-      <Text>Home Screen</Text>
+      <Text>Discover Screen</Text>
       <TouchableOpacity
         testID="open-modal-btn"
         onPress={() => navigation.navigate('ProfileModal', { userId: '123' })}
@@ -69,7 +69,9 @@ function SettingsScreen({ navigation }: any) {
       <Text>Settings Screen</Text>
       <TouchableOpacity
         testID="reset-tab"
-        onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Settings' }] })}
+        onPress={() =>
+          navigation.reset({ index: 0, routes: [{ name: 'Settings' }] })
+        }
       >
         <Text>Reset Tab</Text>
       </TouchableOpacity>
@@ -123,7 +125,7 @@ function EditProfileModalScreen({ navigation }: any) {
 function TabNavigator() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Discover" component={DiscoverScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
@@ -138,7 +140,10 @@ function RootNavigator() {
       <Stack.Screen name="MainTabs" component={TabNavigator} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="ProfileModal" component={ProfileModalScreen} />
-        <Stack.Screen name="EditProfileModal" component={EditProfileModalScreen} />
+        <Stack.Screen
+          name="EditProfileModal"
+          component={EditProfileModalScreen}
+        />
       </Stack.Group>
     </Stack.Navigator>
   );
@@ -320,7 +325,7 @@ describe('Tab Navigation', () => {
       // Badge implementation would be in TabNavigator options
       // Testing concept: verify badge appears and updates
       const { getByText } = render(<TestApp />);
-      
+
       // In real implementation:
       // expect(getByText('3')).toBeTruthy(); // Unread count badge
     });
@@ -604,7 +609,7 @@ describe('Modal Navigation', () => {
       await waitFor(() => expect(getByText('Profile Modal')).toBeTruthy());
 
       fireEvent.press(getByTestId('close-modal-btn'));
-      
+
       // Should be back on Home tab
       await waitFor(() => expect(getByText('Home Screen')).toBeTruthy());
     });
