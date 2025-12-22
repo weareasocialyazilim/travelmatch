@@ -2,8 +2,20 @@
 
 # EAS Build Pre-Install Hook
 # Sets up Mapbox credentials for CocoaPods
+# Also configures pnpm to skip postinstall scripts (supabase CLI download)
 
 set -e
+
+echo "🔧 Configuring pnpm to skip postinstall scripts..."
+
+# Add ignore-scripts to .npmrc to prevent supabase CLI download failure
+# The supabase package tries to download CLI binaries which fails on EAS servers
+if [ -f "$EAS_BUILD_WORKINGDIR/.npmrc" ]; then
+  echo "ignore-scripts=true" >> "$EAS_BUILD_WORKINGDIR/.npmrc"
+elif [ -f ".npmrc" ]; then
+  echo "ignore-scripts=true" >> .npmrc
+fi
+echo "✅ pnpm configured to skip postinstall scripts"
 
 echo "🗺️ Setting up Mapbox credentials..."
 

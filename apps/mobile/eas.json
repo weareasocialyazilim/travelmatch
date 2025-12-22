@@ -7,9 +7,6 @@
     "base": {
       "ios": {
         "image": "latest"
-      },
-      "pnpm": {
-        "installCommand": "pnpm install --frozen-lockfile --ignore-scripts"
       }
     },
     "development": {
