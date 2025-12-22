@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useCallback,
   useRef,
+  useMemo,
 } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -433,34 +434,51 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     };
   }, [isAuthenticated, connectionState, connect, disconnect]);
 
+  // Memoize context value to prevent unnecessary re-renders of consumers
+  const contextValue = useMemo<RealtimeContextType>(
+    () => ({
+      // Connection state
+      connectionState,
+      isConnected,
+
+      // Online users
+      onlineUsers,
+      isUserOnline,
+
+      // Event subscription
+      subscribe,
+
+      // Typing indicators
+      sendTypingStart,
+      sendTypingStop,
+
+      // Notification subscription
+      subscribeToNotifications,
+      unsubscribeFromNotifications,
+
+      // Manual controls
+      connect,
+      disconnect,
+      reconnect,
+    }),
+    [
+      connectionState,
+      isConnected,
+      onlineUsers,
+      isUserOnline,
+      subscribe,
+      sendTypingStart,
+      sendTypingStop,
+      subscribeToNotifications,
+      unsubscribeFromNotifications,
+      connect,
+      disconnect,
+      reconnect,
+    ],
+  );
+
   return (
-    <RealtimeContext.Provider
-      value={{
-        // Connection state
-        connectionState,
-        isConnected,
-
-        // Online users
-        onlineUsers,
-        isUserOnline,
-
-        // Event subscription
-        subscribe,
-
-        // Typing indicators
-        sendTypingStart,
-        sendTypingStop,
-
-        // Notification subscription
-        subscribeToNotifications,
-        unsubscribeFromNotifications,
-
-        // Manual controls
-        connect,
-        disconnect,
-        reconnect,
-      }}
-    >
+    <RealtimeContext.Provider value={contextValue}>
       {children}
     </RealtimeContext.Provider>
   );
