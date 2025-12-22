@@ -746,21 +746,17 @@ export const momentsService = {
       const limit = options?.limit || 20;
 
       // Optimized query with explicit joins
+      // Note: category is a TEXT field in moments table, not a foreign key
       let query = supabase.from('moments').select(`
           *,
           users:user_id (
             id,
-            name,
-            avatar,
+            full_name,
+            avatar_url,
             location,
-            kyc,
-            trust_score,
+            kyc_status,
+            rating,
             created_at
-          ),
-          categories:category (
-            id,
-            name,
-            emoji
           )
         `);
 
@@ -1089,7 +1085,8 @@ export const conversationsService = {
 
     try {
       // Optimized query with specific fields to prevent N+1 queries
-      // Fetch conversation with last message and participant details in single query
+      // Note: last_message_id doesn't have a foreign key constraint, so we can't use the join syntax
+      // Instead, fetch conversations first, then get messages separately if needed
       const { data, count, error } = await supabase
         .from('conversations')
         .select(
@@ -1099,18 +1096,7 @@ export const conversationsService = {
           updated_at,
           created_at,
           last_message_id,
-          last_message:messages!conversations_last_message_id_fkey (
-            id,
-            content,
-            sender_id,
-            created_at,
-            read_at,
-            sender:users!messages_sender_id_fkey (
-              id,
-              full_name,
-              avatar_url
-            )
-          )
+          moment_id
         `,
           { count: 'exact' },
         )
@@ -1118,22 +1104,7 @@ export const conversationsService = {
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-      // Type includes nested messages with sender info
-      return okList<
-        Tables['conversations']['Row'] & {
-          messages: Array<{
-            id: string;
-            content: string;
-            created_at: string;
-            read_at: string | null;
-            sender: {
-              id: string;
-              full_name: string | null;
-              avatar_url: string | null;
-            } | null;
-          }>;
-        }
-      >(data || [], count);
+      return okList<Tables['conversations']['Row']>(data || [], count);
     } catch (error) {
       logger.error('[DB] List conversations error:', error);
       return { data: [], count: 0, error: error as Error };

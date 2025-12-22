@@ -238,21 +238,22 @@ const MomentDetailScreen: React.FC = () => {
   const handleGiftOption = useCallback(() => {
     trackInteraction('gift_selected');
     setShowGiftSheet(false);
-    setGiftAmount(moment.price);
+    // Use price or pricePerGuest as fallback
+    setGiftAmount(moment.price ?? moment.pricePerGuest ?? 0);
 
     setTimeout(() => {
       setShowSuccessModal(true);
     }, VALUES.ANIMATION_DURATION);
-  }, [moment.price, trackInteraction]);
+  }, [moment.price, moment.pricePerGuest, trackInteraction]);
 
   const handleViewApprovals = useCallback(() => {
     setShowSuccessModal(false);
     navigation.navigate('ReceiverApproval', {
       momentTitle: moment.title,
-      totalAmount: moment.price,
+      totalAmount: moment.price ?? moment.pricePerGuest ?? 0,
       momentId: moment.id,
     });
-  }, [moment.price, moment.title, moment.id, navigation]);
+  }, [moment.price, moment.pricePerGuest, moment.title, moment.id, navigation]);
 
   const handleEdit = useCallback(() => {
     navigation.navigate('EditMoment', { momentId: moment.id });

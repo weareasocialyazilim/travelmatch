@@ -46,6 +46,7 @@ export const AddBankAccountBottomSheet: React.FC<
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.modalContainer}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.backdrop} />

@@ -201,13 +201,12 @@ export const userService = {
     if (!user) throw new Error('Not authenticated');
 
     // SECURITY: Only select public profile fields - never expose sensitive data like balance, kyc_status
+    // Note: Using only columns that exist in the database schema
     const { data: profile, error } = await supabase
       .from('users')
       .select(
         `
         id,
-        username,
-        name,
         full_name,
         email,
         avatar_url,
@@ -216,13 +215,8 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
         languages,
         interests,
-        instagram,
-        twitter,
-        website,
-        public_key,
         notification_preferences,
         created_at,
         updated_at
@@ -244,13 +238,12 @@ export const userService = {
    */
   getUserById: async (userId: string): Promise<{ user: UserProfile }> => {
     // SECURITY: Only select public profile fields
+    // Note: Using only columns that exist in the database schema
     const { data: profile, error } = await supabase
       .from('users')
       .select(
         `
         id,
-        username,
-        name,
         full_name,
         avatar_url,
         bio,
@@ -258,12 +251,9 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
         languages,
         interests,
-        instagram,
-        twitter,
-        website
+        created_at
       `,
       )
       .eq('id', userId)
@@ -278,19 +268,21 @@ export const userService = {
   },
 
   /**
-   * Get user profile by username
+   * Get user profile by email (username not available in schema)
+   * @deprecated Use getUserById instead
    */
   getUserByUsername: async (
     username: string,
   ): Promise<{ user: UserProfile }> => {
+    // Note: username column doesn't exist in users table
+    // This function attempts to find by email instead
     // SECURITY: Only select public profile fields
     const { data: profile, error } = await supabase
       .from('users')
       .select(
         `
         id,
-        username,
-        name,
+        email,
         full_name,
         avatar_url,
         bio,
@@ -298,19 +290,16 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
+        created_at,
         languages,
-        interests,
-        instagram,
-        twitter,
-        website
+        interests
       `,
       )
-      .eq('username', username)
+      .eq('email', username)
       .single();
 
     if (error) {
-      logger.error(`Error fetching user by username ${username}:`, error);
+      logger.error(`Error fetching user by email ${username}:`, error);
       throw error;
     }
 
@@ -318,17 +307,19 @@ export const userService = {
   },
 
   /**
-   * Check if username is available
+   * Check if email is available (username column doesn't exist)
+   * @deprecated Use email-based check instead
    */
   checkUsernameAvailability: async (username: string): Promise<boolean> => {
+    // Note: username column doesn't exist, checking email instead
     const { data, error } = await supabase
       .from('users')
       .select('id')
-      .eq('username', username)
+      .eq('email', username)
       .maybeSingle();
 
     if (error) {
-      logger.error(`Error checking username availability:`, error);
+      logger.error(`Error checking email availability:`, error);
       return false;
     }
 

@@ -295,10 +295,43 @@ const DiscoverScreen = () => {
 
   const handleMomentPress = useCallback(
     (moment: Moment) => {
-      // Cast to any to bridge hook Moment and domain Moment types
-      navigation.navigate('MomentDetail', {
-        moment: moment as unknown as import('@/types').Moment,
-      });
+      // Convert hook Moment type to domain Moment type with proper user object
+      const domainMoment: import('@/types').Moment = {
+        id: moment.id,
+        title: moment.title,
+        story: moment.description,
+        description: moment.description,
+        image: moment.image || moment.images?.[0],
+        imageUrl: moment.image || moment.images?.[0],
+        images: moment.images,
+        price: moment.price ?? moment.pricePerGuest,
+        pricePerGuest: moment.pricePerGuest,
+        location:
+          typeof moment.location === 'string'
+            ? { city: moment.location, country: '' }
+            : moment.location,
+        availability: Array.isArray(moment.availability)
+          ? moment.availability.join(', ')
+          : moment.availability?.[0],
+        distance: moment.distance,
+        status: moment.status,
+        category:
+          typeof moment.category === 'string'
+            ? { id: moment.category, label: moment.category, emoji: '✨' }
+            : moment.category,
+        // Properly map host info to user object
+        user: {
+          id: moment.hostId,
+          name: moment.hostName || 'Anonymous',
+          avatar: moment.hostAvatar,
+          isVerified: moment.hostRating > 4.5,
+          type: 'local',
+          travelDays: 0,
+        },
+        createdAt: moment.createdAt,
+        updatedAt: moment.updatedAt,
+      };
+      navigation.navigate('MomentDetail', { moment: domainMoment });
     },
     [navigation],
   );
@@ -365,13 +398,9 @@ const DiscoverScreen = () => {
       {/* Header */}
       <DiscoverHeader
         location={selectedLocation}
-        viewMode={viewMode}
         activeFiltersCount={activeFilterCount}
         onLocationPress={openLocationModal}
         onFilterPress={openFilterModal}
-        onViewModeToggle={() =>
-          setViewMode(viewMode === 'single' ? 'grid' : 'single')
-        }
       />
 
       <NetworkGuard
@@ -628,9 +657,7 @@ const styles = StyleSheet.create({
 
   // Grid Container
   gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
   },
 
   // Error State

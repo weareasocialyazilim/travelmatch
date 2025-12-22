@@ -28,7 +28,7 @@ interface OnboardingPage {
 
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { logger } from '../../../utils/logger';
+import { logger } from '@/utils/logger';
 import { COLORS } from '@/constants/colors';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
@@ -53,7 +53,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Dynamic onboarding pages from i18n
-   
+
   const iconImage =
     require('../../../../assets/icon.png') as ImageSourcePropType;
 

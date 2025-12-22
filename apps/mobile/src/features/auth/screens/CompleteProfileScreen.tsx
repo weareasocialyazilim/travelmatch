@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
   Platform,
-   
   ActionSheetIOS,
   Alert,
 } from 'react-native';
@@ -16,6 +15,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { LoadingState } from '@/components/LoadingState';
@@ -95,9 +95,16 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
           allowsEditing: true,
           aspect: [1, 1],
           quality: 0.8,
+          cameraType: ImagePicker.CameraType.front,
         });
         if (!result.canceled && result.assets[0]) {
-          setValue('avatar', result.assets[0].uri);
+          // Flip selfie horizontally to correct mirror effect
+          const manipulated = await manipulateAsync(
+            result.assets[0].uri,
+            [{ flip: 'horizontal' as const }],
+            { compress: 0.8, format: SaveFormat.JPEG },
+          );
+          setValue('avatar', manipulated.uri);
         }
       } else {
         const { status } =

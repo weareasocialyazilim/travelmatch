@@ -5,13 +5,8 @@
 
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import {
-  Text,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+import { Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '../theme/typography';
 import { radii } from '../constants/radii';

@@ -57,7 +57,9 @@ const MatchConfirmationScreen: React.FC = () => {
           <View
             style={styles.giverCard}
             accessible={true}
-            accessibilityLabel={`${item.name}, offering $${item.amount.toFixed(2)}`}
+            accessibilityLabel={`${item.name}, offering $${item.amount.toFixed(
+              2,
+            )}`}
           >
             <Image
               source={{ uri: item.avatar }}

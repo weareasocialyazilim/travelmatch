@@ -25,6 +25,7 @@ import {
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useMoments, type Moment } from '@/hooks/useMoments';
+import { usePayments } from '@/hooks/usePayments';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -43,6 +44,15 @@ const ProfileScreen: React.FC = () => {
   const { user: authUser, isLoading: _authLoading } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
+  // Get wallet balance and transactions data
+  const { balance, transactions, refreshBalance, loadTransactions } =
+    usePayments();
+
+  // Calculate gifts sent from transactions
+  const giftsSentCount = useMemo(() => {
+    return transactions.filter((t) => t.type === 'gift_sent').length;
+  }, [transactions]);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -54,15 +64,24 @@ const ProfileScreen: React.FC = () => {
     };
     if (authUser) {
       fetchProfile();
+      refreshBalance(); // Fetch wallet balance
+      loadTransactions(); // Fetch transactions for gifts count
     }
-  }, [authUser]);
+  }, [authUser, refreshBalance, loadTransactions]);
 
   // Get moments
-  const { myMoments, myMomentsLoading, loadMyMoments } = useMoments();
+  const {
+    myMoments,
+    myMomentsLoading,
+    loadMyMoments,
+    savedMoments,
+    loadSavedMoments,
+  } = useMoments();
 
   useEffect(() => {
     loadMyMoments();
-  }, [loadMyMoments]);
+    loadSavedMoments();
+  }, [loadMyMoments, loadSavedMoments]);
 
   // User data - merge auth user with profile data
   const userData = useMemo(() => {
@@ -97,9 +116,9 @@ const ProfileScreen: React.FC = () => {
         ).length,
         completedMoments: myMoments.filter((m) => m.status === 'completed')
           .length,
-        walletBalance: PROFILE_DEFAULTS.WALLET_BALANCE, // Will be fetched from wallet service
-        giftsSentCount: userProfile?.giftsSent || 0,
-        savedCount: PROFILE_DEFAULTS.SAVED_COUNT, // Will be fetched from saved items service
+        walletBalance: balance?.available ?? 0, // Real wallet balance from API
+        giftsSentCount: giftsSentCount, // Real gifts count from transactions
+        savedCount: savedMoments.length, // Real saved moments count
       };
     }
 

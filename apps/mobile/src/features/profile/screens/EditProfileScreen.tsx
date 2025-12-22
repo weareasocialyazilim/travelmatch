@@ -16,6 +16,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,6 +29,7 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
+import { CityAutocomplete } from '@/components/CityAutocomplete';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -136,10 +138,17 @@ const EditProfileScreen = () => {
           allowsEditing: true,
           aspect: [1, 1],
           quality: 0.8,
+          cameraType: ImagePicker.CameraType.front,
         });
 
         if (!result.canceled && result.assets[0]) {
-          setAvatarUri(result.assets[0].uri);
+          // Flip selfie horizontally to correct mirror effect
+          const manipulated = await manipulateAsync(
+            result.assets[0].uri,
+            [{ flip: 'horizontal' as const }],
+            { compress: 0.8, format: SaveFormat.JPEG },
+          );
+          setAvatarUri(manipulated.uri);
         }
       } else {
         const { status } =
@@ -183,9 +192,9 @@ const EditProfileScreen = () => {
         await userService.updateAvatar(avatarUri);
       }
 
-      // Update profile
+      // Update profile - convert to snake_case for database
       await userService.updateProfile({
-        fullName: data.fullName,
+        full_name: data.fullName,
         username: data.username,
         bio: data.bio,
         location: data.location
@@ -303,12 +312,14 @@ const EditProfileScreen = () => {
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets
         >
           {/* Avatar Section */}
           <TouchableOpacity
@@ -479,10 +490,10 @@ const EditProfileScreen = () => {
           </View>
 
           {/* Location Section */}
-          <View style={styles.section}>
+          <View style={[styles.section, { zIndex: 100 }]}>
             <Text style={styles.sectionTitle}>LOCATION</Text>
 
-            <View style={styles.inputCard}>
+            <View style={[styles.inputCard, { overflow: 'visible' }]}>
               {/* Location */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Location</Text>
@@ -490,29 +501,15 @@ const EditProfileScreen = () => {
                   control={control}
                   name="location"
                   render={({
-                    field: { onChange, onBlur, value },
+                    field: { onChange, value },
                     fieldState: { error },
                   }) => (
-                    <>
-                      <View style={styles.locationInputContainer}>
-                        <MaterialCommunityIcons
-                          name="map-marker"
-                          size={18}
-                          color={COLORS.textSecondary}
-                        />
-                        <TextInput
-                          style={[styles.textInput, styles.locationInput]}
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          placeholder="City, Country"
-                          placeholderTextColor={COLORS.textSecondary}
-                        />
-                      </View>
-                      {error && (
-                        <Text style={styles.errorText}>{error.message}</Text>
-                      )}
-                    </>
+                    <CityAutocomplete
+                      value={value || ''}
+                      onSelect={onChange}
+                      placeholder="City, Country"
+                      error={error?.message}
+                    />
                   )}
                 />
               </View>

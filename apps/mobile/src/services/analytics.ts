@@ -53,9 +53,22 @@ class AnalyticsService {
         process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://us.posthog.com';
 
       if (!apiKey) {
-        logger.warn(
-          '[Analytics] PostHog API key not found, analytics disabled',
-        );
+        // In development, analytics being disabled is expected
+        if (__DEV__) {
+          logger.debug(
+            '[Analytics] PostHog API key not configured (optional in development)',
+          );
+        } else {
+          logger.warn(
+            '[Analytics] PostHog API key not found, analytics disabled',
+          );
+        }
+        return;
+      }
+
+      // Check if PostHog.initAsync exists (may not be available in all environments)
+      if (typeof PostHog?.initAsync !== 'function') {
+        logger.warn('[Analytics] PostHog.initAsync not available');
         return;
       }
 

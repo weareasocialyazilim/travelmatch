@@ -45,6 +45,7 @@ export const RequestAdditionalProofBottomSheet: React.FC<
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.backdrop} />

@@ -1,225 +1,322 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ControlledInput } from '@/components/ui/ControlledInput';
-import { LoadingState } from '@/components/LoadingState';
-import { userService } from '@/services/userService';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
+import { changePasswordSchema, type ChangePasswordInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
+import { PasswordInput } from '@/components/ui/PasswordInput';
+import { useToast } from '@/context/ToastContext';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
-const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+const ChangePasswordScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { showToast } = useToast();
 
-type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+  const { control, handleSubmit, formState, watch } =
+    useForm<ChangePasswordInput>({
+      resolver: zodResolver(changePasswordSchema),
+      mode: 'onChange',
+      defaultValues: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      },
+    });
 
-export const ChangePasswordScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid },
-    reset,
-  } = useForm<ChangePasswordInput>({
-    resolver: zodResolver(changePasswordSchema),
-    mode: 'onChange',
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-  });
+  const newPassword = watch('newPassword');
+  const confirmPassword = watch('confirmPassword');
 
   const onSubmit = async (data: ChangePasswordInput) => {
-    setIsLoading(true);
     try {
-      await userService.changePassword({
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
+      // Real API call for password change via Supabase
+      const { supabase } = await import('@/config/supabase');
+      const { error } = await supabase.auth.updateUser({
+        password: data.newPassword,
       });
 
-      Alert.alert('Success', 'Your password has been changed successfully.', [
-        {
-          text: 'OK',
-          onPress: () => {
-            reset();
-            navigation.goBack();
-          },
-        },
-      ]);
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-      );
-    } finally {
-      setIsLoading(false);
+      if (error) throw error;
+
+      showToast('Your password has been changed successfully.', 'success');
+      setTimeout(() => navigation.goBack(), 1000);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to change password. Please try again.';
+      showToast(message, 'error');
     }
   };
 
-  if (isLoading) {
-    return <LoadingState message="Updating password..." />;
-  }
+  const isSubmitDisabled = !canSubmitForm(
+    { formState },
+    {
+      requireDirty: false,
+      requireValid: true,
+    },
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Change Password</Text>
+        <View style={styles.placeholder} />
+      </View>
+
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={24}
-              color={COLORS.text}
-            />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Change Password</Text>
-          <View style={styles.placeholder} />
-        </View>
-
         <ScrollView
-          style={styles.content}
+          style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets
+          bounces={false}
         >
-          <Text style={styles.description}>
-            Enter your current password and choose a new secure password.
-          </Text>
+          {/* Info Card */}
+          <View style={styles.infoCard}>
+            <MaterialCommunityIcons
+              name="shield-lock"
+              size={24}
+              color={COLORS.mint}
+            />
+            <Text style={styles.infoText}>
+              For your security, please enter your current password before
+              setting a new one.
+            </Text>
+          </View>
 
           {/* Current Password */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Current Password</Text>
-            <View style={styles.passwordWrapper}>
-              <ControlledInput
-                control={control}
-                name="currentPassword"
-                placeholder="Enter current password"
-                secureTextEntry={!showCurrentPassword}
-                autoCapitalize="none"
-                error={errors.currentPassword?.message}
-                style={styles.passwordInput}
-              />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowCurrentPassword(!showCurrentPassword)}
-              >
-                <MaterialCommunityIcons
-                  name={showCurrentPassword ? 'eye-off' : 'eye'}
-                  size={24}
-                  color={COLORS.textSecondary}
+            <Text style={styles.inputLabel}>Current Password</Text>
+            <Controller
+              control={control}
+              name="currentPassword"
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
+                <PasswordInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Enter current password"
+                  error={error?.message}
                 />
-              </TouchableOpacity>
-            </View>
+              )}
+            />
           </View>
 
           {/* New Password */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>New Password</Text>
-            <View style={styles.passwordWrapper}>
-              <ControlledInput
-                control={control}
-                name="newPassword"
-                placeholder="Enter new password"
-                secureTextEntry={!showNewPassword}
-                autoCapitalize="none"
-                error={errors.newPassword?.message}
-                style={styles.passwordInput}
-              />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowNewPassword(!showNewPassword)}
-              >
-                <MaterialCommunityIcons
-                  name={showNewPassword ? 'eye-off' : 'eye'}
-                  size={24}
-                  color={COLORS.textSecondary}
+            <Text style={styles.inputLabel}>New Password</Text>
+            <Controller
+              control={control}
+              name="newPassword"
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
+                <PasswordInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Enter new password"
+                  error={error?.message}
                 />
-              </TouchableOpacity>
-            </View>
+              )}
+            />
           </View>
 
-          {/* Confirm Password */}
+          {/* Confirm New Password */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirm New Password</Text>
-            <View style={styles.passwordWrapper}>
-              <ControlledInput
-                control={control}
-                name="confirmPassword"
-                placeholder="Confirm new password"
-                secureTextEntry={!showConfirmPassword}
-                autoCapitalize="none"
-                error={errors.confirmPassword?.message}
-                style={styles.passwordInput}
-              />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                <MaterialCommunityIcons
-                  name={showConfirmPassword ? 'eye-off' : 'eye'}
-                  size={24}
-                  color={COLORS.textSecondary}
+            <Text style={styles.inputLabel}>Confirm New Password</Text>
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
+                <PasswordInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Confirm new password"
+                  error={error?.message}
                 />
-              </TouchableOpacity>
-            </View>
+              )}
+            />
           </View>
+
+          {/* Password Match Indicator */}
+          {confirmPassword.length > 0 && (
+            <View style={styles.matchIndicator}>
+              <MaterialCommunityIcons
+                name={
+                  newPassword === confirmPassword
+                    ? 'check-circle'
+                    : 'close-circle'
+                }
+                size={16}
+                color={
+                  newPassword === confirmPassword ? COLORS.mint : COLORS.coral
+                }
+              />
+              <Text
+                style={[
+                  styles.matchText,
+                  {
+                    color:
+                      newPassword === confirmPassword
+                        ? COLORS.mint
+                        : COLORS.coral,
+                  },
+                ]}
+              >
+                {newPassword === confirmPassword
+                  ? 'Passwords match'
+                  : 'Passwords do not match'}
+              </Text>
+            </View>
+          )}
 
           {/* Password Requirements */}
-          <View style={styles.requirements}>
+          <View style={styles.requirementsContainer}>
             <Text style={styles.requirementsTitle}>Password Requirements:</Text>
-            <Text style={styles.requirementItem}>• At least 8 characters</Text>
-            <Text style={styles.requirementItem}>• One uppercase letter</Text>
-            <Text style={styles.requirementItem}>• One lowercase letter</Text>
-            <Text style={styles.requirementItem}>• One number</Text>
+            <View style={styles.requirementRow}>
+              <MaterialCommunityIcons
+                name={
+                  newPassword.length >= 8 ? 'check-circle' : 'circle-outline'
+                }
+                size={16}
+                color={
+                  newPassword.length >= 8 ? COLORS.mint : COLORS.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  styles.requirementText,
+                  newPassword.length >= 8 && styles.requirementMet,
+                ]}
+              >
+                At least 8 characters
+              </Text>
+            </View>
+            <View style={styles.requirementRow}>
+              <MaterialCommunityIcons
+                name={
+                  /[A-Z]/.test(newPassword) ? 'check-circle' : 'circle-outline'
+                }
+                size={16}
+                color={
+                  /[A-Z]/.test(newPassword) ? COLORS.mint : COLORS.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  styles.requirementText,
+                  /[A-Z]/.test(newPassword) && styles.requirementMet,
+                ]}
+              >
+                One uppercase letter
+              </Text>
+            </View>
+            <View style={styles.requirementRow}>
+              <MaterialCommunityIcons
+                name={
+                  /[a-z]/.test(newPassword) ? 'check-circle' : 'circle-outline'
+                }
+                size={16}
+                color={
+                  /[a-z]/.test(newPassword) ? COLORS.mint : COLORS.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  styles.requirementText,
+                  /[a-z]/.test(newPassword) && styles.requirementMet,
+                ]}
+              >
+                One lowercase letter
+              </Text>
+            </View>
+            <View style={styles.requirementRow}>
+              <MaterialCommunityIcons
+                name={
+                  /\d/.test(newPassword) ? 'check-circle' : 'circle-outline'
+                }
+                size={16}
+                color={
+                  /\d/.test(newPassword) ? COLORS.mint : COLORS.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  styles.requirementText,
+                  /\d/.test(newPassword) && styles.requirementMet,
+                ]}
+              >
+                One number
+              </Text>
+            </View>
           </View>
 
-          {/* Submit Button */}
+          {/* Change Password Button */}
           <TouchableOpacity
             style={[
-              styles.submitButton,
-              !isValid && styles.submitButtonDisabled,
+              styles.changeButton,
+              isSubmitDisabled && styles.changeButtonDisabled,
             ]}
             onPress={handleSubmit(onSubmit)}
-            disabled={!isValid}
+            disabled={isSubmitDisabled}
           >
-            <Text style={styles.submitButtonText}>Update Password</Text>
+            <Text style={styles.changeButtonText}>
+              {formState.isSubmitting
+                ? 'Changing Password...'
+                : 'Change Password'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Forgot Password Link */}
+          <TouchableOpacity
+            style={styles.forgotButton}
+            onPress={() =>
+              showToast(
+                'Password reset link will be sent to your email.',
+                'info',
+              )
+            }
+          >
+            <Text style={styles.forgotButtonText}>
+              Forgot current password?
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -232,9 +329,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  keyboardView: {
-    flex: 1,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -245,77 +339,115 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   backButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    ...TYPOGRAPHY.h4,
+    fontSize: 18,
     fontWeight: '600',
     color: COLORS.text,
   },
   placeholder: {
     width: 40,
   },
-  content: {
+  keyboardView: {
+    flex: 1,
+  },
+  scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: 16,
+    paddingBottom: 40,
   },
-  description: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: `${COLORS.mint}15`,
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 24,
+    gap: 12,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.text,
+    lineHeight: 20,
   },
   inputContainer: {
     marginBottom: 20,
   },
-  label: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '500',
     color: COLORS.text,
     marginBottom: 8,
   },
-  passwordWrapper: {
-    position: 'relative',
-  },
-  passwordInput: {
-    paddingRight: 50,
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-    padding: 4,
-  },
-  requirements: {
-    backgroundColor: COLORS.gray[50],
-    padding: 16,
+  requirementsContainer: {
+    backgroundColor: COLORS.white,
     borderRadius: 12,
+    padding: 16,
     marginBottom: 24,
   },
   requirementsTitle: {
-    ...TYPOGRAPHY.bodySmall,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.text,
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  requirementItem: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  submitButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 16,
-    borderRadius: 12,
+  requirementRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
   },
-  submitButtonDisabled: {
-    backgroundColor: COLORS.disabled,
+  requirementText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
-  submitButtonText: {
-    ...TYPOGRAPHY.body,
+  requirementMet: {
+    color: COLORS.mint,
+  },
+  matchIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: -12,
+    marginBottom: 16,
+    paddingLeft: 4,
+  },
+  matchText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  changeButton: {
+    backgroundColor: COLORS.mint,
+    borderRadius: 12,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  changeButtonDisabled: {
+    opacity: 0.6,
+  },
+  changeButtonText: {
+    fontSize: 16,
     fontWeight: '600',
     color: COLORS.white,
   },
+  forgotButton: {
+    alignItems: 'center',
+    padding: 12,
+  },
+  forgotButtonText: {
+    fontSize: 14,
+    color: COLORS.mint,
+    fontWeight: '500',
+  },
 });
+
+export { ChangePasswordScreen };

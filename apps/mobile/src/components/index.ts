@@ -28,6 +28,7 @@ export { ShareMomentBottomSheet } from './ShareMomentBottomSheet';
 export { LanguageSelectionBottomSheet } from './LanguageSelectionBottomSheet';
 export { CurrencySelectionBottomSheet } from './CurrencySelectionBottomSheet';
 export { ClearCacheDialog } from './ClearCacheDialog';
+export { CityAutocomplete } from './CityAutocomplete';
 export { AddBankAccountBottomSheet } from './AddBankAccountBottomSheet';
 export { WithdrawConfirmationModal } from './WithdrawConfirmationModal';
 export { LimitReachedModal } from './LimitReachedModal';

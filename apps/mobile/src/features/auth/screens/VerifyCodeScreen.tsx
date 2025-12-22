@@ -2,192 +2,104 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
   TextInput,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LoadingState } from '@/components/LoadingState';
-import {
-  verifyPhoneOtp,
-  verifyEmailOtp,
-  signInWithPhone,
-  signInWithMagicLink,
-} from '@/services/supabaseAuthService';
+import { useNavigation } from '@react-navigation/native';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
+import { verifyCodeSchema, type VerifyCodeInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
-type RouteParams = {
-  VerifyCode: {
-    verificationType: 'phone' | 'email';
-    contact: string;
-  };
-};
-
-const CODE_LENGTH = 6;
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 export const VerifyCodeScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const route = useRoute<RouteProp<RouteParams, 'VerifyCode'>>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
-  const [resendTimer, setResendTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
-
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [timer, setTimer] = useState(34);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
-  const verificationType = route.params?.verificationType || 'phone';
-  const contact = route.params?.contact || '';
+  const { handleSubmit, formState, setValue } = useForm<VerifyCodeInput>({
+    resolver: zodResolver(verifyCodeSchema),
+    mode: 'onChange',
+    defaultValues: {
+      code: '',
+    },
+  });
 
   useEffect(() => {
-    if (resendTimer > 0) {
-      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setCanResend(true);
-    }
-  }, [resendTimer]);
+    // Auto-focus first input
+    inputRefs.current[0]?.focus();
+  }, []);
 
-  const handleCodeChange = (value: string, index: number) => {
-    // Only allow digits
-    if (value && !/^\d$/.test(value)) return;
+  useEffect(() => {
+    // Countdown timer
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
+  const handleCodeChange = (text: string, index: number) => {
+    // Only allow numbers
+    if (text && !/^\d$/.test(text)) return;
 
     const newCode = [...code];
-    newCode[index] = value;
+    newCode[index] = text;
     setCode(newCode);
 
-    // Auto-focus next input
-    if (value && index < CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
+    // Update form value
+    const fullCode = newCode.join('');
+    setValue('code', fullCode, { shouldValidate: true });
 
-    // Auto-submit when all digits entered
-    if (
-      newCode.every((digit) => digit !== '') &&
-      newCode.join('').length === CODE_LENGTH
-    ) {
-      handleVerify(newCode.join(''));
+    // Auto-focus next input
+    if (text && index < 5) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyPress = (key: string, index: number) => {
+    // Handle backspace
     if (key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handleVerify = async (verificationCode: string) => {
-    if (verificationCode.length !== CODE_LENGTH) {
-      Alert.alert('Error', 'Please enter the complete verification code');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      let result;
-      if (verificationType === 'phone') {
-        result = await verifyPhoneOtp(contact, verificationCode);
-      } else {
-        result = await verifyEmailOtp(contact, verificationCode);
-      }
-
-      if (result.error) {
-        Alert.alert(
-          'Error',
-          result.error.message || 'Invalid verification code',
-        );
-        setCode(Array(CODE_LENGTH).fill(''));
-        inputRefs.current[0]?.focus();
-        return;
-      }
-
-      if (result.session) {
-        // Successfully authenticated
-        Alert.alert('Success', 'Your account has been verified!', [
-          {
-            text: 'Continue',
-            onPress: () => {
-              // Navigation will be handled by auth state change
-            },
-          },
-        ]);
-      }
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-      );
-      setCode(Array(CODE_LENGTH).fill(''));
+  const handleResend = () => {
+    if (timer === 0) {
+      setTimer(34);
+      setCode(['', '', '', '', '', '']);
+      setValue('code', '');
       inputRefs.current[0]?.focus();
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handleResendCode = async () => {
-    if (!canResend) return;
-
-    setIsLoading(true);
-    try {
-      let result;
-      if (verificationType === 'phone') {
-        result = await signInWithPhone(contact);
-      } else {
-        result = await signInWithMagicLink(contact);
-      }
-
-      if (result.error) {
-        Alert.alert('Error', result.error.message || 'Failed to resend code');
-        return;
-      }
-
-      Alert.alert('Success', 'A new verification code has been sent');
-      setResendTimer(60);
-      setCanResend(false);
-      setCode(Array(CODE_LENGTH).fill(''));
-      inputRefs.current[0]?.focus();
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-      );
-    } finally {
-      setIsLoading(false);
-    }
+  const onVerify = (_data: VerifyCodeInput) => {
+    // Navigate to success or next screen
+    navigation.navigate('SuccessConfirmation');
   };
-
-  const formatContact = () => {
-    if (verificationType === 'phone') {
-      // Mask phone number for display
-      if (contact.length > 4) {
-        return `${contact.slice(0, 3)}****${contact.slice(-4)}`;
-      }
-      return contact;
-    }
-    // Mask email for display
-    const parts = contact.split('@');
-    const local = parts[0];
-    const domain = parts[1];
-    if (local && local.length > 2 && domain) {
-      return `${local.slice(0, 2)}***@${domain}`;
-    }
-    return contact;
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
-
-  if (isLoading) {
-    return <LoadingState message="Verifying..." />;
-  }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -196,93 +108,72 @@ export const VerifyCodeScreen: React.FC = () => {
             style={styles.backButton}
           >
             <MaterialCommunityIcons
-              name="arrow-left"
+              name={'arrow-left' as IconName}
               size={24}
-              color={COLORS.text}
+              color={COLORS.textSecondary}
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Verify Code</Text>
-          <View style={styles.placeholder} />
+          <Text style={styles.headerTitle}>Verify your code</Text>
+          <View style={styles.headerSpacer} />
         </View>
 
-        <View style={styles.content}>
-          {/* Icon */}
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              name={
-                verificationType === 'phone'
-                  ? 'message-text-lock'
-                  : 'email-lock'
-              }
-              size={64}
-              color={COLORS.primary}
-            />
-          </View>
+        {/* Main Content */}
+        <View style={styles.main}>
+          {/* Headline */}
+          <Text style={styles.headline}>Enter the 6-digit code</Text>
 
-          <Text style={styles.title}>Enter Verification Code</Text>
-          <Text style={styles.description}>
-            We sent a {CODE_LENGTH}-digit code to{'\n'}
-            <Text style={styles.contactText}>{formatContact()}</Text>
-          </Text>
+          {/* Body */}
+          <Text style={styles.body}>We sent it to your email.</Text>
 
-          {/* Code Input */}
-          <View style={styles.codeContainer}>
+          {/* OTP Input */}
+          <View style={styles.otpContainer}>
             {code.map((digit, index) => (
               <TextInput
-                key={`code-input-${index}`}
+                key={`otp-input-${index}`}
                 ref={(ref) => {
                   inputRefs.current[index] = ref;
                 }}
-                style={[
-                  styles.codeInput,
-                  digit ? styles.codeInputFilled : null,
-                ]}
+                style={[styles.otpInput, digit && styles.otpInputFilled]}
                 value={digit}
-                onChangeText={(value) => handleCodeChange(value, index)}
+                onChangeText={(text) => handleCodeChange(text, index)}
                 onKeyPress={({ nativeEvent }) =>
                   handleKeyPress(nativeEvent.key, index)
                 }
                 keyboardType="number-pad"
                 maxLength={1}
                 selectTextOnFocus
-                autoFocus={index === 0}
               />
             ))}
           </View>
 
-          {/* Verify Button */}
+          {/* Resend Code */}
+          <View style={styles.resendContainer}>
+            <Text style={styles.resendText}>Didn&apos;t receive a code? </Text>
+            <TouchableOpacity onPress={handleResend} disabled={timer > 0}>
+              <Text
+                style={[
+                  styles.resendButton,
+                  timer > 0 && styles.resendButtonDisabled,
+                ]}
+              >
+                Resend
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.timerText}> ({formatTime(timer)})</Text>
+          </View>
+        </View>
+
+        {/* Sticky Bottom Button */}
+        <View style={styles.footer}>
           <TouchableOpacity
             style={[
               styles.verifyButton,
-              code.some((d) => !d) && styles.verifyButtonDisabled,
+              !canSubmitForm({ formState }) && styles.verifyButtonDisabled,
             ]}
-            onPress={() => handleVerify(code.join(''))}
-            disabled={code.some((d) => !d)}
+            onPress={handleSubmit(onVerify)}
+            disabled={!canSubmitForm({ formState })}
           >
-            <Text style={styles.verifyButtonText}>Verify</Text>
-          </TouchableOpacity>
-
-          {/* Resend Code */}
-          <View style={styles.resendContainer}>
-            <Text style={styles.resendText}>Didn't receive the code?</Text>
-            {canResend ? (
-              <TouchableOpacity onPress={handleResendCode}>
-                <Text style={styles.resendLink}>Resend Code</Text>
-              </TouchableOpacity>
-            ) : (
-              <Text style={styles.resendTimer}>Resend in {resendTimer}s</Text>
-            )}
-          </View>
-
-          {/* Change Method */}
-          <TouchableOpacity
-            style={styles.changeMethodButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.changeMethodText}>
-              Wrong {verificationType === 'phone' ? 'phone number' : 'email'}?{' '}
-              <Text style={styles.changeMethodLink}>Change</Text>
-            </Text>
+            <Text style={styles.verifyButtonText}>Verify and continue</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -302,8 +193,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    height: 64,
     paddingHorizontal: 16,
-    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -311,103 +202,97 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   headerTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '600',
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '700',
     color: COLORS.text,
+    marginRight: 40, // Offset back button width
   },
-  placeholder: {
+  headerSpacer: {
     width: 40,
   },
-  content: {
+  main: {
     flex: 1,
-    padding: 24,
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 64,
   },
-  iconContainer: {
-    marginTop: 24,
-    marginBottom: 24,
-  },
-  title: {
-    ...TYPOGRAPHY.h2,
+  headline: {
+    fontSize: 30,
     fontWeight: '700',
     color: COLORS.text,
     textAlign: 'center',
-    marginBottom: 12,
+    letterSpacing: -0.5,
   },
-  description: {
-    ...TYPOGRAPHY.body,
+  body: {
+    marginTop: 8,
+    fontSize: 16,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: 32,
   },
-  contactText: {
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  codeContainer: {
+  otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 12,
-    marginBottom: 32,
-  },
-  codeInput: {
-    width: 48,
-    height: 56,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    fontSize: 24,
-    fontWeight: '700',
-    textAlign: 'center',
-    color: COLORS.text,
-    backgroundColor: COLORS.white,
-  },
-  codeInputFilled: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '10',
-  },
-  verifyButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 64,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  verifyButtonDisabled: {
-    backgroundColor: COLORS.disabled,
-  },
-  verifyButtonText: {
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  resendContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  resendText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  resendLink: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  resendTimer: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textTertiary,
-  },
-  changeMethodButton: {
+    marginTop: 32,
     paddingVertical: 12,
   },
-  changeMethodText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+  otpInput: {
+    width: 48,
+    height: 56,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.background,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.text,
   },
-  changeMethodLink: {
-    color: COLORS.primary,
+  otpInputFilled: {
+    borderColor: COLORS.primary,
+  },
+  resendContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  resendText: {
+    fontSize: 14,
+    color: COLORS.textTertiary,
+  },
+  resendButton: {
+    fontSize: 14,
     fontWeight: '600',
+    color: COLORS.primary,
+    textDecorationLine: 'underline',
+  },
+  resendButtonDisabled: {
+    color: COLORS.textTertiary,
+    textDecorationLine: 'none',
+  },
+  timerText: {
+    fontSize: 14,
+    color: COLORS.textTertiary,
+  },
+  footer: {
+    padding: 16,
+    backgroundColor: COLORS.background,
+  },
+  verifyButton: {
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verifyButtonDisabled: {
+    backgroundColor: COLORS.buttonDisabled,
+  },
+  verifyButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.white,
   },
 });

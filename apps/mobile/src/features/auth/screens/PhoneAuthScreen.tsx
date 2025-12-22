@@ -1,309 +1,430 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ControlledInput } from '@/components/ui/ControlledInput';
+import { phoneAuthSchema, type PhoneAuthInput } from '@/utils/forms/schemas';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
-import { signInWithPhone } from '@/services/supabaseAuthService';
-import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
+import { COLORS, CARD_SHADOW } from '@/constants/colors';
+import { LAYOUT } from '@/constants/layout';
+import { VALUES } from '@/constants/values';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
-const phoneSchema = z.object({
-  phone: z
-    .string()
-    .min(10, 'Phone number must be at least 10 digits')
-    .regex(
-      /^\+?[1-9]\d{9,14}$/,
-      'Please enter a valid phone number with country code (e.g., +1234567890)',
-    ),
-});
+type PhoneAuthScreenProps = StackScreenProps<RootStackParamList, 'PhoneAuth'>;
 
-type PhoneInput = z.infer<typeof phoneSchema>;
-
-type PhoneAuthNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'PhoneAuth'
->;
-
-export const PhoneAuthScreen: React.FC = () => {
-  const navigation = useNavigation<PhoneAuthNavigationProp>();
-  const [isLoading, setIsLoading] = useState(false);
+export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
+  navigation,
+}) => {
+  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']); // UI state for OTP inputs
+  const [loading, setLoading] = useState(false);
+  const otpInputs = useRef<(TextInput | null)[]>([]);
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<PhoneInput>({
-    resolver: zodResolver(phoneSchema),
-    mode: 'onChange',
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<PhoneAuthInput>({
+    resolver: zodResolver(phoneAuthSchema),
     defaultValues: {
       phone: '',
+      otp: '',
     },
   });
 
-  const onSubmit = async (data: PhoneInput) => {
-    setIsLoading(true);
-    try {
-      const { error } = await signInWithPhone(data.phone);
+  const phoneNumber = watch('phone');
 
-      if (error) {
-        Alert.alert(
-          'Error',
-          error.message || 'Failed to send verification code',
-        );
-        return;
-      }
+  const onSendOTP = (_data: PhoneAuthInput) => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setStep('otp');
+      setLoading(false);
+    }, 1000);
+  };
 
-      // Navigate to verification screen with phone number
-      navigation.navigate('VerifyCode', {
-        verificationType: 'phone',
-        contact: data.phone,
-      });
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-      );
-    } finally {
-      setIsLoading(false);
+  const onVerifyOTP = (_data: PhoneAuthInput) => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setLoading(false);
+      navigation.replace('Discover'); // Navigate to discover on success
+    }, 1000);
+  };
+
+  const handleOtpChange = (value: string, index: number) => {
+    if (value.length > 1) {
+      return;
+    }
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Sync to form
+    const fullCode = newOtp.join('');
+    setValue('otp', fullCode, { shouldValidate: true });
+
+    // Focus next input
+    if (value && index < 5) {
+      otpInputs.current[index + 1]?.focus();
     }
   };
 
-  if (isLoading) {
-    return <LoadingState message="Sending verification code..." />;
-  }
+  const handleOtpKeyPress = (key: string, index: number) => {
+    if (key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputs.current[index - 1]?.focus();
+    }
+  };
+
+  const renderPhoneStep = () => (
+    <>
+      <View style={styles.header}>
+        <Icon name="cellphone-key" size={64} color={COLORS.primary} />
+        <Text style={styles.title}>Enter Your Phone</Text>
+        <Text style={styles.subtitle}>
+          We&apos;ll send you a verification code to confirm your number
+        </Text>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <View style={styles.phoneInputWrapper}>
+          <Text style={styles.countryCode}>+1</Text>
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.phoneInput}
+                placeholder="(555) 123-4567"
+                placeholderTextColor={COLORS.textSecondary}
+                keyboardType="phone-pad"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                maxLength={14}
+                autoFocus
+              />
+            )}
+          />
+        </View>
+        {errors.phone && (
+          <Text style={styles.errorText}>{errors.phone.message}</Text>
+        )}
+      </View>
+
+      <TouchableOpacity
+        style={styles.primaryButton}
+        onPress={handleSubmit(onSendOTP)}
+        disabled={loading}
+        activeOpacity={0.8}
+      >
+        <LinearGradient
+          colors={[COLORS.primary, COLORS.accent]}
+          style={styles.buttonGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.buttonText}>Send Code</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </>
+  );
+
+  const renderOtpStep = () => (
+    <>
+      <View style={styles.header}>
+        <Icon name="message-text" size={64} color={COLORS.primary} />
+        <Text style={styles.title}>Verify Your Phone</Text>
+        <Text style={styles.subtitle}>
+          Enter the 6-digit code sent to{'\n'}
+          <Text style={styles.phoneDisplay}>{phoneNumber}</Text>
+        </Text>
+      </View>
+
+      <View style={styles.otpContainer}>
+        {otp.map((digit, index) => (
+          <TextInput
+            key={`otp-input-${index}`}
+            ref={(ref) => {
+              otpInputs.current[index] = ref;
+            }}
+            style={styles.otpInput}
+            value={digit}
+            onChangeText={(value) => handleOtpChange(value, index)}
+            onKeyPress={({ nativeEvent }) =>
+              handleOtpKeyPress(nativeEvent.key, index)
+            }
+            keyboardType="number-pad"
+            maxLength={1}
+            selectTextOnFocus
+          />
+        ))}
+      </View>
+
+      {errors.otp && <Text style={styles.errorText}>{errors.otp.message}</Text>}
+
+      <TouchableOpacity
+        style={styles.primaryButton}
+        onPress={handleSubmit(onVerifyOTP)}
+        disabled={loading}
+        activeOpacity={0.8}
+      >
+        <LinearGradient
+          colors={[COLORS.primary, COLORS.accent]}
+          style={styles.buttonGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.buttonText}>Verify Code</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.resendButton}
+        onPress={handleSubmit(onSendOTP)}
+      >
+        <Text style={styles.resendText}>Didn&apos;t receive code? </Text>
+        <Text style={[styles.resendText, styles.resendLink]}>Resend</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.changeNumberButton}
+        onPress={() => {
+          setStep('phone');
+          setOtp(['', '', '', '', '', '']);
+          setValue('otp', '');
+        }}
+      >
+        <Text style={styles.changeNumberText}>Change Phone Number</Text>
+      </TouchableOpacity>
+    </>
+  );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {loading && (
+        <LoadingState
+          type="overlay"
+          message={step === 'phone' ? 'Sending...' : 'Verifying...'}
+        />
+      )}
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={24}
-              color={COLORS.text}
-            />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Phone Authentication</Text>
-          <View style={styles.placeholder} />
+        <View style={styles.outerContent}>
+          <View style={styles.cardContainer}>
+            <View style={styles.cardInner}>
+              {/* Back Button */}
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Icon name="arrow-left" size={20} color={COLORS.text} />
+              </TouchableOpacity>
+
+              <View style={styles.content}>
+                {step === 'phone' ? renderPhoneStep() : renderOtpStep()}
+
+                {/* Üye olmadan devam et butonu */}
+                <TouchableOpacity
+                  style={styles.continueWithoutSignupButton}
+                  onPress={() => navigation.replace('Discover')}
+                  activeOpacity={0.85}
+                >
+                  <LinearGradient
+                    colors={[COLORS.primary, COLORS.mint]}
+                    style={styles.continueWithoutSignupGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Text style={styles.continueWithoutSignupText}>
+                      Üye olmadan devam et
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
         </View>
-
-        <ScrollView
-          style={styles.content}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* Icon */}
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              name="cellphone-message"
-              size={64}
-              color={COLORS.primary}
-            />
-          </View>
-
-          <Text style={styles.title}>Enter Your Phone Number</Text>
-          <Text style={styles.description}>
-            We'll send you a verification code to confirm your phone number.
-            Please include your country code.
-          </Text>
-
-          {/* Phone Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Phone Number</Text>
-            <ControlledInput
-              control={control}
-              name="phone"
-              placeholder="+1 234 567 8900"
-              keyboardType="phone-pad"
-              autoCapitalize="none"
-              autoComplete="tel"
-              error={errors.phone?.message}
-            />
-            <Text style={styles.hint}>
-              Enter your phone number with country code (e.g., +1 for US)
-            </Text>
-          </View>
-
-          {/* Submit Button */}
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              !isValid && styles.submitButtonDisabled,
-            ]}
-            onPress={handleSubmit(onSubmit)}
-            disabled={!isValid}
-          >
-            <Text style={styles.submitButtonText}>Send Verification Code</Text>
-          </TouchableOpacity>
-
-          {/* Alternative Auth */}
-          <View style={styles.alternativeContainer}>
-            <Text style={styles.alternativeText}>Or sign in with</Text>
-            <TouchableOpacity
-              style={styles.alternativeButton}
-              onPress={() => navigation.navigate('EmailAuth' as never)}
-            >
-              <MaterialCommunityIcons
-                name="email"
-                size={20}
-                color={COLORS.primary}
-              />
-              <Text style={styles.alternativeButtonText}>Email</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Back to Login */}
-          <TouchableOpacity
-            style={styles.loginLink}
-            onPress={() => navigation.navigate('Login' as never)}
-          >
-            <Text style={styles.loginLinkText}>
-              Already have an account?{' '}
-              <Text style={styles.loginLinkBold}>Sign In</Text>
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  backButton: {
+    marginLeft: LAYOUT.padding,
+    padding: LAYOUT.padding * 1.5,
+  },
+  buttonGradient: {
+    alignItems: 'center',
+    paddingVertical: LAYOUT.padding * 2,
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  cardContainer: {
+    alignSelf: 'center',
+    borderRadius: VALUES.borderRadius * 2,
+    maxWidth: 420,
+    overflow: 'hidden',
+    width: '100%',
+    ...CARD_SHADOW,
+    marginVertical: LAYOUT.padding * 2,
+  },
+  cardInner: {
+    backgroundColor: COLORS.card,
+    padding: LAYOUT.padding * 2,
+  },
+  changeNumberButton: {
+    alignItems: 'center',
+    paddingVertical: LAYOUT.padding,
+  },
+  changeNumberText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
   container: {
-    flex: 1,
     backgroundColor: COLORS.background,
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: LAYOUT.padding * 2,
+  },
+  continueWithoutSignupButton: {
+    borderRadius: 12,
+    marginTop: 24,
+    overflow: 'hidden',
+  },
+  continueWithoutSignupGradient: {
+    alignItems: 'center',
+    borderRadius: 12,
+    paddingVertical: 14,
+  },
+  continueWithoutSignupText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  countryCode: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '600',
+    marginRight: LAYOUT.padding,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: LAYOUT.padding * 4,
+  },
+  inputContainer: {
+    marginBottom: LAYOUT.padding * 3,
   },
   keyboardView: {
     flex: 1,
   },
-  header: {
+  otpContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    marginBottom: LAYOUT.padding * 3,
   },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '600',
+  otpInput: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
     color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '700',
+    height: 60,
+    textAlign: 'center',
+    width: 50,
   },
-  placeholder: {
-    width: 40,
-  },
-  content: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 24,
-  },
-  iconContainer: {
+  outerContent: {
     alignItems: 'center',
-    marginBottom: 24,
+    backgroundColor: COLORS.background,
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: LAYOUT.padding * 2,
+  },
+  phoneDisplay: {
+    color: COLORS.primary,
+    fontWeight: '700',
+  },
+  phoneInput: {
+    color: COLORS.text,
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  phoneInputWrapper: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.border,
+    borderRadius: VALUES.borderRadius,
+    borderWidth: 2,
+    flexDirection: 'row',
+    paddingHorizontal: LAYOUT.padding * 1.5,
+  },
+  primaryButton: {
+    borderRadius: VALUES.borderRadius,
+    marginBottom: LAYOUT.padding * 2,
+    overflow: 'hidden',
+  },
+  resendButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: LAYOUT.padding,
+  },
+  resendLink: {
+    color: COLORS.primary,
+    fontWeight: '700',
+  },
+  resendText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: LAYOUT.padding,
+    textAlign: 'center',
+  },
+  subtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
+    textAlign: 'center',
   },
   title: {
-    ...TYPOGRAPHY.h2,
-    fontWeight: '700',
     color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  description: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  label: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  hint: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.textTertiary,
-    marginTop: 4,
-  },
-  submitButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  submitButtonDisabled: {
-    backgroundColor: COLORS.disabled,
-  },
-  submitButtonText: {
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  alternativeContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  alternativeText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-    marginBottom: 12,
-  },
-  alternativeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-  },
-  alternativeButtonText: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.primary,
-    marginLeft: 8,
-  },
-  loginLink: {
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  loginLinkText: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
-  },
-  loginLinkBold: {
-    color: COLORS.primary,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: LAYOUT.padding,
+    marginTop: LAYOUT.padding * 2,
   },
 });

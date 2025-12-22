@@ -52,6 +52,7 @@ export interface UpdateProfilePayload {
   coverImage?: string;
   cover_image?: string;
   full_name?: string;
+  username?: string;
   bio?: string;
   location?: unknown;
   languages?: string[];

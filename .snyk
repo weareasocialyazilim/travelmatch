@@ -145,6 +145,12 @@ ignore:
     - '**/scripts/test-*.ts':
         reason: 'Test scripts use intentional test credentials for API testing, not real passwords.'
         expires: 2099-12-31T00:00:00.000Z
+    - '**/scripts/seed-*.ts':
+        reason: 'Seed scripts use intentional test credentials for local development seeding, not real passwords.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/supabase/scripts/**':
+        reason: 'Supabase scripts use intentional test credentials for local development, not real passwords.'
+        expires: 2099-12-31T00:00:00.000Z
 
   # javascript/NoHardcodedPasswords/test - Test files with mock passwords
   javascript/NoHardcodedPasswords/test:

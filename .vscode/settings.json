@@ -11,6 +11,14 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   // Ignore errors from node_modules (package internal configs)
   "typescript.validate.enable": true,
+  // Exclude node_modules from TypeScript validation to avoid false positives
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+
+  // Files - Exclude from TypeScript/Problems panel
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true
+  },
 
   // Jest - Monorepo configuration
   // This settings file is for root folder - Jest is disabled here

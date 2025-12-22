@@ -1,180 +1,206 @@
 /**
- * MMKV Storage Wrapper
+ * MMKV Storage Wrapper with AsyncStorage Fallback
  * 10-20x faster than AsyncStorage with synchronous API
- * Encrypted storage with type-safe methods
+ * Falls back to AsyncStorage when MMKV/JSI is not available
  */
 
-import { MMKV } from 'react-native-mmkv';
-import * as SecureStore from 'expo-secure-store';
-import * as Crypto from 'expo-crypto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Encryption key management
-const ENCRYPTION_KEY_STORAGE_KEY = 'mmkv_encryption_key_v1';
-let encryptionKey: string | undefined;
-let storageInstance: MMKV | null = null;
+// Try to import MMKV, but don't fail if it's not available
+let MMKV: typeof import('react-native-mmkv').MMKV | null = null;
+let mmkvInstance: InstanceType<typeof import('react-native-mmkv').MMKV> | null =
+  null;
+let isMMKVAvailable = false;
 
-/**
- * Get or generate encryption key from SecureStore
- * Key is hardware-backed on iOS (Keychain) and Android (Keystore)
- */
-async function getOrCreateEncryptionKey(): Promise<string> {
-  if (encryptionKey) {
-    return encryptionKey;
-  }
-
+// Try to initialize MMKV - wrapped in function to prevent crashes
+function initMMKV(): boolean {
   try {
-    // Try to get existing key from SecureStore
-    const existingKey = await SecureStore.getItemAsync(
-      ENCRYPTION_KEY_STORAGE_KEY,
-    );
-
-    if (existingKey) {
-      encryptionKey = existingKey;
-      return existingKey;
+    const mmkvModule = require('react-native-mmkv');
+    if (!mmkvModule?.MMKV) {
+      return false;
     }
+    MMKV = mmkvModule.MMKV;
 
-    // Generate new cryptographically secure key
-    const newKey = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      `travelmatch_${Date.now()}_${Math.random().toString(36)}`,
-    );
+    // Test if MMKV can actually be instantiated (JSI must be available)
+    if (MMKV) {
+      mmkvInstance = new MMKV({ id: 'travelmatch-storage' });
+      console.log('[Storage] MMKV initialized successfully');
+      return true;
+    }
+    return false;
+  } catch {
+    // This is expected in simulator/remote debugger - MMKV requires JSI which is only available on-device
+    // Using AsyncStorage fallback is fine for development
+    if (__DEV__) {
+      console.log(
+        '[Storage] Using AsyncStorage fallback (MMKV requires on-device JSI)',
+      );
+    }
+    return false;
+  }
+}
 
-    // Store key securely (hardware-backed)
-    await SecureStore.setItemAsync(ENCRYPTION_KEY_STORAGE_KEY, newKey, {
-      keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-    });
+// Safe MMKV initialization - never throws
+isMMKVAvailable = initMMKV();
 
-    encryptionKey = newKey;
-    return newKey;
+// In-memory cache for AsyncStorage fallback (for sync-like access)
+const memoryCache: Map<string, string | number | boolean> = new Map();
+let memoryCacheInitialized = false;
+
+/**
+ * Initialize storage - loads AsyncStorage into memory cache if MMKV not available
+ */
+export async function initializeStorage(): Promise<void> {
+  if (isMMKVAvailable && mmkvInstance) {
+    console.log('[Storage] Using MMKV');
+    return;
+  }
+
+  // Load AsyncStorage into memory cache for sync-like access
+  if (!memoryCacheInitialized) {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const pairs = await AsyncStorage.multiGet(keys);
+      pairs.forEach(([key, value]) => {
+        if (value !== null) {
+          // Try to parse as JSON, otherwise store as string
+          try {
+            const parsed = JSON.parse(value);
+            memoryCache.set(key, parsed);
+          } catch {
+            memoryCache.set(key, value);
+          }
+        }
+      });
+      memoryCacheInitialized = true;
+      console.log(
+        '[Storage] AsyncStorage cache initialized with',
+        keys.length,
+        'keys',
+      );
+    } catch (error) {
+      console.warn('[Storage] Failed to initialize AsyncStorage cache:', error);
+    }
+  }
+}
+
+/**
+ * Sync helper - persist memory cache to AsyncStorage
+ */
+async function persistToAsyncStorage(
+  key: string,
+  value: string | number | boolean,
+): Promise<void> {
+  try {
+    const stringValue =
+      typeof value === 'string' ? value : JSON.stringify(value);
+    await AsyncStorage.setItem(key, stringValue);
   } catch (error) {
-    console.warn('[MMKV] Failed to get/create encryption key:', error);
-
-    // SECURITY FIX (D1-002): Generate random fallback instead of hardcoded value
-    // This handles simulator/emulator environments where SecureStore may not work
-    // In production, this should rarely if ever be reached
-    const randomBytes = await Crypto.getRandomBytesAsync(32);
-    const fallbackKey = Array.from(randomBytes)
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-
-    console.warn(
-      '[MMKV] Using randomly generated fallback key (not persisted)',
-    );
-    encryptionKey = fallbackKey;
-    return fallbackKey;
+    console.warn('[Storage] Failed to persist to AsyncStorage:', error);
   }
 }
 
 /**
- * Initialize encrypted MMKV storage
- * Must be called before using storage
+ * Storage implementation with MMKV/AsyncStorage abstraction
  */
-export async function initializeStorage(): Promise<MMKV> {
-  if (storageInstance) {
-    return storageInstance;
-  }
-
-  const key = await getOrCreateEncryptionKey();
-
-  storageInstance = new MMKV({
-    id: 'travelmatch-storage',
-    encryptionKey: key,
-  });
-
-  console.log('[MMKV] Encrypted storage initialized');
-  return storageInstance;
-}
-
-/**
- * Get storage instance (sync after initialization)
- * Throws if storage not initialized
- */
-function getStorage(): MMKV {
-  if (!storageInstance) {
-    // Create unencrypted instance as fallback (for sync access before init)
-    // This will be replaced once initializeStorage is called
-    console.warn(
-      '[MMKV] Storage accessed before initialization, using unencrypted fallback',
-    );
-    return new MMKV({ id: 'travelmatch-storage-temp' });
-  }
-  return storageInstance;
-}
-
-// Legacy export for backward compatibility
-// Will use encrypted instance once initialized
 export const storage = {
-  get: () => getStorage(),
-  set: (key: string, value: string | number | boolean) =>
-    getStorage().set(key, value),
-  getString: (key: string) => getStorage().getString(key),
-  getNumber: (key: string) => getStorage().getNumber(key),
-  getBoolean: (key: string) => getStorage().getBoolean(key),
-  delete: (key: string) => getStorage().delete(key),
-  contains: (key: string) => getStorage().contains(key),
-  getAllKeys: () => getStorage().getAllKeys(),
-  clearAll: () => getStorage().clearAll(),
+  set: (key: string, value: string | number | boolean) => {
+    if (isMMKVAvailable && mmkvInstance) {
+      mmkvInstance.set(key, value);
+    } else {
+      memoryCache.set(key, value);
+      // Async persist to AsyncStorage (fire and forget)
+      persistToAsyncStorage(key, value);
+    }
+  },
+
+  getString: (key: string): string | undefined => {
+    if (isMMKVAvailable && mmkvInstance) {
+      return mmkvInstance.getString(key);
+    }
+    const value = memoryCache.get(key);
+    return typeof value === 'string' ? value : undefined;
+  },
+
+  getNumber: (key: string): number | undefined => {
+    if (isMMKVAvailable && mmkvInstance) {
+      return mmkvInstance.getNumber(key);
+    }
+    const value = memoryCache.get(key);
+    return typeof value === 'number' ? value : undefined;
+  },
+
+  getBoolean: (key: string): boolean | undefined => {
+    if (isMMKVAvailable && mmkvInstance) {
+      return mmkvInstance.getBoolean(key);
+    }
+    const value = memoryCache.get(key);
+    return typeof value === 'boolean' ? value : undefined;
+  },
+
+  delete: (key: string) => {
+    if (isMMKVAvailable && mmkvInstance) {
+      mmkvInstance.delete(key);
+    } else {
+      memoryCache.delete(key);
+      AsyncStorage.removeItem(key).catch(() => {});
+    }
+  },
+
+  contains: (key: string): boolean => {
+    if (isMMKVAvailable && mmkvInstance) {
+      return mmkvInstance.contains(key);
+    }
+    return memoryCache.has(key);
+  },
+
+  getAllKeys: (): string[] => {
+    if (isMMKVAvailable && mmkvInstance) {
+      return mmkvInstance.getAllKeys();
+    }
+    return Array.from(memoryCache.keys());
+  },
+
+  clearAll: () => {
+    if (isMMKVAvailable && mmkvInstance) {
+      mmkvInstance.clearAll();
+    } else {
+      memoryCache.clear();
+      AsyncStorage.clear().catch(() => {});
+    }
+  },
 };
 
 /**
  * Storage API - Drop-in AsyncStorage replacement
- * Returns Promises for backward compatibility, but operations are synchronous
+ * Returns Promises for backward compatibility
  */
 export const Storage = {
-  /**
-   * Set string value
-   */
-  setItem: (key: string, value: string): Promise<void> => {
+  setItem: async (key: string, value: string): Promise<void> => {
     storage.set(key, value);
-    return Promise.resolve();
   },
 
-  /**
-   * Get string value
-   */
-  getItem: (key: string): Promise<string | null> => {
+  getItem: async (key: string): Promise<string | null> => {
     const value = storage.getString(key);
-    return Promise.resolve(value ?? null);
+    return value ?? null;
   },
 
-  /**
-   * Remove item
-   */
-  removeItem: (key: string): Promise<void> => {
+  removeItem: async (key: string): Promise<void> => {
     storage.delete(key);
-    return Promise.resolve();
   },
 
-  /**
-   * Clear all storage
-   */
-  clear: (): Promise<void> => {
+  clear: async (): Promise<void> => {
     storage.clearAll();
-    return Promise.resolve();
   },
 
-  /**
-   * Get all keys
-   */
-  getAllKeys: (): Promise<string[]> => {
-    const keys = storage.getAllKeys();
-    return Promise.resolve(keys);
+  getAllKeys: async (): Promise<string[]> => {
+    return storage.getAllKeys();
   },
 
-  // ============================================
-  // MMKV-Specific Type-Safe Methods
-  // ============================================
-
-  /**
-   * Set object value (automatically stringified)
-   */
   setObject: <T>(key: string, value: T): void => {
     storage.set(key, JSON.stringify(value));
   },
 
-  /**
-   * Get object value (automatically parsed)
-   */
   getObject: <T>(key: string): T | null => {
     const value = storage.getString(key);
     if (!value) return null;
@@ -185,41 +211,27 @@ export const Storage = {
     }
   },
 
-  /**
-   * Set number value (stored as number, not string)
-   */
   setNumber: (key: string, value: number): void => {
     storage.set(key, value);
   },
 
-  /**
-   * Get number value
-   */
   getNumber: (key: string): number | undefined => {
     return storage.getNumber(key);
   },
 
-  /**
-   * Set boolean value (stored as boolean, not string)
-   */
   setBoolean: (key: string, value: boolean): void => {
     storage.set(key, value);
   },
 
-  /**
-   * Get boolean value
-   */
   getBoolean: (key: string): boolean | undefined => {
     return storage.getBoolean(key);
   },
 
-  /**
-   * Check if key exists
-   */
   contains: (key: string): boolean => {
     return storage.contains(key);
   },
 };
 
-// Export the raw MMKV instance for advanced use cases
+export const isUsingMMKV = (): boolean => isMMKVAvailable;
+
 export default Storage;

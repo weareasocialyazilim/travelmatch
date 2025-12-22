@@ -1,210 +1,159 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ControlledInput } from '@/components/ui/ControlledInput';
-import { LoadingState } from '@/components/LoadingState';
-import { signInWithMagicLink } from '@/services/supabaseAuthService';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
+import { spacing as _spacing } from '@/constants/spacing';
+import { TYPOGRAPHY as _TYPOGRAPHY } from '@/constants/typography';
+import { logger } from '@/utils/logger';
+import { LoadingState } from '@/components/LoadingState';
+import SocialButton from '@/components/SocialButton';
+import { emailAuthSchema, type EmailAuthInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
+import { a11yProps } from '@/utils/accessibility';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { StackScreenProps } from '@react-navigation/stack';
 
-const emailSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-});
+type EmailAuthScreenProps = StackScreenProps<RootStackParamList, 'EmailAuth'>;
 
-type EmailInput = z.infer<typeof emailSchema>;
+export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
+  navigation,
+}) => {
+  const [loading, setLoading] = useState(false);
 
-export const EmailAuthScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid },
-    getValues,
-  } = useForm<EmailInput>({
-    resolver: zodResolver(emailSchema),
+  const { control, handleSubmit, formState, watch } = useForm<EmailAuthInput>({
+    resolver: zodResolver(emailAuthSchema),
     mode: 'onChange',
     defaultValues: {
       email: '',
     },
   });
 
-  const onSubmit = async (data: EmailInput) => {
-    setIsLoading(true);
-    try {
-      const { error } = await signInWithMagicLink(data.email);
+  const _email = watch('email');
 
-      if (error) {
-        Alert.alert('Error', error.message || 'Failed to send magic link');
-        return;
-      }
-
-      setEmailSent(true);
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-      );
-    } finally {
-      setIsLoading(false);
-    }
+  const handleContinue = async (_data: EmailAuthInput) => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      // Navigate to verification code screen
+      navigation.navigate('CompleteProfile');
+    }, 1500);
   };
 
-  const handleResendEmail = () => {
-    const email = getValues('email');
-    if (email) {
-      onSubmit({ email });
-    }
+  const handleSocialLogin = (provider: string) => {
+    logger.debug('Social login:', provider);
+    navigation.navigate('CompleteProfile');
   };
-
-  if (isLoading) {
-    return <LoadingState message="Sending magic link..." />;
-  }
-
-  // Success state - email sent
-  if (emailSent) {
-    return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={styles.successContainer}>
-          <View style={styles.successIcon}>
-            <MaterialCommunityIcons
-              name="email-check"
-              size={80}
-              color={COLORS.success}
-            />
-          </View>
-          <Text style={styles.successTitle}>Check Your Email</Text>
-          <Text style={styles.successDescription}>
-            We've sent a magic link to{'\n'}
-            <Text style={styles.emailText}>{getValues('email')}</Text>
-          </Text>
-          <Text style={styles.successNote}>
-            Click the link in the email to sign in. The link will expire in 1 hour.
-          </Text>
-
-          <TouchableOpacity
-            style={styles.resendButton}
-            onPress={handleResendEmail}
-          >
-            <Text style={styles.resendButtonText}>Resend Email</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.backToLoginButton}
-            onPress={() => navigation.navigate('Login' as never)}
-          >
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={20}
-              color={COLORS.primary}
-            />
-            <Text style={styles.backToLoginText}>Back to Login</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Email Authentication</Text>
-          <View style={styles.placeholder} />
-        </View>
+      {loading && <LoadingState type="overlay" message="Sending code..." />}
 
-        <ScrollView
-          style={styles.content}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+          {...a11yProps.button('Go back', 'Return to previous screen')}
         >
-          {/* Icon */}
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              name="email-fast"
-              size={64}
-              color={COLORS.primary}
+          <Icon name="arrow-left" size={24} color={COLORS.text} />
+        </TouchableOpacity>
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            {/* eslint-disable-next-line react-native/no-inline-styles */}
+            <View style={[styles.progressFill, { width: '50%' }]} />
+          </View>
+          <Text style={styles.progressText}>Step 1 of 2</Text>
+        </View>
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+      >
+        <View style={styles.content}>
+          {/* OAuth Buttons */}
+          <View style={styles.socialButtonsContainer}>
+            <SocialButton
+              provider="apple"
+              label="Continue with Apple"
+              onPress={() => handleSocialLogin('apple')}
+            />
+            <SocialButton
+              provider="google"
+              label="Continue with Google"
+              onPress={() => handleSocialLogin('google')}
             />
           </View>
 
-          <Text style={styles.title}>Sign In with Email</Text>
-          <Text style={styles.description}>
-            Enter your email and we'll send you a magic link to sign in instantly.
-            No password required.
-          </Text>
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>Or use email</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
           {/* Email Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email Address</Text>
-            <ControlledInput
-              control={control}
-              name="email"
-              placeholder="Enter your email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              error={errors.email?.message}
-            />
-          </View>
+          <Controller
+            control={control}
+            name="email"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Email address</Text>
+                <TextInput
+                  style={[styles.textInput, error && styles.textInputError]}
+                  placeholder="name@example.com"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                {error && <Text style={styles.errorText}>{error.message}</Text>}
+              </View>
+            )}
+          />
+        </View>
 
-          {/* Submit Button */}
+        {/* Bottom Action Bar */}
+        <View style={styles.bottomBar}>
           <TouchableOpacity
-            style={[styles.submitButton, !isValid && styles.submitButtonDisabled]}
-            onPress={handleSubmit(onSubmit)}
-            disabled={!isValid}
+            style={[
+              styles.continueButton,
+              (!canSubmitForm({ formState }) || loading) &&
+                styles.continueButtonDisabled,
+            ]}
+            onPress={handleSubmit(handleContinue)}
+            disabled={!canSubmitForm({ formState }) || loading}
+            activeOpacity={0.8}
+            {...a11yProps.button(
+              loading ? 'Sending code' : 'Continue to next step',
+              'Send verification code to email',
+              !canSubmitForm({ formState }) || loading,
+            )}
           >
-            <Text style={styles.submitButtonText}>Send Magic Link</Text>
-          </TouchableOpacity>
-
-          {/* Alternative Auth */}
-          <View style={styles.alternativeContainer}>
-            <Text style={styles.alternativeText}>Or sign in with</Text>
-            <TouchableOpacity
-              style={styles.alternativeButton}
-              onPress={() => navigation.navigate('PhoneAuth' as never)}
-            >
-              <MaterialCommunityIcons name="cellphone" size={20} color={COLORS.primary} />
-              <Text style={styles.alternativeButtonText}>Phone</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Back to Login */}
-          <TouchableOpacity
-            style={styles.loginLink}
-            onPress={() => navigation.navigate('Login' as never)}
-          >
-            <Text style={styles.loginLinkText}>
-              Want to use password?{' '}
-              <Text style={styles.loginLinkBold}>Sign In</Text>
+            <Text style={styles.continueButtonText}>
+              {loading ? 'Sending...' : 'Continue'}
             </Text>
           </TouchableOpacity>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -215,166 +164,118 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  keyboardView: {
-    flex: 1,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  placeholder: {
     width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+  },
+  progressContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  progressBar: {
+    width: 120,
+    height: 4,
+    backgroundColor: COLORS.border,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.mint,
+    borderRadius: 2,
+  },
+  progressText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  keyboardView: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
   content: {
     flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 24,
   },
-  scrollContent: {
-    padding: 24,
+  socialButtonsContainer: {
+    gap: 16,
   },
-  iconContainer: {
+  dividerContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginVertical: 24,
   },
-  title: {
-    ...TYPOGRAPHY.h2,
-    fontWeight: '700',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 12,
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.border,
   },
-  description: {
-    ...TYPOGRAPHY.body,
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
     color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: 32,
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
-  label: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '500',
     color: COLORS.text,
     marginBottom: 8,
   },
-  submitButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  submitButtonDisabled: {
-    backgroundColor: COLORS.disabled,
-  },
-  submitButtonText: {
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  alternativeContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  alternativeText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-    marginBottom: 12,
-  },
-  alternativeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+  textInput: {
+    height: 56,
     borderWidth: 1,
     borderColor: COLORS.border,
-    borderRadius: 8,
-  },
-  alternativeButtonText: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.primary,
-    marginLeft: 8,
-  },
-  loginLink: {
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  loginLinkText: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
-  },
-  loginLinkBold: {
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  // Success state styles
-  successContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  successIcon: {
-    marginBottom: 24,
-  },
-  successTitle: {
-    ...TYPOGRAPHY.h2,
-    fontWeight: '700',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  successDescription: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  emailText: {
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  successNote: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textTertiary,
-    textAlign: 'center',
-    marginBottom: 32,
-    paddingHorizontal: 16,
-  },
-  resendButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 48,
     borderRadius: 12,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: COLORS.text,
+    backgroundColor: COLORS.white,
   },
-  resendButtonText: {
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-    color: COLORS.white,
+  textInputError: {
+    borderColor: COLORS.error,
   },
-  backToLoginButton: {
-    flexDirection: 'row',
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+  },
+  bottomBar: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: `${COLORS.border}20`,
+    backgroundColor: COLORS.background,
+  },
+  continueButton: {
+    height: 56,
+    backgroundColor: COLORS.mint,
+    borderRadius: 28,
     alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'center',
   },
-  backToLoginText: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.primary,
-    fontWeight: '600',
-    marginLeft: 8,
+  continueButtonDisabled: {
+    backgroundColor: `${COLORS.mint}50`,
+  },
+  continueButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

@@ -13,7 +13,7 @@ export const HostSection: React.FC<HostSectionProps> = React.memo(
   ({ user, navigation }) => {
     const handlePress = () => {
       navigation.navigate('ProfileDetail', {
-        userId: user.id || 'unknown',
+        userId: user.id || '',
       });
     };
 

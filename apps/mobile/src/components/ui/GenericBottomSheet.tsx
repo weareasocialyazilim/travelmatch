@@ -343,6 +343,7 @@ export const GenericBottomSheet = forwardRef<
               <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
                 testID={testID ? `${testID}-keyboard-avoiding` : undefined}
               >
                 {content}

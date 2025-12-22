@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { FeedbackModal } from './src/components/FeedbackModal';
 import { initializeFeatureFlags } from './src/config/featureFlags';
@@ -20,6 +21,7 @@ import { logger } from './src/utils/logger';
 import { validateEnvironment, env } from './src/config/env.config';
 import { migrateSensitiveDataToSecure } from './src/utils/secureStorage';
 import { initSecurityMonitoring } from './src/utils/securityChecks';
+import { initializeStorage } from './src/utils/storage';
 import './src/config/i18n'; // Initialize i18n
 
 import { analytics } from './src/services/analytics';
@@ -79,6 +81,21 @@ if (__DEV__) {
   logger.info('App', '🛡️ Security monitoring initialized');
 }
 
+// Create QueryClient for React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 30 * 60 * 1000, // 30 minutes (formerly cacheTime)
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -98,6 +115,10 @@ export default Sentry.wrap(function App() {
   useEffect(() => {
     async function prepare() {
       try {
+        // 0. Initialize encrypted MMKV storage FIRST (before any other services)
+        await initializeStorage();
+        logger.info('App', '🔐 MMKV encrypted storage initialized');
+
         // 1. Security Check: Root/Jailbreak Detection (Warning Only)
         const isRooted = await Device.isRootedExperimentalAsync();
         if (isRooted) {
@@ -276,36 +297,38 @@ export default Sentry.wrap(function App() {
       onLayout={onLayoutRootView}
     >
       <ErrorBoundary level="app">
-        <SafeAreaProvider>
-          <NetworkProvider>
-            <AuthProvider>
-              <BiometricAuthProvider>
-                <RealtimeProvider>
-                  <ToastProvider>
-                    <ConfirmationProvider>
-                      <StatusBar style="auto" />
-                      <AppNavigator />
-                      <FeedbackModal
-                        visible={showFeedback}
-                        onClose={dismissFeedback}
-                      />
-                      <PendingTransactionsModal
-                        visible={showPendingModal}
-                        payments={pendingPayments}
-                        uploads={pendingUploads}
-                        onResumePayment={handleResumePayment}
-                        onResumeUpload={handleResumeUpload}
-                        onDismissPayment={handleDismissPayment}
-                        onDismissUpload={handleDismissUpload}
-                        onClose={handleClosePendingModal}
-                      />
-                    </ConfirmationProvider>
-                  </ToastProvider>
-                </RealtimeProvider>
-              </BiometricAuthProvider>
-            </AuthProvider>
-          </NetworkProvider>
-        </SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <SafeAreaProvider>
+            <NetworkProvider>
+              <AuthProvider>
+                <BiometricAuthProvider>
+                  <RealtimeProvider>
+                    <ToastProvider>
+                      <ConfirmationProvider>
+                        <StatusBar style="auto" />
+                        <AppNavigator />
+                        <FeedbackModal
+                          visible={showFeedback}
+                          onClose={dismissFeedback}
+                        />
+                        <PendingTransactionsModal
+                          visible={showPendingModal}
+                          payments={pendingPayments}
+                          uploads={pendingUploads}
+                          onResumePayment={handleResumePayment}
+                          onResumeUpload={handleResumeUpload}
+                          onDismissPayment={handleDismissPayment}
+                          onDismissUpload={handleDismissUpload}
+                          onClose={handleClosePendingModal}
+                        />
+                      </ConfirmationProvider>
+                    </ToastProvider>
+                  </RealtimeProvider>
+                </BiometricAuthProvider>
+              </AuthProvider>
+            </NetworkProvider>
+          </SafeAreaProvider>
+        </QueryClientProvider>
       </ErrorBoundary>
     </GestureHandlerRootView>
   );

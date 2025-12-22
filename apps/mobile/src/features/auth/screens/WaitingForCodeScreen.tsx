@@ -1,101 +1,48 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
   TouchableOpacity,
-  ActivityIndicator,
-  Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import {
-  signInWithPhone,
-  signInWithMagicLink,
-} from '@/services/supabaseAuthService';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
-const RESEND_COOLDOWN = 60; // seconds
-
-type WaitingForCodeNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'WaitingForCode'
->;
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 export const WaitingForCodeScreen: React.FC = () => {
-  const navigation = useNavigation<WaitingForCodeNavigationProp>();
-  const route = useRoute<RouteProp<RootStackParamList, 'WaitingForCode'>>();
-  const [resendTimer, setResendTimer] = useState(RESEND_COOLDOWN);
-  const [isResending, setIsResending] = useState(false);
-
-  const verificationType = route.params?.verificationType || 'phone';
-  const contact = route.params?.contact || '';
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [timer, setTimer] = useState(59);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setResendTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatContact = () => {
-    if (verificationType === 'phone') {
-      if (contact.length > 4) {
-        return `${contact.slice(0, 3)}****${contact.slice(-4)}`;
-      }
-      return contact;
+    // Countdown timer
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
     }
-    const [local, domain] = contact.split('@');
-    if (local && local.length > 2) {
-      return `${local.slice(0, 2)}***@${domain}`;
+  }, [timer]);
+
+  const handleResend = () => {
+    if (timer === 0) {
+      setTimer(59);
+      // Trigger resend code API call here
     }
-    return contact;
   };
 
-  const handleResend = useCallback(async () => {
-    if (resendTimer > 0 || isResending) return;
-
-    setIsResending(true);
-    try {
-      if (verificationType === 'phone') {
-        await signInWithPhone(contact);
-      } else {
-        await signInWithMagicLink(contact);
-      }
-      setResendTimer(RESEND_COOLDOWN);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Failed to resend code';
-      Alert.alert('Error', message);
-    } finally {
-      setIsResending(false);
-    }
-  }, [verificationType, contact, resendTimer, isResending]);
-
-  const handleEnterCode = () => {
-    navigation.navigate('VerifyCode', {
-      verificationType,
-      contact,
-    });
-  };
-
-  const handleChangeContact = () => {
-    navigation.goBack();
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${String(secs).padStart(2, '0')}`;
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -103,92 +50,57 @@ export const WaitingForCodeScreen: React.FC = () => {
           style={styles.backButton}
         >
           <MaterialCommunityIcons
-            name="arrow-left"
+            name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.textSecondary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verification</Text>
-        <View style={styles.placeholder} />
       </View>
 
-      <View style={styles.content}>
-        {/* Animation/Icon */}
+      {/* Main Content */}
+      <View style={styles.main}>
+        {/* Animated Icon */}
         <View style={styles.iconContainer}>
-          <View style={styles.iconBackground}>
-            <MaterialCommunityIcons
-              name={
-                verificationType === 'phone'
-                  ? 'cellphone-message'
-                  : 'email-outline'
-              }
-              size={48}
-              color={COLORS.primary}
-            />
+          <View style={styles.iconOuterCircle}>
+            <View style={styles.iconInnerCircle}>
+              <MaterialCommunityIcons
+                name={'email-outline' as IconName}
+                size={48}
+                color={COLORS.primary}
+              />
+            </View>
           </View>
-          <ActivityIndicator
-            size="large"
-            color={COLORS.primary}
-            style={styles.spinner}
-          />
         </View>
 
-        <Text style={styles.title}>
-          Check Your {verificationType === 'phone' ? 'Phone' : 'Email'}
+        {/* Headline */}
+        <Text style={styles.headline}>Waiting for code…</Text>
+
+        {/* Body */}
+        <Text style={styles.body}>
+          We&apos;ve sent a 6-digit code to your email. Please check your inbox.
         </Text>
 
-        <Text style={styles.description}>
-          We've sent a verification code to{'\n'}
-          <Text style={styles.contactText}>{formatContact()}</Text>
+        {/* Spacer */}
+        <View style={styles.spacer} />
+
+        {/* Countdown */}
+        <Text style={styles.countdown}>
+          You can resend the code in {formatTime(timer)}
         </Text>
 
-        <Text style={styles.hint}>
-          {verificationType === 'phone'
-            ? 'The SMS should arrive within a few seconds'
-            : 'Check your inbox and spam folder'}
-        </Text>
-
-        {/* Enter Code Button */}
+        {/* Resend Button */}
         <TouchableOpacity
-          style={styles.enterCodeButton}
-          onPress={handleEnterCode}
+          onPress={handleResend}
+          disabled={timer > 0}
+          style={styles.resendButton}
         >
-          <MaterialCommunityIcons
-            name="numeric"
-            size={20}
-            color={COLORS.white}
-          />
-          <Text style={styles.enterCodeButtonText}>Enter Code</Text>
-        </TouchableOpacity>
-
-        {/* Resend Section */}
-        <View style={styles.resendContainer}>
-          <Text style={styles.resendText}>Didn't receive the code?</Text>
-          {resendTimer > 0 ? (
-            <Text style={styles.resendTimer}>Resend in {resendTimer}s</Text>
-          ) : (
-            <TouchableOpacity
-              onPress={handleResend}
-              disabled={isResending}
-              style={styles.resendButton}
-            >
-              {isResending ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
-              ) : (
-                <Text style={styles.resendLink}>Resend Code</Text>
-              )}
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Change Contact */}
-        <TouchableOpacity
-          style={styles.changeContactButton}
-          onPress={handleChangeContact}
-        >
-          <Text style={styles.changeContactText}>
-            Wrong {verificationType === 'phone' ? 'phone number' : 'email'}?{' '}
-            <Text style={styles.changeContactLink}>Change</Text>
+          <Text
+            style={[
+              styles.resendButtonText,
+              timer > 0 && styles.resendButtonTextDisabled,
+            ]}
+          >
+            Resend code
           </Text>
         </TouchableOpacity>
       </View>
@@ -202,119 +114,80 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
   backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  placeholder: {
-    width: 40,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 48,
-  },
-  iconContainer: {
-    position: 'relative',
-    marginBottom: 32,
-  },
-  iconBackground: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.primary + '15',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  spinner: {
-    position: 'absolute',
-    top: -10,
-    left: -10,
-    right: -10,
-    bottom: -10,
+  main: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 48,
   },
-  title: {
-    ...TYPOGRAPHY.h2,
+  iconContainer: {
+    marginBottom: 32,
+  },
+  iconOuterCircle: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    backgroundColor: `${COLORS.primary}1A`, // 10% opacity
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconInnerCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${COLORS.primary}33`, // 20% opacity
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headline: {
+    fontSize: 30,
     fontWeight: '700',
     color: COLORS.text,
     textAlign: 'center',
-    marginBottom: 16,
+    letterSpacing: -0.5,
+    lineHeight: 36,
   },
-  description: {
-    ...TYPOGRAPHY.body,
+  body: {
+    marginTop: 8,
+    fontSize: 16,
+    fontWeight: '400',
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: 8,
+    lineHeight: 24,
+    maxWidth: 336,
   },
-  contactText: {
-    fontWeight: '600',
-    color: COLORS.text,
+  spacer: {
+    height: 80,
   },
-  hint: {
-    ...TYPOGRAPHY.bodySmall,
+  countdown: {
+    fontSize: 14,
+    fontWeight: '400',
     color: COLORS.textTertiary,
     textAlign: 'center',
-    marginBottom: 32,
-  },
-  enterCodeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    marginBottom: 24,
-    gap: 8,
-  },
-  enterCodeButtonText: {
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  resendContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  resendText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  resendTimer: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textTertiary,
+    marginBottom: 12,
   },
   resendButton: {
-    padding: 8,
-  },
-  resendLink: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  changeContactButton: {
+    paddingHorizontal: 24,
     paddingVertical: 12,
   },
-  changeContactText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-  },
-  changeContactLink: {
+  resendButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
     color: COLORS.primary,
-    fontWeight: '600',
+  },
+  resendButtonTextDisabled: {
+    opacity: 0.5,
   },
 });
