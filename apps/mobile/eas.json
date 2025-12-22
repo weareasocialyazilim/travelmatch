@@ -48,6 +48,9 @@
       },
       "env": {
         "APP_ENV": "production"
+      },
+      "node": {
+        "installCommand": "pnpm install --frozen-lockfile --ignore-scripts"
       }
     }
   },
