@@ -7,6 +7,9 @@
     "base": {
       "ios": {
         "image": "latest"
+      },
+      "pnpm": {
+        "installCommand": "pnpm install --frozen-lockfile --ignore-scripts"
       }
     },
     "development": {
@@ -48,9 +51,6 @@
       },
       "env": {
         "APP_ENV": "production"
-      },
-      "node": {
-        "installCommand": "pnpm install --frozen-lockfile --ignore-scripts"
       }
     }
   },
