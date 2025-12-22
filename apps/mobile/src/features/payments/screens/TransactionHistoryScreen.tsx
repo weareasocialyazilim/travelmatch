@@ -67,10 +67,11 @@ export const TransactionHistoryScreen: React.FC = () => {
 
       // Map status
       let status: 'Completed' | 'Verified' | 'Pending' | 'Failed' = 'Completed';
-      if (t.status === 'pending') status = 'Pending';
-      else if (t.status === 'failed' || t.status === 'cancelled')
-        status = 'Failed';
-      else if (t.status === 'verified') status = 'Verified';
+      if (t.status === 'pending' || t.status === 'processing')
+        status = 'Pending';
+      else if (t.status === 'failed') status = 'Failed';
+      else if (t.status === 'refunded') status = 'Failed';
+      else if (t.status === 'completed') status = 'Completed';
 
       // Format date
       const dateObj = new Date(t.date);
