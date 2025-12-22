@@ -1,380 +1,521 @@
-# TravelMatch Branch Merge Roadmap
+# TravelMatch Branch Merge Roadmap - Güncellenmiş
 
 **Tarih:** 2025-12-22
-**Analiz Edilen Branch Sayısı:** 10
+**Analiz Edilen Branch Sayısı:** 18
 **Durum:** Hiçbiri henüz main'e merge edilmedi
 
 ---
 
-## Branch Özeti
+## Özet Dashboard
 
-| # | Branch | Kategori | Değişiklik | Dosya Sayısı |
-|---|--------|----------|------------|--------------|
-| 1 | `claude/setup-debugger-session-go0zT` | Bug Fix | TypeScript compilation hataları düzeltmesi | 10 |
-| 2 | `claude/api-security-audit-cEmbI` | Security | API güvenlik açıkları düzeltmesi | 10 |
-| 3 | `claude/security-audit-owasp-Fod9p` | Security | OWASP compliance düzeltmeleri | 8 |
-| 4 | `claude/optimize-react-performance-CGcu3` | Performance | React memoization optimizasyonları | 6 |
-| 5 | `claude/optimize-supabase-realtime-j1BOO` | Performance | Supabase realtime subscription optimizasyonu | 5 |
-| 6 | `claude/test-automation-setup-KnWmC` | Testing | Test altyapısı kurulumu | 34 |
-| 7 | `claude/database-architect-setup-vPpId` | Docs | Veritabanı mimarisi dokümantasyonu | 3 |
-| 8 | `claude/code-reviewer-tool-ZoGn0` | Docs | Kod review raporu | 1 |
-| 9 | `claude/compliance-specialist-tool-UViVR` | Docs | Compliance değerlendirmesi | 2 |
-| 10 | `claude/setup-pentest-specialist-NYqwG` | Docs | Penetration test raporu | 1 |
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         18 BRANCH ANALİZ ÖZETİ                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  🔴 Kritik (Bug Fix)      │  1 branch   │  debugger-session                │
+│  🔒 Güvenlik              │  2 branch   │  api-security, owasp             │
+│  ⚡ Performans            │  2 branch   │  react-perf, supabase-realtime   │
+│  🧪 Test                  │  2 branch   │  test-automation, generate-test  │
+│  🔧 Code Quality          │  1 branch   │  refactor-code-quality           │
+│  🗄️  Database             │  2 branch   │  postgres-schema, db-architect   │
+│  🎨 UI/UX Tools           │  2 branch   │  ui-design, ux-research          │
+│  📚 Dokümantasyon         │  5 branch   │  architecture, docs, reports     │
+│  🎭 Diğer                 │  1 branch   │  algorithmic-art                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  ⚠️  ÇAKIŞMA SAYISI: 11 dosya, 7 branch grubu arasında                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Kritik Çakışmalar (Conflicts)
+## Tüm Branch'lerin Özeti
 
-### Yüksek Öncelikli Çakışmalar
-
-| Dosya | Branch 1 | Branch 2 | Çözüm |
-|-------|----------|----------|-------|
-| `apps/admin/next.config.js` | api-security-audit | security-audit-owasp | Manuel birleştirme gerekli |
-| `apps/admin/src/app/api/admin-users/route.ts` | api-security-audit | security-audit-owasp | Manuel birleştirme gerekli |
-| `apps/admin/src/app/api/users/route.ts` | api-security-audit | security-audit-owasp | Manuel birleştirme gerekli |
-| `apps/admin/src/app/api/auth/login/route.ts` | security-audit-owasp | debugger-session | Manuel birleştirme gerekli |
-| `apps/admin/src/app/api/tasks/route.ts` | api-security-audit | debugger-session | Manuel birleştirme gerekli |
-| `SECURITY_AUDIT_REPORT.md` | api-security-audit | security-audit-owasp | Birleştirilmeli |
-| `apps/mobile/src/context/RealtimeContext.tsx` | react-performance | supabase-realtime | Manuel birleştirme gerekli |
+| # | Branch | Kategori | Açıklama | Dosya | Risk |
+|---|--------|----------|----------|-------|------|
+| 1 | `setup-debugger-session-go0zT` | 🔴 Bug Fix | TypeScript compilation hataları | 10 | Düşük |
+| 2 | `api-security-audit-cEmbI` | 🔒 Security | API güvenlik açıkları (OWASP) | 10 | Orta |
+| 3 | `security-audit-owasp-Fod9p` | 🔒 Security | OWASP compliance düzeltmeleri | 8 | Orta |
+| 4 | `optimize-react-performance-CGcu3` | ⚡ Perf | React memoization | 6 | Orta |
+| 5 | `optimize-supabase-realtime-j1BOO` | ⚡ Perf | Supabase realtime optimize | 5 | Orta |
+| 6 | `test-automation-setup-KnWmC` | 🧪 Test | Jest, Playwright, CI | 34 | Düşük |
+| 7 | `generate-test-suite-HHP8p` | 🧪 Test | Unit test suite | 13 | Düşük |
+| 8 | `refactor-code-quality-vOrxf` | 🔧 Quality | TypeScript düzeltmeleri | 14 | Düşük |
+| 9 | `postgres-schema-design-lYSj1` | 🗄️ DB | PostgreSQL schema best practices | 2 | Düşük |
+| 10 | `database-architect-setup-vPpId` | 📚 Docs | DB architecture docs | 3 | Yok |
+| 11 | `architecture-documentation-mLfcb` | 📚 Docs | C4 model, ADR'ler | 11 | Yok |
+| 12 | `code-reviewer-tool-ZoGn0` | 📚 Docs | Code review raporu | 1 | Yok |
+| 13 | `compliance-specialist-tool-UViVR` | 📚 Docs | Compliance değerlendirmesi | 2 | Yok |
+| 14 | `setup-pentest-specialist-NYqwG` | 📚 Docs | Penetration test raporu | 1 | Yok |
+| 15 | `update-project-docs-JqWGn` | 📚 Docs | README güncellemeleri | 5 | Yok |
+| 16 | `ui-design-system-toolkit-zJx0g` | 🎨 Tools | Design system Python scripts | 5 | Yok |
+| 17 | `ux-research-design-toolkit-eVD3U` | 🎨 Tools | UX research Python scripts | 7 | Yok |
+| 18 | `algorithmic-art-p5js-X9xy5` | 🎭 Other | p5.js sanat generatörü | 2 | Yok |
 
 ---
 
-## Merge Sırası (Önerilen Roadmap)
-
-### Faz 1: Temel Düzeltmeler (Öncelik: Kritik)
-
-**Amaç:** Build hatalarını çöz ve sistemi stabil hale getir
+## Kritik Çakışma Matrisi
 
 ```
-1. claude/setup-debugger-session-go0zT
-   ├── TypeScript compilation hataları düzeltildi
-   ├── pnpm-lock.yaml güncellendi
-   └── Admin API route'ları düzeltildi
+                          ┌─────────────────────────────────────────────────────────┐
+                          │                 DOSYA ÇAKIŞMALARI                       │
+                          └─────────────────────────────────────────────────────────┘
+
+┌──────────────────────────┬──────────────────────────┬──────────────────────────────┐
+│     BRANCH GRUBU 1       │         DOSYALAR         │      BRANCH GRUBU 2          │
+├──────────────────────────┼──────────────────────────┼──────────────────────────────┤
+│ api-security-audit       │ next.config.js           │ security-audit-owasp         │
+│                          │ admin-users/route.ts     │                              │
+│                          │ users/route.ts           │                              │
+│                          │ SECURITY_AUDIT_REPORT.md │                              │
+├──────────────────────────┼──────────────────────────┼──────────────────────────────┤
+│ api-security-audit       │ tasks/route.ts           │ setup-debugger-session       │
+├──────────────────────────┼──────────────────────────┼──────────────────────────────┤
+│ security-audit-owasp     │ auth/login/route.ts      │ setup-debugger-session       │
+├──────────────────────────┼──────────────────────────┼──────────────────────────────┤
+│ react-performance        │ RealtimeContext.tsx      │ supabase-realtime            │
+├──────────────────────────┼──────────────────────────┼──────────────────────────────┤
+│ test-automation          │ jest.config.js           │ generate-test-suite          │
+│                          │ jest.setup.js            │                              │
+│                          │ package.json             │                              │
+├──────────────────────────┼──────────────────────────┼──────────────────────────────┤
+│ test-automation          │ package.json             │ setup-debugger-session       │
+├──────────────────────────┼──────────────────────────┼──────────────────────────────┤
+│ generate-test-suite      │ package.json             │ setup-debugger-session       │
+│                          │ pnpm-lock.yaml           │                              │
+└──────────────────────────┴──────────────────────────┴──────────────────────────────┘
 ```
 
-**Merge Komutları:**
+---
+
+## Merge Sırası (7 Fazlı Roadmap)
+
+### FAZ 0: Bağımsız Dokümantasyon (Herhangi bir zamanda)
+> **Risk:** YOK - Sadece yeni markdown dosyaları
+
+Bu branch'ler hiçbir kod değişikliği içermiyor ve herhangi bir sırada merge edilebilir:
+
+```
+📚 architecture-documentation-mLfcb
+   └── docs/architecture/ (11 dosya: C4 model, ADR'ler, security arch)
+
+📚 database-architect-setup-vPpId
+   └── docs/ (DATABASE_ARCHITECTURE.md, ERD.md, OPTIMIZATION_GUIDE.md)
+
+📚 code-reviewer-tool-ZoGn0
+   └── CODE_REVIEW_REPORT.md
+
+📚 compliance-specialist-tool-UViVR
+   └── docs/COMPLIANCE_*.md
+
+📚 setup-pentest-specialist-NYqwG
+   └── PENTEST_REPORT_2025-12-22.md
+
+📚 update-project-docs-JqWGn
+   └── README.md, apps/admin/README.md güncellemeleri
+
+🎨 ui-design-system-toolkit-zJx0g
+   └── packages/design-system/scripts/*.py (Python araçları)
+
+🎨 ux-research-design-toolkit-eVD3U
+   └── scripts/ux-research/*.py (Python araçları)
+
+🎭 algorithmic-art-p5js-X9xy5
+   └── algorithmic-art/ (p5.js sanat generatörü)
+```
+
+**Merge Komutları (Sırasız):**
 ```bash
 git checkout main
-git merge origin/claude/setup-debugger-session-go0zT
-# Build test: pnpm build
+git merge origin/claude/architecture-documentation-mLfcb
+git merge origin/claude/database-architect-setup-vPpId
+git merge origin/claude/code-reviewer-tool-ZoGn0
+git merge origin/claude/compliance-specialist-tool-UViVR
+git merge origin/claude/setup-pentest-specialist-NYqwG
+git merge origin/claude/update-project-docs-JqWGn
+git merge origin/claude/ui-design-system-toolkit-zJx0g
+git merge origin/claude/ux-research-design-toolkit-eVD3U
+git merge origin/claude/algorithmic-art-p5js-X9xy5
 ```
 
 ---
 
-### Faz 2: Güvenlik Düzeltmeleri (Öncelik: Yüksek)
-
-**Amaç:** Kritik güvenlik açıklarını kapat
-
-```
-2. claude/api-security-audit-cEmbI
-   ├── SQL Injection koruması (query-utils.ts)
-   ├── Rate limiting
-   ├── Input validation
-   └── Security headers
-
-3. claude/security-audit-owasp-Fod9p (Conflict resolution gerekli!)
-   ├── OWASP Top 10 compliance
-   ├── Security middleware (security.ts)
-   └── Next.js security config
-```
-
-**Dikkat:** Bu iki branch çakışıyor! Önerilen yaklaşım:
-```bash
-# Önce api-security-audit merge et
-git checkout main
-git merge origin/claude/api-security-audit-cEmbI
-
-# Sonra security-audit-owasp için conflict resolution
-git merge origin/claude/security-audit-owasp-Fod9p
-# Manual conflict resolution required for:
-#   - apps/admin/next.config.js
-#   - apps/admin/src/app/api/admin-users/route.ts
-#   - apps/admin/src/app/api/users/route.ts
-#   - SECURITY_AUDIT_REPORT.md
-```
-
----
-
-### Faz 3: Performance Optimizasyonları (Öncelik: Orta)
-
-**Amaç:** Mobile app performansını artır
+### FAZ 1: Kritik Bug Fix (Öncelik: YÜKSEK)
+> **Amaç:** Build hatalarını çöz, sistemi derlenebilir hale getir
 
 ```
-4. claude/optimize-react-performance-CGcu3
-   ├── Context memoization
-   ├── useCallback/useMemo optimizasyonları
-   └── performanceOptimization.ts utility
-
-5. claude/optimize-supabase-realtime-j1BOO (Conflict resolution gerekli!)
-   ├── Channel manager service
-   ├── Subscription optimization
-   └── Memory leak fixes
-```
-
-**Dikkat:** `RealtimeContext.tsx` çakışıyor!
-```bash
-# Önce react-performance merge et
-git checkout main
-git merge origin/claude/optimize-react-performance-CGcu3
-
-# Sonra supabase-realtime için conflict resolution
-git merge origin/claude/optimize-supabase-realtime-j1BOO
-# Manual conflict resolution required for:
-#   - apps/mobile/src/context/RealtimeContext.tsx
-```
-
----
-
-### Faz 4: Test Altyapısı (Öncelik: Orta)
-
-**Amaç:** CI/CD ve test coverage'ı artır
-
-```
-6. claude/test-automation-setup-KnWmC
-   ├── Jest configurations (admin, web, services)
-   ├── Playwright E2E tests
-   ├── test-utils package
-   ├── GitHub Actions CI workflow
-   └── Mock utilities (Supabase, Next.js)
+🔴 setup-debugger-session-go0zT
+   ├── apps/admin/src/lib/auth.ts          - Auth düzeltmeleri
+   ├── apps/admin/src/lib/index.ts         - Export düzeltmeleri
+   ├── apps/admin/tsconfig.json            - TypeScript config
+   ├── apps/admin/src/app/api/auth/*.ts    - API route düzeltmeleri
+   └── pnpm-lock.yaml                      - Dependency güncellemesi
 ```
 
 **Merge Komutu:**
 ```bash
 git checkout main
-git merge origin/claude/test-automation-setup-KnWmC
-# Test: pnpm test
+git merge origin/claude/setup-debugger-session-go0zT
+
+# Doğrulama
+pnpm install
+pnpm build
+```
+
+**Dikkat:** Bu branch `pnpm-lock.yaml` içeriyor. Diğer branch'lerle çakışabilir!
+
+---
+
+### FAZ 2: Güvenlik Düzeltmeleri (Öncelik: YÜKSEK)
+> **Amaç:** Kritik güvenlik açıklarını kapat
+
+```
+🔒 api-security-audit-cEmbI
+   ├── apps/admin/src/lib/query-utils.ts   - SQL injection koruması (YENİ)
+   ├── services/job-queue/src/index.ts     - Rate limiting
+   ├── apps/admin/next.config.js           - Security headers
+   ├── apps/admin/nginx.conf               - Nginx security
+   └── API route validasyonları
+
+                    ⬇️ ÇAKIŞMA ÇÖZÜMÜ GEREKLİ ⬇️
+
+🔒 security-audit-owasp-Fod9p
+   ├── apps/admin/src/lib/security.ts      - Security middleware (YENİ)
+   ├── apps/admin/next.config.js           - ⚠️ ÇAKIŞMA
+   ├── apps/web/next.config.ts             - Web security config
+   └── API route auth düzeltmeleri         - ⚠️ ÇAKIŞMA
+```
+
+**Merge Stratejisi:**
+```bash
+# 1. Önce api-security-audit merge et
+git checkout main
+git merge origin/claude/api-security-audit-cEmbI
+
+# 2. security-audit-owasp merge et (conflict olacak!)
+git merge origin/claude/security-audit-owasp-Fod9p
+
+# 3. Conflict resolution için bu dosyaları manuel birleştir:
+#    - apps/admin/next.config.js → Her iki branch'in security header'larını al
+#    - apps/admin/src/app/api/admin-users/route.ts → Validation'ları birleştir
+#    - apps/admin/src/app/api/users/route.ts → Validation'ları birleştir
+#    - SECURITY_AUDIT_REPORT.md → İki raporu birleştir
+
+# 4. Conflict çözümü sonrası
+git add .
+git commit -m "chore: merge security branches with conflict resolution"
+
+# 5. Doğrulama
+pnpm build
+pnpm test
 ```
 
 ---
 
-### Faz 5: Dokümantasyon (Öncelik: Düşük)
-
-**Amaç:** Proje dokümantasyonunu tamamla
+### FAZ 3: Performance Optimizasyonları (Öncelik: ORTA)
+> **Amaç:** Mobile app performansını iyileştir
 
 ```
-7. claude/database-architect-setup-vPpId
-   ├── DATABASE_ARCHITECTURE.md
-   ├── DATABASE_ERD.md
-   └── DATABASE_OPTIMIZATION_GUIDE.md
+⚡ optimize-react-performance-CGcu3
+   ├── apps/mobile/src/utils/performanceOptimization.ts (YENİ)
+   ├── apps/mobile/src/context/AuthContext.tsx
+   ├── apps/mobile/src/context/I18nContext.tsx
+   ├── apps/mobile/src/context/RealtimeContext.tsx      ⚠️ ÇAKIŞMA
+   ├── apps/mobile/src/context/ToastContext.tsx
+   └── apps/mobile/src/features/trips/screens/DiscoverScreen.tsx
 
-8. claude/code-reviewer-tool-ZoGn0
-   └── CODE_REVIEW_REPORT.md
+                    ⬇️ ÇAKIŞMA ÇÖZÜMÜ GEREKLİ ⬇️
 
-9. claude/compliance-specialist-tool-UViVR
-   ├── COMPLIANCE_ASSESSMENT_2025.md
-   └── COMPLIANCE_CHECKLIST.md
-
-10. claude/setup-pentest-specialist-NYqwG
-    └── PENTEST_REPORT_2025-12-22.md
+⚡ optimize-supabase-realtime-j1BOO
+   ├── apps/mobile/src/services/realtimeChannelManager.ts (YENİ)
+   ├── apps/mobile/src/context/RealtimeContext.tsx      ⚠️ ÇAKIŞMA
+   ├── apps/mobile/src/hooks/useMessages.ts
+   ├── apps/mobile/src/config/supabase.ts
+   └── apps/mobile/src/services/subscriptionService.ts
 ```
 
-**Merge Komutları (Sırasız, çakışma yok):**
+**Merge Stratejisi:**
+```bash
+# 1. Önce react-performance merge et
+git checkout main
+git merge origin/claude/optimize-react-performance-CGcu3
+
+# 2. supabase-realtime merge et (conflict olacak!)
+git merge origin/claude/optimize-supabase-realtime-j1BOO
+
+# 3. RealtimeContext.tsx için conflict resolution:
+#    - react-performance'dan: useMemo, useCallback wrappers
+#    - supabase-realtime'dan: Channel manager integration
+#    Her iki optimizasyonu da koruyarak birleştir!
+
+git add .
+git commit -m "chore: merge performance branches with conflict resolution"
+
+# 4. Mobile app test
+cd apps/mobile && npx expo start
+```
+
+---
+
+### FAZ 4: Test Altyapısı (Öncelik: ORTA)
+> **Amaç:** Test coverage ve CI/CD pipeline kurulumu
+
+```
+🧪 test-automation-setup-KnWmC
+   ├── packages/test-utils/                - Test utilities package (YENİ)
+   ├── apps/admin/jest.config.js           ⚠️ ÇAKIŞMA
+   ├── apps/admin/jest.setup.js            ⚠️ ÇAKIŞMA
+   ├── apps/web/jest.config.js
+   ├── tests/e2e-playwright/               - E2E tests (YENİ)
+   ├── playwright.config.ts
+   └── .github/workflows/ci.yml            - CI workflow
+
+                    ⬇️ ÇAKIŞMA ÇÖZÜMÜ GEREKLİ ⬇️
+
+🧪 generate-test-suite-HHP8p
+   ├── apps/admin/jest.config.js           ⚠️ ÇAKIŞMA
+   ├── apps/admin/jest.setup.js            ⚠️ ÇAKIŞMA
+   ├── apps/admin/src/lib/__tests__/       - Unit tests (YENİ)
+   ├── packages/shared/src/__tests__/      - Shared tests (YENİ)
+   └── pnpm-lock.yaml                      ⚠️ ÇAKIŞMA (debugger ile)
+```
+
+**Merge Stratejisi:**
+```bash
+# 1. Önce test-automation merge et (altyapı)
+git checkout main
+git merge origin/claude/test-automation-setup-KnWmC
+
+# 2. generate-test-suite merge et (test cases)
+git merge origin/claude/generate-test-suite-HHP8p
+
+# 3. Conflict resolution:
+#    - jest.config.js → İki config'i birleştir
+#    - jest.setup.js → Mock'ları birleştir
+#    - pnpm-lock.yaml → pnpm install ile yeniden oluştur
+
+git add .
+git commit -m "chore: merge test branches with conflict resolution"
+
+# 4. Testleri çalıştır
+pnpm test
+```
+
+---
+
+### FAZ 5: Code Quality (Öncelik: DÜŞÜK)
+> **Amaç:** TypeScript ve kod kalitesi düzeltmeleri
+
+```
+🔧 refactor-code-quality-vOrxf
+   ├── apps/mobile/src/components/*.tsx    - Component fixes
+   ├── tests/performance/benchmarks.test.tsx
+   └── Dosya uzantısı düzeltmeleri (.mjs → .mts)
+```
+
+**Merge Komutu:**
 ```bash
 git checkout main
-git merge origin/claude/database-architect-setup-vPpId
-git merge origin/claude/code-reviewer-tool-ZoGn0
-git merge origin/claude/compliance-specialist-tool-UViVR
-git merge origin/claude/setup-pentest-specialist-NYqwG
+git merge origin/claude/refactor-code-quality-vOrxf
+
+# Doğrulama
+pnpm build
+pnpm typecheck
 ```
 
 ---
 
-## Görsel Roadmap
+### FAZ 6: Database Schema (Öncelik: DÜŞÜK)
+> **Amaç:** PostgreSQL schema best practices
 
 ```
-                           ┌─────────────────────────────────┐
-                           │         MAIN BRANCH             │
-                           └────────────────┬────────────────┘
-                                            │
-          ┌─────────────────────────────────┼─────────────────────────────────┐
-          │                                 │                                 │
-          ▼                                 │                                 │
-┌──────────────────────┐                    │                                 │
-│     FAZ 1            │                    │                                 │
-│  (Kritik Bug Fix)    │                    │                                 │
-│                      │                    │                                 │
-│  debugger-session    │────────────────────┤                                 │
-└──────────────────────┘                    │                                 │
-                                            │                                 │
-                                            ▼                                 │
-                              ┌──────────────────────┐                        │
-                              │      FAZ 2           │                        │
-                              │  (Security Fixes)    │                        │
-                              │                      │                        │
-                              │ api-security-audit   │──┐                     │
-                              │         +            │  │ CONFLICT            │
-                              │ security-audit-owasp │◄─┘ RESOLUTION          │
-                              └──────────┬───────────┘                        │
-                                         │                                    │
-                                         ▼                                    │
-                              ┌──────────────────────┐                        │
-                              │      FAZ 3           │                        │
-                              │   (Performance)      │                        │
-                              │                      │                        │
-                              │  react-performance   │──┐                     │
-                              │         +            │  │ CONFLICT            │
-                              │  supabase-realtime   │◄─┘ RESOLUTION          │
-                              └──────────┬───────────┘                        │
-                                         │                                    │
-                                         ▼                                    │
-                              ┌──────────────────────┐                        │
-                              │      FAZ 4           │                        │
-                              │     (Testing)        │                        │
-                              │                      │                        │
-                              │  test-automation     │────────────────────────┤
-                              └──────────────────────┘                        │
-                                                                              │
-          ┌───────────────────────────────────────────────────────────────────┤
-          │                                                                   │
-          ▼                                                                   │
-┌──────────────────────────────────────────────────────────────────┐         │
-│                         FAZ 5 (Docs)                              │         │
-│                                                                   │         │
-│  database-architect  code-reviewer  compliance  pentest-report   │─────────┘
-│                                                                   │
-└──────────────────────────────────────────────────────────────────┘
+🗄️ postgres-schema-design-lYSj1
+   ├── docs/DATABASE_SCHEMA.md
+   └── supabase/migrations/20251222000000_schema_best_practices.sql
+```
+
+**Merge Komutu:**
+```bash
+git checkout main
+git merge origin/claude/postgres-schema-design-lYSj1
+
+# Migration uygula (staging'de test et!)
+supabase db push
+```
+
+**Dikkat:** Migration dosyası production'a uygulanmadan önce staging'de test edilmeli!
+
+---
+
+## Görsel Dependency Graph
+
+```
+                                    ┌─────────────────┐
+                                    │      MAIN       │
+                                    └────────┬────────┘
+                                             │
+        ┌────────────────────────────────────┼────────────────────────────────────┐
+        │                                    │                                    │
+        ▼                                    │                                    ▼
+┌───────────────────┐                        │               ┌─────────────────────────────────┐
+│     FAZ 0         │                        │               │           FAZ 0                 │
+│  (Docs - Serbest) │                        │               │      (Tools - Serbest)          │
+├───────────────────┤                        │               ├─────────────────────────────────┤
+│ architecture-docs │                        │               │ ui-design-system-toolkit        │
+│ database-architect│                        │               │ ux-research-design-toolkit      │
+│ code-reviewer     │                        │               │ algorithmic-art-p5js            │
+│ compliance        │                        │               └─────────────────────────────────┘
+│ pentest-report    │                        │
+│ update-project    │                        │
+└───────────────────┘                        │
+                                             ▼
+                              ┌──────────────────────────────┐
+                              │           FAZ 1              │
+                              │    🔴 setup-debugger-session │
+                              │      (Build Fix - KRİTİK)    │
+                              └──────────────┬───────────────┘
+                                             │
+                                             ▼
+                              ┌──────────────────────────────┐
+                              │           FAZ 2              │
+                              │      🔒 SECURITY             │
+                              ├──────────────────────────────┤
+                              │  api-security-audit          │
+                              │         ↓ CONFLICT           │
+                              │  security-audit-owasp        │
+                              └──────────────┬───────────────┘
+                                             │
+                                             ▼
+                              ┌──────────────────────────────┐
+                              │           FAZ 3              │
+                              │      ⚡ PERFORMANCE          │
+                              ├──────────────────────────────┤
+                              │  optimize-react-performance  │
+                              │         ↓ CONFLICT           │
+                              │  optimize-supabase-realtime  │
+                              └──────────────┬───────────────┘
+                                             │
+                                             ▼
+                              ┌──────────────────────────────┐
+                              │           FAZ 4              │
+                              │      🧪 TESTING              │
+                              ├──────────────────────────────┤
+                              │  test-automation-setup       │
+                              │         ↓ CONFLICT           │
+                              │  generate-test-suite         │
+                              └──────────────┬───────────────┘
+                                             │
+                         ┌───────────────────┴───────────────────┐
+                         │                                       │
+                         ▼                                       ▼
+          ┌──────────────────────────┐           ┌──────────────────────────┐
+          │         FAZ 5            │           │         FAZ 6            │
+          │    🔧 CODE QUALITY       │           │    🗄️ DATABASE           │
+          ├──────────────────────────┤           ├──────────────────────────┤
+          │  refactor-code-quality   │           │  postgres-schema-design  │
+          └──────────────────────────┘           └──────────────────────────┘
 ```
 
 ---
 
-## Detaylı Branch Analizi
+## Çakışma Çözüm Rehberi
 
-### 1. claude/setup-debugger-session-go0zT
+### 1. `apps/admin/next.config.js` Birleştirme
 
-**Commit:** `fix(admin): resolve TypeScript compilation errors`
+```javascript
+// api-security-audit'ten al:
+const securityHeaders = [
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Content-Security-Policy', value: '...' },
+];
 
-**Değişiklikler:**
-- `apps/admin/src/lib/auth.ts` - Auth library fixes
-- `apps/admin/src/lib/index.ts` - Export fixes
-- `apps/admin/tsconfig.json` - TypeScript config
-- `pnpm-lock.yaml` - Dependency lock file update
-- Various API route fixes
+// security-audit-owasp'tan al:
+const additionalConfig = {
+  poweredByHeader: false,
+  // ... diğer config
+};
 
-**Risk:** Düşük - Sadece bug fix, yeni feature yok
+// Birleştir
+module.exports = {
+  ...additionalConfig,
+  async headers() {
+    return [{ source: '/:path*', headers: securityHeaders }];
+  },
+};
+```
 
----
+### 2. `RealtimeContext.tsx` Birleştirme
 
-### 2. claude/api-security-audit-cEmbI
+```typescript
+// react-performance'dan al:
+const memoizedValue = useMemo(() => ({
+  // context değerleri
+}), [dependencies]);
 
-**Commit:** `security: Fix critical API vulnerabilities (OWASP Top 10)`
+const memoizedCallback = useCallback(() => {
+  // callback
+}, []);
 
-**Değişiklikler:**
-- `apps/admin/src/lib/query-utils.ts` - NEW: SQL injection prevention
-- `services/job-queue/src/index.ts` - Rate limiting, security headers
-- `apps/admin/nginx.conf` - Security headers
-- `.env.example` - Environment variables
-- API route security fixes
+// supabase-realtime'dan al:
+import { realtimeChannelManager } from '../services/realtimeChannelManager';
 
-**Risk:** Orta - Kritik güvenlik değişiklikleri, dikkatli test gerekli
+// Birleştir: Memoization'ı koruyarak channel manager'ı entegre et
+```
 
----
+### 3. `jest.config.js` Birleştirme
 
-### 3. claude/security-audit-owasp-Fod9p
-
-**Commit:** `security: OWASP compliance audit and vulnerability fixes`
-
-**Değişiklikler:**
-- `apps/admin/src/lib/security.ts` - NEW: Security middleware
-- `apps/admin/next.config.js` - Security headers
-- `apps/web/next.config.ts` - Security headers
-- API route authentication fixes
-
-**Risk:** Orta - api-security-audit ile çakışıyor!
-
----
-
-### 4. claude/optimize-react-performance-CGcu3
-
-**Commit:** `perf(mobile): optimize React performance with memoization`
-
-**Değişiklikler:**
-- `apps/mobile/src/utils/performanceOptimization.ts` - NEW: Performance utilities
-- Context optimizations (AuthContext, I18nContext, RealtimeContext, ToastContext)
-- `DiscoverScreen.tsx` - Component optimizations
-
-**Risk:** Düşük-Orta - Context değişiklikleri dikkatli test gerektirir
+```javascript
+// test-automation'dan: Genel config yapısı
+// generate-test-suite'dan: Test path'leri ve coverage thresholds
+// Her ikisini de içerecek şekilde birleştir
+```
 
 ---
 
-### 5. claude/optimize-supabase-realtime-j1BOO
+## Kontrol Listesi
 
-**Commit:** `perf(mobile): optimize Supabase realtime subscriptions`
+Her merge sonrası kontrol edilmesi gerekenler:
 
-**Değişiklikler:**
-- `apps/mobile/src/services/realtimeChannelManager.ts` - NEW: Channel manager
-- `apps/mobile/src/hooks/useMessages.ts` - Hook optimizations
-- `apps/mobile/src/context/RealtimeContext.tsx` - Context updates
-- `apps/mobile/src/config/supabase.ts` - Config updates
-
-**Risk:** Orta - RealtimeContext react-performance ile çakışıyor!
-
----
-
-### 6. claude/test-automation-setup-KnWmC
-
-**Commit:** `feat(testing): Add comprehensive test automation infrastructure`
-
-**Değişiklikler:**
-- `packages/test-utils/` - NEW: Test utilities package
-- Jest configs for admin, web, services
-- Playwright E2E tests
-- GitHub Actions CI workflow
-- Mock utilities (Supabase, Next.js)
-
-**Risk:** Düşük - Yeni dosyalar, mevcut koda dokunmuyor
+- [ ] `pnpm install` başarılı
+- [ ] `pnpm build` başarılı
+- [ ] `pnpm typecheck` hatasız
+- [ ] `pnpm lint` hatasız
+- [ ] `pnpm test` tüm testler geçiyor
+- [ ] Mobile app başlatılabiliyor
+- [ ] Admin panel başlatılabiliyor
+- [ ] Web app başlatılabiliyor
 
 ---
 
-### 7-10. Dokümantasyon Branch'leri
+## Risk Değerlendirmesi
 
-**Branch'ler:**
-- `claude/database-architect-setup-vPpId` - DB docs
-- `claude/code-reviewer-tool-ZoGn0` - Code review report
-- `claude/compliance-specialist-tool-UViVR` - Compliance docs
-- `claude/setup-pentest-specialist-NYqwG` - Pentest report
-
-**Risk:** Çok Düşük - Sadece markdown dosyaları
-
----
-
-## Önerilen Aksiyon Planı
-
-### Hemen Yapılması Gerekenler
-
-1. **debugger-session branch'ini merge et** - Build hatalarını çözer
-2. **Security branch'lerini birleştir** - Manuel conflict resolution gerekli
-3. **Test automation'ı aktive et** - CI/CD pipeline'ı çalıştır
-
-### Bu Hafta
-
-4. **Performance optimizasyonlarını uygula** - RealtimeContext conflict'ini çöz
-5. **Testleri çalıştır** - Tüm değişiklikleri validate et
-
-### Gelecek Hafta
-
-6. **Dokümantasyonları merge et** - Proje documentation'ını tamamla
-7. **Full regression test** - Production'a hazır hale getir
+| Faz | Risk | Açıklama |
+|-----|------|----------|
+| FAZ 0 | 🟢 YOK | Sadece docs/tools, kod yok |
+| FAZ 1 | 🟡 DÜŞÜK | Bug fix, breaking change yok |
+| FAZ 2 | 🔴 YÜKSEK | Security kritik, dikkatli test |
+| FAZ 3 | 🟡 ORTA | Mobile context değişiklikleri |
+| FAZ 4 | 🟡 DÜŞÜK | Test altyapısı, production etkilemez |
+| FAZ 5 | 🟢 DÜŞÜK | Refactor, davranış değişmez |
+| FAZ 6 | 🔴 YÜKSEK | DB migration, staging'de test! |
 
 ---
 
-## Conflict Resolution Rehberi
+## Özet Aksiyon Planı
 
-### next.config.js Birleştirme
+### Bugün Yapılabilir (Serbest, çakışma yok):
+1. ✅ Tüm dokümantasyon branch'lerini merge et (9 branch)
 
-Her iki branch'ten security header'ları al:
-- `api-security-audit`: CSP, HSTS headers
-- `security-audit-owasp`: Additional security config
+### Bu Hafta:
+2. 🔴 `setup-debugger-session` merge et (build fix)
+3. 🔒 Security branch'lerini birleştir (conflict resolution)
+4. ⚡ Performance branch'lerini birleştir (conflict resolution)
 
-### RealtimeContext.tsx Birleştirme
-
-Performance ve realtime optimizasyonlarını birleştir:
-- `react-performance`: useMemo, useCallback
-- `supabase-realtime`: Channel manager integration
+### Gelecek Hafta:
+5. 🧪 Test branch'lerini birleştir
+6. 🔧 Code quality merge et
+7. 🗄️ DB migration'ı staging'de test et ve merge et
 
 ---
 
-## Notlar
-
-- Tüm merge işlemlerinden önce `pnpm build` ve `pnpm test` çalıştırın
-- Security değişikliklerini staging'de kapsamlı test edin
-- Dokümantasyon branch'leri bağımsız olarak herhangi bir sırada merge edilebilir
+**Not:** Bu roadmap `BRANCH_ROADMAP.md` dosyasında saklanmıştır. Her merge sonrası bu dosyayı güncelleyin.
