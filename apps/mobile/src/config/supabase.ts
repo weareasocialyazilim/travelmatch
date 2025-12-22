@@ -4,8 +4,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
-import { secureStorage } from '../utils/secureStorage';
 import type { Database } from '@/types/database.types';
 
 // Re-export Database type for use in services
@@ -25,16 +25,16 @@ const isTest =
 // In test environment, use mock values to prevent createClient from throwing
 const SUPABASE_URL: string = isTest
   ? 'https://test.supabase.co'
-  : ((process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined) ??
+  : (process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined) ??
     (process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined) ??
-    '');
+    '';
 const SUPABASE_ANON_KEY: string = isTest
   ? 'test-anon-key'
-  : ((process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY as
+  : (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY as
       | string
       | undefined) ??
     (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string | undefined) ??
-    '');
+    '';
 
 // Validate configuration
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -46,17 +46,33 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 /**
- * Custom storage adapter for Supabase to use SecureStore
+ * Storage adapter for Supabase Auth
+ * Uses AsyncStorage which is the officially recommended approach for React Native
+ * This ensures session persistence works correctly across app restarts
  */
-const SupabaseStorage = {
-  getItem: (key: string) => {
-    return secureStorage.getItem(key);
+const SupabaseAuthStorage = {
+  getItem: async (key: string): Promise<string | null> => {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      return value;
+    } catch (error) {
+      logger.error('[Supabase Storage] getItem error:', error);
+      return null;
+    }
   },
-  setItem: (key: string, value: string) => {
-    return secureStorage.setItem(key, value);
+  setItem: async (key: string, value: string): Promise<void> => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (error) {
+      logger.error('[Supabase Storage] setItem error:', error);
+    }
   },
-  removeItem: (key: string) => {
-    return secureStorage.deleteItem(key);
+  removeItem: async (key: string): Promise<void> => {
+    try {
+      await AsyncStorage.removeItem(key);
+    } catch (error) {
+      logger.error('[Supabase Storage] removeItem error:', error);
+    }
   },
 };
 
@@ -67,7 +83,7 @@ export const SUPABASE_EDGE_URL = SUPABASE_URL;
 
 /**
  * Supabase client instance
- * Configured with SecureStore for session persistence in React Native
+ * Configured with AsyncStorage for session persistence in React Native
  * Uses auto-generated Database types from @/types/database.types.ts
  */
 export const supabase = createClient<Database>(
@@ -75,7 +91,7 @@ export const supabase = createClient<Database>(
   SUPABASE_ANON_KEY,
   {
     auth: {
-      storage: SupabaseStorage,
+      storage: SupabaseAuthStorage,
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false, // Disable for React Native

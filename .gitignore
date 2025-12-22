@@ -60,6 +60,15 @@ yarn-error.*
 coverage/
 .eslintcache
 apps/mobile/.eslintcache
+
+# ============================================
+# SECURITY: Test scripts with hardcoded secrets
+# ============================================
+scripts/fix-user.mjs
+scripts/test-moment-creation.ts
+scripts/*-test.ts
+scripts/*-debug.ts
+
 # ============================================
 # SECURITY: Environment files with secrets
 # ============================================
@@ -109,3 +118,4 @@ apps/**/pnpm-lock.yaml
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .github/instructions/snyk_rules.instructions.md
+.eslintcache-mobile

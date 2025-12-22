@@ -78,7 +78,6 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     });
 
   const interests = watch('interests');
-  const _bio = watch('bio');
 
   const pickImage = async (useCamera: boolean) => {
     try {
@@ -98,10 +97,11 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
           cameraType: ImagePicker.CameraType.front,
         });
         if (!result.canceled && result.assets[0]) {
-          // Flip selfie horizontally to correct mirror effect
+          // expo-image-picker handles front camera mirroring automatically on iOS
+          // No manual flip needed - just compress the image
           const manipulated = await manipulateAsync(
             result.assets[0].uri,
-            [{ flip: 'horizontal' as const }],
+            [], // No transformations needed
             { compress: 0.8, format: SaveFormat.JPEG },
           );
           setValue('avatar', manipulated.uri);

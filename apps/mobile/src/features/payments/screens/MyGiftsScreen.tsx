@@ -108,18 +108,36 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
         {/* Stats Section */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Total gifted</Text>
+            <MaterialCommunityIcons
+              name={'cash-multiple' as IconName}
+              size={24}
+              color={COLORS.primary}
+              style={styles.statIcon}
+            />
             <Text style={styles.statValue}>
               ${stats.totalGifted.toFixed(0)}
             </Text>
+            <Text style={styles.statLabel}>Total Gifted</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Gifts completed</Text>
+            <MaterialCommunityIcons
+              name={'gift-outline' as IconName}
+              size={24}
+              color={COLORS.teal}
+              style={styles.statIcon}
+            />
             <Text style={styles.statValue}>{stats.completedGifts}</Text>
+            <Text style={styles.statLabel}>Completed</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Travelers helped</Text>
+            <MaterialCommunityIcons
+              name={'account-group-outline' as IconName}
+              size={24}
+              color={COLORS.coral}
+              style={styles.statIcon}
+            />
             <Text style={styles.statValue}>{stats.uniqueRecipients}</Text>
+            <Text style={styles.statLabel}>People Helped</Text>
           </View>
         </View>
 
@@ -240,17 +258,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     padding: 16,
-    gap: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  statIcon: {
+    marginBottom: 4,
   },
   statLabel: {
-    ...TYPOGRAPHY.bodySmall,
+    ...TYPOGRAPHY.caption,
     fontWeight: '500',
     color: COLORS.textSecondary,
+    textAlign: 'center',
   },
   statValue: {
-    ...TYPOGRAPHY.h2,
+    ...TYPOGRAPHY.h3,
     fontWeight: '700',
     color: COLORS.text,
+    textAlign: 'center',
   },
   giftList: {
     paddingHorizontal: 16,

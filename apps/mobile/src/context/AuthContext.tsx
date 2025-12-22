@@ -318,6 +318,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               expiresAt,
             };
 
+            // Ensure user profile exists in public.users (for users created before trigger)
+            await authService.ensureUserProfile(
+              parsedUser.id,
+              parsedUser.email,
+              parsedUser.name || 'User',
+              parsedUser.avatar,
+            );
+
             setUser(parsedUser);
             setTokens(parsedTokens);
             setAuthState('authenticated');
@@ -354,6 +362,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (error) throw error;
       if (!authUser || !session) throw new Error('Login failed');
+
+      // Ensure user exists in public.users table (for RLS to work)
+      const { error: upsertError } = await authService.ensureUserProfile(
+        authUser.id,
+        authUser.email || '',
+        authUser.user_metadata?.name ||
+          authUser.user_metadata?.full_name ||
+          'User',
+        authUser.user_metadata?.avatar_url,
+      );
+
+      if (upsertError) {
+        logger.warn('[Auth] Failed to ensure user profile:', upsertError);
+        // Continue anyway - profile might already exist
+      }
 
       const newUser = createUser({
         id: authUser.id,
@@ -396,6 +419,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (error) throw error;
       if (!authUser) throw new Error('Registration failed');
+
+      // Ensure user profile exists in public.users table
+      await authService.ensureUserProfile(
+        authUser.id,
+        authUser.email || '',
+        data.name,
+        authUser.user_metadata?.avatar_url,
+      );
 
       if (session) {
         const newUser = createUser({
@@ -506,6 +537,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setAuthState('unauthenticated');
         return;
       }
+
+      // Ensure user profile exists in public.users table
+      await authService.ensureUserProfile(
+        authUser.id,
+        authUser.email || '',
+        authUser.user_metadata?.name ||
+          authUser.user_metadata?.full_name ||
+          authUser.email?.split('@')[0] ||
+          'User',
+        authUser.user_metadata?.avatar_url,
+      );
 
       const newUser = createUser({
         id: authUser.id,

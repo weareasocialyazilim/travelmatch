@@ -13,6 +13,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
 import { COLORS } from '../constants/colors';
+import { logger } from '../utils/logger';
 
 // Initialize Mapbox - access token should be set in env
 const MAPBOX_TOKEN =
@@ -169,7 +170,7 @@ export const LocationPickerBottomSheet: React.FC<
     }
   }, [visible, initialLocation]);
 
-  // Search places using Mapbox Geocoding API
+  // Search places using Mapbox Search Box API (better POI results)
   const searchPlaces = useCallback(async (query: string) => {
     if (!query || query.length < 2) {
       setSearchResults([]);
@@ -178,7 +179,7 @@ export const LocationPickerBottomSheet: React.FC<
     }
 
     if (!MAPBOX_TOKEN) {
-      console.warn('[LocationPicker] Mapbox token not configured');
+      logger.warn('[LocationPicker] Mapbox token not configured');
       return;
     }
 
@@ -186,8 +187,61 @@ export const LocationPickerBottomSheet: React.FC<
     setShowResults(true);
 
     try {
-      // Use Mapbox Geocoding API with POI (Point of Interest) types
-      // types: poi, poi.landmark includes restaurants, cafes, bars, museums, etc.
+      // Try Mapbox Search Box API first (better for POIs like restaurants, museums, etc.)
+      // This API returns richer results including businesses, landmarks, and addresses
+      const searchBoxResponse = await fetch(
+        `https://api.mapbox.com/search/searchbox/v1/suggest?` +
+          `q=${encodeURIComponent(query)}&` +
+          `language=en,tr&` +
+          `limit=10&` +
+          `session_token=${Date.now()}&` +
+          `types=poi,address,place,neighborhood,locality,region,country&` +
+          `access_token=${MAPBOX_TOKEN}`,
+      );
+
+      if (searchBoxResponse.ok) {
+        const searchBoxData = await searchBoxResponse.json();
+
+        if (searchBoxData.suggestions && searchBoxData.suggestions.length > 0) {
+          // Map suggestions directly - coordinates will be fetched when user selects
+          const results: SearchResult[] = searchBoxData.suggestions
+            .slice(0, 10)
+            .map(
+              (suggestion: {
+                mapbox_id: string;
+                name: string;
+                full_address?: string;
+                address?: string;
+                place_formatted?: string;
+                feature_type: string;
+                maki?: string;
+                poi_category?: string[];
+                poi_category_ids?: string[];
+              }) => {
+                const categories = suggestion.poi_category || [];
+
+                return {
+                  id: suggestion.mapbox_id,
+                  name: suggestion.name,
+                  address:
+                    suggestion.full_address ||
+                    suggestion.place_formatted ||
+                    suggestion.address ||
+                    '',
+                  latitude: 0, // Will be fetched on selection
+                  longitude: 0,
+                  category: formatCategory(categories),
+                  categoryIcon: getCategoryIcon(categories),
+                };
+              },
+            );
+
+          setSearchResults(results);
+          return;
+        }
+      }
+
+      // Fallback to Geocoding API if Search Box fails or returns no results
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
           query,
@@ -231,7 +285,7 @@ export const LocationPickerBottomSheet: React.FC<
 
       setSearchResults(results);
     } catch (error) {
-      console.error('[LocationPicker] Search error:', error);
+      logger.error('[LocationPicker] Search error:', error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -254,13 +308,42 @@ export const LocationPickerBottomSheet: React.FC<
     [searchPlaces],
   );
 
-  // Select a search result
-  const handleSelectResult = useCallback((result: SearchResult) => {
+  // Select a search result - fetch coordinates if needed (for Search Box API results)
+  const handleSelectResult = useCallback(async (result: SearchResult) => {
+    let latitude = result.latitude;
+    let longitude = result.longitude;
+
+    // If coordinates are 0, fetch them from Mapbox retrieve endpoint
+    if (latitude === 0 && longitude === 0 && result.id.startsWith('dXJu')) {
+      try {
+        const retrieveResponse = await fetch(
+          `https://api.mapbox.com/search/searchbox/v1/retrieve/${result.id}?` +
+            `session_token=${Date.now()}&` +
+            `access_token=${MAPBOX_TOKEN}`,
+        );
+
+        if (retrieveResponse.ok) {
+          const retrieveData = await retrieveResponse.json();
+          if (retrieveData.features && retrieveData.features.length > 0) {
+            const coords = retrieveData.features[0].geometry?.coordinates;
+            if (coords) {
+              longitude = coords[0];
+              latitude = coords[1];
+            }
+          }
+        }
+      } catch {
+        // Use default Istanbul coordinates if retrieve fails
+        latitude = 41.0082;
+        longitude = 28.9784;
+      }
+    }
+
     const location: Location = {
       name: result.name,
       address: result.address,
-      latitude: result.latitude,
-      longitude: result.longitude,
+      latitude,
+      longitude,
       category: result.category,
     };
 
@@ -270,11 +353,13 @@ export const LocationPickerBottomSheet: React.FC<
     Keyboard.dismiss();
 
     // Animate camera to selected location
-    cameraRef.current?.setCamera({
-      centerCoordinate: [result.longitude, result.latitude],
-      zoomLevel: 16,
-      animationDuration: 500,
-    });
+    if (latitude !== 0 && longitude !== 0) {
+      cameraRef.current?.setCamera({
+        centerCoordinate: [longitude, latitude],
+        zoomLevel: 16,
+        animationDuration: 500,
+      });
+    }
   }, []);
 
   // Confirm selection

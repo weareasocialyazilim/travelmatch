@@ -24,12 +24,14 @@ import { COLORS } from '@/constants/colors';
 import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
+import { ensureUserProfile } from '@/services/supabaseAuthService';
 import { editProfileSchema, type EditProfileInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
 import { CityAutocomplete } from '@/components/CityAutocomplete';
+import { logger } from '@/utils/logger';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -188,9 +190,26 @@ const EditProfileScreen = () => {
     }
 
     try {
+      logger.info('[EditProfile] Starting profile update with data:', data);
+
+      // Ensure user exists in public.users table first
+      // This is needed for users created before the trigger was added
+      if (user?.id && user?.email) {
+        logger.info('[EditProfile] Ensuring user profile exists...');
+        await ensureUserProfile(
+          user.id,
+          user.email,
+          data.fullName || user.name || 'User',
+          user.avatar,
+        );
+        logger.info('[EditProfile] User profile ensured');
+      }
+
       // Upload avatar if changed
       if (avatarUri) {
+        logger.info('[EditProfile] Uploading new avatar...');
         await userService.updateAvatar(avatarUri);
+        logger.info('[EditProfile] Avatar uploaded successfully');
       }
 
       // Update profile - convert to snake_case for database
@@ -198,8 +217,8 @@ const EditProfileScreen = () => {
       // Note: username column may not exist yet - check migration status
       const updateData: Record<string, unknown> = {
         full_name: data.fullName,
-        bio: data.bio,
-        location: data.location || undefined,
+        bio: data.bio || null,
+        location: data.location || null,
       };
 
       // Only include username if it was changed and is available
@@ -211,7 +230,9 @@ const EditProfileScreen = () => {
         updateData.username = data.username;
       }
 
+      logger.info('[EditProfile] Sending update to database:', updateData);
       await userService.updateProfile(updateData);
+      logger.info('[EditProfile] Profile updated successfully');
 
       // Refresh user context
       await refreshUser();
@@ -220,8 +241,22 @@ const EditProfileScreen = () => {
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      console.error('Profile update error:', error);
-      showToast('Failed to update profile', 'error');
+      const err = error as Error & {
+        code?: string;
+        message?: string;
+        details?: string;
+        hint?: string;
+      };
+      logger.error('[EditProfile] Update error:', {
+        message: err.message,
+        code: err.code,
+        details: err.details,
+        hint: err.hint,
+      });
+      showToast(
+        `Failed to update profile: ${err.message || 'Unknown error'}`,
+        'error',
+      );
     }
   };
 

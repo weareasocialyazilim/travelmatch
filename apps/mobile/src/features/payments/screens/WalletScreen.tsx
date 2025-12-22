@@ -31,7 +31,6 @@ const WalletScreen = () => {
     balance,
     transactions,
     balanceLoading,
-    transactionsError: _error,
     refreshBalance,
     loadTransactions,
   } = usePayments();
@@ -203,12 +202,14 @@ const WalletScreen = () => {
               <View style={styles.balanceInfo}>
                 <Text style={styles.balanceLabel}>Available Balance</Text>
                 <Text style={styles.balanceAmount}>
-                  ${(balance?.available || 1250).toFixed(2)}
+                  ${(balance?.available ?? 0).toFixed(2)}
                 </Text>
-                <Text style={styles.escrowText}>
-                  ${(balance?.pending || 300).toFixed(2)} in Escrow (waiting for
-                  proof)
-                </Text>
+                {(balance?.pending ?? 0) > 0 && (
+                  <Text style={styles.escrowText}>
+                    ${(balance?.pending ?? 0).toFixed(2)} in Escrow (waiting for
+                    proof)
+                  </Text>
+                )}
               </View>
               <View style={styles.balanceActions}>
                 <TouchableOpacity

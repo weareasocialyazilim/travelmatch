@@ -395,17 +395,42 @@ export const momentsService = {
     moment: Tables['moments']['Insert'],
   ): Promise<DbResult<Tables['moments']['Row']>> {
     try {
+      logger.info(
+        '[DB] Creating moment with payload:',
+        JSON.stringify(moment, null, 2),
+      );
+
       const { data, error } = await supabase
         .from('moments')
         .insert(moment)
         .select()
         .single();
 
-      if (error) throw error;
-      logger.info('[DB] Moment created:', data?.id);
+      if (error) {
+        logger.error('[DB] Moment insert failed:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw error;
+      }
+
+      logger.info('[DB] Moment created successfully:', data?.id);
       return { data, error: null };
     } catch (error) {
-      logger.error('[DB] Create moment error:', error);
+      const err = error as {
+        code?: string;
+        message?: string;
+        details?: string;
+        hint?: string;
+      };
+      logger.error('[DB] Create moment error:', {
+        code: err.code,
+        message: err.message,
+        details: err.details,
+        hint: err.hint,
+      });
       return { data: null, error: error as Error };
     }
   },
@@ -559,7 +584,7 @@ export const momentsService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data: _data, error } = await callRpc('soft_delete', {
+      const { error } = await callRpc('soft_delete', {
         table_name: 'moments',
         record_id: id,
         user_id: user.id,
@@ -581,7 +606,7 @@ export const momentsService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data: _data, error } = await callRpc('restore_deleted', {
+      const { error } = await callRpc('restore_deleted', {
         table_name: 'moments',
         record_id: id,
         user_id: user.id,

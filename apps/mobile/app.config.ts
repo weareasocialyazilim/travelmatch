@@ -20,7 +20,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.travelmatch.mobile',
-    buildNumber: '9',
+    buildNumber: '10',
     associatedDomains: ['applinks:travelmatch.app'],
     config: {},
     infoPlist: {

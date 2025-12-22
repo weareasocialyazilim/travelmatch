@@ -34,18 +34,16 @@ import {
   StorySection,
   MomentPreview,
   CATEGORIES,
-  getCategoryEmoji,
-  type Place as _Place,
 } from '@/components/createMoment';
 import { COLORS } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
-import { STRINGS as _STRINGS } from '../constants/strings';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
 import { LocationPickerBottomSheet } from '@/components/LocationPickerBottomSheet';
+import { logger } from '@/utils/logger';
 
 // Import sub-components
 
@@ -106,44 +104,42 @@ const CreateMomentScreen: React.FC = () => {
       try {
         const categoryObj = CATEGORIES.find((c) => c.id === data.category);
 
-        const momentData = {
-          title: data.title.trim(),
-          story: data.story?.trim() || undefined,
-          price: data.amount,
-          category: {
-            id: data.category,
-            label: categoryObj?.label || data.category,
-            emoji: getCategoryEmoji(data.category),
-          },
-          location: data.place
-            ? {
-                name: data.place.name,
-                city:
-                  data.place.address.split(',')[0]?.trim() || data.place.name,
-                country: data.place.address.split(',')[1]?.trim() || '',
-              }
-            : undefined,
-          date: data.date.toISOString(),
-          imageUrl: photo || undefined,
-          availability: 'Available',
-        };
+        // Build location from place data
+        const locationCity =
+          data.place?.address?.split(',')[0]?.trim() ||
+          data.place?.name ||
+          'Unknown';
+        const locationCountry =
+          data.place?.address?.split(',')[1]?.trim() || '';
 
         // Convert to CreateMomentData format
         const createMomentInput = {
-          title: momentData.title,
-          description: momentData.story || '',
-          category: momentData.category.id,
+          title: data.title.trim(),
+          description: data.story?.trim() || '',
+          category: categoryObj?.id || data.category,
           location: {
-            city: momentData.location?.city || '',
-            country: momentData.location?.country || '',
+            city: locationCity,
+            country: locationCountry,
+            coordinates:
+              data.place?.latitude && data.place?.longitude
+                ? {
+                    lat: data.place.latitude,
+                    lng: data.place.longitude,
+                  }
+                : undefined,
           },
-          images: momentData.imageUrl ? [momentData.imageUrl] : [],
-          pricePerGuest: momentData.price,
+          images: photo ? [photo] : [],
+          pricePerGuest: data.amount || 0,
           currency: 'USD',
           maxGuests: 4,
           duration: '2 hours',
-          availability: [momentData.date],
+          availability: [data.date.toISOString()],
         };
+
+        logger.info(
+          '[CreateMomentScreen] Submitting moment:',
+          JSON.stringify(createMomentInput, null, 2),
+        );
 
         const createdMoment = await createMoment(createMomentInput);
 
@@ -152,11 +148,37 @@ const CreateMomentScreen: React.FC = () => {
             { text: 'OK', onPress: () => navigation.goBack() },
           ]);
         } else {
+          // This shouldn't happen anymore since we throw errors now
+          logger.error(
+            '[CreateMomentScreen] createMoment returned null unexpectedly',
+          );
           showToast('Could not create moment. Please try again.', 'error');
         }
       } catch (error) {
-        console.error('Create moment error:', error);
-        showToast('Something went wrong. Please try again.', 'error');
+        const err = error as Error & { code?: string; hint?: string };
+        logger.error('[CreateMomentScreen] Create moment error:', {
+          message: err.message,
+          code: err.code,
+          hint: err.hint,
+        });
+
+        // Show user-friendly error message
+        let errorMessage = 'Something went wrong. Please try again.';
+        if (
+          err.message?.includes('Not authenticated') ||
+          err.message?.includes('Authentication failed')
+        ) {
+          errorMessage = 'Please log in again to publish your moment.';
+        } else if (err.code === '23503') {
+          errorMessage =
+            'Account setup incomplete. Please try logging out and back in.';
+        } else if (err.code === '42501') {
+          errorMessage = 'Permission denied. Please log in again.';
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+
+        showToast(errorMessage, 'error');
       } finally {
         setIsSubmitting(false);
       }

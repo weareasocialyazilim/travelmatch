@@ -335,7 +335,12 @@ export const userService = {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    if (!user) {
+      logger.error('updateProfile: Not authenticated - no user');
+      throw new Error('Not authenticated');
+    }
+
+    logger.info('updateProfile: Updating user', user.id, 'with data:', data);
 
     const { data: profile, error } = await supabase
       .from('users')
@@ -345,10 +350,16 @@ export const userService = {
       .single();
 
     if (error) {
-      logger.error('Error updating profile:', error);
+      logger.error('updateProfile: Error updating profile:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
       throw error;
     }
 
+    logger.info('updateProfile: Success, updated profile:', profile?.id);
     return { user: profile as unknown as UserProfile };
   },
 

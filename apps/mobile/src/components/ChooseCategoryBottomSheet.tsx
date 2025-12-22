@@ -7,6 +7,8 @@ import {
   Modal,
   ScrollView,
   TouchableWithoutFeedback,
+  Image,
+  ImageSourcePropType,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
@@ -16,7 +18,8 @@ type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 interface Category {
   id: string;
   label: string;
-  icon: IconName;
+  icon?: IconName;
+  image?: ImageSourcePropType;
 }
 
 interface ChooseCategoryBottomSheetProps {
@@ -28,6 +31,8 @@ interface ChooseCategoryBottomSheetProps {
 
 const CATEGORIES: Category[] = [
   { id: 'adventure', label: 'Adventure', icon: 'compass' },
+  // TODO: Once the image is saved to apps/mobile/assets/categories/food.png, use:
+  // { id: 'food', label: 'Food & Drink', image: require('../../assets/categories/food.png') },
   { id: 'food', label: 'Food & Drink', icon: 'food' },
   { id: 'culture', label: 'Culture', icon: 'bank' },
   { id: 'relaxation', label: 'Relaxation', icon: 'meditation' },
@@ -79,11 +84,18 @@ export const ChooseCategoryBottomSheet: React.FC<
             >
               <View style={styles.categoryContent}>
                 <View style={styles.iconContainer}>
-                  <MaterialCommunityIcons
-                    name={category.icon}
-                    size={24}
-                    color={COLORS.primary}
-                  />
+                  {category.image ? (
+                    <Image
+                      source={category.image}
+                      style={styles.categoryImage}
+                    />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name={category.icon as IconName}
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  )}
                 </View>
                 <Text style={styles.categoryLabel}>{category.label}</Text>
               </View>
@@ -157,6 +169,11 @@ const styles = StyleSheet.create({
     backgroundColor: `${COLORS.primary}20`,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  categoryImage: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
   categoryLabel: {
     fontSize: 16,

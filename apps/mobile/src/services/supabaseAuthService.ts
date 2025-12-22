@@ -25,6 +25,44 @@ export const getSession = async (): Promise<{
 };
 
 /**
+ * Ensure user profile exists in public.users table
+ * This is needed because the trigger might not have run for existing users
+ */
+export const ensureUserProfile = async (
+  userId: string,
+  email: string,
+  fullName: string,
+  avatarUrl?: string,
+): Promise<{ error: Error | null }> => {
+  try {
+    const { error } = await supabase.from('users').upsert(
+      {
+        id: userId,
+        email,
+        full_name: fullName,
+        avatar_url: avatarUrl || null,
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: 'id',
+        ignoreDuplicates: false,
+      },
+    );
+
+    if (error) {
+      logger.error('[Auth] ensureUserProfile error:', error);
+      return { error };
+    }
+
+    logger.info('[Auth] User profile ensured:', userId);
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] ensureUserProfile exception:', error);
+    return { error: error as Error };
+  }
+};
+
+/**
  * Sign up with email and password
  */
 export const signUpWithEmail = async (
@@ -192,7 +230,7 @@ export const handleOAuthCallback = async (
     // Supabase returns tokens in URL hash after OAuth redirect
     const urlObj = new URL(url);
     const hashParams = new URLSearchParams(urlObj.hash.substring(1));
-    
+
     const accessToken = hashParams.get('access_token');
     const refreshToken = hashParams.get('refresh_token');
 
