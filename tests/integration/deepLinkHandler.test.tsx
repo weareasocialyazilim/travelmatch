@@ -52,7 +52,7 @@ jest.mock('../../apps/mobile/src/services/sessionManager', () => ({
 global.fetch = jest.fn();
 
 describe('DeepLinkHandler', () => {
-  let mockNavigation>;
+  let mockNavigation: NavigationContainerRef<any>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -69,10 +69,10 @@ describe('DeepLinkHandler', () => {
     deepLinkHandler.setNavigation(mockNavigation);
 
     // Default sessionManager mock
-    (sessionManager.getValidToken ).mockResolvedValue('mock-token');
+    (sessionManager.getValidToken as jest.Mock).mockResolvedValue('mock-token');
 
     // Default fetch mock (resource exists)
-    (global.fetch ).mockResolvedValue({
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       status: 200,
     });
@@ -239,7 +239,7 @@ describe('DeepLinkHandler', () => {
     it('should check if resource exists (200)', async () => {
       const url = 'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
 
-      (global.fetch ).mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         status: 200,
       });
@@ -261,7 +261,7 @@ describe('DeepLinkHandler', () => {
     it('should handle 404 not found', async () => {
       const url = 'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
 
-      (global.fetch ).mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -276,7 +276,7 @@ describe('DeepLinkHandler', () => {
     it('should handle 410 expired link', async () => {
       const url = 'https://travelmatch.app/gift/456e7890-e89b-12d3-a456-426614174222';
 
-      (global.fetch ).mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 410,
       });
@@ -291,7 +291,7 @@ describe('DeepLinkHandler', () => {
     it('should handle 401 unauthorized', async () => {
       const url = 'https://travelmatch.app/trip/123e4567-e89b-12d3-a456-426614174000';
 
-      (global.fetch ).mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 401,
       });
@@ -306,7 +306,7 @@ describe('DeepLinkHandler', () => {
     it('should handle 403 forbidden', async () => {
       const url = 'https://travelmatch.app/chat/987fcdeb-51a2-43f1-b456-426614174111';
 
-      (global.fetch ).mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 403,
       });
@@ -318,7 +318,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should skip existence check for public resources without token', async () => {
-      (sessionManager.getValidToken ).mockResolvedValueOnce(null);
+      (sessionManager.getValidToken as jest.Mock).mockResolvedValueOnce(null);
 
       const url = 'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
       const result = await deepLinkHandler.handleDeepLink(url, { checkExists: true });
@@ -328,7 +328,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should fail-open on network errors', async () => {
-      (global.fetch ).mockRejectedValueOnce(new Error('Network error'));
+      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
       const url = 'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
       const result = await deepLinkHandler.handleDeepLink(url, { checkExists: true });
@@ -414,7 +414,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should navigate to error screen on 404', async () => {
-      (global.fetch ).mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -433,7 +433,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should navigate to expired screen on 410', async () => {
-      (global.fetch ).mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 410,
       });
@@ -560,7 +560,7 @@ describe('DeepLinkHandler', () => {
     it('should handle initial URL on app launch', async () => {
       const initialURL = 'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
 
-      (Linking.getInitialURL ).mockResolvedValueOnce(initialURL);
+      (Linking.getInitialURL as jest.Mock).mockResolvedValueOnce(initialURL);
 
       const unsubscribe = deepLinkHandler.initialize();
 
@@ -574,7 +574,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should handle no initial URL', async () => {
-      (Linking.getInitialURL ).mockResolvedValueOnce(null);
+      (Linking.getInitialURL as jest.Mock).mockResolvedValueOnce(null);
 
       const unsubscribe = deepLinkHandler.initialize();
 
@@ -588,7 +588,7 @@ describe('DeepLinkHandler', () => {
 
     it('should listen to URL changes', () => {
       const mockRemove = jest.fn();
-      (Linking.addEventListener ).mockReturnValueOnce({ remove: mockRemove });
+      (Linking.addEventListener as jest.Mock).mockReturnValueOnce({ remove: mockRemove });
 
       const unsubscribe = deepLinkHandler.initialize();
 
@@ -601,7 +601,7 @@ describe('DeepLinkHandler', () => {
     it('should handle URL events when app in background', async () => {
       let urlListener: (event: { url: string }) => void = () => {};
 
-      (Linking.addEventListener ).mockImplementationOnce((event, callback) => {
+      (Linking.addEventListener as jest.Mock).mockImplementationOnce((event, callback) => {
         urlListener = callback;
         return { remove: jest.fn() };
       });
@@ -620,7 +620,7 @@ describe('DeepLinkHandler', () => {
     it('should navigate to error screen on failed initial URL', async () => {
       const invalidURL = 'https://travelmatch.app/invalid-path';
 
-      (Linking.getInitialURL ).mockResolvedValueOnce(invalidURL);
+      (Linking.getInitialURL as jest.Mock).mockResolvedValueOnce(invalidURL);
 
       deepLinkHandler.initialize();
 

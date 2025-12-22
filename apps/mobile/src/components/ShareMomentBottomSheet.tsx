@@ -59,7 +59,7 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       Clipboard.setString(momentUrl);
       showToast('Link copied to clipboard!', 'success');
       onClose();
-    } catch (error) {
+    } catch (_error) {
       showToast('Link kopyalanamadı', 'error');
     }
   };

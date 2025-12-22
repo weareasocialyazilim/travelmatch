@@ -64,7 +64,7 @@ export const BlockConfirmation: React.FC<BlockConfirmationProps> = ({
       showToast(`${userName} has been blocked`, 'success');
       onBlocked?.();
       onClose();
-    } catch (error) {
+    } catch (_error) {
       showToast('Failed to block user', 'error');
     } finally {
       setLoading(false);
