@@ -19,7 +19,17 @@
     "test-storybook:ci": "concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"pnpm build-storybook --quiet && npx http-server storybook-static --port 6006 --silent\" \"wait-on tcp:6006 && pnpm test-storybook\"",
     "chromatic": "chromatic --project-token=$CHROMATIC_TOKEN",
     "chromatic:ci": "chromatic --exit-zero-on-changes=false --exit-once-uploaded",
-    "validate": "pnpm run lint && pnpm run type-check && pnpm run test:ci && pnpm run test-storybook:ci"
+    "validate": "pnpm run lint && pnpm run type-check && pnpm run test:ci && pnpm run test-storybook:ci",
+    "tokens:generate": "python3 scripts/design_token_generator.py",
+    "tokens:generate:css": "python3 scripts/design_token_generator.py \"#2196F3\" modern css",
+    "tokens:generate:scss": "python3 scripts/design_token_generator.py \"#2196F3\" modern scss",
+    "responsive:calc": "python3 scripts/responsive_calculator.py",
+    "responsive:report": "python3 scripts/responsive_calculator.py report",
+    "a11y:audit": "python3 scripts/accessibility_checker.py full-audit",
+    "a11y:contrast": "python3 scripts/accessibility_checker.py contrast",
+    "handoff:tokens": "python3 scripts/handoff_generator.py tokens md",
+    "handoff:component": "python3 scripts/handoff_generator.py component",
+    "handoff:docs": "python3 scripts/handoff_generator.py full-docs"
   },
   "dependencies": {
     "zod": "^4.2.1"
