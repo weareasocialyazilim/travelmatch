@@ -54,7 +54,7 @@ export interface UpdateProfilePayload {
   full_name?: string;
   username?: string;
   bio?: string;
-  location?: unknown;
+  location?: string | unknown; // Can be string (database) or object (legacy)
   languages?: string[];
   interests?: string[];
   instagram?: string;

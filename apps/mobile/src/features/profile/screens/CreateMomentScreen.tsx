@@ -45,6 +45,7 @@ import { useMoments } from '../hooks';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
+import { LocationPickerBottomSheet } from '@/components/LocationPickerBottomSheet';
 
 // Import sub-components
 
@@ -56,6 +57,7 @@ const CreateMomentScreen: React.FC = () => {
   // UI-specific state (not in form)
   const [photo, setPhoto] = useState<string>(''); // Managed by PhotoSection
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -152,7 +154,8 @@ const CreateMomentScreen: React.FC = () => {
         } else {
           showToast('Could not create moment. Please try again.', 'error');
         }
-      } catch {
+      } catch (error) {
+        console.error('Create moment error:', error);
         showToast('Something went wrong. Please try again.', 'error');
       } finally {
         setIsSubmitting(false);
@@ -165,10 +168,26 @@ const CreateMomentScreen: React.FC = () => {
   // Handlers
   const handleDatePress = useCallback(() => setShowDatePicker(true), []);
   const handleNavigateToPlaceSearch = useCallback(() => {
-    // TODO: Implement proper place selection (Google Places or similar)
-    showToast('Place selection coming soon', 'info');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setShowLocationPicker(true);
   }, []);
+
+  const handleLocationSelect = useCallback(
+    (location: {
+      name: string;
+      address: string;
+      latitude: number;
+      longitude: number;
+    }) => {
+      setValue('place', {
+        name: location.name,
+        address: location.address,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+      setShowLocationPicker(false);
+    },
+    [setValue],
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -356,6 +375,13 @@ const CreateMomentScreen: React.FC = () => {
             }}
           />
         ))}
+
+      {/* Location Picker Modal */}
+      <LocationPickerBottomSheet
+        visible={showLocationPicker}
+        onClose={() => setShowLocationPicker(false)}
+        onSelectLocation={handleLocationSelect}
+      />
     </SafeAreaView>
   );
 };

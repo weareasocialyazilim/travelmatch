@@ -288,7 +288,10 @@ const DiscoverScreen = () => {
 
   // Apply filters to hook when category changes
   useEffect(() => {
-    if (selectedCategory !== 'all') {
+    if (selectedCategory === 'all') {
+      // Reset filters when category is 'all'
+      setFilters({});
+    } else {
       setFilters({ category: selectedCategory });
     }
   }, [selectedCategory, setFilters]);
@@ -599,8 +602,10 @@ const DiscoverScreen = () => {
         onPreviousStory={goToPreviousStory}
         onViewMoment={handleViewMoment}
         onUserPress={(userId) => {
-          // Handle user profile navigation
-          logger.debug('Navigate to user:', userId);
+          // Navigate to user profile
+          if (userId) {
+            navigation.navigate('ProfileDetail', { userId });
+          }
         }}
         isPaused={isPaused}
         setIsPaused={setIsPaused}

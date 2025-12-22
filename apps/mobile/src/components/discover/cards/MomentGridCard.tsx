@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { OptimizedImage } from '../../ui/OptimizedImage';
 import {
   getMomentImageProps,
@@ -10,6 +11,8 @@ import {
 import { COLORS } from '../../../constants/colors';
 import { DEFAULT_IMAGES } from '../../../constants/defaultValues';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
+import type { RootStackParamList } from '../../../navigation/AppNavigator';
+import type { NavigationProp } from '@react-navigation/native';
 
 interface MomentGridCardProps {
   moment: HookMoment;
@@ -19,6 +22,7 @@ interface MomentGridCardProps {
 
 const MomentGridCard: React.FC<MomentGridCardProps> = memo(
   ({ moment, index, onPress }) => {
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const imageUrl =
       moment.image || moment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER;
     const hostName = moment.hostName || 'Anonymous';
@@ -40,6 +44,12 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
         avatarBlurHash: m.hostAvatarBlurHash,
       };
     })();
+
+    const handleAvatarPress = () => {
+      if (moment.hostId) {
+        navigation.navigate('ProfileDetail', { userId: moment.hostId });
+      }
+    };
 
     return (
       <View
@@ -63,7 +73,11 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
             accessibilityLabel={`Photo of ${moment.title}`}
           />
           <View style={styles.gridContent}>
-            <View style={styles.gridCreatorRow}>
+            <TouchableOpacity
+              style={styles.gridCreatorRow}
+              onPress={handleAvatarPress}
+              activeOpacity={0.7}
+            >
               <OptimizedImage
                 {...getAvatarImageProps(
                   hostUser,
@@ -86,7 +100,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
                   color={COLORS.mint}
                 />
               )}
-            </View>
+            </TouchableOpacity>
             <Text style={styles.gridTitle} numberOfLines={2}>
               {moment.title}
             </Text>
@@ -121,12 +135,12 @@ MomentGridCard.displayName = 'MomentGridCard';
 
 const styles = StyleSheet.create({
   gridItemLeft: {
-    width: '50%',
+    flex: 1,
     paddingRight: 6,
     marginBottom: 12,
   },
   gridItemRight: {
-    width: '50%',
+    flex: 1,
     paddingLeft: 6,
     marginBottom: 12,
   },

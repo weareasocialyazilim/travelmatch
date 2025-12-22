@@ -142,10 +142,11 @@ const EditProfileScreen = () => {
         });
 
         if (!result.canceled && result.assets[0]) {
-          // Flip selfie horizontally to correct mirror effect
+          // Use the photo as-is without mirror flip
+          // User wants to see the photo exactly as they took it
           const manipulated = await manipulateAsync(
             result.assets[0].uri,
-            [{ flip: 'horizontal' as const }],
+            [], // No transformations - keep original orientation
             { compress: 0.8, format: SaveFormat.JPEG },
           );
           setAvatarUri(manipulated.uri);
@@ -193,14 +194,24 @@ const EditProfileScreen = () => {
       }
 
       // Update profile - convert to snake_case for database
-      await userService.updateProfile({
+      // Note: location is TEXT type in database, not JSONB
+      // Note: username column may not exist yet - check migration status
+      const updateData: Record<string, unknown> = {
         full_name: data.fullName,
-        username: data.username,
         bio: data.bio,
-        location: data.location
-          ? { city: data.location, country: '' }
-          : undefined,
-      });
+        location: data.location || undefined,
+      };
+
+      // Only include username if it was changed and is available
+      if (
+        data.username &&
+        data.username !== originalProfile.username &&
+        usernameAvailable
+      ) {
+        updateData.username = data.username;
+      }
+
+      await userService.updateProfile(updateData);
 
       // Refresh user context
       await refreshUser();
@@ -208,7 +219,8 @@ const EditProfileScreen = () => {
       Alert.alert('Success', 'Profile updated successfully', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
-    } catch {
+    } catch (error) {
+      console.error('Profile update error:', error);
       showToast('Failed to update profile', 'error');
     }
   };

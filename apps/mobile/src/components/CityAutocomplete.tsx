@@ -16,7 +16,11 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 
-const MAPBOX_ACCESS_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
+const MAPBOX_ACCESS_TOKEN =
+  process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN ||
+  process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ||
+  process.env.EXPO_PUBLIC_MAPBOX_TOKEN ||
+  '';
 
 interface City {
   id: string;
@@ -49,14 +53,107 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
     setQuery(value);
   }, [value]);
 
+  // Fallback cities for when Mapbox is not available
+  const FALLBACK_CITIES: City[] = [
+    {
+      id: 'istanbul',
+      name: 'Istanbul',
+      country: 'Turkey',
+      fullName: 'Istanbul, Turkey',
+    },
+    {
+      id: 'ankara',
+      name: 'Ankara',
+      country: 'Turkey',
+      fullName: 'Ankara, Turkey',
+    },
+    {
+      id: 'izmir',
+      name: 'Izmir',
+      country: 'Turkey',
+      fullName: 'Izmir, Turkey',
+    },
+    {
+      id: 'antalya',
+      name: 'Antalya',
+      country: 'Turkey',
+      fullName: 'Antalya, Turkey',
+    },
+    {
+      id: 'london',
+      name: 'London',
+      country: 'United Kingdom',
+      fullName: 'London, United Kingdom',
+    },
+    {
+      id: 'paris',
+      name: 'Paris',
+      country: 'France',
+      fullName: 'Paris, France',
+    },
+    {
+      id: 'new-york',
+      name: 'New York',
+      country: 'United States',
+      fullName: 'New York, United States',
+    },
+    {
+      id: 'los-angeles',
+      name: 'Los Angeles',
+      country: 'United States',
+      fullName: 'Los Angeles, United States',
+    },
+    {
+      id: 'san-francisco',
+      name: 'San Francisco',
+      country: 'United States',
+      fullName: 'San Francisco, United States',
+    },
+    { id: 'tokyo', name: 'Tokyo', country: 'Japan', fullName: 'Tokyo, Japan' },
+    {
+      id: 'barcelona',
+      name: 'Barcelona',
+      country: 'Spain',
+      fullName: 'Barcelona, Spain',
+    },
+    { id: 'rome', name: 'Rome', country: 'Italy', fullName: 'Rome, Italy' },
+    {
+      id: 'berlin',
+      name: 'Berlin',
+      country: 'Germany',
+      fullName: 'Berlin, Germany',
+    },
+    {
+      id: 'amsterdam',
+      name: 'Amsterdam',
+      country: 'Netherlands',
+      fullName: 'Amsterdam, Netherlands',
+    },
+    {
+      id: 'dubai',
+      name: 'Dubai',
+      country: 'United Arab Emirates',
+      fullName: 'Dubai, United Arab Emirates',
+    },
+  ];
+
   const searchCities = useCallback(async (searchQuery: string) => {
     if (!searchQuery || searchQuery.length < 2) {
       setSuggestions([]);
       return;
     }
 
+    // Use fallback search if Mapbox token is not configured
     if (!MAPBOX_ACCESS_TOKEN) {
-      console.warn('[CityAutocomplete] Mapbox token not configured');
+      console.warn(
+        '[CityAutocomplete] Mapbox token not configured, using fallback cities',
+      );
+      const filtered = FALLBACK_CITIES.filter(
+        (city) =>
+          city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          city.country.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setSuggestions(filtered);
       return;
     }
 
@@ -102,7 +199,13 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
       setSuggestions(cities);
     } catch (err) {
       console.error('[CityAutocomplete] Search error:', err);
-      setSuggestions([]);
+      // Fallback to local search on error
+      const filtered = FALLBACK_CITIES.filter(
+        (city) =>
+          city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          city.country.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setSuggestions(filtered);
     } finally {
       setIsLoading(false);
     }
