@@ -93,12 +93,12 @@ export async function POST(request: NextRequest) {
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', adminUser.id);
 
-    // Set session cookie
+    // Set session cookie with strict security settings
     const cookieStore = await cookies();
     cookieStore.set('admin_session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict', // Strict for admin panel to prevent CSRF
       maxAge: 24 * 60 * 60, // 24 hours
       path: '/',
     });

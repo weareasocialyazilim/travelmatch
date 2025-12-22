@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
+import { escapeSupabaseFilter } from '@/lib/security';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,8 +18,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const role = searchParams.get('role');
     const isActive = searchParams.get('is_active');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100); // Cap at 100
+    const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
 
     const supabase = createServiceClient();
 
@@ -29,8 +30,12 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
+    // Sanitize search input to prevent injection
     if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+      const safeSearch = escapeSupabaseFilter(search);
+      if (safeSearch) {
+        query = query.or(`name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`);
+      }
     }
 
     if (role) {

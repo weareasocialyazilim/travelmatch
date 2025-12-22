@@ -162,12 +162,12 @@ export async function POST(request: NextRequest) {
       expires_at: expiresAt.toISOString(),
     });
 
-    // Set session cookie
+    // Set session cookie with strict security settings
     const response = NextResponse.json({ success: true });
     response.cookies.set('admin_session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict', // Strict for admin panel to prevent CSRF
       expires: expiresAt,
       path: '/',
     });
