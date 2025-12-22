@@ -20,6 +20,11 @@
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
     "test": "turbo run test",
+    "test:e2e": "playwright test",
+    "test:e2e:web": "playwright test --project=web:chromium",
+    "test:e2e:admin": "playwright test --project=admin:chromium",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
@@ -58,6 +63,7 @@
     "tm": "./bin/tm.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@anthropic-ai/sdk": "^0.71.2",
     "@eslint/js": "^9.39.2",
     "@faker-js/faker": "^10.1.0",
