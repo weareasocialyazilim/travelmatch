@@ -243,7 +243,8 @@ class SubscriptionManager {
   }
 
   /**
-   * Schedule automatic reconnection
+   * Schedule automatic reconnection with exponential backoff and jitter
+   * Jitter prevents thundering herd when multiple subscriptions reconnect simultaneously
    */
   private scheduleReconnect(id: string): void {
     const subscription = this.subscriptions.get(id);
@@ -268,8 +269,16 @@ class SubscriptionManager {
       clearTimeout(existingTimer);
     }
 
-    // Calculate backoff delay (exponential backoff)
-    const delay = reconnectDelay * Math.pow(2, subscription.reconnectAttempts);
+    // Calculate backoff delay with exponential backoff and jitter
+    // Formula: base * 2^attempts + random jitter (0-25% of delay)
+    const maxDelay = 30000; // Cap at 30 seconds
+    const exponentialDelay = Math.min(
+      reconnectDelay * Math.pow(2, subscription.reconnectAttempts),
+      maxDelay
+    );
+    // Add jitter to prevent thundering herd
+    const jitter = exponentialDelay * Math.random() * 0.25;
+    const delay = Math.floor(exponentialDelay + jitter);
 
     logger.info(
       'SubscriptionManager',
