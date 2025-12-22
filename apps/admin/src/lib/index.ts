@@ -1,19 +1,41 @@
 // Supabase client
 export * from './supabase';
 
-// Authentication
-export * from './auth';
+// Authentication - includes session-based hasPermission
+export {
+  getAdminSession,
+  hasPermission,
+  createAuditLog,
+  type AdminSession,
+} from './auth';
 
 // Audit logging
 export * from './audit';
 
-// Permissions
-export * from './permissions';
+// Permissions - role-based permission helpers
+export {
+  hasAnyPermission,
+  hasAllPermissions,
+  getRolePermissions,
+  isRoleAtLeast,
+  getRoleDisplayName,
+  getRoleBadgeColor,
+  PERMISSIONS,
+} from './permissions';
 
-// Utilities
-export * from './utils';
+// Utilities - general helpers
+export {
+  cn,
+  getInitials,
+  truncate,
+  generateId,
+  debounce,
+  sleep,
+  formatRelativeDate,
+  parseError,
+} from './utils';
 
-// Formatters
+// Formatters - all formatting functions
 export * from './formatters';
 
 // Validators

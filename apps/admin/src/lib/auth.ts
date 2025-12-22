@@ -25,31 +25,40 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     const supabase = createServiceClient();
     const sessionHash = crypto.createHash('sha256').update(sessionToken).digest('hex');
 
-    // Find session
-    const { data: session, error: sessionError } = await supabase
+    // Find session with admin user
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: sessionData, error: sessionError } = await (supabase as any)
       .from('admin_sessions')
       .select('*, admin:admin_users(*)')
       .eq('token_hash', sessionHash)
       .gt('expires_at', new Date().toISOString())
       .single();
 
-    if (sessionError || !session || !session.admin) {
+    if (sessionError || !sessionData?.admin) {
       return null;
     }
+
+    const adminUser = sessionData.admin as {
+      id: string;
+      email: string;
+      name: string;
+      avatar_url: string | null;
+      role: string;
+    };
 
     // Get permissions
     const { data: permissions } = await supabase
       .from('role_permissions')
       .select('resource, action')
-      .eq('role', session.admin.role);
+      .eq('role', adminUser.role);
 
     return {
       admin: {
-        id: session.admin.id,
-        email: session.admin.email,
-        name: session.admin.name,
-        avatar_url: session.admin.avatar_url,
-        role: session.admin.role,
+        id: adminUser.id,
+        email: adminUser.email,
+        name: adminUser.name,
+        avatar_url: adminUser.avatar_url,
+        role: adminUser.role,
       },
       permissions: permissions || [],
     };
@@ -86,7 +95,8 @@ export async function createAuditLog(
 ): Promise<void> {
   try {
     const supabase = createServiceClient();
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('audit_logs').insert({
       admin_id: adminId,
       action,
       resource_type: resourceType,

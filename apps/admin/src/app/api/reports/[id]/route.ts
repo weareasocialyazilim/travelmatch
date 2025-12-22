@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = createClient();
 
     const { data: report, error } = await supabase
@@ -17,7 +18,7 @@ export async function GET(
         assigned_to:admin_users!assigned_to(id, full_name),
         actions:report_actions(*)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) throw error;
@@ -41,9 +42,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = createClient();
     const body = await request.json();
 
@@ -57,7 +59,7 @@ export async function PATCH(
         resolved_at: body.status === 'resolved' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 

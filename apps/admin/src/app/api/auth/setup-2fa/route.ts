@@ -4,6 +4,13 @@ import { getAdminSession } from '@/lib/auth';
 import { authenticator } from 'otplib';
 import crypto from 'crypto';
 
+interface AdminUserWith2FA {
+  id: string;
+  email?: string;
+  totp_secret: string | null;
+  totp_enabled: boolean;
+}
+
 // Encryption helpers for TOTP secret
 const ALGORITHM = 'aes-256-gcm';
 
@@ -68,20 +75,21 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user
-    const { data: adminUser, error: userError } = await supabase
+    const { data: adminUserData, error: userError } = await supabase
       .from('admin_users')
       .select('id, email, totp_enabled')
       .eq('id', session.admin.id)
       .eq('is_active', true)
       .single();
 
-    if (userError || !adminUser) {
+    if (userError || !adminUserData) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
         { status: 404 }
       );
     }
 
+    const adminUser = adminUserData as AdminUserWith2FA;
     if (adminUser.totp_enabled) {
       return NextResponse.json(
         { success: false, error: '2FA zaten aktif' },
@@ -91,12 +99,14 @@ export async function GET(request: NextRequest) {
 
     // Generate new TOTP secret
     const secret = authenticator.generateSecret();
-    const qrCodeURL = generateQRCodeURL(secret, adminUser.email);
+    const email = adminUser.email || session.admin.email;
+    const qrCodeURL = generateQRCodeURL(secret, email);
 
     // Encrypt and store the secret temporarily (not enabled yet)
     const encryptedSecret = encrypt(secret);
 
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('admin_users')
       .update({
         totp_secret: encryptedSecret,
@@ -108,7 +118,8 @@ export async function GET(request: NextRequest) {
     const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('audit_logs').insert({
       admin_id: session.admin.id,
       action: '2fa_setup_initiated',
       ip_address: clientIp,
@@ -157,20 +168,21 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user with pending TOTP secret
-    const { data: adminUser, error: userError } = await supabase
+    const { data: adminUserData, error: userError } = await supabase
       .from('admin_users')
       .select('id, totp_secret, totp_enabled')
       .eq('id', session.admin.id)
       .eq('is_active', true)
       .single();
 
-    if (userError || !adminUser) {
+    if (userError || !adminUserData) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
         { status: 404 }
       );
     }
 
+    const adminUser = adminUserData as AdminUserWith2FA;
     if (adminUser.totp_enabled) {
       return NextResponse.json(
         { success: false, error: '2FA zaten aktif' },
@@ -224,7 +236,8 @@ export async function POST(request: NextRequest) {
 
     if (!isValid) {
       // Log failed attempt
-      await supabase.from('audit_logs').insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('audit_logs').insert({
         admin_id: session.admin.id,
         action: '2fa_setup_verification_failed',
         ip_address: clientIp,
@@ -238,13 +251,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Enable 2FA
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('admin_users')
       .update({ totp_enabled: true })
       .eq('id', session.admin.id);
 
     // Log successful setup
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('audit_logs').insert({
       admin_id: session.admin.id,
       action: '2fa_enabled',
       ip_address: clientIp,
@@ -291,20 +306,21 @@ export async function DELETE(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user
-    const { data: adminUser, error: userError } = await supabase
+    const { data: adminUserData, error: userError } = await supabase
       .from('admin_users')
       .select('id, totp_secret, totp_enabled')
       .eq('id', session.admin.id)
       .eq('is_active', true)
       .single();
 
-    if (userError || !adminUser) {
+    if (userError || !adminUserData) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
         { status: 404 }
       );
     }
 
+    const adminUser = adminUserData as AdminUserWith2FA;
     if (!adminUser.totp_enabled || !adminUser.totp_secret) {
       return NextResponse.json(
         { success: false, error: '2FA zaten kapalı' },
@@ -346,7 +362,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Disable 2FA
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('admin_users')
       .update({
         totp_enabled: false,
@@ -358,7 +375,8 @@ export async function DELETE(request: NextRequest) {
     const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('audit_logs').insert({
       admin_id: session.admin.id,
       action: '2fa_disabled',
       ip_address: clientIp,
