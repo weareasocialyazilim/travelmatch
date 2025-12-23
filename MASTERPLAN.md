@@ -531,17 +531,23 @@ eas submit --platform android --latest
 
 ---
 
-## � Subscription Tier Sistemi (HAZIR)
+## 💳 Subscription Tier Sistemi (HAZIR)
 
 > **Branch:** `claude/analyze-images-bqLp0` - ✅ MERGE EDİLDİ
 
 ### Tier Yapısı
 
-| Tier               | Fiyat     | Özellikler                                       |
-| ------------------ | --------- | ------------------------------------------------ |
-| 🆓 **Passport**    | Ücretsiz  | 5 swipe/gün, 1 boost/hafta, reklamlı             |
-| ✈️ **First Class** | $9.99/ay  | Sınırsız swipe, 3 boost/gün, reklamsız           |
-| 👑 **Concierge**   | $29.99/ay | Tüm First Class + VIP desteği, öncelikli eşleşme |
+| Özellik         | 🆓 Passport ($0) | ✈️ First Class ($10) | 👑 Concierge ($25) |
+| --------------- | ---------------- | -------------------- | ------------------ |
+| Moments         | 3/ay             | 15/ay                | Sınırsız           |
+| Mesaj           | 20/gün           | Sınırsız             | Sınırsız           |
+| Gift            | 1/ay             | 10/ay                | Sınırsız           |
+| Kayıtlı Moments | 10               | 50                   | Sınırsız           |
+| Fotoğraf/Moment | 5                | 10                   | 20                 |
+| Filtreler       | Temel            | Tümü                 | Tümü               |
+| Verified Badge  | ❌               | ❌                   | ✅                 |
+| Incognito Mode  | ❌               | ✅                   | ✅                 |
+| Early Access    | ❌               | ❌                   | ✅                 |
 
 ### Uygulanan Dosyalar
 
