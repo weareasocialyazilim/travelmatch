@@ -55,25 +55,65 @@ COMMENT ON FUNCTION refund_escrow IS
 
 DROP POLICY IF EXISTS "Admins can view KYC docs" ON storage.objects;
 
--- Note: Admin access to KYC docs should use service_role JWT, not user-level admin
--- COMMENT ON storage.objects removed - requires table owner permission
+-- Admin access to KYC docs should use service_role JWT, not user-level admin
+COMMENT ON TABLE storage.objects IS
+  'SECURITY NOTE: Admin access to sensitive buckets (kyc_docs) requires service_role JWT.';
 
 -- ============================================================================
--- FIX 4: STORAGE AUDIT LOG (BLOCKER 1.5)
--- NOTE: storage.objects triggers require superuser/service_role access
--- Storage audit logging should be handled at Edge Function level instead
+-- FIX 4: FIX STORAGE AUDIT LOG TRIGGER (BLOCKER 1.5)
+-- Current trigger references wrong column names
 -- ============================================================================
 
--- Drop any existing broken triggers (if we have permission)
-DO $$
+-- Drop existing broken trigger
+DROP TRIGGER IF EXISTS log_sensitive_access_trigger ON storage.objects;
+DROP FUNCTION IF EXISTS storage.log_sensitive_access();
+
+-- Create corrected function that matches actual audit_logs schema
+CREATE OR REPLACE FUNCTION storage.log_sensitive_access()
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = storage, public
+LANGUAGE plpgsql AS $$
 BEGIN
-  DROP TRIGGER IF EXISTS log_sensitive_access_trigger ON storage.objects;
-EXCEPTION WHEN insufficient_privilege THEN
-  RAISE NOTICE 'Skipping storage trigger drop - requires elevated permissions';
-END $$;
+  -- Only log access to sensitive buckets
+  IF NEW.bucket_id IN ('kyc_docs', 'profile-proofs') THEN
+    INSERT INTO public.audit_logs (
+      id,
+      user_id,
+      action,
+      metadata,
+      created_at
+    ) VALUES (
+      gen_random_uuid(),
+      auth.uid(),
+      TG_OP || '_storage_' || NEW.bucket_id,
+      jsonb_build_object(
+        'path', NEW.name,
+        'bucket', NEW.bucket_id,
+        'size', COALESCE(NEW.metadata->>'size', 'unknown'),
+        'mimetype', COALESCE(NEW.metadata->>'mimetype', 'unknown'),
+        'operation', TG_OP,
+        'timestamp', NOW()
+      ),
+      NOW()
+    );
+  END IF;
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  -- Don't fail the storage operation if audit logging fails
+  RAISE WARNING 'Audit log failed for storage operation: %', SQLERRM;
+  RETURN NEW;
+END;
+$$;
 
--- NOTE: Storage audit logging moved to Edge Functions
--- See: supabase/functions/upload-file/index.ts for audit implementation
+-- Recreate trigger
+CREATE TRIGGER log_sensitive_access_trigger
+  AFTER INSERT OR UPDATE ON storage.objects
+  FOR EACH ROW
+  EXECUTE FUNCTION storage.log_sensitive_access();
+
+COMMENT ON FUNCTION storage.log_sensitive_access IS
+  'Audit logging for sensitive storage buckets (kyc_docs, profile-proofs). Fixed 2025-12-17.';
 
 -- ============================================================================
 -- FIX 5: TRANSACTION AMOUNT CONSTRAINT (LOW PRIORITY)

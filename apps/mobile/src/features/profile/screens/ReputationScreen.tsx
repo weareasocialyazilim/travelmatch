@@ -98,7 +98,7 @@ export default function ReputationScreen({
         {/* Stats Row */}
         <View style={styles.statsRow}>
           {STATS.map((stat, index) => (
-            <React.Fragment key={stat.label}>
+            <React.Fragment key={index}>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stat.value}</Text>
                 <Text style={styles.statLabel}>{stat.label}</Text>

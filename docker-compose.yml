@@ -2,29 +2,29 @@ services:
   # ============================================================================
   # Supabase Stack (Local Development)
   # ============================================================================
-
+  
   # Supabase PostgreSQL Database
   postgres:
     image: supabase/postgres:15.1.0.147
     container_name: travelmatch-postgres
     restart: unless-stopped
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required - check .env file}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       # Extensions
-      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=en_US.UTF-8'
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./supabase/migrations:/docker-entrypoint-initdb.d/migrations:ro
     networks:
       - travelmatch-network
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,7 +35,7 @@ services:
     container_name: travelmatch-studio
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - "3000:3000"
     environment:
       SUPABASE_URL: http://kong:8000
       STUDIO_PG_META_URL: http://meta:8080
@@ -53,10 +53,10 @@ services:
     container_name: travelmatch-kong
     restart: unless-stopped
     ports:
-      - '8000:8000'
-      - '8443:8443'
+      - "8000:8000"
+      - "8443:8443"
     environment:
-      KONG_DATABASE: 'off'
+      KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
@@ -65,7 +65,7 @@ services:
     networks:
       - travelmatch-network
     healthcheck:
-      test: ['CMD', 'kong', 'health']
+      test: ["CMD", "kong", "health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -79,28 +79,28 @@ services:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
       API_EXTERNAL_URL: ${API_EXTERNAL_URL:-http://localhost:8000}
-
+      
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres?search_path=auth
-
+      
       GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:3000}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
       GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
-
+      
       GOTRUE_JWT_ADMIN_ROLES: service_role
       GOTRUE_JWT_AUD: authenticated
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
       GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
-
+      
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP:-true}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM:-true}
-
+      
       # OAuth Providers
       GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${ENABLE_GOOGLE_OAUTH:-false}
       GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
-
+      
       GOTRUE_EXTERNAL_APPLE_ENABLED: ${ENABLE_APPLE_OAUTH:-false}
       GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_OAUTH_CLIENT_ID}
       GOTRUE_EXTERNAL_APPLE_SECRET: ${APPLE_OAUTH_CLIENT_SECRET}
@@ -110,15 +110,7 @@ services:
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:9999/health',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -133,7 +125,7 @@ services:
       PGRST_DB_SCHEMAS: public,storage,graphql_public
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
-      PGRST_DB_USE_LEGACY_GUCS: 'false'
+      PGRST_DB_USE_LEGACY_GUCS: "false"
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY:-3600}
     depends_on:
@@ -142,15 +134,7 @@ services:
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:3000/',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -165,16 +149,16 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      DB_PASSWORD: postgres
       DB_NAME: postgres
       DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
       DB_ENC_KEY: supabaserealtime
       API_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
       FLY_ALLOC_ID: fly123
       FLY_APP_NAME: realtime
-      SECRET_KEY_BASE: ${REALTIME_SECRET_KEY_BASE:?REALTIME_SECRET_KEY_BASE is required - check .env file}
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
       ERL_AFLAGS: -proto_dist inet_tcp
-      ENABLE_TAILSCALE: 'false'
+      ENABLE_TAILSCALE: "false"
       DNS_NODES: "''"
     depends_on:
       postgres:
@@ -182,15 +166,7 @@ services:
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:4000/api/health',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -223,15 +199,7 @@ services:
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:5000/status',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/status"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -247,22 +215,14 @@ services:
       PG_META_DB_PORT: 5432
       PG_META_DB_NAME: postgres
       PG_META_DB_USER: postgres
-      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      PG_META_DB_PASSWORD: postgres
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:8080/health',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -270,22 +230,22 @@ services:
   # ============================================================================
   # Redis Stack (Caching, Sessions, Rate Limiting, Pub/Sub)
   # ============================================================================
-
+  
   redis:
     image: redis/redis-stack:7.2.0-v6
     container_name: travelmatch-redis
     restart: unless-stopped
     ports:
-      - '6379:6379' # Redis
-      - '8001:8001' # RedisInsight (Web UI)
+      - "6379:6379"     # Redis
+      - "8001:8001"     # RedisInsight (Web UI)
     environment:
-      REDIS_ARGS: '--requirepass ${REDIS_PASSWORD:-travelmatch-redis-dev-password}'
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-travelmatch-redis-dev-password}"
     volumes:
       - redis-data:/data
     networks:
       - travelmatch-network
     healthcheck:
-      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -299,32 +259,32 @@ services:
   # ============================================================================
   # LocalStack (AWS Services Emulation: S3, SQS, SNS, Lambda)
   # ============================================================================
-
+  
   localstack:
     image: localstack/localstack:3.0
     container_name: travelmatch-localstack
     restart: unless-stopped
     ports:
-      - '4566:4566' # LocalStack Gateway
-      - '4510-4559:4510-4559' # External services port range
+      - "4566:4566"     # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External services port range
     environment:
       # Core Configuration
       SERVICES: s3,sqs,sns,lambda,cloudwatch,dynamodb
       DEBUG: ${LOCALSTACK_DEBUG:-0}
       DATA_DIR: /var/lib/localstack/data
       PERSISTENCE: ${LOCALSTACK_PERSISTENCE:-1}
-
+      
       # AWS Configuration
       AWS_DEFAULT_REGION: us-east-1
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
-
+      
       # Docker Configuration
       DOCKER_HOST: unix:///var/run/docker.sock
-
+      
       # Edge Configuration
       EDGE_PORT: 4566
-
+      
       # Features
       DISABLE_CORS_CHECKS: 1
       SKIP_SSL_CERT_DOWNLOAD: 1
@@ -335,7 +295,7 @@ services:
     networks:
       - travelmatch-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4566/_localstack/health']
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -343,18 +303,17 @@ services:
   # ============================================================================
   # Minio (S3-Compatible Object Storage - Alternative to LocalStack S3)
   # ============================================================================
-
+  
   minio:
     image: minio/minio:RELEASE.2023-12-09T18-17-51Z
     container_name: travelmatch-minio
     restart: unless-stopped
     ports:
-      - '9000:9000' # API
-      - '9001:9001' # Console
+      - "9000:9000"     # API
+      - "9001:9001"     # Console
     environment:
-      # SECURITY: Credentials MUST be set via .env file - no defaults allowed
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER is required - check .env file}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD is required - check .env file}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
       MINIO_BROWSER_REDIRECT_URL: http://localhost:9001
     volumes:
       - minio-data:/data
@@ -362,7 +321,7 @@ services:
       - travelmatch-network
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -370,26 +329,18 @@ services:
   # ============================================================================
   # Mailhog (Email Testing - SMTP Server + Web UI)
   # ============================================================================
-
+  
   mailhog:
     image: mailhog/mailhog:v1.0.1
     container_name: travelmatch-mailhog
     restart: unless-stopped
     ports:
-      - '1025:1025' # SMTP
-      - '8025:8025' # Web UI
+      - "1025:1025"     # SMTP
+      - "8025:8025"     # Web UI
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:8025/',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8025/"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -397,17 +348,16 @@ services:
   # ============================================================================
   # Grafana (Monitoring & Observability Dashboard)
   # ============================================================================
-
+  
   grafana:
     image: grafana/grafana:10.2.2
     container_name: travelmatch-grafana
     restart: unless-stopped
     ports:
-      - '3001:3000'
+      - "3001:3000"
     environment:
-      # SECURITY: Credentials MUST be set via .env file - no defaults allowed
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:?GRAFANA_ADMIN_USER is required - check .env file}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required - check .env file}
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
       GF_INSTALL_PLUGINS: redis-datasource
       GF_SERVER_ROOT_URL: http://localhost:3001
     volumes:
@@ -419,15 +369,7 @@ services:
       - postgres
       - redis
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:3000/api/health',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -435,7 +377,7 @@ services:
   # ============================================================================
   # Job Queue Service (BullMQ Background Workers)
   # ============================================================================
-
+  
   # Job Queue API Server (Add jobs, monitor status)
   job-queue:
     build:
@@ -444,7 +386,7 @@ services:
     container_name: travelmatch-job-queue
     restart: unless-stopped
     ports:
-      - '3002:3002' # API + Bull Board UI
+      - "3002:3002" # API + Bull Board UI
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       REDIS_URL: redis://redis:6379
@@ -465,15 +407,7 @@ services:
       - redis
       - postgres
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:3002/health',
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -511,7 +445,7 @@ services:
   # ML Service (Machine Learning Inference) - DISABLED FOR NOW
   # ============================================================================
   # Uncomment when ready to use ML features
-
+  
   # ml-service:
   #   build:
   #     context: ./services/ml-service
@@ -560,7 +494,7 @@ services:
     container_name: travelmatch-web
     restart: unless-stopped
     ports:
-      - '3001:3000'
+      - "3001:3000"
     environment:
       NEXT_PUBLIC_SUPABASE_URL: http://kong:8000
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
@@ -569,15 +503,7 @@ services:
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--quiet',
-          '--tries=1',
-          '--spider',
-          'http://localhost:3000/api/health',
-        ]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -590,21 +516,13 @@ services:
     container_name: travelmatch-admin
     restart: unless-stopped
     ports:
-      - '8080:80'
+      - "8080:80"
     depends_on:
       - kong
     networks:
       - travelmatch-network
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '--quiet',
-          '--tries=1',
-          '--spider',
-          'http://localhost:80/health',
-        ]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -637,3 +555,4 @@ networks:
   travelmatch-network:
     name: travelmatch-network
     driver: bridge
+

@@ -323,8 +323,8 @@ const TrustGardenDetailScreen: React.FC = () => {
                 {factor.value < factor.maxValue && (
                   <View style={styles.tipsContainer}>
                     <Text style={styles.tipsTitle}>How to improve:</Text>
-                    {factor.tips.slice(0, 2).map((tip) => (
-                      <View key={tip} style={styles.tipItem}>
+                    {factor.tips.slice(0, 2).map((tip, index) => (
+                      <View key={index} style={styles.tipItem}>
                         <MaterialCommunityIcons
                           name="arrow-right"
                           size={14}

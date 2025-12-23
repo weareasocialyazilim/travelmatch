@@ -41,19 +41,16 @@ CREATE INDEX IF NOT EXISTS idx_deep_link_events_created_at ON deep_link_events(c
 ALTER TABLE deep_link_events ENABLE ROW LEVEL SECURITY;
 
 -- Users can read their own events
-DROP POLICY IF EXISTS "Users can read own deep link events" ON deep_link_events;
 CREATE POLICY "Users can read own deep link events"
     ON deep_link_events FOR SELECT
     USING (auth.uid() = user_id);
 
 -- Service role can insert events (from app)
-DROP POLICY IF EXISTS "Service can insert deep link events" ON deep_link_events;
 CREATE POLICY "Service can insert deep link events"
     ON deep_link_events FOR INSERT
     WITH CHECK (true);
 
 -- Users can update their own events
-DROP POLICY IF EXISTS "Users can update own deep link events" ON deep_link_events;
 CREATE POLICY "Users can update own deep link events"
     ON deep_link_events FOR UPDATE
     USING (auth.uid() = user_id);
@@ -87,13 +84,11 @@ CREATE INDEX IF NOT EXISTS idx_proof_quality_scores_created_at ON proof_quality_
 ALTER TABLE proof_quality_scores ENABLE ROW LEVEL SECURITY;
 
 -- Users can read their own scores
-DROP POLICY IF EXISTS "Users can read own quality scores" ON proof_quality_scores;
 CREATE POLICY "Users can read own quality scores"
     ON proof_quality_scores FOR SELECT
     USING (auth.uid() = user_id);
 
 -- Service role can insert scores (from ML service)
-DROP POLICY IF EXISTS "Service can insert quality scores" ON proof_quality_scores;
 CREATE POLICY "Service can insert quality scores"
     ON proof_quality_scores FOR INSERT
     WITH CHECK (true);
@@ -174,13 +169,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Triggers for updated_at
-DROP TRIGGER IF EXISTS update_deep_link_events_updated_at ON deep_link_events;
 CREATE TRIGGER update_deep_link_events_updated_at
     BEFORE UPDATE ON deep_link_events
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-DROP TRIGGER IF EXISTS update_proof_quality_scores_updated_at ON proof_quality_scores;
 CREATE TRIGGER update_proof_quality_scores_updated_at
     BEFORE UPDATE ON proof_quality_scores
     FOR EACH ROW

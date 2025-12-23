@@ -196,7 +196,7 @@ describe('OfflineSyncQueue', () => {
       });
 
       // Re-require the module so constructor runs and attaches listener
-       
+      // eslint-disable-next-line global-require
       const { offlineSyncQueue: newQueue } = require('../offlineSyncQueue');
       
       // Queue action while offline on the newly required instance
@@ -340,7 +340,7 @@ describe('OfflineSyncQueue', () => {
 
       // Reload service to trigger loadQueue (use require to avoid ESM dynamic import issues)
       jest.resetModules();
-       
+      // eslint-disable-next-line global-require
       const { offlineSyncQueue: newQueue } = require('../offlineSyncQueue');
 
       // Wait briefly for async loadQueue to settle

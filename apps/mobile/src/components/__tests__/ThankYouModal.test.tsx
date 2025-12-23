@@ -2,23 +2,10 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { ThankYouModal } from '../ThankYouModal';
 
-// Mock expo-linear-gradient properly
-jest.mock('expo-linear-gradient', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  return {
-    LinearGradient: (props: { children?: React.ReactNode }) =>
-      React.createElement(View, null, props.children),
-  };
-});
-
-// Mock MaterialCommunityIcons direct import
-jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => {
-  const React = require('react');
-  const { Text } = require('react-native');
-  return (props: { name?: string }) =>
-    React.createElement(Text, { testID: 'icon' }, props.name || 'icon');
-});
+// Mock expo-linear-gradient
+jest.mock('expo-linear-gradient', () => ({
+  LinearGradient: 'LinearGradient',
+}));
 
 describe('ThankYouModal', () => {
   const mockOnClose = jest.fn();
@@ -71,8 +58,7 @@ describe('ThankYouModal', () => {
       ).toBeTruthy();
     });
 
-    // Skipped: UNSAFE_getAllByType doesn't work reliably with mocked components
-    it.skip('renders check-circle icon', () => {
+    it('renders check-circle icon', () => {
       const { UNSAFE_getAllByType } = render(
         <ThankYouModal {...defaultProps} />,
       );
@@ -87,8 +73,7 @@ describe('ThankYouModal', () => {
       expect(checkIcon?.props.size).toBe(80);
     });
 
-    // Skipped: UNSAFE_getAllByType doesn't work reliably with mocked components
-    it.skip('renders heart icon in note card', () => {
+    it('renders heart icon in note card', () => {
       const { UNSAFE_getAllByType } = render(
         <ThankYouModal {...defaultProps} />,
       );

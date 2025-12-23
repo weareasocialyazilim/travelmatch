@@ -112,9 +112,11 @@ export interface LocationModalProps {
 
 export interface DiscoverHeaderProps {
   location: string;
+  viewMode: ViewMode;
   activeFiltersCount: number;
   onLocationPress: () => void;
   onFilterPress: () => void;
+  onViewModeToggle: () => void;
 }
 
 export interface CategoryFilterProps {

@@ -6,29 +6,6 @@ Utility scripts for setting up and managing TravelMatch infrastructure.
 
 ## 📋 Available Scripts
 
-### 🎨 UX Research & Design Toolkit
-
-**Location:** `scripts/ux-research/`
-
-Comprehensive toolkit for user-centered research and experience design. See the [UX Research README](./ux-research/README.md) for full documentation.
-
-| Script | Purpose |
-|--------|---------|
-| `persona_generator.py` | Generate research-backed user personas |
-| `journey_mapper.py` | Create customer journey maps |
-| `usability_testing.py` | Plan and analyze usability tests |
-| `research_synthesizer.py` | Synthesize research into insights |
-| `design_validator.py` | Validate designs against heuristics |
-
-**Quick Start:**
-```bash
-python scripts/ux-research/persona_generator.py --sample
-python scripts/ux-research/journey_mapper.py --journey onboarding
-python scripts/ux-research/design_validator.py --heuristics
-```
-
----
-
 ### 🚀 `setup-supabase.sh`
 
 **Purpose:** Complete Supabase infrastructure setup (migrations, Edge Functions, storage)

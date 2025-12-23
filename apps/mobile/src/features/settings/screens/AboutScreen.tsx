@@ -66,8 +66,8 @@ export const AboutScreen: React.FC = () => {
 
         {/* Information List */}
         <View style={styles.infoList}>
-          {appInfo.map((item) => (
-            <View key={item.label} style={styles.infoItem}>
+          {appInfo.map((item, index) => (
+            <View key={index} style={styles.infoItem}>
               <View style={styles.infoLeft}>
                 <View style={styles.infoIconContainer}>
                   <MaterialCommunityIcons

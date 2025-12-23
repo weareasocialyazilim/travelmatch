@@ -73,7 +73,7 @@ export const triggerHaptic = async (type: HapticType = HapticType.LIGHT) => {
   } catch (error) {
     // Haptics may not be available on all devices
     if (__DEV__) {
-       
+      // eslint-disable-next-line no-console
       logger.warn('Haptic feedback failed:', error);
     }
   }

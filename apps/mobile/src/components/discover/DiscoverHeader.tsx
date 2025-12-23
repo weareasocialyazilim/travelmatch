@@ -1,4 +1,4 @@
-// Discover Header - Top bar with location and filter
+// Discover Header - Top bar with location, filter and view toggle
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -7,9 +7,11 @@ import type { DiscoverHeaderProps } from './types';
 
 export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   location,
+  viewMode,
   activeFiltersCount,
   onLocationPress,
   onFilterPress,
+  onViewModeToggle,
 }) => (
   <View style={styles.header}>
     {/* Location Selector */}
@@ -48,6 +50,19 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
           </View>
         )}
       </TouchableOpacity>
+
+      {/* View Toggle */}
+      <TouchableOpacity
+        style={styles.controlButton}
+        onPress={onViewModeToggle}
+        activeOpacity={0.7}
+      >
+        <MaterialCommunityIcons
+          name={viewMode === 'single' ? 'view-grid' : 'view-agenda'}
+          size={22}
+          color={COLORS.text}
+        />
+      </TouchableOpacity>
     </View>
   </View>
 );
@@ -74,8 +89,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.text,
     marginLeft: 6,
-    marginRight: 4,
-    maxWidth: '80%',
+    flex: 1,
   },
   headerControls: {
     flexDirection: 'row',

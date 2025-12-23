@@ -30,7 +30,7 @@ const Button: React.FC<ButtonProps> = ({
     const base = [styles.button, styles[size]];
     if (fullWidth) base.push(styles.fullWidth);
     if (disabled) base.push(styles.disabled);
-
+    
     switch (variant) {
       case 'primary':
         return [...base, styles.primary];
@@ -59,27 +59,15 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <View style={getButtonStyle()}>
       {loading ? (
-        <Text style={[styles.buttonText, { color: getTextColor() }]}>
-          Loading...
-        </Text>
+        <Text style={[styles.buttonText, { color: getTextColor() }]}>Loading...</Text>
       ) : (
         <>
           {icon && iconPosition === 'left' && (
-            <MaterialCommunityIcons
-              name={icon}
-              size={iconSize}
-              color={getTextColor()}
-            />
+            <MaterialCommunityIcons name={icon} size={iconSize} color={getTextColor()} />
           )}
-          <Text style={[styles.buttonText, { color: getTextColor() }]}>
-            {label}
-          </Text>
+          <Text style={[styles.buttonText, { color: getTextColor() }]}>{label}</Text>
           {icon && iconPosition === 'right' && (
-            <MaterialCommunityIcons
-              name={icon}
-              size={iconSize}
-              color={getTextColor()}
-            />
+            <MaterialCommunityIcons name={icon} size={iconSize} color={getTextColor()} />
           )}
         </>
       )}
@@ -279,12 +267,7 @@ export const CommonActions: Story = {
 export const CTAExamples: Story = {
   render: () => (
     <View style={{ gap: 12 }}>
-      <Button
-        label="Create Moment"
-        variant="primary"
-        fullWidth
-        icon="plus-circle-outline"
-      />
+      <Button label="Create Moment" variant="primary" fullWidth icon="plus-circle-outline" />
       <Button label="Join Request" variant="secondary" fullWidth />
       <Button label="Cancel" variant="outline" fullWidth />
     </View>
@@ -301,6 +284,18 @@ const styles = StyleSheet.create({
   },
   fullWidth: {
     width: '100%',
+  },
+  small: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  medium: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  large: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
   },
   primary: {
     backgroundColor: '#007AFF',

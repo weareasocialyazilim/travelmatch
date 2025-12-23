@@ -69,34 +69,3 @@ export {
   useInteractionManager,
   useWhyDidYouUpdate,
 } from './usePerformanceMonitor';
-
-// Accessibility hooks (DEFCON 3.2)
-export {
-  useReduceMotion,
-  withReduceMotion,
-} from './useReduceMotion';
-export type { SpringConfig } from './useReduceMotion';
-
-// Input hooks (DEFCON 3.1)
-export { useInputMask } from './useInputMask';
-export type { MaskType } from './useInputMask';
-
-// Request cancellation hooks (DEFCON 2.7)
-export {
-  useAbortController,
-  useAbortableFetch,
-  useTimeoutPromise,
-} from './useAbortController';
-
-// Navigation gesture hooks (DEFCON 3.4)
-export {
-  useNavigationGesture,
-  withDisabledGesture,
-  GESTURE_DISABLED_SCREENS,
-} from './useNavigationGesture';
-
-// App Tracking Transparency hook (DEFCON 1.1)
-export {
-  useAppTrackingTransparency,
-} from './useAppTrackingTransparency';
-export type { TrackingStatus, ATTResult } from './useAppTrackingTransparency';

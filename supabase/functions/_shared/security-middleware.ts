@@ -175,7 +175,7 @@ export async function logRequest(
   supabase: SupabaseClient,
   userId: string,
   action: string,
-  metadata: Record<string, unknown>,
+  metadata: Record<string, any>,
   req: Request,
 ): Promise<void> {
   try {
@@ -195,7 +195,7 @@ export async function logRequest(
 /**
  * Sanitize user input to prevent injection attacks
  */
-export function sanitizeInput(input: unknown): unknown {
+export function sanitizeInput(input: any): any {
   if (typeof input === 'string') {
     // Remove potentially dangerous characters
     return input
@@ -209,7 +209,7 @@ export function sanitizeInput(input: unknown): unknown {
   }
 
   if (typeof input === 'object' && input !== null) {
-    const sanitized: Record<string, unknown> = {};
+    const sanitized: Record<string, any> = {};
     for (const [key, value] of Object.entries(input)) {
       sanitized[key] = sanitizeInput(value);
     }
@@ -226,7 +226,7 @@ export function sanitizeInput(input: unknown): unknown {
 export function errorResponse(
   message: string,
   status: number = 400,
-  details?: Record<string, unknown>,
+  details?: any,
   origin?: string | null,
 ): Response {
   const headers = getCorsHeaders(origin);
@@ -246,7 +246,7 @@ export function errorResponse(
  * Create standardized success response
  * @param origin - Optional origin for CORS validation
  */
-export function successResponse<T>(data: T, status: number = 200, origin?: string | null): Response {
+export function successResponse(data: any, status: number = 200, origin?: string | null): Response {
   const headers = getCorsHeaders(origin);
   return new Response(JSON.stringify(data), {
     status,
@@ -344,7 +344,7 @@ export function validateUUID(uuid: string, fieldName: string): ValidationError[]
  * Comprehensive request validator
  */
 export function validateRequest(
-  data: Record<string, unknown>,
+  data: any,
   rules: {
     field: string;
     type: 'string' | 'number' | 'uuid' | 'amount' | 'currency';

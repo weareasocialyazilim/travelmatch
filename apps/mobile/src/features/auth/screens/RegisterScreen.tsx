@@ -1,595 +1,228 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
+  View,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
   ScrollView,
+  Alert,
 } from 'react-native';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { COLORS } from '@/constants/colors';
-import { logger } from '@/utils/logger';
-import { LoadingState } from '@/components/LoadingState';
 import { useAuth } from '@/context/AuthContext';
 import { registerSchema, type RegisterInput } from '@/utils/forms';
+import { canSubmitForm } from '@/utils/forms/helpers';
+import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
-import type { StackScreenProps } from '@react-navigation/stack';
 
-type RegisterScreenProps = StackScreenProps<RootStackParamList, 'Register'>;
-
-export const RegisterScreen: React.FC<RegisterScreenProps> = ({
-  navigation,
-}) => {
+export const RegisterScreen: React.FC = () => {
+  const { showToast: _showToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
-  const { showToast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const emailRef = useRef<TextInput>(null);
-  const phoneRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
-  const confirmPasswordRef = useRef<TextInput>(null);
 
   const { control, handleSubmit, formState } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     mode: 'onChange',
     defaultValues: {
-      fullName: '',
       email: '',
-      phone: '',
       password: '',
       confirmPassword: '',
+      fullName: '',
     },
   });
 
-  const handleSocialLogin = (_provider: string) => {
-    showToast('Coming Soon! This feature will be available shortly.', 'info');
-  };
-
   const onSubmit = async (data: RegisterInput) => {
-    setLoading(true);
     try {
-      const result = await register({
+      setIsLoading(true);
+      await register({
         email: data.email,
-        phone: data.phone,
         password: data.password,
         name: data.fullName,
       });
-
-      if (result.success) {
-        // Email verification link is sent automatically by Supabase
-        // Navigate directly to phone verification
-        navigation.navigate('VerifyPhone', {
-          email: data.email,
-          phone: data.phone,
-          fullName: data.fullName,
-        });
-      } else {
-        showToast(
-          result.error || 'Registration failed. Please try again.',
-          'error',
-        );
-      }
+      // Navigation handled by auth state change
     } catch (error) {
-      logger.error('Registration error:', error);
-      showToast('An unexpected error occurred. Please try again.', 'error');
+      Alert.alert(
+        'Registration Failed',
+        error instanceof Error ? error.message : 'Please try again',
+      );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {loading && <LoadingState type="overlay" message="Creating account..." />}
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Create Account</Text>
+      <Text style={styles.subtitle}>Sign up to get started</Text>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle} accessibilityRole="header">
-            Create Account
-          </Text>
-        </View>
-        <View style={styles.headerSpacer} />
-      </View>
+      <Controller
+        control={control}
+        name="fullName"
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input, error && styles.inputError]}
+              placeholder="Full Name"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              autoCapitalize="words"
+              editable={!isLoading}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </View>
+        )}
+      />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+      <Controller
+        control={control}
+        name="email"
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input, error && styles.inputError]}
+              placeholder="Email"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              editable={!isLoading}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </View>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="password"
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input, error && styles.inputError]}
+              placeholder="Password"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              secureTextEntry
+              editable={!isLoading}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </View>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="confirmPassword"
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input, error && styles.inputError]}
+              placeholder="Confirm Password"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              secureTextEntry
+              editable={!isLoading}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </View>
+        )}
+      />
+
+      <TouchableOpacity
+        testID="register-button"
+        style={[
+          styles.button,
+          (isLoading ||
+            !canSubmitForm({ formState } as { formState: MinimalFormState })) &&
+            styles.buttonDisabled,
+        ]}
+        onPress={handleSubmit(onSubmit)}
+        disabled={
+          isLoading ||
+          !canSubmitForm({ formState } as { formState: MinimalFormState })
+        }
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets
-          bounces={false}
-        >
-          {/* Social Login Icons - Small Row at Top */}
-          <View style={styles.socialSection}>
-            <View style={styles.socialRow}>
-              <TouchableOpacity
-                style={styles.socialIconButton}
-                onPress={() => handleSocialLogin('apple')}
-                activeOpacity={0.7}
-              >
-                <Icon name="apple" size={22} color={COLORS.white} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.socialIconButton, styles.googleButton]}
-                onPress={() => handleSocialLogin('google')}
-                activeOpacity={0.7}
-              >
-                <Icon name="google" size={22} color={COLORS.white} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.socialIconButton, styles.facebookButton]}
-                onPress={() => handleSocialLogin('facebook')}
-                activeOpacity={0.7}
-              >
-                <Icon name="facebook" size={22} color={COLORS.white} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or continue with email</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Full Name Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Full Name</Text>
-            <Controller
-              control={control}
-              name="fullName"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <>
-                  <View
-                    style={[styles.inputWrapper, error && styles.inputError]}
-                  >
-                    <Icon
-                      name="account-outline"
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                    <TextInput
-                      style={styles.textInput}
-                      placeholder="John Doe"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      autoCapitalize="words"
-                      autoCorrect={false}
-                      returnKeyType="next"
-                      onSubmitEditing={() => emailRef.current?.focus()}
-                      blurOnSubmit={false}
-                    />
-                  </View>
-                  {error && (
-                    <Text style={styles.errorText}>{error.message}</Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
-
-          {/* Email Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Email address</Text>
-            <Controller
-              control={control}
-              name="email"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <>
-                  <View
-                    style={[styles.inputWrapper, error && styles.inputError]}
-                  >
-                    <Icon
-                      name="email-outline"
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                    <TextInput
-                      ref={emailRef}
-                      style={styles.textInput}
-                      placeholder="name@example.com"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      returnKeyType="next"
-                      onSubmitEditing={() => phoneRef.current?.focus()}
-                      blurOnSubmit={false}
-                    />
-                  </View>
-                  {error && (
-                    <Text style={styles.errorText}>{error.message}</Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
-
-          {/* Phone Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Phone Number</Text>
-            <Controller
-              control={control}
-              name="phone"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <>
-                  <View
-                    style={[styles.inputWrapper, error && styles.inputError]}
-                  >
-                    <Icon
-                      name="phone-outline"
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                    <TextInput
-                      ref={phoneRef}
-                      style={styles.textInput}
-                      placeholder="+1 234 567 8900"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      keyboardType="phone-pad"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      returnKeyType="next"
-                      onSubmitEditing={() => passwordRef.current?.focus()}
-                      blurOnSubmit={false}
-                    />
-                  </View>
-                  {error && (
-                    <Text style={styles.errorText}>{error.message}</Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
-
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Password</Text>
-            <Controller
-              control={control}
-              name="password"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <>
-                  <View
-                    style={[styles.inputWrapper, error && styles.inputError]}
-                  >
-                    <Icon
-                      name="lock-outline"
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                    <TextInput
-                      ref={passwordRef}
-                      style={styles.textInput}
-                      placeholder="Min. 8 characters"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      secureTextEntry={!showPassword}
-                      autoCapitalize="none"
-                      returnKeyType="next"
-                      onSubmitEditing={() =>
-                        confirmPasswordRef.current?.focus()
-                      }
-                      blurOnSubmit={false}
-                    />
-                    <TouchableOpacity
-                      onPress={() => setShowPassword(!showPassword)}
-                    >
-                      <Icon
-                        name={showPassword ? 'eye-off' : 'eye'}
-                        size={20}
-                        color={COLORS.textSecondary}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  {error && (
-                    <Text style={styles.errorText}>{error.message}</Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
-
-          {/* Confirm Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Confirm Password</Text>
-            <Controller
-              control={control}
-              name="confirmPassword"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <>
-                  <View
-                    style={[styles.inputWrapper, error && styles.inputError]}
-                  >
-                    <Icon
-                      name="lock-check-outline"
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                    <TextInput
-                      ref={confirmPasswordRef}
-                      style={styles.textInput}
-                      placeholder="Re-enter password"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      secureTextEntry={!showConfirmPassword}
-                      autoCapitalize="none"
-                      returnKeyType="done"
-                      onSubmitEditing={handleSubmit(onSubmit)}
-                    />
-                    <TouchableOpacity
-                      onPress={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                    >
-                      <Icon
-                        name={showConfirmPassword ? 'eye-off' : 'eye'}
-                        size={20}
-                        color={COLORS.textSecondary}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  {error && (
-                    <Text style={styles.errorText}>{error.message}</Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
-
-          {/* Terms */}
-          <Text style={styles.termsText}>
-            By creating an account, you agree to our{' '}
-            <Text
-              style={styles.termsLink}
-              onPress={() => navigation.navigate('TermsOfService')}
-            >
-              Terms of Service
-            </Text>{' '}
-            and{' '}
-            <Text
-              style={styles.termsLink}
-              onPress={() => navigation.navigate('PrivacyPolicy')}
-            >
-              Privacy Policy
-            </Text>
-          </Text>
-
-          {/* Bottom Action Bar */}
-          <View style={styles.bottomBar}>
-            <TouchableOpacity
-              style={[
-                styles.registerButton,
-                (!formState.isValid || loading) &&
-                  styles.registerButtonDisabled,
-              ]}
-              onPress={handleSubmit(onSubmit)}
-              disabled={!formState.isValid || loading}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.registerButtonText}>Create Account</Text>
-            </TouchableOpacity>
-
-            <View style={styles.loginPrompt}>
-              <Text style={styles.loginPromptText}>
-                Already have an account?{' '}
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginLink}>Log in</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <Text style={styles.buttonText}>
+          {isLoading ? 'Creating Account...' : 'Sign Up'}
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
+    flexGrow: 1,
     justifyContent: 'center',
-    borderRadius: 20,
-  },
-  headerCenter: {
-    flex: 1,
     alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#1a1a1a',
   },
-  headerSpacer: {
-    width: 40,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-  },
-  socialSection: {
-    marginBottom: 16,
-    marginTop: 8,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  socialIconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#000000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  googleButton: {
-    backgroundColor: '#DB4437',
-  },
-  facebookButton: {
-    backgroundColor: '#1877F2',
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  dividerText: {
-    paddingHorizontal: 12,
-    color: COLORS.textSecondary,
-    fontSize: 13,
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 30,
   },
   inputContainer: {
+    width: '100%',
     marginBottom: 16,
   },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 52,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    backgroundColor: COLORS.white,
-    gap: 10,
+  input: {
+    width: '100%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
   },
   inputError: {
-    borderColor: COLORS.error,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 16,
-    color: COLORS.text,
+    borderColor: '#ef4444',
   },
   errorText: {
-    color: COLORS.error,
+    color: '#ef4444',
     fontSize: 12,
     marginTop: 4,
+    marginLeft: 4,
   },
-  termsText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
+  button: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 8,
   },
-  termsLink: {
-    color: COLORS.mint,
-    fontWeight: '600',
+  buttonDisabled: {
+    opacity: 0.6,
   },
-  bottomBar: {
-    paddingTop: 24,
-    paddingBottom: 16,
-  },
-  registerButton: {
-    height: 52,
-    backgroundColor: COLORS.mint,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  registerButtonDisabled: {
-    backgroundColor: `${COLORS.mint}50`,
-  },
-  registerButtonText: {
-    color: COLORS.white,
+  buttonText: {
+    color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
-  },
-  loginPrompt: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  loginPromptText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  loginLink: {
-    fontSize: 14,
     fontWeight: '600',
-    color: COLORS.mint,
   },
 });

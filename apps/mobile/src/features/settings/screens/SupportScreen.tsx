@@ -36,23 +36,22 @@ interface SupportOption {
 type SupportScreenProps = StackScreenProps<RootStackParamList, 'Support'>;
 
 export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
-  const { showToast: _showToast } = useToast();
+    const { showToast: _showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
-  const { control, handleSubmit, formState, watch } =
-    useForm<ContactSupportInput>({
-      resolver: zodResolver(contactSupportSchema),
-      mode: 'onChange',
-      defaultValues: {
-        subject: '',
-        message: '',
-        category: 'other',
-      },
-    });
+const { control, handleSubmit, formState, watch } = useForm<ContactSupportInput>({
+    resolver: zodResolver(contactSupportSchema),
+    mode: 'onChange',
+    defaultValues: {
+      subject: '',
+      message: '',
+      category: 'other',
+    },
+  });
 
   const _message = watch('message');
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (_data: ContactSupportInput) => {
+  const onSubmit = async (data: ContactSupportInput) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -64,13 +63,10 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
     }, 1500);
   };
 
-  const isSubmitDisabled = !canSubmitForm(
-    { formState },
-    {
-      requireDirty: false,
-      requireValid: true,
-    },
-  );
+  const isSubmitDisabled = !canSubmitForm({ formState }, {
+    requireDirty: false,
+    requireValid: true,
+  });
 
   const handleEmailSupport = () => {
     Linking.openURL('mailto:support@travelmatch.com?subject=Support Request');
@@ -191,10 +187,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                 <Controller
                   control={control}
                   name="subject"
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => (
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                     <>
                       <TextInput
                         style={styles.input}
@@ -204,9 +197,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                         onChangeText={onChange}
                         onBlur={onBlur}
                       />
-                      {error && (
-                        <Text style={styles.errorText}>{error.message}</Text>
-                      )}
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
                     </>
                   )}
                 />
@@ -217,10 +208,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                 <Controller
                   control={control}
                   name="message"
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => (
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                     <>
                       <TextInput
                         style={[styles.input, styles.textArea]}
@@ -234,9 +222,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                         textAlignVertical="top"
                       />
                       <Text style={styles.charCount}>{value.length}/500</Text>
-                      {error && (
-                        <Text style={styles.errorText}>{error.message}</Text>
-                      )}
+                      {error && <Text style={styles.errorText}>{error.message}</Text>}
                     </>
                   )}
                 />

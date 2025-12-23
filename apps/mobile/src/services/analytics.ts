@@ -2,19 +2,6 @@ import { logger } from '../utils/logger';
 import PostHog from 'posthog-react-native';
 import * as Sentry from '@sentry/react-native';
 
-// Analytics property types - support primitive values and nested objects
-type AnalyticsPropertyValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | string[]
-  | number[]
-  | Record<string, string | number | boolean | null | undefined>;
-
-type AnalyticsProperties = Record<string, AnalyticsPropertyValue>;
-
 /**
  * Analytics Service
  * Centralized analytics tracking with PostHog + Sentry
@@ -53,22 +40,9 @@ class AnalyticsService {
         process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://us.posthog.com';
 
       if (!apiKey) {
-        // In development, analytics being disabled is expected
-        if (__DEV__) {
-          logger.debug(
-            '[Analytics] PostHog API key not configured (optional in development)',
-          );
-        } else {
-          logger.warn(
-            '[Analytics] PostHog API key not found, analytics disabled',
-          );
-        }
-        return;
-      }
-
-      // Check if PostHog.initAsync exists (may not be available in all environments)
-      if (typeof PostHog?.initAsync !== 'function') {
-        logger.warn('[Analytics] PostHog.initAsync not available');
+        logger.warn(
+          '[Analytics] PostHog API key not found, analytics disabled',
+        );
         return;
       }
 
@@ -96,7 +70,7 @@ class AnalyticsService {
    * Track a custom event
    * Sends to both PostHog and Sentry breadcrumbs
    */
-  public trackEvent(eventName: string, properties?: AnalyticsProperties) {
+  public trackEvent(eventName: string, properties?: Record<string, any>) {
     if (!this.initialized) {
       logger.warn('[Analytics] Not initialized, skipping event:', eventName);
       return;
@@ -123,7 +97,7 @@ class AnalyticsService {
   /**
    * Track a screen view
    */
-  public trackScreen(screenName: string, properties?: AnalyticsProperties) {
+  public trackScreen(screenName: string, properties?: Record<string, any>) {
     if (!this.initialized) return;
 
     try {
@@ -145,7 +119,7 @@ class AnalyticsService {
   /**
    * Alias for trackScreen
    */
-  public screen(screenName: string, properties?: AnalyticsProperties) {
+  public screen(screenName: string, properties?: Record<string, any>) {
     this.trackScreen(screenName, properties);
   }
 
@@ -153,7 +127,7 @@ class AnalyticsService {
    * Identify a user
    * Sets user context in both PostHog and Sentry
    */
-  public identify(userId: string, traits?: AnalyticsProperties) {
+  public identify(userId: string, traits?: Record<string, any>) {
     if (!this.initialized) return;
 
     try {
@@ -196,7 +170,7 @@ class AnalyticsService {
   public trackTiming(
     metricName: string,
     duration: number,
-    properties?: AnalyticsProperties,
+    properties?: Record<string, any>,
   ) {
     if (!this.initialized) return;
 
@@ -229,7 +203,7 @@ class AnalyticsService {
    * Set user properties
    * Updates user traits without changing distinct_id
    */
-  public setUserProperties(properties: AnalyticsProperties) {
+  public setUserProperties(properties: Record<string, any>) {
     if (!this.initialized) return;
 
     try {

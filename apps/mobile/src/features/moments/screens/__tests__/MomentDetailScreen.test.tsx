@@ -161,13 +161,7 @@ jest.mock('@/components/GiftMomentBottomSheet', () => ({
 }));
 
 jest.mock('@/components/GiftSuccessModal', () => ({
-  GiftSuccessModal: ({
-    visible,
-    onViewApprovals,
-    onClose,
-    amount,
-    momentTitle,
-  }: any) => {
+  GiftSuccessModal: ({ visible, onViewApprovals, onClose, amount, momentTitle }: any) => {
     const { View, TouchableOpacity, Text } = require('react-native');
     if (!visible) return null;
     return (
@@ -193,9 +187,7 @@ jest.mock('@/components/ReportBlockBottomSheet', () => ({
     return (
       <View>
         <Text>Report Sheet</Text>
-        <TouchableOpacity
-          onPress={() => onSubmit('report', 'spam', 'This is spam')}
-        >
+        <TouchableOpacity onPress={() => onSubmit('report', 'spam', 'This is spam')}>
           <Text>Submit Report</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onClose}>
@@ -236,8 +228,7 @@ const mockMoment: MomentData = {
   status: 'active',
 };
 
-// Skipped: Tests need to be updated for current component API
-describe.skip('MomentDetailScreen', () => {
+describe('MomentDetailScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(Alert, 'alert').mockImplementation();
@@ -282,7 +273,7 @@ describe.skip('MomentDetailScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Saved!',
-          'This moment has been added to your saved list.',
+          'This moment has been added to your saved list.'
         );
       });
     });
@@ -292,7 +283,7 @@ describe.skip('MomentDetailScreen', () => {
       const { getByText } = render(<MomentDetailScreen />);
 
       const saveButton = getByText('Save');
-
+      
       // First save
       fireEvent.press(saveButton);
       await waitFor(() => {
@@ -304,7 +295,7 @@ describe.skip('MomentDetailScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Removed from Saved',
-          'This moment has been removed from your saved list.',
+          'This moment has been removed from your saved list.'
         );
       });
     });
@@ -321,22 +312,20 @@ describe.skip('MomentDetailScreen', () => {
       expect(alertSpy).toHaveBeenCalledWith(
         'Delete Moment',
         'Are you sure you want to delete this moment? This action cannot be undone.',
-        expect.any(Array),
+        expect.any(Array)
       );
     });
 
     it('should delete moment when confirmed', async () => {
-      const alertSpy = jest
-        .spyOn(Alert, 'alert')
-        .mockImplementation((title, message, buttons) => {
-          // Simulate pressing the Delete button
-          if (buttons && buttons.length > 1) {
-            const deleteAction = buttons[1];
-            if (deleteAction.onPress) {
-              deleteAction.onPress();
-            }
+      const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
+        // Simulate pressing the Delete button
+        if (buttons && buttons.length > 1) {
+          const deleteAction = buttons[1];
+          if (deleteAction.onPress) {
+            deleteAction.onPress();
           }
-        });
+        }
+      });
 
       const { getByText } = render(<MomentDetailScreen />);
 
@@ -467,13 +456,15 @@ describe.skip('MomentDetailScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Report Submitted',
-          'Thank you for keeping our community safe.',
+          'Thank you for keeping our community safe.'
         );
       });
 
       expect(queryByText('Report Sheet')).toBeFalsy();
     });
   });
+
+
 
   describe('Data Loading', () => {
     it('should fetch reviews on mount', async () => {
@@ -491,9 +482,7 @@ describe.skip('MomentDetailScreen', () => {
 
     it('should handle review loading errors silently', async () => {
       const { reviewService } = require('@/services/reviewService');
-      reviewService.getReviews.mockRejectedValueOnce(
-        new Error('Network error'),
-      );
+      reviewService.getReviews.mockRejectedValueOnce(new Error('Network error'));
 
       const { queryByText } = render(<MomentDetailScreen />);
 

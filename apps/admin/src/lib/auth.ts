@@ -1,20 +1,6 @@
 import { cookies } from 'next/headers';
 import { createServiceClient } from '@/lib/supabase';
 import crypto from 'crypto';
-import type { Database } from '@/types/database';
-
-type AdminUser = Database['public']['Tables']['admin_users']['Row'];
-
-interface SessionWithAdmin {
-  id: string;
-  admin_id: string;
-  token_hash: string;
-  ip_address: string | null;
-  user_agent: string | null;
-  expires_at: string;
-  created_at: string;
-  admin: AdminUser | null;
-}
 
 export interface AdminSession {
   admin: {
@@ -42,16 +28,16 @@ export async function getAdminSession(): Promise<AdminSession | null> {
       .update(sessionToken)
       .digest('hex');
 
-    // Find session with admin user joined
-    const { data, error: sessionError } = await supabase
+    // Find session
+    const { data: sessionData, error: sessionError } = await supabase
       .from('admin_sessions')
       .select('*, admin:admin_users(*)')
       .eq('token_hash', sessionHash)
       .gt('expires_at', new Date().toISOString())
       .single();
 
-    // Type assertion for joined query result
-    const session = data as SessionWithAdmin | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const session = sessionData as any;
 
     if (sessionError || !session || !session.admin) {
       return null;
@@ -61,7 +47,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     const { data: permissions } = await supabase
       .from('role_permissions')
       .select('resource, action')
-      .eq('role', session.admin.role);
+      .eq('role', session.admin.role as string);
 
     return {
       admin: {
@@ -71,8 +57,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
         avatar_url: session.admin.avatar_url,
         role: session.admin.role,
       },
-      permissions:
-        (permissions as Array<{ resource: string; action: string }>) || [],
+      permissions: permissions || [],
     };
   } catch (error) {
     console.error('Session check error:', error);
@@ -107,7 +92,8 @@ export async function createAuditLog(
 ): Promise<void> {
   try {
     const supabase = createServiceClient();
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('audit_logs') as any).insert({
       admin_id: adminId,
       action,
       resource_type: resourceType,

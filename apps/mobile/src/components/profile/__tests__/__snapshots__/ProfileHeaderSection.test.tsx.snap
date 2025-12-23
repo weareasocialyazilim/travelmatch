@@ -2,7 +2,6 @@
 
 exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverified user 1`] = `
 <RCTView
-  ref={null}
   style={
     {
       "alignItems": "center",
@@ -29,7 +28,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     }
     accessible={true}
     activeOpacity={0.9}
-    ref={null}
     style={
       {
         "marginBottom": 16,
@@ -38,7 +36,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     }
   >
     <RCTImage
-      ref={null}
       source="avatar.jpg"
       style={
         {
@@ -53,7 +50,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     />
   </RCTTouchableOpacity>
   <RCTText
-    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -67,7 +63,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     Test User
   </RCTText>
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -80,14 +75,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     <RCTText
       color="#666666"
       name="map-marker"
-      ref={null}
       size={16}
       testID="RCTText"
     >
       map-marker
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",
@@ -109,7 +102,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     }
     accessible={true}
     aria-label="ProofScore undefined percent. Tap to view Trust Garden"
-    ref={null}
     role="button"
     style={
       {
@@ -127,14 +119,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     <RCTText
       color="#A6E5C1"
       name="shield-check"
-      ref={null}
       size={16}
       testID="RCTText"
     >
       shield-check
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#A6E5C1",
@@ -151,7 +141,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     <RCTText
       color="#A6E5C1"
       name="chevron-right"
-      ref={null}
       size={16}
       testID="RCTText"
     >
@@ -167,12 +156,10 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     }
     accessible={true}
     onPress={[MockFunction]}
-    ref={null}
     role="button"
     testID="edit-button"
   >
     <RCTText
-      ref={null}
       testID="RCTText"
     >
       Edit
@@ -183,7 +170,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
 
 exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified user 1`] = `
 <RCTView
-  ref={null}
   style={
     {
       "alignItems": "center",
@@ -210,7 +196,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     }
     accessible={true}
     activeOpacity={0.9}
-    ref={null}
     style={
       {
         "marginBottom": 16,
@@ -219,7 +204,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     }
   >
     <RCTImage
-      ref={null}
       source="avatar.jpg"
       style={
         {
@@ -234,7 +218,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     />
   </RCTTouchableOpacity>
   <RCTText
-    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -248,7 +231,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     Test User
   </RCTText>
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -261,14 +243,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     <RCTText
       color="#666666"
       name="map-marker"
-      ref={null}
       size={16}
       testID="RCTText"
     >
       map-marker
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",
@@ -290,7 +270,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     }
     accessible={true}
     aria-label="ProofScore undefined percent. Tap to view Trust Garden"
-    ref={null}
     role="button"
     style={
       {
@@ -308,14 +287,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     <RCTText
       color="#A6E5C1"
       name="shield-check"
-      ref={null}
       size={16}
       testID="RCTText"
     >
       shield-check
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#A6E5C1",
@@ -332,7 +309,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     <RCTText
       color="#A6E5C1"
       name="chevron-right"
-      ref={null}
       size={16}
       testID="RCTText"
     >
@@ -348,12 +324,10 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     }
     accessible={true}
     onPress={[MockFunction]}
-    ref={null}
     role="button"
     testID="edit-button"
   >
     <RCTText
-      ref={null}
       testID="RCTText"
     >
       Edit

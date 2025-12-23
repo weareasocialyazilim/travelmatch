@@ -41,6 +41,11 @@ interface CacheEntry<T = any> {
   tags?: string[];
 }
 
+interface InvalidationRecord {
+  cache_key: string;
+  invalidated_at: string;
+}
+
 class CacheInvalidationService {
   private invalidationChecks = new Map<string, number>();
 
@@ -255,7 +260,7 @@ class CacheInvalidationService {
         ? new Date(data.invalidated_at).getTime()
         : 0;
       return invalidatedAt > entry.timestamp;
-    } catch {
+    } catch (error) {
       // Don't fail if invalidation check fails
       return false;
     }

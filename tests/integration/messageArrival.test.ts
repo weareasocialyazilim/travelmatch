@@ -1,13 +1,13 @@
 /**
  * Message Arrival and Real-time Handling Tests
- *
+ * 
  * Tests for real-time message features including:
  * - New message arrival
  * - Message read receipts
  * - Typing indicators
  * - Notification badge updates
  * - Unread count management
- *
+ * 
  * Coverage:
  * - Real-time message insertion
  * - Message state updates
@@ -18,35 +18,16 @@
 
 // @ts-nocheck - React hooks and realtime mocks
 
-import { renderHook, act, waitFor } from '@testing-library/react-native';
+import { renderHook, act, waitFor } from '@testing-library/react-hooks';
 import { useMessages } from '../../apps/mobile/src/hooks/useMessages';
-
-// Mock dependencies - must be before importing supabase
-jest.mock('../../apps/mobile/src/config/supabase', () => ({
-  supabase: {
-    channel: jest.fn(() => ({
-      on: jest.fn().mockReturnThis(),
-      subscribe: jest.fn().mockReturnThis(),
-      unsubscribe: jest.fn(),
-    })),
-    removeChannel: jest.fn(),
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockResolvedValue({ data: [], error: null }),
-    })),
-  },
-}));
-jest.mock('../../apps/mobile/src/utils/logger');
-
-// Import supabase after mocking
 import { supabase } from '../../apps/mobile/src/config/supabase';
 
+// Mock dependencies
+jest.mock('../../apps/mobile/src/config/supabase');
+jest.mock('../../apps/mobile/src/utils/logger');
+
 describe('Message Arrival Handling', () => {
-  let mockChannel: any;
+  let mockChannel;
   let insertHandler: Function;
   let updateHandler: Function;
 
@@ -55,29 +36,23 @@ describe('Message Arrival Handling', () => {
 
     // Mock channel with handlers
     mockChannel = {
-      on: jest.fn(
-        (type: string, config: { event: string }, handler: Function) => {
-          if (config.event === 'INSERT') {
-            insertHandler = handler;
-          } else if (config.event === 'UPDATE') {
-            updateHandler = handler;
-          }
-          return mockChannel;
-        },
-      ),
-      subscribe: jest.fn((callback?: Function) => {
-        // Safely invoke callback if it's a function
-        if (typeof callback === 'function') {
-          callback('SUBSCRIBED');
+      on: jest.fn((type, config, handler) => {
+        if (config.event === 'INSERT') {
+          insertHandler = handler;
+        } else if (config.event === 'UPDATE') {
+          updateHandler = handler;
         }
+        return mockChannel;
+      }),
+      subscribe: jest.fn((callback) => {
+        callback('SUBSCRIBED');
         return mockChannel;
       }),
       unsubscribe: jest.fn(),
     };
 
-    // Setup the mock to return our custom channel
-    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
-    (supabase.removeChannel as jest.Mock).mockImplementation(() => {});
+    (supabase.channel ).mockReturnValue(mockChannel);
+    (supabase.removeChannel ).mockImplementation(() => {});
   });
 
   // ===========================
@@ -202,9 +177,7 @@ describe('Message Arrival Handling', () => {
 
       await waitFor(() => {
         expect(result.current.messages[0].type).toBe('image');
-        expect(result.current.messages[0].imageUrl).toBe(
-          'https://example.com/image.jpg',
-        );
+        expect(result.current.messages[0].imageUrl).toBe('https://example.com/image.jpg');
       });
     });
 
@@ -217,7 +190,7 @@ describe('Message Arrival Handling', () => {
 
       const location = {
         latitude: 40.7128,
-        longitude: -74.006,
+        longitude: -74.0060,
         name: 'New York',
       };
 
@@ -445,7 +418,7 @@ describe('Message Arrival Handling', () => {
 
     it('should auto-clear typing after timeout', async () => {
       jest.useFakeTimers();
-
+      
       const { result } = renderHook(() => useMessages('conv-123'));
 
       await waitFor(() => {
@@ -590,7 +563,7 @@ describe('Message Arrival Handling', () => {
 
       const totalUnread = conversations.reduce(
         (sum, conv) => sum + conv.unreadCount,
-        0,
+        0
       );
 
       expect(totalUnread).toBe(8);

@@ -160,15 +160,15 @@ export function useOfflineMutation<
   const [error, setError] = useState<string | null>(null);
   const [isQueued, setIsQueued] = useState(false);
 
-  const { isOnline: _isOnline } = useNetwork();
+  const { isOnline } = useNetwork();
 
   const mutationFn =
-    typeof mutationOrOptions === 'function' ? mutationOrOptions : undefined;
+    typeof mutationOrOptions === 'function'
+      ? mutationOrOptions
+      : undefined;
 
   const options: UseOfflineMutationOptions =
-    typeof mutationOrOptions === 'function'
-      ? maybeOptions
-      : (mutationOrOptions as UseOfflineMutationOptions);
+    typeof mutationOrOptions === 'function' ? maybeOptions : (mutationOrOptions as UseOfflineMutationOptions);
 
   const { onSuccess, onError, offlineActionType } = options;
 
@@ -183,9 +183,7 @@ export function useOfflineMutation<
         // potentially-stale `isOnline` value from the hook state.
         const netState = await NetInfo.fetch();
         const online = !!(
-          netState &&
-          netState.isConnected &&
-          netState.isInternetReachable !== false
+          netState && netState.isConnected && netState.isInternetReachable !== false
         );
         if (mutationFn) {
           // Caller supplied a direct mutation function
@@ -214,7 +212,7 @@ export function useOfflineMutation<
         if (online) {
           // Execute registered handler immediately when online
           // `executeHandler` will throw if no handler exists.
-
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const result = await (offlineSyncQueue as any).executeHandler(
             offlineActionType,
             params as Record<string, unknown>,
@@ -226,10 +224,7 @@ export function useOfflineMutation<
         // Offline: queue the action for later. Set queued state synchronously
         // so tests and callers can observe the queued state immediately.
         setIsQueued(true);
-        await offlineSyncQueue.add(
-          offlineActionType,
-          params as Record<string, unknown>,
-        );
+        await offlineSyncQueue.add(offlineActionType, params as Record<string, unknown>);
         onSuccess?.();
         return null;
       } catch (err) {
@@ -242,7 +237,7 @@ export function useOfflineMutation<
         setLoading(false);
       }
     },
-    [mutationFn, offlineActionType, onSuccess, onError],
+    [isOnline, mutationFn, offlineActionType, onSuccess, onError],
   );
 
   return {

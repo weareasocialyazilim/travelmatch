@@ -25,9 +25,10 @@ export async function deleteAccount(): Promise<DeleteAccountResult> {
 
     // Mark user for deletion (soft delete)
     const { error: updateError } = await supabase
-      .from('users')
+      .from('profiles')
       .update({
         deleted_at: new Date().toISOString(),
+        deletion_requested_at: new Date().toISOString(),
       })
       .eq('id', userId);
 
@@ -77,6 +78,7 @@ export async function requestDataExport(): Promise<{
       .insert({
         user_id: userId,
         status: 'pending',
+        requested_at: new Date().toISOString(),
       })
       .select('id')
       .single();

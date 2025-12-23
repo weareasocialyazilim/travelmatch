@@ -3,10 +3,7 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
-import {
-  createStackNavigator,
-  CardStyleInterpolators,
-} from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';
 import { lazyLoad } from '../utils/lazyLoad';
@@ -43,7 +40,6 @@ import {
   WaitingForCodeScreen,
   ForgotPasswordScreen,
   ChangePasswordScreen,
-  VerifyPhoneScreen,
 } from '../features/auth';
 import SessionExpiredScreen from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
@@ -86,17 +82,13 @@ const ReputationScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.ReputationScreen })),
 );
 const TrustGardenDetailScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.TrustGardenDetailScreen,
-  })),
+  import('../features/profile').then((m) => ({ default: m.TrustGardenDetailScreen })),
 );
 import { TrustNotesScreen, ProfileDetailScreen } from '../features/profile';
 
 // Proof system screens
 const ProofHistoryScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.ProofHistoryScreen,
-  })),
+  import('../features/profile').then((m) => ({ default: m.ProofHistoryScreen })),
 );
 const ProofFlowScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.ProofFlowScreen })),
@@ -110,35 +102,25 @@ const MyMomentsScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.MyMomentsScreen })),
 );
 const CreateMomentScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.CreateMomentScreen,
-  })),
+  import('../features/profile').then((m) => ({ default: m.CreateMomentScreen })),
 );
 const MomentDetailScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.MomentDetailScreen,
-  })),
+  import('../features/profile').then((m) => ({ default: m.MomentDetailScreen })),
 );
 const MomentGalleryScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.MomentGalleryScreen,
-  })),
+  import('../features/profile').then((m) => ({ default: m.MomentGalleryScreen })),
 );
 const ShareMomentScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.ShareMomentScreen })),
 );
 const SavedMomentsScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.SavedMomentsScreen,
-  })),
+  import('../features/profile').then((m) => ({ default: m.SavedMomentsScreen })),
 );
 const EditMomentScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.EditMomentScreen })),
 );
 const ReportMomentScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.ReportMomentScreen,
-  })),
+  import('../features/profile').then((m) => ({ default: m.ReportMomentScreen })),
 );
 
 // ===================================
@@ -223,19 +205,8 @@ export type RootStackParamList = {
   PhoneAuth: undefined;
   EmailAuth: undefined;
   ForgotPassword: undefined;
-  VerifyCode: {
-    verificationType: 'phone' | 'email';
-    contact: string;
-  };
-  WaitingForCode: {
-    verificationType: 'phone' | 'email';
-    contact: string;
-  };
-  VerifyPhone: {
-    email: string;
-    phone: string;
-    fullName: string;
-  };
+  VerifyCode: undefined;
+  WaitingForCode: undefined;
   SuccessConfirmation: undefined;
   SetPassword: undefined;
   TwoFactorSetup: undefined;
@@ -246,7 +217,7 @@ export type RootStackParamList = {
   DisputeFlow: {
     type: 'transaction' | 'proof';
     id: string;
-    details?: Record<string, unknown>;
+    details?: any;
   };
 
   // Deprecated - to be removed
@@ -254,13 +225,7 @@ export type RootStackParamList = {
   // DisputeStatus: undefined;
   // DisputeProof: { proofId: string };
 
-  CompleteProfile:
-    | {
-        email?: string;
-        phone?: string;
-        fullName?: string;
-      }
-    | undefined;
+  CompleteProfile: undefined;
 
   // Unified Success Screen - replaces individual success screens
   Success: {
@@ -290,11 +255,7 @@ export type RootStackParamList = {
   ProofDetail: { proofId: string };
 
   // Approval & Matching
-  ReceiverApproval: {
-    momentTitle: string;
-    totalAmount: number;
-    momentId: string;
-  };
+  ReceiverApproval: { momentTitle: string; totalAmount: number; momentId: string };
   MatchConfirmation: { selectedGivers: SelectedGiver[] };
 
   // Communication
@@ -465,7 +426,7 @@ const AppNavigator = () => {
     };
     checkOnboarding();
   }, []);
-
+  
   // Setup session expired callback for API client
   useEffect(() => {
     apiClient.setSessionExpiredCallback(() => {
@@ -475,7 +436,7 @@ const AppNavigator = () => {
         (navigationRef.navigate as (name: string) => void)('SessionExpired');
       }
     });
-
+    
     // Setup deep link handler with navigation
     if (navigationRef.current) {
       deepLinkHandler.setNavigation(navigationRef.current);
@@ -509,38 +470,25 @@ const AppNavigator = () => {
             initialRouteName={initialRoute}
             screenOptions={{
               headerShown: false,
-              // DEFCON 3.4 FIX: Enable proper iOS swipe-to-go-back gesture
-              gestureEnabled: true,
-              gestureDirection: 'horizontal',
-              // Use standard iOS horizontal slide animation that works with gestures
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              // Faster, smoother transitions
+              cardStyleInterpolator: ({ current: { progress } }) => ({
+                cardStyle: {
+                  opacity: progress,
+                },
+              }),
               transitionSpec: {
                 open: {
-                  animation: 'spring',
+                  animation: 'timing',
                   config: {
-                    stiffness: 1000,
-                    damping: 500,
-                    mass: 3,
-                    overshootClamping: true,
-                    restDisplacementThreshold: 10,
-                    restSpeedThreshold: 10,
+                    duration: 200,
                   },
                 },
                 close: {
-                  animation: 'spring',
+                  animation: 'timing',
                   config: {
-                    stiffness: 1000,
-                    damping: 500,
-                    mass: 3,
-                    overshootClamping: true,
-                    restDisplacementThreshold: 10,
-                    restSpeedThreshold: 10,
+                    duration: 200,
                   },
                 },
               },
-              // Gesture response config
-              gestureResponseDistance: 50, // iOS default edge distance
             }}
           >
             {/* Onboarding & Auth */}
@@ -548,15 +496,7 @@ const AppNavigator = () => {
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen
-              name="VerifyPhone"
-              component={VerifyPhoneScreen}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="SessionExpired"
-              component={SessionExpiredScreen}
-            />
+            <Stack.Screen name="SessionExpired" component={SessionExpiredScreen} />
             <Stack.Screen name="LinkNotFound" component={LinkNotFoundScreen} />
             <Stack.Screen name="LinkExpired" component={LinkExpiredScreen} />
             <Stack.Screen name="LinkInvalid" component={LinkInvalidScreen} />
@@ -566,22 +506,12 @@ const AppNavigator = () => {
               name="ForgotPassword"
               component={ForgotPasswordScreen}
             />
-            {/* DEFCON 3.4: Disable gesture for critical auth flows */}
-            <Stack.Screen
-              name="SetPassword"
-              component={SetPasswordScreen}
-              options={{ gestureEnabled: false }}
-            />
+            <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
             <Stack.Screen
               name="TwoFactorSetup"
               component={TwoFactorSetupScreen}
-              options={{ gestureEnabled: false }}
             />
-            <Stack.Screen
-              name="VerifyCode"
-              component={VerifyCodeScreen}
-              options={{ gestureEnabled: false }}
-            />
+            <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
             <Stack.Screen
               name="WaitingForCode"
               component={WaitingForCodeScreen}
@@ -656,11 +586,9 @@ const AppNavigator = () => {
               component={TransactionDetailScreen}
             />
             <Stack.Screen name="RefundPolicy" component={RefundPolicyScreen} />
-            {/* DEFCON 3.4: Disable gesture for payment flows */}
             <Stack.Screen
               name="RefundRequest"
               component={RefundRequestScreen}
-              options={{ gestureEnabled: false }}
             />
 
             {/* Escrow & Gesture Tracking */}
@@ -712,22 +640,12 @@ const AppNavigator = () => {
               name="KYCDocumentType"
               component={KYCDocumentTypeScreen}
             />
-            {/* DEFCON 3.4: Disable gesture for KYC flow to prevent losing progress */}
             <Stack.Screen
               name="KYCDocumentCapture"
               component={KYCDocumentCaptureScreen}
-              options={{ gestureEnabled: false }}
             />
-            <Stack.Screen
-              name="KYCSelfie"
-              component={KYCSelfieScreen}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="KYCReview"
-              component={KYCReviewScreen}
-              options={{ gestureEnabled: false }}
-            />
+            <Stack.Screen name="KYCSelfie" component={KYCSelfieScreen} />
+            <Stack.Screen name="KYCReview" component={KYCReviewScreen} />
             <Stack.Screen name="KYCPending" component={KYCPendingScreen} />
 
             {/* Social & Invite */}
@@ -750,12 +668,8 @@ const AppNavigator = () => {
             />
             <Stack.Screen name="PaymentsKYC" component={PaymentsKYCScreen} />
 
-            {/* Withdraw - DEFCON 3.4: Disable gesture for payment flow */}
-            <Stack.Screen
-              name="Withdraw"
-              component={WithdrawScreen}
-              options={{ gestureEnabled: false }}
-            />
+            {/* Withdraw */}
+            <Stack.Screen name="Withdraw" component={WithdrawScreen} />
 
             {/* Moment Publishing */}
             {/* <Stack.Screen
@@ -808,11 +722,9 @@ const AppNavigator = () => {
               component={BookingDetailScreen}
             />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
-            {/* DEFCON 3.4: Disable gesture for payment flow */}
             <Stack.Screen
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
-              options={{ gestureEnabled: false }}
             />
 
             {/* Footer Pages */}

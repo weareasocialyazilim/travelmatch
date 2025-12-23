@@ -15,8 +15,6 @@ export { VerifyCodeScreen } from './screens/VerifyCodeScreen';
 export { WaitingForCodeScreen } from './screens/WaitingForCodeScreen';
 export { ForgotPasswordScreen } from './screens/ForgotPasswordScreen';
 export { ChangePasswordScreen } from './screens/ChangePasswordScreen';
-// Note: VerifyEmailScreen removed - using email link verification instead
-export { VerifyPhoneScreen } from './screens/VerifyPhoneScreen';
 
 // Services
 export { authApi } from './services/authApi';

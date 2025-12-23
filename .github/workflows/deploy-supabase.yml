@@ -49,7 +49,7 @@ jobs:
           node-version: '20'
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v2.0.0
+        uses: Infisical/secrets-action@v1
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}

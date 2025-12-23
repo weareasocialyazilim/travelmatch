@@ -8,15 +8,12 @@ A social travel platform connecting travelers through shared experiences and gif
 
 - ✅ Core Platform: 90% complete
 - 🔴 Authentication: 30% complete (BLOCKER - 2 weeks needed)
-- ✅ Admin Panel: 90% complete (33 modules implemented)
+- 🟡 Admin Panel: 40% complete (1 week needed)
 - 🟡 Web Landing: 20% complete (1 week needed)
-- **Timeline to Production:** 4 weeks (1 month)
+- **Timeline to Production:** 6 weeks (1.5 months)
 
 **Quick Links:**
 
-- 📱 [Mobile-First Roadmap](./MOBILE_FIRST_ROADMAP.md) - Critical security fixes & launch plan
-- 🏗️ [Architecture Best Practices](./docs/ARCHITECTURE_BEST_PRACTICES.md) - Feature-based structure
-  guide
 - 📘 [Full Analysis](./docs/COMPREHENSIVE_PROJECT_ANALYSIS.md) - 50 pages, detailed technical
   analysis
 - ⚡ [Quick Action Plan](./docs/QUICK_ACTION_PLAN.md) - 5 pages, TL;DR version
@@ -34,7 +31,7 @@ travelmatch/
 ├── apps/
 │   ├── mobile/          # React Native + Expo mobile app
 │   ├── web/             # Next.js landing page
-│   └── admin/           # Next.js 16 admin panel (90% complete)
+│   └── admin/           # React admin panel (Refine)
 ├── packages/
 │   ├── shared/          # Shared utilities and types
 │   ├── design-system/   # UI components and tokens
@@ -69,8 +66,8 @@ pnpm test
 
 ### Mobile App (`apps/mobile`)
 
-- **Framework**: React Native 0.81.5 + Expo SDK 54.0
-- **Language**: TypeScript 5.9.3 (strict mode)
+- **Framework**: React Native 0.81.5 + Expo SDK 54
+- **Language**: TypeScript 5.9.2 (strict mode)
 - **State Management**: Zustand
 - **Navigation**: React Navigation v6
 - **Forms**: React Hook Form + Zod validation
@@ -86,12 +83,9 @@ pnpm test
 
 ### Admin Panel (`apps/admin`)
 
-- **Framework**: Next.js 16 (App Router)
-- **UI**: shadcn/ui + Tailwind CSS
-- **State**: TanStack Query + Zustand
-- **Tables**: TanStack Table + DataTable
-- **Forms**: React Hook Form + Zod
-- **Backend**: Supabase (PostgreSQL)
+- **Framework**: React + Vite
+- **Admin Framework**: Refine
+- **Backend**: Supabase
 
 ### Infrastructure
 
@@ -403,7 +397,7 @@ pnpm --filter @travelmatch/mobile test:e2e:cloud     # Maestro Cloud
 
 **3. Screen Tests (120 tests - 75% coverage)**
 
-- DiscoverScreen (feed, search, filters)
+- HomeScreen (feed, search, filters)
 - ProfileScreen (info, edit, settings)
 - DiscoverScreen (categories, map, search)
 

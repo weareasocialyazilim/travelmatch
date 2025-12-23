@@ -1,7 +1,6 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { OptimizedImage } from '../../ui/OptimizedImage';
 import {
   getMomentImageProps,
@@ -9,10 +8,7 @@ import {
   IMAGE_VARIANTS_BY_CONTEXT,
 } from '../../../utils/cloudflareImageHelpers';
 import { COLORS } from '../../../constants/colors';
-import { DEFAULT_IMAGES } from '../../../constants/defaultValues';
 import type { Moment as HookMoment } from '../../../hooks/useMoments';
-import type { RootStackParamList } from '../../../navigation/AppNavigator';
-import type { NavigationProp } from '@react-navigation/native';
 
 interface MomentSingleCardProps {
   moment: HookMoment;
@@ -21,9 +17,8 @@ interface MomentSingleCardProps {
 
 const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
   ({ moment, onPress }) => {
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const imageUrl =
-      moment.image || moment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER;
+      moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
     const hostName = moment.hostName || 'Anonymous';
     const price = moment.price ?? moment.pricePerGuest ?? 0;
     const locationCity =
@@ -63,20 +58,12 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
           accessibilityLabel={`Photo of ${moment.title}`}
         />
         <View style={styles.singleContent}>
-          <TouchableOpacity
-            style={styles.creatorRow}
-            onPress={() => {
-              if (moment.hostId) {
-                navigation.navigate('ProfileDetail', { userId: moment.hostId });
-              }
-            }}
-            activeOpacity={0.7}
-          >
+          <View style={styles.creatorRow}>
             <OptimizedImage
               {...getAvatarImageProps(
                 hostUser,
                 IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                DEFAULT_IMAGES.AVATAR_SMALL,
+                'https://via.placeholder.com/40',
               )}
               contentFit="cover"
               style={styles.creatorAvatar}
@@ -96,7 +83,7 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
                 )}
               </View>
             </View>
-          </TouchableOpacity>
+          </View>
           <Text style={styles.singleTitle} numberOfLines={2}>
             {moment.title}
           </Text>

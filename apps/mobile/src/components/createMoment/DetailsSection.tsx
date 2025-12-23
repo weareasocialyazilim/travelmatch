@@ -12,7 +12,7 @@ import {
   StyleSheet,
   Platform,
   Alert,
-   
+  // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';

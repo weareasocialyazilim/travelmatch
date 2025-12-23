@@ -29,7 +29,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = React.memo(
                 <View style={styles.reviewStars}>
                   {Array.from({ length: 5 }, (_, i) => (
                     <MaterialCommunityIcons
-                      key={`star-${review.id}-${i}`}
+                      key={i}
                       name="star"
                       size={14}
                       color={i < review.rating ? COLORS.warning : COLORS.border}

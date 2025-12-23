@@ -107,10 +107,7 @@ async function createPaymentIntent(req: Request) {
   // 4. Calculate platform fee (10%)
   const platformFee = Math.round(body.amount * 0.1);
 
-  // 5. Create Stripe Payment Intent with idempotency key
-  // Idempotency key prevents duplicate charges on network retries
-  const idempotencyKey = `pi_${body.momentId}_${user.id}_${Date.now()}`;
-
+  // 5. Create Stripe Payment Intent
   const paymentIntent = await stripe.paymentIntents.create({
     amount: body.amount,
     currency: body.currency,
@@ -125,14 +122,11 @@ async function createPaymentIntent(req: Request) {
       giverId: user.id,
       receiverId: moment.user_id,
       platformFee: platformFee.toString(),
-      idempotencyKey, // Store for debugging
     },
     application_fee_amount: platformFee,
     transfer_data: {
       destination: moment.stripe_account_id, // Connected account
     },
-  }, {
-    idempotencyKey, // Prevent duplicate charges
   });
 
   // 6. Store transaction in database
@@ -373,16 +367,9 @@ async function handlePaymentFailed(
 /**
  * Process refund
  */
-// Refund validation schema
-const refundSchema = z.object({
-  paymentIntentId: z.string().min(1, 'Payment intent ID is required'),
-  reason: z.enum(['requested_by_customer', 'fraudulent', 'duplicate']).optional(),
-});
-
 async function processRefund(req: Request) {
   const { user } = await validateAuth(req);
-  const body = await req.json();
-  const { paymentIntentId, reason } = refundSchema.parse(body);
+  const { paymentIntentId, reason } = await req.json();
 
   logger.info('Processing refund', {
     userId: user.id,
@@ -445,15 +432,7 @@ async function handleTransferPaid(transfer: Stripe.Transfer): Promise<void> {
 /**
  * Get or create Stripe customer for user
  */
-interface AuthenticatedUser {
-  id: string;
-  email: string;
-  user_metadata?: {
-    full_name?: string;
-  };
-}
-
-async function getOrCreateStripeCustomer(user: AuthenticatedUser): Promise<string> {
+async function getOrCreateStripeCustomer(user: any): Promise<string> {
   // Check if user has Stripe customer ID
   const { data: profile } = await supabase
     .from('profiles')

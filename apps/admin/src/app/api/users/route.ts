@@ -1,22 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
-import {
-  buildSafeSearchFilter,
-  validatePagination,
-  validateSortColumn,
-  validateSortOrder,
-} from '@/lib/query-utils';
-
-// Whitelist of allowed sort columns (VULN-014)
-const ALLOWED_SORT_COLUMNS = [
-  'created_at',
-  'display_name',
-  'email',
-  'is_verified',
-  'is_active',
-  'last_active_at',
-];
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,17 +17,10 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const status = searchParams.get('status');
     const verified = searchParams.get('verified');
-    const { limit, offset } = validatePagination(
-      searchParams.get('limit'),
-      searchParams.get('offset')
-    );
-    // SECURITY: Validate sort column against whitelist (VULN-014)
-    const sortBy = validateSortColumn(
-      searchParams.get('sort_by'),
-      ALLOWED_SORT_COLUMNS,
-      'created_at'
-    );
-    const sortOrder = validateSortOrder(searchParams.get('sort_order'));
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const sortBy = searchParams.get('sort_by') || 'created_at';
+    const sortOrder = searchParams.get('sort_order') || 'desc';
 
     const supabase = createServiceClient();
 
@@ -53,10 +30,9 @@ export async function GET(request: NextRequest) {
       .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
-    // SECURITY: Use safe search filter to prevent PostgREST injection (VULN-001)
-    const searchFilter = buildSafeSearchFilter(['display_name', 'email'], search);
-    if (searchFilter) {
-      query = query.or(searchFilter);
+    // Search by name or email
+    if (search) {
+      query = query.or(`display_name.ilike.%${search}%,email.ilike.%${search}%`);
     }
 
     // Filter by status

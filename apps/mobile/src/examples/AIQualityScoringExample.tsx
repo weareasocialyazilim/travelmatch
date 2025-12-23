@@ -55,8 +55,8 @@ export function ProfileVerificationScreen({ userId }: { userId: string }) {
       {/* Quality Tips */}
       <View style={styles.tips}>
         <Text style={styles.tipsTitle}>Tips for best results:</Text>
-        {tips.map((tip) => (
-          <Text key={tip} style={styles.tip}>• {tip}</Text>
+        {tips.map((tip, i) => (
+          <Text key={i} style={styles.tip}>• {tip}</Text>
         ))}
       </View>
 
@@ -116,8 +116,8 @@ export function ProfileVerificationScreen({ userId }: { userId: string }) {
           {score.issues.length > 0 && (
             <View style={styles.issues}>
               <Text style={styles.issuesTitle}>Issues Found:</Text>
-              {score.issues.map((issue) => (
-                <Text key={issue} style={styles.issue}>⚠️ {issue}</Text>
+              {score.issues.map((issue, i) => (
+                <Text key={i} style={styles.issue}>⚠️ {issue}</Text>
               ))}
             </View>
           )}
@@ -126,8 +126,8 @@ export function ProfileVerificationScreen({ userId }: { userId: string }) {
           {score.suggestions.length > 0 && (
             <View style={styles.suggestions}>
               <Text style={styles.suggestionsTitle}>Suggestions:</Text>
-              {score.suggestions.map((suggestion) => (
-                <Text key={suggestion} style={styles.suggestion}>💡 {suggestion}</Text>
+              {score.suggestions.map((suggestion, i) => (
+                <Text key={i} style={styles.suggestion}>💡 {suggestion}</Text>
               ))}
             </View>
           )}

@@ -10,8 +10,6 @@ import { initReactI18next } from 'react-i18next';
 // Import translations
 import en from '../locales/en.json';
 import tr from '../locales/tr.json';
-import formsEn from '../i18n/en/forms.json';
-import formsTr from '../i18n/tr/forms.json';
 
 // Get device language
 const deviceLanguage = Localization.getLocales()[0]?.languageCode || 'en';
@@ -27,8 +25,8 @@ export type SupportedLanguage = keyof typeof SUPPORTED_LANGUAGES;
 // i18n configuration
 i18n.use(initReactI18next).init({
   resources: {
-    en: { translation: { ...en, ...formsEn } },
-    tr: { translation: { ...tr, ...formsTr } },
+    en: { translation: en },
+    tr: { translation: tr },
   },
   lng: deviceLanguage,
   fallbackLng: 'en',

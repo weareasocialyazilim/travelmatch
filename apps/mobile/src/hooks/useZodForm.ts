@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useHookForm } from 'react-hook-form';
 import { logger } from '../utils/logger';
 import type { UseFormProps, UseFormReturn, FieldValues } from 'react-hook-form';
-import type { ZodTypeAny } from 'zod';
+import type { ZodType, TypeOf, ZodTypeAny } from 'zod';
 
 /**
  * Zod schema ile entegre form hook

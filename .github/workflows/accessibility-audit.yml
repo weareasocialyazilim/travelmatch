@@ -20,7 +20,7 @@ jobs:
   accessibility-check:
     name: Accessibility Check
     runs-on: ubuntu-latest
-    continue-on-error: true # OK: Accessibility is advisory, not blocking
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
           cd apps/web && pnpm run build || echo "Web build failed, skipping"
         env:
           NODE_ENV: production
-        continue-on-error: true # OK: Web may not always build, accessibility is advisory
+        continue-on-error: true
 
       - name: Install pa11y
         run: npm install -g pa11y pa11y-ci

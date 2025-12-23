@@ -4,14 +4,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'TravelMatch',
   slug: 'travelmatch',
-  version: '0.0.1',
+  version: '1.0.0',
   orientation: 'portrait',
   // Custom entry point to fix AppEntry.js resolution in monorepo
   entryPoint: './index.ts',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'travelmatch',
-  newArchEnabled: true,
+  newArchEnabled: false,
   splash: {
     image: './assets/splash-icon.png',
     resizeMode: 'contain',
@@ -19,8 +19,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.travelmatch.mobile',
-    buildNumber: '10',
+    bundleIdentifier: 'com.travelmatch.app',
+    buildNumber: '1',
     associatedDomains: ['applinks:travelmatch.app'],
     config: {},
     infoPlist: {
@@ -62,19 +62,25 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-localization',
-    'expo-updates',
-    '@sentry/react-native/expo',
+    [
+      '@sentry/react-native/expo',
+      {
+        organization: process.env.SENTRY_ORG || 'travelmatch-2p',
+        project: process.env.SENTRY_PROJECT || 'react-native',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      },
+    ],
     'expo-font',
     'expo-secure-store',
     '@react-native-community/datetimepicker',
-    '@rnmapbox/maps',
+    [
+      '@rnmapbox/maps',
+      {
+        // Build-time only token - NOT bundled in client (no EXPO_PUBLIC_ prefix)
+        RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
+      },
+    ],
   ],
-  updates: {
-    url: 'https://u.expo.dev/55ca9fff-1a53-4190-b368-f9facf1febfd',
-  },
-  runtimeVersion: {
-    policy: 'appVersion',
-  },
   extra: {
     eas: {
       projectId: '55ca9fff-1a53-4190-b368-f9facf1febfd',

@@ -2,28 +2,25 @@
 
 /**
  * Stripe Webhook Handler Edge Function
- *
+ * 
  * Security Features:
  * - Webhook signature verification
  * - Idempotent processing
  * - Automatic retry handling
  * - Audit logging
  * - Cache invalidation
- *
+ * 
  * Handles events:
  * - payment_intent.succeeded
  * - payment_intent.payment_failed
  * - charge.refunded
  * - customer.subscription.created/updated/deleted
- *
+ * 
  * @see https://stripe.com/docs/webhooks
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import {
-  createClient,
-  SupabaseClient,
-} from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 import {
   ErrorCode,
@@ -33,18 +30,21 @@ import {
   toHttpSuccessResponse,
   handleUnexpectedError,
 } from '../_shared/errorHandler.ts';
-import { getCorsHeaders } from '../_shared/security-middleware.ts';
 
 // CORS headers (webhooks from Stripe don't need CORS, but keeping for consistency)
-// Note: Stripe webhooks come from Stripe servers, not browsers, so CORS is not strictly needed
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'stripe-signature, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 /**
  * Log audit event
  */
 async function logAudit(
-  supabase: SupabaseClient,
+  supabase: any,
   action: string,
-  metadata: Record<string, unknown>,
+  metadata: Record<string, any>,
 ) {
   try {
     await supabase.from('audit_logs').insert({
@@ -61,12 +61,12 @@ async function logAudit(
  * Invalidate payment-related cache for user
  */
 async function invalidateUserPaymentCache(
-  supabase: SupabaseClient,
+  supabase: any,
   userId: string,
 ) {
   try {
     const timestamp = new Date().toISOString();
-
+    
     await supabase.from('cache_invalidation').insert([
       { cache_key: `wallet:${userId}`, invalidated_at: timestamp },
       { cache_key: `transactions:${userId}`, invalidated_at: timestamp },
@@ -81,7 +81,7 @@ async function invalidateUserPaymentCache(
  * Check if event was already processed (idempotency)
  */
 async function isEventProcessed(
-  supabase: SupabaseClient,
+  supabase: any,
   eventId: string,
 ): Promise<boolean> {
   const { data } = await supabase
@@ -97,7 +97,7 @@ async function isEventProcessed(
  * Mark event as processed
  */
 async function markEventProcessed(
-  supabase: SupabaseClient,
+  supabase: any,
   eventId: string,
   eventType: string,
 ) {
@@ -116,7 +116,7 @@ async function markEventProcessed(
  * Handle payment_intent.succeeded event
  */
 async function handlePaymentSucceeded(
-  supabase: SupabaseClient,
+  supabase: any,
   paymentIntent: Stripe.PaymentIntent,
 ) {
   const userId = paymentIntent.metadata.supabase_user_id;
@@ -185,7 +185,7 @@ async function handlePaymentSucceeded(
  * Handle payment_intent.payment_failed event
  */
 async function handlePaymentFailed(
-  supabase: SupabaseClient,
+  supabase: any,
   paymentIntent: Stripe.PaymentIntent,
 ) {
   const userId = paymentIntent.metadata.supabase_user_id;
@@ -239,7 +239,7 @@ async function handlePaymentFailed(
  * Handle charge.refunded event
  */
 async function handleChargeRefunded(
-  supabase: SupabaseClient,
+  supabase: any,
   charge: Stripe.Charge,
 ) {
   const paymentIntentId = charge.payment_intent as string;
@@ -341,7 +341,7 @@ serve(async (req) => {
     // Initialize Stripe
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-
+    
     if (!stripeSecretKey || !webhookSecret) {
       const error = createErrorResponse(
         'Stripe configuration missing',
@@ -358,7 +358,7 @@ serve(async (req) => {
     // Initialize Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
+    
     if (!supabaseUrl || !supabaseServiceKey) {
       const error = createErrorResponse(
         'Supabase configuration missing',
@@ -408,24 +408,15 @@ serve(async (req) => {
 
     switch (event.type) {
       case 'payment_intent.succeeded':
-        await handlePaymentSucceeded(
-          supabase,
-          event.data.object as Stripe.PaymentIntent,
-        );
+        await handlePaymentSucceeded(supabase, event.data.object as Stripe.PaymentIntent);
         break;
 
       case 'payment_intent.payment_failed':
-        await handlePaymentFailed(
-          supabase,
-          event.data.object as Stripe.PaymentIntent,
-        );
+        await handlePaymentFailed(supabase, event.data.object as Stripe.PaymentIntent);
         break;
 
       case 'charge.refunded':
-        await handleChargeRefunded(
-          supabase,
-          event.data.object as Stripe.Charge,
-        );
+        await handleChargeRefunded(supabase, event.data.object as Stripe.Charge);
         break;
 
       default:

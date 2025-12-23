@@ -9,9 +9,6 @@
 -- Cron job exists but function was missing!
 -- ============================================================
 
--- Drop existing function first to allow return type change
-DROP FUNCTION IF EXISTS refund_expired_escrow();
-
 CREATE OR REPLACE FUNCTION refund_expired_escrow()
 RETURNS INTEGER
 LANGUAGE plpgsql
@@ -96,11 +93,6 @@ COMMENT ON FUNCTION refund_expired_escrow() IS 'Automatically refunds expired es
 -- 2. CLEANUP FUNCTIONS FOR LOG/STREAM TABLES
 -- TTL/Archiving strategy for feed_delta, deep_link_events, audit_logs
 -- ============================================================
-
--- Drop existing functions first to allow return type changes
-DROP FUNCTION IF EXISTS cleanup_old_feed_delta();
-DROP FUNCTION IF EXISTS cleanup_old_deep_link_events();
-DROP FUNCTION IF EXISTS count_old_audit_logs();
 
 -- Feed delta cleanup (keep last 30 days)
 CREATE OR REPLACE FUNCTION cleanup_old_feed_delta()

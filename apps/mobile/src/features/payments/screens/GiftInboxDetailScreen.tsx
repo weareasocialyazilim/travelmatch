@@ -61,14 +61,12 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
     navigation.navigate('Chat', {
       otherUser: {
         id: senderId,
-        email: '',
         name: senderName,
         avatar: senderAvatar,
         isVerified: senderVerified,
         type: 'traveler',
         role: 'Traveler',
         kyc: senderVerified ? 'Verified' : 'Unverified',
-        kycStatus: senderVerified ? 'Verified' : 'Unverified',
         location: senderCity,
       },
     });

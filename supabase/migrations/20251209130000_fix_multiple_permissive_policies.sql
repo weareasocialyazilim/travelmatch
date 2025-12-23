@@ -12,7 +12,6 @@ DROP POLICY IF EXISTS "Users can manage own blocks" ON public.blocks;
 DROP POLICY IF EXISTS "Users can check if blocked" ON public.blocks;
 
 -- Consolidated SELECT policy (blocker OR blocked can view)
-DROP POLICY IF EXISTS "blocks_select_participants" ON public.blocks;
 CREATE POLICY "blocks_select_participants" ON public.blocks
 FOR SELECT
 USING (
@@ -24,7 +23,6 @@ COMMENT ON POLICY "blocks_select_participants" ON public.blocks IS
 'Both blocker and blocked user can view the block record';
 
 -- INSERT: Only blocker can create blocks
-DROP POLICY IF EXISTS "blocks_insert_blocker" ON public.blocks;
 CREATE POLICY "blocks_insert_blocker" ON public.blocks
 FOR INSERT
 WITH CHECK (blocker_id = auth_user_id());
@@ -33,7 +31,6 @@ COMMENT ON POLICY "blocks_insert_blocker" ON public.blocks IS
 'Only the blocker can create new block records';
 
 -- DELETE: Only blocker can remove blocks
-DROP POLICY IF EXISTS "blocks_delete_blocker" ON public.blocks;
 CREATE POLICY "blocks_delete_blocker" ON public.blocks
 FOR DELETE
 USING (blocker_id = auth_user_id());
@@ -55,7 +52,6 @@ DROP POLICY IF EXISTS "Moment owners can update requests" ON public.requests;
 DROP POLICY IF EXISTS "Users can cancel own requests" ON public.requests;
 
 -- SELECT: Requester OR moment owner can view
-DROP POLICY IF EXISTS "requests_select_related" ON public.requests;
 CREATE POLICY "requests_select_related" ON public.requests
 FOR SELECT
 USING (
@@ -67,7 +63,6 @@ COMMENT ON POLICY "requests_select_related" ON public.requests IS
 'Requester and moment owner can view request. Uses helper function for performance.';
 
 -- INSERT: Only requester can create
-DROP POLICY IF EXISTS "requests_insert_requester" ON public.requests;
 CREATE POLICY "requests_insert_requester" ON public.requests
 FOR INSERT
 WITH CHECK (user_id = auth_user_id());
@@ -76,7 +71,6 @@ COMMENT ON POLICY "requests_insert_requester" ON public.requests IS
 'Users can create requests for moments';
 
 -- UPDATE: Requester OR moment owner can update (consolidated)
-DROP POLICY IF EXISTS "requests_update_related" ON public.requests;
 CREATE POLICY "requests_update_related" ON public.requests
 FOR UPDATE
 USING (
@@ -88,7 +82,6 @@ COMMENT ON POLICY "requests_update_related" ON public.requests IS
 'Both requester and moment owner can update request status. Consolidates previous multiple policies.';
 
 -- DELETE: Only requester can delete (cancel)
-DROP POLICY IF EXISTS "requests_delete_requester" ON public.requests;
 CREATE POLICY "requests_delete_requester" ON public.requests
 FOR DELETE
 USING (user_id = auth_user_id());

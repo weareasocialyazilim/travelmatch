@@ -2,9 +2,6 @@
  * RegisterScreen Component Tests
  * Tests for the registration screen including form validation, password matching, and registration flow
  * Target Coverage: 70%+
- *
- * NOTE: Most tests are skipped because they were written for an older API.
- * TODO: Update tests to match current component implementation.
  */
 
 import React from 'react';
@@ -28,20 +25,6 @@ const render = (ui: React.ReactElement, options?: RenderOptions) => {
 // Mock dependencies
 jest.mock('@/context/AuthContext');
 jest.mock('@/utils/logger');
-jest.mock('@/context/BiometricAuthContext', () => ({
-  useBiometric: () => ({
-    isSupported: false,
-    isEnabled: false,
-    authenticate: jest.fn(),
-    enable: jest.fn(),
-    disable: jest.fn(),
-    checkSupport: jest.fn(),
-    loading: false,
-    error: null,
-  }),
-  BiometricAuthProvider: ({ children }: { children: React.ReactNode }) =>
-    children,
-}));
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -73,22 +56,10 @@ const mockRoute = {
   name: 'Register' as const,
 };
 
-/**
- * Test credential helpers - builds values at runtime to avoid
- * static analysis false positives for hardcoded credentials.
- */
-const TestCredentials = {
-  email: () => ['test', '@', 'example.com'].join(''),
-  password: () => ['pass', 'word', '123'].join(''),
-  weakPassword: () => ['weak', '1'].join(''),
-  mismatchPassword: () => ['different', '123'].join(''),
-};
-
 // Mock Alert
 jest.spyOn(Alert, 'alert');
 
-describe.skip('RegisterScreen', () => {
-  // Skipped: Tests need to be updated for current component API
+describe('RegisterScreen', () => {
   const mockRegister = jest.fn();
   const mockUseAuth = useAuth;
   const mockLogger = logger;
@@ -150,9 +121,9 @@ describe.skip('RegisterScreen', () => {
       );
 
       const emailInput = getByPlaceholderText('Email');
-      fireEvent.changeText(emailInput, TestCredentials.email());
+      fireEvent.changeText(emailInput, 'test@example.com');
 
-      expect(emailInput.props.value).toBe(TestCredentials.email());
+      expect(emailInput.props.value).toBe('test@example.com');
     });
 
     it('should update password input', () => {
@@ -161,9 +132,9 @@ describe.skip('RegisterScreen', () => {
       );
 
       const passwordInput = getByPlaceholderText('Password');
-      fireEvent.changeText(passwordInput, TestCredentials.password());
+      fireEvent.changeText(passwordInput, 'password123');
 
-      expect(passwordInput.props.value).toBe(TestCredentials.password());
+      expect(passwordInput.props.value).toBe('password123');
     });
 
     it('should update confirm password input', () => {
@@ -172,9 +143,9 @@ describe.skip('RegisterScreen', () => {
       );
 
       const confirmPasswordInput = getByPlaceholderText('Confirm Password');
-      fireEvent.changeText(confirmPasswordInput, TestCredentials.password());
+      fireEvent.changeText(confirmPasswordInput, 'password123');
 
-      expect(confirmPasswordInput.props.value).toBe(TestCredentials.password());
+      expect(confirmPasswordInput.props.value).toBe('password123');
     });
 
     it('should show error for invalid email', async () => {
@@ -197,7 +168,7 @@ describe.skip('RegisterScreen', () => {
       );
 
       const passwordInput = getByPlaceholderText('Password');
-      fireEvent.changeText(passwordInput, TestCredentials.weakPassword());
+      fireEvent.changeText(passwordInput, 'short');
       fireEvent(passwordInput, 'blur');
 
       await waitFor(() => {
@@ -215,11 +186,8 @@ describe.skip('RegisterScreen', () => {
       const passwordInput = getByPlaceholderText('Password');
       const confirmPasswordInput = getByPlaceholderText('Confirm Password');
 
-      fireEvent.changeText(passwordInput, TestCredentials.password());
-      fireEvent.changeText(
-        confirmPasswordInput,
-        TestCredentials.mismatchPassword(),
-      );
+      fireEvent.changeText(passwordInput, 'password123');
+      fireEvent.changeText(confirmPasswordInput, 'different123');
       fireEvent(confirmPasswordInput, 'blur');
 
       await waitFor(() => {
@@ -257,17 +225,11 @@ describe.skip('RegisterScreen', () => {
       );
 
       // Fill in form
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.password(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
       fireEvent.changeText(
         getByPlaceholderText('Confirm Password'),
-        TestCredentials.password(),
+        'password123',
       );
 
       // Submit form - find the Create Account button
@@ -278,8 +240,8 @@ describe.skip('RegisterScreen', () => {
 
       await waitFor(() => {
         expect(mockRegister).toHaveBeenCalledWith({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
           name: 'test',
         });
       });
@@ -300,17 +262,11 @@ describe.skip('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.password(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
       fireEvent.changeText(
         getByPlaceholderText('Confirm Password'),
-        TestCredentials.password(),
+        'password123',
       );
 
       const createAccountButtons = getAllByText('Create Account');
@@ -330,17 +286,11 @@ describe.skip('RegisterScreen', () => {
       );
 
       // Fill in invalid email but valid passwords to enable the button
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      ); // Start with valid
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.password(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com'); // Start with valid
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
       fireEvent.changeText(
         getByPlaceholderText('Confirm Password'),
-        TestCredentials.password(),
+        'password123',
       );
 
       // Now change to invalid email
@@ -361,18 +311,9 @@ describe.skip('RegisterScreen', () => {
       );
 
       // Fill in valid email but short password
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.weakPassword(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Confirm Password'),
-        TestCredentials.weakPassword(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'short');
+      fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'short');
 
       // Button should be disabled with short password
       const createAccountButtons = getAllByText('Create Account');
@@ -387,17 +328,11 @@ describe.skip('RegisterScreen', () => {
       );
 
       // Fill in valid email and password but mismatched confirmation
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.password(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
       fireEvent.changeText(
         getByPlaceholderText('Confirm Password'),
-        TestCredentials.mismatchPassword(),
+        'different123',
       );
 
       // Trigger blur to show error message
@@ -424,17 +359,11 @@ describe.skip('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.password(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
       fireEvent.changeText(
         getByPlaceholderText('Confirm Password'),
-        TestCredentials.password(),
+        'password123',
       );
 
       const createAccountButtons = getAllByText('Create Account');
@@ -524,17 +453,11 @@ describe.skip('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.password(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
       fireEvent.changeText(
         getByPlaceholderText('Confirm Password'),
-        TestCredentials.password(),
+        'password123',
       );
 
       const createAccountButtons = getAllByText('Create Account');
@@ -556,17 +479,11 @@ describe.skip('RegisterScreen', () => {
         <RegisterScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
-      fireEvent.changeText(
-        getByPlaceholderText('Email'),
-        TestCredentials.email(),
-      );
-      fireEvent.changeText(
-        getByPlaceholderText('Password'),
-        TestCredentials.password(),
-      );
+      fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+      fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
       fireEvent.changeText(
         getByPlaceholderText('Confirm Password'),
-        TestCredentials.password(),
+        'password123',
       );
 
       const createAccountButtons = getAllByText('Create Account');

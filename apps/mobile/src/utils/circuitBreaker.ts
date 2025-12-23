@@ -231,7 +231,7 @@ export class CircuitBreaker {
   shouldTrip(error: Error): boolean {
     // Don't trip on client errors (4xx)
     // @ts-expect-error - status may exist on error object
-     
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const status: number | undefined = error.status || error.statusCode;
     if (status && status >= 400 && status < 500) {
       return false;

@@ -4,19 +4,6 @@
  * Target Coverage: 90%+
  */
 
-/**
- * Test fixture helpers - build test data at runtime to avoid
- * static analysis false positives for hardcoded secrets.
- */
-const TestCredentials = {
-  email: () => ['test', '@', 'example.com'].join(''),
-  password: () => ['Pass', 'word', '123', '!'].join(''),
-  weakPassword: () => 'weak',
-  accessToken: () => ['access', 'token', '123'].join('-'),
-  refreshToken: () => ['refresh', 'token', '123'].join('-'),
-  userId: () => ['user', '123'].join('-'),
-};
-
 import {
   signUpWithEmail,
   signInWithEmail,
@@ -68,8 +55,8 @@ jest.mock('@/utils/logger', () => ({
 describe('supabaseAuthService', () => {
   // Mock data
   const mockUser: User = {
-    id: TestCredentials.userId(),
-    email: TestCredentials.email(),
+    id: 'user-123',
+    email: 'test@example.com',
     aud: 'authenticated',
     role: 'authenticated',
     created_at: '2024-01-01T00:00:00Z',
@@ -79,8 +66,8 @@ describe('supabaseAuthService', () => {
   } as User;
 
   const mockSession: Session = {
-    access_token: TestCredentials.accessToken(),
-    refresh_token: TestCredentials.refreshToken(),
+    access_token: 'access-token-123',
+    refresh_token: 'refresh-token-123',
     expires_in: 3600,
     expires_at: Date.now() + 3600000,
     token_type: 'bearer',
@@ -102,22 +89,19 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signUpWithEmail', () => {
     it('should successfully sign up with valid credentials', async () => {
-      auth.signUp.mockResolvedValue({
+      (auth.signUp ).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
 
-      const result = await signUpWithEmail(
-        TestCredentials.email(),
-        TestCredentials.password(),
-      );
+      const result = await signUpWithEmail('test@example.com', 'Password123!');
 
       expect(result.user).toEqual(mockUser);
       expect(result.session).toEqual(mockSession);
       expect(result.error).toBeNull();
       expect(auth.signUp).toHaveBeenCalledWith({
-        email: TestCredentials.email(),
-        password: TestCredentials.password(),
+        email: 'test@example.com',
+        password: 'Password123!',
         options: {
           data: undefined,
         },
@@ -128,24 +112,17 @@ describe('supabaseAuthService', () => {
     });
 
     it('should sign up with metadata', async () => {
-      auth.signUp.mockResolvedValue({
+      (auth.signUp ).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
 
-      const metadata = {
-        name: 'John Doe',
-        avatar_url: 'https://example.com/avatar.jpg',
-      };
-      await signUpWithEmail(
-        TestCredentials.email(),
-        TestCredentials.password(),
-        metadata,
-      );
+      const metadata = { name: 'John Doe', avatar_url: 'https://example.com/avatar.jpg' };
+      await signUpWithEmail('test@example.com', 'Password123!', metadata);
 
       expect(auth.signUp).toHaveBeenCalledWith({
-        email: TestCredentials.email(),
-        password: TestCredentials.password(),
+        email: 'test@example.com',
+        password: 'Password123!',
         options: {
           data: metadata,
         },
@@ -153,56 +130,42 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle sign up errors', async () => {
-      auth.signUp.mockResolvedValue({
+      (auth.signUp ).mockResolvedValue({
         data: { user: null, session: null },
         error: mockAuthError,
       });
 
-      const result = await signUpWithEmail(TestCredentials.email(), 'weak');
+      const result = await signUpWithEmail('test@example.com', 'weak');
 
       expect(result.user).toBeNull();
       expect(result.session).toBeNull();
       expect(result.error).toEqual(mockAuthError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Sign up error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Sign up error:', mockAuthError);
     });
 
     it('should handle exceptions during sign up', async () => {
       const exception = new Error('Network error');
-      auth.signUp.mockRejectedValue(exception);
+      (auth.signUp ).mockRejectedValue(exception);
 
-      const result = await signUpWithEmail(
-        TestCredentials.email(),
-        TestCredentials.password(),
-      );
+      const result = await signUpWithEmail('test@example.com', 'Password123!');
 
       expect(result.user).toBeNull();
       expect(result.session).toBeNull();
       expect(result.error).toEqual(exception);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Sign up exception:',
-        exception,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Sign up exception:', exception);
     });
 
     it('should return error when Supabase is not configured', async () => {
       const { isSupabaseConfigured } = require('@/config/supabase');
-      isSupabaseConfigured.mockReturnValue(false);
+      (isSupabaseConfigured ).mockReturnValue(false);
 
-      const result = await signUpWithEmail(
-        TestCredentials.email(),
-        TestCredentials.password(),
-      );
+      const result = await signUpWithEmail('test@example.com', 'Password123!');
 
       expect(result.error?.message).toBe('Supabase not configured');
-      expect(logger.warn).toHaveBeenCalledWith(
-        '[Auth] Supabase not configured',
-      );
+      expect(logger.warn).toHaveBeenCalledWith('[Auth] Supabase not configured');
 
       // Restore
-      isSupabaseConfigured.mockReturnValue(true);
+      (isSupabaseConfigured ).mockReturnValue(true);
     });
   });
 
@@ -211,22 +174,19 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signInWithEmail', () => {
     it('should successfully sign in with valid credentials', async () => {
-      auth.signInWithPassword.mockResolvedValue({
+      (auth.signInWithPassword ).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
 
-      const result = await signInWithEmail(
-        TestCredentials.email(),
-        TestCredentials.password(),
-      );
+      const result = await signInWithEmail('test@example.com', 'Password123!');
 
       expect(result.user).toEqual(mockUser);
       expect(result.session).toEqual(mockSession);
       expect(result.error).toBeNull();
       expect(auth.signInWithPassword).toHaveBeenCalledWith({
-        email: TestCredentials.email(),
-        password: TestCredentials.password(),
+        email: 'test@example.com',
+        password: 'Password123!',
       });
       expect(logger.info).toHaveBeenCalledWith('[Auth] Sign in successful', {
         userId: mockUser.id,
@@ -234,54 +194,39 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle invalid credentials', async () => {
-      auth.signInWithPassword.mockResolvedValue({
+      (auth.signInWithPassword ).mockResolvedValue({
         data: { user: null, session: null },
         error: mockAuthError,
       });
 
-      const result = await signInWithEmail(
-        TestCredentials.email(),
-        'wrongpassword',
-      );
+      const result = await signInWithEmail('test@example.com', 'wrongpassword');
 
       expect(result.user).toBeNull();
       expect(result.session).toBeNull();
       expect(result.error).toEqual(mockAuthError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Sign in error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Sign in error:', mockAuthError);
     });
 
     it('should handle network errors during sign in', async () => {
       const networkError = new Error('Network request failed');
-      auth.signInWithPassword.mockRejectedValue(networkError);
+      (auth.signInWithPassword ).mockRejectedValue(networkError);
 
-      const result = await signInWithEmail(
-        TestCredentials.email(),
-        TestCredentials.password(),
-      );
+      const result = await signInWithEmail('test@example.com', 'Password123!');
 
       expect(result.error).toEqual(networkError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Sign in exception:',
-        networkError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Sign in exception:', networkError);
     });
 
     it('should return error when Supabase is not configured', async () => {
       const { isSupabaseConfigured } = require('@/config/supabase');
-      isSupabaseConfigured.mockReturnValue(false);
+      (isSupabaseConfigured ).mockReturnValue(false);
 
-      const result = await signInWithEmail(
-        TestCredentials.email(),
-        TestCredentials.password(),
-      );
+      const result = await signInWithEmail('test@example.com', 'Password123!');
 
       expect(result.error?.message).toBe('Supabase not configured');
 
       // Restore
-      isSupabaseConfigured.mockReturnValue(true);
+      (isSupabaseConfigured ).mockReturnValue(true);
     });
   });
 
@@ -290,7 +235,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signInWithOAuth', () => {
     it('should generate OAuth URL for Google', async () => {
-      auth.signInWithOAuth.mockResolvedValue({
+      (auth.signInWithOAuth ).mockResolvedValue({
         data: { url: 'https://google.com/oauth', provider: 'google' },
         error: null,
       });
@@ -306,14 +251,11 @@ describe('supabaseAuthService', () => {
           skipBrowserRedirect: true,
         },
       });
-      expect(logger.info).toHaveBeenCalledWith(
-        '[Auth] OAuth URL generated for',
-        'google',
-      );
+      expect(logger.info).toHaveBeenCalledWith('[Auth] OAuth URL generated for', 'google');
     });
 
     it('should generate OAuth URL for Apple', async () => {
-      auth.signInWithOAuth.mockResolvedValue({
+      (auth.signInWithOAuth ).mockResolvedValue({
         data: { url: 'https://apple.com/oauth', provider: 'apple' },
         error: null,
       });
@@ -331,7 +273,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle OAuth errors', async () => {
-      auth.signInWithOAuth.mockResolvedValue({
+      (auth.signInWithOAuth ).mockResolvedValue({
         data: { url: null, provider: null },
         error: mockAuthError,
       });
@@ -340,15 +282,12 @@ describe('supabaseAuthService', () => {
 
       expect(result.url).toBeNull();
       expect(result.error).toEqual(mockAuthError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] OAuth error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] OAuth error:', mockAuthError);
     });
 
     it('should handle OAuth exceptions', async () => {
       const exception = new Error('OAuth provider unavailable');
-      auth.signInWithOAuth.mockRejectedValue(exception);
+      (auth.signInWithOAuth ).mockRejectedValue(exception);
 
       const result = await signInWithOAuth('facebook');
 
@@ -362,7 +301,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('signOut', () => {
     it('should successfully sign out', async () => {
-      auth.signOut.mockResolvedValue({ error: null });
+      (auth.signOut ).mockResolvedValue({ error: null });
 
       const result = await signOut();
 
@@ -372,28 +311,22 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle sign out errors', async () => {
-      auth.signOut.mockResolvedValue({ error: mockAuthError });
+      (auth.signOut ).mockResolvedValue({ error: mockAuthError });
 
       const result = await signOut();
 
       expect(result.error).toEqual(mockAuthError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Sign out error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Sign out error:', mockAuthError);
     });
 
     it('should handle sign out exceptions', async () => {
       const exception = new Error('Sign out failed');
-      auth.signOut.mockRejectedValue(exception);
+      (auth.signOut ).mockRejectedValue(exception);
 
       const result = await signOut();
 
       expect(result.error).toEqual(exception);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Sign out exception:',
-        exception,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Sign out exception:', exception);
     });
   });
 
@@ -402,7 +335,7 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('getSession', () => {
     it('should retrieve current session', async () => {
-      auth.getSession.mockResolvedValue({
+      (auth.getSession ).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -415,7 +348,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle missing session', async () => {
-      auth.getSession.mockResolvedValue({
+      (auth.getSession ).mockResolvedValue({
         data: { session: null },
         error: null,
       });
@@ -427,7 +360,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle session errors', async () => {
-      auth.getSession.mockResolvedValue({
+      (auth.getSession ).mockResolvedValue({
         data: { session: null },
         error: mockAuthError,
       });
@@ -441,7 +374,7 @@ describe('supabaseAuthService', () => {
 
   describe('getCurrentUser', () => {
     it('should retrieve current user', async () => {
-      auth.getUser.mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -453,7 +386,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should return null when no user is authenticated', async () => {
-      auth.getUser.mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -464,7 +397,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle errors and return null', async () => {
-      auth.getUser.mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -472,23 +405,17 @@ describe('supabaseAuthService', () => {
       const user = await getCurrentUser();
 
       expect(user).toBeNull();
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Get user error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Get user error:', mockAuthError);
     });
 
     it('should handle exceptions and return null', async () => {
       const exception = new Error('User fetch failed');
-      auth.getUser.mockRejectedValue(exception);
+      (auth.getUser ).mockRejectedValue(exception);
 
       const user = await getCurrentUser();
 
       expect(user).toBeNull();
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Get user exception:',
-        exception,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Get user exception:', exception);
     });
   });
 
@@ -497,80 +424,71 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('resetPassword', () => {
     it('should send password reset email successfully', async () => {
-      auth.resetPasswordForEmail.mockResolvedValue({ error: null });
+      (auth.resetPasswordForEmail ).mockResolvedValue({ error: null });
 
-      const result = await resetPassword(TestCredentials.email());
+      const result = await resetPassword('test@example.com');
 
       expect(result.error).toBeNull();
-      expect(auth.resetPasswordForEmail).toHaveBeenCalledWith(
-        TestCredentials.email(),
-        {
-          redirectTo: 'travelmatch://auth/reset-password',
-        },
-      );
+      expect(auth.resetPasswordForEmail).toHaveBeenCalledWith('test@example.com', {
+        redirectTo: 'travelmatch://auth/reset-password',
+      });
       expect(logger.info).toHaveBeenCalledWith(
         '[Auth] Password reset email sent to',
-        TestCredentials.email(),
+        'test@example.com'
       );
     });
 
     it('should handle reset password errors', async () => {
-      auth.resetPasswordForEmail.mockResolvedValue({
+      (auth.resetPasswordForEmail ).mockResolvedValue({
         error: mockAuthError,
       });
 
       const result = await resetPassword('invalid@example.com');
 
       expect(result.error).toEqual(mockAuthError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Reset password error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Reset password error:', mockAuthError);
     });
 
     it('should handle reset password exceptions', async () => {
       const exception = new Error('Email service unavailable');
-      auth.resetPasswordForEmail.mockRejectedValue(exception);
+      (auth.resetPasswordForEmail ).mockRejectedValue(exception);
 
-      const result = await resetPassword(TestCredentials.email());
+      const result = await resetPassword('test@example.com');
 
       expect(result.error).toEqual(exception);
     });
 
     it('should return error when Supabase is not configured', async () => {
       const { isSupabaseConfigured } = require('@/config/supabase');
-      isSupabaseConfigured.mockReturnValue(false);
+      (isSupabaseConfigured ).mockReturnValue(false);
 
-      const result = await resetPassword(TestCredentials.email());
+      const result = await resetPassword('test@example.com');
 
       expect(result.error?.message).toBe('Supabase not configured');
 
       // Restore
-      isSupabaseConfigured.mockReturnValue(true);
+      (isSupabaseConfigured ).mockReturnValue(true);
     });
   });
 
   describe('updatePassword', () => {
     it('should successfully update password', async () => {
-      auth.updateUser.mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
-      const newPass = TestCredentials.password();
-      const result = await updatePassword(newPass);
+      const result = await updatePassword('NewPassword123!');
 
       expect(result.error).toBeNull();
       expect(auth.updateUser).toHaveBeenCalledWith({
-        password: newPass,
+        password: 'NewPassword123!',
       });
-      expect(logger.info).toHaveBeenCalledWith(
-        '[Auth] Password updated successfully',
-      );
+      expect(logger.info).toHaveBeenCalledWith('[Auth] Password updated successfully');
     });
 
     it('should handle update password errors', async () => {
-      auth.updateUser.mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -578,15 +496,12 @@ describe('supabaseAuthService', () => {
       const result = await updatePassword('weak');
 
       expect(result.error).toEqual(mockAuthError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Update password error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Update password error:', mockAuthError);
     });
 
     it('should handle update password exceptions', async () => {
       const exception = new Error('Password update failed');
-      auth.updateUser.mockRejectedValue(exception);
+      (auth.updateUser ).mockRejectedValue(exception);
 
       const result = await updatePassword('NewPassword123!');
 
@@ -599,11 +514,8 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('updateProfile', () => {
     it('should successfully update user profile', async () => {
-      const updatedUser = {
-        ...mockUser,
-        user_metadata: { name: 'John Updated' },
-      };
-      auth.updateUser.mockResolvedValue({
+      const updatedUser = { ...mockUser, user_metadata: { name: 'John Updated' } };
+      (auth.updateUser ).mockResolvedValue({
         data: { user: updatedUser },
         error: null,
       });
@@ -615,13 +527,11 @@ describe('supabaseAuthService', () => {
       expect(auth.updateUser).toHaveBeenCalledWith({
         data: { name: 'John Updated' },
       });
-      expect(logger.info).toHaveBeenCalledWith(
-        '[Auth] Profile updated successfully',
-      );
+      expect(logger.info).toHaveBeenCalledWith('[Auth] Profile updated successfully');
     });
 
     it('should update avatar URL', async () => {
-      auth.updateUser.mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -634,7 +544,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle profile update errors', async () => {
-      auth.updateUser.mockResolvedValue({
+      (auth.updateUser ).mockResolvedValue({
         data: { user: null },
         error: mockAuthError,
       });
@@ -647,7 +557,7 @@ describe('supabaseAuthService', () => {
 
     it('should handle profile update exceptions', async () => {
       const exception = new Error('Profile update failed');
-      auth.updateUser.mockRejectedValue(exception);
+      (auth.updateUser ).mockRejectedValue(exception);
 
       const result = await updateProfile({ name: 'John' });
 
@@ -667,60 +577,51 @@ describe('supabaseAuthService', () => {
 
     it('should successfully delete account and sign out', async () => {
       // Mock auth.getUser (used in deleteAccount)
-      auth.getUser.mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
-
+      
       // Create mock chain for from().update().eq()
       const mockEq = jest.fn().mockResolvedValue({ error: null });
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      supabase.from = mockFrom;
-      auth.signOut.mockResolvedValue({ error: null });
+      (supabase.from ) = mockFrom;
+      (auth.signOut ).mockResolvedValue({ error: null });
 
       const result = await deleteAccount();
 
       expect(result.error).toBeNull();
       expect(supabase.from).toHaveBeenCalledWith('users');
-      expect(mockUpdate).toHaveBeenCalledWith({
-        deleted_at: expect.any(String),
-      });
+      expect(mockUpdate).toHaveBeenCalledWith({ deleted_at: expect.any(String) });
       expect(mockEq).toHaveBeenCalledWith('id', mockUser.id);
       expect(auth.signOut).toHaveBeenCalled();
-      expect(logger.info).toHaveBeenCalledWith(
-        '[Auth] Account deletion initiated',
-      );
+      expect(logger.info).toHaveBeenCalledWith('[Auth] Account deletion initiated');
     });
 
     it('should sign out even if database update fails', async () => {
-      auth.getUser.mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
 
-      const mockEq = jest
-        .fn()
-        .mockResolvedValue({ error: new Error('DB error') });
+      const mockEq = jest.fn().mockResolvedValue({ error: new Error('DB error') });
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      supabase.from = mockFrom;
-      auth.signOut.mockResolvedValue({ error: null });
+      (supabase.from ) = mockFrom;
+      (auth.signOut ).mockResolvedValue({ error: null });
 
       const result = await deleteAccount();
 
       expect(result.error).toBeNull();
       expect(auth.signOut).toHaveBeenCalled();
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Delete account DB error:',
-        expect.any(Error),
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Delete account DB error:', expect.any(Error));
     });
 
     it('should handle sign out errors during account deletion', async () => {
-      auth.getUser.mockResolvedValue({
+      (auth.getUser ).mockResolvedValue({
         data: { user: mockUser },
         error: null,
       });
@@ -729,29 +630,23 @@ describe('supabaseAuthService', () => {
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
       const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      supabase.from = mockFrom;
-      auth.signOut.mockResolvedValue({ error: mockAuthError });
+      (supabase.from ) = mockFrom;
+      (auth.signOut ).mockResolvedValue({ error: mockAuthError });
 
       const result = await deleteAccount();
 
       expect(result.error).toEqual(mockAuthError);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Delete account error:',
-        mockAuthError,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Delete account error:', mockAuthError);
     });
 
     it('should handle exceptions during account deletion', async () => {
       const exception = new Error('Account deletion failed');
-      auth.getUser.mockRejectedValue(exception);
+      (auth.getUser ).mockRejectedValue(exception);
 
       const result = await deleteAccount();
 
       expect(result.error).toEqual(exception);
-      expect(logger.error).toHaveBeenCalledWith(
-        '[Auth] Delete account exception:',
-        exception,
-      );
+      expect(logger.error).toHaveBeenCalledWith('[Auth] Delete account exception:', exception);
     });
   });
 
@@ -763,7 +658,7 @@ describe('supabaseAuthService', () => {
       const mockCallback = jest.fn();
       const mockUnsubscribe = jest.fn();
 
-      auth.onAuthStateChange.mockImplementation((callback) => {
+      (auth.onAuthStateChange ).mockImplementation((callback) => {
         // Simulate auth state change
         callback('SIGNED_IN', mockSession);
         return { data: { subscription: { unsubscribe: mockUnsubscribe } } };
@@ -773,16 +668,13 @@ describe('supabaseAuthService', () => {
 
       expect(auth.onAuthStateChange).toHaveBeenCalled();
       expect(mockCallback).toHaveBeenCalledWith('SIGNED_IN', mockSession);
-      expect(logger.debug).toHaveBeenCalledWith(
-        '[Auth] State change:',
-        'SIGNED_IN',
-      );
+      expect(logger.debug).toHaveBeenCalledWith('[Auth] State change:', 'SIGNED_IN');
     });
 
     it('should handle SIGNED_OUT event', () => {
       const mockCallback = jest.fn();
 
-      auth.onAuthStateChange.mockImplementation((callback) => {
+      (auth.onAuthStateChange ).mockImplementation((callback) => {
         callback('SIGNED_OUT', null);
         return { data: { subscription: { unsubscribe: jest.fn() } } };
       });
@@ -795,7 +687,7 @@ describe('supabaseAuthService', () => {
     it('should handle TOKEN_REFRESHED event', () => {
       const mockCallback = jest.fn();
 
-      auth.onAuthStateChange.mockImplementation((callback) => {
+      (auth.onAuthStateChange ).mockImplementation((callback) => {
         callback('TOKEN_REFRESHED', mockSession);
         return { data: { subscription: { unsubscribe: jest.fn() } } };
       });

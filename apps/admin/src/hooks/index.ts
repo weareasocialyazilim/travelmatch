@@ -10,9 +10,7 @@ export * from './use-tasks';
 export * from './use-users';
 export * from './use-admin-users';
 export * from './use-disputes';
-// Note: use-stats exports useRealtimeStats which conflicts with use-realtime
-// Use explicit imports from use-stats if needed: import { useStats } from './use-stats'
-export { useStats } from './use-stats';
+export * from './use-stats';
 export * from './use-audit-logs';
 export * from './use-finance';
 export * from './use-notifications';

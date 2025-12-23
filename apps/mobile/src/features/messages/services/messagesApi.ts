@@ -126,12 +126,15 @@ export const messagesApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    // Use archived_at column in conversations table
+    const upsertPayload = {
+      conversation_id: conversationId,
+      user_id: user.id,
+      is_archived: true,
+    } as unknown as Database['public']['Tables']['conversation_settings']['Insert'];
+
     const { error } = await supabase
-      .from('conversations')
-      .update({ archived_at: new Date().toISOString() })
-      .eq('id', conversationId)
-      .contains('participant_ids', [user.id]);
+      .from('conversation_settings')
+      .upsert(upsertPayload);
 
     if (error) throw error;
   },

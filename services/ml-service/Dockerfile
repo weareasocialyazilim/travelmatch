@@ -6,10 +6,21 @@ WORKDIR /app
 
 # Install system dependencies and apply security updates
 # CVE fixes: zlib (integer overflow), pam (directory traversal)
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    # Explicitly upgrade vulnerable packages to latest patched versions
+    apt-get install -y --only-upgrade \
+        zlib1g \
+        libpam0g \
+        libpam-modules \
+        libpam-modules-bin \
+        libpam-runtime && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        curl && \
+    # Clean up to reduce image size
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy requirements
 COPY requirements.txt .

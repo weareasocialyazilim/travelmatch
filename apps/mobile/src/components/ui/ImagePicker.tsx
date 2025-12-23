@@ -72,7 +72,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages([image]);
         }
       }
-    } catch {
+    } catch (error) {
       showToast('Failed to pick image from camera', 'error');
     }
   };
@@ -104,7 +104,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages(validImages);
         }
       }
-    } catch {
+    } catch (error) {
       showToast('Failed to pick image from gallery', 'error');
     }
   };
@@ -120,7 +120,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
       // Clear after successful upload
       setSelectedImages([]);
-    } catch {
+    } catch (error) {
       // Error handled by hook
     }
   };
@@ -154,7 +154,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
       {showPreview && selectedImages.length > 0 && (
         <ScrollView horizontal style={styles.preview}>
           {selectedImages.map((image, index) => (
-            <View key={image.uri} style={styles.imageContainer}>
+            <View key={index} style={styles.imageContainer}>
               <Image source={{ uri: image.uri }} style={styles.image} />
 
               {/* Remove Button */}

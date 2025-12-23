@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,6 @@ import {
   StatusBar,
   ActivityIndicator,
   TouchableOpacity,
-  type NativeSyntheticEvent,
-  type NativeScrollEvent,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
@@ -210,29 +208,6 @@ const DiscoverScreen = () => {
     }
   }, [hasMore, loading, loadMore]);
 
-  // Ref to track if we're already loading more to prevent duplicate calls
-  const isLoadingMoreRef = useRef(false);
-
-  // Memoized scroll handler to prevent re-creation on every render
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-      const paddingToBottom = 50;
-      const isCloseToBottom =
-        layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
-
-      if (isCloseToBottom && !isLoadingMoreRef.current) {
-        isLoadingMoreRef.current = true;
-        handleLoadMore();
-        // Reset after a short delay to prevent rapid firing
-        setTimeout(() => {
-          isLoadingMoreRef.current = false;
-        }, 500);
-      }
-    },
-    [handleLoadMore],
-  );
-
   // Apply filters to hook when category changes
   useEffect(() => {
     if (selectedCategory !== 'all') {
@@ -290,20 +265,6 @@ const DiscoverScreen = () => {
     setPriceRange({ min: 0, max: 500 });
   }, []);
 
-  // Memoized modal handlers to prevent unnecessary re-renders
-  const openLocationModal = useCallback(() => setShowLocationModal(true), []);
-  const closeLocationModal = useCallback(() => setShowLocationModal(false), []);
-  const openFilterModal = useCallback(() => setShowFilterModal(true), []);
-  const closeFilterModal = useCallback(() => setShowFilterModal(false), []);
-
-  // Memoized view mode handlers
-  const setViewModeSingle = useCallback(() => setViewMode('single'), []);
-  const setViewModeGrid = useCallback(() => setViewMode('grid'), []);
-  const toggleViewMode = useCallback(
-    () => setViewMode((prev) => (prev === 'single' ? 'grid' : 'single')),
-    [],
-  );
-
   // Memoized render functions
   const renderStoryItem = useCallback(
     ({ item }: { item: UserStory }) => (
@@ -346,9 +307,11 @@ const DiscoverScreen = () => {
         location={selectedLocation}
         viewMode={viewMode}
         activeFiltersCount={activeFilterCount}
-        onLocationPress={openLocationModal}
-        onFilterPress={openFilterModal}
-        onViewModeToggle={toggleViewMode}
+        onLocationPress={() => setShowLocationModal(true)}
+        onFilterPress={() => setShowFilterModal(true)}
+        onViewModeToggle={() =>
+          setViewMode(viewMode === 'single' ? 'grid' : 'single')
+        }
       />
 
       <NetworkGuard
@@ -369,7 +332,17 @@ const DiscoverScreen = () => {
               tintColor={COLORS.mint}
             />
           }
-          onScroll={handleScroll}
+          onScroll={({ nativeEvent }) => {
+            const { layoutMeasurement, contentOffset, contentSize } =
+              nativeEvent;
+            const paddingToBottom = 50;
+            if (
+              layoutMeasurement.height + contentOffset.y >=
+              contentSize.height - paddingToBottom
+            ) {
+              handleLoadMore();
+            }
+          }}
           scrollEventThrottle={400}
         >
           {/* Stories */}
@@ -379,7 +352,6 @@ const DiscoverScreen = () => {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.storiesContainer}
-            estimatedItemSize={80}
           />
 
           {/* Results Bar */}
@@ -395,7 +367,7 @@ const DiscoverScreen = () => {
                   styles.viewToggleButton,
                   viewMode === 'single' && styles.viewToggleButtonActive,
                 ]}
-                onPress={setViewModeSingle}
+                onPress={() => setViewMode('single')}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 {...a11y.button(
                   'Single column view',
@@ -418,7 +390,7 @@ const DiscoverScreen = () => {
                   styles.viewToggleButton,
                   viewMode === 'grid' && styles.viewToggleButtonActive,
                 ]}
-                onPress={setViewModeGrid}
+                onPress={() => setViewMode('grid')}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 {...a11y.button(
                   'Grid view',
@@ -473,7 +445,7 @@ const DiscoverScreen = () => {
 
           {/* Moments List */}
           {!error && filteredMoments.length > 0 && (
-            <View style={styles.momentsListContainer}>
+            <View style={{ minHeight: 400 }}>
               <FlashList
                 data={filteredMoments}
                 renderItem={renderMomentCard}
@@ -487,7 +459,6 @@ const DiscoverScreen = () => {
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.5}
                 scrollEnabled={false}
-                estimatedItemSize={viewMode === 'grid' ? 200 : 350}
               />
             </View>
           )}
@@ -512,14 +483,15 @@ const DiscoverScreen = () => {
           )}
 
           {/* Bottom Padding */}
-          <View style={styles.bottomPadding} />
+          {/* eslint-disable-next-line react-native/no-inline-styles */}
+          <View style={{ height: 100 }} />
         </ScrollView>
       </NetworkGuard>
 
       {/* Modals - Using extracted components */}
       <LocationModal
         visible={showLocationModal}
-        onClose={closeLocationModal}
+        onClose={() => setShowLocationModal(false)}
         onLocationSelect={handleLocationSelect}
         selectedLocation={selectedLocation}
         recentLocations={recentLocations}
@@ -529,7 +501,7 @@ const DiscoverScreen = () => {
 
       <FilterModal
         visible={showFilterModal}
-        onClose={closeFilterModal}
+        onClose={() => setShowFilterModal(false)}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         sortBy={sortBy}
@@ -712,16 +684,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     gap: 16,
-  },
-
-  // Moments List Container - for FlashList
-  momentsListContainer: {
-    minHeight: 400,
-  },
-
-  // Bottom Padding
-  bottomPadding: {
-    height: 100,
   },
 });
 

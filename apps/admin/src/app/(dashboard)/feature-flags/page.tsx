@@ -30,13 +30,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -232,26 +226,11 @@ const mockFlags: FeatureFlag[] = [
   },
 ];
 
-const categoryLabels: Record<
-  string,
-  { label: string; color: string; icon: React.ElementType }
-> = {
+const categoryLabels: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   feature: { label: 'Özellik', color: 'bg-blue-100 text-blue-800', icon: Zap },
-  experiment: {
-    label: 'Deney',
-    color: 'bg-purple-100 text-purple-800',
-    icon: TrendingUp,
-  },
-  operational: {
-    label: 'Operasyonel',
-    color: 'bg-gray-100 text-gray-800',
-    icon: Settings,
-  },
-  kill_switch: {
-    label: 'Kill Switch',
-    color: 'bg-red-100 text-red-800',
-    icon: Shield,
-  },
+  experiment: { label: 'Deney', color: 'bg-purple-100 text-purple-800', icon: TrendingUp },
+  operational: { label: 'Operasyonel', color: 'bg-gray-100 text-gray-800', icon: Settings },
+  kill_switch: { label: 'Kill Switch', color: 'bg-red-100 text-red-800', icon: Shield },
 };
 
 const platformIcons: Record<string, React.ElementType> = {
@@ -287,10 +266,8 @@ export default function FeatureFlagsPage() {
       flag.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
       flag.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory =
-      categoryFilter === 'all' || flag.category === categoryFilter;
-    const matchesEnvironment =
-      environmentFilter === 'all' || flag.environment === environmentFilter;
+    const matchesCategory = categoryFilter === 'all' || flag.category === categoryFilter;
+    const matchesEnvironment = environmentFilter === 'all' || flag.environment === environmentFilter;
 
     return matchesSearch && matchesCategory && matchesEnvironment;
   });
@@ -309,12 +286,12 @@ export default function FeatureFlagsPage() {
       prev.map((f) =>
         f.id === flagId
           ? { ...f, enabled, updated_at: new Date().toISOString() }
-          : f,
-      ),
+          : f
+      )
     );
     const flag = flags.find((f) => f.id === flagId);
     toast.success(
-      `${flag?.name} ${enabled ? 'etkinleştirildi' : 'devre dışı bırakıldı'}`,
+      `${flag?.name} ${enabled ? 'etkinleştirildi' : 'devre dışı bırakıldı'}`
     );
   };
 
@@ -323,13 +300,9 @@ export default function FeatureFlagsPage() {
     setFlags((prev) =>
       prev.map((f) =>
         f.id === flagId
-          ? {
-              ...f,
-              rollout_percentage: percentage,
-              updated_at: new Date().toISOString(),
-            }
-          : f,
-      ),
+          ? { ...f, rollout_percentage: percentage, updated_at: new Date().toISOString() }
+          : f
+      )
     );
   };
 
@@ -403,10 +376,7 @@ export default function FeatureFlagsPage() {
                   placeholder="feature_key"
                   value={newFlag.key}
                   onChange={(e) =>
-                    setNewFlag({
-                      ...newFlag,
-                      key: e.target.value.toLowerCase().replace(/\s+/g, '_'),
-                    })
+                    setNewFlag({ ...newFlag, key: e.target.value.toLowerCase().replace(/\s+/g, '_') })
                   }
                 />
                 <p className="text-xs text-muted-foreground">
@@ -419,9 +389,7 @@ export default function FeatureFlagsPage() {
                   id="name"
                   placeholder="Özellik Adı"
                   value={newFlag.name}
-                  onChange={(e) =>
-                    setNewFlag({ ...newFlag, name: e.target.value })
-                  }
+                  onChange={(e) => setNewFlag({ ...newFlag, name: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -430,9 +398,7 @@ export default function FeatureFlagsPage() {
                   id="description"
                   placeholder="Bu özellik ne yapar?"
                   value={newFlag.description}
-                  onChange={(e) =>
-                    setNewFlag({ ...newFlag, description: e.target.value })
-                  }
+                  onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -440,12 +406,7 @@ export default function FeatureFlagsPage() {
                   <Label>Kategori</Label>
                   <Select
                     value={newFlag.category}
-                    onValueChange={(v) =>
-                      setNewFlag({
-                        ...newFlag,
-                        category: v as FeatureFlag['category'],
-                      })
-                    }
+                    onValueChange={(v) => setNewFlag({ ...newFlag, category: v as FeatureFlag['category'] })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -462,12 +423,7 @@ export default function FeatureFlagsPage() {
                   <Label>Environment</Label>
                   <Select
                     value={newFlag.environment}
-                    onValueChange={(v) =>
-                      setNewFlag({
-                        ...newFlag,
-                        environment: v as FeatureFlag['environment'],
-                      })
-                    }
+                    onValueChange={(v) => setNewFlag({ ...newFlag, environment: v as FeatureFlag['environment'] })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -484,28 +440,17 @@ export default function FeatureFlagsPage() {
                 <Label>Başlangıç Rollout: {newFlag.rollout_percentage}%</Label>
                 <Slider
                   value={[newFlag.rollout_percentage]}
-                  onValueChange={(values) =>
-                    setNewFlag({
-                      ...newFlag,
-                      rollout_percentage: values[0] ?? 0,
-                    })
-                  }
+                  onValueChange={([v]) => setNewFlag({ ...newFlag, rollout_percentage: v })}
                   max={100}
                   step={5}
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                 İptal
               </Button>
-              <Button
-                onClick={handleCreateFlag}
-                disabled={!newFlag.key || !newFlag.name}
-              >
+              <Button onClick={handleCreateFlag} disabled={!newFlag.key || !newFlag.name}>
                 Oluştur
               </Button>
             </DialogFooter>
@@ -543,9 +488,7 @@ export default function FeatureFlagsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.experiments}</div>
-            <p className="text-xs text-muted-foreground">
-              A/B test devam ediyor
-            </p>
+            <p className="text-xs text-muted-foreground">A/B test devam ediyor</p>
           </CardContent>
         </Card>
         <Card>
@@ -555,9 +498,7 @@ export default function FeatureFlagsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.killSwitches}</div>
-            <p className="text-xs text-muted-foreground">
-              Acil durum kontrolleri
-            </p>
+            <p className="text-xs text-muted-foreground">Acil durum kontrolleri</p>
           </CardContent>
         </Card>
       </div>
@@ -589,10 +530,7 @@ export default function FeatureFlagsPage() {
                 <SelectItem value="kill_switch">Kill Switch</SelectItem>
               </SelectContent>
             </Select>
-            <Select
-              value={environmentFilter}
-              onValueChange={setEnvironmentFilter}
-            >
+            <Select value={environmentFilter} onValueChange={setEnvironmentFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Environment" />
               </SelectTrigger>
@@ -681,9 +619,6 @@ function FlagCard({
   onCopyKey: (key: string) => void;
 }) {
   const categoryInfo = categoryLabels[flag.category];
-  if (!categoryInfo) {
-    return null;
-  }
   const CategoryIcon = categoryInfo.icon;
 
   return (
@@ -710,9 +645,7 @@ function FlagCard({
                 {flag.environment}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              {flag.description}
-            </p>
+            <p className="text-sm text-muted-foreground mb-3">{flag.description}</p>
             <div className="flex items-center gap-4 text-sm">
               <button
                 onClick={() => onCopyKey(flag.key)}
@@ -725,10 +658,8 @@ function FlagCard({
               </button>
               <div className="flex items-center gap-1 text-muted-foreground">
                 {flag.platforms.map((platform) => {
-                  const PlatformIcon = platformIcons[platform];
-                  return PlatformIcon ? (
-                    <PlatformIcon key={platform} className="h-4 w-4" />
-                  ) : null;
+                  const Icon = platformIcons[platform];
+                  return <Icon key={platform} className="h-4 w-4" />;
                 })}
               </div>
               <span className="text-muted-foreground">
@@ -744,15 +675,11 @@ function FlagCard({
               <div className="w-32">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-muted-foreground">Rollout</span>
-                  <span className="text-xs font-medium">
-                    {flag.rollout_percentage}%
-                  </span>
+                  <span className="text-xs font-medium">{flag.rollout_percentage}%</span>
                 </div>
                 <Slider
                   value={[flag.rollout_percentage]}
-                  onValueChange={(values) =>
-                    onRolloutChange(flag.id, values[0] ?? 0)
-                  }
+                  onValueChange={([v]) => onRolloutChange(flag.id, v)}
                   max={100}
                   step={5}
                   className="cursor-pointer"
@@ -764,11 +691,7 @@ function FlagCard({
             <Switch
               checked={flag.enabled}
               onCheckedChange={(checked) => onToggle(flag.id, checked)}
-              className={
-                flag.category === 'kill_switch'
-                  ? 'data-[state=checked]:bg-red-600'
-                  : ''
-              }
+              className={flag.category === 'kill_switch' ? 'data-[state=checked]:bg-red-600' : ''}
             />
 
             {/* Actions */}
@@ -802,9 +725,8 @@ function FlagCard({
                     <AlertDialogHeader>
                       <AlertDialogTitle>Feature Flag Sil</AlertDialogTitle>
                       <AlertDialogDescription>
-                        <strong>{flag.name}</strong> flag&apos;ini silmek
-                        istediğinizden emin misiniz? Bu işlem geri alınamaz ve
-                        kodda hatalara yol açabilir.
+                        <strong>{flag.name}</strong> flag&apos;ini silmek istediğinizden emin misiniz?
+                        Bu işlem geri alınamaz ve kodda hatalara yol açabilir.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -829,10 +751,7 @@ function FlagCard({
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-muted-foreground">Kullanıcı Dağılımı</span>
               <span>
-                ~
-                {Math.round(
-                  (flag.rollout_percentage / 100) * 125000,
-                ).toLocaleString('tr-TR')}{' '}
+                ~{Math.round((flag.rollout_percentage / 100) * 125000).toLocaleString('tr-TR')}{' '}
                 kullanıcı
               </span>
             </div>

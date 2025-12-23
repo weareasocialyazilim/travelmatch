@@ -187,7 +187,6 @@ $$;
 -- =============================================================================
 
 -- Rate limits: Only service role can access
-DROP POLICY IF EXISTS "rate_limits_service_only" ON rate_limits;
 CREATE POLICY "rate_limits_service_only"
 ON rate_limits
 FOR ALL
@@ -195,13 +194,11 @@ USING (auth.role() = 'service_role')
 WITH CHECK (auth.role() = 'service_role');
 
 -- Rate limit config: Read for authenticated, write for service role
-DROP POLICY IF EXISTS "rate_limit_config_read" ON rate_limit_config;
 CREATE POLICY "rate_limit_config_read"
 ON rate_limit_config
 FOR SELECT
 USING (auth.role() = 'authenticated' OR auth.role() = 'service_role');
 
-DROP POLICY IF EXISTS "rate_limit_config_write" ON rate_limit_config;
 CREATE POLICY "rate_limit_config_write"
 ON rate_limit_config
 FOR ALL

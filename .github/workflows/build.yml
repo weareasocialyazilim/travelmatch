@@ -14,25 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v2.0.0
-        with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
-          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: travelmatch
-          env-slug: prod
-          export-type: env
-
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: \${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ env.EXPO_TOKEN }}
+          token: \${{ secrets.EXPO_TOKEN }}
       - run: pnpm install --frozen-lockfile
       - run: eas build --platform android --profile production --non-interactive
       - run: eas build --platform ios --profile production --non-interactive

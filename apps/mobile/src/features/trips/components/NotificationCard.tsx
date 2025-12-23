@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -9,81 +9,64 @@ interface NotificationCardProps {
   onPress: (item: NotificationItem) => void;
 }
 
-export const NotificationCard = memo(
-  ({ item, onPress }: NotificationCardProps) => {
-    const getIcon = () => {
-      switch (item.type) {
-        case 'completed':
-          return 'check-circle';
-        case 'review':
-          return 'star';
-        case 'payment':
-          return 'cash';
-        case 'new_request':
-          return 'account-plus';
-        default:
-          return 'bell';
-      }
-    };
+export const NotificationCard = ({ item, onPress }: NotificationCardProps) => {
+  const getIcon = () => {
+    switch (item.type) {
+      case 'completed':
+        return 'check-circle';
+      case 'review':
+        return 'star';
+      case 'payment':
+        return 'cash';
+      case 'new_request':
+        return 'account-plus';
+      default:
+        return 'bell';
+    }
+  };
 
-    const getIconColor = () => {
-      switch (item.type) {
-        case 'completed':
-          return COLORS.success;
-        case 'review':
-          return COLORS.gold;
-        case 'payment':
-          return COLORS.primary;
-        case 'new_request':
-          return COLORS.info;
-        default:
-          return COLORS.textSecondary;
-      }
-    };
+  const getIconColor = () => {
+    switch (item.type) {
+      case 'completed':
+        return COLORS.success;
+      case 'review':
+        return COLORS.gold;
+      case 'payment':
+        return COLORS.primary;
+      case 'new_request':
+        return COLORS.info;
+      default:
+        return COLORS.textSecondary;
+    }
+  };
 
-    return (
-      <TouchableOpacity
-        style={[
-          styles.notificationItem,
-          !item.isRead && styles.notificationUnread,
-        ]}
-        onPress={() => onPress(item)}
-      >
-        {item.avatar ? (
-          <Image
-            source={{ uri: item.avatar }}
-            style={styles.notificationAvatar}
-          />
-        ) : (
-          <View
-            style={[
-              styles.notificationIcon,
-              { backgroundColor: `${getIconColor()}20` },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name={getIcon()}
-              size={20}
-              color={getIconColor()}
-            />
-          </View>
-        )}
-
-        <View style={styles.notificationContent}>
-          <Text style={styles.notificationTitle} numberOfLines={1}>
-            {item.title}
-          </Text>
-          <Text style={styles.notificationBody} numberOfLines={2}>
-            {item.body}
-          </Text>
-          <Text style={styles.notificationTime}>{item.timeAgo}</Text>
+  return (
+    <TouchableOpacity
+      style={[styles.notificationItem, !item.isRead && styles.notificationUnread]}
+      onPress={() => onPress(item)}
+    >
+      {item.avatar ? (
+        <Image source={{ uri: item.avatar }} style={styles.notificationAvatar} />
+      ) : (
+        <View style={[styles.notificationIcon, { backgroundColor: `${getIconColor()}20` }]}>
+          <MaterialCommunityIcons name={getIcon()} size={20} color={getIconColor()} />
         </View>
+      )}
 
-        {!item.isRead && <View style={styles.unreadIndicator} />}
-      </TouchableOpacity>
-    );
-  },
-);
+      <View style={styles.notificationContent}>
+        <Text style={styles.notificationTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
+        <Text style={styles.notificationBody} numberOfLines={2}>
+          {item.body}
+        </Text>
+        <Text style={styles.notificationTime}>{item.timeAgo}</Text>
+      </View>
+
+      {!item.isRead && <View style={styles.unreadIndicator} />}
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   notificationItem: {
@@ -140,5 +123,3 @@ const styles = StyleSheet.create({
     width: 8,
   },
 });
-
-NotificationCard.displayName = 'NotificationCard';

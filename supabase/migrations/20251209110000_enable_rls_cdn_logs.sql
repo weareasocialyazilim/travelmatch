@@ -16,7 +16,6 @@ ENABLE ROW LEVEL SECURITY;
 
 -- Policy 1: Service role can read all logs
 -- This is used for admin dashboards and debugging
-DROP POLICY IF EXISTS "Service role can read cdn invalidation logs" ON public.cdn_invalidation_logs;
 CREATE POLICY "Service role can read cdn invalidation logs"
   ON public.cdn_invalidation_logs 
   FOR SELECT
@@ -27,7 +26,6 @@ CREATE POLICY "Service role can read cdn invalidation logs"
 
 -- Policy 2: Service role can insert logs
 -- CDN invalidation triggers and edge functions need write access
-DROP POLICY IF EXISTS "Service role can insert cdn invalidation logs" ON public.cdn_invalidation_logs;
 CREATE POLICY "Service role can insert cdn invalidation logs"
   ON public.cdn_invalidation_logs 
   FOR INSERT
@@ -38,7 +36,6 @@ CREATE POLICY "Service role can insert cdn invalidation logs"
 
 -- Policy 3: Service role can update logs
 -- For updating success/error status asynchronously
-DROP POLICY IF EXISTS "Service role can update cdn invalidation logs" ON public.cdn_invalidation_logs;
 CREATE POLICY "Service role can update cdn invalidation logs"
   ON public.cdn_invalidation_logs 
   FOR UPDATE

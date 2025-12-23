@@ -16,20 +16,6 @@ import * as friendlyErrorHandler from '@/utils/friendlyErrorHandler';
 jest.mock('@/context/AuthContext');
 jest.mock('@/utils/logger');
 jest.mock('@/utils/friendlyErrorHandler');
-jest.mock('@/context/BiometricAuthContext', () => ({
-  useBiometric: () => ({
-    isSupported: false,
-    isEnabled: false,
-    authenticate: jest.fn(),
-    enable: jest.fn(),
-    disable: jest.fn(),
-    checkSupport: jest.fn(),
-    loading: false,
-    error: null,
-  }),
-  BiometricAuthProvider: ({ children }: { children: React.ReactNode }) =>
-    children,
-}));
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -50,16 +36,6 @@ const mockNavigation = {
 const mockRoute = {
   key: 'Login',
   name: 'Login' as const,
-};
-
-/**
- * Test credential helpers - builds values at runtime to avoid
- * static analysis false positives for hardcoded credentials.
- */
-const TestCredentials = {
-  email: () => ['test', '@', 'example.com'].join(''),
-  password: () => ['pass', 'word', '123'].join(''),
-  wrongPassword: () => ['wrong', 'pass', 'word'].join(''),
 };
 
 describe('LoginScreen', () => {
@@ -94,17 +70,16 @@ describe('LoginScreen', () => {
 
   describe('Rendering', () => {
     it('should render all form elements', () => {
-      const { getByLabelText, getByTestId } = render(
+      const { getByLabelText, getByRole } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       expect(getByLabelText('Email address')).toBeTruthy();
       expect(getByLabelText('Password')).toBeTruthy();
-      expect(getByTestId('login-button')).toBeTruthy();
+      expect(getByLabelText('Log in to your account')).toBeTruthy();
     });
 
-    it.skip('should render social login buttons', () => {
-      // Skipped: Component doesn't have social login buttons in current implementation
+    it('should render social login buttons', () => {
       const { getByText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
@@ -113,8 +88,7 @@ describe('LoginScreen', () => {
       expect(getByText(/or login with email/i)).toBeTruthy();
     });
 
-    it.skip('should render sign up link', () => {
-      // Skipped: Component may not have sign up link in current implementation
+    it('should render sign up link', () => {
       const { getByText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
@@ -122,8 +96,7 @@ describe('LoginScreen', () => {
       expect(getByText(/Sign up/i)).toBeTruthy();
     });
 
-    it.skip('should render back button', () => {
-      // Skipped: Component may not have back button in current implementation
+    it('should render back button', () => {
       const { getByLabelText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
@@ -139,9 +112,9 @@ describe('LoginScreen', () => {
       );
 
       const emailInput = getByLabelText('Email address');
-      fireEvent.changeText(emailInput, TestCredentials.email());
+      fireEvent.changeText(emailInput, 'test@example.com');
 
-      expect(emailInput.props.value).toBe(TestCredentials.email());
+      expect(emailInput.props.value).toBe('test@example.com');
     });
 
     it('should update password input', () => {
@@ -150,13 +123,12 @@ describe('LoginScreen', () => {
       );
 
       const passwordInput = getByLabelText('Password');
-      fireEvent.changeText(passwordInput, TestCredentials.password());
+      fireEvent.changeText(passwordInput, 'password123');
 
-      expect(passwordInput.props.value).toBe(TestCredentials.password());
+      expect(passwordInput.props.value).toBe('password123');
     });
 
-    it.skip('should toggle password visibility', () => {
-      // Skipped: Component doesn't have password toggle in current implementation
+    it('should toggle password visibility', () => {
       const { getByLabelText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
@@ -183,28 +155,35 @@ describe('LoginScreen', () => {
     it('should handle successful login', async () => {
       mockLogin.mockResolvedValue({ success: true });
 
-      const { getByLabelText, getByTestId } = render(
+      const { getByLabelText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       // Fill in form
-      fireEvent.changeText(getByLabelText('Email address'), TestCredentials.email());
-      fireEvent.changeText(getByLabelText('Password'), TestCredentials.password());
+      fireEvent.changeText(getByLabelText('Email address'), 'test@example.com');
+      fireEvent.changeText(getByLabelText('Password'), 'password123');
 
-      // Submit form using testID
-      const loginButton = getByTestId('login-button');
+      // Submit form
+      const loginButton = getByLabelText('Log in to your account');
       fireEvent.press(loginButton);
 
       await waitFor(() => {
         expect(mockLogin).toHaveBeenCalledWith({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
+        });
+      });
+
+      // Should navigate to Discover screen
+      await waitFor(() => {
+        expect(mockNavigation.reset).toHaveBeenCalledWith({
+          index: 0,
+          routes: [{ name: 'Discover' }],
         });
       });
     });
 
-    it.skip('should handle login failure', async () => {
-      // Skipped: showErrorAlert not used in current implementation (uses Toast)
+    it('should handle login failure', async () => {
       mockLogin.mockResolvedValue({
         success: false,
         error: 'Invalid credentials',
@@ -215,8 +194,8 @@ describe('LoginScreen', () => {
       );
 
       // Fill in form
-      fireEvent.changeText(getByLabelText('Email address'), TestCredentials.email());
-      fireEvent.changeText(getByLabelText('Password'), TestCredentials.wrongPassword());
+      fireEvent.changeText(getByLabelText('Email address'), 'test@example.com');
+      fireEvent.changeText(getByLabelText('Password'), 'wrongpassword');
 
       // Submit form
       fireEvent.press(getByLabelText('Log in to your account'));
@@ -226,15 +205,14 @@ describe('LoginScreen', () => {
       });
     });
 
-    it.skip('should validate email before login', async () => {
-      // Skipped: Validation UI differs in current implementation
+    it('should validate email before login', async () => {
       const { getByLabelText, queryByText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
       // Fill in invalid email
       fireEvent.changeText(getByLabelText('Email address'), 'invalid-email');
-      fireEvent.changeText(getByLabelText('Password'), TestCredentials.password());
+      fireEvent.changeText(getByLabelText('Password'), 'password123');
 
       // Should show validation error inline
       await waitFor(() => {
@@ -249,8 +227,7 @@ describe('LoginScreen', () => {
       expect(mockLogin).not.toHaveBeenCalled();
     });
 
-    it.skip('should validate required fields', async () => {
-      // Skipped: Button disable state differs in current implementation
+    it('should validate required fields', async () => {
       const { getByLabelText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
@@ -260,7 +237,7 @@ describe('LoginScreen', () => {
       expect(loginButton.props.accessibilityState.disabled).toBe(true);
 
       // Fill in only email
-      fireEvent.changeText(getByLabelText('Email address'), TestCredentials.email());
+      fireEvent.changeText(getByLabelText('Email address'), 'test@example.com');
 
       // Still disabled without password
       expect(loginButton.props.accessibilityState.disabled).toBe(true);
@@ -269,8 +246,7 @@ describe('LoginScreen', () => {
       expect(mockLogin).not.toHaveBeenCalled();
     });
 
-    it.skip('should show loading state during login', async () => {
-      // Skipped: Loading state text differs in current implementation
+    it('should show loading state during login', async () => {
       mockLogin.mockImplementation(
         () =>
           new Promise((resolve) =>
@@ -283,8 +259,8 @@ describe('LoginScreen', () => {
       );
 
       // Fill in form
-      fireEvent.changeText(getByLabelText('Email address'), TestCredentials.email());
-      fireEvent.changeText(getByLabelText('Password'), TestCredentials.password());
+      fireEvent.changeText(getByLabelText('Email address'), 'test@example.com');
+      fireEvent.changeText(getByLabelText('Password'), 'password123');
 
       // Submit form
       fireEvent.press(getByLabelText('Log in to your account'));
@@ -301,8 +277,7 @@ describe('LoginScreen', () => {
     });
   });
 
-  describe.skip('Navigation', () => {
-    // Skipped: Component uses different navigation pattern
+  describe('Navigation', () => {
     it('should navigate back when back button is pressed', () => {
       const { getByLabelText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
@@ -339,8 +314,7 @@ describe('LoginScreen', () => {
     });
   });
 
-  describe.skip('Social Login', () => {
-    // Skipped: Component doesn't have social login in current implementation
+  describe('Social Login', () => {
     it('should handle Google social login', () => {
       const { getByText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
@@ -374,8 +348,7 @@ describe('LoginScreen', () => {
     });
   });
 
-  describe.skip('Error Handling', () => {
-    // Skipped: Error handling uses Toast instead of Alert in current implementation
+  describe('Error Handling', () => {
     it('should handle network errors', async () => {
       mockLogin.mockRejectedValue(new Error('Network error'));
 
@@ -383,8 +356,8 @@ describe('LoginScreen', () => {
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
-      fireEvent.changeText(getByLabelText('Email address'), TestCredentials.email());
-      fireEvent.changeText(getByLabelText('Password'), TestCredentials.password());
+      fireEvent.changeText(getByLabelText('Email address'), 'test@example.com');
+      fireEvent.changeText(getByLabelText('Password'), 'password123');
 
       fireEvent.press(getByLabelText('Log in to your account'));
 
@@ -401,8 +374,8 @@ describe('LoginScreen', () => {
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,
       );
 
-      fireEvent.changeText(getByLabelText('Email address'), TestCredentials.email());
-      fireEvent.changeText(getByLabelText('Password'), TestCredentials.password());
+      fireEvent.changeText(getByLabelText('Email address'), 'test@example.com');
+      fireEvent.changeText(getByLabelText('Password'), 'password123');
 
       fireEvent.press(getByLabelText('Log in to your account'));
 
@@ -412,8 +385,7 @@ describe('LoginScreen', () => {
     });
   });
 
-  describe.skip('Accessibility', () => {
-    // Skipped: Accessibility labels differ in current implementation
+  describe('Accessibility', () => {
     it('should have proper accessibility labels', () => {
       const { getByLabelText } = render(
         <LoginScreen navigation={mockNavigation} route={mockRoute} />,

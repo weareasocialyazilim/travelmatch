@@ -1,472 +1,330 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
+  View,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
-  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { COLORS } from '@/constants/colors';
-import { logger } from '@/utils/logger';
-import {
-  showErrorAlert,
-  AppErrorCode,
-  AppError,
-} from '@/utils/friendlyErrorHandler';
-import { LoadingState } from '@/components/LoadingState';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/context/ToastContext';
+import { useBiometric } from '@/context/BiometricAuthContext';
+import { useAccessibility } from '@/hooks/useAccessibility';
+import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { loginSchema, type LoginInput } from '@/utils/forms';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
-import type { StackScreenProps } from '@react-navigation/stack';
+import { canSubmitForm } from '@/utils/forms/helpers';
+import type { MinimalFormState } from '@/utils/forms/helpers';
+import { useToast } from '@/context/ToastContext';
 
-type LoginScreenProps = StackScreenProps<RootStackParamList, 'Login'>;
-
-export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-  const { login } = useAuth();
-  const { t } = useTranslation();
+export const LoginScreen: React.FC = () => {
   const { showToast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBiometricLoading, setIsBiometricLoading] = useState(false);
+  const { login } = useAuth();
+  const {
+    biometricAvailable,
+    biometricEnabled,
+    biometricTypeName,
+    authenticateForAppLaunch,
+  } = useBiometric();
+  const { props: a11y } = useAccessibility();
 
-  const { control, handleSubmit, formState, watch } = useForm<LoginInput>({
+  const { control, handleSubmit, formState } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     mode: 'onChange',
     defaultValues: {
-      identifier: '',
+      email: '',
       password: '',
     },
   });
 
-  const identifierValue = watch('identifier');
-  
-  // Detect if identifier is email or phone
-  const isEmailInput = useMemo(() => {
-    return identifierValue?.includes('@') || false;
-  }, [identifierValue]);
-
   const onSubmit = async (data: LoginInput) => {
-    setLoading(true);
     try {
-      logger.info('LoginScreen', 'Starting login...');
-      
-      // Determine if using email or phone
-      const loginPayload = isEmailInput
-        ? { email: data.identifier, password: data.password }
-        : { phone: data.identifier, password: data.password };
-      
-      const result = await login(loginPayload);
-
-      logger.info('LoginScreen', 'Login result:', result);
-
-      if (result.success) {
-        logger.info('LoginScreen', 'Navigating to Discover...');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Discover' }],
-        });
-        logger.info('LoginScreen', 'Navigation reset called');
-      } else {
-        throw new AppError(
-          AppErrorCode.AUTH_INVALID_CREDENTIALS,
-          result.error || 'Invalid credentials',
-        );
-      }
+      setIsLoading(true);
+      await login({ email: data.email, password: data.password });
+      // Navigation handled by auth state change
     } catch (error) {
-      logger.error('Login error:', error);
-      showErrorAlert(error, t, {
-        onRetry: () => handleSubmit(onSubmit)(),
-      });
+      showToast(
+        error instanceof Error
+          ? error.message
+          : 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin',
+        'error',
+      );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSocialLogin = (_provider: string) => {
-    showToast('Coming Soon! This feature will be available shortly.', 'info');
+  const handleBiometricLogin = async () => {
+    try {
+      setIsBiometricLoading(true);
+      const success = await authenticateForAppLaunch();
+
+      if (success) {
+        // User authenticated with biometric, proceed with login
+        // In a real app, you would retrieve stored credentials and call login
+        // For now, we'll just show a success message
+        showToast(
+          biometricTypeName + ' ile başarıyla giriş yaptınız',
+          'success',
+        );
+      } else {
+        showToast(
+          biometricTypeName +
+            ' doğrulaması başarısız. Lütfen tekrar deneyin veya şifrenizi kullanın',
+          'error',
+        );
+      }
+    } catch (error) {
+      showToast(
+        'Biyometrik doğrulama kullanılamıyor. Lütfen şifrenizi kullanın',
+        'error',
+      );
+    } finally {
+      setIsBiometricLoading(false);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {loading && <LoadingState type="overlay" message="Logging in..." />}
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
+    <ScreenErrorBoundary>
+      <View style={styles.container}>
+        <Text style={styles.title} {...a11y.header('Welcome Back')}>
+          Welcome Back
+        </Text>
+        <Text
+          style={styles.subtitle}
+          accessible={true}
+          accessibilityLabel="Sign in to continue"
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle} accessibilityRole="header">
-            Log In
-          </Text>
-        </View>
-        <View style={styles.headerSpacer} />
-      </View>
+          Sign in to continue
+        </Text>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
-      >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets
-          bounces={false}
-        >
-          {/* Social Login Icons - Small Row at Top */}
-          <View style={styles.socialSection}>
-            <View style={styles.socialRow}>
-              <TouchableOpacity
-                style={styles.socialIconButton}
-                onPress={() => handleSocialLogin('apple')}
-                activeOpacity={0.7}
-              >
-                <Icon name="apple" size={22} color={COLORS.white} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.socialIconButton, styles.googleButton]}
-                onPress={() => handleSocialLogin('google')}
-                activeOpacity={0.7}
-              >
-                <Icon name="google" size={22} color={COLORS.white} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.socialIconButton, styles.facebookButton]}
-                onPress={() => handleSocialLogin('facebook')}
-                activeOpacity={0.7}
-              >
-                <Icon name="facebook" size={22} color={COLORS.white} />
-              </TouchableOpacity>
+        <Controller
+          control={control}
+          name="email"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, error && styles.inputError]}
+                placeholder="Email"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!isLoading}
+                accessible={true}
+                accessibilityLabel="Email address"
+                accessibilityHint="Enter your email address to sign in"
+                accessibilityValue={{ text: value }}
+              />
+              {error && (
+                <Text
+                  style={styles.errorText}
+                  {...a11y.alert(error.message || 'Validation error')}
+                >
+                  {error.message}
+                </Text>
+              )}
             </View>
-          </View>
+          )}
+        />
 
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or login with email/phone</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Email/Phone Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel} nativeID="identifier-label">
-              Email or Phone Number
-            </Text>
-            <Controller
-              control={control}
-              name="identifier"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <>
-                  <View
-                    style={[styles.inputWrapper, error && styles.inputError]}
-                  >
-                    <Icon
-                      name={isEmailInput ? "email-outline" : "phone-outline"}
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                    <TextInput
-                      style={styles.textInput}
-                      placeholder="Email or phone number"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      keyboardType={isEmailInput ? "email-address" : "default"}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      accessibilityLabel="Email or phone number"
-                      accessibilityHint="Enter your email address or phone number"
-                      accessibilityLabelledBy="identifier-label"
-                    />
-                  </View>
-                  {error && (
-                    <Text
-                      style={styles.errorText}
-                      accessibilityLiveRegion="polite"
-                    >
-                      {error.message}
-                    </Text>
-                  )}
-                </>
+        <Controller
+          control={control}
+          name="password"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, error && styles.inputError]}
+                placeholder="Password"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                secureTextEntry
+                editable={!isLoading}
+                accessible={true}
+                accessibilityLabel="Password"
+                accessibilityHint="Enter your password to sign in"
+              />
+              {error && (
+                <Text
+                  style={styles.errorText}
+                  {...a11y.alert(error.message || 'Validation error')}
+                >
+                  {error.message}
+                </Text>
               )}
-            />
-          </View>
+            </View>
+          )}
+        />
 
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel} nativeID="password-label">
-              Password
-            </Text>
-            <Controller
-              control={control}
-              name="password"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <>
-                  <View
-                    style={[styles.inputWrapper, error && styles.inputError]}
-                  >
-                    <Icon
-                      name="lock-outline"
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                    <TextInput
-                      style={styles.textInput}
-                      placeholder="Enter your password"
-                      placeholderTextColor={COLORS.textSecondary}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      secureTextEntry={!showPassword}
-                      autoCapitalize="none"
-                      accessibilityLabel="Password"
-                      accessibilityHint="Enter your password"
-                      accessibilityLabelledBy="password-label"
-                    />
-                    <TouchableOpacity
-                      onPress={() => setShowPassword(!showPassword)}
-                      accessibilityRole="button"
-                      accessibilityLabel={
-                        showPassword ? 'Hide password' : 'Show password'
-                      }
-                    >
-                      <Icon
-                        name={showPassword ? 'eye-off' : 'eye'}
-                        size={20}
-                        color={COLORS.textSecondary}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  {error && (
-                    <Text style={styles.errorText}>{error.message}</Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
+        <TouchableOpacity
+          testID="login-button"
+          style={[
+            styles.button,
+            (isLoading ||
+              !canSubmitForm({ formState } as {
+                formState: MinimalFormState;
+              })) &&
+              styles.buttonDisabled,
+          ]}
+          onPress={handleSubmit(onSubmit)}
+          disabled={
+            isLoading ||
+            !canSubmitForm({ formState } as { formState: MinimalFormState })
+          }
+          {...a11y.button(
+            isLoading ? 'Signing in' : 'Sign In',
+            'Sign in with your email and password',
+            isLoading ||
+              !canSubmitForm({ formState } as { formState: MinimalFormState }),
+          )}
+        >
+          <Text style={styles.buttonText}>
+            {isLoading ? 'Signing in...' : 'Sign In'}
+          </Text>
+        </TouchableOpacity>
 
-          {/* Forgot Password */}
-          <TouchableOpacity
-            style={styles.forgotPasswordButton}
-            onPress={() => navigation.navigate('ForgotPassword')}
-            accessibilityRole="link"
-            accessibilityLabel="Forgot your password? Tap to reset"
-          >
-            <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
-          </TouchableOpacity>
-        </ScrollView>
+        {biometricAvailable && biometricEnabled && (
+          <>
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
 
-        {/* Bottom Action Bar */}
-        <View style={styles.bottomBar}>
-          <TouchableOpacity
-            style={[
-              styles.loginButton,
-              (!formState.isValid || loading) && styles.loginButtonDisabled,
-            ]}
-            onPress={handleSubmit(onSubmit)}
-            disabled={!formState.isValid || loading}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="Log in"
-            accessibilityState={{ disabled: !formState.isValid || loading }}
-          >
-            <Text style={styles.loginButtonText}>Log In</Text>
-          </TouchableOpacity>
-
-          <View style={styles.registerPrompt}>
-            <Text style={styles.registerPromptText}>
-              Don't have an account?{' '}
-            </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Register')}
-              accessibilityRole="link"
+              testID="biometric-login-button"
+              style={styles.biometricButton}
+              onPress={handleBiometricLogin}
+              disabled={isBiometricLoading || isLoading}
+              {...a11y.button(
+                `Sign in with ${biometricTypeName}`,
+                `Use ${biometricTypeName} to sign in quickly`,
+                isBiometricLoading || isLoading,
+              )}
             >
-              <Text style={styles.registerLink}>Sign up</Text>
+              {isBiometricLoading ? (
+                <ActivityIndicator size="small" color="#2563eb" />
+              ) : (
+                <>
+                  <MaterialCommunityIcons
+                    name="fingerprint"
+                    size={32}
+                    color="#2563eb"
+                    accessible={false}
+                  />
+                  <Text style={styles.biometricButtonText}>
+                    Sign in with {biometricTypeName}
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </>
+        )}
+      </View>
+    </ScreenErrorBoundary>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
-  },
-  headerCenter: {
-    flex: 1,
     alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#1a1a1a',
   },
-  headerSpacer: {
-    width: 40,
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 30,
   },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-  },
-  socialSection: {
+  inputContainer: {
+    width: '100%',
     marginBottom: 16,
-    marginTop: 24,
   },
-  socialRow: {
-    flexDirection: 'row',
+  input: {
+    width: '100%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
+  },
+  inputError: {
+    borderColor: '#ef4444',
+  },
+  errorText: {
+    color: '#ef4444',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+  },
+  button: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
     justifyContent: 'center',
-    gap: 16,
-  },
-  socialIconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#000000',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 8,
   },
-  googleButton: {
-    backgroundColor: '#DB4437',
+  buttonDisabled: {
+    opacity: 0.6,
   },
-  facebookButton: {
-    backgroundColor: '#1877F2',
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
-  dividerContainer: {
+  divider: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 24,
+    width: '100%',
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: '#ddd',
   },
   dividerText: {
-    paddingHorizontal: 12,
-    color: COLORS.textSecondary,
-    fontSize: 13,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
+    marginHorizontal: 16,
     fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 8,
+    color: '#666',
   },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 52,
+  biometricButton: {
+    width: '100%',
+    height: 60,
     borderWidth: 1.5,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    backgroundColor: COLORS.white,
-    gap: 10,
-  },
-  inputError: {
-    borderColor: COLORS.error,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 16,
-    color: COLORS.text,
-  },
-  errorText: {
-    color: COLORS.error,
-    fontSize: 12,
-    marginTop: 4,
-  },
-  forgotPasswordButton: {
-    alignSelf: 'flex-end',
-    marginTop: 4,
-  },
-  forgotPasswordText: {
-    color: COLORS.mint,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  bottomBar: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 24,
-    backgroundColor: COLORS.background,
-  },
-  loginButton: {
-    height: 52,
-    backgroundColor: COLORS.mint,
-    borderRadius: 26,
-    alignItems: 'center',
+    borderColor: '#2563eb',
+    borderRadius: 8,
     justifyContent: 'center',
-  },
-  loginButtonDisabled: {
-    backgroundColor: `${COLORS.mint}50`,
-  },
-  loginButtonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  registerPrompt: {
+    alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
+    gap: 12,
   },
-  registerPromptText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  registerLink: {
-    fontSize: 14,
+  biometricButtonText: {
+    color: '#2563eb',
+    fontSize: 16,
     fontWeight: '600',
-    color: COLORS.mint,
   },
 });

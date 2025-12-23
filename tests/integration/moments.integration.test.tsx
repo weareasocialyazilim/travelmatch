@@ -1,122 +1,18 @@
 /**
  * Integration Tests
- *
+ * 
  * Tests combined functionality of hooks + services + API
  * Ensures end-to-end data flow works correctly
  */
 
-import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useMoments } from '../../apps/mobile/src/hooks/useMoments';
+import { useMoments } from '../src/hooks/useMoments';
+import { momentsService } from '../src/services/supabaseDbService';
+import { supabase } from '../src/lib/supabase';
 
-// Mock all the dependencies
-jest.mock('../../apps/mobile/src/config/supabase', () => {
-  const mockMoments = [
-    {
-      id: '1',
-      title: 'Paris Trip',
-      description: 'Amazing journey',
-      user_id: 'user-1',
-      created_at: '2024-12-01T00:00:00Z',
-      category_id: 'cat-1',
-      price: 100,
-      currency: 'USD',
-      location_city: 'Paris',
-      location_country: 'France',
-      status: 'active',
-      users: {
-        full_name: 'Test User',
-        avatar_url: '',
-        rating: 4.5,
-        review_count: 10,
-      },
-    },
-    {
-      id: '2',
-      title: 'Tokyo Adventure',
-      description: 'Unforgettable experience',
-      user_id: 'user-1',
-      created_at: '2024-12-02T00:00:00Z',
-      category_id: 'cat-2',
-      price: 200,
-      currency: 'USD',
-      location_city: 'Tokyo',
-      location_country: 'Japan',
-      status: 'active',
-      users: {
-        full_name: 'Test User',
-        avatar_url: '',
-        rating: 4.5,
-        review_count: 10,
-      },
-    },
-  ];
-
-  const createChainMock = (data: any) => {
-    const mock = {
-      select: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      gt: jest.fn().mockReturnThis(),
-      lt: jest.fn().mockReturnThis(),
-      gte: jest.fn().mockReturnThis(),
-      lte: jest.fn().mockReturnThis(),
-      or: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      range: jest.fn().mockReturnThis(),
-      single: jest.fn().mockResolvedValue({ data: data[0], error: null }),
-      maybeSingle: jest.fn().mockResolvedValue({ data: data[0], error: null }),
-    };
-    // Make range resolve with the data
-    mock.range.mockResolvedValue({ data, error: null, count: data.length });
-    return mock;
-  };
-
-  return {
-    supabase: {
-      auth: {
-        getUser: jest
-          .fn()
-          .mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }),
-        getSession: jest.fn().mockResolvedValue({
-          data: { session: { user: { id: 'user-1' } } },
-          error: null,
-        }),
-      },
-      from: jest.fn(() => createChainMock(mockMoments)),
-      rpc: jest.fn().mockResolvedValue({ data: [], error: null }),
-      channel: jest.fn(() => ({
-        on: jest.fn().mockReturnThis(),
-        subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
-      })),
-      removeChannel: jest.fn(),
-    },
-    isSupabaseConfigured: () => true,
-  };
-});
-
-// Mock logger
-jest.mock('../../apps/mobile/src/utils/logger', () => ({
-  logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-  },
-}));
-
-// Mock errorHandler
-jest.mock('../../apps/mobile/src/utils/errorHandler', () => ({
-  ErrorHandler: {
-    handle: jest.fn(),
-    log: jest.fn(),
-  },
-}));
+// Mock Supabase client
+jest.mock('../src/lib/supabase');
 
 describe('Integration Tests: Moments Flow', () => {
   let queryClient: QueryClient;
@@ -133,6 +29,37 @@ describe('Integration Tests: Moments Flow', () => {
 
   describe('useMoments + momentsService + Supabase API', () => {
     it('should fetch moments and handle pagination', async () => {
+      // Mock Supabase response
+      const mockMoments = [
+        {
+          id: '1',
+          title: 'Paris Trip',
+          description: 'Amazing journey',
+          user_id: 'user-1',
+          created_at: '2024-12-01T00:00:00Z',
+        },
+        {
+          id: '2',
+          title: 'Tokyo Adventure',
+          description: 'Unforgettable experience',
+          user_id: 'user-1',
+          created_at: '2024-12-02T00:00:00Z',
+        },
+      ];
+
+      (supabase.from as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          order: jest.fn().mockReturnValue({
+            limit: jest.fn().mockReturnValue({
+              range: jest.fn().mockResolvedValue({
+                data: mockMoments,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      });
+
       // Render hook with QueryClient provider
       const wrapper = ({ children }: { children: React.ReactNode }) => (
         <QueryClientProvider client={queryClient}>
@@ -142,15 +69,15 @@ describe('Integration Tests: Moments Flow', () => {
 
       const { result } = renderHook(() => useMoments(), { wrapper });
 
-      // Wait for data to load - the hook might return empty initially
-      await waitFor(
-        () => {
-          expect(result.current.loading).toBe(false);
-        },
-        { timeout: 3000 },
-      );
+      // Wait for data to load
+      await waitFor(() => {
+        expect(result.current.moments).toHaveLength(2);
+      });
 
-      // The hook fetches data, verify no error state
+      // Verify data
+      expect(result.current.moments[0].title).toBe('Paris Trip');
+      expect(result.current.moments[1].title).toBe('Tokyo Adventure');
+      expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBeNull();
     });
 
@@ -162,6 +89,25 @@ describe('Integration Tests: Moments Flow', () => {
         currency: 'USD',
       };
 
+      const createdMoment = {
+        id: '3',
+        ...newMoment,
+        user_id: 'user-1',
+        created_at: '2024-12-08T00:00:00Z',
+      };
+
+      // Mock create response
+      (supabase.from as jest.Mock).mockReturnValue({
+        insert: jest.fn().mockReturnValue({
+          select: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: createdMoment,
+              error: null,
+            }),
+          }),
+        }),
+      });
+
       const wrapper = ({ children }: { children: React.ReactNode }) => (
         <QueryClientProvider client={queryClient}>
           {children}
@@ -170,19 +116,30 @@ describe('Integration Tests: Moments Flow', () => {
 
       const { result } = renderHook(() => useMoments(), { wrapper });
 
-      // Wait for hook to be ready
-      await waitFor(
-        () => {
-          expect(result.current.loading).toBe(false);
-        },
-        { timeout: 3000 },
-      );
+      // Create moment
+      await waitFor(async () => {
+        await result.current.createMoment(newMoment);
+      });
 
-      // Verify hook provides createMoment function
-      expect(typeof result.current.createMoment).toBe('function');
+      // Verify service was called
+      expect(supabase.from).toHaveBeenCalledWith('moments');
     });
 
     it('should handle API errors gracefully', async () => {
+      // Mock error response
+      (supabase.from as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          order: jest.fn().mockReturnValue({
+            limit: jest.fn().mockReturnValue({
+              range: jest.fn().mockResolvedValue({
+                data: null,
+                error: { message: 'Network error', code: 'NETWORK_ERROR' },
+              }),
+            }),
+          }),
+        }),
+      });
+
       const wrapper = ({ children }: { children: React.ReactNode }) => (
         <QueryClientProvider client={queryClient}>
           {children}
@@ -191,22 +148,43 @@ describe('Integration Tests: Moments Flow', () => {
 
       const { result } = renderHook(() => useMoments(), { wrapper });
 
-      // Wait for hook to finish loading
-      await waitFor(
-        () => {
-          expect(result.current.loading).toBe(false);
-        },
-        { timeout: 3000 },
-      );
+      // Wait for error state
+      await waitFor(() => {
+        expect(result.current.error).toBeTruthy();
+      });
 
-      // Verify hook has proper structure
-      expect(result.current).toHaveProperty('moments');
-      expect(result.current).toHaveProperty('error');
+      expect(result.current.moments).toHaveLength(0);
+      expect(result.current.isLoading).toBe(false);
     });
   });
 
   describe('Cache invalidation and updates', () => {
     it('should invalidate cache after mutation', async () => {
+      const mockMoments = [{ id: '1', title: 'Test' }];
+
+      (supabase.from as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          order: jest.fn().mockReturnValue({
+            limit: jest.fn().mockReturnValue({
+              range: jest.fn().mockResolvedValue({
+                data: mockMoments,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+        update: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            select: jest.fn().mockReturnValue({
+              single: jest.fn().mockResolvedValue({
+                data: { id: '1', title: 'Updated Test' },
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      });
+
       const wrapper = ({ children }: { children: React.ReactNode }) => (
         <QueryClientProvider client={queryClient}>
           {children}
@@ -216,15 +194,17 @@ describe('Integration Tests: Moments Flow', () => {
       const { result } = renderHook(() => useMoments(), { wrapper });
 
       // Wait for initial load
-      await waitFor(
-        () => {
-          expect(result.current.loading).toBe(false);
-        },
-        { timeout: 3000 },
-      );
+      await waitFor(() => {
+        expect(result.current.moments).toHaveLength(1);
+      });
 
-      // Verify updateMoment function exists
-      expect(typeof result.current.updateMoment).toBe('function');
+      // Update moment
+      await waitFor(async () => {
+        await result.current.updateMoment('1', { title: 'Updated Test' });
+      });
+
+      // Cache should be invalidated
+      expect(queryClient.getQueryState(['moments']))?.isInvalidated;
     });
   });
 });
@@ -232,18 +212,15 @@ describe('Integration Tests: Moments Flow', () => {
 describe('Integration Tests: Authentication Flow', () => {
   it('should login and store session', async () => {
     // TODO: Implement auth integration tests
-    expect(true).toBe(true);
   });
 
   it('should handle OAuth callback', async () => {
     // TODO: Implement OAuth integration tests
-    expect(true).toBe(true);
   });
 });
 
 describe('Integration Tests: Payment Flow', () => {
   it('should create payment intent and process payment', async () => {
     // TODO: Implement payment integration tests
-    expect(true).toBe(true);
   });
 });

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
-import { View, Text, ActivityIndicator, RefreshControl } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { View, Text, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { usePagination } from '../hooks/usePagination';
 
 // Mock moment data
@@ -23,21 +22,15 @@ const createMockFetcher = (totalItems = 100) => {
     let startIndex = 0;
 
     if (cursor) {
-      const { id } = JSON.parse(
-        Buffer.from(cursor, 'base64').toString('utf-8'),
-      );
+      const { id } = JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'));
       const momentId = parseInt(id.split('-')[1]);
       startIndex = momentId;
     }
 
     const items = [];
     const now = new Date();
-
-    for (
-      let i = startIndex;
-      i < Math.min(startIndex + limit, totalItems);
-      i++
-    ) {
+    
+    for (let i = startIndex; i < Math.min(startIndex + limit, totalItems); i++) {
       const createdAt = new Date(now.getTime() - i * 60000); // 1 minute apart
       items.push(generateMockMoment(i, createdAt));
     }
@@ -51,7 +44,7 @@ const createMockFetcher = (totalItems = 100) => {
         JSON.stringify({
           created_at: lastItem.created_at,
           id: lastItem.id,
-        }),
+        })
       ).toString('base64');
     }
 
@@ -68,14 +61,11 @@ const createMockFetcher = (totalItems = 100) => {
 
 // Pagination list component
 const PaginatedList = ({ totalItems = 100 }: { totalItems?: number }) => {
-  const fetcher = React.useMemo(
-    () => createMockFetcher(totalItems),
-    [totalItems],
-  );
-
+  const fetcher = React.useMemo(() => createMockFetcher(totalItems), [totalItems]);
+  
   const { items, loadMore, refresh, hasMore, loading, error } = usePagination(
     fetcher,
-    { limit: 20, autoLoad: true },
+    { limit: 20, autoLoad: true }
   );
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -118,17 +108,8 @@ const PaginatedList = ({ totalItems = 100 }: { totalItems?: number }) => {
 
   if (error) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 20,
-        }}
-      >
-        <Text style={{ color: 'red', fontSize: 16, marginBottom: 8 }}>
-          Error
-        </Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <Text style={{ color: 'red', fontSize: 16, marginBottom: 8 }}>Error</Text>
         <Text style={{ color: '#666', textAlign: 'center' }}>{error}</Text>
       </View>
     );
@@ -151,8 +132,8 @@ const PaginatedList = ({ totalItems = 100 }: { totalItems?: number }) => {
           {items.length} items loaded {hasMore && '• Scroll for more'}
         </Text>
       </View>
-
-      <FlashList
+      
+      <FlatList
         data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}

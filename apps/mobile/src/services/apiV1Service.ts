@@ -1,9 +1,9 @@
 /**
  * API v1 Client Service
- *
+ * 
  * Wrapper for calling the new API v1 endpoints
  * Gradually migrate from direct edge function calls to v1 API
- *
+ * 
  * FEATURES:
  * - Offline handling: Checks network before making requests
  * - Auto token refresh: Refreshes expired tokens on 401
@@ -11,7 +11,7 @@
  */
 
 import NetInfo from '@react-native-community/netinfo';
-import type { User, Session } from '@supabase/supabase-js';
+import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { sessionManager } from './sessionManager';
 
@@ -37,7 +37,7 @@ export interface ApiResponse<T> {
  */
 class ApiClient {
   private sessionExpiredCallback: (() => void) | null = null;
-
+  
   /**
    * Set callback for session expired events
    * Used to trigger navigation to session expired screen
@@ -45,7 +45,7 @@ class ApiClient {
   setSessionExpiredCallback(callback: () => void) {
     this.sessionExpiredCallback = callback;
   }
-
+  
   /**
    * Check if device is online
    * Returns false if offline, preventing unnecessary requests
@@ -53,13 +53,12 @@ class ApiClient {
   private async checkNetwork(): Promise<boolean> {
     try {
       const netState = await NetInfo.fetch();
-      const isConnected =
-        netState.isConnected === true && netState.isInternetReachable !== false;
-
+      const isConnected = netState.isConnected === true && netState.isInternetReachable !== false;
+      
       if (!isConnected) {
         logger.warn('[API v1] Offline - request blocked');
       }
-
+      
       return isConnected;
     } catch (error) {
       // If NetInfo fails, assume connected (fail-open)
@@ -70,19 +69,19 @@ class ApiClient {
 
   private async getHeaders(useToken?: string): Promise<HeadersInit> {
     // Use provided token or get from session manager
-    const token = useToken || (await sessionManager.getValidToken());
-
+    const token = useToken || await sessionManager.getValidToken();
+    
     return {
       'Content-Type': 'application/json',
-      Authorization: token ? `Bearer ${token}` : '',
-      apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+      'Authorization': token ? `Bearer ${token}` : '',
+      'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
     };
   }
 
   async request<T>(
     method: string,
     path: string,
-    body?: unknown,
+    body?: any,
     isRetry = false,
   ): Promise<ApiResponse<T>> {
     try {
@@ -93,8 +92,7 @@ class ApiClient {
           success: false,
           error: {
             code: 'NETWORK_ERROR',
-            message:
-              'İnternet bağlantısı yok. Lütfen bağlantınızı kontrol edin.',
+            message: 'İnternet bağlantısı yok. Lütfen bağlantınızı kontrol edin.',
           },
         };
       }
@@ -117,10 +115,10 @@ class ApiClient {
       // ============================================
       if (response.status === 401 && !isRetry) {
         logger.warn('[API v1] 401 Unauthorized - attempting token refresh');
-
+        
         // Try to refresh token
         const newToken = await sessionManager.getValidToken();
-
+        
         if (newToken) {
           // Retry request with new token
           logger.info('[API v1] Token refreshed, retrying request');
@@ -128,12 +126,12 @@ class ApiClient {
         } else {
           // Refresh failed - session expired
           logger.error('[API v1] Token refresh failed - session expired');
-
+          
           // Trigger session expired callback
           if (this.sessionExpiredCallback) {
             this.sessionExpiredCallback();
           }
-
+          
           return {
             success: false,
             error: {
@@ -159,21 +157,18 @@ class ApiClient {
       return data as ApiResponse<T>;
     } catch (error) {
       logger.error('[API v1] Request failed:', error);
-
+      
       // Better error messaging for network errors
-      const isNetworkError =
-        error instanceof TypeError &&
+      const isNetworkError = error instanceof TypeError && 
         (error.message.includes('Network') || error.message.includes('fetch'));
-
+      
       return {
         success: false,
         error: {
           code: isNetworkError ? 'NETWORK_ERROR' : 'REQUEST_ERROR',
-          message: isNetworkError
+          message: isNetworkError 
             ? 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.'
-            : error instanceof Error
-            ? error.message
-            : 'Request failed',
+            : (error instanceof Error ? error.message : 'Request failed'),
         },
       };
     }
@@ -184,15 +179,15 @@ class ApiClient {
     return this.request<T>('GET', path);
   }
 
-  post<T>(path: string, body: unknown) {
+  post<T>(path: string, body: any) {
     return this.request<T>('POST', path, body);
   }
 
-  put<T>(path: string, body: unknown) {
+  put<T>(path: string, body: any) {
     return this.request<T>('PUT', path, body);
   }
 
-  patch<T>(path: string, body: unknown) {
+  patch<T>(path: string, body: any) {
     return this.request<T>('PATCH', path, body);
   }
 
@@ -203,45 +198,9 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
-// API Response Types
-interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  username: string;
-  avatar: string;
-  bio?: string;
-  verified: boolean;
-}
-
-interface Moment {
-  id: string;
-  user_id: string;
-  title: string;
-  description: string;
-  category: string;
-  price: number;
-  status: string;
-  created_at: string;
-}
-
-interface Request {
-  id: string;
-  moment_id: string;
-  user_id: string;
-  status: string;
-  message?: string;
-  created_at: string;
-}
-
-interface LoginResponse {
-  user: User;
-  session: Session;
-}
-
 /**
  * API v1 Service Methods
- *
+ * 
  * Gradually migrate to these methods from direct Supabase calls
  */
 export const apiV1Service = {
@@ -249,7 +208,10 @@ export const apiV1Service = {
   // AUTH
   // ============================================
   async login(email: string, password: string) {
-    return apiClient.post<LoginResponse>('/auth/login', { email, password });
+    return apiClient.post<{
+      user: any;
+      session: any;
+    }>('/auth/login', { email, password });
   },
 
   async logout() {
@@ -260,12 +222,12 @@ export const apiV1Service = {
   // USERS
   // ============================================
   async getUser(userId: string) {
-    return apiClient.get<UserProfile>(`/users/${userId}`);
+    return apiClient.get<any>(`/users/${userId}`);
   },
 
   async getUserMoments(userId: string) {
     return apiClient.get<{
-      moments: Moment[];
+      moments: any[];
       count: number;
     }>(`/users/${userId}/moments`);
   },
@@ -285,7 +247,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      moments: Moment[];
+      moments: any[];
       pagination: {
         total: number;
         limit: number;
@@ -296,7 +258,7 @@ export const apiV1Service = {
   },
 
   async getMoment(momentId: string) {
-    return apiClient.get<Moment>(`/moments/${momentId}`);
+    return apiClient.get<any>(`/moments/${momentId}`);
   },
 
   // ============================================
@@ -314,7 +276,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      requests: Request[];
+      requests: any[];
       count: number;
     }>(`/requests${query ? `?${query}` : ''}`);
   },
@@ -322,7 +284,7 @@ export const apiV1Service = {
 
 /**
  * Migration Examples
- *
+ * 
  * BEFORE (Direct Supabase call):
  * ```typescript
  * const { data, error } = await supabase
@@ -330,7 +292,7 @@ export const apiV1Service = {
  *   .select('*')
  *   .eq('category', 'food');
  * ```
- *
+ * 
  * AFTER (API v1):
  * ```typescript
  * const response = await apiV1Service.listMoments({ category: 'food' });
@@ -338,7 +300,7 @@ export const apiV1Service = {
  *   const moments = response.data?.moments;
  * }
  * ```
- *
+ * 
  * Benefits:
  * 1. Consistent error handling
  * 2. Standardized response format

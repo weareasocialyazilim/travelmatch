@@ -5,9 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
   Switch,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '@/constants/colors';
@@ -126,7 +126,7 @@ export const NotificationSettingsScreen: React.FC<
             })),
           );
         }
-      } catch {
+      } catch (error) {
         logger.debug('Failed to load notification settings');
       }
     };
@@ -135,10 +135,9 @@ export const NotificationSettingsScreen: React.FC<
 
   const toggleSetting = async (sectionIndex: number, settingId: string) => {
     const newSections = [...sections];
-    const section = newSections[sectionIndex];
-    if (!section) return;
-
-    const setting = section.settings.find((s) => s.id === settingId);
+    const setting = newSections[sectionIndex].settings.find(
+      (s) => s.id === settingId,
+    );
     if (setting) {
       setting.value = !setting.value;
       setSections(newSections);
@@ -152,7 +151,7 @@ export const NotificationSettingsScreen: React.FC<
       });
       try {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allSettings));
-      } catch {
+      } catch (error) {
         logger.debug('Failed to save notification settings');
       }
     }

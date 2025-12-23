@@ -9,31 +9,8 @@ import { ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import * as authService from '@/services/supabaseAuthService';
-import {
-  secureStorage,
-  AUTH_STORAGE_KEYS,
-  StorageKeys,
-} from '@/utils/secureStorage';
+import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '@/utils/secureStorage';
 import type { User } from '@/types/index';
-
-/**
- * Test fixture helpers - build test data at runtime to avoid
- * static analysis false positives for hardcoded secrets.
- * These are mock credentials for testing only, not real secrets.
- */
-const TestCredentials = {
-  email: () => ['test', '@', 'example.com'].join(''),
-  newEmail: () => ['new', '@', 'example.com'].join(''),
-  existingEmail: () => ['existing', '@', 'example.com'].join(''),
-  nonexistentEmail: () => ['nonexistent', '@', 'example.com'].join(''),
-  password: () => ['pass', 'word', '123'].join(''),
-  wrongPassword: () => 'wrong',
-  weakPassword: () => 'weak',
-  newPassword: () => ['new', 'pass', '123'].join(''),
-  accessToken: () => ['access', 'token', '123'].join('-'),
-  refreshToken: () => ['refresh', 'token', '123'].join('-'),
-  userId: () => ['user', '123'].join('-'),
-};
 
 // Mock Supabase config first
 jest.mock('@/config/supabase', () => ({
@@ -50,18 +27,7 @@ jest.mock('@/config/supabase', () => ({
 
 // Mock dependencies
 jest.mock('@/services/supabaseAuthService');
-jest.mock('@/utils/secureStorage', () => {
-  const originalModule = jest.requireActual('@/utils/secureStorage');
-  return {
-    ...originalModule,
-    secureStorage: {
-      getItem: jest.fn(),
-      setItem: jest.fn(),
-      deleteItem: jest.fn(),
-      deleteItems: jest.fn(),
-    },
-  };
-});
+jest.mock('@/utils/secureStorage');
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <AuthProvider>{children}</AuthProvider>
@@ -72,30 +38,30 @@ const USER_STORAGE_KEY = StorageKeys.PUBLIC.USER_PROFILE;
 
 describe('useAuth', () => {
   // mockUser must include all fields created by AuthContext.createUser
-  const getMockUser = (): User => ({
-    id: TestCredentials.userId(),
-    email: TestCredentials.email(),
+  const mockUser: User = {
+    id: 'user-123',
+    email: 'test@example.com',
     name: 'Test User',
     avatar: 'https://example.com/avatar.jpg',
     role: 'Traveler',
-    kycStatus: 'Unverified',
-    location: { latitude: 0, longitude: 0 },
-  });
+    kyc: 'Unverified',
+    location: { lat: 0, lng: 0 },
+  };
 
-  const getMockSession = () => ({
-    access_token: TestCredentials.accessToken(),
-    refresh_token: TestCredentials.refreshToken(),
+  const mockSession = {
+    access_token: 'access-token-123',
+    refresh_token: 'refresh-token-123',
     expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
-  });
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
     await AsyncStorage.clear();
-
+    
     // Mock secureStorage methods
-    secureStorage.getItem.mockResolvedValue(null);
-    secureStorage.setItem.mockResolvedValue(undefined);
-    secureStorage.deleteItems.mockResolvedValue(undefined);
+    (secureStorage.getItem ).mockResolvedValue(null);
+    (secureStorage.setItem ).mockResolvedValue(undefined);
+    (secureStorage.deleteItems ).mockResolvedValue(undefined);
   });
 
   describe('initial state', () => {
@@ -124,14 +90,14 @@ describe('useAuth', () => {
       // Mock stored data
       await AsyncStorage.setItem(
         USER_STORAGE_KEY,
-        JSON.stringify(getMockUser()),
+        JSON.stringify(mockUser),
       );
 
-      secureStorage.getItem.mockImplementation((key: string) => {
+      (secureStorage.getItem ).mockImplementation((key: string) => {
         if (key === AUTH_STORAGE_KEYS.ACCESS_TOKEN)
-          return Promise.resolve(TestCredentials.accessToken());
+          return Promise.resolve('access-token-123');
         if (key === AUTH_STORAGE_KEYS.REFRESH_TOKEN)
-          return Promise.resolve(TestCredentials.refreshToken());
+          return Promise.resolve('refresh-token-123');
         if (key === AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT)
           return Promise.resolve(String(Date.now() + 3600000));
         return Promise.resolve(null);
@@ -144,20 +110,20 @@ describe('useAuth', () => {
       });
 
       expect(result.current.isAuthenticated).toBe(true);
-      expect(result.current.user).toEqual(getMockUser());
+      expect(result.current.user).toEqual(mockUser);
     });
 
     it('should not restore expired session', async () => {
       await AsyncStorage.setItem(
         USER_STORAGE_KEY,
-        JSON.stringify(getMockUser()),
+        JSON.stringify(mockUser),
       );
 
-      secureStorage.getItem.mockImplementation((key: string) => {
+      (secureStorage.getItem ).mockImplementation((key: string) => {
         if (key === AUTH_STORAGE_KEYS.ACCESS_TOKEN)
-          return Promise.resolve(TestCredentials.accessToken());
+          return Promise.resolve('access-token-123');
         if (key === AUTH_STORAGE_KEYS.REFRESH_TOKEN)
-          return Promise.resolve(TestCredentials.refreshToken());
+          return Promise.resolve('refresh-token-123');
         if (key === AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT)
           return Promise.resolve(String(Date.now() - 1000)); // Expired
         return Promise.resolve(null);
@@ -175,16 +141,16 @@ describe('useAuth', () => {
 
   describe('login', () => {
     it('should login successfully with valid credentials', async () => {
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
+          id: mockUser.id,
+          email: mockUser.email,
           user_metadata: {
-            name: getMockUser().name,
-            avatar_url: getMockUser().avatar,
+            name: mockUser.name,
+            avatar_url: mockUser.avatar,
           },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -199,23 +165,23 @@ describe('useAuth', () => {
       };
       await act(async () => {
         loginResult = await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
       expect(loginResult.success).toBe(true);
       expect(loginResult.error).toBeUndefined();
       expect(result.current.isAuthenticated).toBe(true);
-      expect(result.current.user).toEqual(getMockUser());
+      expect(result.current.user).toEqual(mockUser);
       expect(authService.signInWithEmail).toHaveBeenCalledWith(
-        TestCredentials.email(),
-        TestCredentials.password(),
+        'test@example.com',
+        'password123',
       );
     });
 
     it('should handle invalid credentials', async () => {
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: null,
         session: null,
         error: new Error('Invalid credentials'),
@@ -232,8 +198,8 @@ describe('useAuth', () => {
       };
       await act(async () => {
         loginResult = await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.wrongPassword(),
+          email: 'test@example.com',
+          password: 'wrong',
         });
       });
 
@@ -244,7 +210,9 @@ describe('useAuth', () => {
     });
 
     it('should handle network errors', async () => {
-      authService.signInWithEmail.mockRejectedValue(new Error('Network error'));
+      (authService.signInWithEmail ).mockRejectedValue(
+        new Error('Network error'),
+      );
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -257,8 +225,8 @@ describe('useAuth', () => {
       };
       await act(async () => {
         loginResult = await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
@@ -267,16 +235,13 @@ describe('useAuth', () => {
     });
 
     it('should persist user and tokens after login', async () => {
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: {
-            name: getMockUser().name,
-            avatar_url: getMockUser().avatar,
-          },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name, avatar_url: mockUser.avatar },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -288,37 +253,37 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
       // Verify AsyncStorage was called
       const storedUser = await AsyncStorage.getItem(USER_STORAGE_KEY);
       expect(storedUser).toBeTruthy();
-      expect(JSON.parse(storedUser!)).toEqual(getMockUser());
+      expect(JSON.parse(storedUser!)).toEqual(mockUser);
 
       // Verify secureStorage was called
       expect(secureStorage.setItem).toHaveBeenCalledWith(
         AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-        getMockSession().access_token,
+        mockSession.access_token,
       );
       expect(secureStorage.setItem).toHaveBeenCalledWith(
         AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-        getMockSession().refresh_token,
+        mockSession.refresh_token,
       );
     });
   });
 
   describe('register', () => {
     it('should register new user successfully', async () => {
-      authService.signUpWithEmail.mockResolvedValue({
+      (authService.signUpWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -333,8 +298,8 @@ describe('useAuth', () => {
       };
       await act(async () => {
         registerResult = await result.current.register({
-          email: TestCredentials.newEmail(),
-          password: TestCredentials.password(),
+          email: 'new@example.com',
+          password: 'password123',
           name: 'New User',
         });
       });
@@ -342,14 +307,14 @@ describe('useAuth', () => {
       expect(registerResult.success).toBe(true);
       expect(result.current.isAuthenticated).toBe(true);
       expect(authService.signUpWithEmail).toHaveBeenCalledWith(
-        TestCredentials.newEmail(),
-        TestCredentials.password(),
+        'new@example.com',
+        'password123',
         { name: 'New User' },
       );
     });
 
     it('should handle duplicate email error', async () => {
-      authService.signUpWithEmail.mockResolvedValue({
+      (authService.signUpWithEmail ).mockResolvedValue({
         user: null,
         session: null,
         error: new Error('User already exists'),
@@ -366,8 +331,8 @@ describe('useAuth', () => {
       };
       await act(async () => {
         registerResult = await result.current.register({
-          email: TestCredentials.existingEmail(),
-          password: TestCredentials.password(),
+          email: 'existing@example.com',
+          password: 'password123',
           name: 'Test',
         });
       });
@@ -377,7 +342,7 @@ describe('useAuth', () => {
     });
 
     it('should handle weak password error', async () => {
-      authService.signUpWithEmail.mockRejectedValue(
+      (authService.signUpWithEmail ).mockRejectedValue(
         new Error('Password too weak'),
       );
 
@@ -392,7 +357,7 @@ describe('useAuth', () => {
       };
       await act(async () => {
         registerResult = await result.current.register({
-          email: TestCredentials.email(),
+          email: 'test@example.com',
           password: '123',
           name: 'Test',
         });
@@ -403,11 +368,11 @@ describe('useAuth', () => {
     });
 
     it('should handle registration without immediate session', async () => {
-      authService.signUpWithEmail.mockResolvedValue({
+      (authService.signUpWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
         session: null, // Email confirmation required
         error: null,
@@ -424,8 +389,8 @@ describe('useAuth', () => {
       };
       await act(async () => {
         registerResult = await result.current.register({
-          email: TestCredentials.newEmail(),
-          password: TestCredentials.password(),
+          email: 'new@example.com',
+          password: 'password123',
           name: 'New User',
         });
       });
@@ -439,13 +404,13 @@ describe('useAuth', () => {
   describe('logout', () => {
     it('should logout successfully', async () => {
       // Setup authenticated state
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -457,15 +422,15 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
       expect(result.current.isAuthenticated).toBe(true);
 
       // Mock signOut
-      authService.signOut.mockResolvedValue({ error: null });
+      (authService.signOut ).mockResolvedValue({ error: null });
 
       // Logout
       await act(async () => {
@@ -479,13 +444,13 @@ describe('useAuth', () => {
 
     it('should clear local data even if server logout fails', async () => {
       // Setup authenticated state
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -497,13 +462,15 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
       // Mock failed signOut
-      authService.signOut.mockRejectedValue(new Error('Network error'));
+      (authService.signOut ).mockRejectedValue(
+        new Error('Network error'),
+      );
 
       // Logout should still clear local state
       await act(async () => {
@@ -516,13 +483,13 @@ describe('useAuth', () => {
 
     it('should clear storage on logout', async () => {
       // Setup authenticated state
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -534,12 +501,12 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
-      authService.signOut.mockResolvedValue({ error: null });
+      (authService.signOut ).mockResolvedValue({ error: null });
 
       await act(async () => {
         await result.current.logout();
@@ -556,12 +523,12 @@ describe('useAuth', () => {
       // Setup authenticated state with valid token
       await AsyncStorage.setItem(
         USER_STORAGE_KEY,
-        JSON.stringify(getMockUser()),
+        JSON.stringify(mockUser),
       );
 
       const futureExpiry = Date.now() + 3600000; // 1 hour from now
 
-      secureStorage.getItem.mockImplementation((key: string) => {
+      (secureStorage.getItem ).mockImplementation((key: string) => {
         if (key === AUTH_STORAGE_KEYS.ACCESS_TOKEN)
           return Promise.resolve('valid-token');
         if (key === AUTH_STORAGE_KEYS.REFRESH_TOKEN)
@@ -603,13 +570,13 @@ describe('useAuth', () => {
 
   describe('updateUser', () => {
     it('should update user data locally', async () => {
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -621,8 +588,8 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
@@ -638,13 +605,13 @@ describe('useAuth', () => {
     });
 
     it('should persist updated user to storage', async () => {
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -656,8 +623,8 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
@@ -675,13 +642,13 @@ describe('useAuth', () => {
 
   describe('refreshUser', () => {
     it('should refresh user data from server', async () => {
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -693,18 +660,15 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
-      authService.getCurrentUser.mockResolvedValue({
-        id: getMockUser().id,
-        email: getMockUser().email,
-        user_metadata: {
-          name: 'Server Updated Name',
-          avatar_url: 'new-avatar.jpg',
-        },
+      (authService.getCurrentUser ).mockResolvedValue({
+        id: mockUser.id,
+        email: mockUser.email,
+        user_metadata: { name: 'Server Updated Name', avatar_url: 'new-avatar.jpg' },
       });
 
       await act(async () => {
@@ -716,13 +680,13 @@ describe('useAuth', () => {
     });
 
     it('should handle refresh errors silently', async () => {
-      authService.signInWithEmail.mockResolvedValue({
+      (authService.signInWithEmail ).mockResolvedValue({
         user: {
-          id: getMockUser().id,
-          email: getMockUser().email,
-          user_metadata: { name: getMockUser().name },
+          id: mockUser.id,
+          email: mockUser.email,
+          user_metadata: { name: mockUser.name },
         },
-        session: getMockSession(),
+        session: mockSession,
         error: null,
       });
 
@@ -734,27 +698,29 @@ describe('useAuth', () => {
 
       await act(async () => {
         await result.current.login({
-          email: TestCredentials.email(),
-          password: TestCredentials.password(),
+          email: 'test@example.com',
+          password: 'password123',
         });
       });
 
-      authService.getCurrentUser.mockRejectedValue(new Error('Network error'));
+      (authService.getCurrentUser ).mockRejectedValue(
+        new Error('Network error'),
+      );
 
       await act(async () => {
         await result.current.refreshUser();
       });
 
       // User should remain unchanged (avatar may be undefined after login without it)
-      expect(result.current.user?.name).toBe(getMockUser().name);
-      expect(result.current.user?.email).toBe(getMockUser().email);
+      expect(result.current.user?.name).toBe(mockUser.name);
+      expect(result.current.user?.email).toBe(mockUser.email);
       expect(result.current.isAuthenticated).toBe(true);
     });
   });
 
   describe('password operations', () => {
     it('should request password reset', async () => {
-      authService.resetPassword.mockResolvedValue({
+      (authService.resetPassword ).mockResolvedValue({
         error: null,
       });
 
@@ -768,19 +734,15 @@ describe('useAuth', () => {
         success: false,
       };
       await act(async () => {
-        resetResult = await result.current.forgotPassword(
-          TestCredentials.email(),
-        );
+        resetResult = await result.current.forgotPassword('test@example.com');
       });
 
       expect(resetResult.success).toBe(true);
-      expect(authService.resetPassword).toHaveBeenCalledWith(
-        TestCredentials.email(),
-      );
+      expect(authService.resetPassword).toHaveBeenCalledWith('test@example.com');
     });
 
     it('should handle password reset errors', async () => {
-      authService.resetPassword.mockResolvedValue({
+      (authService.resetPassword ).mockResolvedValue({
         error: new Error('User not found'),
       });
 
@@ -795,7 +757,7 @@ describe('useAuth', () => {
       };
       await act(async () => {
         resetResult = await result.current.forgotPassword(
-          TestCredentials.nonexistentEmail(),
+          'nonexistent@example.com',
         );
       });
 

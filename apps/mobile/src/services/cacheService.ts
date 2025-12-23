@@ -108,7 +108,6 @@ class CacheService {
     const now = Date.now();
 
     // Compress large data
-     
     let finalData: any = data;
     let compressed = false;
     let size = calculateSize(data);
@@ -128,7 +127,7 @@ class CacheService {
             key,
             originalSize: calculateSize(data),
             compressedSize: size,
-            ratio: ((size / calculateSize(data)) * 100).toFixed(1) + '%',
+            ratio: (size / calculateSize(data) * 100).toFixed(1) + '%',
           });
         }
       } catch (error) {
@@ -425,10 +424,7 @@ class CacheService {
       // Evict oldest items until we have enough space
       let freedSpace = 0;
       for (const { key, item } of items) {
-        if (
-          this.currentSize - freedSpace + requiredSpace <=
-          MAX_CACHE_SIZE_BYTES * 0.8
-        ) {
+        if (this.currentSize - freedSpace + requiredSpace <= MAX_CACHE_SIZE_BYTES * 0.8) {
           break; // Leave 20% buffer
         }
 

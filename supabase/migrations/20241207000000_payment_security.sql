@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
-CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at DESC);
+CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
 
 -- ============================================
 -- CACHE INVALIDATION TABLE
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS cache_invalidation (
   invalidated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
-CREATE INDEX IF NOT EXISTS idx_cache_invalidation_key ON cache_invalidation(cache_key);
-CREATE INDEX IF NOT EXISTS idx_cache_invalidation_timestamp ON cache_invalidation(invalidated_at DESC);
+CREATE INDEX idx_cache_invalidation_key ON cache_invalidation(cache_key);
+CREATE INDEX idx_cache_invalidation_timestamp ON cache_invalidation(invalidated_at DESC);
 
 -- ============================================
 -- PROCESSED WEBHOOK EVENTS TABLE
@@ -48,8 +48,8 @@ CREATE TABLE IF NOT EXISTS processed_webhook_events (
   metadata JSONB DEFAULT '{}'::jsonb
 );
 
-CREATE INDEX IF NOT EXISTS idx_webhook_events_event_id ON processed_webhook_events(event_id);
-CREATE INDEX IF NOT EXISTS idx_webhook_events_processed_at ON processed_webhook_events(processed_at DESC);
+CREATE INDEX idx_webhook_events_event_id ON processed_webhook_events(event_id);
+CREATE INDEX idx_webhook_events_processed_at ON processed_webhook_events(processed_at DESC);
 
 -- ============================================
 -- EXTEND USERS TABLE FOR STRIPE
@@ -122,13 +122,11 @@ $$ LANGUAGE plpgsql;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- Users can only view their own audit logs
-DROP POLICY IF EXISTS audit_logs_select_policy ON audit_logs;
 CREATE POLICY audit_logs_select_policy ON audit_logs
   FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Only service role can insert audit logs
-DROP POLICY IF EXISTS audit_logs_insert_policy ON audit_logs;
 CREATE POLICY audit_logs_insert_policy ON audit_logs
   FOR INSERT
   WITH CHECK (auth.role() = 'service_role');
@@ -137,21 +135,18 @@ CREATE POLICY audit_logs_insert_policy ON audit_logs
 ALTER TABLE cache_invalidation ENABLE ROW LEVEL SECURITY;
 
 -- Allow authenticated users to read cache invalidation records
-DROP POLICY IF EXISTS cache_invalidation_select_policy ON cache_invalidation;
 CREATE POLICY cache_invalidation_select_policy ON cache_invalidation
   FOR SELECT
   TO authenticated
   USING (true);
 
 -- Only service role can insert cache invalidation records
-DROP POLICY IF EXISTS cache_invalidation_insert_policy ON cache_invalidation;
 CREATE POLICY cache_invalidation_insert_policy ON cache_invalidation
   FOR INSERT
   WITH CHECK (auth.role() = 'service_role');
 
 -- Enable RLS on webhook events
 ALTER TABLE processed_webhook_events ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS webhook_events_policy ON processed_webhook_events;
 
 -- Only service role can access webhook events
 CREATE POLICY webhook_events_policy ON processed_webhook_events
@@ -164,12 +159,7 @@ CREATE POLICY webhook_events_policy ON processed_webhook_events
 -- ============================================
 
 -- Enable realtime for transactions (for real-time payment updates)
-DO $$
-BEGIN
-  ALTER PUBLICATION supabase_realtime ADD TABLE transactions;
-EXCEPTION
-  WHEN duplicate_object THEN NULL;
-END $$;
+ALTER PUBLICATION supabase_realtime ADD TABLE transactions;
 
 -- ============================================
 -- CLEANUP FUNCTION

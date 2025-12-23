@@ -44,11 +44,7 @@ describe('RequestCard', () => {
 
   it('should render request card with person info', () => {
     const { getByText } = render(
-      <RequestCard
-        item={mockRequest}
-        onAccept={mockOnAccept}
-        onDecline={mockOnDecline}
-      />,
+      <RequestCard item={mockRequest} onAccept={mockOnAccept} onDecline={mockOnDecline} />
     );
 
     expect(getByText('John Doe, 30')).toBeTruthy();
@@ -58,26 +54,17 @@ describe('RequestCard', () => {
   });
 
   it('should show verified badge for verified users', () => {
-    const { getByText } = render(
-      <RequestCard
-        item={mockRequest}
-        onAccept={mockOnAccept}
-        onDecline={mockOnDecline}
-      />,
+    const { UNSAFE_getByType } = render(
+      <RequestCard item={mockRequest} onAccept={mockOnAccept} onDecline={mockOnDecline} />
     );
 
-    // Verified badge is shown via the person's info
-    // Just verify the card renders properly for a verified user
-    expect(getByText('John Doe, 30')).toBeTruthy();
+    const verifiedBadge = UNSAFE_getByType('View');
+    expect(verifiedBadge).toBeTruthy();
   });
 
   it('should call onAccept when accept button is pressed', () => {
     const { getByText } = render(
-      <RequestCard
-        item={mockRequest}
-        onAccept={mockOnAccept}
-        onDecline={mockOnDecline}
-      />,
+      <RequestCard item={mockRequest} onAccept={mockOnAccept} onDecline={mockOnDecline} />
     );
 
     const acceptButton = getByText('Accept');
@@ -88,11 +75,7 @@ describe('RequestCard', () => {
 
   it('should call onDecline when decline button is pressed', () => {
     const { getByText } = render(
-      <RequestCard
-        item={mockRequest}
-        onAccept={mockOnAccept}
-        onDecline={mockOnDecline}
-      />,
+      <RequestCard item={mockRequest} onAccept={mockOnAccept} onDecline={mockOnDecline} />
     );
 
     const declineButton = getByText('Decline');
@@ -102,17 +85,9 @@ describe('RequestCard', () => {
   });
 
   it('should show proof required indicator when proofRequired is true', () => {
-    const requestWithProof = {
-      ...mockRequest,
-      proofRequired: true,
-      proofUploaded: false,
-    };
+    const requestWithProof = { ...mockRequest, proofRequired: true, proofUploaded: false };
     const { getByText } = render(
-      <RequestCard
-        item={requestWithProof}
-        onAccept={mockOnAccept}
-        onDecline={mockOnDecline}
-      />,
+      <RequestCard item={requestWithProof} onAccept={mockOnAccept} onDecline={mockOnDecline} />
     );
 
     expect(getByText('Proof Required')).toBeTruthy();
@@ -120,17 +95,9 @@ describe('RequestCard', () => {
   });
 
   it('should show proof uploaded when proof is uploaded', () => {
-    const requestWithProof = {
-      ...mockRequest,
-      proofRequired: true,
-      proofUploaded: true,
-    };
+    const requestWithProof = { ...mockRequest, proofRequired: true, proofUploaded: true };
     const { getByText } = render(
-      <RequestCard
-        item={requestWithProof}
-        onAccept={mockOnAccept}
-        onDecline={mockOnDecline}
-      />,
+      <RequestCard item={requestWithProof} onAccept={mockOnAccept} onDecline={mockOnDecline} />
     );
 
     expect(getByText('Proof Uploaded')).toBeTruthy();
@@ -138,27 +105,15 @@ describe('RequestCard', () => {
   });
 
   it('should navigate to profile when avatar is pressed', () => {
-    const { getByLabelText, queryByLabelText } = render(
-      <RequestCard
-        item={mockRequest}
-        onAccept={mockOnAccept}
-        onDecline={mockOnDecline}
-      />,
+    const { UNSAFE_getAllByType } = render(
+      <RequestCard item={mockRequest} onAccept={mockOnAccept} onDecline={mockOnDecline} />
     );
 
-    // Try to find avatar by accessibility label, or skip if not implemented
-    const avatarTouchable =
-      queryByLabelText(/John Doe/i) || queryByLabelText(/avatar/i);
+    const touchables = UNSAFE_getAllByType('TouchableOpacity');
+    const avatarTouchable = touchables[0]; // First touchable is avatar
+    
+    fireEvent.press(avatarTouchable);
 
-    if (avatarTouchable) {
-      fireEvent.press(avatarTouchable);
-      expect(mockNavigate).toHaveBeenCalledWith('ProfileDetail', {
-        userId: 'user1',
-      });
-    } else {
-      // Avatar press navigation may not be implemented with accessible label
-      // Just verify the card renders
-      expect(true).toBe(true);
-    }
+    expect(mockNavigate).toHaveBeenCalledWith('ProfileDetail', { userId: 'user1' });
   });
 });

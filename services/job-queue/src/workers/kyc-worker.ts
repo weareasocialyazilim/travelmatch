@@ -3,36 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 import { KycJobData, KycJobResult, KycJobSchema } from '../jobs/index.js';
 import Redis from 'ioredis';
 
-// Onfido API response types
-interface OnfidoReportBreakdown {
-  result: string;
-  [key: string]: unknown;
-}
-
-interface OnfidoReport {
-  result: 'clear' | 'consider' | 'unidentified';
-  name: string;
-  breakdown?: OnfidoReportBreakdown[];
-}
-
-interface OnfidoCheckResult {
-  id: string;
-  status: 'in_progress' | 'awaiting_applicant' | 'complete' | 'withdrawn' | 'paused' | 'reopened';
-  result: 'clear' | 'consider' | 'unidentified' | null;
-  reports?: OnfidoReport[];
-}
-
-// Stripe Identity response types
-interface StripeVerificationSession {
-  id: string;
-  status: 'requires_input' | 'processing' | 'verified' | 'canceled';
-  livemode: boolean;
-  last_error?: {
-    code: string;
-    reason: string;
-  } | null;
-}
-
 // Initialize Supabase client with service role key
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -137,7 +107,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   // 4. Poll for results (in production, use webhooks)
   let attempts = 0;
   const maxAttempts = 20; // 20 * 3s = 60s max wait
-  let checkResult: OnfidoCheckResult | null = null;
+  let checkResult: any;
 
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait 3s
@@ -152,7 +122,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
       throw new Error(`Onfido check retrieval failed: ${resultResponse.statusText}`);
     }
 
-    checkResult = await resultResponse.json() as OnfidoCheckResult;
+    checkResult = await resultResponse.json();
 
     if (checkResult.status === 'complete') {
       break;
@@ -168,8 +138,8 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   // 5. Parse result
   const isVerified = checkResult.result === 'clear';
   const rejectionReasons = checkResult.reports
-    ?.filter((r: OnfidoReport) => r.result !== 'clear')
-    .map((r: OnfidoReport) => r.breakdown?.map((b: OnfidoReportBreakdown) => b.result).join(', '))
+    ?.filter((r: any) => r.result !== 'clear')
+    .map((r: any) => r.breakdown?.map((b: any) => b.result).join(', '))
     .filter(Boolean);
 
   return {
@@ -234,7 +204,7 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
   // 3. Poll for verification result
   let attempts = 0;
   const maxAttempts = 20;
-  let verificationResult: StripeVerificationSession | null = null;
+  let verificationResult: any;
 
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -252,7 +222,7 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
       throw new Error(`Stripe result retrieval failed: ${resultResponse.statusText}`);
     }
 
-    verificationResult = await resultResponse.json() as StripeVerificationSession;
+    verificationResult = await resultResponse.json();
 
     if (verificationResult.status === 'verified' || verificationResult.status === 'requires_input') {
       break;

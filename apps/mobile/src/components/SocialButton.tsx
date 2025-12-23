@@ -47,10 +47,7 @@ const SocialButton: React.FC<SocialButtonProps> = memo(
     const config = useMemo(() => providerConfig[provider], [provider]);
 
     // Memoize display text
-    const displayText = useMemo(
-      () => label || config.text,
-      [label, config.text],
-    );
+    const displayText = useMemo(() => label || config.text, [label, config.text]);
 
     if (size === 'icon') {
       return (

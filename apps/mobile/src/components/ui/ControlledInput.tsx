@@ -11,10 +11,11 @@ import { Input } from './Input';
 import { PasswordInput } from './PasswordInput';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
-interface ControlledInputProps<T extends FieldValues> extends Omit<
-  TextInputProps,
-  'value' | 'onChangeText' | 'onChange' | 'onBlur'
-> {
+interface ControlledInputProps<T extends FieldValues>
+  extends Omit<
+    TextInputProps,
+    'value' | 'onChangeText' | 'onChange' | 'onBlur'
+  > {
   name: Path<T>;
   control: Control<T>;
   label?: string;
@@ -25,11 +26,10 @@ interface ControlledInputProps<T extends FieldValues> extends Omit<
   required?: boolean;
   showSuccess?: boolean;
   isPassword?: boolean;
-  error?: string; // External error message (optional override)
 }
 
 interface InputWithValidationProps {
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   InputComponent: React.ComponentType<any>;
   onChange: (text: string) => void;
   onBlur: () => void;
@@ -116,7 +116,6 @@ export function ControlledInput<T extends FieldValues>({
   required,
   showSuccess,
   isPassword,
-  error: externalError,
   ...inputProps
 }: ControlledInputProps<T>) {
   return (
@@ -128,8 +127,6 @@ export function ControlledInput<T extends FieldValues>({
         fieldState: { error },
       }) => {
         const InputComponent = isPassword ? PasswordInput : Input;
-        // Use external error if provided, otherwise use form error
-        const finalError = externalError ? { message: externalError } : error;
 
         return (
           <InputWithValidation
@@ -138,7 +135,7 @@ export function ControlledInput<T extends FieldValues>({
             value={(value as string) ?? ''}
             onChange={(text: string) => onChange(text)}
             onBlur={() => onBlur()}
-            error={finalError}
+            error={error}
             hint={hint}
             leftIcon={leftIcon}
             rightIcon={rightIcon}

@@ -66,7 +66,7 @@ export async function uploadImage(
     }
 
     // FormData.append accepts Blob in browsers but React Native uses a different FormData implementation
-     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formData.append('file', file as Blob);
     
     // Add metadata

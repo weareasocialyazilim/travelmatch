@@ -11,29 +11,13 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   // Ignore errors from node_modules (package internal configs)
   "typescript.validate.enable": true,
-  // Exclude node_modules from TypeScript validation to avoid false positives
-  "typescript.preferences.includePackageJsonAutoImports": "on",
-
-  // Files - Exclude from TypeScript/Problems panel
-  "files.watcherExclude": {
-    "**/node_modules/**": true,
-    "**/.git/**": true
-  },
-
-  // Jest - Monorepo configuration
-  // This settings file is for root folder - Jest is disabled here
-  // Each sub-project should be opened separately OR use workspace file
-  "jest.enable": false,
-  "jest.autoRun": "off",
-  "jest.runMode": "on-demand",
 
   // ESLint
   "eslint.workingDirectories": [
-    { "directory": "apps/mobile", "changeProcessCWD": true },
-    { "directory": "apps/admin", "changeProcessCWD": true },
-    { "directory": "apps/web", "changeProcessCWD": true },
-    { "directory": "packages/design-system", "changeProcessCWD": true },
-    { "directory": "packages/shared", "changeProcessCWD": true }
+    "./apps/mobile",
+    "./admin",
+    "./packages/design-system",
+    "./packages/shared"
   ],
 
   // Files - exclude from search/watch
@@ -43,7 +27,7 @@
     "**/node_modules": true,
     "**/.turbo": true
   },
-
+  
   // Search - exclude node_modules from search
   "search.exclude": {
     "**/node_modules": true,
@@ -52,10 +36,10 @@
     "**/dist": true,
     "**/build": true
   },
-
+  
   // Python
   "python.analysis.typeCheckingMode": "strict",
-
+  
   // GitHub Actions
   "yaml.schemas": {
     "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"

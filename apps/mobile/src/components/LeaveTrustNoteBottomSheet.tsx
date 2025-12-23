@@ -58,7 +58,6 @@ export const LeaveTrustNoteBottomSheet: React.FC<
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <View style={styles.bottomSheet}>
           {/* Handle */}

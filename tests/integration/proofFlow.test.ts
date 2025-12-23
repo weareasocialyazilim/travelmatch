@@ -1,6 +1,6 @@
 /**
  * Proof System Integration Tests
- *
+ * 
  * End-to-end tests for proof submission and verification:
  * - Submit proof → AI verification → Moderator review → Status update
  * - Upload proof images → Verify → Update trust score
@@ -9,15 +9,6 @@
 
 import { supabase } from '../../config/supabase';
 import * as FileSystem from 'expo-file-system';
-
-/**
- * Test credential helpers - builds values at runtime to avoid
- * static analysis false positives for hardcoded credentials.
- */
-const TestCredentials = {
-  proofTestPassword: () => ['Test', 'Password', '123!'].join(''),
-  moderatorPassword: () => ['Mod', 'Password', '123!'].join(''),
-};
 
 describe('Proof System Integration Tests', () => {
   let testUserId: string;
@@ -28,7 +19,7 @@ describe('Proof System Integration Tests', () => {
     // Create test user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: `proof-test-${Date.now()}@example.com`,
-      password: TestCredentials.proofTestPassword(),
+      password: 'TestPassword123!',
     });
 
     if (authError) throw authError;
@@ -51,7 +42,7 @@ describe('Proof System Integration Tests', () => {
         type: 'coffee',
         price: 10,
         currency: 'USD',
-        location: { lat: 40.7128, lng: -74.006 },
+        location: { lat: 40.7128, lng: -74.0060 },
         status: 'active',
       })
       .select()
@@ -83,7 +74,7 @@ describe('Proof System Integration Tests', () => {
           status: 'pending',
           image_url: 'https://example.com/proof-image.jpg',
           metadata: {
-            location: { lat: 40.7128, lng: -74.006 },
+            location: { lat: 40.7128, lng: -74.0060 },
             timestamp: new Date().toISOString(),
           },
         })
@@ -94,7 +85,7 @@ describe('Proof System Integration Tests', () => {
       expect(proofData).toBeDefined();
       expect(proofData.status).toBe('pending');
       expect(proofData.type).toBe('photo');
-
+      
       testProofId = proofData.id;
 
       // Step 2: Verify proof is linked to moment
@@ -110,23 +101,19 @@ describe('Proof System Integration Tests', () => {
 
     it('should handle multiple proof types', async () => {
       const proofTypes = ['photo', 'receipt', 'location', 'timestamp'];
-
-      const promises = proofTypes.map((type) =>
-        supabase
-          .from('proofs')
-          .insert({
-            user_id: testUserId,
-            moment_id: testMomentId,
-            type,
-            status: 'pending',
-            image_url: `https://example.com/${type}-proof.jpg`,
-          })
-          .select()
-          .single(),
+      
+      const promises = proofTypes.map(type =>
+        supabase.from('proofs').insert({
+          user_id: testUserId,
+          moment_id: testMomentId,
+          type,
+          status: 'pending',
+          image_url: `https://example.com/${type}-proof.jpg`,
+        }).select().single()
       );
 
       const results = await Promise.all(promises);
-
+      
       results.forEach((result, index) => {
         expect(result.error).toBeNull();
         expect(result.data?.type).toBe(proofTypes[index]);
@@ -135,7 +122,7 @@ describe('Proof System Integration Tests', () => {
 
     it('should validate proof metadata', async () => {
       const validMetadata = {
-        location: { lat: 40.7128, lng: -74.006 },
+        location: { lat: 40.7128, lng: -74.0060 },
         timestamp: new Date().toISOString(),
         device: 'iPhone 14',
         confidence: 0.95,
@@ -173,7 +160,7 @@ describe('Proof System Integration Tests', () => {
         })
         .select()
         .single();
-
+      
       testProofId = data!.id;
     });
 
@@ -284,9 +271,9 @@ describe('Proof System Integration Tests', () => {
       // Create moderator account
       const { data: modData } = await supabase.auth.signUp({
         email: `moderator-${Date.now()}@example.com`,
-        password: TestCredentials.moderatorPassword(),
+        password: 'ModPassword123!',
       });
-
+      
       moderatorId = modData.user!.id;
 
       await supabase.from('profiles').insert({
@@ -321,8 +308,7 @@ describe('Proof System Integration Tests', () => {
     });
 
     it('should approve proof after moderator review', async () => {
-      const reviewNotes =
-        'Valid proof verified. Location matches, timestamp correct.';
+      const reviewNotes = 'Valid proof verified. Location matches, timestamp correct.';
 
       const { data, error } = await supabase
         .from('proofs')
@@ -364,8 +350,7 @@ describe('Proof System Integration Tests', () => {
         .select()
         .single();
 
-      const rejectionReason =
-        'Image quality too low, cannot verify authenticity';
+      const rejectionReason = 'Image quality too low, cannot verify authenticity';
 
       const { data, error } = await supabase
         .from('proofs')
@@ -392,11 +377,11 @@ describe('Proof System Integration Tests', () => {
         .eq('reviewed_by', moderatorId);
 
       expect(count).toBeGreaterThan(0);
-
+      
       // Calculate approval rate
-      const approved = reviews!.filter((p) => p.status === 'approved').length;
+      const approved = reviews!.filter(p => p.status === 'approved').length;
       const approvalRate = approved / count!;
-
+      
       expect(approvalRate).toBeGreaterThanOrEqual(0);
       expect(approvalRate).toBeLessThanOrEqual(1);
     });
@@ -529,9 +514,8 @@ describe('Proof System Integration Tests', () => {
         .single();
 
       // Submit appeal
-      const appealReason =
-        'The image quality is sufficient for verification. Request re-review.';
-
+      const appealReason = 'The image quality is sufficient for verification. Request re-review.';
+      
       const { data, error } = await supabase
         .from('proofs')
         .update({
@@ -571,8 +555,7 @@ describe('Proof System Integration Tests', () => {
           status: 'approved',
           appeal_reviewed_at: new Date().toISOString(),
           appeal_decision: 'approved',
-          appeal_notes:
-            'Upon review, GPS inaccuracy confirmed. Proof approved.',
+          appeal_notes: 'Upon review, GPS inaccuracy confirmed. Proof approved.',
         })
         .eq('id', appealedProof!.id)
         .select()
@@ -585,7 +568,7 @@ describe('Proof System Integration Tests', () => {
 
     it('should limit number of appeals per user', async () => {
       const MAX_APPEALS = 3;
-
+      
       // Count user's appeals
       const { count } = await supabase
         .from('proofs')
@@ -594,7 +577,7 @@ describe('Proof System Integration Tests', () => {
         .eq('status', 'appealed');
 
       expect(count).toBeDefined();
-
+      
       // If user has reached limit, they shouldn't be able to appeal more
       if (count! >= MAX_APPEALS) {
         // This would be enforced by business logic
@@ -612,9 +595,9 @@ describe('Proof System Integration Tests', () => {
         .eq('user_id', testUserId);
 
       const total = allProofs!.length;
-      const approved = allProofs!.filter((p) => p.status === 'approved').length;
-      const rejected = allProofs!.filter((p) => p.status === 'rejected').length;
-
+      const approved = allProofs!.filter(p => p.status === 'approved').length;
+      const rejected = allProofs!.filter(p => p.status === 'rejected').length;
+      
       const successRate = total > 0 ? (approved / total) * 100 : 0;
 
       expect(successRate).toBeGreaterThanOrEqual(0);
@@ -625,19 +608,17 @@ describe('Proof System Integration Tests', () => {
     it('should calculate average AI confidence score', async () => {
       // Create proofs with varying AI scores
       const scores = [0.9, 0.85, 0.75, 0.95, 0.8];
-
-      await Promise.all(
-        scores.map((score) =>
-          supabase.from('proofs').insert({
-            user_id: testUserId,
-            moment_id: testMomentId,
-            type: 'photo',
-            status: 'pending',
-            image_url: 'https://example.com/test.jpg',
-            ai_score: score,
-          }),
-        ),
-      );
+      
+      await Promise.all(scores.map(score =>
+        supabase.from('proofs').insert({
+          user_id: testUserId,
+          moment_id: testMomentId,
+          type: 'photo',
+          status: 'pending',
+          image_url: 'https://example.com/test.jpg',
+          ai_score: score,
+        })
+      ));
 
       // Calculate average
       const { data: proofs } = await supabase
@@ -646,9 +627,8 @@ describe('Proof System Integration Tests', () => {
         .eq('user_id', testUserId)
         .not('ai_score', 'is', null);
 
-      const avgScore =
-        proofs!.reduce((sum, p) => sum + p.ai_score, 0) / proofs!.length;
-
+      const avgScore = proofs!.reduce((sum, p) => sum + p.ai_score, 0) / proofs!.length;
+      
       expect(avgScore).toBeGreaterThan(0);
       expect(avgScore).toBeLessThanOrEqual(1);
     });
@@ -672,7 +652,7 @@ describe('Proof System Integration Tests', () => {
   describe('Performance', () => {
     it('should submit proof within acceptable time', async () => {
       const start = Date.now();
-
+      
       await supabase.from('proofs').insert({
         user_id: testUserId,
         moment_id: testMomentId,

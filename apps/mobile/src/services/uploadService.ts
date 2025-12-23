@@ -282,7 +282,6 @@ const trackUploadAttempt = async (
 ): Promise<void> => {
   try {
     // Insert to file_uploads table (created in migration)
-    // @ts-expect-error - file_uploads table not yet in generated types
     await supabase.from('file_uploads').insert({
       user_id: userId,
       bucket_id: bucket,
@@ -310,9 +309,7 @@ const checkRateLimit = async (userId: string): Promise<boolean> => {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
     const { count, error } = await supabase
-       
-      // @ts-ignore - file_uploads table not yet in generated types
-      .from('file_uploads' as any)
+      .from('file_uploads')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
       .gte('uploaded_at', oneHourAgo);

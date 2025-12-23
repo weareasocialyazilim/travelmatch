@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,11 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
-  RefreshControl,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { usePayments } from '@/hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -21,7 +18,7 @@ type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 type FilterType = 'All' | 'Sent' | 'Received' | 'Withdrawals';
 
-interface DisplayTransaction {
+interface Transaction {
   id: string;
   type: 'received' | 'sent' | 'withdrawal';
   title: string;
@@ -35,80 +32,57 @@ interface DisplayTransaction {
 export const TransactionHistoryScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [filter, setFilter] = useState<FilterType>('All');
-  const [refreshing, setRefreshing] = useState(false);
 
-  const { transactions, transactionsLoading, loadTransactions } = usePayments();
+  const transactions: Transaction[] = [
+    {
+      id: '1',
+      type: 'received',
+      title: 'Gift from Alex Johnson',
+      date: 'Oct 26, 2023',
+      amount: 50.0,
+      status: 'Completed',
+      icon: 'inbox-arrow-down',
+      iconBgColor: COLORS.successTransparent33,
+    },
+    {
+      id: '2',
+      type: 'sent',
+      title: "Gift for Maria's trip",
+      date: 'Oct 24, 2023',
+      amount: -25.0,
+      status: 'Verified',
+      icon: 'inbox-arrow-up',
+      iconBgColor: `${COLORS.primary}33`,
+    },
+    {
+      id: '3',
+      type: 'withdrawal',
+      title: 'Withdrawal to Bank Account',
+      date: 'Oct 20, 2023',
+      amount: -150.0,
+      status: 'Pending',
+      icon: 'bank',
+      iconBgColor: `${COLORS.border}80`,
+    },
+    {
+      id: '4',
+      type: 'received',
+      title: 'Gift from Samantha Bee',
+      date: 'Oct 19, 2023',
+      amount: 75.0,
+      status: 'Failed',
+      icon: 'inbox-arrow-down',
+      iconBgColor: `${COLORS.border}80`,
+    },
+  ];
 
-  // Load transactions on mount
-  useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
-
-  // Map API transactions to display format
-  const displayTransactions: DisplayTransaction[] = useMemo(() => {
-    return transactions.map((t) => {
-      const isReceived = t.type === 'gift_received' || t.type === 'deposit';
-      const isWithdrawal = t.type === 'withdrawal';
-
-      let displayType: 'received' | 'sent' | 'withdrawal' = 'sent';
-      if (isReceived) displayType = 'received';
-      if (isWithdrawal) displayType = 'withdrawal';
-
-      let icon: IconName = 'inbox-arrow-up';
-      let iconBgColor = `${COLORS.primary}33`;
-
-      if (isReceived) {
-        icon = 'inbox-arrow-down';
-        iconBgColor = COLORS.successTransparent33;
-      } else if (isWithdrawal) {
-        icon = 'bank';
-        iconBgColor = `${COLORS.border}80`;
-      }
-
-      // Map status
-      let status: 'Completed' | 'Verified' | 'Pending' | 'Failed' = 'Completed';
-      if (t.status === 'pending' || t.status === 'processing')
-        status = 'Pending';
-      else if (t.status === 'failed') status = 'Failed';
-      else if (t.status === 'refunded') status = 'Failed';
-      else if (t.status === 'completed') status = 'Completed';
-
-      // Format date
-      const dateObj = new Date(t.date);
-      const formattedDate = dateObj.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-
-      return {
-        id: t.id,
-        type: displayType,
-        title: t.description || t.type.replace(/_/g, ' '),
-        date: formattedDate,
-        amount: t.amount,
-        status,
-        icon,
-        iconBgColor,
-      };
-    });
-  }, [transactions]);
-
-  const filteredTransactions = useMemo(() => {
-    return displayTransactions.filter((transaction) => {
-      if (filter === 'All') return true;
-      if (filter === 'Sent') return transaction.type === 'sent';
-      if (filter === 'Received') return transaction.type === 'received';
-      if (filter === 'Withdrawals') return transaction.type === 'withdrawal';
-      return true;
-    });
-  }, [displayTransactions, filter]);
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadTransactions();
-    setRefreshing(false);
-  };
+  const filteredTransactions = transactions.filter((transaction) => {
+    if (filter === 'All') return true;
+    if (filter === 'Sent') return transaction.type === 'sent';
+    if (filter === 'Received') return transaction.type === 'received';
+    if (filter === 'Withdrawals') return transaction.type === 'withdrawal';
+    return true;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -148,19 +122,7 @@ export const TransactionHistoryScreen: React.FC = () => {
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView
-        style={styles.content}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {/* Loading State */}
-        {transactionsLoading && !refreshing && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
-        )}
-
+      <ScrollView style={styles.content}>
         {/* Filter Buttons */}
         <View style={styles.filterContainer}>
           <View style={styles.filterButtonGroup}>
@@ -361,11 +323,6 @@ const styles = StyleSheet.create({
   filterButtonTextActive: {
     color: COLORS.text,
     fontWeight: '600',
-  },
-  loadingContainer: {
-    padding: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   transactionList: {
     paddingTop: 16,

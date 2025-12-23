@@ -209,7 +209,6 @@ export const FormInput: React.FC<FormInputProps> = ({
           <TouchableOpacity
             onPress={toggleSecureEntry}
             style={styles.rightIconButton}
-            testID={testID ? `${testID}-toggle-visibility` : undefined}
             accessibilityLabel={
               isSecureVisible ? 'Hide password' : 'Show password'
             }
@@ -226,7 +225,6 @@ export const FormInput: React.FC<FormInputProps> = ({
           <TouchableOpacity
             onPress={onRightIconPress}
             style={styles.rightIconButton}
-            testID={testID ? `${testID}-right-icon` : undefined}
             disabled={!onRightIconPress}
           >
             <MaterialCommunityIcons

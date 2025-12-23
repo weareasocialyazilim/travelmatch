@@ -20,10 +20,7 @@ export interface CardListItemProps {
 }
 
 // Brand config defined outside component to avoid recreation
-const brandConfig: Record<
-  string,
-  { icon: 'credit-card' | 'credit-card-outline'; color: string }
-> = {
+const brandConfig: Record<string, { icon: 'credit-card' | 'credit-card-outline'; color: string }> = {
   visa: { icon: 'credit-card', color: '#1A1F71' },
   mastercard: { icon: 'credit-card', color: '#EB001B' },
   amex: { icon: 'credit-card', color: '#006FCF' },
@@ -42,18 +39,12 @@ export const CardListItem: React.FC<CardListItemProps> = memo(
     onOptionsPress,
   }) => {
     // Memoize brand config to prevent recreation
-    const config = useMemo(
-      () => brandConfig[brand] ?? brandConfig.unknown,
-      [brand],
-    );
+    const config = useMemo(() => brandConfig[brand] || brandConfig.unknown, [brand]);
 
     // Memoize icon container background style
     const iconContainerStyle = useMemo(
-      () => [
-        styles.iconContainer,
-        { backgroundColor: (config?.color ?? COLORS.textSecondary) + '20' },
-      ],
-      [config?.color],
+      () => [styles.iconContainer, { backgroundColor: config.color + '20' }],
+      [config.color],
     );
 
     // Memoize expiry text to prevent recreation
@@ -63,17 +54,9 @@ export const CardListItem: React.FC<CardListItemProps> = memo(
     }, [expiryMonth, expiryYear]);
 
     return (
-      <TouchableOpacity
-        style={styles.container}
-        onPress={onPress}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
         <View style={iconContainerStyle}>
-          <MaterialCommunityIcons
-            name={config?.icon ?? 'credit-card'}
-            size={24}
-            color={config?.color ?? COLORS.textSecondary}
-          />
+          <MaterialCommunityIcons name={config.icon} size={24} color={config.color} />
         </View>
         <View style={styles.info}>
           <Text style={styles.cardNumber}>•••• {last4}</Text>
@@ -81,11 +64,7 @@ export const CardListItem: React.FC<CardListItemProps> = memo(
           {isDefault && <Text style={styles.defaultBadge}>Default</Text>}
         </View>
         <TouchableOpacity style={styles.optionsButton} onPress={onOptionsPress}>
-          <MaterialCommunityIcons
-            name="dots-vertical"
-            size={20}
-            color={COLORS.textSecondary}
-          />
+          <MaterialCommunityIcons name="dots-vertical" size={20} color={COLORS.textSecondary} />
         </TouchableOpacity>
       </TouchableOpacity>
     );

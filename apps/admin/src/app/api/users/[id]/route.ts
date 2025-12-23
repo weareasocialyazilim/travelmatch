@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
-import {
-  sanitizeUUID,
-  buildSafeMultiColumnUUIDFilter,
-} from '@/lib/query-utils';
 
 export async function GET(
   request: NextRequest,
@@ -20,13 +16,7 @@ export async function GET(
       return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
     }
 
-    const { id: rawId } = await params;
-    // SECURITY: Validate UUID to prevent injection (VULN-001)
-    const id = sanitizeUUID(rawId);
-    if (!id) {
-      return NextResponse.json({ error: 'Geçersiz kullanıcı ID' }, { status: 400 });
-    }
-
+    const { id } = await params;
     const supabase = createServiceClient();
 
     // Get user profile with related data
@@ -40,9 +30,6 @@ export async function GET(
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
 
-    // SECURITY: Build safe filter for multi-column OR query (VULN-001)
-    const matchFilter = buildSafeMultiColumnUUIDFilter(['user1_id', 'user2_id'], id);
-
     // Get user stats
     const [
       { count: momentCount },
@@ -51,9 +38,7 @@ export async function GET(
       { data: recentTransactions },
     ] = await Promise.all([
       supabase.from('moments').select('*', { count: 'exact', head: true }).eq('user_id', id),
-      matchFilter
-        ? supabase.from('matches').select('*', { count: 'exact', head: true }).or(matchFilter)
-        : Promise.resolve({ count: 0 }),
+      supabase.from('matches').select('*', { count: 'exact', head: true }).or(`user1_id.eq.${id},user2_id.eq.${id}`),
       supabase.from('reports').select('*', { count: 'exact', head: true }).eq('reported_user_id', id),
       supabase.from('transactions').select('*').eq('user_id', id).order('created_at', { ascending: false }).limit(10),
     ]);

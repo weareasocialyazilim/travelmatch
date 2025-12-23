@@ -2,39 +2,35 @@
   "folders": [
     {
       "name": "🏠 Root",
-      "path": ".."
+      "path": "."
     },
     {
       "name": "📱 Mobile App",
-      "path": "../apps/mobile"
-    },
-    {
-      "name": "🌐 Web App",
-      "path": "../apps/web"
+      "path": "apps/mobile"
     },
     {
       "name": "⚙️ Admin Panel",
-      "path": "../apps/admin"
+      "path": "admin"
     },
     {
       "name": "🎨 Design System",
-      "path": "../packages/design-system"
+      "path": "packages/design-system"
     },
     {
       "name": "📦 Shared",
-      "path": "../packages/shared"
+      "path": "packages/shared"
     },
     {
       "name": "🤖 ML Services",
-      "path": "../services/ml"
+      "path": "services/ml"
     },
     {
       "name": "💳 Payment Services",
-      "path": "../services/payment"
+      "path": "services/payment"
     },
     {
       "name": "🗄️ Supabase",
-      "path": "../supabase"
+      "path": "supabase"
     }
   ],
   "settings": {
@@ -101,13 +97,12 @@
 
     // ESLint
     "eslint.workingDirectories": [
-      { "directory": "../apps/mobile", "changeProcessCWD": true },
-      { "directory": "../apps/web", "changeProcessCWD": true },
-      { "directory": "../apps/admin", "changeProcessCWD": true },
-      { "directory": "../packages/design-system", "changeProcessCWD": true },
-      { "directory": "../packages/shared", "changeProcessCWD": true },
-      { "directory": "../services/ml", "changeProcessCWD": true },
-      { "directory": "../services/payment", "changeProcessCWD": true }
+      "./apps/mobile",
+      "./admin",
+      "./packages/design-system",
+      "./packages/shared",
+      "./services/ml",
+      "./services/payment"
     ],
     "eslint.validate": [
       "javascript",
@@ -147,29 +142,13 @@
       "*.env.example": "properties",
       ".env*": "properties"
     },
-
+    
     // Turbo
     "turbo.useLocalTurbo": true,
 
-    // Testing - Jest Monorepo Configuration
+    // Testing
     "jest.autoRun": "off",
     "jest.showCoverageOnLoad": false,
-    "jest.runMode": "on-demand",
-    "jest.monitorLongRun": 60000,
-    "jest.outputConfig": {
-      "revealOn": "error",
-      "revealWithFocus": "none",
-      "clearOnRun": "none"
-    },
-    // Disable Jest in root folder - use workspace-specific settings
-    "jest.disabledWorkspaceFolders": [
-      "🏠 Root",
-      "🌐 Web App",
-      "⚙️ Admin Panel",
-      "🤖 ML Services",
-      "💳 Payment Services",
-      "🗄️ Supabase"
-    ],
 
     // Spell Checker
     "cSpell.words": [
@@ -181,9 +160,7 @@
       "IDOR",
       "GDPR",
       "datetime",
-      "leveldb",
-      "codecov",
-      "infisical"
+      "leveldb"
     ],
 
     // Exclude from recommendations
@@ -196,41 +173,41 @@
       "esbenp.prettier-vscode",
       "eamodio.gitlens",
       "github.copilot",
-
+      
       // TypeScript & React
       "dsznajder.es7-react-js-snippets",
       "styled-components.vscode-styled-components",
-
+      
       // React Native & Expo
       "msjsdiag.vscode-react-native",
       "expo.vscode-expo-tools",
-
+      
       // Database & Supabase
       "supabase.supabase-vscode",
       "mtxr.sqltools",
-
+      
       // Testing
       "orta.vscode-jest",
       "hbenl.vscode-test-explorer",
-
+      
       // Utilities
       "christian-kohler.path-intellisense",
       "christian-kohler.npm-intellisense",
       "mikestead.dotenv",
       "streetsidesoftware.code-spell-checker",
-
+      
       // Git
       "mhutchie.git-graph",
       "github.vscode-pull-request-github",
-
+      
       // Markdown
       "yzhang.markdown-all-in-one",
       "bierner.markdown-mermaid",
-
+      
       // Performance
       "wayou.vscode-todo-highlight",
       "usernamehw.errorlens",
-
+      
       // Themes (optional)
       "github.github-vscode-theme",
       "pkief.material-icon-theme"
@@ -295,7 +272,10 @@
     "compounds": [
       {
         "name": "🚀 Full Stack (Admin + Mobile)",
-        "configurations": ["⚙️ Debug Admin Panel", "📱 Debug Mobile (iOS)"],
+        "configurations": [
+          "⚙️ Debug Admin Panel",
+          "📱 Debug Mobile (iOS)"
+        ],
         "stopAll": true
       }
     ]

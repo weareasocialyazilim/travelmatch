@@ -17,4 +17,3 @@ export * from './shadows';
 export * from './typography';
 export * from './layout';
 export * from './values';
-export * from './defaultValues';

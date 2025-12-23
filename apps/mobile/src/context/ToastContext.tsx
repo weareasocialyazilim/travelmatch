@@ -4,7 +4,7 @@
  */
 
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useCallback, useMemo, memo } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import {
   Text,
   StyleSheet,
@@ -90,21 +90,13 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     [showToast],
   );
 
-  // Memoize dismiss handler to prevent unnecessary re-renders
-  const handleDismiss = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
-
-  // Memoize context value to prevent unnecessary re-renders of consumers
-  const contextValue = useMemo<ToastContextValue>(
-    () => ({ showToast, success, error, warning, info }),
-    [showToast, success, error, warning, info],
-  );
-
   return (
-    <ToastContext.Provider value={contextValue}>
+    <ToastContext.Provider value={{ showToast, success, error, warning, info }}>
       {children}
-      <ToastContainer toasts={toasts} onDismiss={handleDismiss} />
+      <ToastContainer
+        toasts={toasts}
+        onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
+      />
     </ToastContext.Provider>
   );
 };
@@ -132,8 +124,7 @@ interface ToastItemProps {
   onDismiss: (id: string) => void;
 }
 
-// Memoized ToastItem to prevent re-renders when other toasts change
-const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
+const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(-100));
 
@@ -219,9 +210,7 @@ const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
       </TouchableOpacity>
     </Animated.View>
   );
-});
-
-ToastItem.displayName = 'ToastItem';
+};
 
 const styles = StyleSheet.create({
   container: {

@@ -8,8 +8,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const type = searchParams.get('type');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase as any)
+    let query = supabase
       .from('notification_campaigns')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest) {
     console.error('Notifications API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch notifications' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -43,8 +42,7 @@ export async function POST(request: NextRequest) {
     const supabase = createClient();
     const body = await request.json();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('notification_campaigns')
       .insert({
         title: body.title,
@@ -65,7 +63,7 @@ export async function POST(request: NextRequest) {
     console.error('Create notification error:', error);
     return NextResponse.json(
       { error: 'Failed to create notification' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

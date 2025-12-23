@@ -16,13 +16,7 @@ import {
   Percent,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -88,46 +82,10 @@ const cohortData = [
   { month: 'Oca', m0: 100, m1: 75, m2: 62, m3: 55, m4: 50, m5: 46, m6: 42 },
   { month: 'Şub', m0: 100, m1: 72, m2: 58, m3: 51, m4: 46, m5: 42, m6: null },
   { month: 'Mar', m0: 100, m1: 78, m2: 65, m3: 58, m4: 52, m5: null, m6: null },
-  {
-    month: 'Nis',
-    m0: 100,
-    m1: 74,
-    m2: 60,
-    m3: 53,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
-  {
-    month: 'May',
-    m0: 100,
-    m1: 76,
-    m2: 63,
-    m3: null,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
-  {
-    month: 'Haz',
-    m0: 100,
-    m1: 80,
-    m2: null,
-    m3: null,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
-  {
-    month: 'Tem',
-    m0: 100,
-    m1: null,
-    m2: null,
-    m3: null,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
+  { month: 'Nis', m0: 100, m1: 74, m2: 60, m3: 53, m4: null, m5: null, m6: null },
+  { month: 'May', m0: 100, m1: 76, m2: 63, m3: null, m4: null, m5: null, m6: null },
+  { month: 'Haz', m0: 100, m1: 80, m2: null, m3: null, m4: null, m5: null, m6: null },
+  { month: 'Tem', m0: 100, m1: null, m2: null, m3: null, m4: null, m5: null, m6: null },
 ];
 
 const forecastData = [
@@ -214,8 +172,8 @@ export default function RevenuePage() {
               </div>
             </div>
             <div className="mt-2 flex items-center gap-1 text-sm text-green-600">
-              <TrendingUp className="h-4 w-4" />+{revenueOverview.growthRate}%
-              büyüme
+              <TrendingUp className="h-4 w-4" />
+              +{revenueOverview.growthRate}% büyüme
             </div>
           </CardContent>
         </Card>
@@ -232,9 +190,7 @@ export default function RevenuePage() {
                 <CreditCard className="h-5 w-5 text-blue-600" />
               </div>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Aylık tekrarlayan
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Aylık tekrarlayan</p>
           </CardContent>
         </Card>
         <Card>
@@ -242,17 +198,13 @@ export default function RevenuePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">ARPU</p>
-                <p className="text-2xl font-bold">
-                  ₺{revenueOverview.avgRevenuePerUser}
-                </p>
+                <p className="text-2xl font-bold">₺{revenueOverview.avgRevenuePerUser}</p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
                 <Users className="h-5 w-5 text-purple-600" />
               </div>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Kullanıcı başına
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Kullanıcı başına</p>
           </CardContent>
         </Card>
         <Card>
@@ -260,17 +212,13 @@ export default function RevenuePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">LTV</p>
-                <p className="text-2xl font-bold">
-                  ₺{revenueOverview.lifetimeValue}
-                </p>
+                <p className="text-2xl font-bold">₺{revenueOverview.lifetimeValue}</p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
                 <Target className="h-5 w-5 text-orange-600" />
               </div>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Yaşam boyu değer
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Yaşam boyu değer</p>
           </CardContent>
         </Card>
         <Card>
@@ -294,9 +242,7 @@ export default function RevenuePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Churn</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {revenueOverview.churnRate}%
-                </p>
+                <p className="text-2xl font-bold text-red-600">{revenueOverview.churnRate}%</p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
                 <TrendingDown className="h-5 w-5 text-red-600" />
@@ -321,9 +267,7 @@ export default function RevenuePage() {
           <Card>
             <CardHeader>
               <CardTitle>Gelir Trendi</CardTitle>
-              <CardDescription>
-                Aylık gelir ve hedef karşılaştırması
-              </CardDescription>
+              <CardDescription>Aylık gelir ve hedef karşılaştırması</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
@@ -331,16 +275,9 @@ export default function RevenuePage() {
                   <AreaChart data={revenueByMonth}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
-                    <YAxis
-                      tickFormatter={(value) =>
-                        `₺${(value / 1000).toFixed(0)}K`
-                      }
-                    />
+                    <YAxis tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`} />
                     <Tooltip
-                      formatter={(value) => [
-                        formatCurrency(value as number, 'TRY'),
-                        '',
-                      ]}
+                      formatter={(value: number) => [formatCurrency(value, 'TRY'), '']}
                     />
                     <Area
                       type="monotone"
@@ -434,9 +371,7 @@ export default function RevenuePage() {
           <Card>
             <CardHeader>
               <CardTitle>Gelir Tahmini</CardTitle>
-              <CardDescription>
-                6 aylık gelir projeksiyonu (ML bazlı)
-              </CardDescription>
+              <CardDescription>6 aylık gelir projeksiyonu (ML bazlı)</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
@@ -444,17 +379,8 @@ export default function RevenuePage() {
                   <LineChart data={forecastData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
-                    <YAxis
-                      tickFormatter={(value) =>
-                        `₺${(value / 1000).toFixed(0)}K`
-                      }
-                    />
-                    <Tooltip
-                      formatter={(value) => [
-                        formatCurrency(value as number, 'TRY'),
-                        '',
-                      ]}
-                    />
+                    <YAxis tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`} />
+                    <Tooltip formatter={(value: number) => [formatCurrency(value, 'TRY'), '']} />
                     <Line
                       type="monotone"
                       dataKey="actual"
@@ -478,9 +404,7 @@ export default function RevenuePage() {
               <div className="mt-4 flex items-center justify-center gap-6">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-8 rounded bg-blue-500" />
-                  <span className="text-sm text-muted-foreground">
-                    Gerçekleşen
-                  </span>
+                  <span className="text-sm text-muted-foreground">Gerçekleşen</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-8 rounded border-2 border-dashed border-green-500" />
@@ -507,44 +431,28 @@ export default function RevenuePage() {
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold">{tier.name}</h3>
                       <Badge
-                        variant={
-                          tier.revenueImpact.startsWith('+')
-                            ? 'default'
-                            : 'destructive'
-                        }
+                        variant={tier.revenueImpact.startsWith('+') ? 'default' : 'destructive'}
                       >
                         {tier.revenueImpact} gelir etkisi
                       </Badge>
                     </div>
                     <div className="grid gap-4 md:grid-cols-4">
                       <div>
-                        <p className="text-sm text-muted-foreground">
-                          Mevcut Fiyat
-                        </p>
-                        <p className="text-xl font-semibold">
-                          {formatCurrency(tier.currentPrice, 'TRY')}
-                        </p>
+                        <p className="text-sm text-muted-foreground">Mevcut Fiyat</p>
+                        <p className="text-xl font-semibold">{formatCurrency(tier.currentPrice, 'TRY')}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">
-                          Önerilen Fiyat
-                        </p>
+                        <p className="text-sm text-muted-foreground">Önerilen Fiyat</p>
                         <p className="text-xl font-semibold text-green-600">
                           {formatCurrency(tier.suggestedPrice, 'TRY')}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">
-                          Mevcut Dönüşüm
-                        </p>
-                        <p className="text-xl font-semibold">
-                          %{tier.conversionRate}
-                        </p>
+                        <p className="text-sm text-muted-foreground">Mevcut Dönüşüm</p>
+                        <p className="text-xl font-semibold">%{tier.conversionRate}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">
-                          Tahmini Dönüşüm
-                        </p>
+                        <p className="text-sm text-muted-foreground">Tahmini Dönüşüm</p>
                         <p className="text-xl font-semibold text-orange-600">
                           %{tier.suggestedConversion}
                         </p>
@@ -565,9 +473,7 @@ export default function RevenuePage() {
           <Card>
             <CardHeader>
               <CardTitle>Kohort Analizi</CardTitle>
-              <CardDescription>
-                Aylık premium tutundurma oranları (%)
-              </CardDescription>
+              <CardDescription>Aylık premium tutundurma oranları (%)</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -604,37 +510,32 @@ export default function RevenuePage() {
                     {cohortData.map((row) => (
                       <tr key={row.month}>
                         <td className="p-2 text-sm font-medium">{row.month}</td>
-                        {['m0', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6'].map(
-                          (col) => {
-                            const value = row[col as keyof typeof row] as
-                              | number
-                              | null;
-                            if (value === null) {
-                              return (
-                                <td key={col} className="p-1">
-                                  <div className="flex h-10 w-full items-center justify-center rounded bg-gray-100 text-xs text-gray-400">
-                                    -
-                                  </div>
-                                </td>
-                              );
-                            }
-                            const intensity = value / 100;
+                        {['m0', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6'].map((col) => {
+                          const value = row[col as keyof typeof row] as number | null;
+                          if (value === null) {
                             return (
                               <td key={col} className="p-1">
-                                <div
-                                  className="flex h-10 w-full items-center justify-center rounded text-xs font-medium"
-                                  style={{
-                                    backgroundColor: `rgba(34, 197, 94, ${intensity})`,
-                                    color:
-                                      intensity > 0.5 ? 'white' : 'inherit',
-                                  }}
-                                >
-                                  {value}%
+                                <div className="flex h-10 w-full items-center justify-center rounded bg-gray-100 text-xs text-gray-400">
+                                  -
                                 </div>
                               </td>
                             );
-                          },
-                        )}
+                          }
+                          const intensity = value / 100;
+                          return (
+                            <td key={col} className="p-1">
+                              <div
+                                className="flex h-10 w-full items-center justify-center rounded text-xs font-medium"
+                                style={{
+                                  backgroundColor: `rgba(34, 197, 94, ${intensity})`,
+                                  color: intensity > 0.5 ? 'white' : 'inherit',
+                                }}
+                              >
+                                {value}%
+                              </div>
+                            </td>
+                          );
+                        })}
                       </tr>
                     ))}
                   </tbody>

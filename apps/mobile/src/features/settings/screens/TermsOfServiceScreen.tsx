@@ -3,10 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';

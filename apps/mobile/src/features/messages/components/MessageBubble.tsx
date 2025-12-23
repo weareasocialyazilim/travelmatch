@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -9,119 +9,21 @@ interface MessageBubbleProps {
   proofStatus?: 'pending' | 'verified' | 'rejected' | 'disputed';
 }
 
-export const MessageBubble: React.FC<MessageBubbleProps> = memo(
-  ({ item, proofStatus = 'verified' }) => {
-    // System message
-    if (item.type === 'system') {
-      return (
-        <View style={styles.systemMessageContainer}>
-          <Text style={styles.systemMessageText}>{item.text}</Text>
-        </View>
-      );
-    }
+export const MessageBubble: React.FC<MessageBubbleProps> = ({
+  item,
+  proofStatus = 'verified',
+}) => {
+  // System message
+  if (item.type === 'system') {
+    return (
+      <View style={styles.systemMessageContainer}>
+        <Text style={styles.systemMessageText}>{item.text}</Text>
+      </View>
+    );
+  }
 
-    // Proof message
-    if (item.type === 'proof') {
-      return (
-        <View style={styles.messageRow}>
-          <Image
-            source={{
-              uri: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=100',
-            }}
-            style={styles.messageAvatar}
-          />
-          <View style={styles.proofMessageContainer}>
-            <View style={styles.proofCard}>
-              <View style={styles.proofHeaderRow}>
-                <MaterialCommunityIcons
-                  name="file-document-outline"
-                  size={18}
-                  color={COLORS.success}
-                />
-                <Text style={styles.proofHeaderText}>Proof of Moment</Text>
-                <MaterialCommunityIcons
-                  name="check-decagram"
-                  size={18}
-                  color={COLORS.success}
-                />
-              </View>
-              <Text style={styles.proofFilename}>{item.text}</Text>
-            </View>
-            {/* Status messages based on proof verification */}
-            {proofStatus === 'pending' && (
-              <View style={styles.proofStatusContainer}>
-                <MaterialCommunityIcons
-                  name="clock-outline"
-                  size={16}
-                  color={COLORS.warning}
-                />
-                <Text style={styles.proofStatusText}>Verifying proof...</Text>
-              </View>
-            )}
-            {proofStatus === 'verified' && (
-              <View style={styles.proofStatusContainer}>
-                <MaterialCommunityIcons
-                  name="check-circle"
-                  size={16}
-                  color={COLORS.success}
-                />
-                <Text style={styles.proofStatusVerified}>
-                  Verified - Funds released
-                </Text>
-              </View>
-            )}
-            {proofStatus === 'rejected' && (
-              <View style={styles.proofStatusContainer}>
-                <MaterialCommunityIcons
-                  name="close-circle"
-                  size={16}
-                  color={COLORS.error}
-                />
-                <Text style={styles.proofStatusRejected}>
-                  Verification failed
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-      );
-    }
-
-    // Image message
-    if (item.type === 'image') {
-      return (
-        <View style={styles.messageRow}>
-          <Image
-            source={{
-              uri: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=100',
-            }}
-            style={styles.messageAvatar}
-          />
-          <View style={styles.imageMessageContainer}>
-            {item.imageUrl ? (
-              <Image
-                source={{ uri: item.imageUrl }}
-                style={styles.messageImage}
-                resizeMode="cover"
-              />
-            ) : null}
-          </View>
-        </View>
-      );
-    }
-
-    // My message
-    if (item.user === 'me') {
-      return (
-        <View style={styles.myMessageRow}>
-          <View style={styles.myMessageBubble}>
-            <Text style={styles.myMessageText}>{item.text}</Text>
-          </View>
-        </View>
-      );
-    }
-
-    // Other user message
+  // Proof message
+  if (item.type === 'proof') {
     return (
       <View style={styles.messageRow}>
         <Image
@@ -130,13 +32,112 @@ export const MessageBubble: React.FC<MessageBubbleProps> = memo(
           }}
           style={styles.messageAvatar}
         />
-        <View style={styles.otherMessageBubble}>
-          <Text style={styles.otherMessageText}>{item.text}</Text>
+        <View style={styles.proofMessageContainer}>
+          <View style={styles.proofCard}>
+            <View style={styles.proofHeaderRow}>
+              <MaterialCommunityIcons
+                name="file-document-outline"
+                size={18}
+                color={COLORS.success}
+              />
+              <Text style={styles.proofHeaderText}>Proof of Moment</Text>
+              <MaterialCommunityIcons
+                name="check-decagram"
+                size={18}
+                color={COLORS.success}
+              />
+            </View>
+            <Text style={styles.proofFilename}>{item.text}</Text>
+          </View>
+          {/* Status messages based on proof verification */}
+          {proofStatus === 'pending' && (
+            <View style={styles.proofStatusContainer}>
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={16}
+                color={COLORS.warning}
+              />
+              <Text style={styles.proofStatusText}>Verifying proof...</Text>
+            </View>
+          )}
+          {proofStatus === 'verified' && (
+            <View style={styles.proofStatusContainer}>
+              <MaterialCommunityIcons
+                name="check-circle"
+                size={16}
+                color={COLORS.success}
+              />
+              <Text style={styles.proofStatusVerified}>
+                Verified - Funds released
+              </Text>
+            </View>
+          )}
+          {proofStatus === 'rejected' && (
+            <View style={styles.proofStatusContainer}>
+              <MaterialCommunityIcons
+                name="close-circle"
+                size={16}
+                color={COLORS.error}
+              />
+              <Text style={styles.proofStatusRejected}>
+                Verification failed
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     );
-  },
-);
+  }
+
+  // Image message
+  if (item.type === 'image') {
+    return (
+      <View style={styles.messageRow}>
+        <Image
+          source={{
+            uri: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=100',
+          }}
+          style={styles.messageAvatar}
+        />
+        <View style={styles.imageMessageContainer}>
+          {item.imageUrl ? (
+            <Image
+              source={{ uri: item.imageUrl }}
+              style={styles.messageImage}
+              resizeMode="cover"
+            />
+          ) : null}
+        </View>
+      </View>
+    );
+  }
+
+  // My message
+  if (item.user === 'me') {
+    return (
+      <View style={styles.myMessageRow}>
+        <View style={styles.myMessageBubble}>
+          <Text style={styles.myMessageText}>{item.text}</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // Other user message
+  return (
+    <View style={styles.messageRow}>
+      <Image
+        source={{
+          uri: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=100',
+        }}
+        style={styles.messageAvatar}
+      />
+      <View style={styles.otherMessageBubble}>
+        <Text style={styles.otherMessageText}>{item.text}</Text>
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   systemMessageContainer: {
@@ -253,5 +254,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
-MessageBubble.displayName = 'MessageBubble';

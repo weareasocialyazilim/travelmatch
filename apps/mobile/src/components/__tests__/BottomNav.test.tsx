@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 
-// Unmock BottomNav so we test the real component
+// Unmock BottomNav to test the actual component
 jest.unmock('@/components/BottomNav');
 
 import BottomNav from '../BottomNav';
@@ -38,9 +38,7 @@ describe('BottomNav', () => {
     });
 
     it('renders all tab icons', () => {
-      const { UNSAFE_getAllByType } = render(
-        <BottomNav activeTab="Discover" />,
-      );
+      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       // 5 icons (Discover, Requests, Create button, Messages, Profile)
@@ -48,18 +46,14 @@ describe('BottomNav', () => {
     });
 
     it('highlights active tab with filled icon', () => {
-      const { UNSAFE_getAllByType } = render(
-        <BottomNav activeTab="Discover" />,
-      );
+      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       expect(icons[0].props.name).toBe('compass'); // Active = filled
     });
 
     it('shows outlined icon for inactive tabs', () => {
-      const { UNSAFE_getAllByType } = render(
-        <BottomNav activeTab="Discover" />,
-      );
+      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       expect(icons[1].props.name).toBe('inbox-outline'); // Inactive = outline
@@ -68,22 +62,16 @@ describe('BottomNav', () => {
     });
 
     it('renders create button with plus icon', () => {
-      const { UNSAFE_getAllByType } = render(
-        <BottomNav activeTab="Discover" />,
-      );
+      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       expect(icons[2].props.name).toBe('plus');
     });
 
     it('has correct accessibility roles', () => {
-      const { getByTestId } = render(<BottomNav activeTab="Discover" />);
-      // Verify all 5 tabs exist by their testIDs
-      expect(getByTestId('nav-discover-tab')).toBeTruthy();
-      expect(getByTestId('nav-requests-tab')).toBeTruthy();
-      expect(getByTestId('nav-create-tab')).toBeTruthy();
-      expect(getByTestId('nav-messages-tab')).toBeTruthy();
-      expect(getByTestId('nav-profile-tab')).toBeTruthy();
+      const { getAllByRole } = render(<BottomNav activeTab="Discover" />);
+      const tabs = getAllByRole('tab');
+      expect(tabs.length).toBe(5);
     });
 
     it('has correct accessibility state for active tab', () => {
@@ -102,21 +90,21 @@ describe('BottomNav', () => {
   describe('Badge Display', () => {
     it('shows requests badge when count > 0', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={3} />,
+        <BottomNav activeTab="Discover" requestsBadge={3} />
       );
       expect(getByText('3')).toBeTruthy();
     });
 
     it('shows messages badge when count > 0', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" messagesBadge={5} />,
+        <BottomNav activeTab="Discover" messagesBadge={5} />
       );
       expect(getByText('5')).toBeTruthy();
     });
 
     it('does not show badge when count is 0', () => {
       const { queryByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={0} messagesBadge={0} />,
+        <BottomNav activeTab="Discover" requestsBadge={0} messagesBadge={0} />
       );
       // No badge numbers should be visible
       expect(queryByText('0')).toBeNull();
@@ -124,21 +112,21 @@ describe('BottomNav', () => {
 
     it('shows "9+" for requests badge when count > 9', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={15} />,
+        <BottomNav activeTab="Discover" requestsBadge={15} />
       );
       expect(getByText('9+')).toBeTruthy();
     });
 
     it('shows "9+" for messages badge when count > 9', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" messagesBadge={42} />,
+        <BottomNav activeTab="Discover" messagesBadge={42} />
       );
       expect(getByText('9+')).toBeTruthy();
     });
 
     it('shows both badges simultaneously', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={3} messagesBadge={7} />,
+        <BottomNav activeTab="Discover" requestsBadge={3} messagesBadge={7} />
       );
       expect(getByText('3')).toBeTruthy();
       expect(getByText('7')).toBeTruthy();
@@ -146,14 +134,14 @@ describe('BottomNav', () => {
 
     it('handles exactly 9 requests badge', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={9} />,
+        <BottomNav activeTab="Discover" requestsBadge={9} />
       );
       expect(getByText('9')).toBeTruthy();
     });
 
     it('handles exactly 10 requests badge as 9+', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={10} />,
+        <BottomNav activeTab="Discover" requestsBadge={10} />
       );
       expect(getByText('9+')).toBeTruthy();
     });
@@ -235,18 +223,14 @@ describe('BottomNav', () => {
     });
 
     it('shows filled icon for active Requests tab', () => {
-      const { UNSAFE_getAllByType } = render(
-        <BottomNav activeTab="Requests" />,
-      );
+      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Requests" />);
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       expect(icons[1].props.name).toBe('inbox-full');
     });
 
     it('shows filled icon for active Messages tab', () => {
-      const { UNSAFE_getAllByType } = render(
-        <BottomNav activeTab="Messages" />,
-      );
+      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Messages" />);
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       expect(icons[3].props.name).toBe('chat');
@@ -263,21 +247,21 @@ describe('BottomNav', () => {
   describe('Edge Cases', () => {
     it('handles rapid tab switching', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-
+      
       fireEvent.press(getByLabelText('Requests tab'));
       fireEvent.press(getByLabelText('Messages tab'));
       fireEvent.press(getByLabelText('Profile tab'));
-
+      
       expect(mockNavigate).toHaveBeenCalledTimes(3);
     });
 
     it('handles badge with undefined values', () => {
       const { queryByText } = render(
-        <BottomNav
-          activeTab="Discover"
-          requestsBadge={undefined}
-          messagesBadge={undefined}
-        />,
+        <BottomNav 
+          activeTab="Discover" 
+          requestsBadge={undefined} 
+          messagesBadge={undefined} 
+        />
       );
       // Should not crash, no badges shown
       expect(queryByText('0')).toBeNull();
@@ -285,31 +269,25 @@ describe('BottomNav', () => {
 
     it('handles very large badge numbers', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={999} />,
+        <BottomNav activeTab="Discover" requestsBadge={999} />
       );
       expect(getByText('9+')).toBeTruthy();
     });
 
     it('re-renders when activeTab changes', () => {
       const { rerender, getByLabelText } = render(
-        <BottomNav activeTab="Discover" />,
+        <BottomNav activeTab="Discover" />
       );
-      expect(
-        getByLabelText('Discover tab').props.accessibilityState.selected,
-      ).toBe(true);
+      expect(getByLabelText('Discover tab').props.accessibilityState.selected).toBe(true);
 
       rerender(<BottomNav activeTab="Profile" />);
-      expect(
-        getByLabelText('Profile tab').props.accessibilityState.selected,
-      ).toBe(true);
-      expect(
-        getByLabelText('Discover tab').props.accessibilityState.selected,
-      ).toBe(false);
+      expect(getByLabelText('Profile tab').props.accessibilityState.selected).toBe(true);
+      expect(getByLabelText('Discover tab').props.accessibilityState.selected).toBe(false);
     });
 
     it('re-renders when badge counts change', () => {
       const { rerender, getByText, queryByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={0} />,
+        <BottomNav activeTab="Discover" requestsBadge={0} />
       );
       expect(queryByText('5')).toBeNull();
 
@@ -319,7 +297,11 @@ describe('BottomNav', () => {
 
     it('handles all tabs having badges', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={2} messagesBadge={8} />,
+        <BottomNav 
+          activeTab="Discover" 
+          requestsBadge={2} 
+          messagesBadge={8} 
+        />
       );
       expect(getByText('2')).toBeTruthy();
       expect(getByText('8')).toBeTruthy();

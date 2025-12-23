@@ -2,7 +2,6 @@
 
 exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
 <RCTView
-  ref={null}
   style={
     {
       "marginBottom": 16,
@@ -10,7 +9,6 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
   }
 >
   <RCTText
-    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -24,7 +22,6 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
     Email
   </RCTText>
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -45,7 +42,6 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
       onFocus={[Function]}
       placeholder="Enter email"
       placeholderTextColor="#9CA3AF"
-      ref={null}
       secureTextEntry={false}
       style={
         [
@@ -66,7 +62,6 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
 
 exports[`Input Component Snapshots matches snapshot with error 1`] = `
 <RCTView
-  ref={null}
   style={
     {
       "marginBottom": 16,
@@ -74,7 +69,6 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
   }
 >
   <RCTText
-    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -88,7 +82,6 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
     Password
   </RCTText>
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -108,7 +101,6 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
       onChange={[Function]}
       onFocus={[Function]}
       placeholderTextColor="#9CA3AF"
-      ref={null}
       secureTextEntry={false}
       style={
         [
@@ -124,45 +116,23 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
       }
     />
   </RCTView>
-  <RCTView
-    ref={null}
+  <RCTText
     style={
       {
-        "alignItems": "center",
-        "flexDirection": "row",
+        "color": "#EF4444",
+        "fontSize": 12,
         "marginTop": 4,
       }
     }
+    testID="RCTText"
   >
-    <RCTText
-      color="#EF4444"
-      name="alert-circle"
-      ref={null}
-      size={16}
-      testID="RCTText"
-    >
-      alert-circle
-    </RCTText>
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#EF4444",
-          "fontSize": 12,
-          "marginLeft": 4,
-        }
-      }
-      testID="RCTText"
-    >
-      Too short
-    </RCTText>
-  </RCTView>
+    Too short
+  </RCTText>
 </RCTView>
 `;
 
 exports[`Input Component Snapshots matches snapshot with icons 1`] = `
 <RCTView
-  ref={null}
   style={
     {
       "marginBottom": 16,
@@ -170,7 +140,6 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
   }
 >
   <RCTText
-    ref={null}
     style={
       {
         "color": "#1A1A1A",
@@ -184,7 +153,6 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
     Search
   </RCTText>
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -201,7 +169,6 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
     <RCTText
       color="#9CA3AF"
       name="magnify"
-      ref={null}
       size={20}
       style={
         {
@@ -218,7 +185,6 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
       onChange={[Function]}
       onFocus={[Function]}
       placeholderTextColor="#9CA3AF"
-      ref={null}
       secureTextEntry={false}
       style={
         [
@@ -246,7 +212,6 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
       accessible={true}
       aria-disabled={true}
       disabled={true}
-      ref={null}
       style={
         {
           "marginLeft": 12,
@@ -257,7 +222,6 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
       <RCTText
         color="#9CA3AF"
         name="close"
-        ref={null}
         size={20}
         testID="RCTText"
       >

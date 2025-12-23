@@ -6,7 +6,6 @@
 import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
-import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 
 export interface GiftInboxCardProps {
   id: string;
@@ -46,10 +45,7 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
     onPress,
   }) => {
     // Memoize formatted amount
-    const formattedAmount = useMemo(
-      () => `${currency} ${amount.toFixed(2)}`,
-      [currency, amount],
-    );
+    const formattedAmount = useMemo(() => `${currency} ${amount.toFixed(2)}`, [currency, amount]);
 
     // Memoize status badge style
     const statusBadgeStyle = useMemo(
@@ -59,16 +55,12 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
 
     // Memoize avatar source
     const avatarSource = useMemo(
-      () => ({ uri: senderAvatar || DEFAULT_IMAGES.AVATAR_SMALL }),
+      () => ({ uri: senderAvatar || 'https://via.placeholder.com/40' }),
       [senderAvatar],
     );
 
     return (
-      <TouchableOpacity
-        style={styles.card}
-        onPress={onPress}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
         <View style={styles.header}>
           <Image source={avatarSource} style={styles.avatar} />
           <View style={styles.headerInfo}>

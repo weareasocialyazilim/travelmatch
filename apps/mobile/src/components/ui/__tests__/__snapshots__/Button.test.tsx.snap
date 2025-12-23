@@ -22,7 +22,6 @@ exports[`Button Component Snapshots matches snapshot for disabled state 1`] = `
       "top": 8,
     }
   }
-  ref={null}
   role="button"
   style={
     [
@@ -46,7 +45,6 @@ exports[`Button Component Snapshots matches snapshot for disabled state 1`] = `
   }
 >
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -56,7 +54,6 @@ exports[`Button Component Snapshots matches snapshot for disabled state 1`] = `
     }
   >
     <RCTText
-      ref={null}
       style={
         [
           {
@@ -100,7 +97,6 @@ exports[`Button Component Snapshots matches snapshot for loading state 1`] = `
       "top": 8,
     }
   }
-  ref={null}
   role="button"
   style={
     [
@@ -125,7 +121,6 @@ exports[`Button Component Snapshots matches snapshot for loading state 1`] = `
 >
   <RCTActivityIndicator
     color="#1A1A1A"
-    ref={null}
     size="small"
     testID="RCTActivityIndicator"
   />
@@ -155,7 +150,6 @@ exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
     }
   }
   onPress={[MockFunction]}
-  ref={null}
   role="button"
   style={
     [
@@ -179,7 +173,6 @@ exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
   }
 >
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -189,7 +182,6 @@ exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
     }
   >
     <RCTText
-      ref={null}
       style={
         [
           {

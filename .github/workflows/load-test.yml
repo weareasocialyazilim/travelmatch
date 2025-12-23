@@ -23,7 +23,7 @@ jobs:
   load-test:
     name: Load Test
     runs-on: ubuntu-latest
-    continue-on-error: true # OK: Load tests are informational, not blocking
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4

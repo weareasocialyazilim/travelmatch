@@ -72,67 +72,70 @@ export const useGiftInbox = () => {
       const { requests } = await requestService.getReceivedRequests();
 
       // Group by requester
-      const grouped = requests.reduce((acc, req) => {
-        const senderId = req.requesterId;
-        if (!acc[senderId]) {
-          acc[senderId] = {
-            id: senderId,
-            sender: {
+      const grouped = requests.reduce(
+        (acc, req) => {
+          const senderId = req.requesterId;
+          if (!acc[senderId]) {
+            acc[senderId] = {
               id: senderId,
-              name: req.requesterName,
-              age: 0,
-              avatar: req.requesterAvatar,
-              rating: req.requesterRating || 0,
-              isVerified: req.requesterVerified || false,
-              tripCount: 0,
-              city:
-                typeof req.requesterLocation === 'string'
-                  ? req.requesterLocation
-                  : '',
-            },
-            gifts: [],
-            totalAmount: 0,
-            latestMessage: '',
-            latestGiftAt: '',
-            canStartChat: false,
-            score: 0,
-          };
-        }
-
-        acc[senderId].gifts.push({
-          id: req.id,
-          momentTitle: req.momentTitle,
-          momentEmoji: '🎁',
-          amount: req.totalPrice ?? 0,
-          message: req.message || '',
-          paymentType: 'direct',
-          status: req.status === 'completed' ? 'received' : 'pending_proof',
-          createdAt: req.createdAt ?? null,
-        });
-
-        acc[senderId].totalAmount += req.totalPrice ?? 0;
-        acc[senderId].score = acc[senderId].totalAmount; // Simple score based on amount
-
-        // Only update latestGiftAt when we have a valid createdAt to compare
-        if (!acc[senderId].latestGiftAt) {
-          acc[senderId].latestGiftAt = req.createdAt ?? null;
-          acc[senderId].latestMessage = req.message || '';
-        } else if (req.createdAt) {
-          try {
-            if (
-              new Date(req.createdAt) >
-              new Date(acc[senderId].latestGiftAt || 0)
-            ) {
-              acc[senderId].latestGiftAt = req.createdAt;
-              acc[senderId].latestMessage = req.message || '';
-            }
-          } catch {
-            // If parsing fails, keep existing latestGiftAt
+              sender: {
+                id: senderId,
+                name: req.requesterName,
+                age: 0,
+                avatar: req.requesterAvatar,
+                rating: req.requesterRating || 0,
+                isVerified: req.requesterVerified || false,
+                tripCount: 0,
+                city:
+                  typeof req.requesterLocation === 'string'
+                    ? req.requesterLocation
+                    : '',
+              },
+              gifts: [],
+              totalAmount: 0,
+              latestMessage: '',
+              latestGiftAt: '',
+              canStartChat: false,
+              score: 0,
+            };
           }
-        }
 
-        return acc;
-      }, {} as Record<string, GiftInboxItem>);
+          acc[senderId].gifts.push({
+            id: req.id,
+            momentTitle: req.momentTitle,
+            momentEmoji: '🎁',
+            amount: req.totalPrice ?? 0,
+            message: req.message || '',
+            paymentType: 'direct',
+            status: req.status === 'completed' ? 'received' : 'pending_proof',
+            createdAt: req.createdAt ?? null,
+          });
+
+          acc[senderId].totalAmount += req.totalPrice ?? 0;
+          acc[senderId].score = acc[senderId].totalAmount; // Simple score based on amount
+
+          // Only update latestGiftAt when we have a valid createdAt to compare
+          if (!acc[senderId].latestGiftAt) {
+            acc[senderId].latestGiftAt = req.createdAt ?? null;
+            acc[senderId].latestMessage = req.message || '';
+          } else if (req.createdAt) {
+            try {
+              if (
+                new Date(req.createdAt) >
+                new Date(acc[senderId].latestGiftAt || 0)
+              ) {
+                acc[senderId].latestGiftAt = req.createdAt;
+                acc[senderId].latestMessage = req.message || '';
+              }
+            } catch (e) {
+              // If parsing fails, keep existing latestGiftAt
+            }
+          }
+
+          return acc;
+        },
+        {} as Record<string, GiftInboxItem>,
+      );
 
       setInboxItems(Object.values(grouped));
     } catch (error) {

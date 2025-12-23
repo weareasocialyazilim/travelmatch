@@ -52,6 +52,6 @@ export {
   useCancelSubscription
 } from './hooks/usePayments';
 
-// Services - re-export from main services folder (single source of truth)
-export { paymentsApi } from '@/services/paymentsApi';
-export type { CreatePaymentIntentDto } from '@/services/paymentsApi';
+// Services
+export { paymentsApi } from './services/paymentsApi';
+export type { CreatePaymentIntentDto } from './services/paymentsApi';

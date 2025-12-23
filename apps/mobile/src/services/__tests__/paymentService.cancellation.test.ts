@@ -1,6 +1,6 @@
 /**
  * Payment Service - Payment Cancellation Edge Cases
- *
+ * 
  * Tests for payment cancellation scenarios:
  * - Cancel payment mid-processing
  * - Cancel after confirmation
@@ -39,9 +39,9 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase;
-const mockTransactionsService = transactionsService;
-const mockLogger = logger;
+const mockSupabase = supabase ;
+const mockTransactionsService = transactionsService ;
+const mockLogger = logger ;
 
 // Simulated cancellable payment (would be in paymentService in production)
 class CancellablePayment {
@@ -67,7 +67,7 @@ class CancellablePayment {
       // Simulate processing delay
       await new Promise((resolve, reject) => {
         const timer = setTimeout(resolve, 2000);
-
+        
         // Check for cancellation during processing
         const checkInterval = setInterval(() => {
           if (this.cancelled) {
@@ -109,19 +109,14 @@ class CancellablePayment {
 }
 
 describe('PaymentService - Payment Cancellation', () => {
-  // Test fixture helper - runtime string construction
-  const TestData = {
-    email: () => ['test', '@', 'example.com'].join(''),
-    usrId: () => ['user', '123'].join('-'),
-  };
-  const mockUser = { id: TestData.usrId(), email: TestData.email() };
+  const mockUser = { id: 'user-123', email: 'test@example.com' };
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
+    (mockSupabase.auth.getUser ).mockResolvedValue({ 
+      data: { user: mockUser }, 
+      error: null 
     });
   });
 
@@ -142,12 +137,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      mockTransactionsService.update.mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'cancelled' },
         error: null,
       });
@@ -176,9 +171,7 @@ describe('PaymentService - Payment Cancellation', () => {
         status: 'cancelled',
       });
 
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        'Payment cancellation requested',
-      );
+      expect(mockLogger.info).toHaveBeenCalledWith('Payment cancellation requested');
     });
 
     it('should not cancel if already completed', async () => {
@@ -193,7 +186,7 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -253,12 +246,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      mockTransactionsService.update.mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'refunded' },
         error: null,
       });
@@ -309,7 +302,7 @@ describe('PaymentService - Payment Cancellation', () => {
         metadata: { originalTransactionId: 'tx-123' },
       };
 
-      mockTransactionsService.create
+      (mockTransactionsService.create )
         .mockResolvedValueOnce({ data: mockPaymentTransaction, error: null })
         .mockResolvedValueOnce({ data: mockRefundTransaction, error: null });
 
@@ -323,7 +316,7 @@ describe('PaymentService - Payment Cancellation', () => {
 
       // Create refund transaction
       const refund = await mockTransactionsService.create({
-        user_id: TestData.usrId(),
+        user_id: 'user-123',
         amount: -50,
         currency: 'USD',
         type: 'refund',
@@ -351,12 +344,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create ).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      mockTransactionsService.update.mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction, status: 'cancelled' },
         error: null,
       });
@@ -390,12 +383,10 @@ describe('PaymentService - Payment Cancellation', () => {
     it('should release payment hold on cancellation', async () => {
       const mockBalance = { balance: 100, currency: 'USD' };
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest
-              .fn()
-              .mockResolvedValue({ data: mockBalance, error: null }),
+            single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
           }),
         }),
         update: jest.fn().mockReturnValue({
@@ -411,12 +402,10 @@ describe('PaymentService - Payment Cancellation', () => {
       // In production, this would update the balance back to original
       const updatedBalance = { balance: 100, currency: 'USD' }; // Hold released
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from ).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest
-              .fn()
-              .mockResolvedValue({ data: updatedBalance, error: null }),
+            single: jest.fn().mockResolvedValue({ data: updatedBalance, error: null }),
           }),
         }),
       });
@@ -450,19 +439,13 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       };
 
-      mockTransactionsService.create
+      (mockTransactionsService.create )
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
-      mockTransactionsService.update
-        .mockResolvedValueOnce({
-          data: { ...mockTransaction1, status: 'cancelled' },
-          error: null,
-        })
-        .mockResolvedValueOnce({
-          data: { ...mockTransaction2, status: 'cancelled' },
-          error: null,
-        });
+      (mockTransactionsService.update )
+        .mockResolvedValueOnce({ data: { ...mockTransaction1, status: 'cancelled' }, error: null })
+        .mockResolvedValueOnce({ data: { ...mockTransaction2, status: 'cancelled' }, error: null });
 
       const payment1 = new CancellablePayment();
       const payment2 = new CancellablePayment();
@@ -516,11 +499,11 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       };
 
-      mockTransactionsService.create
+      (mockTransactionsService.create )
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
-      mockTransactionsService.update.mockResolvedValue({
+      (mockTransactionsService.update ).mockResolvedValue({
         data: { ...mockTransaction1, status: 'cancelled' },
         error: null,
       });
@@ -548,7 +531,7 @@ describe('PaymentService - Payment Cancellation', () => {
       await jest.advanceTimersByTimeAsync(2000);
 
       await expect(promise1).rejects.toThrow('cancelled');
-
+      
       const result2 = await promise2;
       expect(result2.transaction.status).toBe('completed');
 

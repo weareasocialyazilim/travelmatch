@@ -75,7 +75,6 @@ export const EditCardModal: React.FC<EditCardModalProps> = ({
       <KeyboardAvoidingView
         style={styles.modalOverlay}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <TouchableOpacity
           style={styles.modalOverlay}

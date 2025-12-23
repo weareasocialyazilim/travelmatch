@@ -14,7 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
-import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
@@ -159,7 +158,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         user: {
           id: moment.creator?.id || 'unknown',
           name: moment.creator?.name || 'Anonymous',
-          avatar: moment.creator?.avatar || DEFAULT_IMAGES.AVATAR_LARGE,
+          avatar: moment.creator?.avatar || 'https://via.placeholder.com/150',
         },
         status:
           (moment.status as 'active' | 'pending' | 'completed') || 'active',

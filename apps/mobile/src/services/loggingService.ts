@@ -16,7 +16,7 @@
  * import { loggingService } from '@/services/loggingService';
  *
  * // Track screen view
- * loggingService.trackScreen('DiscoverScreen', { userId: '123' });
+ * loggingService.trackScreen('HomeScreen', { userId: '123' });
  *
  * // Track user action
  * loggingService.trackAction('button_press', { button: 'submit' });

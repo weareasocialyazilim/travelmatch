@@ -27,6 +27,7 @@ export {
   OptimizedFlatList,
   useOptimizedRenderItem,
   useInfiniteScroll,
+  getItemLayout,
 } from './OptimizedFlatList';
 export { MemoizedMomentCard, MemoizedMessageItem } from './MemoizedMomentCard';
 export { OptimizedImage } from './OptimizedImage';

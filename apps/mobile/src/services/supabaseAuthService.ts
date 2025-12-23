@@ -25,50 +25,12 @@ export const getSession = async (): Promise<{
 };
 
 /**
- * Ensure user profile exists in public.users table
- * This is needed because the trigger might not have run for existing users
- */
-export const ensureUserProfile = async (
-  userId: string,
-  email: string,
-  fullName: string,
-  avatarUrl?: string,
-): Promise<{ error: Error | null }> => {
-  try {
-    const { error } = await supabase.from('users').upsert(
-      {
-        id: userId,
-        email,
-        full_name: fullName,
-        avatar_url: avatarUrl || null,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: 'id',
-        ignoreDuplicates: false,
-      },
-    );
-
-    if (error) {
-      logger.error('[Auth] ensureUserProfile error:', error);
-      return { error };
-    }
-
-    logger.info('[Auth] User profile ensured:', userId);
-    return { error: null };
-  } catch (error) {
-    logger.error('[Auth] ensureUserProfile exception:', error);
-    return { error: error as Error };
-  }
-};
-
-/**
  * Sign up with email and password
  */
 export const signUpWithEmail = async (
   email: string,
   password: string,
-  metadata?: { name?: string; avatar_url?: string; phone?: string },
+  metadata?: { name?: string; avatar_url?: string },
 ): Promise<AuthResult> => {
   if (!isSupabaseConfigured()) {
     logger.warn('[Auth] Supabase not configured');
@@ -84,10 +46,7 @@ export const signUpWithEmail = async (
       email,
       password,
       options: {
-        data: {
-          ...metadata,
-          phone: metadata?.phone,
-        },
+        data: metadata,
       },
     });
 
@@ -233,7 +192,7 @@ export const handleOAuthCallback = async (
     // Supabase returns tokens in URL hash after OAuth redirect
     const urlObj = new URL(url);
     const hashParams = new URLSearchParams(urlObj.hash.substring(1));
-
+    
     const accessToken = hashParams.get('access_token');
     const refreshToken = hashParams.get('refresh_token');
 
@@ -261,135 +220,6 @@ export const handleOAuthCallback = async (
   } catch (error) {
     logger.error('[Auth] OAuth callback exception:', error);
     return { session: null, error: error as AuthError };
-  }
-};
-
-/**
- * Send OTP to phone for authentication
- */
-export const signInWithPhone = async (
-  phone: string,
-): Promise<{ error: AuthError | null }> => {
-  if (!isSupabaseConfigured()) {
-    return { error: { message: 'Supabase not configured' } as AuthError };
-  }
-
-  try {
-    const { error } = await auth.signInWithOtp({
-      phone,
-    });
-
-    if (error) {
-      logger.error('[Auth] Phone OTP error:', error);
-      return { error };
-    }
-
-    logger.info('[Auth] OTP sent to phone');
-    return { error: null };
-  } catch (error) {
-    logger.error('[Auth] Phone OTP exception:', error);
-    return { error: error as AuthError };
-  }
-};
-
-/**
- * Verify phone OTP code
- */
-export const verifyPhoneOtp = async (
-  phone: string,
-  token: string,
-): Promise<AuthResult> => {
-  if (!isSupabaseConfigured()) {
-    return {
-      user: null,
-      session: null,
-      error: { message: 'Supabase not configured' } as AuthError,
-    };
-  }
-
-  try {
-    const { data, error } = await auth.verifyOtp({
-      phone,
-      token,
-      type: 'sms',
-    });
-
-    if (error) {
-      logger.error('[Auth] Verify phone OTP error:', error);
-      return { user: null, session: null, error };
-    }
-
-    logger.info('[Auth] Phone OTP verified', { userId: data.user?.id });
-    return { user: data.user, session: data.session, error: null };
-  } catch (error) {
-    logger.error('[Auth] Verify phone OTP exception:', error);
-    return { user: null, session: null, error: error as AuthError };
-  }
-};
-
-/**
- * Send magic link to email for passwordless authentication
- */
-export const signInWithMagicLink = async (
-  email: string,
-): Promise<{ error: AuthError | null }> => {
-  if (!isSupabaseConfigured()) {
-    return { error: { message: 'Supabase not configured' } as AuthError };
-  }
-
-  try {
-    const { error } = await auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: 'travelmatch://auth/callback',
-      },
-    });
-
-    if (error) {
-      logger.error('[Auth] Magic link error:', error);
-      return { error };
-    }
-
-    logger.info('[Auth] Magic link sent to email');
-    return { error: null };
-  } catch (error) {
-    logger.error('[Auth] Magic link exception:', error);
-    return { error: error as AuthError };
-  }
-};
-
-/**
- * Verify email OTP code (for email verification)
- */
-export const verifyEmailOtp = async (
-  email: string,
-  token: string,
-): Promise<AuthResult> => {
-  if (!isSupabaseConfigured()) {
-    return {
-      user: null,
-      session: null,
-      error: { message: 'Supabase not configured' } as AuthError,
-    };
-  }
-
-  try {
-    const { data, error } = await auth.verifyOtp({
-      email,
-      token,
-      type: 'email',
-    });
-
-    if (error) {
-      logger.error('[Auth] Verify email OTP error:', error);
-      return { user: null, session: null, error };
-    }
-
-    logger.info('[Auth] Email OTP verified', { userId: data.user?.id });
-    return { user: data.user, session: data.session, error: null };
-  } catch (error) {
-    logger.error('[Auth] Verify email OTP exception:', error);
-    return { user: null, session: null, error: error as AuthError };
   }
 };
 
@@ -520,10 +350,6 @@ export const onAuthStateChange = (
 export default {
   signUpWithEmail,
   signInWithEmail,
-  signInWithPhone,
-  verifyPhoneOtp,
-  signInWithMagicLink,
-  verifyEmailOtp,
   signInWithOAuth,
   handleOAuthCallback,
   signOut,

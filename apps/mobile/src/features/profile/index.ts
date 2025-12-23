@@ -24,14 +24,16 @@ export { ReportMomentScreen } from './screens/ReportMomentScreen';
 export { SavedMomentsScreen } from './screens/SavedMomentsScreen';
 
 // Hooks
-export {
-  useProfile,
-  useMyProfile,
-  useUpdateProfile,
-  useReputation,
+export { 
+  useProfile, 
+  useMyProfile, 
+  useUpdateProfile, 
+  useReputation, 
+  useTrustScore, 
+  useProofHistory,
   useMyMoments,
   useCreateMoment,
-  useDeleteMoment,
+  useDeleteMoment
 } from './hooks/useProfile';
 
 // Services

@@ -4,13 +4,7 @@
  */
 
 import React, { useRef, useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Video from 'react-native-video';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { colors, spacing, typography } from '@travelmatch/design-system/tokens';
@@ -45,11 +39,13 @@ export function AccessibleVideoPlayer({
 }: AccessibleVideoPlayerProps) {
   const videoRef = useRef<Video>(null);
   const { announce } = useAccessibility();
-
+  
   const [paused, setPaused] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [selectedCaptions, setSelectedCaptions] = useState<string | null>(null);
+  const [selectedCaptions, setSelectedCaptions] = useState<string | null>(
+    captions.length > 0 ? captions[0].language : null
+  );
   const [showTranscript, setShowTranscript] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,10 +65,7 @@ export function AccessibleVideoPlayer({
     announce(paused ? 'Playing' : 'Paused', 'assertive');
   };
 
-  const handleProgress = (data: {
-    currentTime: number;
-    playableDuration: number;
-  }) => {
+  const handleProgress = (data: { currentTime: number; playableDuration: number }) => {
     setCurrentTime(data.currentTime);
     onProgress?.({ currentTime: data.currentTime, duration });
   };
@@ -101,10 +94,7 @@ export function AccessibleVideoPlayer({
 
   const toggleTranscript = () => {
     setShowTranscript(!showTranscript);
-    announce(
-      showTranscript ? 'Transcript hidden' : 'Transcript shown',
-      'assertive',
-    );
+    announce(showTranscript ? 'Transcript hidden' : 'Transcript shown', 'assertive');
   };
 
   const changePlaybackSpeed = () => {
@@ -117,12 +107,7 @@ export function AccessibleVideoPlayer({
 
   const seekTo = (seconds: number) => {
     videoRef.current?.seek(currentTime + seconds);
-    announce(
-      `Skipped ${seconds > 0 ? 'forward' : 'backward'} ${Math.abs(
-        seconds,
-      )} seconds`,
-      'assertive',
-    );
+    announce(`Skipped ${seconds > 0 ? 'forward' : 'backward'} ${Math.abs(seconds)} seconds`, 'assertive');
   };
 
   const formatTime = (seconds: number): string => {
@@ -142,7 +127,9 @@ export function AccessibleVideoPlayer({
         >
           {title}
         </Text>
-        {description && <Text style={styles.description}>{description}</Text>}
+        {description && (
+          <Text style={styles.description}>{description}</Text>
+        )}
       </View>
 
       {/* Video Player */}
@@ -161,7 +148,7 @@ export function AccessibleVideoPlayer({
             logger.error('Video error:', error);
             announce('Video failed to load', 'assertive');
           }}
-          textTracks={captions.map((caption) => ({
+          textTracks={captions.map(caption => ({
             title: caption.label,
             language: caption.language,
             type: 'text/vtt',
@@ -197,7 +184,9 @@ export function AccessibleVideoPlayer({
           accessibilityLabel={paused ? 'Play video' : 'Pause video'}
           accessibilityRole="button"
         >
-          <Text style={styles.playPauseIcon}>{paused ? '▶' : '⏸'}</Text>
+          <Text style={styles.playPauseIcon}>
+            {paused ? '▶' : '⏸'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -206,17 +195,12 @@ export function AccessibleVideoPlayer({
         {/* Progress bar */}
         <View style={styles.progressContainer}>
           <View
-            style={[
-              styles.progressBar,
-              { width: `${(currentTime / duration) * 100}%` },
-            ]}
+            style={[styles.progressBar, { width: `${(currentTime / duration) * 100}%` }]}
             accessible={false}
           />
           <Text
             style={styles.timeText}
-            accessibilityLabel={`${formatTime(currentTime)} of ${formatTime(
-              duration,
-            )}`}
+            accessibilityLabel={`${formatTime(currentTime)} of ${formatTime(duration)}`}
           >
             {formatTime(currentTime)} / {formatTime(duration)}
           </Text>
@@ -268,9 +252,7 @@ export function AccessibleVideoPlayer({
               style={styles.secondaryButton}
               onPress={toggleCaptions}
               accessible={true}
-              accessibilityLabel={
-                selectedCaptions ? 'Disable captions' : 'Enable captions'
-              }
+              accessibilityLabel={selectedCaptions ? 'Disable captions' : 'Enable captions'}
               accessibilityRole="button"
               accessibilityState={{ selected: !!selectedCaptions }}
             >
@@ -297,13 +279,13 @@ export function AccessibleVideoPlayer({
               style={styles.secondaryButton}
               onPress={toggleTranscript}
               accessible={true}
-              accessibilityLabel={
-                showTranscript ? 'Hide transcript' : 'Show transcript'
-              }
+              accessibilityLabel={showTranscript ? 'Hide transcript' : 'Show transcript'}
               accessibilityRole="button"
               accessibilityState={{ selected: showTranscript }}
             >
-              <Text style={styles.secondaryButtonText}>📄 Transcript</Text>
+              <Text style={styles.secondaryButtonText}>
+                📄 Transcript
+              </Text>
             </TouchableOpacity>
           )}
         </View>

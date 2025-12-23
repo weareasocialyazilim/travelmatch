@@ -1,11 +1,11 @@
 /**
  * Navigation Service
- *
+ * 
  * Global navigation reference for navigating outside React components
  * Used by services (like apiClient) to trigger navigation on events
  */
 
-import { createNavigationContainerRef } from '@react-navigation/native';
+import { createNavigationContainerRef, CommonActions } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
@@ -15,16 +15,11 @@ export const navigationRef = createNavigationContainerRef<RootStackParamList>();
  */
 export function navigate<T extends keyof RootStackParamList>(
   name: T,
-  params?: RootStackParamList[T],
+  params?: RootStackParamList[T]
 ) {
   if (navigationRef.isReady()) {
     // Type assertion for generic screen navigation outside components
-    (
-      navigationRef.navigate as unknown as (
-        name: string,
-        params?: object,
-      ) => void
-    )(name as string, params);
+    (navigationRef.navigate as unknown as (name: string, params?: object) => void)(name as string, params);
   }
 }
 

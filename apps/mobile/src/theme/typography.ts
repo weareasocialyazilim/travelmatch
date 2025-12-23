@@ -92,10 +92,7 @@ export const getResponsiveFontSize = (baseSize: number, scale = 1): number => {
   return Math.round(baseSize * scale);
 };
 
-export const getLineHeight = (
-  fontSize: number,
-  ratio: number = LINE_HEIGHTS.normal,
-): number => {
+export const getLineHeight = (fontSize: number, ratio: number = LINE_HEIGHTS.normal): number => {
   return Math.round(fontSize * ratio);
 };
 
@@ -126,7 +123,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'header' as const,
       minContrastRatio: 7, // WCAG AAA for large text
     } as TypographyStyle,
-
+    
     display2: {
       fontSize: FONT_SIZES['4xl'],
       fontWeight: FONT_WEIGHTS.extrabold,
@@ -136,7 +133,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
-
+    
     display3: {
       fontSize: FONT_SIZES['3xl'],
       fontWeight: FONT_WEIGHTS.bold,
@@ -157,7 +154,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
-
+    
     h2: {
       fontSize: FONT_SIZES['2xl'],
       fontWeight: FONT_WEIGHTS.bold,
@@ -167,7 +164,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
-
+    
     h3: {
       fontSize: FONT_SIZES.xl,
       fontWeight: FONT_WEIGHTS.semibold,
@@ -176,7 +173,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
-
+    
     h4: {
       fontSize: FONT_SIZES.lg,
       fontWeight: FONT_WEIGHTS.semibold,
@@ -185,7 +182,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'header' as const,
       minContrastRatio: 4.5, // WCAG AA for normal text
     } as TypographyStyle,
-
+    
     h5: {
       fontSize: FONT_SIZES.md,
       fontWeight: FONT_WEIGHTS.semibold,
@@ -194,7 +191,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'header' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     h6: {
       fontSize: FONT_SIZES.base,
       fontWeight: FONT_WEIGHTS.semibold,
@@ -213,7 +210,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     bodyLarge: {
       fontSize: FONT_SIZES.md,
       fontWeight: FONT_WEIGHTS.regular,
@@ -222,7 +219,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     bodySmall: {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.regular,
@@ -231,7 +228,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     bodyMedium: {
       fontSize: FONT_SIZES.base,
       fontWeight: FONT_WEIGHTS.medium,
@@ -250,7 +247,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     captionMedium: {
       fontSize: FONT_SIZES.xs,
       fontWeight: FONT_WEIGHTS.medium,
@@ -259,7 +256,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     label: {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.medium,
@@ -268,7 +265,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     labelLarge: {
       fontSize: FONT_SIZES.base,
       fontWeight: FONT_WEIGHTS.medium,
@@ -287,7 +284,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'button' as const,
       minContrastRatio: 4.5, // Buttons need good contrast
     } as TypographyStyle,
-
+    
     buttonSmall: {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.semibold,
@@ -296,7 +293,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'button' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     buttonLarge: {
       fontSize: FONT_SIZES.lg,
       fontWeight: FONT_WEIGHTS.semibold,
@@ -316,7 +313,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'link' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     linkSmall: {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.medium,
@@ -338,7 +335,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     code: {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.regular,
@@ -359,7 +356,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     success: {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.medium,
@@ -378,7 +375,7 @@ export const createTypography = (isDark = false) => {
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
-
+    
     priceSmall: {
       fontSize: FONT_SIZES.md,
       fontWeight: FONT_WEIGHTS.semibold,
@@ -417,7 +414,7 @@ export const TypographyAccessibility = {
   meetsContrastRequirement: (
     foreground: string,
     background: string,
-    _minimumRatio = 4.5,
+    minimumRatio = 4.5
   ): boolean => {
     // Implementation would require color contrast calculation
     // For now, return true as colors.ts should ensure compliance

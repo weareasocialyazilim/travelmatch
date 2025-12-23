@@ -85,85 +85,21 @@ function generateTOTP(secret: string, time?: number): string {
 }
 
 /**
- * Used TOTP codes cache (in-memory for edge function)
- * In production, use Redis/Upstash for distributed cache
+ * Verify TOTP code with time window tolerance
  */
-const usedCodesCache = new Map<string, number>();
-
-// Clean expired codes periodically (codes older than 60 seconds)
-function cleanExpiredCodes() {
+function verifyTOTP(secret: string, code: string, window = 1): boolean {
   const now = Date.now();
-  const expiryTime = 60000; // 60 seconds
-  for (const [key, timestamp] of usedCodesCache.entries()) {
-    if (now - timestamp > expiryTime) {
-      usedCodesCache.delete(key);
-    }
-  }
-}
-
-/**
- * Verify TOTP code with time window tolerance and replay protection
- */
-async function verifyTOTP(
-  secret: string,
-  code: string,
-  userId: string,
-  window = 1
-): Promise<{ valid: boolean; error?: string }> {
-  const now = Date.now();
-
-  // Clean expired codes first
-  cleanExpiredCodes();
-
-  // Check if code was already used (replay attack prevention)
-  const codeKey = `${userId}:${code}`;
-  if (usedCodesCache.has(codeKey)) {
-    console.warn(`[2FA] Replay attack detected for user ${userId}`);
-    return { valid: false, error: 'Code already used. Please wait for a new code.' };
-  }
-
+  
   // Check current time and ±window intervals (30 seconds each)
   for (let i = -window; i <= window; i++) {
     const time = now + i * 30000;
     const expectedCode = generateTOTP(secret, time);
     if (expectedCode === code) {
-      // Mark code as used to prevent replay attacks
-      usedCodesCache.set(codeKey, now);
-
-      // Also try to persist to database for distributed replay protection
-      try {
-        const supabaseAdmin = createClient(
-          Deno.env.get('SUPABASE_URL') ?? '',
-          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-        );
-
-        await supabaseAdmin.from('used_2fa_codes').insert({
-          user_id: userId,
-          code_hash: await hashCode(code),
-          used_at: new Date().toISOString(),
-          expires_at: new Date(now + 60000).toISOString(),
-        });
-      } catch {
-        // Ignore database errors - in-memory cache is primary protection
-        console.warn('[2FA] Failed to persist used code to database');
-      }
-
-      return { valid: true };
+      return true;
     }
   }
-
-  return { valid: false, error: 'Invalid verification code' };
-}
-
-/**
- * Hash code for secure storage
- */
-async function hashCode(code: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(code + Deno.env.get('SUPABASE_JWT_SECRET'));
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  return false;
 }
 
 serve(async (req) => {
@@ -235,13 +171,13 @@ serve(async (req) => {
       return toHttpResponse(error, corsHeaders);
     }
 
-    // Verify TOTP code with replay protection
-    const verifyResult = await verifyTOTP(totpSecret, code, user.id);
+    // Verify TOTP code
+    const isValid = verifyTOTP(totpSecret, code);
 
-    if (!verifyResult.valid) {
-      console.log(`[2FA Verify] Invalid code for user ${user.id}: ${verifyResult.error}`);
+    if (!isValid) {
+      console.log(`[2FA Verify] Invalid code for user ${user.id}`);
       const error = createErrorResponse(
-        verifyResult.error || 'Invalid verification code',
+        'Invalid verification code',
         ErrorCode.INVALID_INPUT,
       );
       return toHttpResponse(error, corsHeaders);

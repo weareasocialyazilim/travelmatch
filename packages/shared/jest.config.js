@@ -14,20 +14,4 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  // JUnit reporter for Codecov Test Analytics
-  reporters: [
-    'default',
-    [
-      'jest-junit',
-      {
-        outputDirectory: './coverage',
-        outputName: 'junit.xml',
-        suiteName: 'TravelMatch Shared Tests',
-        classNameTemplate: '{classname}',
-        titleTemplate: '{title}',
-        ancestorSeparator: ' › ',
-        usePathForSuiteName: true,
-      },
-    ],
-  ],
 };

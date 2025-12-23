@@ -19,9 +19,7 @@ jest.mock('@react-navigation/native', () => ({
 
 jest.mock('@/hooks', () => ({
   useMoments: () => ({
-    createMoment: jest
-      .fn()
-      .mockResolvedValue({ id: '1', title: 'Test Moment' }),
+    createMoment: jest.fn().mockResolvedValue({ id: '1', title: 'Test Moment' }),
   }),
 }));
 
@@ -29,9 +27,7 @@ jest.mock('@/components/createMoment', () => ({
   PhotoSection: ({ photo, onPhotoSelected }: any) => {
     const { Text, TouchableOpacity } = require('react-native');
     return (
-      <TouchableOpacity
-        onPress={() => onPhotoSelected('https://example.com/photo.jpg')}
-      >
+      <TouchableOpacity onPress={() => onPhotoSelected('https://example.com/photo.jpg')}>
         <Text>Add Photo</Text>
         {photo && <Text>Photo: {photo}</Text>}
       </TouchableOpacity>
@@ -59,14 +55,7 @@ jest.mock('@/components/createMoment', () => ({
       </View>
     );
   },
-  DetailsSection: ({
-    place,
-    selectedDate,
-    amount,
-    onAmountChange,
-    onDatePress,
-    onNavigateToPlaceSearch,
-  }: any) => {
+  DetailsSection: ({ place, selectedDate, amount, onAmountChange, onDatePress, onNavigateToPlaceSearch }: any) => {
     const { Text, TextInput, TouchableOpacity, View } = require('react-native');
     return (
       <View>
@@ -105,11 +94,10 @@ jest.mock('@/components/createMoment', () => ({
     { id: 'food', label: 'Food & Drink', emoji: '🍽️' },
     { id: 'culture', label: 'Culture', emoji: '🎨' },
   ],
-  getCategoryEmoji: (id: string) => (id === 'food' ? '🍽️' : '🎨'),
+  getCategoryEmoji: (id: string) => id === 'food' ? '🍽️' : '🎨',
 }));
 
-describe.skip('CreateMomentScreen', () => {
-  // Skipped: Tests need to be updated for current component API
+describe('CreateMomentScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(Alert, 'alert').mockImplementation();
@@ -127,9 +115,7 @@ describe.skip('CreateMomentScreen', () => {
     });
 
     it('should render all form sections', () => {
-      const { getByText, getByPlaceholderText } = render(
-        <CreateMomentScreen />,
-      );
+      const { getByText, getByPlaceholderText } = render(<CreateMomentScreen />);
 
       expect(getByText('Add Photo')).toBeTruthy();
       expect(getByPlaceholderText("What's this moment about?")).toBeTruthy();
@@ -219,7 +205,7 @@ describe.skip('CreateMomentScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Title required',
-          expect.any(String),
+          expect.any(String)
         );
       });
     });
@@ -237,7 +223,7 @@ describe.skip('CreateMomentScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Title too short',
-          'Title must be at least 5 characters',
+          'Title must be at least 5 characters'
         );
       });
     });
@@ -255,7 +241,7 @@ describe.skip('CreateMomentScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Category required',
-          expect.any(String),
+          expect.any(String)
         );
       });
     });
@@ -276,7 +262,7 @@ describe.skip('CreateMomentScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Amount required',
-          expect.any(String),
+          expect.any(String)
         );
       });
     });
@@ -300,7 +286,7 @@ describe.skip('CreateMomentScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Amount too high',
-          'Maximum amount is $10,000',
+          'Maximum amount is $10,000'
         );
       });
     });
@@ -369,7 +355,7 @@ describe.skip('CreateMomentScreen', () => {
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Not implemented',
-          'Place selection coming soon',
+          'Place selection coming soon'
         );
       });
     });
@@ -400,15 +386,13 @@ describe.skip('CreateMomentScreen', () => {
         expect(alertSpy).toHaveBeenCalledWith(
           'Success!',
           'Your moment has been published',
-          expect.any(Array),
+          expect.any(Array)
         );
       });
     });
 
     it('should show loading indicator while publishing', async () => {
-      const { getByText, getByTestId, queryByText } = render(
-        <CreateMomentScreen />,
-      );
+      const { getByText, getByTestId, queryByText } = render(<CreateMomentScreen />);
 
       // Fill all fields
       const titleInput = getByTestId('title-input');
@@ -495,7 +479,7 @@ describe.skip('CreateMomentScreen', () => {
         expect(Alert.alert).toHaveBeenCalledWith(
           'Success!',
           expect.any(String),
-          expect.any(Array),
+          expect.any(Array)
         );
       });
     });

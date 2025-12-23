@@ -28,7 +28,7 @@ export interface PaginationResult<T> {
  * Supabase Query Type Helper
  * Provides type-safe query building
  */
- 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SupabaseQuery<T extends Record<string, unknown> = Record<string, unknown>> = PostgrestFilterBuilder<any, any, T, any, any>;
 
 /**

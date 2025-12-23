@@ -29,7 +29,6 @@ DROP POLICY IF EXISTS "Users can view matched profiles" ON users;
 -- - Users whose moments they've interacted with (requests)
 -- - Users whose moments they've favorited
 -- - Users with active moments (for discovery)
-DROP POLICY IF EXISTS "Users can view connected profiles" ON users;
 CREATE POLICY "Users can view connected profiles" ON users
 FOR SELECT
 USING (
@@ -90,7 +89,6 @@ and users with active moments.';
 -- 3. CREATE CORRECTED REVIEW VISIBILITY POLICY
 -- ============================================
 
-DROP POLICY IF EXISTS "Users can view relevant reviews" ON reviews;
 CREATE POLICY "Users can view relevant reviews" ON reviews
 FOR SELECT
 USING (

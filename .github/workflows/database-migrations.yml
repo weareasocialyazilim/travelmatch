@@ -106,7 +106,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v2.0.0
+        uses: Infisical/secrets-action@v1.0.15
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
@@ -129,7 +129,7 @@ jobs:
         run: |
           echo "Dry run - showing pending migrations..."
           supabase db diff --linked 2>/dev/null || echo "No diff available"
-        continue-on-error: true # OK: Dry run is informational only
+        continue-on-error: true
 
       - name: Apply migrations
         if: github.event.inputs.dry_run != 'true'
@@ -137,22 +137,6 @@ jobs:
           supabase db push --linked
         env:
           SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Generate TypeScript types
-        if: github.event.inputs.dry_run != 'true'
-        run: |
-          supabase gen types typescript --linked > src/types/database.types.ts
-          echo "✅ Database types generated"
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Upload generated types
-        if: github.event.inputs.dry_run != 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: database-types-staging
-          path: src/types/database.types.ts
-          retention-days: 30
 
   deploy-production:
     name: Deploy to Production
@@ -164,7 +148,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v2.0.0
+        uses: Infisical/secrets-action@v1.0.15
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
@@ -192,7 +176,7 @@ jobs:
         run: |
           echo "Dry run - showing pending migrations for production..."
           supabase db diff --linked 2>/dev/null || echo "No diff available"
-        continue-on-error: true # OK: Dry run is informational only
+        continue-on-error: true
 
       - name: Apply migrations to production
         if: github.event.inputs.dry_run != 'true'
@@ -201,19 +185,3 @@ jobs:
           supabase db push --linked
         env:
           SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Generate TypeScript types
-        if: github.event.inputs.dry_run != 'true'
-        run: |
-          supabase gen types typescript --linked > src/types/database.types.ts
-          echo "✅ Database types generated for production"
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Upload generated types
-        if: github.event.inputs.dry_run != 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: database-types-production
-          path: src/types/database.types.ts
-          retention-days: 30

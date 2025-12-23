@@ -16,13 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -71,34 +65,10 @@ const revenueData = [
 ];
 
 const pendingTasks = [
-  {
-    id: '1',
-    type: 'kyc',
-    title: 'KYC Onayı Bekliyor',
-    count: 24,
-    priority: 'high',
-  },
-  {
-    id: '2',
-    type: 'payout',
-    title: 'Ödeme Onayı Bekliyor',
-    count: 12,
-    priority: 'high',
-  },
-  {
-    id: '3',
-    type: 'report',
-    title: 'Şikayet İncelemesi',
-    count: 45,
-    priority: 'medium',
-  },
-  {
-    id: '4',
-    type: 'moment',
-    title: 'Moment Moderasyonu',
-    count: 156,
-    priority: 'medium',
-  },
+  { id: '1', type: 'kyc', title: 'KYC Onayı Bekliyor', count: 24, priority: 'high' },
+  { id: '2', type: 'payout', title: 'Ödeme Onayı Bekliyor', count: 12, priority: 'high' },
+  { id: '3', type: 'report', title: 'Şikayet İncelemesi', count: 45, priority: 'medium' },
+  { id: '4', type: 'moment', title: 'Moment Moderasyonu', count: 156, priority: 'medium' },
 ];
 
 const systemHealth = {
@@ -109,36 +79,11 @@ const systemHealth = {
 };
 
 const recentActivity = [
-  {
-    id: '1',
-    type: 'user',
-    message: 'Yeni kullanıcı kaydı: Ahmet Y.',
-    time: '2 dk önce',
-  },
-  {
-    id: '2',
-    type: 'payment',
-    message: 'Premium abonelik: ₺149.99',
-    time: '5 dk önce',
-  },
-  {
-    id: '3',
-    type: 'report',
-    message: 'Yeni şikayet alındı',
-    time: '8 dk önce',
-  },
-  {
-    id: '4',
-    type: 'moment',
-    message: 'Moment onaylandı: #12345',
-    time: '12 dk önce',
-  },
-  {
-    id: '5',
-    type: 'payout',
-    message: 'Ödeme onaylandı: ₺540.00',
-    time: '15 dk önce',
-  },
+  { id: '1', type: 'user', message: 'Yeni kullanıcı kaydı: Ahmet Y.', time: '2 dk önce' },
+  { id: '2', type: 'payment', message: 'Premium abonelik: ₺149.99', time: '5 dk önce' },
+  { id: '3', type: 'report', message: 'Yeni şikayet alındı', time: '8 dk önce' },
+  { id: '4', type: 'moment', message: 'Moment onaylandı: #12345', time: '12 dk önce' },
+  { id: '5', type: 'payout', message: 'Ödeme onaylandı: ₺540.00', time: '15 dk önce' },
 ];
 
 export default function DashboardPage() {
@@ -173,9 +118,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Platform genel bakış ve özet metrikleri
-        </p>
+        <p className="text-muted-foreground">Platform genel bakış ve özet metrikleri</p>
       </div>
 
       {/* Key Metrics */}
@@ -184,9 +127,7 @@ export default function DashboardPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
-                  Toplam Kullanıcı
-                </p>
+                <p className="text-sm text-muted-foreground">Toplam Kullanıcı</p>
                 <p className="text-2xl font-bold">
                   {overviewStats.totalUsers.toLocaleString('tr-TR')}
                 </p>
@@ -199,16 +140,12 @@ export default function DashboardPage() {
               {overviewStats.userGrowth > 0 ? (
                 <>
                   <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="text-green-600">
-                    +{overviewStats.userGrowth}%
-                  </span>
+                  <span className="text-green-600">+{overviewStats.userGrowth}%</span>
                 </>
               ) : (
                 <>
                   <TrendingDown className="h-4 w-4 text-red-500" />
-                  <span className="text-red-600">
-                    {overviewStats.userGrowth}%
-                  </span>
+                  <span className="text-red-600">{overviewStats.userGrowth}%</span>
                 </>
               )}
               <span className="text-muted-foreground">son 30 gün</span>
@@ -231,9 +168,7 @@ export default function DashboardPage() {
             </div>
             <div className="mt-2 flex items-center gap-1 text-sm">
               <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">
-                +{overviewStats.activeGrowth}%
-              </span>
+              <span className="text-green-600">+{overviewStats.activeGrowth}%</span>
               <span className="text-muted-foreground">son 7 gün</span>
             </div>
           </CardContent>
@@ -254,9 +189,7 @@ export default function DashboardPage() {
             </div>
             <div className="mt-2 flex items-center gap-1 text-sm">
               <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">
-                +{overviewStats.revenueGrowth}%
-              </span>
+              <span className="text-green-600">+{overviewStats.revenueGrowth}%</span>
               <span className="text-muted-foreground">son 30 gün</span>
             </div>
           </CardContent>
@@ -277,9 +210,7 @@ export default function DashboardPage() {
             </div>
             <div className="mt-2 flex items-center gap-1 text-sm">
               <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">
-                +{overviewStats.momentGrowth}%
-              </span>
+              <span className="text-green-600">+{overviewStats.momentGrowth}%</span>
               <span className="text-muted-foreground">son 30 gün</span>
             </div>
           </CardContent>
@@ -293,9 +224,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Kullanıcı Aktivitesi</CardTitle>
-              <CardDescription>
-                Son 7 günlük DAU ve yeni kayıtlar
-              </CardDescription>
+              <CardDescription>Son 7 günlük DAU ve yeni kayıtlar</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -339,17 +268,8 @@ export default function DashboardPage() {
                   <LineChart data={revenueData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis
-                      tickFormatter={(value) =>
-                        `₺${(value / 1000).toFixed(0)}K`
-                      }
-                    />
-                    <Tooltip
-                      formatter={(value) => [
-                        formatCurrency(value as number, 'TRY'),
-                        'Gelir',
-                      ]}
-                    />
+                    <YAxis tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`} />
+                    <Tooltip formatter={(value: number) => [formatCurrency(value, 'TRY'), 'Gelir']} />
                     <Line
                       type="monotone"
                       dataKey="revenue"
@@ -387,19 +307,13 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${getPriorityColor(
-                        task.priority,
-                      )}`}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${getPriorityColor(task.priority)}`}
                     >
                       {task.count}
                     </div>
                     <span className="text-sm font-medium">{task.title}</span>
                   </div>
-                  <Badge
-                    variant={
-                      task.priority === 'high' ? 'destructive' : 'secondary'
-                    }
-                  >
+                  <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
                     {task.priority === 'high' ? 'Acil' : 'Normal'}
                   </Badge>
                 </div>
@@ -424,18 +338,10 @@ export default function DashboardPage() {
               {Object.entries(systemHealth).map(([key, data]) => (
                 <div key={key} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`h-2 w-2 rounded-full ${getStatusColor(
-                        data.status,
-                      )}`}
-                    />
-                    <span className="text-sm font-medium capitalize">
-                      {key}
-                    </span>
+                    <div className={`h-2 w-2 rounded-full ${getStatusColor(data.status)}`} />
+                    <span className="text-sm font-medium capitalize">{key}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {data.uptime}%
-                  </span>
+                  <span className="text-sm text-muted-foreground">{data.uptime}%</span>
                 </div>
               ))}
             </CardContent>
@@ -452,9 +358,7 @@ export default function DashboardPage() {
                   <div className="mt-1 h-2 w-2 rounded-full bg-blue-500" />
                   <div className="flex-1">
                     <p className="text-sm">{activity.message}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.time}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{activity.time}</p>
                   </div>
                 </div>
               ))}
@@ -474,9 +378,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="font-medium">Analitik</p>
-                  <p className="text-sm text-muted-foreground">
-                    Detaylı metrikler
-                  </p>
+                  <p className="text-sm text-muted-foreground">Detaylı metrikler</p>
                 </div>
               </div>
             </CardContent>
@@ -491,9 +393,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="font-medium">Gelir</p>
-                  <p className="text-sm text-muted-foreground">
-                    Finansal raporlar
-                  </p>
+                  <p className="text-sm text-muted-foreground">Finansal raporlar</p>
                 </div>
               </div>
             </CardContent>
@@ -508,9 +408,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="font-medium">Coğrafya</p>
-                  <p className="text-sm text-muted-foreground">
-                    Bölgesel analiz
-                  </p>
+                  <p className="text-sm text-muted-foreground">Bölgesel analiz</p>
                 </div>
               </div>
             </CardContent>

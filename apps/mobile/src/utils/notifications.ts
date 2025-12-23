@@ -50,7 +50,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
     }
 
     // Get push token
-     
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const projectId = Constants.expoConfig?.extra?.eas?.projectId as
       | string
       | undefined;

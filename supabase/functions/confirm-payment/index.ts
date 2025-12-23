@@ -14,7 +14,7 @@
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
 import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
@@ -31,10 +31,10 @@ type ConfirmPaymentRequest = z.infer<typeof ConfirmPaymentSchema>;
 const confirmLimiter = createUpstashRateLimiter(RateLimitPresets.PAYMENT);
 
 async function logAudit(
-  supabase: SupabaseClient,
+  supabase: any,
   userId: string,
   action: string,
-  metadata: Record<string, unknown>,
+  metadata: Record<string, any>,
 ) {
   try {
     await supabase.from('audit_logs').insert({

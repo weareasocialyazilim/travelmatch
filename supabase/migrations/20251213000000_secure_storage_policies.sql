@@ -68,7 +68,6 @@ DROP POLICY IF EXISTS "Admins can view KYC docs" ON storage.objects;
 DROP POLICY IF EXISTS "Users can view their own KYC docs" ON storage.objects;
 
 -- PRIVATE READ: Only owner can view their own KYC documents
-DROP POLICY IF EXISTS "Users can view their own KYC docs" ON storage.objects;
 CREATE POLICY "Users can view their own KYC docs"
 ON storage.objects FOR SELECT
 USING (
@@ -79,7 +78,6 @@ USING (
 
 -- ADMIN READ: Admins can view KYC docs for verification
 -- Uses secure helper function to check admin role
-DROP POLICY IF EXISTS "Admins can view KYC docs" ON storage.objects;
 CREATE POLICY "Admins can view KYC docs"
 ON storage.objects FOR SELECT
 USING (
@@ -89,7 +87,6 @@ USING (
 );
 
 -- OWNER UPLOAD: Only owner can upload to their folder
-DROP POLICY IF EXISTS "Users can upload their own KYC docs" ON storage.objects;
 CREATE POLICY "Users can upload their own KYC docs"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -102,7 +99,6 @@ WITH CHECK (
 -- If update is needed, user must delete and re-upload
 
 -- OWNER DELETE: Only owner can delete their docs
-DROP POLICY IF EXISTS "Users can delete their own KYC docs" ON storage.objects;
 CREATE POLICY "Users can delete their own KYC docs"
 ON storage.objects FOR DELETE
 USING (
@@ -127,13 +123,11 @@ DROP POLICY IF EXISTS "Users can update their moment images" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete their moment images" ON storage.objects;
 
 -- PUBLIC READ: Anyone can view moment images
-DROP POLICY IF EXISTS "Moment images are publicly accessible" ON storage.objects;
 CREATE POLICY "Moment images are publicly accessible"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'moment-images');
 
 -- OWNER WRITE: Only owner can upload to their folder
-DROP POLICY IF EXISTS "Users can upload moment images" ON storage.objects;
 CREATE POLICY "Users can upload moment images"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -143,7 +137,6 @@ WITH CHECK (
 );
 
 -- OWNER UPDATE: Only owner can update their moment images
-DROP POLICY IF EXISTS "Users can update their moment images" ON storage.objects;
 CREATE POLICY "Users can update their moment images"
 ON storage.objects FOR UPDATE
 USING (
@@ -153,7 +146,6 @@ USING (
 );
 
 -- OWNER DELETE: Only owner can delete their moment images
-DROP POLICY IF EXISTS "Users can delete their moment images" ON storage.objects;
 CREATE POLICY "Users can delete their moment images"
 ON storage.objects FOR DELETE
 USING (
@@ -177,7 +169,6 @@ DROP POLICY IF EXISTS "Users can upload profile proofs" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete their profile proofs" ON storage.objects;
 
 -- OWNER READ: Only owner can view their proofs
-DROP POLICY IF EXISTS "Users can view their own profile proofs" ON storage.objects;
 CREATE POLICY "Users can view their own profile proofs"
 ON storage.objects FOR SELECT
 USING (
@@ -187,7 +178,6 @@ USING (
 );
 
 -- OWNER UPLOAD: Only owner can upload
-DROP POLICY IF EXISTS "Users can upload profile proofs" ON storage.objects;
 CREATE POLICY "Users can upload profile proofs"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -197,7 +187,6 @@ WITH CHECK (
 );
 
 -- OWNER DELETE: Only owner can delete
-DROP POLICY IF EXISTS "Users can delete their profile proofs" ON storage.objects;
 CREATE POLICY "Users can delete their profile proofs"
 ON storage.objects FOR DELETE
 USING (
@@ -221,7 +210,6 @@ DROP POLICY IF EXISTS "Users can upload videos" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete their video uploads" ON storage.objects;
 
 -- OWNER READ: Only owner can view their uploads
-DROP POLICY IF EXISTS "Users can view their own video uploads" ON storage.objects;
 CREATE POLICY "Users can view their own video uploads"
 ON storage.objects FOR SELECT
 USING (
@@ -231,7 +219,6 @@ USING (
 );
 
 -- OWNER UPLOAD: Only owner can upload
-DROP POLICY IF EXISTS "Users can upload videos" ON storage.objects;
 CREATE POLICY "Users can upload videos"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -241,7 +228,6 @@ WITH CHECK (
 );
 
 -- OWNER DELETE: Only owner can delete
-DROP POLICY IF EXISTS "Users can delete their video uploads" ON storage.objects;
 CREATE POLICY "Users can delete their video uploads"
 ON storage.objects FOR DELETE
 USING (

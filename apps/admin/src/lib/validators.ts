@@ -78,10 +78,7 @@ export const createTaskSchema = z.object({
   resource_type: z.string(),
   resource_id: z.string().uuid(),
   assigned_to: z.string().uuid().optional(),
-  due_date: z
-    .string()
-    .datetime({ message: 'Geçerli bir tarih girin' })
-    .optional(),
+  due_date: z.string().optional(),
 });
 
 /**
@@ -121,10 +118,7 @@ export const notificationCampaignSchema = z.object({
     filters: z.record(z.string(), z.unknown()).optional(),
     user_ids: z.array(z.string().uuid()).optional(),
   }),
-  scheduled_at: z
-    .string()
-    .datetime({ message: 'Geçerli bir tarih/saat formatı girin' })
-    .optional(),
+  scheduled_at: z.string().optional(),
 });
 
 /**
@@ -135,10 +129,8 @@ export const marketingCampaignSchema = z.object({
   description: z.string().min(20, 'Açıklama en az 20 karakter olmalı'),
   type: z.enum(['email', 'push', 'social', 'display', 'influencer']),
   budget: z.number().min(0, 'Bütçe negatif olamaz'),
-  start_date: z
-    .string()
-    .datetime({ message: 'Geçerli bir başlangıç tarihi girin' }),
-  end_date: z.string().datetime({ message: 'Geçerli bir bitiş tarihi girin' }),
+  start_date: z.string(),
+  end_date: z.string(),
   target_audience: z.record(z.string(), z.unknown()),
 });
 

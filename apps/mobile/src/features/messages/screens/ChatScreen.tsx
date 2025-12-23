@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,7 +10,11 @@ import { ChatAttachmentBottomSheet } from '@/components/ChatAttachmentBottomShee
 import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
 import { useChatScreen, type Message } from '../hooks/useChatScreen';
-import { CHAT_LIST_CONFIG } from '@/utils/listOptimization';
+import {
+  CHAT_LIST_CONFIG,
+  ITEM_HEIGHTS,
+  createGetItemLayout,
+} from '@/utils/listOptimization';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { RouteProp } from '@react-navigation/native';

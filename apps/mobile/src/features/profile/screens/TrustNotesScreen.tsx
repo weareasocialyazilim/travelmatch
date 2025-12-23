@@ -170,4 +170,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
   },
+  emptyState: {
+    paddingHorizontal: 16,
+    paddingTop: 64,
+    alignItems: 'center',
+  },
+  emptyIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: `${COLORS.primary}1A`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyTextContainer: {
+    alignItems: 'center',
+    maxWidth: 320,
+    gap: 4,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  emptyDescription: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    maxWidth: 280,
+  },
 });

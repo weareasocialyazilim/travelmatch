@@ -28,7 +28,7 @@ export function useAuth() {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (session?.user?.email) {
+        if (session?.user) {
           // Fetch admin user profile
           const { data: adminUser } = await supabase
             .from('admin_users')
@@ -80,7 +80,7 @@ export function useAuth() {
     async (email: string, password: string) => {
       setLoading(true);
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -88,12 +88,13 @@ export function useAuth() {
         if (error) throw error;
 
         // Check if user is an admin
-        const { data: adminUser, error: adminError } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: adminUser, error: adminError } = await (supabase
           .from('admin_users')
           .select('*')
           .eq('email', email)
           .eq('is_active', true)
-          .single();
+          .single() as any);
 
         if (adminError || !adminUser) {
           await supabase.auth.signOut();
@@ -105,13 +106,19 @@ export function useAuth() {
         setUser(adminUser as AdminUser);
 
         // If 2FA is required and enabled, redirect to 2FA page
-        if (adminUser.requires_2fa && adminUser.totp_enabled) {
+        if (
+          (adminUser as AdminUser).requires_2fa &&
+          (adminUser as AdminUser).totp_enabled
+        ) {
           set2FAVerified(false);
           return { success: true, requires2FA: true };
         }
 
         // If 2FA is required but not set up, redirect to setup
-        if (adminUser.requires_2fa && !adminUser.totp_enabled) {
+        if (
+          (adminUser as AdminUser).requires_2fa &&
+          !(adminUser as AdminUser).totp_enabled
+        ) {
           set2FAVerified(false);
           return { success: true, requires2FASetup: true };
         }

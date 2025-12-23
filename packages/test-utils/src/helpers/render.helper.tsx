@@ -2,6 +2,7 @@
  * Custom render helpers for React component testing
  */
 
+import React from 'react';
 import type { RenderOptions, RenderResult } from '@testing-library/react';
 
 // Re-export everything from testing-library
@@ -12,7 +13,7 @@ import type { RenderOptions, RenderResult } from '@testing-library/react';
  */
 export async function waitForElementToBeRemoved(
   callback: () => HTMLElement | null,
-  options?: { timeout?: number; interval?: number }
+  options?: { timeout?: number; interval?: number },
 ): Promise<void> {
   const { timeout = 5000, interval = 50 } = options ?? {};
   const startTime = Date.now();
@@ -42,7 +43,7 @@ export async function waitForElementToBeRemoved(
  */
 export async function waitFor(
   callback: () => boolean | Promise<boolean>,
-  options?: { timeout?: number; interval?: number }
+  options?: { timeout?: number; interval?: number },
 ): Promise<void> {
   const { timeout = 5000, interval = 50 } = options ?? {};
   const startTime = Date.now();
@@ -74,11 +75,13 @@ export async function waitFor(
 /**
  * Helper to create a wrapper component with providers
  */
-export function createWrapper(providers: React.ComponentType<{ children: React.ReactNode }>[]) {
+export function createWrapper(
+  providers: React.ComponentType<{ children: React.ReactNode }>[],
+) {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return providers.reduceRight(
       (acc, Provider) => <Provider>{acc}</Provider>,
-      children as React.ReactElement
+      children as React.ReactElement,
     );
   };
 }

@@ -12,9 +12,6 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get various stats in parallel
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sb = supabase as any;
-
     const [
       usersResult,
       activeUsersResult,
@@ -25,19 +22,16 @@ export async function GET(request: NextRequest) {
       transactionsResult,
     ] = await Promise.all([
       // Total users
-      sb.from('users').select('*', { count: 'exact', head: true }),
+      supabase.from('profiles').select('*', { count: 'exact', head: true }),
       // Active users (last 24h)
-      sb
-        .from('users')
+      supabase
+        .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .gte(
-          'last_active_at',
-          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        ),
+        .gte('last_active_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       // Total moments
       supabase.from('moments').select('*', { count: 'exact', head: true }),
-      // Total bookings/matches
-      supabase.from('bookings').select('*', { count: 'exact', head: true }),
+      // Total matches
+      supabase.from('matches').select('*', { count: 'exact', head: true }),
       // Pending disputes
       supabase
         .from('disputes')
@@ -57,9 +51,10 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Calculate today's revenue
-    const todayRevenue =
-      transactionsResult.data?.reduce((sum, t) => sum + (t.amount || 0), 0) ||
-      0;
+    const todayRevenue = transactionsResult.data?.reduce(
+      (sum, t) => sum + (t.amount || 0),
+      0
+    ) || 0;
 
     const stats = {
       total_users: usersResult.count || 0,

@@ -17,19 +17,8 @@ import { usePagination, type PaginatedResponse } from './usePagination';
 import type { Database } from '../types/database.types';
 
 // MomentRow type from the database - includes joined data from momentsService
-type MomentRow = Database['public']['Tables']['moments']['Row'] & {
-  users?: Pick<
-    Database['public']['Tables']['users']['Row'],
-    'full_name' | 'avatar_url' | 'rating' | 'review_count'
-  > | null;
-  user?: Pick<
-    Database['public']['Tables']['users']['Row'],
-    'full_name' | 'avatar_url' | 'rating' | 'review_count'
-  > | null;
-  categories?: Record<string, unknown> | null;
-  favorites_count?: number;
-  trust_score?: number;
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MomentRow = any; // Using any as the service returns dynamic joins
 
 // Types
 export interface Moment {
@@ -156,32 +145,31 @@ const DEFAULT_PAGE_SIZE = 20;
 
 const mapToMoment = (row: MomentRow): Moment => {
   // Extract user data from the optimized join
-  const userData = row.users || row.user || null;
+  const userData = row.users || row.user || {};
+  const categoryData = row.categories || {};
 
   return {
     id: row.id,
     title: row.title,
-    description: row.description || '',
+    description: row.description,
     category: row.category,
     location: row.location,
     images: row.images || [],
-    pricePerGuest: row.price || 0,
-    currency: row.currency || 'USD',
-    maxGuests: row.max_participants || 1,
-    duration: `${row.duration_hours || 0} hours`,
-    availability: row.tags || [],
+    pricePerGuest: row.price,
+    currency: row.currency,
+    maxGuests: row.max_guests,
+    duration: row.duration,
+    availability: row.availability || [],
     hostId: row.user_id,
-    hostName: userData?.full_name || 'Unknown',
-    hostAvatar: userData?.avatar_url || '',
-    hostRating: userData?.rating || row.trust_score || 0,
-    hostReviewCount: userData?.review_count || 0,
+    hostName: userData.name || 'Unknown',
+    hostAvatar: userData.avatar || '',
+    hostRating: userData.rating || userData.trust_score || 0,
+    hostReviewCount: userData.review_count || 0,
     saves: row.favorites_count || 0,
     isSaved: false,
-    status:
-      (row.status as 'active' | 'paused' | 'draft' | 'deleted' | 'completed') ||
-      'active',
-    createdAt: row.created_at || new Date().toISOString(),
-    updatedAt: row.updated_at || new Date().toISOString(),
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 };
 
@@ -296,115 +284,41 @@ export const useMoments = (): UseMomentsReturn => {
   const createMoment = useCallback(
     async (data: CreateMomentData): Promise<Moment | null> => {
       try {
-        // Step 1: Check Supabase session first
-        const { data: sessionData, error: sessionError } =
-          await supabase.auth.getSession();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
 
-        if (sessionError) {
-          logger.error('[useMoments] Session error:', sessionError);
-          throw new Error(`Session error: ${sessionError.message}`);
-        }
-
-        let session = sessionData.session;
-
-        // If no session, try to refresh
-        if (!session) {
-          logger.warn('[useMoments] No session found, attempting refresh...');
-          const { data: refreshData, error: refreshError } =
-            await supabase.auth.refreshSession();
-
-          if (refreshError || !refreshData.session) {
-            logger.error('[useMoments] Session refresh failed:', refreshError);
-            throw new Error('Your session has expired. Please log in again.');
-          }
-
-          session = refreshData.session;
-          logger.info('[useMoments] Session refreshed successfully');
-        }
-
-        const user = session.user;
-        if (!user) {
-          logger.error('[useMoments] No user in session');
-          throw new Error('Not authenticated - please log in again');
-        }
-
-        logger.info(
-          '[useMoments] Authenticated user:',
-          user.id,
-          'Session expires:',
-          new Date(session.expires_at! * 1000).toISOString(),
-        );
-
-        // Step 2: Build location string from city/country
-        const locationStr =
-          typeof data.location === 'string'
-            ? data.location
-            : data.location?.city && data.location?.country
-            ? `${data.location.city}, ${data.location.country}`
-            : data.location?.city || 'Unknown Location';
-
-        // Step 3: Parse duration string to hours (e.g., "2 hours" -> 2)
-        const durationHours =
-          typeof data.duration === 'string'
-            ? parseInt(data.duration.replace(/[^0-9]/g, ''), 10) || 2
-            : 2;
-
-        // Step 4: Build moment data
-        const momentData: Record<string, unknown> = {
+        const momentData = {
           user_id: user.id,
           title: data.title,
-          description: data.description || '',
+          description: data.description,
           category: data.category,
-          location: locationStr,
-          date: data.availability?.[0] || new Date().toISOString(),
+          location:
+            typeof data.location === 'string'
+              ? data.location
+              : data.location?.city || '',
+          latitude: data.location?.coordinates?.lat ?? null,
+          longitude: data.location?.coordinates?.lng ?? null,
+          date: new Date().toISOString(),
           max_participants: data.maxGuests || 1,
-          images: data.images || [],
-          price: data.pricePerGuest || 0,
-          currency: data.currency || 'USD',
-          duration_hours: durationHours,
-          tags: [],
+          images: data.images,
+          price: data.pricePerGuest,
+          currency: data.currency,
+          max_guests: data.maxGuests,
+          duration: data.duration,
+          availability: data.availability,
           status: 'active',
         };
 
-        // Add coordinates if available (required for location-based discovery)
-        if (
-          typeof data.location === 'object' &&
-          data.location.coordinates?.lat &&
-          data.location.coordinates?.lng
-        ) {
-          // PostGIS expects: ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
-          // Supabase accepts WKT or GeoJSON format
-          momentData.coordinates = `POINT(${data.location.coordinates.lng} ${data.location.coordinates.lat})`;
-        }
-
-        logger.info(
-          '[useMoments] Creating moment with data:',
-          JSON.stringify(momentData),
-        );
-
-        // Step 5: Insert into database
         const insertPayload =
           momentData as unknown as Database['public']['Tables']['moments']['Insert'];
         const { data: moment, error } = await momentsService.create(
           insertPayload,
         );
+        if (error) throw error;
 
-        if (error) {
-          logger.error('[useMoments] Create moment DB error:', {
-            message: error.message,
-            name: error.name,
-          });
-          throw error;
-        }
-
-        if (!moment) {
-          logger.error('[useMoments] No moment returned from DB');
-          throw new Error('Database returned empty result');
-        }
-
-        logger.info('[useMoments] Moment created successfully:', moment.id);
-
-        const newMoment = mapToMoment(moment);
+        const newMoment = moment ? mapToMoment(moment) : null;
         if (newMoment && mountedRef.current) {
           setMyMoments((prev) => [newMoment, ...prev]);
           // Note: Main feed uses cursor pagination, refresh to see new moment
@@ -412,20 +326,9 @@ export const useMoments = (): UseMomentsReturn => {
         }
         return newMoment;
       } catch (err) {
-        const error = err as Error & {
-          code?: string;
-          details?: string;
-          hint?: string;
-        };
-        logger.error('[useMoments] Failed to create moment:', {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint,
-          stack: error.stack,
-        });
-        // Re-throw to allow UI to handle and display the error
-        throw error;
+        const standardizedError = ErrorHandler.handle(err, 'createMoment');
+        logger.error('Failed to create moment:', standardizedError);
+        return null;
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -441,23 +344,17 @@ export const useMoments = (): UseMomentsReturn => {
       data: Partial<CreateMomentData>,
     ): Promise<Moment | null> => {
       try {
-        const updates: Database['public']['Tables']['moments']['Update'] = {};
-        if (data.title !== undefined) updates.title = data.title;
-        if (data.description !== undefined)
-          updates.description = data.description;
-        if (data.category !== undefined) updates.category = data.category;
-        if (data.location !== undefined) {
-          updates.location =
-            typeof data.location === 'string'
-              ? data.location
-              : data.location.city;
-        }
-        if (data.images !== undefined) updates.images = data.images;
-        if (data.pricePerGuest !== undefined)
-          updates.price = data.pricePerGuest;
-        if (data.currency !== undefined) updates.currency = data.currency;
-        if (data.maxGuests !== undefined)
-          updates.max_participants = data.maxGuests;
+        const updates: any = {};
+        if (data.title) updates.title = data.title;
+        if (data.description) updates.description = data.description;
+        if (data.category) updates.category = data.category;
+        if (data.location) updates.location = data.location;
+        if (data.images) updates.images = data.images;
+        if (data.pricePerGuest) updates.price = data.pricePerGuest;
+        if (data.currency) updates.currency = data.currency;
+        if (data.maxGuests) updates.max_guests = data.maxGuests;
+        if (data.duration) updates.duration = data.duration;
+        if (data.availability) updates.availability = data.availability;
 
         const { data: moment, error } = await momentsService.update(
           id,
@@ -674,7 +571,7 @@ export const useMoments = (): UseMomentsReturn => {
 
       if (!mountedRef.current) return;
 
-      const mappedMoments: Moment[] = data.map((row: MomentRow) => ({
+      const mappedMoments: Moment[] = data.map((row: any) => ({
         ...mapToMoment(row),
         isSaved: true,
       }));

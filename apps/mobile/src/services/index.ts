@@ -95,6 +95,7 @@ export type {
   UserProfile,
   UserPreferences,
   UpdateProfileData,
+  FollowUser,
 } from './userService';
 
 export { personalization } from './personalization';
@@ -113,11 +114,6 @@ export type {
   SessionEventListener,
 } from './sessionManager';
 
-export {
-  navigationRef,
-  navigate,
-  resetNavigation,
-  goBack,
-} from './navigationService';
+export { navigationRef, navigate, resetNavigation, goBack } from './navigationService';
 export { apiClient, apiV1Service } from './apiV1Service';
 export type { ApiResponse } from './apiV1Service';

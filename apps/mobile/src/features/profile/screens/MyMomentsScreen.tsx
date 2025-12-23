@@ -15,7 +15,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
-import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { useMoments } from '@/hooks/useMoments';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { Moment as MomentType } from '../types';
@@ -60,8 +59,8 @@ const MyMomentsScreen: React.FC = () => {
       id: moment.id,
       title: moment.title,
       story: moment.description || `Experience ${moment.title}`,
-      imageUrl: moment.images?.[0] || DEFAULT_IMAGES.AVATAR_LARGE,
-      image: moment.images?.[0] || DEFAULT_IMAGES.AVATAR_LARGE,
+      imageUrl: moment.images?.[0] || 'https://via.placeholder.com/150',
+      image: moment.images?.[0] || 'https://via.placeholder.com/150',
       price: moment.pricePerGuest,
       status: moment.status,
       location: {
@@ -150,17 +149,20 @@ const MyMomentsScreen: React.FC = () => {
             accessible={false}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} {...a11y.header('My Moments')}>
+        <Text 
+          style={styles.headerTitle}
+          {...a11y.header('My Moments')}
+        >
           My Moments
         </Text>
-        <TouchableOpacity
-          style={styles.addButton}
+        <TouchableOpacity 
+          style={styles.addButton} 
           onPress={handleCreateMoment}
           {...a11y.button('Create new moment', 'Add a new travel moment')}
         >
-          <MaterialCommunityIcons
-            name="plus"
-            size={24}
+          <MaterialCommunityIcons 
+            name="plus" 
+            size={24} 
             color={COLORS.coral}
             accessible={false}
           />
@@ -174,7 +176,7 @@ const MyMomentsScreen: React.FC = () => {
           onPress={() => setActiveTab('active')}
           {...a11y.tab(
             `Active moments, ${activeMoments.length} items`,
-            activeTab === 'active',
+            activeTab === 'active'
           )}
         >
           <Text
@@ -191,7 +193,7 @@ const MyMomentsScreen: React.FC = () => {
           onPress={() => setActiveTab('completed')}
           {...a11y.tab(
             `Completed moments, ${completedMoments.length} items`,
-            activeTab === 'completed',
+            activeTab === 'completed'
           )}
         >
           <Text
@@ -223,9 +225,7 @@ const MyMomentsScreen: React.FC = () => {
           </View>
         ) : moments.length === 0 ? (
           <EmptyState
-            illustrationType={
-              activeTab === 'active' ? 'no_moments' : 'no_moments'
-            }
+            illustrationType={activeTab === 'active' ? 'no_moments' : 'no_moments'}
             icon={activeTab === 'active' ? 'map-marker-star' : 'check-circle'}
             title={
               activeTab === 'active'
@@ -266,15 +266,11 @@ const MyMomentsScreen: React.FC = () => {
                     color={COLORS.textSecondary}
                   />
                   <Text style={styles.momentLocationText}>
-                    {typeof moment.location === 'string'
-                      ? moment.location
-                      : `${moment.location.city}, ${moment.location.country}`}
+                    {typeof moment.location === 'string' ? moment.location : `${moment.location.city}, ${moment.location.country}`}
                   </Text>
                 </View>
                 <View style={styles.momentFooter}>
-                  <Text style={styles.momentPrice}>
-                    ${moment.price ?? moment.pricePerGuest}
-                  </Text>
+                  <Text style={styles.momentPrice}>${moment.price ?? moment.pricePerGuest}</Text>
                   {moment.status === 'completed' && moment.rating && (
                     <View style={styles.ratingContainer}>
                       <MaterialCommunityIcons
@@ -314,11 +310,7 @@ const MyMomentsScreen: React.FC = () => {
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Total earned</Text>
               <Text style={styles.summaryValueHighlight}>
-                $
-                {completedMoments.reduce(
-                  (sum, m) => sum + (m.price ?? m.pricePerGuest ?? 0),
-                  0,
-                )}
+                ${completedMoments.reduce((sum, m) => sum + (m.price ?? m.pricePerGuest ?? 0), 0)}
               </Text>
             </View>
           </View>
@@ -506,6 +498,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 40,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+  },
+  emptyIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  createButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: COLORS.coral,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  createButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.white,
   },
 
   // Summary Card

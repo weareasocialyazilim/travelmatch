@@ -4,8 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Share,
-  Image,
+  Share,  Image,
   Clipboard,
   Linking,
   Alert,
@@ -14,7 +13,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
-import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { logger } from '@/utils/logger';
 import { useMoments } from '@/hooks/useMoments';
 import type { Moment } from '@/hooks/useMoments';
@@ -33,8 +31,8 @@ interface ShareOption {
 }
 
 export const ShareMomentScreen: React.FC = () => {
-  const { showToast } = useToast();
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const { showToast } = useToast();
+const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<ShareMomentScreenProps>();
   const { momentId } = route.params;
   const { getMoment } = useMoments();
@@ -89,7 +87,7 @@ export const ShareMomentScreen: React.FC = () => {
         url: shareUrl,
         title: displayMoment.title,
       });
-    } catch {
+    } catch (error) {
       showToast('Could not share this moment', 'error');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -239,19 +237,14 @@ export const ShareMomentScreen: React.FC = () => {
       <View style={styles.previewSection}>
         <View style={styles.previewCard}>
           <Image
-            source={{
-              uri:
-                displayMoment.images?.[0] || DEFAULT_IMAGES.MOMENT_PLACEHOLDER,
-            }}
+            source={{ uri: displayMoment.images?.[0] || 'https://via.placeholder.com/400' }}
             style={styles.previewImage}
           />
           <View style={styles.previewInfo}>
             <Text style={styles.previewTitle} numberOfLines={2}>
               {displayMoment.title}
             </Text>
-            <Text style={styles.previewPrice}>
-              ${displayMoment.pricePerGuest}
-            </Text>
+            <Text style={styles.previewPrice}>${displayMoment.pricePerGuest}</Text>
           </View>
         </View>
       </View>
@@ -325,7 +318,9 @@ export const ShareMomentScreen: React.FC = () => {
       <View style={styles.qrSection}>
         <TouchableOpacity
           style={styles.qrButton}
-          onPress={() => showToast('QR code would be displayed here', 'info')}
+          onPress={() =>
+            showToast('QR code would be displayed here', 'info')
+          }
         >
           <MaterialCommunityIcons
             name="qrcode"

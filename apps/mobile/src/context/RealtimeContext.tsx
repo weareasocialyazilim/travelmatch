@@ -12,10 +12,6 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { useAuth } from './AuthContext';
-import {
-  realtimeChannelManager,
-  ConnectionHealth,
-} from '../services/realtimeChannelManager';
 
 // Event types
 export type RealtimeEventType =
@@ -94,7 +90,6 @@ interface RealtimeContextType {
   // Connection state
   connectionState: ConnectionState;
   isConnected: boolean;
-  connectionHealth: ConnectionHealth | null;
 
   // Online users (Supabase Presence)
   onlineUsers: Set<string>;
@@ -118,9 +113,6 @@ interface RealtimeContextType {
   connect: () => void;
   disconnect: () => void;
   reconnect: () => void;
-
-  // Performance metrics
-  getConnectionHealth: () => ConnectionHealth;
 }
 
 const RealtimeContext = createContext<RealtimeContextType | undefined>(
@@ -136,26 +128,15 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   const [connectionState, setConnectionState] =
     useState<ConnectionState>('disconnected');
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
-  const [connectionHealth, setConnectionHealth] =
-    useState<ConnectionHealth | null>(null);
 
   // Refs for Supabase channels and handlers
   const presenceChannelRef = useRef<RealtimeChannel | null>(null);
   const notificationChannelRef = useRef<RealtimeChannel | null>(null);
-  const typingChannelUnsubscribeRef = useRef<(() => void) | null>(null);
   const handlersRef = useRef<EventHandlers>(new Map());
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
-  const typingDebounceRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // Derived state
   const isConnected = connectionState === 'connected';
-
-  /**
-   * Get current connection health from channel manager
-   */
-  const getConnectionHealth = useCallback((): ConnectionHealth => {
-    return realtimeChannelManager.getConnectionHealth();
-  }, []);
 
   /**
    * Emit event to all subscribed handlers
@@ -382,79 +363,29 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   );
 
   /**
-   * Send typing start indicator via broadcast
-   * Uses debouncing to prevent flooding
+   * Send typing start indicator (via broadcast)
    */
   const sendTypingStart = useCallback(
     (conversationId: string) => {
-      if (!user?.id) return;
-
-      // Clear existing debounce timer for this conversation
-      const existingTimer = typingDebounceRef.current.get(conversationId);
-      if (existingTimer) {
-        clearTimeout(existingTimer);
-      }
-
-      // Broadcast to other users in the conversation
-      realtimeChannelManager.broadcast(
-        `conversation:${conversationId}`,
-        'typing',
-        {
-          userId: user.id,
-          conversationId,
-          isTyping: true,
-          timestamp: Date.now(),
-        }
-      );
-
-      // Emit local event
+      // This would be handled by conversation-specific channels
+      // Emit local event for now
       emit('message:typing', {
         conversationId,
-        userId: user.id,
+        userId: user?.id || '',
         isTyping: true,
       });
-
-      // Auto-stop typing after 5 seconds of inactivity
-      const timer = setTimeout(() => {
-        sendTypingStop(conversationId);
-        typingDebounceRef.current.delete(conversationId);
-      }, 5000);
-
-      typingDebounceRef.current.set(conversationId, timer);
     },
     [user, emit],
   );
 
   /**
-   * Send typing stop indicator via broadcast
+   * Send typing stop indicator
    */
   const sendTypingStop = useCallback(
     (conversationId: string) => {
-      if (!user?.id) return;
-
-      // Clear debounce timer
-      const existingTimer = typingDebounceRef.current.get(conversationId);
-      if (existingTimer) {
-        clearTimeout(existingTimer);
-        typingDebounceRef.current.delete(conversationId);
-      }
-
-      // Broadcast to other users
-      realtimeChannelManager.broadcast(
-        `conversation:${conversationId}`,
-        'typing',
-        {
-          userId: user.id,
-          conversationId,
-          isTyping: false,
-          timestamp: Date.now(),
-        }
-      );
-
-      // Emit local event
       emit('message:typing', {
         conversationId,
-        userId: user.id,
+        userId: user?.id || '',
         isTyping: false,
       });
     },
@@ -502,34 +433,12 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     };
   }, [isAuthenticated, connectionState, connect, disconnect]);
 
-  // Subscribe to health updates from channel manager
-  useEffect(() => {
-    const unsubscribe = realtimeChannelManager.onHealthChange((health) => {
-      setConnectionHealth(health);
-    });
-
-    // Get initial health
-    setConnectionHealth(realtimeChannelManager.getConnectionHealth());
-
-    return unsubscribe;
-  }, []);
-
-  // Cleanup typing debounce timers on unmount
-  useEffect(() => {
-    const currentTimers = typingDebounceRef.current;
-    return () => {
-      currentTimers.forEach((timer) => clearTimeout(timer));
-      currentTimers.clear();
-    };
-  }, []);
-
   return (
     <RealtimeContext.Provider
       value={{
         // Connection state
         connectionState,
         isConnected,
-        connectionHealth,
 
         // Online users
         onlineUsers,
@@ -550,9 +459,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
         connect,
         disconnect,
         reconnect,
-
-        // Performance metrics
-        getConnectionHealth,
       }}
     >
       {children}

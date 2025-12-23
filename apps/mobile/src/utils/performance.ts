@@ -98,38 +98,11 @@ export const useStableCallback = <T extends (...args: unknown[]) => unknown>(
 };
 
 /**
- * FlashList Optimization Helpers
- * FlashList handles most optimizations automatically
- */
-export const flashListOptimizations = {
-  /**
-   * Key extractor - works with both FlatList and FlashList
-   */
-  keyExtractor: <T extends { id?: string | number }>(
-    item: T,
-    index: number,
-  ) => {
-    return item.id?.toString() ?? index.toString();
-  },
-
-  /**
-   * Common estimated item sizes
-   */
-  estimatedSizes: {
-    small: 60,
-    medium: 120,
-    large: 200,
-    extraLarge: 420,
-  },
-};
-
-/**
- * @deprecated Use flashListOptimizations instead. FlashList doesn't need these props.
- * FlatList Optimization Helpers (Legacy)
+ * FlatList Optimization Helpers
  */
 export const flatListOptimizations = {
   /**
-   * @deprecated FlashList doesn't use getItemLayout
+   * Get item layout for fixed height items
    */
   getItemLayout: (itemHeight: number) => (_data: unknown, index: number) => ({
     length: itemHeight,
@@ -148,7 +121,7 @@ export const flatListOptimizations = {
   },
 
   /**
-   * @deprecated FlashList doesn't need these manual optimization props
+   * Default optimization props
    */
   defaultProps: {
     removeClippedSubviews: true,
@@ -300,7 +273,7 @@ class PerformanceMonitorClass {
     // @ts-expect-error - performance.memory is non-standard but available in React Native
     if (performance.memory) {
       // @ts-expect-error - performance.memory types
-       
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
       const usage =
         ((usedJSHeapSize as number) / (totalJSHeapSize as number)) * 100;

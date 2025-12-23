@@ -55,7 +55,7 @@ describe('FilterPill', () => {
     it('does not render icon when not provided', () => {
       const filterWithoutIcon = { ...mockFilter, icon: undefined };
       const { UNSAFE_queryByType } = render(
-        <FilterPill {...defaultProps} filter={filterWithoutIcon} />,
+        <FilterPill {...defaultProps} filter={filterWithoutIcon} />
       );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       expect(UNSAFE_queryByType(MaterialCommunityIcons)).toBeNull();
@@ -63,7 +63,7 @@ describe('FilterPill', () => {
 
     it('applies selected styles when isSelected is true', () => {
       const { getByText } = render(
-        <FilterPill {...defaultProps} isSelected={true} />,
+        <FilterPill {...defaultProps} isSelected={true} />
       );
       const label = getByText('Coffee');
       expect(label).toBeTruthy();
@@ -71,15 +71,15 @@ describe('FilterPill', () => {
 
     it('applies unselected styles when isSelected is false', () => {
       const { getByText } = render(
-        <FilterPill {...defaultProps} isSelected={false} />,
+        <FilterPill {...defaultProps} isSelected={false} />
       );
       const label = getByText('Coffee');
       expect(label).toBeTruthy();
     });
 
     it('has correct accessibility role', () => {
-      const { getByLabelText } = render(<FilterPill {...defaultProps} />);
-      expect(getByLabelText(defaultProps.filter.label)).toBeTruthy();
+      const { getByRole } = render(<FilterPill {...defaultProps} />);
+      expect(getByRole('button')).toBeTruthy();
     });
 
     it('has correct accessibility label', () => {
@@ -88,49 +88,49 @@ describe('FilterPill', () => {
     });
 
     it('has correct accessibility state when selected', () => {
-      const { getByLabelText } = render(
-        <FilterPill {...defaultProps} isSelected={true} />,
+      const { getByRole } = render(
+        <FilterPill {...defaultProps} isSelected={true} />
       );
-      const button = getByLabelText(defaultProps.filter.label);
+      const button = getByRole('button');
       expect(button.props.accessibilityState.selected).toBe(true);
     });
 
     it('has correct accessibility state when not selected', () => {
-      const { getByLabelText } = render(
-        <FilterPill {...defaultProps} isSelected={false} />,
+      const { getByRole } = render(
+        <FilterPill {...defaultProps} isSelected={false} />
       );
-      const button = getByLabelText(defaultProps.filter.label);
+      const button = getByRole('button');
       expect(button.props.accessibilityState.selected).toBe(false);
     });
   });
 
   describe('User Interactions', () => {
     it('calls onPress with filter id when pressed', () => {
-      const { getByLabelText } = render(<FilterPill {...defaultProps} />);
-      const button = getByLabelText(defaultProps.filter.label);
+      const { getByRole } = render(<FilterPill {...defaultProps} />);
+      const button = getByRole('button');
       fireEvent.press(button);
       expect(mockOnPress).toHaveBeenCalledWith('coffee');
       expect(mockOnPress).toHaveBeenCalledTimes(1);
     });
 
     it('calls onPress multiple times', () => {
-      const { getByLabelText } = render(<FilterPill {...defaultProps} />);
-      const button = getByLabelText(defaultProps.filter.label);
-
+      const { getByRole } = render(<FilterPill {...defaultProps} />);
+      const button = getByRole('button');
+      
       fireEvent.press(button);
       fireEvent.press(button);
-
+      
       expect(mockOnPress).toHaveBeenCalledTimes(2);
     });
 
     it('handles multiple presses', () => {
-      const { getByLabelText } = render(<FilterPill {...defaultProps} />);
-      const button = getByLabelText(defaultProps.filter.label);
-
+      const { getByRole } = render(<FilterPill {...defaultProps} />);
+      const button = getByRole('button');
+      
       fireEvent.press(button);
       fireEvent.press(button);
       fireEvent.press(button);
-
+      
       expect(mockOnPress).toHaveBeenCalledTimes(3);
       expect(mockOnPress).toHaveBeenCalledWith('coffee');
     });
@@ -140,21 +140,17 @@ describe('FilterPill', () => {
     it('renders filter with different id', () => {
       const differentFilter = { id: 'meals', label: 'Meals', icon: 'food' };
       const { getByText } = render(
-        <FilterPill {...defaultProps} filter={differentFilter} />,
+        <FilterPill {...defaultProps} filter={differentFilter} />
       );
       expect(getByText('Meals')).toBeTruthy();
     });
 
     it('calls onPress with correct id for different filter', () => {
-      const differentFilter = {
-        id: 'tickets',
-        label: 'Tickets',
-        icon: 'ticket',
-      };
-      const { getByLabelText } = render(
-        <FilterPill {...defaultProps} filter={differentFilter} />,
+      const differentFilter = { id: 'tickets', label: 'Tickets', icon: 'ticket' };
+      const { getByRole } = render(
+        <FilterPill {...defaultProps} filter={differentFilter} />
       );
-      fireEvent.press(getByLabelText('Tickets'));
+      fireEvent.press(getByRole('button'));
       expect(mockOnPress).toHaveBeenCalledWith('tickets');
     });
 
@@ -165,19 +161,15 @@ describe('FilterPill', () => {
         icon: 'star',
       };
       const { getByText } = render(
-        <FilterPill {...defaultProps} filter={longFilter} />,
+        <FilterPill {...defaultProps} filter={longFilter} />
       );
       expect(getByText('Very Long Filter Name That Might Wrap')).toBeTruthy();
     });
 
     it('renders filter with special characters in label', () => {
-      const specialFilter = {
-        id: 'special',
-        label: 'Café & Bar 🍺',
-        icon: 'glass-cocktail',
-      };
+      const specialFilter = { id: 'special', label: 'Café & Bar 🍺', icon: 'glass-cocktail' };
       const { getByText } = render(
-        <FilterPill {...defaultProps} filter={specialFilter} />,
+        <FilterPill {...defaultProps} filter={specialFilter} />
       );
       expect(getByText('Café & Bar 🍺')).toBeTruthy();
     });
@@ -186,7 +178,7 @@ describe('FilterPill', () => {
   describe('Icon Color', () => {
     it('renders icon with secondary color when not selected', () => {
       const { UNSAFE_getByType } = render(
-        <FilterPill {...defaultProps} isSelected={false} />,
+        <FilterPill {...defaultProps} isSelected={false} />
       );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icon = UNSAFE_getByType(MaterialCommunityIcons);
@@ -196,7 +188,7 @@ describe('FilterPill', () => {
 
     it('renders icon with text color when selected', () => {
       const { UNSAFE_getByType } = render(
-        <FilterPill {...defaultProps} isSelected={true} />,
+        <FilterPill {...defaultProps} isSelected={true} />
       );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icon = UNSAFE_getByType(MaterialCommunityIcons);
@@ -208,44 +200,43 @@ describe('FilterPill', () => {
   describe('Edge Cases', () => {
     it('handles filter with empty string label', () => {
       const emptyFilter = { id: 'empty', label: '', icon: 'star' };
-      const { UNSAFE_root } = render(
-        <FilterPill {...defaultProps} filter={emptyFilter} />,
+      const { getByRole } = render(
+        <FilterPill {...defaultProps} filter={emptyFilter} />
       );
-      // Just verify it renders without crashing
-      expect(UNSAFE_root).toBeTruthy();
+      expect(getByRole('button')).toBeTruthy();
     });
 
     it('handles filter with empty id', () => {
       const emptyIdFilter = { id: '', label: 'Test', icon: 'star' };
-      const { getByLabelText } = render(
-        <FilterPill {...defaultProps} filter={emptyIdFilter} />,
+      const { getByRole } = render(
+        <FilterPill {...defaultProps} filter={emptyIdFilter} />
       );
-      fireEvent.press(getByLabelText('Test'));
+      fireEvent.press(getByRole('button'));
       expect(mockOnPress).toHaveBeenCalledWith('');
     });
 
     it('toggles selection state correctly', () => {
-      const { rerender, getByLabelText } = render(
-        <FilterPill {...defaultProps} isSelected={false} />,
+      const { rerender, getByRole } = render(
+        <FilterPill {...defaultProps} isSelected={false} />
       );
-      let button = getByLabelText(defaultProps.filter.label);
+      let button = getByRole('button');
       expect(button.props.accessibilityState.selected).toBe(false);
 
       rerender(<FilterPill {...defaultProps} isSelected={true} />);
-      button = getByLabelText(defaultProps.filter.label);
+      button = getByRole('button');
       expect(button.props.accessibilityState.selected).toBe(true);
     });
 
     it('handles rapid selection changes', () => {
-      const { rerender, getByLabelText } = render(
-        <FilterPill {...defaultProps} isSelected={false} />,
+      const { rerender, getByRole } = render(
+        <FilterPill {...defaultProps} isSelected={false} />
       );
-
+      
       rerender(<FilterPill {...defaultProps} isSelected={true} />);
       rerender(<FilterPill {...defaultProps} isSelected={false} />);
       rerender(<FilterPill {...defaultProps} isSelected={true} />);
-
-      const button = getByLabelText(defaultProps.filter.label);
+      
+      const button = getByRole('button');
       expect(button.props.accessibilityState.selected).toBe(true);
     });
   });

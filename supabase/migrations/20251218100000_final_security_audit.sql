@@ -227,19 +227,15 @@ WITH CHECK ((select auth.role()) = 'service_role');
 DROP POLICY IF EXISTS "rate_limit_config_read" ON public.rate_limit_config;
 DROP POLICY IF EXISTS "rate_limit_config_write" ON public.rate_limit_config;
 
-DROP POLICY IF EXISTS "rate_limit_config_select" ON public.rate_limit_config;
 CREATE POLICY "rate_limit_config_select" ON public.rate_limit_config
 FOR SELECT USING ((select auth.role()) IN ('authenticated', 'service_role'));
 
-DROP POLICY IF EXISTS "rate_limit_config_insert" ON public.rate_limit_config;
 CREATE POLICY "rate_limit_config_insert" ON public.rate_limit_config
 FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
 
-DROP POLICY IF EXISTS "rate_limit_config_update" ON public.rate_limit_config;
 CREATE POLICY "rate_limit_config_update" ON public.rate_limit_config
 FOR UPDATE USING ((select auth.role()) = 'service_role');
 
-DROP POLICY IF EXISTS "rate_limit_config_delete" ON public.rate_limit_config;
 CREATE POLICY "rate_limit_config_delete" ON public.rate_limit_config
 FOR DELETE USING ((select auth.role()) = 'service_role');
 
@@ -261,21 +257,17 @@ FOR INSERT WITH CHECK ((select auth.uid()) = reviewer_id);
 DROP POLICY IF EXISTS "Service role can manage KYC verifications" ON public.kyc_verifications;
 DROP POLICY IF EXISTS "Users can view their own KYC verifications" ON public.kyc_verifications;
 
-DROP POLICY IF EXISTS "KYC verifications access" ON public.kyc_verifications;
 CREATE POLICY "KYC verifications access" ON public.kyc_verifications
 FOR SELECT USING (
   (select auth.uid()) = user_id OR (select auth.role()) = 'service_role'
 );
 
-DROP POLICY IF EXISTS "KYC verifications service write" ON public.kyc_verifications;
 CREATE POLICY "KYC verifications service write" ON public.kyc_verifications
 FOR INSERT WITH CHECK ((select auth.role()) = 'service_role');
 
-DROP POLICY IF EXISTS "KYC verifications service update" ON public.kyc_verifications;
 CREATE POLICY "KYC verifications service update" ON public.kyc_verifications
 FOR UPDATE USING ((select auth.role()) = 'service_role');
 
-DROP POLICY IF EXISTS "KYC verifications service delete" ON public.kyc_verifications;
 CREATE POLICY "KYC verifications service delete" ON public.kyc_verifications
 FOR DELETE USING ((select auth.role()) = 'service_role');
 
@@ -283,7 +275,6 @@ FOR DELETE USING ((select auth.role()) = 'service_role');
 DROP POLICY IF EXISTS "Users can view own proof verifications" ON public.proof_verifications;
 DROP POLICY IF EXISTS "Users can view verifications for their moments" ON public.proof_verifications;
 
-DROP POLICY IF EXISTS "Users can view proof verifications" ON public.proof_verifications;
 CREATE POLICY "Users can view proof verifications" ON public.proof_verifications
 FOR SELECT USING (
   (select auth.uid()) = user_id

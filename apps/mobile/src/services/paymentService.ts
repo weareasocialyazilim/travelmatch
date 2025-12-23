@@ -14,19 +14,12 @@ import {
 } from '../schemas/payment.schema';
 import { VALUES } from '../constants/values';
 
-// Fallback for __DEV__ when running in Jest or Node.js environment
-declare const __DEV__: boolean | undefined;
-const isDev =
-  typeof __DEV__ !== 'undefined'
-    ? __DEV__
-    : process.env.NODE_ENV !== 'production';
-
 // Mock storage for payment methods (simulated for store readiness)
 // WARNING: Only used in development. Production should use real payment gateway.
 let MOCK_CARDS: PaymentCard[] = [];
 let MOCK_BANKS: BankAccount[] = [];
 
-if (!isDev) {
+if (!__DEV__) {
   logger.warn('Mock payment methods should not be used in production!');
 }
 
@@ -81,7 +74,7 @@ export interface Transaction {
   date: string;
   description: string;
   referenceId?: string; // e.g., momentId or requestId
-  metadata?: Record<string, string | number | boolean | null>;
+  metadata?: Record<string, any>;
 }
 
 export interface WalletBalance {
@@ -138,27 +131,6 @@ export interface EscrowTransaction {
   created_at: string;
   expires_at: string;
   moment_id?: string;
-}
-
-// RPC Response Types
-interface AtomicTransferResult {
-  success: boolean;
-  senderTxnId: string;
-  recipientTxnId: string;
-}
-
-interface CreateEscrowResult {
-  success: boolean;
-  transaction_id: string;
-  escrow_id: string;
-}
-
-interface ReleaseEscrowResult {
-  success: boolean;
-}
-
-interface RefundEscrowResult {
-  success: boolean;
 }
 
 /**
@@ -271,12 +243,12 @@ export const paymentService = {
         id: row.id,
         type: (row.type as TransactionType) || 'payment', // Simple cast
         amount: row.amount,
-        currency: row.currency ?? 'USD',
+        currency: row.currency,
         status: (row.status as PaymentStatus) || 'completed',
-        date: row.created_at ?? new Date().toISOString(),
+        date: row.created_at,
         description: row.description || '',
-        referenceId: row.moment_id ?? undefined,
-        metadata: row.metadata as Transaction['metadata'],
+        referenceId: row.moment_id,
+        metadata: row.metadata,
       }));
 
       return { transactions, total: count };
@@ -311,7 +283,7 @@ export const paymentService = {
         date: data.created_at ?? new Date().toISOString(),
         description: data.description ?? '',
         referenceId: data.moment_id ?? undefined,
-        metadata: validatedMetadata as Transaction['metadata'],
+        metadata: validatedMetadata,
       };
 
       return { transaction };
@@ -331,7 +303,7 @@ export const paymentService = {
     bankAccounts: BankAccount[];
   } => {
     // Simulated for store readiness (would be Stripe/Supabase in production)
-    if (!isDev) {
+    if (!__DEV__) {
       logger.warn('Using mock payment methods in production!');
       return { cards: [], bankAccounts: [] };
     }
@@ -342,7 +314,7 @@ export const paymentService = {
    * Add a new card
    */
   addCard: (_tokenId: string): { card: PaymentCard } => {
-    if (!isDev) {
+    if (!__DEV__) {
       logger.error('addCard called in production with mock implementation!');
       throw new Error('Payment methods not configured for production');
     }
@@ -363,7 +335,7 @@ export const paymentService = {
    * Remove a card
    */
   removeCard: (cardId: string): { success: boolean } => {
-    if (!isDev) {
+    if (!__DEV__) {
       logger.error('removeCard called in production with mock implementation!');
       throw new Error('Payment methods not configured for production');
     }
@@ -377,7 +349,7 @@ export const paymentService = {
   addBankAccount: (
     _data: Record<string, unknown>,
   ): { bankAccount: BankAccount } => {
-    if (!isDev) {
+    if (!__DEV__) {
       logger.error(
         'addBankAccount called in production with mock implementation!',
       );
@@ -399,7 +371,7 @@ export const paymentService = {
    * Remove a bank account
    */
   removeBankAccount: (bankAccountId: string): { success: boolean } => {
-    if (!isDev) {
+    if (!__DEV__) {
       logger.error(
         'removeBankAccount called in production with mock implementation!',
       );
@@ -424,7 +396,7 @@ export const paymentService = {
    * Set default card
    */
   setDefaultCard: async (cardId: string): Promise<{ success: boolean }> => {
-    if (!isDev) {
+    if (!__DEV__) {
       logger.error(
         'setDefaultCard called in production with mock implementation!',
       );
@@ -580,7 +552,7 @@ export const paymentService = {
           status: 'completed',
           date: transaction.created_at ?? new Date().toISOString(),
           description: transaction.description ?? '',
-          metadata: validatedMetadata as Transaction['metadata'],
+          metadata: validatedMetadata,
         },
       };
     } catch (error) {
@@ -614,8 +586,7 @@ export const paymentService = {
       });
 
       if (error) throw error;
-      if (!transaction)
-        throw new Error('Failed to create withdrawal transaction');
+      if (!transaction) throw new Error('Failed to create withdrawal transaction');
 
       return {
         transaction: {
@@ -671,20 +642,22 @@ export const paymentService = {
         case 'direct':
           // < $30: Direct atomic transfer (no escrow)
           logger.info(`[Payment] Direct transfer: $${amount}`);
-          const { data: directData, error: directError } =
-            await callRpc<AtomicTransferResult>('atomic_transfer', {
+          const { data: directData, error: directError } = await callRpc<any>(
+            'atomic_transfer',
+            {
               p_sender_id: user.id,
               p_recipient_id: recipientId,
               p_amount: amount,
               p_moment_id: momentId,
               p_message: message,
-            });
+            },
+          );
 
           if (directError) throw directError;
 
           return {
             success: true,
-            transactionId: directData?.senderTxnId || '',
+            transactionId: directData?.senderTxnId,
           };
 
         case 'optional':
@@ -696,26 +669,28 @@ export const paymentService = {
 
           if (useEscrow) {
             // User chose escrow protection
-            const { data: escrowData, error: escrowError } =
-              await callRpc<CreateEscrowResult>('create_escrow_transaction', {
+            const { data: escrowData, error: escrowError } = await callRpc<any>(
+              'create_escrow_transaction',
+              {
                 p_sender_id: user.id,
                 p_recipient_id: recipientId,
                 p_amount: amount,
                 p_moment_id: momentId,
                 p_release_condition: 'proof_verified',
-              });
+              },
+            );
 
             if (escrowError) throw escrowError;
 
             return {
               success: true,
-              transactionId: escrowData?.transaction_id || '',
+              transactionId: escrowData?.transaction_id,
               escrowId: escrowData?.escrow_id,
             };
           } else {
             // User chose direct payment
             const { data: directData2, error: directError2 } =
-              await callRpc<AtomicTransferResult>('atomic_transfer', {
+              await callRpc<any>('atomic_transfer', {
                 p_sender_id: user.id,
                 p_recipient_id: recipientId,
                 p_amount: amount,
@@ -727,7 +702,7 @@ export const paymentService = {
 
             return {
               success: true,
-              transactionId: directData2?.senderTxnId || '',
+              transactionId: directData2?.senderTxnId,
             };
           }
 
@@ -735,7 +710,7 @@ export const paymentService = {
           // >= $100: Force escrow (no choice)
           logger.info(`[Payment] Mandatory escrow: $${amount}`);
           const { data: mandatoryData, error: mandatoryError } =
-            await callRpc<CreateEscrowResult>('create_escrow_transaction', {
+            await callRpc<any>('create_escrow_transaction', {
               p_sender_id: user.id,
               p_recipient_id: recipientId,
               p_amount: amount,
@@ -747,7 +722,7 @@ export const paymentService = {
 
           return {
             success: true,
-            transactionId: mandatoryData?.transaction_id || '',
+            transactionId: mandatoryData?.transaction_id,
             escrowId: mandatoryData?.escrow_id,
           };
 
@@ -766,16 +741,13 @@ export const paymentService = {
    */
   releaseEscrow: async (escrowId: string): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await callRpc<ReleaseEscrowResult>(
-        'release_escrow',
-        {
-          p_escrow_id: escrowId,
-        },
-      );
+      const { data, error } = await callRpc<any>('release_escrow', {
+        p_escrow_id: escrowId,
+      });
 
       if (error) throw error;
 
-      return { success: data?.success || false };
+      return { success: data?.success };
     } catch (error) {
       logger.error('Release escrow error:', error);
       throw error;
@@ -791,17 +763,14 @@ export const paymentService = {
     reason: string,
   ): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await callRpc<RefundEscrowResult>(
-        'refund_escrow',
-        {
-          p_escrow_id: escrowId,
-          p_reason: reason,
-        },
-      );
+      const { data, error } = await callRpc<any>('refund_escrow', {
+        p_escrow_id: escrowId,
+        p_reason: reason,
+      });
 
       if (error) throw error;
 
-      return { success: data?.success || false };
+      return { success: data?.success };
     } catch (error) {
       logger.error('Refund escrow error:', error);
       throw error;

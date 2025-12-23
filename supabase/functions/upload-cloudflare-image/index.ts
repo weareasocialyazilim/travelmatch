@@ -2,14 +2,18 @@
 
 /**
  * Upload Cloudflare Image Edge Function
- *
+ * 
  * SECURITY: API token is stored server-side only.
  * Client sends base64 image data, server handles Cloudflare API.
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { getCorsHeaders } from '../_shared/security-middleware.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 const CLOUDFLARE_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
 const CLOUDFLARE_IMAGES_TOKEN = Deno.env.get('CLOUDFLARE_IMAGES_TOKEN') || '';
@@ -37,10 +41,7 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -48,18 +49,15 @@ serve(async (req) => {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } },
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseClient.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Parse request body
@@ -67,10 +65,10 @@ serve(async (req) => {
     const { imageBase64, mimeType, options = {} } = body;
 
     if (!imageBase64) {
-      return new Response(JSON.stringify({ error: 'Missing imageBase64' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Missing imageBase64' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Convert base64 to binary
@@ -83,11 +81,7 @@ serve(async (req) => {
     // Create form data for Cloudflare
     const formData = new FormData();
     const blob = new Blob([bytes], { type: mimeType });
-    formData.append(
-      'file',
-      blob,
-      `upload-${Date.now()}.${mimeType.split('/')[1] || 'jpg'}`,
-    );
+    formData.append('file', blob, `upload-${Date.now()}.${mimeType.split('/')[1] || 'jpg'}`);
 
     if (options.requireSignedURLs) {
       formData.append('requireSignedURLs', 'true');
@@ -109,7 +103,7 @@ serve(async (req) => {
     const response = await fetch(CLOUDFLARE_IMAGES_URL, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${CLOUDFLARE_IMAGES_TOKEN}`,
+        'Authorization': `Bearer ${CLOUDFLARE_IMAGES_TOKEN}`,
       },
       body: formData,
     });
@@ -118,14 +112,8 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error('[upload-cloudflare-image] Cloudflare error:', errorText);
       return new Response(
-        JSON.stringify({
-          error: 'Cloudflare upload failed',
-          details: errorText,
-        }),
-        {
-          status: response.status,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        JSON.stringify({ error: 'Cloudflare upload failed', details: errorText }),
+        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -138,21 +126,16 @@ serve(async (req) => {
       size: bytes.length,
     });
 
-    return new Response(JSON.stringify(result.result), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify(result.result),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
   } catch (error) {
     console.error('[upload-cloudflare-image] Error:', error);
     return new Response(
-      JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+      JSON.stringify({ error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

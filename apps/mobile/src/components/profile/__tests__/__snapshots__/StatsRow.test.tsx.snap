@@ -2,7 +2,6 @@
 
 exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] = `
 <RCTView
-  ref={null}
   style={
     {
       "alignItems": "center",
@@ -25,7 +24,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     accessible={true}
     aria-label="15 Moments. Tap to view"
     onPress={[MockFunction]}
-    ref={null}
     role="button"
     style={
       {
@@ -35,7 +33,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     }
   >
     <RCTText
-      ref={null}
       style={
         {
           "color": "#1A1A1A",
@@ -49,7 +46,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       15
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",
@@ -62,7 +58,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     </RCTText>
   </RCTTouchableOpacity>
   <RCTView
-    ref={null}
     style={
       {
         "backgroundColor": "#E5E5E5",
@@ -82,7 +77,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     accessible={true}
     aria-label="42 Exchanges. Tap to view"
     onPress={[MockFunction]}
-    ref={null}
     role="button"
     style={
       {
@@ -92,7 +86,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     }
   >
     <RCTText
-      ref={null}
       style={
         {
           "color": "#1A1A1A",
@@ -106,7 +99,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       42
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",
@@ -119,7 +111,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     </RCTText>
   </RCTTouchableOpacity>
   <RCTView
-    ref={null}
     style={
       {
         "backgroundColor": "#E5E5E5",
@@ -129,7 +120,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     }
   />
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -138,7 +128,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     }
   >
     <RCTText
-      ref={null}
       style={
         {
           "color": "#1A1A1A",
@@ -153,7 +142,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       %
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",
@@ -170,7 +158,6 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
 
 exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
 <RCTView
-  ref={null}
   style={
     {
       "alignItems": "center",
@@ -193,7 +180,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     accessible={true}
     aria-label="0 Moments. Tap to view"
     onPress={[MockFunction]}
-    ref={null}
     role="button"
     style={
       {
@@ -203,7 +189,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     }
   >
     <RCTText
-      ref={null}
       style={
         {
           "color": "#1A1A1A",
@@ -217,7 +202,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       0
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",
@@ -230,7 +214,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     </RCTText>
   </RCTTouchableOpacity>
   <RCTView
-    ref={null}
     style={
       {
         "backgroundColor": "#E5E5E5",
@@ -250,7 +233,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     accessible={true}
     aria-label="0 Exchanges. Tap to view"
     onPress={[MockFunction]}
-    ref={null}
     role="button"
     style={
       {
@@ -260,7 +242,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     }
   >
     <RCTText
-      ref={null}
       style={
         {
           "color": "#1A1A1A",
@@ -274,7 +255,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       0
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",
@@ -287,7 +267,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     </RCTText>
   </RCTTouchableOpacity>
   <RCTView
-    ref={null}
     style={
       {
         "backgroundColor": "#E5E5E5",
@@ -297,7 +276,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     }
   />
   <RCTView
-    ref={null}
     style={
       {
         "alignItems": "center",
@@ -306,7 +284,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     }
   >
     <RCTText
-      ref={null}
       style={
         {
           "color": "#1A1A1A",
@@ -321,7 +298,6 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       %
     </RCTText>
     <RCTText
-      ref={null}
       style={
         {
           "color": "#666666",

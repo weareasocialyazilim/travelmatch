@@ -12,29 +12,6 @@ jest.mock('@sentry/react-native', () => ({
   addBreadcrumb: jest.fn(),
 }));
 
-/**
- * Test fixture helpers for PII redaction tests.
- * These build test data at runtime to avoid static analysis false positives.
- * The logger is EXPECTED to redact these values - that's what we're testing.
- */
-const TestSecrets = {
-  secret: () => ['secret', '123'].join(''),
-  secret1: () => ['secret', '1'].join(''),
-  secret2: () => ['secret', '2'].join(''),
-  plainSecret: () => 'secret',
-  token: () => ['abc', '123'].join(''),
-  token2: () => ['token', '123'].join(''),
-  apiKey: () => ['key', '123'].join(''),
-  creditCard: () => '1234567890123456',
-  jwt: () =>
-    [
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-      'eyJzdWIiOiIxMjM0NTY3ODkwIn0',
-      'dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U',
-    ].join('.'),
-  bearer: () => ['abc123', 'def456', 'ghi789'].join('.'),
-};
-
 // Mock console methods
 const mockConsoleInfo = jest.spyOn(console, 'info').mockImplementation();
 const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation();
@@ -72,70 +49,61 @@ describe('logger.ts', () => {
   describe('PII redaction - object sanitization', () => {
     it('should redact password in object', () => {
       const testLogger = new Logger({ enableInProduction: true });
-      const secretVal = TestSecrets.secret();
-      testLogger.info('User data', { password: secretVal });
+      testLogger.info('User data', { password: 'secret123' });
 
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
       expect(loggedCall).toContain('[REDACTED]');
-      expect(loggedCall).not.toContain(secretVal);
+      expect(loggedCall).not.toContain('secret123');
     });
 
     it('should redact multiple sensitive keys', () => {
       const testLogger = new Logger({ enableInProduction: true });
-      const secretVal = TestSecrets.secret();
-      const tokenVal = TestSecrets.token();
-      const apiKeyVal = TestSecrets.apiKey();
-      const ccVal = TestSecrets.creditCard();
       const sensitiveData = {
-        password: secretVal,
-        token: tokenVal,
-        apiKey: apiKeyVal,
-        credit_card: ccVal,
+        password: 'secret123',
+        token: 'abc123',
+        apiKey: 'key123',
+        credit_card: '1234567890123456',
       };
       testLogger.info('Sensitive data', sensitiveData);
 
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
-      expect(loggedCall).not.toContain(secretVal);
-      expect(loggedCall).not.toContain(tokenVal);
-      expect(loggedCall).not.toContain(apiKeyVal);
-      expect(loggedCall).not.toContain(ccVal);
+      expect(loggedCall).not.toContain('secret123');
+      expect(loggedCall).not.toContain('abc123');
+      expect(loggedCall).not.toContain('key123');
+      expect(loggedCall).not.toContain('1234567890123456');
     });
 
     it('should redact nested sensitive data', () => {
       const testLogger = new Logger({ enableInProduction: true });
-      const secretVal = TestSecrets.plainSecret();
-      const apiKeyVal = TestSecrets.apiKey();
       const nestedData = {
         user: {
           name: 'John',
           credentials: {
-            password: secretVal,
-            apiKey: apiKeyVal,
+            password: 'secret',
+            apiKey: 'key123',
           },
         },
       };
       testLogger.info('Nested data', nestedData);
 
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
-      expect(loggedCall).not.toContain(secretVal);
-      expect(loggedCall).not.toContain(apiKeyVal);
+      expect(loggedCall).not.toContain('secret');
+      expect(loggedCall).not.toContain('key123');
       expect(loggedCall).toContain('John'); // Non-sensitive data preserved
     });
 
     it('should handle arrays with sensitive data', () => {
       const testLogger = new Logger({ enableInProduction: true });
-      const secret1 = TestSecrets.secret1();
-      const token2 = TestSecrets.token2();
       const arrayData = [
-        { id: 1, password: secret1 },
-        { id: 2, token: token2 },
+        { id: 1, password: 'secret1' },
+        { id: 2, token: 'token123' },
       ];
       testLogger.info('Array data', arrayData);
 
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
-      expect(loggedCall).not.toContain(secret1);
-      expect(loggedCall).not.toContain(token2);
+      expect(loggedCall).not.toContain('secret1');
+      expect(loggedCall).not.toContain('token123');
     });
 
     it('should preserve non-sensitive data', () => {
@@ -159,21 +127,20 @@ describe('logger.ts', () => {
   // ========================================
   describe('PII redaction - string sanitization', () => {
     it('should redact JWT tokens', () => {
-      const jwtToken = TestSecrets.jwt();
-      const message = `Auth token: ${jwtToken}`;
+      const message =
+        'Auth token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
       logger.info(message);
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).toContain('[JWT_REDACTED]');
-      expect(loggedCall).not.toContain(jwtToken.split('.')[0]);
+      expect(loggedCall).not.toContain('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9');
     });
 
     it('should redact Bearer tokens', () => {
-      const bearerVal = TestSecrets.bearer();
-      const message = `Authorization: Bearer ${bearerVal}`;
+      const message = 'Authorization: Bearer abc123.def456.ghi789';
       logger.info(message);
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).toContain('Bearer [REDACTED]');
-      expect(loggedCall).not.toContain(bearerVal);
+      expect(loggedCall).not.toContain('abc123.def456.ghi789');
     });
 
     it('should redact email addresses', () => {
@@ -214,12 +181,8 @@ describe('logger.ts', () => {
     });
 
     it('should handle multiple PII patterns in one string', () => {
-      const jwtPart = [
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-        'test',
-        'test',
-      ].join('.');
-      const message = `User john@example.com with phone +1234567890 and token ${jwtPart}`;
+      const message =
+        'User john@example.com with phone +1234567890 and token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.test';
       logger.info(message);
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).toContain('[EMAIL_REDACTED]');
@@ -316,15 +279,15 @@ describe('logger.ts', () => {
   // ENVIRONMENT HANDLING
   // ========================================
   describe('environment handling', () => {
-    it('should respect enableInProduction flag when set to false', () => {
-      // When enableInProduction is false (default), and we're not in dev mode,
-      // the logger should be disabled. Since isDev is calculated at module load time
-      // and we're in test environment (which is treated as dev), we test the config instead.
-      const logger = new Logger({ enableInProduction: false });
+    it('should not log in production mode by default', () => {
+      global.__DEV__ = false;
+      const prodLogger = new Logger();
+      prodLogger.debug('Production message');
 
-      // Logger instance is created but will only log if isDev || enableInProduction
-      // We verify the configuration is set correctly
-      expect(logger).toBeDefined();
+      const calls = mockConsoleInfo.mock.calls.filter((call) =>
+        call[0]?.includes('Production message'),
+      );
+      expect(calls.length).toBe(0);
     });
 
     it('should log in production if enableInProduction is true', () => {
@@ -414,10 +377,9 @@ describe('logger.ts', () => {
     });
 
     it('should sanitize group label', () => {
-      const secretVal = TestSecrets.secret();
-      logger.group(`Group with password: ${secretVal}`, () => {});
+      logger.group('Group with password: secret123', () => {});
       const groupCall = mockConsoleGroup.mock.calls[0][0];
-      expect(groupCall).not.toContain(secretVal);
+      expect(groupCall).not.toContain('secret123');
     });
   });
 
@@ -440,17 +402,15 @@ describe('logger.ts', () => {
     });
 
     it('should sanitize table data', () => {
-      const secret1 = TestSecrets.secret1();
-      const secret2 = TestSecrets.secret2();
       const data = [
-        { id: 1, password: secret1 },
-        { id: 2, password: secret2 },
+        { id: 1, password: 'secret1' },
+        { id: 2, password: 'secret2' },
       ];
       logger.data('Sensitive data', data);
 
       const tableData = mockConsoleTable.mock.calls[0][0];
-      expect(JSON.stringify(tableData)).not.toContain(secret1);
-      expect(JSON.stringify(tableData)).not.toContain(secret2);
+      expect(JSON.stringify(tableData)).not.toContain('secret1');
+      expect(JSON.stringify(tableData)).not.toContain('secret2');
     });
   });
 
@@ -467,15 +427,14 @@ describe('logger.ts', () => {
     });
 
     it('should sanitize context data', () => {
-      const secretVal = TestSecrets.plainSecret();
       const contextLogger = logger.withContext({
         userId: 'user-123',
-        password: secretVal,
+        password: 'secret',
       });
       contextLogger.info('Action');
 
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
-      expect(loggedCall).not.toContain(secretVal);
+      expect(loggedCall).not.toContain('secret');
     });
 
     it('should support multiple log levels with context', () => {
@@ -572,18 +531,17 @@ describe('logger.ts', () => {
     });
 
     it('should sanitize remote logs', () => {
-      const secretVal = TestSecrets.secret();
       const remoteLogger = new Logger({
         enableRemoteLogging: true,
         enableInProduction: true,
       });
 
-      remoteLogger.error('Error', { password: secretVal });
+      remoteLogger.error('Error', { password: 'secret123' });
       remoteLogger.flushRemoteLogs();
 
       const breadcrumbs = Sentry.addBreadcrumb.mock.calls;
       const hasSecret = breadcrumbs.some((call) =>
-        JSON.stringify(call).includes(secretVal),
+        JSON.stringify(call).includes('secret123'),
       );
       expect(hasSecret).toBe(false);
     });

@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import { useRoute } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
 import BottomNav from '@/components/BottomNav';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -11,11 +10,11 @@ import { NotificationCard } from '@/components/NotificationCard';
 import { useRequestsScreen } from '@/hooks/useRequestsScreen';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { TabType } from '../types/requests.types';
 import type { NotificationType } from '@/components/NotificationCard';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 
 type RequestsRouteProp = RouteProp<RootStackParamList, 'Requests'>;
-type RequestsNavigationProp = StackNavigationProp<RootStackParamList>;
 
 // Map hook notification types to NotificationCard types
 const mapNotificationType = (type: string): NotificationType => {
@@ -31,7 +30,6 @@ const mapNotificationType = (type: string): NotificationType => {
 
 const RequestsScreen = () => {
   const route = useRoute<RequestsRouteProp>();
-  const navigation = useNavigation<RequestsNavigationProp>();
   const {
     selectedTab,
     setSelectedTab,
@@ -50,31 +48,7 @@ const RequestsScreen = () => {
     if (!item.isRead) {
       await markNotificationAsRead(item.id);
     }
-
-    // Navigate based on targetType
-    switch (item.targetType) {
-      case 'moment':
-        if (item.targetData?.momentId) {
-          navigation.navigate('MomentDetail', {
-            moment: { id: item.targetData.momentId } as any,
-            isOwner: false
-          });
-        }
-        break;
-      case 'wallet':
-        navigation.navigate('Wallet');
-        break;
-      case 'profile':
-        if (item.targetData?.userId) {
-          navigation.navigate('ProfileDetail', { userId: item.targetData.userId });
-        }
-        break;
-      case 'request':
-      default:
-        // Stay on requests tab - already viewing
-        setSelectedTab('pending');
-        break;
-    }
+    // TODO: Navigate based on targetType
   };
 
   return (

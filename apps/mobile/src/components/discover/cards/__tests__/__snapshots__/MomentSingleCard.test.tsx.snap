@@ -9,10 +9,8 @@ exports[`MomentSingleCard Component Snapshots matches snapshot for basic moment 
   }
   accessible={true}
   onPress={[Function]}
-  ref={null}
 >
   <RCTText
-    ref={null}
     testID="RCTText"
   >
     Test Moment
@@ -29,10 +27,8 @@ exports[`MomentSingleCard Component Snapshots matches snapshot for verified host
   }
   accessible={true}
   onPress={[Function]}
-  ref={null}
 >
   <RCTText
-    ref={null}
     testID="RCTText"
   >
     Test Moment
@@ -49,10 +45,8 @@ exports[`MomentSingleCard Component Snapshots matches snapshot with distance 1`]
   }
   accessible={true}
   onPress={[Function]}
-  ref={null}
 >
   <RCTText
-    ref={null}
     testID="RCTText"
   >
     Test Moment

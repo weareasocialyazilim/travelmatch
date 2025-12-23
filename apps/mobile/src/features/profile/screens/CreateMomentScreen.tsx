@@ -18,10 +18,7 @@ import {
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  createMomentSchema,
-  type CreateMomentInput,
-} from '../../../utils/forms/schemas';
+import { createMomentSchema, type CreateMomentInput } from '../../../utils/forms/schemas';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -34,16 +31,17 @@ import {
   StorySection,
   MomentPreview,
   CATEGORIES,
+  getCategoryEmoji,
+  type Place as _Place,
 } from '@/components/createMoment';
 import { COLORS } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
+import { STRINGS as _STRINGS } from '../constants/strings';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
-import { LocationPickerBottomSheet } from '@/components/LocationPickerBottomSheet';
-import { logger } from '@/utils/logger';
 
 // Import sub-components
 
@@ -55,7 +53,6 @@ const CreateMomentScreen: React.FC = () => {
   // UI-specific state (not in form)
   const [photo, setPhoto] = useState<string>(''); // Managed by PhotoSection
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -97,130 +94,80 @@ const CreateMomentScreen: React.FC = () => {
   }, [amount]);
 
   // Handle publish
-  const onPublish = useCallback(
-    async (data: CreateMomentInput) => {
-      setIsSubmitting(true);
+  const onPublish = useCallback(async (data: CreateMomentInput) => {
+    setIsSubmitting(true);
 
-      try {
-        const categoryObj = CATEGORIES.find((c) => c.id === data.category);
+    try {
+      const categoryObj = CATEGORIES.find((c) => c.id === data.category);
 
-        // Build location from place data
-        const locationCity =
-          data.place?.address?.split(',')[0]?.trim() ||
-          data.place?.name ||
-          'Unknown';
-        const locationCountry =
-          data.place?.address?.split(',')[1]?.trim() || '';
+      const momentData = {
+        title: data.title.trim(),
+        story: data.story?.trim() || undefined,
+        price: data.amount,
+        category: {
+          id: data.category,
+          label: categoryObj?.label || data.category,
+          emoji: getCategoryEmoji(data.category),
+        },
+        location: data.place
+          ? {
+              name: data.place.name,
+              city: data.place.address.split(',')[0]?.trim() || data.place.name,
+              country: data.place.address.split(',')[1]?.trim() || '',
+            }
+          : undefined,
+        date: data.date.toISOString(),
+        imageUrl: photo || undefined,
+        availability: 'Available',
+      };
 
-        // Convert to CreateMomentData format
-        const createMomentInput = {
-          title: data.title.trim(),
-          description: data.story?.trim() || '',
-          category: categoryObj?.id || data.category,
-          location: {
-            city: locationCity,
-            country: locationCountry,
-            coordinates:
-              data.place?.latitude && data.place?.longitude
-                ? {
-                    lat: data.place.latitude,
-                    lng: data.place.longitude,
-                  }
-                : undefined,
-          },
-          images: photo ? [photo] : [],
-          pricePerGuest: data.amount || 0,
-          currency: 'USD',
-          maxGuests: 4,
-          duration: '2 hours',
-          availability: [data.date.toISOString()],
-        };
+      // Convert to CreateMomentData format
+      const createMomentInput = {
+        title: momentData.title,
+        description: momentData.story || '',
+        category: momentData.category.id,
+        location: {
+          city: momentData.location?.city || '',
+          country: momentData.location?.country || '',
+        },
+        images: momentData.imageUrl ? [momentData.imageUrl] : [],
+        pricePerGuest: momentData.price,
+        currency: 'USD',
+        maxGuests: 4,
+        duration: '2 hours',
+        availability: [momentData.date],
+      };
 
-        logger.info(
-          '[CreateMomentScreen] Submitting moment:',
-          JSON.stringify(createMomentInput, null, 2),
-        );
+      const createdMoment = await createMoment(createMomentInput);
 
-        const createdMoment = await createMoment(createMomentInput);
-
-        if (createdMoment) {
-          Alert.alert('Success!', 'Your moment has been published', [
-            { text: 'OK', onPress: () => navigation.goBack() },
-          ]);
-        } else {
-          // This shouldn't happen anymore since we throw errors now
-          logger.error(
-            '[CreateMomentScreen] createMoment returned null unexpectedly',
-          );
-          showToast('Could not create moment. Please try again.', 'error');
-        }
-      } catch (error) {
-        const err = error as Error & { code?: string; hint?: string };
-        logger.error('[CreateMomentScreen] Create moment error:', {
-          message: err.message,
-          code: err.code,
-          hint: err.hint,
-        });
-
-        // Show user-friendly error message
-        let errorMessage = 'Something went wrong. Please try again.';
-        if (
-          err.message?.includes('Not authenticated') ||
-          err.message?.includes('Authentication failed')
-        ) {
-          errorMessage = 'Please log in again to publish your moment.';
-        } else if (err.code === '23503') {
-          errorMessage =
-            'Account setup incomplete. Please try logging out and back in.';
-        } else if (err.code === '42501') {
-          errorMessage = 'Permission denied. Please log in again.';
-        } else if (err.message) {
-          errorMessage = err.message;
-        }
-
-        showToast(errorMessage, 'error');
-      } finally {
-        setIsSubmitting(false);
+      if (createdMoment) {
+        Alert.alert('Success!', 'Your moment has been published', [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      } else {
+        showToast('Could not create moment. Please try again.', 'error');
       }
-    },
+    } catch {
+      showToast('Something went wrong. Please try again.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [createMoment, navigation],
-  );
+  }, [createMoment, navigation]);
 
   // Handlers
   const handleDatePress = useCallback(() => setShowDatePicker(true), []);
   const handleNavigateToPlaceSearch = useCallback(() => {
-    setShowLocationPicker(true);
+    // TODO: Implement proper place selection (Google Places or similar)
+    showToast('Place selection coming soon', 'info');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleLocationSelect = useCallback(
-    (location: {
-      name: string;
-      address: string;
-      latitude: number;
-      longitude: number;
-    }) => {
-      setValue(
-        'place',
-        {
-          name: location.name,
-          address: location.address,
-          latitude: location.latitude,
-          longitude: location.longitude,
-        },
-        { shouldValidate: true },
-      );
-      setShowLocationPicker(false);
-    },
-    [setValue],
-  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -247,13 +194,10 @@ const CreateMomentScreen: React.FC = () => {
           keyboardShouldPersistTaps="handled"
         >
           {/* Photo Section */}
-          <PhotoSection
-            photo={photo}
-            onPhotoSelected={(uri) => {
-              setPhoto(uri);
-              setValue('photo', uri, { shouldValidate: true });
-            }}
-          />
+          <PhotoSection photo={photo} onPhotoSelected={(uri) => {
+            setPhoto(uri);
+            setValue('photo', uri);
+          }} />
 
           {/* Title Input */}
           <Controller
@@ -270,9 +214,7 @@ const CreateMomentScreen: React.FC = () => {
           {/* Category Selector */}
           <CategorySelector
             selectedCategory={selectedCategory}
-            onSelectCategory={(category) =>
-              setValue('category', category, { shouldValidate: true })
-            }
+            onSelectCategory={(category) => setValue('category', category)}
           />
           {errors.category && (
             <Text style={styles.errorText}>{errors.category.message}</Text>
@@ -283,13 +225,9 @@ const CreateMomentScreen: React.FC = () => {
             place={place ?? null}
             selectedDate={selectedDate}
             amount={String(amount || '')}
-            onPlaceChange={(p) =>
-              setValue('place', p, { shouldValidate: true })
-            }
+            onPlaceChange={(p) => setValue('place', p)}
             onDatePress={handleDatePress}
-            onAmountChange={(a) =>
-              setValue('amount', parseFloat(a) || 0, { shouldValidate: true })
-            }
+            onAmountChange={(a) => setValue('amount', parseFloat(a) || 0)}
             onNavigateToPlaceSearch={handleNavigateToPlaceSearch}
           />
           {errors.amount && (
@@ -300,12 +238,7 @@ const CreateMomentScreen: React.FC = () => {
           )}
 
           {/* Story Section */}
-          <StorySection
-            story={story || ''}
-            onStoryChange={(s) =>
-              setValue('story', s, { shouldValidate: true })
-            }
-          />
+          <StorySection story={story || ''} onStoryChange={(s) => setValue('story', s)} />
 
           {/* Live Preview */}
           <MomentPreview
@@ -323,14 +256,6 @@ const CreateMomentScreen: React.FC = () => {
 
         {/* Sticky Publish Button */}
         <View style={styles.publishSection}>
-          {Object.keys(errors).length > 0 && (
-            <Text style={styles.validationHint}>
-              {errors.title?.message ||
-                errors.category?.message ||
-                errors.amount?.message ||
-                'Please fill in all required fields'}
-            </Text>
-          )}
           <Text style={styles.publishHint}>{paymentHint}</Text>
           <TouchableOpacity
             testID="create-moment-button"
@@ -389,7 +314,7 @@ const CreateMomentScreen: React.FC = () => {
                   minimumDate={new Date()}
                   maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
                   onChange={(_event, date) => {
-                    if (date) setValue('date', date, { shouldValidate: true });
+                    if (date) setValue('date', date);
                   }}
                   textColor={COLORS.text}
                 />
@@ -405,17 +330,10 @@ const CreateMomentScreen: React.FC = () => {
             maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
             onChange={(_event, date) => {
               setShowDatePicker(false);
-              if (date) setValue('date', date, { shouldValidate: true });
+              if (date) setValue('date', date);
             }}
           />
         ))}
-
-      {/* Location Picker Modal */}
-      <LocationPickerBottomSheet
-        visible={showLocationPicker}
-        onClose={() => setShowLocationPicker(false)}
-        onSelectLocation={handleLocationSelect}
-      />
     </SafeAreaView>
   );
 };
@@ -463,12 +381,6 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 12,
     textAlign: 'center',
-  },
-  validationHint: {
-    color: COLORS.error,
-    fontSize: 13,
-    textAlign: 'center',
-    marginBottom: 4,
   },
   publishButton: {
     alignItems: 'center',

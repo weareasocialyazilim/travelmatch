@@ -8,7 +8,6 @@ import React, { memo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 
 export type RequestStatus =
   | 'pending'
@@ -92,7 +91,7 @@ export const RequestCard: React.FC<RequestCardProps> = memo(
       >
         <View style={styles.header}>
           <Image
-            source={{ uri: userAvatar || DEFAULT_IMAGES.AVATAR_SMALL }}
+            source={{ uri: userAvatar || 'https://via.placeholder.com/48' }}
             style={styles.avatar}
           />
           <View style={styles.headerInfo}>

@@ -25,9 +25,7 @@ jest.mock('expo-secure-store', () => ({
 }));
 
 const mockPlatform = { OS: 'ios' };
-jest.mock('react-native/Libraries/Utilities/Platform', () => mockPlatform, {
-  virtual: true,
-});
+jest.mock('react-native/Libraries/Utilities/Platform', () => mockPlatform, { virtual: true });
 
 describe('secureStorage', () => {
   beforeEach(() => {
@@ -40,8 +38,7 @@ describe('secureStorage', () => {
       expect(AUTH_STORAGE_KEYS.ACCESS_TOKEN).toBe('auth_access_token');
       expect(AUTH_STORAGE_KEYS.REFRESH_TOKEN).toBe('auth_refresh_token');
       expect(AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT).toBe('auth_token_expires');
-      // Note: USER key uses runtime string concatenation for security (Snyk fix)
-      expect(AUTH_STORAGE_KEYS.USER).toBe('@_auth_user');
+      expect(AUTH_STORAGE_KEYS.USER).toBe('@auth_user');
     });
 
     it('should have consistent key naming for secure keys', () => {
@@ -64,17 +61,14 @@ describe('secureStorage', () => {
 
   describe('setItem - SecureStore available', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.setItemAsync.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should store item in SecureStore when available', async () => {
       await secureStorage.setItem('test_key', 'test_value');
 
-      expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
-        'test_key',
-        'test_value',
-      );
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('test_key', 'test_value');
     });
 
     it('should store auth tokens in SecureStore', async () => {
@@ -82,89 +76,73 @@ describe('secureStorage', () => {
 
       expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
         AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-        'token_123',
+        'token_123'
       );
     });
   });
 
   describe('setItem - SecureStore not available', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(false);
-      AsyncStorage.setItem.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(false);
+      (AsyncStorage.setItem ).mockResolvedValue(undefined);
     });
 
     it('should fallback to AsyncStorage when SecureStore not available', async () => {
       await secureStorage.setItem('test_key', 'test_value');
 
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-        '@secure_test_key',
-        'test_value',
-      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_test_key', 'test_value');
     });
 
     it('should prefix keys with @secure_ when using AsyncStorage', async () => {
       await secureStorage.setItem('my_key', 'my_value');
 
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-        '@secure_my_key',
-        'my_value',
-      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_my_key', 'my_value');
     });
   });
 
   describe('setItem - web platform', () => {
     beforeEach(() => {
       mockPlatform.OS = 'web';
-      AsyncStorage.setItem.mockResolvedValue(undefined);
+      (AsyncStorage.setItem ).mockResolvedValue(undefined);
     });
 
     it('should use AsyncStorage on web platform', async () => {
       await secureStorage.setItem('web_key', 'web_value');
 
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-        '@secure_web_key',
-        'web_value',
-      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_web_key', 'web_value');
       expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
     });
   });
 
   describe('setItem - error handling', () => {
     it('should fallback to AsyncStorage when SecureStore throws error', async () => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.setItemAsync.mockRejectedValue(
-        new Error('SecureStore error'),
-      );
-      AsyncStorage.setItem.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.setItem ).mockResolvedValue(undefined);
 
       await secureStorage.setItem('test_key', 'test_value');
 
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-        '@secure_test_key',
-        'test_value',
-      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@secure_test_key', 'test_value');
     });
 
     it('should throw if both SecureStore and AsyncStorage fail', async () => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.setItemAsync.mockRejectedValue(
-        new Error('SecureStore error'),
-      );
-      AsyncStorage.setItem.mockRejectedValue(new Error('AsyncStorage error'));
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.setItem ).mockRejectedValue(new Error('AsyncStorage error'));
 
-      await expect(
-        secureStorage.setItem('test_key', 'test_value'),
-      ).rejects.toThrow('AsyncStorage error');
+      await expect(secureStorage.setItem('test_key', 'test_value')).rejects.toThrow(
+        'AsyncStorage error'
+      );
     });
   });
 
   describe('getItem - SecureStore available', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
     });
 
     it('should retrieve item from SecureStore', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('stored_value');
+      (SecureStore.getItemAsync ).mockResolvedValue('stored_value');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -173,7 +151,7 @@ describe('secureStorage', () => {
     });
 
     it('should return null when key does not exist', async () => {
-      SecureStore.getItemAsync.mockResolvedValue(null);
+      (SecureStore.getItemAsync ).mockResolvedValue(null);
 
       const result = await secureStorage.getItem('nonexistent');
 
@@ -181,11 +159,9 @@ describe('secureStorage', () => {
     });
 
     it('should retrieve auth tokens from SecureStore', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('refresh_token_456');
+      (SecureStore.getItemAsync ).mockResolvedValue('refresh_token_456');
 
-      const result = await secureStorage.getItem(
-        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-      );
+      const result = await secureStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
 
       expect(result).toBe('refresh_token_456');
     });
@@ -193,11 +169,11 @@ describe('secureStorage', () => {
 
   describe('getItem - SecureStore not available', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(false);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(false);
     });
 
     it('should retrieve from AsyncStorage when SecureStore not available', async () => {
-      AsyncStorage.getItem.mockResolvedValue('async_value');
+      (AsyncStorage.getItem ).mockResolvedValue('async_value');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -206,7 +182,7 @@ describe('secureStorage', () => {
     });
 
     it('should return null from AsyncStorage when key does not exist', async () => {
-      AsyncStorage.getItem.mockResolvedValue(null);
+      (AsyncStorage.getItem ).mockResolvedValue(null);
 
       const result = await secureStorage.getItem('nonexistent');
 
@@ -216,11 +192,9 @@ describe('secureStorage', () => {
 
   describe('getItem - error handling', () => {
     it('should fallback to AsyncStorage when SecureStore throws error', async () => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.getItemAsync.mockRejectedValue(
-        new Error('SecureStore error'),
-      );
-      AsyncStorage.getItem.mockResolvedValue('fallback_value');
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.getItemAsync ).mockRejectedValue(new Error('SecureStore error'));
+      (AsyncStorage.getItem ).mockResolvedValue('fallback_value');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -229,10 +203,10 @@ describe('secureStorage', () => {
     });
 
     it('should handle isAvailableAsync throwing error', async () => {
-      SecureStore.isAvailableAsync.mockRejectedValue(
-        new Error('Availability check failed'),
+      (SecureStore.isAvailableAsync ).mockRejectedValue(
+        new Error('Availability check failed')
       );
-      AsyncStorage.getItem.mockResolvedValue('async_fallback');
+      (AsyncStorage.getItem ).mockResolvedValue('async_fallback');
 
       const result = await secureStorage.getItem('test_key');
 
@@ -242,8 +216,8 @@ describe('secureStorage', () => {
 
   describe('deleteItem - SecureStore available', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.deleteItemAsync.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should delete from SecureStore when available', async () => {
@@ -255,16 +229,14 @@ describe('secureStorage', () => {
     it('should delete auth tokens from SecureStore', async () => {
       await secureStorage.deleteItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
 
-      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
-        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-      );
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
     });
   });
 
   describe('deleteItem - SecureStore not available', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(false);
-      AsyncStorage.removeItem.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(false);
+      (AsyncStorage.removeItem ).mockResolvedValue(undefined);
     });
 
     it('should delete from AsyncStorage when SecureStore not available', async () => {
@@ -276,11 +248,11 @@ describe('secureStorage', () => {
 
   describe('deleteItem - error handling', () => {
     it('should fallback to AsyncStorage when SecureStore throws error', async () => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.deleteItemAsync.mockRejectedValue(
-        new Error('SecureStore delete error'),
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync ).mockRejectedValue(
+        new Error('SecureStore delete error')
       );
-      AsyncStorage.removeItem.mockResolvedValue(undefined);
+      (AsyncStorage.removeItem ).mockResolvedValue(undefined);
 
       await secureStorage.deleteItem('test_key');
 
@@ -290,8 +262,8 @@ describe('secureStorage', () => {
 
   describe('deleteItems', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.deleteItemAsync.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.deleteItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should delete multiple items', async () => {
@@ -314,15 +286,9 @@ describe('secureStorage', () => {
       await secureStorage.deleteItems(authKeys);
 
       expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
-      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
-        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-      );
-      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
-        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-      );
-      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
-        AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
-      );
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT);
     });
 
     it('should handle empty array', async () => {
@@ -332,11 +298,11 @@ describe('secureStorage', () => {
     });
 
     it('should delete items even if some fail', async () => {
-      SecureStore.deleteItemAsync
+      (SecureStore.deleteItemAsync )
         .mockResolvedValueOnce(undefined)
         .mockRejectedValueOnce(new Error('Delete failed'))
         .mockResolvedValueOnce(undefined);
-      AsyncStorage.removeItem.mockResolvedValue(undefined);
+      (AsyncStorage.removeItem ).mockResolvedValue(undefined);
 
       const keys = ['key1', 'key2', 'key3'];
       await secureStorage.deleteItems(keys);
@@ -348,33 +314,26 @@ describe('secureStorage', () => {
 
   describe('Integration scenarios', () => {
     beforeEach(() => {
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.setItemAsync.mockResolvedValue(undefined);
-      SecureStore.getItemAsync.mockImplementation((key) => {
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
+      (SecureStore.getItemAsync ).mockImplementation((key) => {
         const storage: Record<string, string> = {
           [AUTH_STORAGE_KEYS.ACCESS_TOKEN]: 'access_123',
           [AUTH_STORAGE_KEYS.REFRESH_TOKEN]: 'refresh_456',
         };
         return Promise.resolve(storage[key] || null);
       });
-      SecureStore.deleteItemAsync.mockResolvedValue(undefined);
+      (SecureStore.deleteItemAsync ).mockResolvedValue(undefined);
     });
 
     it('should handle full auth flow: store, retrieve, delete tokens', async () => {
       // Store tokens
       await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, 'access_123');
-      await secureStorage.setItem(
-        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-        'refresh_456',
-      );
+      await secureStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, 'refresh_456');
 
       // Retrieve tokens
-      const accessToken = await secureStorage.getItem(
-        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-      );
-      const refreshToken = await secureStorage.getItem(
-        AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-      );
+      const accessToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      const refreshToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
 
       expect(accessToken).toBe('access_123');
       expect(refreshToken).toBe('refresh_456');
@@ -392,14 +351,12 @@ describe('secureStorage', () => {
     it('should handle token refresh scenario', async () => {
       // Set item to return different values on subsequent calls
       let currentToken = 'old_token';
-      SecureStore.getItemAsync.mockImplementation(() =>
-        Promise.resolve(currentToken),
+      (SecureStore.getItemAsync ).mockImplementation(() =>
+        Promise.resolve(currentToken)
       );
 
       // Get old token
-      const oldToken = await secureStorage.getItem(
-        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-      );
+      const oldToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
       expect(oldToken).toBe('old_token');
 
       // Update with new token
@@ -407,9 +364,7 @@ describe('secureStorage', () => {
       await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, 'new_token');
 
       // Verify new token
-      const newToken = await secureStorage.getItem(
-        AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-      );
+      const newToken = await secureStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
       expect(newToken).toBe('new_token');
     });
 
@@ -432,28 +387,22 @@ describe('secureStorage', () => {
   describe('Platform-specific behavior', () => {
     it('should handle Android platform', async () => {
       mockPlatform.OS = 'android';
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.setItemAsync.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
 
       await secureStorage.setItem('android_key', 'android_value');
 
-      expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
-        'android_key',
-        'android_value',
-      );
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('android_key', 'android_value');
     });
 
     it('should handle iOS platform', async () => {
       mockPlatform.OS = 'ios';
-      SecureStore.isAvailableAsync.mockResolvedValue(true);
-      SecureStore.setItemAsync.mockResolvedValue(undefined);
+      (SecureStore.isAvailableAsync ).mockResolvedValue(true);
+      (SecureStore.setItemAsync ).mockResolvedValue(undefined);
 
       await secureStorage.setItem('ios_key', 'ios_value');
 
-      expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
-        'ios_key',
-        'ios_value',
-      );
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('ios_key', 'ios_value');
     });
   });
 });

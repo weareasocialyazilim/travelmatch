@@ -5,13 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '@/constants/colors';
-import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
@@ -43,13 +42,13 @@ const MOCK_BLOCKED_USERS: BlockedUser[] = __DEV__
         id: '1',
         name: 'John Doe',
         role: 'Traveler / Local',
-        avatarUrl: DEFAULT_IMAGES.AVATAR_SMALL,
+        avatarUrl: 'https://via.placeholder.com/48',
       },
       {
         id: '2',
         name: 'Jane Smith',
         role: 'Traveler',
-        avatarUrl: DEFAULT_IMAGES.AVATAR_SMALL,
+        avatarUrl: 'https://via.placeholder.com/48',
       },
     ]
   : [];
@@ -75,7 +74,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
           // First time - use mock data
           setBlockedUsers(MOCK_BLOCKED_USERS);
         }
-      } catch {
+      } catch (error) {
         logger.debug('Failed to load blocked users');
         setBlockedUsers(MOCK_BLOCKED_USERS);
       }
@@ -101,7 +100,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
                 STORAGE_KEY,
                 JSON.stringify(newBlockedUsers),
               );
-            } catch {
+            } catch (error) {
               logger.debug('Failed to save blocked users');
             }
           },

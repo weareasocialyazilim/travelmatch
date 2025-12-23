@@ -209,4 +209,4 @@ eas submit --platform android --latest
 
 ---
 
-_Last updated: December 22, 2025_
+_Last updated: December 18, 2025_

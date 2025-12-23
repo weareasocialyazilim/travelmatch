@@ -167,7 +167,7 @@ export function ProfileSkeleton() {
       <View style={styles.momentsGrid}>
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <SkeletonBox
-            key={`moment-grid-${i}`}
+            key={i}
             width="31%"
             height={120}
             borderRadius={8}
@@ -188,7 +188,7 @@ export function FeedSkeleton({ count = 3 }: FeedSkeletonProps) {
   return (
     <View style={styles.feed}>
       {Array.from({ length: count }).map((_, i) => (
-        <MomentCardSkeleton key={`feed-skeleton-${i}`} />
+        <MomentCardSkeleton key={i} />
       ))}
     </View>
   );
@@ -238,7 +238,7 @@ export function ListSkeleton({
   return (
     <View>
       {Array.from({ length: itemCount }).map((_, i) => (
-        <View key={`list-skeleton-${i}`} style={{ marginBottom: 12 }}>
+        <View key={i} style={{ marginBottom: 12 }}>
           <ItemSkeleton />
         </View>
       ))}

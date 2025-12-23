@@ -11,7 +11,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { Animated, Text, StyleSheet } from 'react-native';
+import { Animated, Text, StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 
@@ -98,12 +98,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             size={20}
             color={getToastConfig(toast.type).color}
           />
-          <Text
-            style={[
-              styles.message,
-              { color: getToastConfig(toast.type).color },
-            ]}
-          >
+          <Text style={[styles.message, { color: getToastConfig(toast.type).color }]}>
             {toast.message}
           </Text>
         </Animated.View>

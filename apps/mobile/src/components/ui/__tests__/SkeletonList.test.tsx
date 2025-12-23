@@ -2,11 +2,8 @@
  * SkeletonList Component Tests - Simplified
  */
 
-// Unmock SkeletonList so we test the real component
-jest.unmock('@/components/ui/SkeletonList');
-
 import React from 'react';
-import { render, act } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { SkeletonList } from '../SkeletonList';
 
 describe('SkeletonList', () => {
@@ -33,15 +30,7 @@ describe('SkeletonList', () => {
   });
 
   describe('Skeleton Item Types', () => {
-    const types = [
-      'chat',
-      'moment',
-      'gift',
-      'transaction',
-      'notification',
-      'request',
-      'trip',
-    ] as const;
+    const types = ['chat', 'moment', 'gift', 'transaction', 'notification', 'request', 'trip'] as const;
 
     types.forEach((type) => {
       it(`should render ${type} skeleton type`, () => {
@@ -60,31 +49,22 @@ describe('SkeletonList', () => {
       jest.useRealTimers();
     });
 
-    it('should respect minDisplayTime when hiding', async () => {
+    it('should respect minDisplayTime when hiding', () => {
       const { rerender, toJSON } = render(
-        <SkeletonList type="moment" show={true} minDisplayTime={400} />,
+        <SkeletonList type="moment" show={true} minDisplayTime={400} />
       );
       expect(toJSON()).toBeTruthy();
 
       // Hide request comes in
-      rerender(
-        <SkeletonList type="moment" show={false} minDisplayTime={400} />,
-      );
-
+      rerender(<SkeletonList type="moment" show={false} minDisplayTime={400} />);
+      
       // Should still be visible (minDisplayTime not elapsed)
       jest.advanceTimersByTime(200);
       expect(toJSON()).toBeTruthy();
-
+      
       // After minDisplayTime, should hide
-      // Use act to properly flush state updates
-      await act(async () => {
-        jest.advanceTimersByTime(250);
-      });
-
-      // Note: Due to React batching and async state updates,
-      // the component may still be visible immediately after timer advance.
-      // The important thing is that the timeout logic is working.
-      // We verify the component was visible during the minimum display time.
+      jest.advanceTimersByTime(250);
+      expect(toJSON()).toBeNull();
     });
   });
 });

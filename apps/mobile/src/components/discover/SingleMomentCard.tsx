@@ -3,7 +3,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { DEFAULT_IMAGES } from '../../constants/defaultValues';
 import type { MomentCardProps } from './types';
 
 export const SingleMomentCard: React.FC<MomentCardProps> = ({
@@ -24,7 +23,7 @@ export const SingleMomentCard: React.FC<MomentCardProps> = ({
       <View style={styles.creatorRow}>
         <Image
           source={{
-            uri: item.user?.avatar || DEFAULT_IMAGES.AVATAR_SMALL,
+            uri: item.user?.avatar || 'https://via.placeholder.com/40',
           }}
           style={styles.creatorAvatar}
         />

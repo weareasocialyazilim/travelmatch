@@ -9,10 +9,10 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  FlatList,
   Text,
   Keyboard,
 } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
@@ -20,6 +20,11 @@ import { spacing } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSearchStore } from '../../stores/searchStore';
+import {
+  VERTICAL_LIST_CONFIG,
+  ITEM_HEIGHTS,
+  createGetItemLayout,
+} from '../../utils/listOptimization';
 import { useDebounce } from '../../utils/performance';
 
 interface EnhancedSearchBarProps {
@@ -144,45 +149,45 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* PERFORMANCE: Use FlashList instead of FlatList */}
-          <View style={styles.suggestionsList}>
-            <FlashList<string>
-              data={searchHistory}
-              keyExtractor={(item) => `history-${item}`}
-              renderItem={({ item }) => (
-                <View style={styles.suggestionRow}>
-                  <TouchableOpacity
-                    style={styles.suggestionButton}
-                    onPress={() => handleSuggestionPress(item)}
-                  >
-                    <MaterialCommunityIcons
-                      name="history"
-                      size={20}
-                      color={COLORS.textSecondary}
-                      style={styles.suggestionIcon}
-                    />
-                    <Text
-                      style={[styles.suggestionText, { color: COLORS.text }]}
-                    >
-                      {item}
-                    </Text>
-                  </TouchableOpacity>
+          <FlatList<string>
+            data={searchHistory}
+            keyExtractor={(item, index) => `${item}-${index}`}
+            renderItem={({ item }) => (
+              <View style={styles.suggestionRow}>
+                <TouchableOpacity
+                  style={styles.suggestionButton}
+                  onPress={() => handleSuggestionPress(item)}
+                >
+                  <MaterialCommunityIcons
+                    name="history"
+                    size={20}
+                    color={COLORS.textSecondary}
+                    style={styles.suggestionIcon}
+                  />
+                  <Text style={[styles.suggestionText, { color: COLORS.text }]}>
+                    {item}
+                  </Text>
+                </TouchableOpacity>
 
-                  <TouchableOpacity
-                    onPress={() => removeFromHistory(item)}
-                    style={styles.deleteButton}
-                  >
-                    <MaterialCommunityIcons
-                      name="close"
-                      size={18}
-                      color={COLORS.textSecondary}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
-              keyboardShouldPersistTaps="handled"
-            />
-          </View>
+                <TouchableOpacity
+                  onPress={() => removeFromHistory(item)}
+                  style={styles.deleteButton}
+                >
+                  <MaterialCommunityIcons
+                    name="close"
+                    size={18}
+                    color={COLORS.textSecondary}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+            style={styles.suggestionsList}
+            keyboardShouldPersistTaps="handled"
+            {...VERTICAL_LIST_CONFIG}
+            initialNumToRender={5}
+            maxToRenderPerBatch={5}
+            getItemLayout={createGetItemLayout(ITEM_HEIGHTS.SMALL)}
+          />
         </View>
       )}
     </View>

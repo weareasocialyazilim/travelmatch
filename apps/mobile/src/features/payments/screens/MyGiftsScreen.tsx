@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { usePayments } from '@/hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -27,61 +25,43 @@ interface MyGiftsScreenProps {
   navigation: MyGiftsScreenNavigationProp;
 }
 
+interface Gift {
+  id: string;
+  title: string;
+  recipient: string;
+  location: string;
+  status: 'verified' | 'pending';
+  icon: IconName;
+}
+
+const GIFTS_DATA: Gift[] = [
+  {
+    id: '1',
+    title: 'First Authentic Pizza in Naples',
+    recipient: 'Anna K.',
+    location: 'Naples, Italy',
+    status: 'verified',
+    icon: 'ticket-confirmation',
+  },
+  {
+    id: '2',
+    title: 'Sunrise Hot Air Balloon Ride',
+    recipient: 'Ben C.',
+    location: 'Cappadocia, Turkey',
+    status: 'verified',
+    icon: 'airplane',
+  },
+  {
+    id: '3',
+    title: 'Tango Class in Buenos Aires',
+    recipient: 'Chloe D.',
+    location: 'Buenos Aires, Argentina',
+    status: 'pending',
+    icon: 'music-note',
+  },
+];
+
 export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
-  const { transactions, transactionsLoading, loadTransactions } = usePayments();
-
-  // Load transactions on mount
-  useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
-
-  // Filter gift transactions
-  const giftTransactions = useMemo(() => {
-    return transactions.filter((t) => t.type === 'gift_sent');
-  }, [transactions]);
-
-  // Calculate stats
-  const stats = useMemo(() => {
-    const totalGifted = giftTransactions.reduce((sum, t) => sum + t.amount, 0);
-    const completedGifts = giftTransactions.filter(
-      (t) => t.status === 'completed',
-    ).length;
-    const uniqueRecipients = new Set(
-      giftTransactions.map((t) => t.referenceId || t.description),
-    ).size;
-
-    return {
-      totalGifted,
-      completedGifts,
-      uniqueRecipients,
-    };
-  }, [giftTransactions]);
-
-  if (transactionsLoading && giftTransactions.length === 0) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <MaterialCommunityIcons
-              name={'arrow-left' as IconName}
-              size={24}
-              color={COLORS.text}
-            />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>My Gifts</Text>
-          <View style={styles.headerButton} />
-        </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -108,97 +88,75 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
         {/* Stats Section */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <MaterialCommunityIcons
-              name={'cash-multiple' as IconName}
-              size={24}
-              color={COLORS.primary}
-              style={styles.statIcon}
-            />
-            <Text style={styles.statValue}>
-              ${stats.totalGifted.toFixed(0)}
-            </Text>
-            <Text style={styles.statLabel}>Total Gifted</Text>
+            <Text style={styles.statLabel}>Total gifted</Text>
+            <Text style={styles.statValue}>$250</Text>
           </View>
           <View style={styles.statCard}>
-            <MaterialCommunityIcons
-              name={'gift-outline' as IconName}
-              size={24}
-              color={COLORS.teal}
-              style={styles.statIcon}
-            />
-            <Text style={styles.statValue}>{stats.completedGifts}</Text>
-            <Text style={styles.statLabel}>Completed</Text>
+            <Text style={styles.statLabel}>Moments completed</Text>
+            <Text style={styles.statValue}>5</Text>
           </View>
           <View style={styles.statCard}>
-            <MaterialCommunityIcons
-              name={'account-group-outline' as IconName}
-              size={24}
-              color={COLORS.coral}
-              style={styles.statIcon}
-            />
-            <Text style={styles.statValue}>{stats.uniqueRecipients}</Text>
-            <Text style={styles.statLabel}>People Helped</Text>
+            <Text style={styles.statLabel}>Travelers helped</Text>
+            <Text style={styles.statValue}>3</Text>
           </View>
         </View>
 
         {/* Gift List */}
-        {giftTransactions.length > 0 ? (
+        {GIFTS_DATA.length > 0 ? (
           <View style={styles.giftList}>
-            {giftTransactions.map((transaction) => {
-              const isCompleted = transaction.status === 'completed';
-
-              return (
-                <View
-                  key={transaction.id}
-                  style={[
-                    styles.giftCard,
-                    !isCompleted && styles.giftCardPending,
-                  ]}
-                >
-                  <View style={styles.giftContent}>
-                    <View style={styles.giftIconContainer}>
-                      <MaterialCommunityIcons
-                        name={'gift-outline' as IconName}
-                        size={24}
-                        color={COLORS.textSecondary}
-                      />
-                    </View>
-                    <View style={styles.giftInfo}>
-                      <Text style={styles.giftTitle} numberOfLines={1}>
-                        ${transaction.amount.toFixed(2)} Gift
-                      </Text>
-                      <Text style={styles.giftMeta} numberOfLines={2}>
-                        {transaction.description || 'Gift sent'} •{' '}
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </Text>
-                    </View>
+            {GIFTS_DATA.map((gift) => (
+              <View
+                key={gift.id}
+                style={[
+                  styles.giftCard,
+                  gift.status === 'pending' && styles.giftCardPending,
+                ]}
+              >
+                <View style={styles.giftContent}>
+                  <View style={styles.giftIconContainer}>
+                    <MaterialCommunityIcons
+                      name={gift.icon}
+                      size={24}
+                      color={COLORS.textSecondary}
+                    />
                   </View>
-
-                  {/* Status Badge */}
-                  {isCompleted ? (
-                    <View style={styles.statusBadgeVerified}>
-                      <MaterialCommunityIcons
-                        name={'check-decagram' as IconName}
-                        size={16}
-                        color={COLORS.teal}
-                      />
-                      <Text style={styles.statusBadgeTextVerified}>
-                        Completed
-                      </Text>
-                    </View>
-                  ) : (
-                    <View style={styles.statusBadgePending}>
-                      <MaterialCommunityIcons
-                        name={'clock-outline' as IconName}
-                        size={16}
-                        color={COLORS.warning}
-                      />
-                      <Text style={styles.statusBadgeTextPending}>Pending</Text>
-                    </View>
-                  )}
+                  <View style={styles.giftInfo}>
+                    <Text style={styles.giftTitle} numberOfLines={1}>
+                      {gift.title}
+                    </Text>
+                    <Text style={styles.giftMeta} numberOfLines={2}>
+                      For {gift.recipient} in {gift.location} •{' '}
+                      {gift.status === 'verified' ? 'Approved' : 'Pending'}
+                    </Text>
+                  </View>
                 </View>
-              );
-            })}
+
+                {/* Status Badge */}
+                {gift.status === 'verified' ? (
+                  <View style={styles.statusBadgeVerified}>
+                    <MaterialCommunityIcons
+                      name={'check-decagram' as IconName}
+                      size={16}
+                      color={COLORS.teal}
+                    />
+                    <Text style={styles.statusBadgeTextVerified}>
+                      Proof Received
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.statusBadgePending}>
+                    <MaterialCommunityIcons
+                      name={'clock-outline' as IconName}
+                      size={16}
+                      color={COLORS.warning}
+                    />
+                    <Text style={styles.statusBadgeTextPending}>
+                      Awaiting Proof
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ))}
           </View>
         ) : (
           <EmptyState
@@ -217,11 +175,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -258,24 +211,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  statIcon: {
-    marginBottom: 4,
+    gap: 6,
   },
   statLabel: {
-    ...TYPOGRAPHY.caption,
+    ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     color: COLORS.textSecondary,
-    textAlign: 'center',
   },
   statValue: {
-    ...TYPOGRAPHY.h3,
+    ...TYPOGRAPHY.h2,
     fontWeight: '700',
     color: COLORS.text,
-    textAlign: 'center',
   },
   giftList: {
     paddingHorizontal: 16,

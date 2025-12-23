@@ -1,25 +1,26 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '@/constants/colors';
-import { useToast } from '@/context/ToastContext';
+
+const { height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
 export const WelcomeScreen: React.FC<{
   navigation: { navigate: (route: string) => void };
 }> = ({ navigation }) => {
-  const { showToast } = useToast();
-
   const handleCreateAccount = () => {
     navigation.navigate('Register');
   };
 
   const handleLogin = () => {
     navigation.navigate('Login');
-  };
-
-  const handleSocialLogin = (_provider: string) => {
-    showToast('Coming Soon! This feature will be available shortly.', 'info');
   };
 
   const handleTermsPress = () => {
@@ -38,7 +39,7 @@ export const WelcomeScreen: React.FC<{
           {/* Illustration */}
           <View style={styles.illustrationContainer}>
             <Image
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
               source={require('../../../../assets/icon.png')}
               style={styles.illustration}
               resizeMode="contain"
@@ -49,47 +50,41 @@ export const WelcomeScreen: React.FC<{
           <View style={styles.textSection}>
             <Text style={styles.headline}>Welcome to TravelMatch</Text>
             <Text style={styles.bodyText}>
-              Connect with locals. Share experiences.
+              Connect with locals. Share experiences.{'\n'}Make every trip
+              meaningful.
             </Text>
           </View>
         </View>
 
         {/* Action Section */}
         <View style={styles.actionSection}>
-          {/* Social Login Icons - Row */}
-          <View style={styles.socialRow}>
-            <TouchableOpacity
-              style={styles.socialIconButton}
-              onPress={() => handleSocialLogin('apple')}
-              activeOpacity={0.7}
-            >
-              <Icon name="apple" size={28} color={COLORS.white} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.socialIconButton, styles.googleButton]}
-              onPress={() => handleSocialLogin('google')}
-              activeOpacity={0.7}
-            >
-              <Icon name="google" size={28} color={COLORS.white} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.socialIconButton, styles.facebookButton]}
-              onPress={() => handleSocialLogin('facebook')}
-              activeOpacity={0.7}
-            >
-              <Icon name="facebook" size={28} color={COLORS.white} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Main Buttons */}
           <View style={styles.buttonContainer}>
+            {/* Apple Sign In (Mock) */}
+            <TouchableOpacity
+              style={[
+                styles.primaryButton,
+                styles.appleButton,
+              ]}
+              onPress={() => navigation.navigate('Register')} // Mock action
+              activeOpacity={0.8}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {/* Use text icon for now as we don't have Apple icon asset guaranteed */}
+                <Text style={[styles.primaryButtonText, { marginRight: 8 }]}>
+                  
+                </Text>
+                <Text style={styles.primaryButtonText}>
+                  Continue with Apple
+                </Text>
+              </View>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.primaryButton}
               onPress={handleCreateAccount}
@@ -142,11 +137,11 @@ const styles = StyleSheet.create({
   },
   illustrationContainer: {
     width: '100%',
-    maxWidth: 280,
+    maxWidth: 320,
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
+    marginBottom: 32,
   },
   illustration: {
     width: '100%',
@@ -157,11 +152,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headline: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
     color: COLORS.text,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
     letterSpacing: -0.5,
   },
   bodyText: {
@@ -173,46 +168,12 @@ const styles = StyleSheet.create({
   },
   actionSection: {
     width: '100%',
+    paddingTop: 32,
     paddingBottom: 16,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-    marginBottom: 20,
-  },
-  socialIconButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#000000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  googleButton: {
-    backgroundColor: '#DB4437',
-  },
-  facebookButton: {
-    backgroundColor: '#1877F2',
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  dividerText: {
-    paddingHorizontal: 16,
-    color: COLORS.textSecondary,
-    fontSize: 14,
   },
   buttonContainer: {
     width: '100%',
-    gap: 12,
+    gap: 16,
     marginBottom: 16,
   },
   primaryButton: {
@@ -224,9 +185,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   primaryButtonText: {
-    color: COLORS.text,
+    color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.25,
   },
   secondaryButton: {
     backgroundColor: COLORS.transparent,
@@ -241,14 +203,28 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: COLORS.mint,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.25,
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+    marginBottom: 12,
+  },
+  appleButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  appleIconText: {
+    marginRight: 8,
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '400',
     color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
+    paddingTop: 16,
   },
   footerLink: {
     textDecorationLine: 'underline',

@@ -1,12 +1,20 @@
 /**
  * Manual Database Type Definitions
- *
+ * 
  * These types are manually defined based on the Supabase schema.
  * Ideally, these should be auto-generated using:
  * `supabase gen types typescript --local > types/database.types.ts`
- *
+ * 
  * TODO: Replace with auto-generated types when Docker is available
  */
+
+// Follows table
+export interface FollowRow {
+  id: string;
+  follower_id: string;
+  following_id: string;
+  created_at: string;
+}
 
 // Notification preferences JSONB type
 export interface NotificationPreferences {
@@ -20,7 +28,7 @@ export interface NotificationPreferences {
 export interface PrivacySettings {
   showLocation?: boolean;
   showLastSeen?: boolean;
-  allowMessages?: 'everyone' | 'none';
+  allowMessages?: 'everyone' | 'followers' | 'none';
   timezone?: string;
   autoAcceptRequests?: boolean;
   instantBooking?: boolean;
@@ -48,13 +56,12 @@ export interface UserRow {
 
 // Update profile payload type
 export interface UpdateProfilePayload {
-  avatar_url?: string;
+  avatar?: string;
   coverImage?: string;
   cover_image?: string;
   full_name?: string;
-  username?: string;
   bio?: string;
-  location?: string | unknown; // Can be string (database) or object (legacy)
+  location?: unknown;
   languages?: string[];
   interests?: string[];
   instagram?: string;

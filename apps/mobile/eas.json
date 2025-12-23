@@ -4,13 +4,7 @@
     "appVersionSource": "remote"
   },
   "build": {
-    "base": {
-      "ios": {
-        "image": "latest"
-      }
-    },
     "development": {
-      "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
@@ -24,7 +18,6 @@
       }
     },
     "preview": {
-      "extends": "base",
       "distribution": "internal",
       "channel": "preview",
       "ios": {
@@ -38,7 +31,7 @@
       }
     },
     "production": {
-      "extends": "base",
+      "channel": "production",
       "autoIncrement": true,
       "ios": {
         "resourceClass": "m-medium"
@@ -47,15 +40,19 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "APP_ENV": "production"
+        "APP_ENV": "production",
+        "SENTRY_ORG": "${SENTRY_ORG}",
+        "SENTRY_PROJECT": "${SENTRY_PROJECT}",
+        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "hello@weareasocial.com",
-        "appleTeamId": "LVBFTMQ2MA"
+        "appleId": "${APPLE_ID}",
+        "ascAppId": "${ASC_APP_ID}",
+        "appleTeamId": "${APPLE_TEAM_ID}"
       },
       "android": {
         "serviceAccountKeyPath": "./google-services.json",

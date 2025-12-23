@@ -1,4 +1,17 @@
 /**
+      let query = supabase
+        .from('requests')
+        .select('*, users(*), moments(*)', { count: 'exact' });
+
+      if (filters?.status) {
+        query = query.eq('status', filters.status);
+      }
+
+      const { data, count, error } = await query.order('created_at', {
+        ascending: false,
+      });
+      if (error) throw error;
+/**
  * Request Service
  * Gift requests, bookings, and related operations
  */
@@ -7,23 +20,6 @@ import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { requestsService as dbRequestsService } from './supabaseDbService';
 import type { Database } from '../types/database.types';
-
-// Type aliases for joined relations
-type UserRow = Database['public']['Tables']['users']['Row'];
-type MomentRow = Database['public']['Tables']['moments']['Row'];
-
-// Partial types for joined data (Supabase returns nullable when joined)
-type JoinedUser = Pick<
-  UserRow,
-  'full_name' | 'avatar_url' | 'rating' | 'verified' | 'location'
->;
-type JoinedMoment = Pick<MomentRow, 'title' | 'images' | 'user_id'>;
-
-// Request row with joined relations
-type RequestWithRelations = Database['public']['Tables']['requests']['Row'] & {
-  users?: JoinedUser | null;
-  moments?: JoinedMoment | null;
-};
 
 // Types
 export type RequestStatus =
@@ -146,13 +142,8 @@ export const requestService = {
       );
       if (error) throw error;
 
-      const _dbTotal = (
-        newRequest as Database['public']['Tables']['requests']['Row'] & {
-          total_price?: number;
-        }
-      )?.total_price;
-      const computedTotal =
-        Number(momentRow.price || 0) * Number(data.guestCount || 0);
+      const dbTotal = (newRequest as any)?.total_price;
+      const computedTotal = Number(momentRow.price || 0) * Number(data.guestCount || 0);
 
       const request: GiftRequest = {
         id: newRequest!.id,
@@ -207,7 +198,10 @@ export const requestService = {
       if (error) throw error;
 
       const requests: GiftRequest[] = (data || []).map((row: unknown) => {
-        const r = row as RequestWithRelations;
+        const r = row as Database['public']['Tables']['requests']['Row'] & {
+          users?: any;
+          moments?: any;
+        };
         return {
           id: r.id,
           type: 'gift_request',
@@ -257,7 +251,6 @@ export const requestService = {
 
   /**
    * Get requests I received (as host)
-   * Optimized: Uses inner join filter instead of client-side filtering
    */
   getReceivedRequests: async (
     filters?: Omit<RequestFilters, 'role'>,
@@ -268,36 +261,23 @@ export const requestService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // First get user's moment IDs to filter requests server-side
-      const { data: userMoments } = await supabase
-        .from('moments')
-        .select('id')
-        .eq('user_id', user.id);
-
-      const momentIds = (userMoments || []).map((m) => m.id);
-
-      if (momentIds.length === 0) {
-        return { requests: [], total: 0 };
-      }
-
-      // Query requests only for user's moments (server-side filter)
-      let query = supabase
+      const { data, count, error } = await supabase
         .from('requests')
         .select('*, users(*), moments(*)', { count: 'exact' })
-        .in('moment_id', momentIds);
-
-      if (filters?.status) {
-        query = query.eq('status', filters.status);
-      }
-
-      const { data, count, error } = await query.order('created_at', {
-        ascending: false,
-      });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const requests: GiftRequest[] = (data || []).map((row) => {
-        const r = row as unknown as RequestWithRelations;
+      // Filter by moment owner (host)
+      const filtered = (data || []).filter(
+        (row: any) => (row?.moments?.user_id ?? '') === user.id,
+      );
+
+      const requests: GiftRequest[] = filtered.map((row: unknown) => {
+        const r = row as Database['public']['Tables']['requests']['Row'] & {
+          users?: any;
+          moments?: any;
+        };
         return {
           id: r.id,
           type: 'gift_request',
@@ -326,7 +306,7 @@ export const requestService = {
         };
       });
 
-      return { requests, total: count || requests.length };
+      return { requests, total: filtered.length || 0 };
     } catch (error) {
       logger.error('Get received requests error:', error);
       return { requests: [], total: 0 };
@@ -346,7 +326,11 @@ export const requestService = {
 
       if (error) throw error;
 
-      const row = data as unknown as RequestWithRelations;
+      const row =
+        data as unknown as Database['public']['Tables']['requests']['Row'] & {
+          users?: any;
+          moments?: any;
+        };
 
       const request: GiftRequest = {
         id: row.id,

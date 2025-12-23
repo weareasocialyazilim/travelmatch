@@ -8,7 +8,6 @@ import React, {
   useState,
   useEffect,
   useCallback,
-  useMemo,
   type ReactNode,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -99,7 +98,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
             setLanguageState('tr');
           }
         }
-      } catch {
+      } catch (error) {
         // Use default language on error
       } finally {
         setIsInitialized(true);
@@ -114,7 +113,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     try {
       await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
       setLanguageState(lang);
-    } catch {
+    } catch (error) {
       // Silent fail, still update state
       setLanguageState(lang);
     }
@@ -156,23 +155,19 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   // RTL support (Turkish is LTR, but keeping for future languages)
   const isRTL = false;
 
-  // Memoize context value to prevent unnecessary re-renders of consumers
-  const contextValue = useMemo<I18nContextType>(
-    () => ({
-      language,
-      setLanguage,
-      t,
-      isRTL,
-      supportedLanguages: SUPPORTED_LANGUAGES,
-    }),
-    [language, setLanguage, t],
-  );
+  const value: I18nContextType = {
+    language,
+    setLanguage,
+    t,
+    isRTL,
+    supportedLanguages: SUPPORTED_LANGUAGES,
+  };
 
   if (!isInitialized) {
     return null; // Or a loading spinner
   }
 
-  return <I18nContext.Provider value={contextValue}>{children}</I18nContext.Provider>;
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 };
 
 // Hook

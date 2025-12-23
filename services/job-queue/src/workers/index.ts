@@ -1,7 +1,5 @@
 import Redis from 'ioredis';
 import { createKycWorker } from './kyc-worker.js';
-import { createEmailWorker } from './email-worker.js';
-import { createNotificationWorker } from './notification-worker.js';
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -35,20 +33,14 @@ redis.on('error', (error) => {
 console.log('Starting job queue workers...');
 
 const kycWorker = createKycWorker(redis);
+
 console.log('✓ KYC verification worker started');
 
-const emailWorker = createEmailWorker(redis);
-console.log('✓ Email worker started');
-
-const notificationWorker = createNotificationWorker(redis);
-console.log('✓ Notification worker started');
-
-// Log worker stats every 30 seconds
+// Log worker stats every 30 seconds (simplified without getMetrics)
 setInterval(() => {
-  console.log('[Stats] Workers status:', {
-    kyc: { name: kycWorker.name, running: kycWorker.isRunning() },
-    email: { name: emailWorker.name, running: emailWorker.isRunning() },
-    notification: { name: notificationWorker.name, running: notificationWorker.isRunning() },
+  console.log('[Stats] Worker is running', {
+    name: kycWorker.name,
+    running: kycWorker.isRunning(),
   });
 }, 30000);
 
@@ -58,11 +50,8 @@ console.log(`
 ║  TravelMatch Job Queue Workers                             ║
 ║                                                            ║
 ║  Status: Running                                           ║
-║  Workers:                                                  ║
-║    - KYC Verification                                      ║
-║    - Email                                                 ║
-║    - Notification                                          ║
-║  Redis: ${process.env.REDIS_URL?.substring(0, 30)}...      ║
+║  Workers: KYC Verification                                 ║
+║  Redis: ${process.env.REDIS_URL}                           ║
 ║                                                            ║
 ║  Press Ctrl+C to stop                                      ║
 ║                                                            ║

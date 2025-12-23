@@ -5,7 +5,11 @@
 // Creates uploaded_images records automatically
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
-import { getCorsHeaders } from '../_shared/security-middleware.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 interface StorageWebhookPayload {
   type: 'INSERT' | 'UPDATE' | 'DELETE';
@@ -33,34 +37,34 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const payload: StorageWebhookPayload = await req.json();
-
+    
     // Debug log for development only
 
     // Only process INSERT events on storage.objects
     if (payload.type !== 'INSERT' || payload.table !== 'objects') {
       return new Response(
         JSON.stringify({ message: 'Skipping non-INSERT event' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const { record } = payload;
-
+    
     // Skip if no owner (system uploads)
     if (!record.owner) {
       return new Response(
         JSON.stringify({ message: 'Skipping upload without owner' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Generate public URL
     const publicUrl = `${supabaseUrl}/storage/v1/object/public/${record.bucket_id}/${record.name}`;
-
+    
     // Determine image type from path
     let imageType = 'other';
     const pathLower = record.name.toLowerCase();
@@ -68,10 +72,7 @@ Deno.serve(async (req) => {
       imageType = 'avatar';
     } else if (pathLower.includes('moment')) {
       imageType = 'moment';
-    } else if (
-      pathLower.includes('verification') ||
-      pathLower.includes('proof')
-    ) {
+    } else if (pathLower.includes('verification') || pathLower.includes('proof')) {
       imageType = 'verification';
     }
 
@@ -93,20 +94,22 @@ Deno.serve(async (req) => {
 
     if (error) {
       // Error logged by Supabase
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: error.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true, data }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ success: true, data }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ error: message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });

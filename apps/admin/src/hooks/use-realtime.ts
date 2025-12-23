@@ -24,9 +24,8 @@ interface RealtimeConfig<T> {
 /**
  * Hook for subscribing to real-time Postgres changes
  */
-export function useRealtimeSubscription<T extends Record<string, unknown>>(
-  config: RealtimeConfig<T>,
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useRealtimeSubscription<T = any>(config: RealtimeConfig<T>) {
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -46,8 +45,9 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
 
     const channelName = `realtime:${schema}:${table}:${filter || 'all'}`;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newChannel = (supabase.channel(channelName) as any)
+    const newChannel = supabase
+      .channel(channelName)
+      // @ts-expect-error Supabase realtime API type issue
       .on(
         'postgres_changes',
         {
@@ -56,7 +56,8 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
           table,
           filter,
         },
-        (payload: RealtimePostgresChangesPayload<T>) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload: any) => {
           switch (payload.eventType) {
             case 'INSERT':
               if (onInsert) {
@@ -82,7 +83,7 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
           }
         },
       )
-      .subscribe((status: string) => {
+      .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           setIsConnected(true);
           setError(null);
@@ -141,7 +142,6 @@ interface TaskQueueItem {
   assigned_to: string | null;
   created_at: string;
   updated_at: string;
-  [key: string]: unknown;
 }
 
 /**
@@ -174,7 +174,6 @@ interface AdminNotification {
   type: string;
   read: boolean;
   created_at: string;
-  [key: string]: unknown;
 }
 
 /**
@@ -206,7 +205,6 @@ interface Dispute {
   reporter_id: string;
   reported_id: string;
   created_at: string;
-  [key: string]: unknown;
 }
 
 /**
@@ -231,7 +229,6 @@ interface Payout {
   currency: string;
   status: string;
   created_at: string;
-  [key: string]: unknown;
 }
 
 /**
@@ -386,5 +383,4 @@ interface AuditLogEntry {
   resource_type: string;
   resource_id: string;
   created_at: string;
-  [key: string]: unknown;
 }

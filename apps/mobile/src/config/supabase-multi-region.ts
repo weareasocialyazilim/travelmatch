@@ -1,7 +1,7 @@
 /**
  * Supabase Multi-Region Configuration
  * Ensures global latency <100ms with 99.99% uptime
- *
+ * 
  * Architecture:
  * - Primary: EU West (Frankfurt) - Turkish users
  * - Read Replicas: US East, AP Southeast, EU Central
@@ -32,9 +32,7 @@ export const SUPABASE_REGIONS = {
   },
   'ap-southeast-1': {
     name: 'AP Southeast (Singapore)',
-    url:
-      process.env.SUPABASE_URL_AP_SOUTHEAST ||
-      'https://ap-southeast.supabase.co',
+    url: process.env.SUPABASE_URL_AP_SOUTHEAST || 'https://ap-southeast.supabase.co',
     key: process.env.SUPABASE_KEY_AP_SOUTHEAST || '',
     priority: 3,
     location: { lat: 1.3521, lon: 103.8198 },
@@ -42,8 +40,7 @@ export const SUPABASE_REGIONS = {
   },
   'eu-central-1': {
     name: 'EU Central (Warsaw)',
-    url:
-      process.env.SUPABASE_URL_EU_CENTRAL || 'https://eu-central.supabase.co',
+    url: process.env.SUPABASE_URL_EU_CENTRAL || 'https://eu-central.supabase.co',
     key: process.env.SUPABASE_KEY_EU_CENTRAL || '',
     priority: 4,
     location: { lat: 52.2297, lon: 21.0122 },
@@ -54,11 +51,8 @@ export const SUPABASE_REGIONS = {
 type RegionKey = keyof typeof SUPABASE_REGIONS;
 
 // Connection pool for each region
- 
-const connectionPools = new Map<
-  RegionKey,
-  SupabaseClient<any, 'public', any>
->();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const connectionPools = new Map<RegionKey, SupabaseClient<any, 'public', any>>();
 
 // Health check status
 interface HealthStatus {
@@ -73,10 +67,8 @@ const healthStatus = new Map<RegionKey, HealthStatus>();
 /**
  * Get Supabase client for specific region
  */
- 
-export function getRegionalClient(
-  region: RegionKey,
-): SupabaseClient<any, 'public', any> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getRegionalClient(region: RegionKey): SupabaseClient<any, 'public', any> {
   if (!connectionPools.has(region)) {
     const config = SUPABASE_REGIONS[region];
     const client = createClient(config.url, config.key, {
@@ -108,10 +100,7 @@ export function getRegionalClient(
 /**
  * Smart routing: Get optimal client based on user location
  */
-export async function getOptimalClient(userLocation?: {
-  lat: number;
-  lon: number;
-}) {
+export async function getOptimalClient(userLocation?: { lat: number; lon: number }) {
   // Get all healthy regions
   const healthyRegions = await getHealthyRegions();
 
@@ -122,26 +111,24 @@ export async function getOptimalClient(userLocation?: {
 
   // If no user location, use primary
   if (!userLocation) {
-    return getRegionalClient(healthyRegions[0] ?? 'eu-west-1');
+    return getRegionalClient(healthyRegions[0]);
   }
 
   // Find closest healthy region
-  const distances = healthyRegions.map((region) => ({
+  const distances = healthyRegions.map(region => ({
     region,
     distance: calculateDistance(
       userLocation.lat,
       userLocation.lon,
-      SUPABASE_REGIONS[region]?.location.lat ?? 0,
-      SUPABASE_REGIONS[region]?.location.lon ?? 0,
+      SUPABASE_REGIONS[region].location.lat,
+      SUPABASE_REGIONS[region].location.lon
     ),
   }));
 
   distances.sort((a, b) => a.distance - b.distance);
 
-  const optimalRegion = distances[0]?.region ?? 'eu-west-1';
-  logger.info(
-    `Optimal region: ${SUPABASE_REGIONS[optimalRegion]?.name ?? 'Unknown'}`,
-  );
+  const optimalRegion = distances[0].region;
+  logger.info(`Optimal region: ${SUPABASE_REGIONS[optimalRegion].name}`);
 
   return getRegionalClient(optimalRegion);
 }
@@ -149,10 +136,8 @@ export async function getOptimalClient(userLocation?: {
 /**
  * Get client by country code
  */
- 
-export function getClientByCountry(
-  countryCode: string,
-): SupabaseClient<any, 'public', any> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getClientByCountry(countryCode: string): SupabaseClient<any, 'public', any> {
   // Find region that serves this country
   for (const [region, config] of Object.entries(SUPABASE_REGIONS)) {
     if ((config.serves as readonly string[]).includes(countryCode)) {
@@ -167,19 +152,17 @@ export function getClientByCountry(
 /**
  * Health check for all regions
  */
-export async function checkRegionHealth(
-  region: RegionKey,
-): Promise<HealthStatus> {
+export async function checkRegionHealth(region: RegionKey): Promise<HealthStatus> {
   const startTime = Date.now();
-
+  
   try {
     const client = getRegionalClient(region);
-
+    
     // Simple health check query - explicit column selection for security
     const { error } = await client.from('_health').select('id').limit(1);
-
+    
     const latency = Date.now() - startTime;
-
+    
     const status: HealthStatus = {
       region,
       healthy: !error && latency < 1000, // Consider healthy if <1s
@@ -188,13 +171,11 @@ export async function checkRegionHealth(
     };
 
     healthStatus.set(region, status);
-
+    
     if (status.healthy) {
       logger.debug(`Region ${SUPABASE_REGIONS[region].name}: ${latency}ms`);
     } else {
-      logger.error(
-        `Region ${SUPABASE_REGIONS[region].name}: ${error ? 'Error' : 'Timeout'}`,
-      );
+      logger.error(`Region ${SUPABASE_REGIONS[region].name}: ${error ? 'Error' : 'Timeout'}`);
     }
 
     return status;
@@ -219,18 +200,16 @@ export async function checkRegionHealth(
 async function getHealthyRegions(): Promise<RegionKey[]> {
   // Check health of all regions
   await Promise.all(
-    Object.keys(SUPABASE_REGIONS).map((region) =>
-      checkRegionHealth(region as RegionKey),
-    ),
+    Object.keys(SUPABASE_REGIONS).map(region => 
+      checkRegionHealth(region as RegionKey)
+    )
   );
 
   // Get healthy regions sorted by priority
   const healthy = Array.from(healthStatus.entries())
     .filter(([, status]) => status.healthy)
     .map(([region]) => region)
-    .sort(
-      (a, b) => SUPABASE_REGIONS[a].priority - SUPABASE_REGIONS[b].priority,
-    );
+    .sort((a, b) => SUPABASE_REGIONS[a].priority - SUPABASE_REGIONS[b].priority);
 
   return healthy;
 }
@@ -238,12 +217,7 @@ async function getHealthyRegions(): Promise<RegionKey[]> {
 /**
  * Calculate distance between two coordinates (Haversine formula)
  */
-function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number {
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -264,9 +238,9 @@ function calculateDistance(
  * Retries with fallback regions if primary fails
  */
 export async function withFailover<T>(
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   operation: (client: SupabaseClient<any, 'public', any>) => Promise<T>,
-  _userLocation?: { lat: number; lon: number },
+  _userLocation?: { lat: number; lon: number }
 ): Promise<T> {
   const healthyRegions = await getHealthyRegions();
 
@@ -304,16 +278,15 @@ export async function monitorLatency() {
         latency: status.latency,
         healthy: status.healthy,
       };
-    }),
+    })
   );
 
-  const avgLatency =
-    results.reduce((sum, r) => sum + r.latency, 0) / results.length;
-  const healthyCount = results.filter((r) => r.healthy).length;
+  const avgLatency = results.reduce((sum, r) => sum + r.latency, 0) / results.length;
+  const healthyCount = results.filter(r => r.healthy).length;
   const uptime = (healthyCount / results.length) * 100;
 
   logger.info('Latency Report:', {
-    regions: results.map((r) => ({
+    regions: results.map(r => ({
       name: r.region,
       latency: `${r.latency}ms`,
       healthy: r.healthy,
@@ -337,13 +310,9 @@ export async function monitorLatency() {
 // Start health monitoring every 30 seconds
 if (typeof setInterval !== 'undefined') {
   setInterval(() => {
-    monitorLatency().catch((err) =>
-      logger.error('Health monitor failed:', err),
-    );
+    monitorLatency().catch((err) => logger.error('Health monitor failed:', err));
   }, 30000);
 }
 
 // Initial health check
-monitorLatency().catch((err) =>
-  logger.error('Initial health check failed:', err),
-);
+monitorLatency().catch((err) => logger.error('Initial health check failed:', err));

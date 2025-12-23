@@ -95,7 +95,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
       showToast('Şikayetiniz başarıyla gönderildi', 'success');
       handleClose();
-    } catch {
+    } catch (_error) {
       showToast('Şikayetiniz gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setLoading(false);
@@ -120,8 +120,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
     >
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top || 16 }]}>
@@ -303,6 +302,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: colors.text.primary,
+  },
+  reasonDescription: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    marginLeft: 32,
+    marginTop: 4,
   },
   detailsContainer: {
     marginTop: 24,

@@ -1,32 +1,33 @@
 /**
  * Stripe Payment Intent Creation Edge Function
- *
+ * 
  * Security Features:
  * - Server-side Stripe API calls (PCI compliant)
  * - Authentication required
  * - Input validation with Zod
  * - Rate limiting
  * - Audit logging
- *
+ * 
  * @see https://stripe.com/docs/payments/payment-intents
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import {
-  createClient,
-  SupabaseClient,
-} from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.11.0?target=deno';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-import { getCorsHeaders } from '../_shared/security-middleware.ts';
+
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 // Request validation schema
 const CreatePaymentIntentSchema = z.object({
   momentId: z.string().uuid('Invalid moment ID'),
-  amount: z
-    .number()
-    .min(1, 'Amount must be at least 1')
-    .max(1000000, 'Amount exceeds maximum'),
+  amount: z.number().min(1, 'Amount must be at least 1').max(1000000, 'Amount exceeds maximum'),
   currency: z.string().length(3, 'Currency must be 3 letters').default('USD'),
   paymentMethodId: z.string().optional(),
   metadata: z.record(z.string()).optional(),
@@ -67,10 +68,10 @@ function checkRateLimit(userId: string): boolean {
  * Log audit event to database
  */
 async function logAudit(
-  supabase: SupabaseClient,
+  supabase: any,
   userId: string,
   action: string,
-  metadata: Record<string, unknown>,
+  metadata: Record<string, any>,
 ) {
   try {
     await supabase.from('audit_logs').insert({
@@ -88,7 +89,7 @@ async function logAudit(
  * Invalidate payment-related cache
  */
 async function invalidatePaymentCache(
-  supabase: SupabaseClient,
+  supabase: any,
   userId: string,
   momentId: string,
 ) {
@@ -146,10 +147,7 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -159,29 +157,23 @@ serve(async (req) => {
     } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
 
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
     }
 
     // Check rate limit
     if (!checkRateLimit(user.id)) {
       return new Response(
-        JSON.stringify({
-          error: 'Rate limit exceeded. Please try again later.',
-        }),
-        {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
     // Parse and validate request body
     const body = await req.json();
-    const validatedData: CreatePaymentIntentRequest =
-      CreatePaymentIntentSchema.parse(body);
+    const validatedData: CreatePaymentIntentRequest = CreatePaymentIntentSchema.parse(body);
 
     // Verify moment exists and is available
     const { data: moment, error: momentError } = await supabase
@@ -191,19 +183,16 @@ serve(async (req) => {
       .single();
 
     if (momentError || !moment) {
-      return new Response(JSON.stringify({ error: 'Moment not found' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Moment not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
     }
 
     if (moment.status !== 'active') {
       return new Response(
         JSON.stringify({ error: 'Moment is not available for gifting' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -211,10 +200,7 @@ serve(async (req) => {
     if (moment.user_id === user.id) {
       return new Response(
         JSON.stringify({ error: 'Cannot gift your own moment' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -222,10 +208,7 @@ serve(async (req) => {
     if (validatedData.amount !== moment.price) {
       return new Response(
         JSON.stringify({ error: 'Amount does not match moment price' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -265,9 +248,7 @@ serve(async (req) => {
       automatic_payment_methods: validatedData.paymentMethodId
         ? undefined
         : { enabled: true },
-      description:
-        validatedData.description ||
-        `Gift for moment ${validatedData.momentId}`,
+      description: validatedData.description || `Gift for moment ${validatedData.momentId}`,
       metadata: {
         supabase_user_id: user.id,
         moment_id: validatedData.momentId,
