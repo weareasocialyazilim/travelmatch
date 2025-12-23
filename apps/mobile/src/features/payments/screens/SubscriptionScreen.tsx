@@ -214,10 +214,6 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               <Text style={styles.benefitText}>Send more gifts & show appreciation</Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="eye" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>See who viewed your profile</Text>
-            </View>
-            <View style={styles.benefitItem}>
               <Icon name="shield-check" size={20} color={COLORS.success} />
               <Text style={styles.benefitText}>Get verified badge & build trust</Text>
             </View>
