@@ -4,11 +4,16 @@
  */
 
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { createContext, useContext, useState, useCallback, useMemo, memo } from 'react';
+import {
+  Text,
+  StyleSheet,
+  Animated,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import { COLORS } from '../constants/colors';
-import { TYPOGRAPHY } from '../theme/typography';
+import { TYPOGRAPHY } from '@/theme/typography';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
 import { spacing } from '../constants/spacing';
@@ -85,13 +90,21 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     [showToast],
   );
 
+  // Memoize dismiss handler to prevent unnecessary re-renders
+  const handleDismiss = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  // Memoize context value to prevent unnecessary re-renders of consumers
+  const contextValue = useMemo<ToastContextValue>(
+    () => ({ showToast, success, error, warning, info }),
+    [showToast, success, error, warning, info],
+  );
+
   return (
-    <ToastContext.Provider value={{ showToast, success, error, warning, info }}>
+    <ToastContext.Provider value={contextValue}>
       {children}
-      <ToastContainer
-        toasts={toasts}
-        onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
-      />
+      <ToastContainer toasts={toasts} onDismiss={handleDismiss} />
     </ToastContext.Provider>
   );
 };
@@ -119,7 +132,8 @@ interface ToastItemProps {
   onDismiss: (id: string) => void;
 }
 
-const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
+// Memoized ToastItem to prevent re-renders when other toasts change
+const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(-100));
 
@@ -205,7 +219,9 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
       </TouchableOpacity>
     </Animated.View>
   );
-};
+});
+
+ToastItem.displayName = 'ToastItem';
 
 const styles = StyleSheet.create({
   container: {
