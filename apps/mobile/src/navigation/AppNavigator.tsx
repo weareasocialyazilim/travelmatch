@@ -43,6 +43,7 @@ import {
   WaitingForCodeScreen,
   ForgotPasswordScreen,
   ChangePasswordScreen,
+  VerifyPhoneScreen,
 } from '../features/auth';
 import SessionExpiredScreen from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
@@ -230,6 +231,11 @@ export type RootStackParamList = {
     verificationType: 'phone' | 'email';
     contact: string;
   };
+  VerifyPhone: {
+    email: string;
+    phone: string;
+    fullName: string;
+  };
   SuccessConfirmation: undefined;
   SetPassword: undefined;
   TwoFactorSetup: undefined;
@@ -240,7 +246,7 @@ export type RootStackParamList = {
   DisputeFlow: {
     type: 'transaction' | 'proof';
     id: string;
-    details?: any;
+    details?: Record<string, unknown>;
   };
 
   // Deprecated - to be removed
@@ -248,7 +254,13 @@ export type RootStackParamList = {
   // DisputeStatus: undefined;
   // DisputeProof: { proofId: string };
 
-  CompleteProfile: undefined;
+  CompleteProfile:
+    | {
+        email?: string;
+        phone?: string;
+        fullName?: string;
+      }
+    | undefined;
 
   // Unified Success Screen - replaces individual success screens
   Success: {
@@ -536,6 +548,11 @@ const AppNavigator = () => {
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen
+              name="VerifyPhone"
+              component={VerifyPhoneScreen}
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen
               name="SessionExpired"
               component={SessionExpiredScreen}

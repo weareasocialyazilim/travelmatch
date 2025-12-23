@@ -68,7 +68,7 @@ export const ensureUserProfile = async (
 export const signUpWithEmail = async (
   email: string,
   password: string,
-  metadata?: { name?: string; avatar_url?: string },
+  metadata?: { name?: string; avatar_url?: string; phone?: string },
 ): Promise<AuthResult> => {
   if (!isSupabaseConfigured()) {
     logger.warn('[Auth] Supabase not configured');
@@ -84,7 +84,10 @@ export const signUpWithEmail = async (
       email,
       password,
       options: {
-        data: metadata,
+        data: {
+          ...metadata,
+          phone: metadata?.phone,
+        },
       },
     });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -22,10 +22,9 @@ import {
   AppError,
 } from '@/utils/friendlyErrorHandler';
 import { LoadingState } from '@/components/LoadingState';
-import SocialButton from '@/components/SocialButton';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { loginSchema, type LoginInput } from '@/utils/forms';
-import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -34,26 +33,37 @@ type LoginScreenProps = StackScreenProps<RootStackParamList, 'Login'>;
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { login } = useAuth();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { control, handleSubmit, formState } = useForm<LoginInput>({
+  const { control, handleSubmit, formState, watch } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     mode: 'onChange',
     defaultValues: {
-      email: '',
+      identifier: '',
       password: '',
     },
   });
+
+  const identifierValue = watch('identifier');
+  
+  // Detect if identifier is email or phone
+  const isEmailInput = useMemo(() => {
+    return identifierValue?.includes('@') || false;
+  }, [identifierValue]);
 
   const onSubmit = async (data: LoginInput) => {
     setLoading(true);
     try {
       logger.info('LoginScreen', 'Starting login...');
-      const result = await login({
-        email: data.email,
-        password: data.password,
-      });
+      
+      // Determine if using email or phone
+      const loginPayload = isEmailInput
+        ? { email: data.identifier, password: data.password }
+        : { phone: data.identifier, password: data.password };
+      
+      const result = await login(loginPayload);
 
       logger.info('LoginScreen', 'Login result:', result);
 
@@ -65,7 +75,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         });
         logger.info('LoginScreen', 'Navigation reset called');
       } else {
-        // Show user-friendly error
         throw new AppError(
           AppErrorCode.AUTH_INVALID_CREDENTIALS,
           result.error || 'Invalid credentials',
@@ -81,12 +90,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    logger.debug('Social login:', provider);
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Discover' }],
-    });
+  const handleSocialLogin = (_provider: string) => {
+    showToast('Coming Soon! This feature will be available shortly.', 'info');
   };
 
   return (
@@ -124,43 +129,48 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           automaticallyAdjustKeyboardInsets
           bounces={false}
         >
-          {/* Welcome Text */}
-          <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>Welcome Back</Text>
-            <Text style={styles.welcomeSubtitle}>
-              Sign in to continue exploring and connecting
-            </Text>
-          </View>
-
-          {/* OAuth Buttons */}
-          <View style={styles.socialButtonsContainer}>
-            <SocialButton
-              provider="apple"
-              label="Continue with Apple"
-              onPress={() => handleSocialLogin('apple')}
-            />
-            <SocialButton
-              provider="google"
-              label="Continue with Google"
-              onPress={() => handleSocialLogin('google')}
-            />
+          {/* Social Login Icons - Small Row at Top */}
+          <View style={styles.socialSection}>
+            <View style={styles.socialRow}>
+              <TouchableOpacity
+                style={styles.socialIconButton}
+                onPress={() => handleSocialLogin('apple')}
+                activeOpacity={0.7}
+              >
+                <Icon name="apple" size={22} color={COLORS.white} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.socialIconButton, styles.googleButton]}
+                onPress={() => handleSocialLogin('google')}
+                activeOpacity={0.7}
+              >
+                <Icon name="google" size={22} color={COLORS.white} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.socialIconButton, styles.facebookButton]}
+                onPress={() => handleSocialLogin('facebook')}
+                activeOpacity={0.7}
+              >
+                <Icon name="facebook" size={22} color={COLORS.white} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Divider */}
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or login with email</Text>
+            <Text style={styles.dividerText}>or login with email/phone</Text>
             <View style={styles.dividerLine} />
           </View>
 
-          {/* Email Input */}
+          {/* Email/Phone Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel} nativeID="email-label">
-              Email address
+            <Text style={styles.inputLabel} nativeID="identifier-label">
+              Email or Phone Number
             </Text>
             <Controller
               control={control}
-              name="email"
+              name="identifier"
               render={({
                 field: { onChange, onBlur, value },
                 fieldState: { error },
@@ -170,23 +180,23 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                     style={[styles.inputWrapper, error && styles.inputError]}
                   >
                     <Icon
-                      name="email-outline"
+                      name={isEmailInput ? "email-outline" : "phone-outline"}
                       size={20}
                       color={COLORS.textSecondary}
                     />
                     <TextInput
                       style={styles.textInput}
-                      placeholder="name@example.com"
+                      placeholder="Email or phone number"
                       placeholderTextColor={COLORS.textSecondary}
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
-                      keyboardType="email-address"
+                      keyboardType={isEmailInput ? "email-address" : "default"}
                       autoCapitalize="none"
                       autoCorrect={false}
-                      accessibilityLabel="Email address"
-                      accessibilityHint="Enter your email address"
-                      accessibilityLabelledBy="email-label"
+                      accessibilityLabel="Email or phone number"
+                      accessibilityHint="Enter your email address or phone number"
+                      accessibilityLabelledBy="identifier-label"
                     />
                   </View>
                   {error && (
@@ -274,28 +284,25 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <TouchableOpacity
             style={[
               styles.loginButton,
-              !canSubmitForm({ formState }) && styles.loginButtonDisabled,
+              (!formState.isValid || loading) && styles.loginButtonDisabled,
             ]}
             onPress={handleSubmit(onSubmit)}
-            disabled={!canSubmitForm({ formState }) || loading}
+            disabled={!formState.isValid || loading}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel="Log in to your account"
-            accessibilityState={{
-              disabled: !canSubmitForm({ formState }) || loading,
-            }}
+            accessibilityLabel="Log in"
+            accessibilityState={{ disabled: !formState.isValid || loading }}
           >
             <Text style={styles.loginButtonText}>Log In</Text>
           </TouchableOpacity>
 
           <View style={styles.registerPrompt}>
             <Text style={styles.registerPromptText}>
-              Don&apos;t have an account?{' '}
+              Don't have an account?{' '}
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('Register')}
               accessibilityRole="link"
-              accessibilityLabel="Sign up for an account"
             >
               <Text style={styles.registerLink}>Sign up</Text>
             </TouchableOpacity>
@@ -345,24 +352,29 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingBottom: 24,
   },
-  welcomeSection: {
-    marginBottom: 24,
+  socialSection: {
+    marginBottom: 16,
+    marginTop: 24,
   },
-  welcomeTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 8,
+  socialRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
   },
-  welcomeSubtitle: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    lineHeight: 22,
+  socialIconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#000000',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  socialButtonsContainer: {
-    gap: 12,
+  googleButton: {
+    backgroundColor: '#DB4437',
+  },
+  facebookButton: {
+    backgroundColor: '#1877F2',
   },
   dividerContainer: {
     flexDirection: 'row',
@@ -375,12 +387,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   dividerText: {
-    marginHorizontal: 16,
-    fontSize: 13,
+    paddingHorizontal: 12,
     color: COLORS.textSecondary,
+    fontSize: 13,
   },
   inputContainer: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   inputLabel: {
     fontSize: 14,
@@ -414,19 +426,18 @@ const styles = StyleSheet.create({
   },
   forgotPasswordButton: {
     alignSelf: 'flex-end',
-    paddingVertical: 8,
+    marginTop: 4,
   },
   forgotPasswordText: {
+    color: COLORS.mint,
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.mint,
   },
   bottomBar: {
-    padding: 24,
-    paddingBottom: 16,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
     backgroundColor: COLORS.background,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
   },
   loginButton: {
     height: 52,

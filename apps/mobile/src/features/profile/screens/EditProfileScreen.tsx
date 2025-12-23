@@ -43,7 +43,6 @@ const EditProfileScreen = () => {
     return {
       avatarUrl: user?.avatarUrl || user?.avatar || DEFAULT_IMAGES.AVATAR_LARGE,
       name: user?.name || '',
-      username: user?.username || '',
       bio: user?.bio || '',
       location:
         typeof user?.location === 'string'
@@ -59,21 +58,18 @@ const EditProfileScreen = () => {
       mode: 'onChange',
       defaultValues: {
         fullName: originalProfile.name,
-        username: originalProfile.username,
         bio: originalProfile.bio,
         location: originalProfile.location,
       },
     });
 
   // Watch fields for real-time updates
-  const username = watch('username');
   const bio = watch('bio');
 
   // Update form when user data loads
   useEffect(() => {
     reset({
       fullName: originalProfile.name,
-      username: originalProfile.username,
       bio: originalProfile.bio,
       location: originalProfile.location,
     });
@@ -81,10 +77,6 @@ const EditProfileScreen = () => {
 
   // UI state
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
-    null,
-  );
-  const [checkingUsername, setCheckingUsername] = useState(false);
 
   const BIO_MAX_LENGTH = 200;
 
@@ -92,35 +84,6 @@ const EditProfileScreen = () => {
   const hasChanges = useCallback(() => {
     return avatarUri !== null || formState.isDirty;
   }, [avatarUri, formState.isDirty]);
-
-  // Username availability check (debounced)
-  useEffect(() => {
-    if (username === originalProfile.username) {
-      setUsernameAvailable(null);
-      return;
-    }
-
-    if (!username || username.length < 3) {
-      setUsernameAvailable(null);
-      return;
-    }
-
-    setCheckingUsername(true);
-    const timer = setTimeout(async () => {
-      try {
-        const isAvailable = await userService.checkUsernameAvailability(
-          username,
-        );
-        setUsernameAvailable(isAvailable);
-      } catch {
-        // Ignore error
-      } finally {
-        setCheckingUsername(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [username, originalProfile.username]);
 
   const pickImage = async (useCamera: boolean) => {
     try {
@@ -184,11 +147,6 @@ const EditProfileScreen = () => {
   const onSubmit = async (data: EditProfileInput) => {
     if (!hasChanges()) return;
 
-    if (usernameAvailable === false) {
-      showToast('Username is not available', 'error');
-      return;
-    }
-
     try {
       logger.info('[EditProfile] Starting profile update with data:', data);
 
@@ -213,22 +171,11 @@ const EditProfileScreen = () => {
       }
 
       // Update profile - convert to snake_case for database
-      // Note: location is TEXT type in database, not JSONB
-      // Note: username column may not exist yet - check migration status
       const updateData: Record<string, unknown> = {
         full_name: data.fullName,
         bio: data.bio || null,
         location: data.location || null,
       };
-
-      // Only include username if it was changed and is available
-      if (
-        data.username &&
-        data.username !== originalProfile.username &&
-        usernameAvailable
-      ) {
-        updateData.username = data.username;
-      }
 
       logger.info('[EditProfile] Sending update to database:', updateData);
       await userService.updateProfile(updateData);
@@ -260,14 +207,13 @@ const EditProfileScreen = () => {
     }
   };
 
-  const isSubmitDisabled =
-    !canSubmitForm(
-      { formState },
-      {
-        requireDirty: false,
-        requireValid: true,
-      },
-    ) || usernameAvailable === false;
+  const isSubmitDisabled = !canSubmitForm(
+    { formState },
+    {
+      requireDirty: false,
+      requireValid: true,
+    },
+  );
 
   const handleChangeAvatar = () => {
     const options = avatarUri
@@ -415,70 +361,6 @@ const EditProfileScreen = () => {
                         placeholderTextColor={COLORS.textSecondary}
                         maxLength={50}
                       />
-                      {error && (
-                        <Text style={styles.errorText}>{error.message}</Text>
-                      )}
-                    </>
-                  )}
-                />
-              </View>
-
-              <View style={styles.inputDivider} />
-
-              {/* Username */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Username</Text>
-                <Controller
-                  control={control}
-                  name="username"
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => (
-                    <>
-                      <View style={styles.usernameInputContainer}>
-                        <Text style={styles.usernamePrefix}>@</Text>
-                        <TextInput
-                          style={[styles.textInput, styles.usernameInput]}
-                          value={value}
-                          onChangeText={(text) =>
-                            onChange(
-                              text.toLowerCase().replace(/[^a-z0-9_]/g, ''),
-                            )
-                          }
-                          onBlur={onBlur}
-                          placeholder="username"
-                          placeholderTextColor={COLORS.textSecondary}
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          maxLength={30}
-                        />
-                        {checkingUsername && (
-                          <ActivityIndicator
-                            size="small"
-                            color={COLORS.textSecondary}
-                          />
-                        )}
-                        {!checkingUsername && usernameAvailable === true && (
-                          <MaterialCommunityIcons
-                            name="check-circle"
-                            size={20}
-                            color={COLORS.mint}
-                          />
-                        )}
-                        {!checkingUsername && usernameAvailable === false && (
-                          <MaterialCommunityIcons
-                            name="close-circle"
-                            size={20}
-                            color={COLORS.coral}
-                          />
-                        )}
-                      </View>
-                      {usernameAvailable === false && (
-                        <Text style={styles.usernameError}>
-                          This username is already taken
-                        </Text>
-                      )}
                       {error && (
                         <Text style={styles.errorText}>{error.message}</Text>
                       )}

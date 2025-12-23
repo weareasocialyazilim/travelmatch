@@ -16,10 +16,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 import { LoadingState } from '@/components/LoadingState';
-import SocialButton from '@/components/SocialButton';
 import { useAuth } from '@/context/AuthContext';
 import { registerSchema, type RegisterInput } from '@/utils/forms';
-import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -35,52 +33,57 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const emailRef = useRef<TextInput>(null);
+  const phoneRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
 
-  const { control, handleSubmit, formState, watch } = useForm<RegisterInput>({
+  const { control, handleSubmit, formState } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     mode: 'onChange',
     defaultValues: {
+      fullName: '',
       email: '',
+      phone: '',
       password: '',
       confirmPassword: '',
     },
   });
 
-  const _password = watch('password');
-  const _email = watch('email');
+  const handleSocialLogin = (_provider: string) => {
+    showToast('Coming Soon! This feature will be available shortly.', 'info');
+  };
 
   const onSubmit = async (data: RegisterInput) => {
     setLoading(true);
     try {
-      const emailParts = data.email.split('@');
-      const defaultName = emailParts[0] ?? data.email;
       const result = await register({
         email: data.email,
+        phone: data.phone,
         password: data.password,
-        name: defaultName,
+        name: data.fullName,
       });
 
       if (result.success) {
-        navigation.navigate('CompleteProfile');
+        // Email verification link is sent automatically by Supabase
+        // Navigate directly to phone verification
+        navigation.navigate('VerifyPhone', {
+          email: data.email,
+          phone: data.phone,
+          fullName: data.fullName,
+        });
       } else {
         showToast(
-          result.error || 'Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin',
+          result.error || 'Registration failed. Please try again.',
           'error',
         );
       }
     } catch (error) {
       logger.error('Registration error:', error);
-      showToast('Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin', 'error');
+      showToast('An unexpected error occurred. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSocialLogin = (provider: string) => {
-    logger.debug('Social register:', provider);
-    navigation.navigate('CompleteProfile');
   };
 
   return (
@@ -118,38 +121,79 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
           automaticallyAdjustKeyboardInsets
           bounces={false}
         >
-          {/* Welcome Text */}
-          <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>Join TravelMatch</Text>
-            <Text style={styles.welcomeSubtitle}>
-              Create an account to start connecting with travelers and locals
-            </Text>
-          </View>
-
-          {/* Social Login */}
+          {/* Social Login Icons - Small Row at Top */}
           <View style={styles.socialSection}>
-            <Text style={styles.socialText}>Or sign up with</Text>
-            <View style={styles.socialButtons}>
-              <SocialButton
-                provider="apple"
+            <View style={styles.socialRow}>
+              <TouchableOpacity
+                style={styles.socialIconButton}
                 onPress={() => handleSocialLogin('apple')}
-              />
-              <SocialButton
-                provider="google"
+                activeOpacity={0.7}
+              >
+                <Icon name="apple" size={22} color={COLORS.white} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.socialIconButton, styles.googleButton]}
                 onPress={() => handleSocialLogin('google')}
-              />
-              <SocialButton
-                provider="facebook"
+                activeOpacity={0.7}
+              >
+                <Icon name="google" size={22} color={COLORS.white} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.socialIconButton, styles.facebookButton]}
                 onPress={() => handleSocialLogin('facebook')}
-              />
+                activeOpacity={0.7}
+              >
+                <Icon name="facebook" size={22} color={COLORS.white} />
+              </TouchableOpacity>
             </View>
           </View>
 
           {/* Divider */}
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or register with email</Text>
+            <Text style={styles.dividerText}>or continue with email</Text>
             <View style={styles.dividerLine} />
+          </View>
+
+          {/* Full Name Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Full Name</Text>
+            <Controller
+              control={control}
+              name="fullName"
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
+                <>
+                  <View
+                    style={[styles.inputWrapper, error && styles.inputError]}
+                  >
+                    <Icon
+                      name="account-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="John Doe"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      autoCapitalize="words"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      onSubmitEditing={() => emailRef.current?.focus()}
+                      blurOnSubmit={false}
+                    />
+                  </View>
+                  {error && (
+                    <Text style={styles.errorText}>{error.message}</Text>
+                  )}
+                </>
+              )}
+            />
           </View>
 
           {/* Email Input */}
@@ -172,6 +216,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                       color={COLORS.textSecondary}
                     />
                     <TextInput
+                      ref={emailRef}
                       style={styles.textInput}
                       placeholder="name@example.com"
                       placeholderTextColor={COLORS.textSecondary}
@@ -179,6 +224,49 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                       onChangeText={onChange}
                       onBlur={onBlur}
                       keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      onSubmitEditing={() => phoneRef.current?.focus()}
+                      blurOnSubmit={false}
+                    />
+                  </View>
+                  {error && (
+                    <Text style={styles.errorText}>{error.message}</Text>
+                  )}
+                </>
+              )}
+            />
+          </View>
+
+          {/* Phone Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Phone Number</Text>
+            <Controller
+              control={control}
+              name="phone"
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
+                <>
+                  <View
+                    style={[styles.inputWrapper, error && styles.inputError]}
+                  >
+                    <Icon
+                      name="phone-outline"
+                      size={20}
+                      color={COLORS.textSecondary}
+                    />
+                    <TextInput
+                      ref={phoneRef}
+                      style={styles.textInput}
+                      placeholder="+1 234 567 8900"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="phone-pad"
                       autoCapitalize="none"
                       autoCorrect={false}
                       returnKeyType="next"
@@ -317,15 +405,16 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             </Text>
           </Text>
 
-          {/* Bottom Action Bar - Moved inside ScrollView to prevent keyboard overlap issues */}
+          {/* Bottom Action Bar */}
           <View style={styles.bottomBar}>
             <TouchableOpacity
               style={[
                 styles.registerButton,
-                !canSubmitForm({ formState }) && styles.registerButtonDisabled,
+                (!formState.isValid || loading) &&
+                  styles.registerButtonDisabled,
               ]}
               onPress={handleSubmit(onSubmit)}
-              disabled={!canSubmitForm({ formState }) || loading}
+              disabled={!formState.isValid || loading}
               activeOpacity={0.8}
             >
               <Text style={styles.registerButtonText}>Create Account</Text>
@@ -387,35 +476,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 24,
   },
-  welcomeSection: {
-    marginBottom: 24,
-  },
-  welcomeTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  welcomeSubtitle: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    lineHeight: 22,
-  },
   socialSection: {
-    marginBottom: 24,
+    marginBottom: 16,
+    marginTop: 8,
   },
-  socialText: {
-    fontSize: 14,
-    color: COLORS.text,
-    marginBottom: 12,
+  socialRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
   },
-  socialButtons: {
-    gap: 12,
+  socialIconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#000000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleButton: {
+    backgroundColor: '#DB4437',
+  },
+  facebookButton: {
+    backgroundColor: '#1877F2',
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24,
+    marginBottom: 20,
   },
   dividerLine: {
     flex: 1,
@@ -423,9 +510,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   dividerText: {
-    marginHorizontal: 16,
-    fontSize: 13,
+    paddingHorizontal: 12,
     color: COLORS.textSecondary,
+    fontSize: 13,
   },
   inputContainer: {
     marginBottom: 16,
@@ -474,7 +561,6 @@ const styles = StyleSheet.create({
   bottomBar: {
     paddingTop: 24,
     paddingBottom: 16,
-    // Removed absolute positioning/border to flow with content
   },
   registerButton: {
     height: 52,

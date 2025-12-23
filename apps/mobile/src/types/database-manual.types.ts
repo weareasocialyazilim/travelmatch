@@ -48,7 +48,7 @@ export interface UserRow {
 
 // Update profile payload type
 export interface UpdateProfilePayload {
-  avatar?: string;
+  avatar_url?: string;
   coverImage?: string;
   cover_image?: string;
   full_name?: string;

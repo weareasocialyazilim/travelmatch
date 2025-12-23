@@ -74,24 +74,36 @@ export const messageValidation = z
 // AUTH SCHEMAS
 // ============================================================================
 
+// Login can be with email OR phone
 export const loginSchema = z.object({
-  email: emailValidation,
+  identifier: z.string().min(1, 'forms.validation.identifier.required'),
   password: z.string().min(1, 'forms.validation.password.required'),
 });
 
 export const registerSchema = z
   .object({
+    fullName: nameValidation,
     email: emailValidation,
+    phone: phoneValidation,
     password: passwordValidation,
     confirmPassword: z
       .string()
       .min(1, 'forms.validation.confirmPassword.required'),
-    fullName: nameValidation,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'forms.validation.confirmPassword.mismatch',
     path: ['confirmPassword'],
   });
+
+// Email verification code
+export const emailVerificationSchema = z.object({
+  code: z.string().length(6, 'forms.validation.code.length'),
+});
+
+// Phone verification code
+export const phoneVerificationSchema = z.object({
+  code: z.string().length(6, 'forms.validation.code.length'),
+});
 
 export const forgotPasswordSchema = z.object({
   email: emailValidation,
@@ -150,7 +162,6 @@ export const verifyCodeSchema = z.object({
 
 export const editProfileSchema = z.object({
   fullName: nameValidation,
-  username: usernameValidation.optional(),
   bio: bioValidation,
   location: z.string().max(100, 'forms.validation.location.max').optional(),
   website: urlValidation,
@@ -158,14 +169,11 @@ export const editProfileSchema = z.object({
 });
 
 export const completeProfileSchema = z.object({
-  fullName: nameValidation,
-  username: usernameValidation,
   bio: bioValidation,
-  avatar: z.string().optional().or(z.literal('')),
   interests: z
     .array(z.string())
-    .min(1, 'forms.validation.interests.min')
-    .max(5, 'forms.validation.interests.max'),
+    .max(5, 'forms.validation.interests.max')
+    .default([]),
 });
 
 // ============================================================================

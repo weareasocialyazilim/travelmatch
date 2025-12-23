@@ -182,8 +182,8 @@ const CreateMomentScreen: React.FC = () => {
       } finally {
         setIsSubmitting(false);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [createMoment, navigation],
   );
 
@@ -200,12 +200,16 @@ const CreateMomentScreen: React.FC = () => {
       latitude: number;
       longitude: number;
     }) => {
-      setValue('place', {
-        name: location.name,
-        address: location.address,
-        latitude: location.latitude,
-        longitude: location.longitude,
-      });
+      setValue(
+        'place',
+        {
+          name: location.name,
+          address: location.address,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        },
+        { shouldValidate: true },
+      );
       setShowLocationPicker(false);
     },
     [setValue],
@@ -247,7 +251,7 @@ const CreateMomentScreen: React.FC = () => {
             photo={photo}
             onPhotoSelected={(uri) => {
               setPhoto(uri);
-              setValue('photo', uri);
+              setValue('photo', uri, { shouldValidate: true });
             }}
           />
 
@@ -266,7 +270,9 @@ const CreateMomentScreen: React.FC = () => {
           {/* Category Selector */}
           <CategorySelector
             selectedCategory={selectedCategory}
-            onSelectCategory={(category) => setValue('category', category)}
+            onSelectCategory={(category) =>
+              setValue('category', category, { shouldValidate: true })
+            }
           />
           {errors.category && (
             <Text style={styles.errorText}>{errors.category.message}</Text>
@@ -277,9 +283,13 @@ const CreateMomentScreen: React.FC = () => {
             place={place ?? null}
             selectedDate={selectedDate}
             amount={String(amount || '')}
-            onPlaceChange={(p) => setValue('place', p)}
+            onPlaceChange={(p) =>
+              setValue('place', p, { shouldValidate: true })
+            }
             onDatePress={handleDatePress}
-            onAmountChange={(a) => setValue('amount', parseFloat(a) || 0)}
+            onAmountChange={(a) =>
+              setValue('amount', parseFloat(a) || 0, { shouldValidate: true })
+            }
             onNavigateToPlaceSearch={handleNavigateToPlaceSearch}
           />
           {errors.amount && (
@@ -292,7 +302,9 @@ const CreateMomentScreen: React.FC = () => {
           {/* Story Section */}
           <StorySection
             story={story || ''}
-            onStoryChange={(s) => setValue('story', s)}
+            onStoryChange={(s) =>
+              setValue('story', s, { shouldValidate: true })
+            }
           />
 
           {/* Live Preview */}
@@ -377,7 +389,7 @@ const CreateMomentScreen: React.FC = () => {
                   minimumDate={new Date()}
                   maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
                   onChange={(_event, date) => {
-                    if (date) setValue('date', date);
+                    if (date) setValue('date', date, { shouldValidate: true });
                   }}
                   textColor={COLORS.text}
                 />
@@ -393,7 +405,7 @@ const CreateMomentScreen: React.FC = () => {
             maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
             onChange={(_event, date) => {
               setShowDatePicker(false);
-              if (date) setValue('date', date);
+              if (date) setValue('date', date, { shouldValidate: true });
             }}
           />
         ))}

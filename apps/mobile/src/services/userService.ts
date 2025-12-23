@@ -377,7 +377,7 @@ export const userService = {
     if (!url) throw new Error('Upload failed');
 
     // Update user profile
-    const updatePayload: UpdateProfilePayload = { avatar: url };
+    const updatePayload: UpdateProfilePayload = { avatar_url: url };
     await userService.updateProfile(updatePayload);
 
     return { avatarUrl: url };
@@ -409,7 +409,7 @@ export const userService = {
    */
   deleteAvatar: async (): Promise<{ success: boolean }> => {
     // Just set avatar to default or null
-    const updatePayload: UpdateProfilePayload = { avatar: '' };
+    const updatePayload: UpdateProfilePayload = { avatar_url: '' };
     await userService.updateProfile(updatePayload);
     return { success: true };
   },

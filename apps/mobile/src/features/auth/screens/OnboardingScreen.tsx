@@ -5,6 +5,10 @@ import type {
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ImageSourcePropType } from 'react-native';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const iconImage = require('../../../../assets/icon.png') as ImageSourcePropType;
+
 import {
   Animated,
   Dimensions,
@@ -16,8 +20,7 @@ import {
 } from 'react-native';
 import { FlashList, type FlashListRef } from '@shopify/flash-list';
 
-const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
-  Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface OnboardingPage {
   id: string;
@@ -53,9 +56,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Dynamic onboarding pages from i18n
-
-  const iconImage =
-    require('../../../../assets/icon.png') as ImageSourcePropType;
 
   const ONBOARDING_PAGES: OnboardingPage[] = [
     {
@@ -239,10 +239,14 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           </TouchableOpacity>
         </View>
 
-        {/* Skip Link */}
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-        </TouchableOpacity>
+        {/* Skip Link - Only visible after page 2 */}
+        {currentIndex >= 1 ? (
+          <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+            <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.skipButtonPlaceholder} />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -358,6 +362,11 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     alignItems: 'center',
+    paddingTop: 8,
+    minHeight: 32,
+  },
+  skipButtonPlaceholder: {
+    minHeight: 32,
     paddingTop: 8,
   },
   skipText: {

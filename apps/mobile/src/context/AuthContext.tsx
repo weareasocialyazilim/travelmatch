@@ -80,11 +80,13 @@ interface AuthTokens {
 type AuthState = 'loading' | 'authenticated' | 'unauthenticated';
 
 /**
- * Credentials for email/password login
+ * Credentials for email/password or phone/password login
  */
 interface LoginCredentials {
-  /** User's email address */
-  email: string;
+  /** User's email address (optional if phone is provided) */
+  email?: string;
+  /** User's phone number (optional if email is provided) */
+  phone?: string;
   /** User's password */
   password: string;
 }
@@ -95,6 +97,8 @@ interface LoginCredentials {
 interface RegisterData {
   /** User's email address */
   email: string;
+  /** User's phone number */
+  phone?: string;
   /** User's password (min 8 chars) */
   password: string;
   /** User's display name */
@@ -345,18 +349,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   /**
-   * Login with email/password
+   * Login with email/password or phone/password
    */
   const login = async (
     credentials: LoginCredentials,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
+      // Determine login method
+      const identifier = credentials.email || credentials.phone;
+      if (!identifier) {
+        return { success: false, error: 'Email or phone is required' };
+      }
+
       const {
         user: authUser,
         session,
         error,
       } = await authService.signInWithEmail(
-        credentials.email,
+        credentials.email || credentials.phone || '',
         credentials.password,
       );
 
@@ -415,6 +425,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         error,
       } = await authService.signUpWithEmail(data.email, data.password, {
         name: data.name,
+        phone: data.phone,
       });
 
       if (error) throw error;
