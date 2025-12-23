@@ -47,7 +47,18 @@ Mobile app is the core product. All efforts prioritize mobile stability, securit
 | Screens | 80+ screens |
 | Framework | React Native 0.81.5 + Expo SDK 54 |
 | State | Zustand |
-| Backend | Supabase (21 Edge Functions) |
+| Backend | Supabase (21+ Edge Functions, 52+ Migrations) |
+
+## Current Supabase/Backend Stats
+
+| Metric | Value |
+|--------|-------|
+| Migrations | 52+ SQL files |
+| Edge Functions | 21+ functions deployed |
+| Tables | 33+ tables with RLS |
+| RLS Policies | 184+ policies |
+| Region | Southeast Asia (Singapore) |
+| Project ID | bjikxgtbptrvawkguypv |
 
 ---
 
@@ -103,47 +114,37 @@ export async function uploadImage(imageBlob: Blob) {
 
 | Task | File | Priority | Status |
 |------|------|----------|--------|
-| atomic_transfer RPC enable | `migrations/` | P0 | ⬜ |
-| cache_invalidation RLS fix | `migrations/` | P0 | ⬜ |
-| KYC verification real impl | `functions/verify-kyc/` | P1 | ⬜ |
+| atomic_transfer RPC enable | `20251217200000_enable_atomic_transfer.sql` | P0 | ✅ DONE |
+| cache_invalidation RLS fix | `20251217200001_fix_cache_invalidation_rls.sql` | P0 | ✅ DONE |
+| KYC verification real impl | `functions/verify-kyc/index.ts:110` | P1 | ⚠️ MOCK |
 
-**1.1.1 Atomic Transfer RPC**
+**1.1.1 Atomic Transfer RPC** ✅ IMPLEMENTED
 ```sql
--- supabase/migrations/20251222000001_enable_atomic_transfer.sql
-CREATE OR REPLACE FUNCTION atomic_transfer(
-  p_sender_id UUID,
-  p_recipient_id UUID,
-  p_amount DECIMAL,
-  p_moment_id UUID,
-  p_message TEXT
-) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  v_sender_balance DECIMAL;
-BEGIN
-  -- FOR UPDATE kilitleri ile atomik işlem
-  SELECT balance INTO STRICT v_sender_balance
-  FROM users WHERE id = p_sender_id FOR UPDATE;
-
-  IF v_sender_balance < p_amount THEN
-    RAISE EXCEPTION 'Insufficient balance';
-  END IF;
-
-  UPDATE users SET balance = balance - p_amount WHERE id = p_sender_id;
-  UPDATE users SET balance = balance + p_amount WHERE id = p_recipient_id;
-
-  RETURN jsonb_build_object('success', true);
-END;
-$$;
+-- File: supabase/migrations/20251217200000_enable_atomic_transfer.sql
+-- Status: DEPLOYED
+-- Features:
+--   - FOR UPDATE locks to prevent race conditions
+--   - UUID ordering to prevent deadlocks
+--   - Transaction logging with audit trail
+--   - Proper error handling
 ```
 
-**1.1.2 Cache Invalidation RLS**
+**1.1.2 Cache Invalidation RLS** ✅ IMPLEMENTED
 ```sql
--- Service role only access
-DROP POLICY IF EXISTS "cache_invalidation_select_policy" ON public.cache_invalidation;
-CREATE POLICY "Only service role access" ON public.cache_invalidation
-  FOR ALL USING ((select auth.role()) = 'service_role');
+-- File: supabase/migrations/20251217200001_fix_cache_invalidation_rls.sql
+-- Status: DEPLOYED
+-- Fix: Restricted to service_role only
+```
+
+**1.1.3 KYC Verification** ⚠️ MOCK - PRODUCTION'DA DEĞİŞTİRİLMELİ
+```typescript
+// File: supabase/functions/verify-kyc/index.ts:110
+const isValid = true; // ⚠️ MOCK - Replace before production launch
+
+// Production options:
+// 1. Onfido: https://documentation.onfido.com/
+// 2. Stripe Identity: https://stripe.com/docs/identity
+// 3. Jumio: https://www.jumio.com/
 ```
 
 ### 1.2 Type Safety (7 `any` tipi)
@@ -162,9 +163,9 @@ CREATE POLICY "Only service role access" ON public.cache_invalidation
 
 | Deliverable | Status | Effort |
 |-------------|--------|--------|
-| atomic_transfer migration | ⬜ | 30 min |
-| cache_invalidation RLS | ⬜ | 15 min |
-| KYC real implementation | ⬜ | 2-4 saat |
+| atomic_transfer migration | ✅ DONE | - |
+| cache_invalidation RLS | ✅ DONE | - |
+| KYC real implementation | ⚠️ MOCK | 2-4 saat |
 | Type safety fixes (7 any) | ⬜ | 2 saat |
 
 ---
@@ -501,6 +502,52 @@ PARALEL (Phase 2.5 - Architecture Refactor):
 
 ---
 
+## Supabase/Backend Status
+
+### Edge Functions (21+ Deployed)
+
+| Function | Purpose | Status |
+|----------|---------|--------|
+| `audit-logging` | Activity logging | ✅ Active |
+| `auth-login` | Custom auth flow | ✅ Active |
+| `confirm-payment` | Payment confirmation | ✅ Active |
+| `create-payment` | Payment creation | ✅ Active |
+| `create-payment-intent` | Stripe intent | ✅ Active |
+| `export-user-data` | GDPR export | ✅ Active |
+| `feed-delta` | Feed updates | ✅ Active |
+| `geocode` | Location geocoding | ✅ Active |
+| `get-user-profile` | Profile fetching | ✅ Active |
+| `handle-storage-upload` | File uploads | ✅ Active |
+| `setup-2fa` | 2FA setup | ✅ Active |
+| `stripe-webhook` | Stripe webhooks | ✅ Active |
+| `transfer-funds` | Fund transfers | ✅ Active |
+| `upload-image` | Image uploads | ✅ Active |
+| `verify-2fa` | 2FA verification | ✅ Active |
+| `verify-kyc` | KYC verification | ⚠️ MOCK |
+| `verify-proof` | Proof verification | ✅ Active |
+
+### Critical Migrations (Recent)
+
+| Migration | Purpose | Status |
+|-----------|---------|--------|
+| `20251217100000_critical_security_fixes.sql` | Security hardening | ✅ Applied |
+| `20251217200000_enable_atomic_transfer.sql` | Atomic transfers | ✅ Applied |
+| `20251217200001_fix_cache_invalidation_rls.sql` | RLS fix | ✅ Applied |
+| `20251218100000_final_security_audit.sql` | Final audit | ✅ Applied |
+| `20251218150000_security_definer_audit.sql` | DEFINER audit | ✅ Applied |
+
+### Database Tasks Still Pending
+
+| Task | Priority | Status |
+|------|----------|--------|
+| KYC real provider integration | P1 | ⬜ |
+| Production Stripe keys | P1 | ⬜ |
+| Realtime subscriptions test | P2 | ⬜ |
+| pg_cron job monitoring | P2 | ⬜ |
+| Database performance tuning | P3 | ⬜ |
+
+---
+
 ## Risk Matrix
 
 | Risk | Impact | Probability | Mitigation |
@@ -509,9 +556,10 @@ PARALEL (Phase 2.5 - Architecture Refactor):
 | Store rejection | High | Medium | Follow guidelines exactly |
 | Performance issues | Medium | Low | FlashList + profiling |
 | Type errors in prod | Medium | Medium | Strict mode + tests |
+| KYC mock in production | High | Medium | Integrate real provider |
 
 ---
 
 **Document Status:** Active Implementation
 **Owner:** Development Team
-**Last Updated:** December 22, 2025
+**Last Updated:** December 23, 2025
