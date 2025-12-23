@@ -4,41 +4,22 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
+import { secureStorage } from '../utils/secureStorage';
 import type { Database } from '@/types/database.types';
 
 // Re-export Database type for use in services
 export type { Database } from '@/types/database.types';
 
-// Safe __DEV__ check for Jest environment
-const isDev =
-  typeof __DEV__ !== 'undefined'
-    ? __DEV__
-    : process.env.NODE_ENV !== 'production';
-
-// Check if running in test environment
-const isTest =
-  process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
-
 // Supabase credentials from environment variables
-// In test environment, use mock values to prevent createClient from throwing
-const SUPABASE_URL: string = isTest
-  ? 'https://test.supabase.co'
-  : (process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined) ??
-    (process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined) ??
-    '';
-const SUPABASE_ANON_KEY: string = isTest
-  ? 'test-anon-key'
-  : (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY as
-      | string
-      | undefined) ??
-    (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string | undefined) ??
-    '';
+const SUPABASE_URL: string =
+  (process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined) ?? (process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined) ?? '';
+const SUPABASE_ANON_KEY: string =
+  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY as string | undefined) ?? (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string | undefined) ?? '';
 
 // Validate configuration
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  if (isDev) {
+  if (__DEV__) {
     logger.warn(
       '[Supabase] Missing configuration. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in your .env file',
     );
@@ -46,33 +27,17 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 /**
- * Storage adapter for Supabase Auth
- * Uses AsyncStorage which is the officially recommended approach for React Native
- * This ensures session persistence works correctly across app restarts
+ * Custom storage adapter for Supabase to use SecureStore
  */
-const SupabaseAuthStorage = {
-  getItem: async (key: string): Promise<string | null> => {
-    try {
-      const value = await AsyncStorage.getItem(key);
-      return value;
-    } catch (error) {
-      logger.error('[Supabase Storage] getItem error:', error);
-      return null;
-    }
+const SupabaseStorage = {
+  getItem: (key: string) => {
+    return secureStorage.getItem(key);
   },
-  setItem: async (key: string, value: string): Promise<void> => {
-    try {
-      await AsyncStorage.setItem(key, value);
-    } catch (error) {
-      logger.error('[Supabase Storage] setItem error:', error);
-    }
+  setItem: (key: string, value: string) => {
+    return secureStorage.setItem(key, value);
   },
-  removeItem: async (key: string): Promise<void> => {
-    try {
-      await AsyncStorage.removeItem(key);
-    } catch (error) {
-      logger.error('[Supabase Storage] removeItem error:', error);
-    }
+  removeItem: (key: string) => {
+    return secureStorage.deleteItem(key);
   },
 };
 
@@ -82,28 +47,49 @@ const SupabaseAuthStorage = {
 export const SUPABASE_EDGE_URL = SUPABASE_URL;
 
 /**
- * Supabase client instance
- * Configured with AsyncStorage for session persistence in React Native
- * Uses auto-generated Database types from @/types/database.types.ts
+ * Realtime configuration for optimal performance
  */
-export const supabase = createClient<Database>(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY,
-  {
-    auth: {
-      storage: SupabaseAuthStorage,
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: false, // Disable for React Native
-    },
-    global: {
-      headers: {
-        'x-app-name': 'TravelMatch',
-        'x-app-version': '1.0.0',
-      },
+const REALTIME_CONFIG = {
+  params: {
+    eventsPerSecond: 10, // Rate limit to prevent flooding
+  },
+  // Heartbeat interval to detect disconnections early
+  heartbeatIntervalMs: 15000, // 15 seconds
+  // Reconnect configuration with exponential backoff
+  reconnectAfterMs: (tries: number) => {
+    // Exponential backoff with jitter: base * 2^tries + random jitter
+    const baseDelay = 1000;
+    const maxDelay = 30000;
+    const exponentialDelay = Math.min(baseDelay * Math.pow(2, tries), maxDelay);
+    // Add jitter (0-25% of delay) to prevent thundering herd
+    const jitter = exponentialDelay * Math.random() * 0.25;
+    return Math.floor(exponentialDelay + jitter);
+  },
+  // Connection timeout
+  timeout: 10000, // 10 seconds
+};
+
+/**
+ * Supabase client instance
+ * Configured with SecureStore for session persistence in React Native
+ * Uses auto-generated Database types from @/types/database.types.ts
+ * Optimized realtime configuration for better performance and reliability
+ */
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    storage: SupabaseStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false, // Disable for React Native
+  },
+  global: {
+    headers: {
+      'x-app-name': 'TravelMatch',
+      'x-app-version': '1.0.0',
     },
   },
-);
+  realtime: REALTIME_CONFIG,
+});
 
 /**
  * Typed Supabase client
