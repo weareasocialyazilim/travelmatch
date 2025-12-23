@@ -27,6 +27,7 @@ const LoadingFallback = () => (
 // AUTH FEATURE SCREENS
 // ===================================
 import {
+  SplashScreen,
   WelcomeScreen,
   OnboardingScreen,
   CompleteProfileScreen,
@@ -198,6 +199,7 @@ interface SuccessDetails {
 }
 
 export type RootStackParamList = {
+  Splash: undefined;
   Welcome: undefined;
   Onboarding: undefined;
   Login: undefined;
@@ -408,20 +410,22 @@ const Stack = createStackNavigator<RootStackParamList>();
 const ONBOARDING_KEY = '@has_seen_onboarding';
 
 const AppNavigator = () => {
-  // Check if user has seen onboarding
+  // Check if user has seen onboarding - determines where Splash navigates to
   const [initialRoute, setInitialRoute] = useState<
-    'Onboarding' | 'Welcome' | null
+    'Splash' | 'Onboarding' | 'Welcome' | null
   >(null);
 
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
         const hasSeenOnboarding = await AsyncStorage.getItem(ONBOARDING_KEY);
+        // Always start with Splash, which will navigate to appropriate screen
+        // Pass the next destination via AsyncStorage or state
         setInitialRoute(
-          hasSeenOnboarding === 'true' ? 'Welcome' : 'Onboarding',
+          hasSeenOnboarding === 'true' ? 'Welcome' : 'Splash',
         );
       } catch {
-        setInitialRoute('Onboarding');
+        setInitialRoute('Splash');
       }
     };
     checkOnboarding();
@@ -491,7 +495,12 @@ const AppNavigator = () => {
               },
             }}
           >
-            {/* Onboarding & Auth */}
+            {/* Splash & Onboarding */}
+            <Stack.Screen
+              name="Splash"
+              component={SplashScreen}
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen name="Onboarding" component={OnboardingScreen} />
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />

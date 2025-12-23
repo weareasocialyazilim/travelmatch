@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator as _ActivityIndicator,
+  Platform,
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,9 +18,23 @@ import { PLANS } from '../constants/plans';
 import { VALUES } from '@/constants/values';
 import { subscriptionsService } from '@/services/supabase';
 import { logger } from '@/utils/logger';
-import type { Plan } from '../constants/plans';
+import type { Plan, SubscriptionPlan } from '../constants/plans';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import type { ComponentProps } from 'react';
+
+type IconName = ComponentProps<typeof Icon>['name'];
+
+/**
+ * SubscriptionScreen - Membership plans selection
+ *
+ * Design Guidelines (Adrian K / DESIGNME):
+ * - Clearly show available plans, pricing, and features
+ * - Highlight the most popular option
+ * - Briefly describe benefits and include a clear call to action
+ * - Keep the process simple
+ * - Implement biometric authentication for quick verification
+ */
 
 type SubscriptionScreenProps = StackScreenProps<
   RootStackParamList,
@@ -29,11 +44,8 @@ type SubscriptionScreenProps = StackScreenProps<
 export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   navigation,
 }) => {
-  const [selectedPlan, setSelectedPlan] = useState<string>('pro');
-  const [billingInterval, setBillingInterval] = useState<'month' | 'year'>(
-    'month',
-  );
-  const [_plans, _setPlans] = useState<Plan[]>(PLANS);
+  const [selectedPlan, setSelectedPlan] = useState<string>('first_class');
+  const [plans, setPlans] = useState<SubscriptionPlan[]>(PLANS);
   const [_loading, _setLoading] = useState(false);
 
   useEffect(() => {
@@ -41,16 +53,9 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       _setLoading(true);
       const { data } = await subscriptionsService.getPlans();
       if (data && data.length > 0) {
-        const mappedPlans: Plan[] = data.map((p: { id: string; name: string; price: number; currency?: string; interval: 'month' | 'year'; features?: Array<{ text: string; included: boolean }>; is_popular?: boolean }) => ({
-          id: p.id,
-          name: p.name,
-          price: p.price,
-          currency: p.currency || 'USD',
-          interval: p.interval,
-          features: p.features || [],
-          popular: p.is_popular,
-        }));
-        _setPlans(mappedPlans);
+        // Map API plans to our structure if needed
+        // For now, use static plans
+        setPlans(PLANS);
       }
       _setLoading(false);
     };
@@ -62,71 +67,84 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     logger.debug('Subscribe to plan', { planId });
   };
 
-  const renderPlanCard = (plan: Plan) => {
+  const renderPlanCard = (plan: SubscriptionPlan) => {
     const isSelected = selectedPlan === plan.id;
-    const displayPrice =
-      billingInterval === 'year' ? plan.price * 10 : plan.price;
-    const planColor = plan.popular ? COLORS.primary : COLORS.mint;
+    const planColor = plan.color || COLORS.primary;
+    const isFree = plan.price === 0;
 
     return (
       <TouchableOpacity
         key={plan.id}
-        style={[styles.planCard, isSelected && styles.selectedPlan]}
+        style={[
+          styles.planCard,
+          isSelected && styles.selectedPlan,
+          isSelected && { borderColor: planColor },
+        ]}
         onPress={() => setSelectedPlan(plan.id)}
         activeOpacity={0.8}
       >
         {plan.popular && (
-          <View style={styles.popularBadge}>
+          <View style={[styles.popularBadge, { backgroundColor: planColor }]}>
             <Text style={styles.popularText}>MOST POPULAR</Text>
           </View>
         )}
 
         <View style={[styles.planIcon, { backgroundColor: planColor }]}>
-          <Icon name="crown" size={32} color={COLORS.white} />
+          <Icon name={plan.icon as IconName} size={32} color={COLORS.white} />
         </View>
 
         <Text style={styles.planName}>{plan.name}</Text>
+        <Text style={styles.planTagline}>{plan.tagline}</Text>
 
         <View style={styles.priceContainer}>
           <Text style={styles.currency}>$</Text>
-          <Text style={styles.price}>{displayPrice}</Text>
-          <Text style={styles.interval}>/{billingInterval}</Text>
+          <Text style={styles.price}>{plan.price}</Text>
+          <Text style={styles.interval}>/month</Text>
         </View>
 
-        {billingInterval === 'year' && plan.price > 0 && (
-          <Text style={styles.savings}>Save 20%</Text>
-        )}
-
         <View style={styles.featuresContainer}>
-          {plan.features.map((feature, index) => (
-            <View key={index} style={styles.featureRow}>
-              <Icon name={feature.included ? "check-circle" : "close-circle"} size={16} color={feature.included ? COLORS.success : COLORS.textSecondary} />
-              <Text style={[styles.featureText, !feature.included && styles.featureDisabled]}>{feature.text}</Text>
+          {plan.features.slice(0, 6).map((feature) => (
+            <View key={`${plan.id}-${feature.text}`} style={styles.featureRow}>
+              <Icon
+                name={feature.included ? 'check-circle' : 'close-circle'}
+                size={16}
+                color={feature.included ? planColor : COLORS.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.featureText,
+                  !feature.included && styles.featureDisabled,
+                ]}
+              >
+                {feature.text}
+              </Text>
             </View>
           ))}
+          {plan.features.length > 6 && (
+            <Text style={[styles.moreFeatures, { color: planColor }]}>
+              +{plan.features.length - 6} more features
+            </Text>
+          )}
         </View>
 
         <TouchableOpacity
-          style={[
-            styles.subscribeButton,
-            plan.id === 'free' && styles.freeButton,
-          ]}
+          style={[styles.subscribeButton, isFree && styles.freeButton]}
           onPress={() => handleSubscribe(plan.id)}
           activeOpacity={0.8}
         >
-          {plan.id === 'free' ? (
+          {isFree ? (
             <View style={styles.freeButtonInner}>
               <Text style={styles.freeButtonText}>Current Plan</Text>
             </View>
           ) : (
             <LinearGradient
-              colors={[planColor, planColor + '80']}
+              colors={[planColor, planColor + 'CC']}
               style={styles.subscribeGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
             >
               <Text style={styles.subscribeText}>
-                {isSelected ? 'Subscribe' : 'Select Plan'}
+                {isSelected ? 'Get ' + plan.name : 'Select Plan'}
               </Text>
             </LinearGradient>
           )}
@@ -154,44 +172,11 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         <View style={styles.headerSpacer} />
       </LinearGradient>
 
-      {/* Billing Toggle */}
-      <View style={styles.billingToggle}>
-        <TouchableOpacity
-          style={[
-            styles.toggleButton,
-            billingInterval === 'month' && styles.activeToggle,
-          ]}
-          onPress={() => setBillingInterval('month')}
-        >
-          <Text
-            style={[
-              styles.toggleText,
-              billingInterval === 'month' && styles.activeToggleText,
-            ]}
-          >
-            Monthly
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.toggleButton,
-            billingInterval === 'year' && styles.activeToggle,
-          ]}
-          onPress={() => setBillingInterval('year')}
-        >
-          <Text
-            style={[
-              styles.toggleText,
-              billingInterval === 'year' && styles.activeToggleText,
-            ]}
-          >
-            Yearly
-          </Text>
-          <View style={styles.savingsBadge}>
-            <Text style={styles.savingsText}>-20%</Text>
-          </View>
-        </TouchableOpacity>
+      {/* Subtitle */}
+      <View style={styles.subtitleContainer}>
+        <Text style={styles.subtitle}>
+          Choose the plan that fits your travel style
+        </Text>
       </View>
 
       <ScrollView
@@ -199,7 +184,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {PLANS.map(renderPlanCard)}
+        {plans.map(renderPlanCard)}
 
         {/* Info Card */}
         <View style={styles.infoCard}>
@@ -208,6 +193,44 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             <Text style={styles.infoTitle}>Flexible Billing</Text>
             <Text style={styles.infoText}>
               Cancel anytime. All plans include 14-day money-back guarantee.
+            </Text>
+          </View>
+        </View>
+
+        {/* Benefits Summary */}
+        <View style={styles.benefitsCard}>
+          <Text style={styles.benefitsTitle}>Why Upgrade?</Text>
+          <View style={styles.benefitsList}>
+            <View style={styles.benefitItem}>
+              <Icon name="compass" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Create more moments & share experiences</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <Icon name="message-text" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Unlimited messaging with travelers</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <Icon name="gift" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Send more gifts & show appreciation</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <Icon name="shield-check" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Get verified badge & build trust</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Biometric Payment Hint */}
+        <View style={styles.biometricHint}>
+          <Icon
+            name={Platform.OS === 'ios' ? 'face-recognition' : 'fingerprint'}
+            size={24}
+            color={COLORS.primary}
+          />
+          <View style={styles.biometricContent}>
+            <Text style={styles.biometricTitle}>Quick & Secure Checkout</Text>
+            <Text style={styles.biometricText}>
+              Use {Platform.OS === 'ios' ? 'Face ID' : 'Fingerprint'} for fast payment verification
             </Text>
           </View>
         </View>
@@ -226,23 +249,8 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  activeToggle: {
-    backgroundColor: COLORS.primary,
-  },
-  activeToggleText: {
-    color: COLORS.white,
-  },
   backButton: {
     padding: LAYOUT.padding / 2,
-  },
-  billingToggle: {
-    backgroundColor: COLORS.white,
-    borderRadius: VALUES.borderRadius,
-    flexDirection: 'row',
-    marginHorizontal: LAYOUT.padding * 2,
-    marginVertical: LAYOUT.padding * 2,
-    padding: LAYOUT.padding / 2,
-    ...VALUES.shadow,
   },
   container: {
     backgroundColor: COLORS.background,
@@ -253,6 +261,74 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
     marginRight: LAYOUT.padding / 4,
+  },
+  subtitleContainer: {
+    paddingHorizontal: LAYOUT.padding * 2,
+    paddingVertical: LAYOUT.padding * 1.5,
+  },
+  subtitle: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  planTagline: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textSecondary,
+    marginBottom: LAYOUT.padding,
+  },
+  moreFeatures: {
+    ...TYPOGRAPHY.caption,
+    fontWeight: '600',
+    marginTop: LAYOUT.padding / 2,
+  },
+  benefitsCard: {
+    backgroundColor: COLORS.mintTransparent,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+  },
+  benefitsTitle: {
+    ...TYPOGRAPHY.h4,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: LAYOUT.padding,
+  },
+  benefitsList: {
+    gap: LAYOUT.padding,
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: LAYOUT.padding,
+  },
+  benefitText: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.text,
+    flex: 1,
+  },
+  biometricHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+    gap: LAYOUT.padding,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  biometricContent: {
+    flex: 1,
+  },
+  biometricTitle: {
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: LAYOUT.padding / 4,
+  },
+  biometricText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
   },
   faqButton: {
     alignItems: 'center',
@@ -390,24 +466,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: LAYOUT.padding / 2,
   },
-  savings: {
-    color: COLORS.success,
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '700',
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  savingsBadge: {
-    backgroundColor: COLORS.success,
-    borderRadius: VALUES.borderRadius / 4,
-    marginLeft: LAYOUT.padding / 2,
-    paddingHorizontal: LAYOUT.padding / 2,
-    paddingVertical: LAYOUT.padding / 4,
-  },
-  savingsText: {
-    color: COLORS.white,
-    fontSize: 10,
-    fontWeight: '700',
-  },
   scrollContent: {
     paddingBottom: LAYOUT.padding * 4,
     paddingHorizontal: LAYOUT.padding * 2,
@@ -430,18 +488,5 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-  },
-  toggleButton: {
-    alignItems: 'center',
-    borderRadius: VALUES.borderRadius / 2,
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: LAYOUT.padding,
-  },
-  toggleText: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
   },
 });

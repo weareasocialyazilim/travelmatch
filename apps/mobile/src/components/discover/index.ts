@@ -7,6 +7,7 @@ export { DiscoverHeader } from './DiscoverHeader';
 export { StoryViewer } from './StoryViewer';
 export { FilterModal } from './FilterModal';
 export { LocationModal } from './LocationModal';
+export { HomeWelcomeCard } from './HomeWelcomeCard';
 
 // Re-export types and constants
 export * from './types';

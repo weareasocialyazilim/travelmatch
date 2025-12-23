@@ -1,5 +1,6 @@
 // Auth Feature Exports
 // Core screens
+export { SplashScreen } from './screens/SplashScreen';
 export { WelcomeScreen } from './screens/WelcomeScreen';
 export { OnboardingScreen } from './screens/OnboardingScreen';
 export { CompleteProfileScreen } from './screens/CompleteProfileScreen';

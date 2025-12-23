@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  TextInput,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -23,58 +27,61 @@ import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { useToast } from '@/context/ToastContext';
 
+// Enable LayoutAnimation on Android
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const APP_VERSION = '0.0.1';
+
 const AppSettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, logout } = useAuth();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const { showToast } = useToast();
 
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Notification settings
   const [pushEnabled, setPushEnabled] = useState(true);
   const [chatNotifications, setChatNotifications] = useState(true);
   const [requestNotifications, setRequestNotifications] = useState(true);
   const [marketingNotifications, setMarketingNotifications] = useState(false);
+  const [notificationsExpanded, setNotificationsExpanded] = useState(false);
 
   // Privacy settings
   const [profileVisible, setProfileVisible] = useState(true);
 
   // KYC status from auth context
   const isIdentityVerified = user?.kyc === 'Verified';
+
+  // Get member since year from user creation date
   const memberSince = user?.createdAt
     ? new Date(user.createdAt).getFullYear().toString()
-    : '2024';
+    : new Date().getFullYear().toString();
 
   // Language
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isLanguageSheetVisible, setIsLanguageSheetVisible] = useState(false);
 
-  const handleClearCache = () => {
-    Alert.alert(
-      'Clear Cache',
-      'This will clear all cached data. Are you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear',
-          style: 'destructive',
-          onPress: () => {
-            // Clear cache logic here
-            showToast('Cache cleared successfully', 'success');
-          },
-        },
-      ],
-    );
-  };
+  const toggleNotifications = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setNotificationsExpanded(!notificationsExpanded);
+  }, [notificationsExpanded]);
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
       {
         text: 'Sign Out',
         style: 'destructive',
         onPress: async () => {
           try {
             await logout();
-            // Navigation is typically handled by the auth state change in AppNavigator
           } catch (error) {
             logger.error('Sign out failed', error);
             showToast('Failed to sign out', 'error');
@@ -84,17 +91,52 @@ const AppSettingsScreen: React.FC = () => {
     ]);
   };
 
+  const handleDeleteAccount = () => {
+    navigation.navigate('DeleteAccount');
+  };
+
+  // Count enabled notifications
+  const enabledNotificationsCount = [
+    chatNotifications,
+    requestNotifications,
+    marketingNotifications,
+  ].filter(Boolean).length;
+
+  // Settings sections for search filtering
+  const settingsSections = useMemo(() => [
+    { id: 'notifications', label: 'Notifications', keywords: ['push', 'alert', 'sound', 'chat', 'request', 'marketing'] },
+    { id: 'privacy', label: 'Profile Visibility', keywords: ['privacy', 'visible', 'discoverable', 'hidden'] },
+    { id: 'language', label: 'Language', keywords: ['language', 'english', 'turkish', 'translate'] },
+    { id: 'invite', label: 'Invite Friends', keywords: ['invite', 'share', 'friends', 'referral'] },
+    { id: 'terms', label: 'Terms of Service', keywords: ['terms', 'legal', 'agreement'] },
+    { id: 'privacyPolicy', label: 'Privacy Policy', keywords: ['privacy', 'policy', 'data', 'gdpr'] },
+  ], []);
+
+  // Filter sections based on search query
+  const filteredSections = useMemo(() => {
+    if (!searchQuery.trim()) return settingsSections.map(s => s.id);
+    const query = searchQuery.toLowerCase();
+    return settingsSections
+      .filter(section =>
+        section.label.toLowerCase().includes(query) ||
+        section.keywords.some(keyword => keyword.includes(query))
+      )
+      .map(s => s.id);
+  }, [searchQuery, settingsSections]);
+
+  const shouldShowSection = (sectionId: string) => filteredSections.includes(sectionId);
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Offline Banner */}
       {!isConnected && (
-        <OfflineState 
-          compact 
+        <OfflineState
+          compact
           onRetry={refreshNetwork}
-          message="İnternet bağlantısı yok"
+          message="No internet connection"
         />
       )}
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -107,8 +149,37 @@ const AppSettingsScreen: React.FC = () => {
             color={COLORS.text}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>App Settings</Text>
+        <Text style={styles.headerTitle}>Settings</Text>
         <View style={styles.placeholder} />
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputWrapper}>
+          <MaterialCommunityIcons
+            name="magnify"
+            size={20}
+            color={COLORS.textSecondary}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search settings..."
+            placeholderTextColor={COLORS.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <MaterialCommunityIcons
+                name="close-circle"
+                size={18}
+                color={COLORS.textSecondary}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView
@@ -116,11 +187,39 @@ const AppSettingsScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Notifications Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>NOTIFICATIONS</Text>
+        {/* Identity Verification - Important, at top */}
+        {!isIdentityVerified && (
+          <TouchableOpacity
+            style={styles.verificationBanner}
+            onPress={() => navigation.navigate('IdentityVerification')}
+          >
+            <View style={styles.verificationIcon}>
+              <MaterialCommunityIcons
+                name="shield-account"
+                size={24}
+                color={COLORS.warning}
+              />
+            </View>
+            <View style={styles.verificationContent}>
+              <Text style={styles.verificationTitle}>Verify Your Identity</Text>
+              <Text style={styles.verificationDesc}>
+                Unlock all features and build trust
+              </Text>
+            </View>
+            <View style={styles.verifyButton}>
+              <Text style={styles.verifyButtonText}>Verify</Text>
+            </View>
+          </TouchableOpacity>
+        )}
 
-          <View style={styles.settingsCard}>
+        {/* Notifications - Expandable */}
+        {shouldShowSection('notifications') && (
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.settingsCard}
+            onPress={toggleNotifications}
+            activeOpacity={0.7}
+          >
             <View style={styles.settingItem}>
               <View
                 style={[
@@ -135,18 +234,17 @@ const AppSettingsScreen: React.FC = () => {
                 />
               </View>
               <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Push Notifications</Text>
+                <Text style={styles.settingLabel}>Notifications</Text>
                 <Text style={styles.settingDesc}>
                   {pushEnabled
-                    ? 'All notifications are enabled'
-                    : 'All notifications are disabled'}
+                    ? `${enabledNotificationsCount} of 3 enabled`
+                    : 'All disabled'}
                 </Text>
               </View>
               <Switch
                 value={pushEnabled}
                 onValueChange={(value) => {
                   setPushEnabled(value);
-                  // If turning off push, disable all sub-notifications
                   if (!value) {
                     setChatNotifications(false);
                     setRequestNotifications(false);
@@ -156,21 +254,20 @@ const AppSettingsScreen: React.FC = () => {
                 trackColor={{ false: COLORS.border, true: COLORS.mint }}
                 thumbColor={COLORS.white}
               />
+              <MaterialCommunityIcons
+                name={notificationsExpanded ? 'chevron-up' : 'chevron-down'}
+                size={20}
+                color={COLORS.softGray}
+                style={{ marginLeft: 8 }}
+              />
             </View>
 
-            {/* Only show sub-notifications if push is enabled */}
-            {pushEnabled && (
-              <>
+            {/* Expandable notification options */}
+            {notificationsExpanded && pushEnabled && (
+              <View style={styles.expandedContent}>
                 <View style={styles.divider} />
-
-                <View style={styles.settingItem}>
-                  <View style={styles.settingIconPlaceholder} />
-                  <View style={styles.settingContent}>
-                    <Text style={styles.settingLabel}>Chat Messages</Text>
-                    <Text style={styles.settingDesc}>
-                      New message notifications
-                    </Text>
-                  </View>
+                <View style={styles.subSettingItem}>
+                  <Text style={styles.subSettingLabel}>Chat Messages</Text>
                   <Switch
                     value={chatNotifications}
                     onValueChange={setChatNotifications}
@@ -178,17 +275,8 @@ const AppSettingsScreen: React.FC = () => {
                     thumbColor={COLORS.white}
                   />
                 </View>
-
-                <View style={styles.divider} />
-
-                <View style={styles.settingItem}>
-                  <View style={styles.settingIconPlaceholder} />
-                  <View style={styles.settingContent}>
-                    <Text style={styles.settingLabel}>Request Updates</Text>
-                    <Text style={styles.settingDesc}>
-                      Gift requests and proofs
-                    </Text>
-                  </View>
+                <View style={styles.subSettingItem}>
+                  <Text style={styles.subSettingLabel}>Request Updates</Text>
                   <Switch
                     value={requestNotifications}
                     onValueChange={setRequestNotifications}
@@ -196,17 +284,8 @@ const AppSettingsScreen: React.FC = () => {
                     thumbColor={COLORS.white}
                   />
                 </View>
-
-                <View style={styles.divider} />
-
-                <View style={styles.settingItem}>
-                  <View style={styles.settingIconPlaceholder} />
-                  <View style={styles.settingContent}>
-                    <Text style={styles.settingLabel}>Marketing</Text>
-                    <Text style={styles.settingDesc}>
-                      Tips, offers, and news
-                    </Text>
-                  </View>
+                <View style={styles.subSettingItem}>
+                  <Text style={styles.subSettingLabel}>Marketing</Text>
                   <Switch
                     value={marketingNotifications}
                     onValueChange={setMarketingNotifications}
@@ -214,15 +293,15 @@ const AppSettingsScreen: React.FC = () => {
                     thumbColor={COLORS.white}
                   />
                 </View>
-              </>
+              </View>
             )}
-          </View>
+          </TouchableOpacity>
         </View>
+        )}
 
-        {/* Privacy Section */}
+        {/* Privacy */}
+        {shouldShowSection('privacy') && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>PRIVACY</Text>
-
           <View style={styles.settingsCard}>
             <View style={styles.settingItem}>
               <View
@@ -240,9 +319,7 @@ const AppSettingsScreen: React.FC = () => {
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Profile Visibility</Text>
                 <Text style={styles.settingDesc}>
-                  {profileVisible
-                    ? 'Others can discover your profile'
-                    : 'Your profile is hidden from search'}
+                  {profileVisible ? 'Discoverable' : 'Hidden'}
                 </Text>
               </View>
               <Switch
@@ -254,11 +331,11 @@ const AppSettingsScreen: React.FC = () => {
             </View>
           </View>
         </View>
+        )}
 
-        {/* Language Section */}
+        {/* Language */}
+        {shouldShowSection('language') && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>LANGUAGE</Text>
-
           <View style={styles.settingsCard}>
             <TouchableOpacity
               style={styles.settingItem}
@@ -277,7 +354,7 @@ const AppSettingsScreen: React.FC = () => {
                 />
               </View>
               <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>App Language</Text>
+                <Text style={styles.settingLabel}>Language</Text>
                 <Text style={styles.settingDesc}>{selectedLanguage}</Text>
               </View>
               <MaterialCommunityIcons
@@ -288,11 +365,11 @@ const AppSettingsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        )}
 
-        {/* Share Section */}
+        {/* Share */}
+        {shouldShowSection('invite') && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>SHARE</Text>
-
           <View style={styles.settingsCard}>
             <TouchableOpacity
               style={styles.settingItem}
@@ -312,9 +389,7 @@ const AppSettingsScreen: React.FC = () => {
               </View>
               <View style={styles.settingContent}>
                 <Text style={styles.settingLabel}>Invite Friends</Text>
-                <Text style={styles.settingDesc}>
-                  Share TravelMatch with friends
-                </Text>
+                <Text style={styles.settingDesc}>Share TravelMatch</Text>
               </View>
               <MaterialCommunityIcons
                 name="chevron-right"
@@ -324,62 +399,12 @@ const AppSettingsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        )}
 
-        {/* Storage Section */}
+        {/* Legal Links */}
+        {(shouldShowSection('terms') || shouldShowSection('privacyPolicy')) && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>STORAGE</Text>
-
           <View style={styles.settingsCard}>
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={handleClearCache}
-            >
-              <View
-                style={[
-                  styles.settingIcon,
-                  { backgroundColor: COLORS.background },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="broom"
-                  size={20}
-                  color={COLORS.text}
-                />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Clear Cache</Text>
-                <Text style={styles.settingDesc}>
-                  Images will be re-downloaded
-                </Text>
-              </View>
-              <Text style={styles.cacheSize}>24.5 MB</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* About Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ABOUT</Text>
-
-          <View style={styles.settingsCard}>
-            <View style={styles.settingItem}>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Version</Text>
-              </View>
-              <Text style={styles.versionText}>1.0.0 (Build 100)</Text>
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Member Since</Text>
-              </View>
-              <Text style={styles.memberSinceText}>{memberSince}</Text>
-            </View>
-
-            <View style={styles.divider} />
-
             <TouchableOpacity
               style={styles.settingItem}
               onPress={() => navigation.navigate('TermsOfService')}
@@ -393,9 +418,7 @@ const AppSettingsScreen: React.FC = () => {
                 color={COLORS.softGray}
               />
             </TouchableOpacity>
-
-            <View style={styles.divider} />
-
+            <View style={styles.dividerFull} />
             <TouchableOpacity
               style={styles.settingItem}
               onPress={() => navigation.navigate('PrivacyPolicy')}
@@ -409,141 +432,56 @@ const AppSettingsScreen: React.FC = () => {
                 color={COLORS.softGray}
               />
             </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.settingItem}>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Open Source Licenses</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
           </View>
         </View>
+        )}
 
-        {/* Account Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ACCOUNT</Text>
-
-          <View style={styles.settingsCard}>
-            {/* Identity Verification */}
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() =>
-                !isIdentityVerified &&
-                navigation.navigate('IdentityVerification')
-              }
-              disabled={isIdentityVerified}
-            >
-              <View
-                style={[
-                  styles.settingIcon,
-                  {
-                    backgroundColor: isIdentityVerified
-                      ? COLORS.mintTransparent
-                      : COLORS.warningLight,
-                  },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name={isIdentityVerified ? 'shield-check' : 'shield-account'}
-                  size={20}
-                  color={isIdentityVerified ? COLORS.mint : COLORS.warning}
-                />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Identity Verification</Text>
-                <Text style={styles.settingDesc}>
-                  {isIdentityVerified
-                    ? 'Your identity has been verified'
-                    : 'Verify your identity to unlock full features'}
-                </Text>
-              </View>
-              {isIdentityVerified ? (
-                <View style={styles.verifiedBadge}>
-                  <MaterialCommunityIcons
-                    name="check"
-                    size={14}
-                    color={COLORS.white}
-                  />
-                  <Text style={styles.verifiedBadgeText}>Verified</Text>
-                </View>
-              ) : (
-                <View style={styles.verifyBadge}>
-                  <Text style={styles.verifyBadgeText}>Verify</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={handleSignOut}
-            >
-              <View
-                style={[
-                  styles.settingIcon,
-                  { backgroundColor: COLORS.warningLight },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="logout"
-                  size={20}
-                  color={COLORS.warning}
-                />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Sign Out</Text>
-                <Text style={styles.settingDesc}>Log out of your account</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => navigation.navigate('DeleteAccount')}
-            >
-              <View
-                style={[
-                  styles.settingIcon,
-                  { backgroundColor: COLORS.errorLight },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="delete-outline"
-                  size={20}
-                  color={COLORS.error}
-                />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, { color: COLORS.error }]}>
-                  Delete Account
-                </Text>
-                <Text style={styles.settingDesc}>
-                  Permanently delete your account
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
+        {/* No Results */}
+        {filteredSections.length === 0 && searchQuery.trim() !== '' && (
+          <View style={styles.noResults}>
+            <MaterialCommunityIcons
+              name="magnify-close"
+              size={48}
+              color={COLORS.textSecondary}
+            />
+            <Text style={styles.noResultsText}>
+              No settings found for "{searchQuery}"
+            </Text>
           </View>
+        )}
+
+        {/* Sign Out & Delete Account - Side by Side */}
+        <View style={styles.actionButtonsContainer}>
+          <TouchableOpacity
+            style={styles.signOutButton}
+            onPress={handleSignOut}
+          >
+            <MaterialCommunityIcons
+              name="logout"
+              size={20}
+              color={COLORS.text}
+            />
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDeleteAccount}
+          >
+            <MaterialCommunityIcons
+              name="delete-outline"
+              size={20}
+              color={COLORS.error}
+            />
+            <Text style={styles.deleteText}>Delete</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.bottomSpacer} />
+        {/* Footer with Version & Member Info */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>TravelMatch v{APP_VERSION}</Text>
+          <Text style={styles.footerText}>Member since {memberSince}</Text>
+        </View>
       </ScrollView>
 
       <LanguageSelectionBottomSheet
@@ -586,24 +524,94 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 40,
   },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 44,
+    gap: 10,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: COLORS.text,
+  },
+  noResults: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    gap: 12,
+  },
+  noResultsText: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+
+  // Verification Banner
+  verificationBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.warningLight,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    gap: 12,
+  },
+  verificationIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verificationContent: {
+    flex: 1,
+  },
+  verificationTitle: {
+    ...TYPOGRAPHY.body,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  verificationDesc: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
+  },
+  verifyButton: {
+    backgroundColor: COLORS.warning,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  verifyButtonText: {
+    ...TYPOGRAPHY.caption,
+    fontWeight: '700',
+    color: COLORS.white,
   },
 
   // Sections
   section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-    marginBottom: 12,
+    marginBottom: 16,
   },
 
   // Settings Card
@@ -630,9 +638,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  settingIconPlaceholder: {
-    width: 36,
-  },
   settingContent: {
     flex: 1,
   },
@@ -649,53 +654,84 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: COLORS.border,
-    marginLeft: 62,
+    marginHorizontal: 14,
   },
-  cacheSize: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-  },
-  versionText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-  },
-  memberSinceText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-  },
-  verifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.mint,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  verifiedBadgeText: {
-    ...TYPOGRAPHY.caption,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  verifyBadge: {
-    backgroundColor: COLORS.warningLight,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  verifyBadgeText: {
-    ...TYPOGRAPHY.caption,
-    fontWeight: '600',
-    color: COLORS.warning,
+  dividerFull: {
+    height: 1,
+    backgroundColor: COLORS.border,
   },
 
-  bottomSpacer: {
-    height: 40,
+  // Expanded notifications
+  expandedContent: {
+    paddingBottom: 8,
+  },
+  subSettingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginLeft: 48,
+  },
+  subSettingLabel: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.text,
+  },
+
+  // Action Buttons
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  signOutButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 14,
+    paddingVertical: 14,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  signOutText: {
+    ...TYPOGRAPHY.body,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  deleteButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.errorLight,
+    borderRadius: 14,
+    paddingVertical: 14,
+    gap: 8,
+  },
+  deleteText: {
+    ...TYPOGRAPHY.body,
+    fontWeight: '600',
+    color: COLORS.error,
+  },
+
+  // Footer
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 16,
+    gap: 4,
+  },
+  footerText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textTertiary,
+    fontWeight: '500',
   },
 });
 
-// Wrap with ErrorBoundary for settings screen
-export default withErrorBoundary(AppSettingsScreen, { 
+export default withErrorBoundary(AppSettingsScreen, {
   fallbackType: 'generic',
-  displayName: 'AppSettingsScreen' 
+  displayName: 'AppSettingsScreen',
 });
