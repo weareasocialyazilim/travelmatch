@@ -1,9 +1,11 @@
 # TravelMatch Mobile-First Implementation Roadmap
 
-**Version:** 1.0
+**Version:** 2.0
 **Created:** December 22, 2025
+**Updated:** December 23, 2025
 **Status:** Pre-Launch - Critical Fixes Required
 **Priority:** MOBILE FIRST
+**Architecture Guide:** [docs/ARCHITECTURE_BEST_PRACTICES.md](./docs/ARCHITECTURE_BEST_PRACTICES.md)
 
 ---
 
@@ -16,16 +18,19 @@ Mobile app is the core product. All efforts prioritize mobile stability, securit
 │                    MOBILE-FIRST PRIORITY                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  🔴 PHASE 0 ████████████░░░░░░░░░░░░░░░░░░░░░░░  BUGÜN          │
+│  🔴 PHASE 0 ████████░░░░░░░░░░░░░░░░░░░░░░░░░░░  BUGÜN          │
 │  Critical Security Fixes (BLOCKER)                              │
 │                                                                 │
-│  🟡 PHASE 1 ░░░░░░░░░░░░████████░░░░░░░░░░░░░░░  Bu Hafta       │
+│  🟡 PHASE 1 ░░░░░░░░████████░░░░░░░░░░░░░░░░░░░  Bu Hafta       │
 │  Database & Type Safety                                         │
 │                                                                 │
-│  🟢 PHASE 2 ░░░░░░░░░░░░░░░░░░░░████████░░░░░░░  Önümüzdeki Hf  │
+│  🟢 PHASE 2 ░░░░░░░░░░░░░░░░████████░░░░░░░░░░░  Önümüzdeki Hf  │
 │  Performance & Code Quality                                     │
 │                                                                 │
-│  🔵 PHASE 3 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░████████  2 Hafta       │
+│  🟣 PHASE 2.5 ░░░░░░░░░░░░░░░░░░░░░░████████░░░  Paralel        │
+│  Architecture Refactor (Feature-Based)                          │
+│                                                                 │
+│  🔵 PHASE 3 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░████████  2-3 Hafta     │
 │  Polish & Store Submission                                      │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -251,7 +256,139 @@ export function useFetch<T>(url: string, options?: FetchOptions) {
 
 ---
 
-## 🔵 PHASE 3: POLISH & STORE SUBMISSION (2 Hafta)
+## 🟣 PHASE 2.5: ARCHITECTURE REFACTOR (Paralel - Darius Cosden Pattern)
+
+> **Referans:** [docs/ARCHITECTURE_BEST_PRACTICES.md](./docs/ARCHITECTURE_BEST_PRACTICES.md)
+
+### 2.5.1 Core Principles (Darius Cosden)
+
+1. **Organize by Features** - Her entity kendi feature klasöründe
+2. **Single Responsibility** - Her component/hook 1 iş yapar
+3. **Page → Feature → UI** - Component hierarchy
+4. **Fetch at Navigation** - Screen'de fetch, component'a props olarak geç
+5. **features/shared/** - Paylaşılan UI components
+6. **lib/** - Low-level utilities (UI dışı)
+
+### 2.5.2 Current Architecture Problems
+
+```
+❌ MEVCUT SORUNLAR:
+├── components/           # 80+ dosya root'ta (KÖTÜ)
+├── hooks/                # Global hooks (feature'da olmalı)
+├── types/                # Global types (feature'da olmalı)
+├── utils/                # lib/ olmalı
+└── features/
+    └── auth/             # Eksik: components/, hooks/
+```
+
+### 2.5.3 Target Architecture
+
+```
+✅ HEDEF YAPI:
+├── features/
+│   ├── shared/                    ← YENİ
+│   │   ├── components/
+│   │   │   ├── ui/               # Button, Card, Input
+│   │   │   ├── feedback/         # ErrorState, LoadingState
+│   │   │   └── media/            # CachedImage, VideoPlayer
+│   │   ├── hooks/
+│   │   ├── types/
+│   │   └── constants/
+│   ├── auth/
+│   │   ├── components/           # LoginForm, RegisterForm
+│   │   ├── hooks/                # useAuth
+│   │   ├── screens/
+│   │   ├── services/
+│   │   ├── types.ts
+│   │   └── constants.ts
+│   ├── moments/
+│   │   ├── components/           # MomentCard, MomentList
+│   │   ├── hooks/                # useMoments
+│   │   └── ...
+│   └── payments/                  # Zaten iyi yapıda
+├── lib/                           ← utils/ yerine
+│   ├── supabase.ts
+│   ├── api-client.ts
+│   └── formatters.ts
+├── stores/                        # Global state (OK)
+└── navigation/                    # Navigation layer (OK)
+```
+
+### 2.5.4 Migration Tasks
+
+| Task | Priority | Status | Effort |
+|------|----------|--------|--------|
+| Create `features/shared/` folder structure | P1 | ⬜ | 30 min |
+| Move UI components to `shared/components/ui/` | P1 | ⬜ | 2 saat |
+| Move feedback components to `shared/components/feedback/` | P1 | ⬜ | 1 saat |
+| Move media components to `shared/components/media/` | P1 | ⬜ | 30 min |
+| Move MomentCard to `features/moments/components/` | P2 | ⬜ | 30 min |
+| Move RequestCard to `features/trips/components/` | P2 | ⬜ | 30 min |
+| Rename `utils/` to `lib/` | P2 | ⬜ | 1 saat |
+| Move global hooks to `features/shared/hooks/` | P2 | ⬜ | 1 saat |
+| Create barrel exports (`index.ts`) | P2 | ⬜ | 1 saat |
+| Update all import paths | P2 | ⬜ | 2 saat |
+
+### 2.5.5 Component Categories
+
+**UI Components → `features/shared/components/ui/`**
+```
+Button, Card, Input, Modal, Badge, Avatar,
+Checkbox, Switch, Select, Tabs, Toast, Tooltip
+```
+
+**Feedback Components → `features/shared/components/feedback/`**
+```
+ErrorState, LoadingState, EmptyState,
+OfflineBanner, OfflineState, NetworkGuard
+```
+
+**Media Components → `features/shared/components/media/`**
+```
+CachedImage, SmartImage, AccessibleVideoPlayer
+```
+
+**Feature Components → `features/{feature}/components/`**
+```
+features/moments/components/MomentCard.tsx
+features/trips/components/RequestCard.tsx
+features/payments/components/WalletListItem.tsx
+```
+
+### 2.5.6 Import Path Conventions
+
+```typescript
+// UI Components
+import { Button, Card } from '@/features/shared/components/ui'
+
+// Feedback Components
+import { ErrorState } from '@/features/shared/components/feedback'
+
+// Feature Components
+import { MomentCard } from '@/features/moments/components'
+
+// Lib utilities
+import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/formatters'
+```
+
+### 2.5.7 Deliverables - Phase 2.5
+
+| Deliverable | Status | Effort |
+|-------------|--------|--------|
+| features/shared/ structure | ⬜ | 30 min |
+| UI components migration | ⬜ | 2 saat |
+| Feedback components migration | ⬜ | 1 saat |
+| Feature components migration | ⬜ | 1 saat |
+| utils/ → lib/ rename | ⬜ | 1 saat |
+| Import paths update | ⬜ | 2 saat |
+| Barrel exports | ⬜ | 1 saat |
+
+**Total Effort:** ~8-10 saat
+
+---
+
+## 🔵 PHASE 3: POLISH & STORE SUBMISSION (2-3 Hafta)
 
 ### 3.1 Store Requirements
 
@@ -294,29 +431,37 @@ export function useFetch<T>(url: string, options?: FetchOptions) {
 ## Implementation Order (Öncelik Sırası)
 
 ```
-BUGÜN:
+BUGÜN (Phase 0):
 ├── 1. Mapbox token fix (15 min)
 ├── 2. Cloudflare token removal (1 saat)
 └── 3. env.config.ts update (15 min)
 
-BU HAFTA:
+BU HAFTA (Phase 1):
 ├── 4. atomic_transfer migration (30 min)
 ├── 5. cache_invalidation RLS (15 min)
 ├── 6. Type safety fixes (2 saat)
 └── 7. KYC real implementation (2-4 saat)
 
-ÖNÜMÜZDEKİ HAFTA:
+ÖNÜMÜZDEKİ HAFTA (Phase 2):
 ├── 8. FlashList migration (2 saat)
 ├── 9. Validation schema cleanup (1 saat)
 ├── 10. RequestCard memo (30 min)
 ├── 11. useFetch offline (1 saat)
 └── 12. Type consistency (2 saat)
 
-2 HAFTA İÇİNDE:
-├── 13. Store accounts
-├── 14. Screenshots & assets
-├── 15. Production testing
-└── 16. Store submission
+PARALEL (Phase 2.5 - Architecture Refactor):
+├── 13. Create features/shared/ structure (30 min)
+├── 14. Move UI components (2 saat)
+├── 15. Move feedback/media components (1.5 saat)
+├── 16. Move feature-specific components (1 saat)
+├── 17. Rename utils/ → lib/ (1 saat)
+└── 18. Update import paths (2 saat)
+
+2-3 HAFTA İÇİNDE (Phase 3):
+├── 19. Store accounts setup
+├── 20. Screenshots & assets
+├── 21. Production testing
+└── 22. Store submission
 ```
 
 ---
@@ -339,6 +484,14 @@ BU HAFTA:
 - [ ] Single source for validation schemas
 - [ ] 60 FPS scroll performance
 - [ ] Offline mode functional
+
+### Phase 2.5 Complete When:
+- [ ] `features/shared/` folder created with ui/, feedback/, media/
+- [ ] All global components moved to appropriate locations
+- [ ] `utils/` renamed to `lib/`
+- [ ] All import paths updated
+- [ ] Barrel exports (`index.ts`) for each folder
+- [ ] Feature folders have consistent structure
 
 ### Phase 3 Complete When:
 - [ ] App Store approved

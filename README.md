@@ -15,6 +15,7 @@ A social travel platform connecting travelers through shared experiences and gif
 **Quick Links:**
 
 - 📱 [Mobile-First Roadmap](./MOBILE_FIRST_ROADMAP.md) - Critical security fixes & launch plan
+- 🏗️ [Architecture Best Practices](./docs/ARCHITECTURE_BEST_PRACTICES.md) - Feature-based structure guide
 - 📘 [Full Analysis](./docs/COMPREHENSIVE_PROJECT_ANALYSIS.md) - 50 pages, detailed technical
   analysis
 - ⚡ [Quick Action Plan](./docs/QUICK_ACTION_PLAN.md) - 5 pages, TL;DR version
