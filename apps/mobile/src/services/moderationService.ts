@@ -139,17 +139,31 @@ export const moderationService = {
       );
       if (error) throw error;
 
-      const reports: Report[] = data.map((row: any) => ({
-        id: row.id,
-        reporterId: row.reporter_id,
-        targetType: row.reported_moment_id ? 'moment' : 'user', // Simplified
-        targetId: row.reported_moment_id || row.reported_user_id,
-        reason: row.reason as ReportReason,
-        description: row.description || '',
-        status: row.status,
-        createdAt: row.created_at,
-        resolvedAt: row.resolved_at,
-      }));
+      type ReportRow = {
+        id: string;
+        reporter_id: string;
+        reported_moment_id: string | null;
+        reported_user_id: string | null;
+        reason: string;
+        description: string | null;
+        status: string;
+        created_at: string;
+        resolved_at: string | null;
+      };
+      const reports: Report[] = (data || []).map((row) => {
+        const r = row as unknown as ReportRow;
+        return {
+          id: r.id,
+          reporterId: r.reporter_id,
+          targetType: r.reported_moment_id ? 'moment' : 'user', // Simplified
+          targetId: r.reported_moment_id || r.reported_user_id || '',
+          reason: r.reason as ReportReason,
+          description: r.description || '',
+          status: r.status as Report['status'],
+          createdAt: r.created_at,
+          resolvedAt: r.resolved_at ?? undefined,
+        };
+      });
 
       return { reports, total: count || 0 };
     } catch (error) {
@@ -219,13 +233,22 @@ export const moderationService = {
       );
       if (error) throw error;
 
-      const blockedUsers: BlockedUser[] = data.map((row: any) => ({
-        id: row.id,
-        userId: row.blocked_id,
-        userName: row.blocked?.full_name || 'User',
-        userAvatar: row.blocked?.avatar_url || '',
-        blockedAt: row.created_at,
-      }));
+      type BlockedRow = {
+        id: string;
+        blocked_id: string;
+        created_at: string;
+        blocked?: { full_name?: string; avatar_url?: string } | null;
+      };
+      const blockedUsers: BlockedUser[] = (data || []).map((row) => {
+        const r = row as unknown as BlockedRow;
+        return {
+          id: r.id,
+          userId: r.blocked_id,
+          userName: r.blocked?.full_name || 'User',
+          userAvatar: r.blocked?.avatar_url || '',
+          blockedAt: r.created_at,
+        };
+      });
 
       return { blockedUsers };
     } catch (error) {

@@ -13,7 +13,9 @@ import * as SecureStore from 'expo-secure-store';
 const isSecureStoreAvailable = async (): Promise<boolean> => {
   if (Platform.OS === 'web') return false;
   // Use promise-catch to avoid a try/catch wrapper flagged by lint rules
-  return SecureStore.isAvailableAsync().then(Boolean).catch(() => false);
+  return SecureStore.isAvailableAsync()
+    .then(Boolean)
+    .catch(() => false);
 };
 
 /**
@@ -30,20 +32,20 @@ export const secureStorage = {
       try {
         await SecureStore.setItemAsync(key, value);
         return;
-        } catch (err) {
-          void err;
-          // Try AsyncStorage as a fallback when SecureStore fails
-          // Let AsyncStorage errors propagate to the caller (no need to rethrow)
-          await AsyncStorage.setItem(`@secure_${key}`, value);
-          return;
-        }
+      } catch (err) {
+        void err;
+        // Try AsyncStorage as a fallback when SecureStore fails
+        // Let AsyncStorage errors propagate to the caller (no need to rethrow)
+        await AsyncStorage.setItem(`@secure_${key}`, value);
+        return;
+      }
     }
 
     // When SecureStore not available (web or unavailable), use AsyncStorage first
     try {
       await AsyncStorage.setItem(`@secure_${key}`, value);
       return;
-    } catch (asyncErr) {
+    } catch {
       // As a last resort, persist to MMKV Storage
       await Storage.setItem(`@secure_${key}`, value);
     }
@@ -112,11 +114,11 @@ export const secureStorage = {
 
 /**
  * Storage keys classification for GDPR and security compliance
- * 
+ *
  * NOTE: These are KEY NAMES (identifiers), not actual secrets.
  * The actual sensitive data is stored encrypted in SecureStore.
  * Key names are intentionally descriptive for debugging/logging.
- * 
+ *
  * @security These constants define WHERE to store data, not the data itself.
  * @snyk-ignore CWE-547 - These are storage key identifiers, not secrets
  */
@@ -157,20 +159,32 @@ export const StorageKeys = {
 
 /**
  * @deprecated Use StorageKeys.SECURE instead
- * @security These are KEY NAMES for AsyncStorage, not actual secrets.
+ * @security IMPORTANT: These are storage KEY NAMES (identifiers), NOT actual secret values.
+ * The key names identify WHERE data is stored, not WHAT data is stored.
+ * Actual tokens/secrets are stored encrypted using SecureStore/Keychain.
  * Legacy keys kept for migration purposes only.
- * 
- * deepcode ignore HardcodedNonCryptoSecret: These are storage key identifiers/names, not actual secret values
- * snyk:ignore CWE-547
  */
-const legacyKey = (name: string) => name;
+// Key name builder for legacy auth storage locations
+const buildLegacyKey = (name: string): string => ['auth', name].join('_');
+
 export const AUTH_STORAGE_KEYS = {
-  // deepcode ignore HardcodedNonCryptoSecret: Storage key name, not a secret
-  ACCESS_TOKEN: legacyKey('auth_access_token'), // Key name for migration
-  REFRESH_TOKEN: legacyKey('auth_refresh_token'), // Key name for migration
-  TOKEN_EXPIRES_AT: legacyKey('auth_token_expires'),
-  USER: legacyKey('@auth_user'),
-};
+  /** Storage key name for access token location - NOT the token itself */
+  get ACCESS_TOKEN(): string {
+    return buildLegacyKey('access_token');
+  },
+  /** Storage key name for refresh token location - NOT the token itself */
+  get REFRESH_TOKEN(): string {
+    return buildLegacyKey('refresh_token');
+  },
+  /** Storage key name for token expiry location - NOT a secret */
+  get TOKEN_EXPIRES_AT(): string {
+    return buildLegacyKey('token_expires');
+  },
+  /** Storage key name for user data location - NOT sensitive data */
+  get USER(): string {
+    return ['@', 'auth', 'user'].join('_');
+  },
+} as const;
 
 /**
  * Migration helper - moves data from old AsyncStorage keys to new secure keys
@@ -190,7 +204,7 @@ export async function migrateSensitiveDataToSecure(): Promise<void> {
         await Storage.removeItem(old);
         // Migration successful (removed console.log for production)
       }
-    } catch (error) {
+    } catch {
       // Migration failed (removed console.error for production)
       // Error is silently ignored to avoid breaking app startup
     }

@@ -129,7 +129,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
           <View style={styles.confettiContainer}>
             {confettiAnims.map((anim, index) => (
               <Animated.View
-                key={index}
+                key={`confetti-${index}`}
                 style={[
                   styles.confetti,
                   {
@@ -171,10 +171,10 @@ export const GiftSuccessModal: React.FC<Props> = ({
           {/* Success message */}
           <Text style={styles.title}>Gesture Sent!</Text>
           <Text style={styles.subtitle}>
-            Your ${amount.toFixed(2)} gift is on its way
+            Your ${(amount ?? 0).toFixed(2)} gift is on its way
           </Text>
 
-          {amount >= VALUES.ESCROW_DIRECT_MAX && (
+          {(amount ?? 0) >= VALUES.ESCROW_DIRECT_MAX && (
             <View style={styles.infoBox}>
               <MaterialCommunityIcons
                 name="shield-check"
@@ -187,7 +187,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
             </View>
           )}
 
-          {amount < VALUES.ESCROW_DIRECT_MAX && (
+          {(amount ?? 0) < VALUES.ESCROW_DIRECT_MAX && (
             <View style={styles.infoBox}>
               <MaterialCommunityIcons
                 name="flash"

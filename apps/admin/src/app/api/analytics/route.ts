@@ -31,22 +31,22 @@ export async function GET(request: NextRequest) {
 
     // Fetch user metrics
     const { count: totalUsers } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact', head: true });
 
     const { count: newUsers } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', startDate.toISOString());
 
     const { count: activeUsers } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact', head: true })
       .gte('last_active', startDate.toISOString());
 
-    // Fetch match metrics
+    // Fetch booking/match metrics
     const { count: totalMatches } = await supabase
-      .from('matches')
+      .from('bookings')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', startDate.toISOString());
 
@@ -65,7 +65,9 @@ export async function GET(request: NextRequest) {
       .in('type', ['subscription', 'boost']);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const totalRevenue = revenueData?.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) || 0;
+    const totalRevenue =
+      revenueData?.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) ||
+      0;
 
     return NextResponse.json({
       period,
@@ -76,15 +78,19 @@ export async function GET(request: NextRequest) {
         totalMatches: totalMatches || 0,
         totalMessages: totalMessages || 0,
         totalRevenue,
-        avgRevenuePerUser: totalUsers ? (totalRevenue / totalUsers).toFixed(2) : 0,
-        conversionRate: totalUsers ? ((newUsers || 0) / totalUsers * 100).toFixed(2) : 0,
+        avgRevenuePerUser: totalUsers
+          ? (totalRevenue / totalUsers).toFixed(2)
+          : 0,
+        conversionRate: totalUsers
+          ? (((newUsers || 0) / totalUsers) * 100).toFixed(2)
+          : 0,
       },
     });
   } catch (error) {
     console.error('Analytics API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

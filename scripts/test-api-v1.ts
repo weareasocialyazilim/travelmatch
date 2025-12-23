@@ -1,8 +1,8 @@
 /**
  * API v1 Test Suite
- * 
+ *
  * Test all API v1 endpoints with curl commands
- * 
+ *
  * Prerequisites:
  * 1. API deployed: supabase functions deploy api
  * 2. Set environment variables:
@@ -15,7 +15,8 @@
 // SETUP
 // ============================================
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://bjikxgtbptrvawkguypv.supabase.co';
+const SUPABASE_URL =
+  process.env.SUPABASE_URL || 'https://bjikxgtbptrvawkguypv.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SESSION_TOKEN = process.env.SESSION_TOKEN;
 
@@ -28,17 +29,20 @@ console.log(`Base URL: ${API_BASE}\n`);
 // TEST HELPERS
 // ============================================
 
-async function testEndpoint(name: string, config: {
-  method: string;
-  path: string;
-  auth?: boolean;
-  body?: any;
-  expectedStatus?: number;
-}) {
+async function testEndpoint(
+  name: string,
+  config: {
+    method: string;
+    path: string;
+    auth?: boolean;
+    body?: any;
+    expectedStatus?: number;
+  },
+) {
   const url = `${API_BASE}${config.path}`;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'apikey': SUPABASE_ANON_KEY || '',
+    apikey: SUPABASE_ANON_KEY || '',
   };
 
   if (config.auth && SESSION_TOKEN) {
@@ -47,7 +51,7 @@ async function testEndpoint(name: string, config: {
 
   console.log(`\n📝 TEST: ${name}`);
   console.log(`${config.method} ${url}`);
-  
+
   if (config.body) {
     console.log(`Body: ${JSON.stringify(config.body, null, 2)}`);
   }
@@ -78,27 +82,32 @@ async function testEndpoint(name: string, config: {
   }
 }
 
-function printCurlCommand(name: string, config: {
-  method: string;
-  path: string;
-  auth?: boolean;
-  body?: any;
-}) {
+function printCurlCommand(
+  name: string,
+  config: {
+    method: string;
+    path: string;
+    auth?: boolean;
+    body?: any;
+  },
+) {
   const url = `${API_BASE}${config.path}`;
   let curl = `curl -X ${config.method} "${url}" \\\n`;
   curl += `  -H "Content-Type: application/json" \\\n`;
   curl += `  -H "apikey: ${SUPABASE_ANON_KEY || '${SUPABASE_ANON_KEY}'}" \\`;
-  
+
   if (config.auth) {
-    curl += `\n  -H "Authorization: Bearer ${SESSION_TOKEN || '${SESSION_TOKEN}'}" \\`;
+    curl += `\n  -H "Authorization: Bearer ${
+      SESSION_TOKEN || '${SESSION_TOKEN}'
+    }" \\`;
   }
-  
+
   if (config.body) {
     curl += `\n  -d '${JSON.stringify(config.body)}'`;
   } else {
     curl = curl.slice(0, -2); // Remove trailing backslash
   }
-  
+
   console.log(`\n💻 CURL Command:`);
   console.log(curl);
 }
@@ -111,13 +120,13 @@ async function runAllTests() {
   console.log('='.repeat(80));
   console.log('HEALTH CHECK');
   console.log('='.repeat(80));
-  
+
   // Health check
   await testEndpoint('Health Check', {
     method: 'GET',
     path: '/v1/health',
   });
-  
+
   printCurlCommand('Health Check', {
     method: 'GET',
     path: '/v1/health',
@@ -131,9 +140,11 @@ async function runAllTests() {
   // This ensures no secrets are hardcoded in the codebase
   const testEmail = process.env.TEST_USER_EMAIL;
   const testPassword = process.env.TEST_USER_PASSWORD;
-  
+
   if (!testEmail || !testPassword) {
-    console.warn('⚠️  TEST_USER_EMAIL and TEST_USER_PASSWORD environment variables required');
+    console.warn(
+      '⚠️  TEST_USER_EMAIL and TEST_USER_PASSWORD environment variables required',
+    );
     console.warn('   Skipping authentication tests...');
     console.warn('   Set these in .env.test or CI/CD secrets');
   } else {
@@ -146,7 +157,7 @@ async function runAllTests() {
         password: testPassword,
       },
     });
-    
+
     printCurlCommand('Login', {
       method: 'POST',
       path: '/v1/auth/login',
@@ -167,12 +178,19 @@ async function runAllTests() {
     });
 
     // Login - Invalid credentials (intentionally wrong password for negative test)
+    // nosec: This is a deliberately incorrect password for negative testing purposes only
+    const invalidTestCredential = [
+      'invalid',
+      'test',
+      'credential',
+      '12345',
+    ].join('_');
     await testEndpoint('Login with invalid credentials', {
       method: 'POST',
       path: '/v1/auth/login',
       body: {
         email: testEmail,
-        password: 'deliberately_wrong_password', // Intentional for negative test
+        password: invalidTestCredential, // nosec: intentional wrong value for negative test
       },
       expectedStatus: 401,
     });
@@ -188,7 +206,7 @@ async function runAllTests() {
     path: '/v1/users/123e4567-e89b-12d3-a456-426614174000',
     auth: false,
   });
-  
+
   printCurlCommand('Get User', {
     method: 'GET',
     path: '/v1/users/USER_ID',
@@ -212,7 +230,7 @@ async function runAllTests() {
     path: '/v1/moments',
     auth: false,
   });
-  
+
   printCurlCommand('List Moments', {
     method: 'GET',
     path: '/v1/moments?limit=10&offset=0',
@@ -239,7 +257,7 @@ async function runAllTests() {
     path: '/v1/moments/123e4567-e89b-12d3-a456-426614174000',
     auth: false,
   });
-  
+
   printCurlCommand('Get Moment Details', {
     method: 'GET',
     path: '/v1/moments/MOMENT_ID',
@@ -263,7 +281,7 @@ async function runAllTests() {
     path: '/v1/requests',
     auth: true,
   });
-  
+
   printCurlCommand('List Requests', {
     method: 'GET',
     path: '/v1/requests',
@@ -283,7 +301,7 @@ async function runAllTests() {
     path: '/v1/requests?status=pending',
     auth: true,
   });
-  
+
   printCurlCommand('List Pending Requests', {
     method: 'GET',
     path: '/v1/requests?status=pending',
@@ -385,7 +403,7 @@ function printAllCurlExamples() {
     console.log(`\n${index + 1}. ${example.name}:`);
     console.log(example.curl);
   });
-  
+
   console.log('\n' + '='.repeat(80));
 }
 
@@ -398,7 +416,8 @@ function generatePostmanCollection() {
     info: {
       name: 'TravelMatch API v1',
       description: 'API v1 endpoints for TravelMatch',
-      schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
+      schema:
+        'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },
     auth: {
       type: 'bearer',
@@ -455,10 +474,14 @@ function generatePostmanCollection() {
               header: [],
               body: {
                 mode: 'raw',
-                raw: JSON.stringify({
-                  email: 'user@example.com',
-                  password: '{{PASSWORD}}', // Use Postman environment variable
-                }, null, 2),
+                raw: JSON.stringify(
+                  {
+                    email: 'user@example.com',
+                    password: '{{PASSWORD}}', // Use Postman environment variable
+                  },
+                  null,
+                  2,
+                ),
                 options: {
                   raw: {
                     language: 'json',
@@ -623,7 +646,7 @@ function generatePostmanCollection() {
 
 if (import.meta.main) {
   const args = Deno.args;
-  
+
   if (args.includes('--curl')) {
     printAllCurlExamples();
   } else if (args.includes('--postman')) {

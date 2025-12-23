@@ -101,12 +101,17 @@ export const reviewService = {
 
       // Determine who is being reviewed
       // If I am the host, I review the user. If I am the user, I review the host.
-      const reqRow: any = request;
+      type RequestRow = {
+        moment_id: string;
+        host_id: string | null;
+        user_id: string;
+      };
+      const reqRow = request as RequestRow;
       let reviewedId = '';
       if (user.id === reqRow.host_id) {
         reviewedId = reqRow.user_id;
       } else if (user.id === reqRow.user_id) {
-        reviewedId = reqRow.host_id;
+        reviewedId = reqRow.host_id ?? '';
       } else {
         throw new Error('Not authorized to review this request');
       }
@@ -155,7 +160,7 @@ export const reviewService = {
     filters: ReviewFilters,
   ): Promise<{ reviews: Review[]; stats: ReviewStats; total: number }> => {
     try {
-      let data: any[] = [];
+      let data: ReviewRowLike[] = [];
       let count = 0;
 
       if (filters.userId) {
@@ -176,17 +181,17 @@ export const reviewService = {
         };
       }
 
-      const reviews: Review[] = data.map((row: any) => ({
+      const reviews: Review[] = data.map((row: ReviewRowLike) => ({
         id: row.id as string,
         rating: row.rating as number,
         comment: (row.comment as string) || '',
         reviewerId: row.reviewer_id as string,
-        reviewerName: (row as ReviewRowLike).reviewer?.full_name || 'User',
-        reviewerAvatar: (row as ReviewRowLike).reviewer?.avatar_url || '',
+        reviewerName: row.reviewer?.full_name || 'User',
+        reviewerAvatar: row.reviewer?.avatar_url || '',
         revieweeId: row.reviewed_id as string,
         revieweeName: '', // Could be fetched
         momentId: row.moment_id as string,
-        momentTitle: (row as ReviewRowLike).moment?.title || '',
+        momentTitle: row.moment?.title || '',
         requestId: '', // Not stored in reviews table directly usually
         createdAt: row.created_at as string,
         isVerified: true,
@@ -246,22 +251,25 @@ export const reviewService = {
 
       if (error) throw error;
 
-      const reviews: Review[] = (data || []).map((row: any) => ({
-        id: row.id,
-        rating: row.rating,
-        comment: row.comment || '',
-        reviewerId: row.reviewer_id,
-        reviewerName: 'Me',
-        reviewerAvatar: '',
-        revieweeId: row.reviewed_id,
-        revieweeName: '',
-        momentId: row.moment_id,
-        momentTitle: row.moment?.title || '',
-        requestId: '',
-        createdAt: row.created_at,
-        isVerified: true,
-        isEdited: false,
-      }));
+      const reviews: Review[] = (data || []).map((row) => {
+        const r = row as unknown as ReviewRowLike;
+        return {
+          id: r.id as string,
+          rating: r.rating as number,
+          comment: (r.comment as string) || '',
+          reviewerId: r.reviewer_id as string,
+          reviewerName: 'Me',
+          reviewerAvatar: '',
+          revieweeId: r.reviewed_id as string,
+          revieweeName: '',
+          momentId: r.moment_id as string,
+          momentTitle: r.moment?.title || '',
+          requestId: '',
+          createdAt: r.created_at as string,
+          isVerified: true,
+          isEdited: false,
+        };
+      });
 
       return { reviews, total: count || 0 };
     } catch (error) {

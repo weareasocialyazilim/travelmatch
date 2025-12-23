@@ -6,12 +6,10 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import {
   subscriptionManager,
   SubscriptionConfig,
   SubscriptionStatus,
-  Subscriptions,
 } from '../services/subscriptionService';
 import { logger } from '../utils/logger';
 import { Database } from '../types/database.types';
@@ -79,7 +77,7 @@ export const useSubscription = <
 
     logger.info('useSubscription', `Subscribing to ${config.table} (${id})`);
 
-    const unsubscribe = subscriptionManager.subscribe(id, {
+    const _unsubscribe = subscriptionManager.subscribe(id, {
       ...config,
       onStatusChange: (newStatus) => {
         setStatus(newStatus);
@@ -323,7 +321,7 @@ export const useMultipleSubscriptions = <
 ) => {
   // Note: This hook has a limitation - it cannot dynamically change subscriptions
   // The subscriptions array length must remain constant across renders
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+
   const results = subscriptions.map((sub) => {
     const { id, ...config } = sub;
     // eslint-disable-next-line react-hooks/rules-of-hooks

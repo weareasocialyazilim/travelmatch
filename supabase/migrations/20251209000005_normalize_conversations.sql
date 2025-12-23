@@ -21,18 +21,18 @@ CREATE TABLE IF NOT EXISTS conversation_participants (
 );
 
 -- Create indexes for optimal query performance
-CREATE INDEX idx_conversation_participants_conversation 
+CREATE INDEX IF NOT EXISTS idx_conversation_participants_conversation 
   ON conversation_participants(conversation_id);
 
-CREATE INDEX idx_conversation_participants_user 
+CREATE INDEX IF NOT EXISTS idx_conversation_participants_user 
   ON conversation_participants(user_id);
 
-CREATE INDEX idx_conversation_participants_user_not_archived 
+CREATE INDEX IF NOT EXISTS idx_conversation_participants_user_not_archived 
   ON conversation_participants(user_id) 
   WHERE is_archived = FALSE;
 
 -- Composite index for common query pattern
-CREATE INDEX idx_conversation_participants_composite 
+CREATE INDEX IF NOT EXISTS idx_conversation_participants_composite 
   ON conversation_participants(user_id, conversation_id) 
   INCLUDE (last_read_at);
 
@@ -67,24 +67,28 @@ END $$;
 ALTER TABLE conversation_participants ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own participations
+DROP POLICY IF EXISTS "Users can view own participations" ON conversation_participants;
 CREATE POLICY "Users can view own participations"
   ON conversation_participants
   FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Users can insert themselves as participants (for creating conversations)
+DROP POLICY IF EXISTS "Users can add themselves to conversations" ON conversation_participants;
 CREATE POLICY "Users can add themselves to conversations"
   ON conversation_participants
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 -- Users can update their own participation (archive, last_read)
+DROP POLICY IF EXISTS "Users can update own participations" ON conversation_participants;
 CREATE POLICY "Users can update own participations"
   ON conversation_participants
   FOR UPDATE
   USING (auth.uid() = user_id);
 
 -- Users cannot delete participations (soft delete via archive)
+DROP POLICY IF EXISTS "Prevent direct deletion" ON conversation_participants;
 CREATE POLICY "Prevent direct deletion"
   ON conversation_participants
   FOR DELETE

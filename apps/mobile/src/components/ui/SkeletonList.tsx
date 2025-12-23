@@ -1,6 +1,6 @@
 /**
  * SkeletonList - Unified Skeleton Loading System
- * 
+ *
  * Provides consistent skeleton loading states across all list views
  * with configurable minimum display time for better UX
  */
@@ -14,7 +14,7 @@ import { Skeleton } from './Skeleton';
 // TYPES
 // ============================================================================
 
-export type SkeletonItemType = 
+export type SkeletonItemType =
   | 'chat'
   | 'moment'
   | 'gift'
@@ -28,24 +28,29 @@ interface SkeletonListProps {
    * Type of skeleton item to render
    */
   type: SkeletonItemType;
-  
+
   /**
    * Number of skeleton items to show
    * @default 5
    */
   count?: number;
-  
+
   /**
    * Minimum display time in ms (prevents flash)
    * @default 400
    */
   minDisplayTime?: number;
-  
+
   /**
    * Whether to show the skeleton
    * If false and minDisplayTime has passed, hides immediately
    */
   show?: boolean;
+
+  /**
+   * Test ID for testing
+   */
+  testID?: string;
 }
 
 // ============================================================================
@@ -206,20 +211,20 @@ const SkeletonItem: React.FC<{ type: SkeletonItemType }> = ({ type }) => {
 
 /**
  * SkeletonList - Renders a list of skeleton items with minimum display time
- * 
+ *
  * @example
  * // Basic usage
  * {loading && <SkeletonList type="moment" count={3} />}
- * 
+ *
  * @example
  * // With controlled visibility
- * <SkeletonList 
- *   type="chat" 
- *   count={5} 
+ * <SkeletonList
+ *   type="chat"
+ *   count={5}
  *   show={isLoading}
  *   minDisplayTime={500}
  * />
- * 
+ *
  * @example
  * // Prevent flash on fast responses
  * <SkeletonList type="transaction" minDisplayTime={300} />
@@ -229,6 +234,7 @@ export const SkeletonList: React.FC<SkeletonListProps> = ({
   count = 5,
   minDisplayTime = 400,
   show = true,
+  testID,
 }) => {
   const [shouldShow, setShouldShow] = useState(show);
   const [hasShown, setHasShown] = useState(false);
@@ -259,9 +265,9 @@ export const SkeletonList: React.FC<SkeletonListProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={testID}>
       {Array.from({ length: count }, (_, i) => (
-        <SkeletonItem key={i} type={type} />
+        <SkeletonItem key={`skeleton-${type}-${i}`} type={type} />
       ))}
     </View>
   );

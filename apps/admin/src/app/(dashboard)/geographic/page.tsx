@@ -14,7 +14,13 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -107,12 +113,66 @@ const regionDistribution = [
 ];
 
 const heatmapData = [
-  { hour: '00:00', mon: 120, tue: 115, wed: 125, thu: 118, fri: 135, sat: 180, sun: 165 },
-  { hour: '04:00', mon: 80, tue: 75, wed: 85, thu: 78, fri: 95, sat: 120, sun: 110 },
-  { hour: '08:00', mon: 250, tue: 245, wed: 255, thu: 248, fri: 265, sat: 180, sun: 165 },
-  { hour: '12:00', mon: 380, tue: 375, wed: 395, thu: 388, fri: 420, sat: 350, sun: 320 },
-  { hour: '16:00', mon: 450, tue: 445, wed: 465, thu: 458, fri: 520, sat: 480, sun: 420 },
-  { hour: '20:00', mon: 520, tue: 515, wed: 535, thu: 528, fri: 620, sat: 680, sun: 580 },
+  {
+    hour: '00:00',
+    mon: 120,
+    tue: 115,
+    wed: 125,
+    thu: 118,
+    fri: 135,
+    sat: 180,
+    sun: 165,
+  },
+  {
+    hour: '04:00',
+    mon: 80,
+    tue: 75,
+    wed: 85,
+    thu: 78,
+    fri: 95,
+    sat: 120,
+    sun: 110,
+  },
+  {
+    hour: '08:00',
+    mon: 250,
+    tue: 245,
+    wed: 255,
+    thu: 248,
+    fri: 265,
+    sat: 180,
+    sun: 165,
+  },
+  {
+    hour: '12:00',
+    mon: 380,
+    tue: 375,
+    wed: 395,
+    thu: 388,
+    fri: 420,
+    sat: 350,
+    sun: 320,
+  },
+  {
+    hour: '16:00',
+    mon: 450,
+    tue: 445,
+    wed: 465,
+    thu: 458,
+    fri: 520,
+    sat: 480,
+    sun: 420,
+  },
+  {
+    hour: '20:00',
+    mon: 520,
+    tue: 515,
+    wed: 535,
+    thu: 528,
+    fri: 620,
+    sat: 680,
+    sun: 580,
+  },
 ];
 
 const overallStats = {
@@ -167,7 +227,9 @@ export default function GeographicPage() {
                 <Globe className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{overallStats.totalCountries}</p>
+                <p className="text-2xl font-bold">
+                  {overallStats.totalCountries}
+                </p>
                 <p className="text-sm text-muted-foreground">Ülke</p>
               </div>
             </div>
@@ -194,9 +256,13 @@ export default function GeographicPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {countryStats.reduce((sum, c) => sum + c.users, 0).toLocaleString('tr-TR')}
+                  {countryStats
+                    .reduce((sum, c) => sum + c.users, 0)
+                    .toLocaleString('tr-TR')}
                 </p>
-                <p className="text-sm text-muted-foreground">Toplam Kullanıcı</p>
+                <p className="text-sm text-muted-foreground">
+                  Toplam Kullanıcı
+                </p>
               </div>
             </div>
           </CardContent>
@@ -211,7 +277,7 @@ export default function GeographicPage() {
                 <p className="text-2xl font-bold">
                   {formatCurrency(
                     countryStats.reduce((sum, c) => sum + c.revenue, 0),
-                    'TRY'
+                    'TRY',
                   )}
                 </p>
                 <p className="text-sm text-muted-foreground">Toplam Gelir</p>
@@ -245,7 +311,9 @@ export default function GeographicPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Ülke Performansı</CardTitle>
-                  <CardDescription>Kullanıcı ve gelir bazlı ülke sıralaması</CardDescription>
+                  <CardDescription>
+                    Kullanıcı ve gelir bazlı ülke sıralaması
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -275,8 +343,12 @@ export default function GeographicPage() {
                         </div>
                         <div className="flex items-center gap-6">
                           <div className="text-right">
-                            <p className="font-semibold">{formatCurrency(country.revenue, 'TRY')}</p>
-                            <p className="text-xs text-muted-foreground">Gelir</p>
+                            <p className="font-semibold">
+                              {formatCurrency(country.revenue, 'TRY')}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Gelir
+                            </p>
                           </div>
                           <div className="flex items-center gap-1">
                             {country.growth > 0 ? (
@@ -286,7 +358,9 @@ export default function GeographicPage() {
                             )}
                             <span
                               className={`text-sm font-medium ${
-                                country.growth > 0 ? 'text-green-600' : 'text-red-600'
+                                country.growth > 0
+                                  ? 'text-green-600'
+                                  : 'text-red-600'
                               }`}
                             >
                               {country.growth > 0 ? '+' : ''}
@@ -330,7 +404,10 @@ export default function GeographicPage() {
                   </div>
                   <div className="mt-4 space-y-2">
                     {regionDistribution.map((region) => (
-                      <div key={region.name} className="flex items-center justify-between">
+                      <div
+                        key={region.name}
+                        className="flex items-center justify-between"
+                      >
                         <div className="flex items-center gap-2">
                           <div
                             className="h-3 w-3 rounded-full"
@@ -338,7 +415,9 @@ export default function GeographicPage() {
                           />
                           <span className="text-sm">{region.name}</span>
                         </div>
-                        <span className="text-sm font-medium">{region.value}%</span>
+                        <span className="text-sm font-medium">
+                          {region.value}%
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -350,33 +429,49 @@ export default function GeographicPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {countryStats.find((c) => c.code === selectedCountry)?.name}
+                      {
+                        countryStats.find((c) => c.code === selectedCountry)
+                          ?.name
+                      }
                     </CardTitle>
                     <CardDescription>Detaylı bilgiler</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {(() => {
-                      const country = countryStats.find((c) => c.code === selectedCountry);
+                      const country = countryStats.find(
+                        (c) => c.code === selectedCountry,
+                      );
                       if (!country) return null;
                       return (
                         <>
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">Aktif Kullanıcı</span>
+                              <span className="text-muted-foreground">
+                                Aktif Kullanıcı
+                              </span>
                               <span className="font-medium">
                                 {country.activeUsers.toLocaleString('tr-TR')}
                               </span>
                             </div>
                             <Progress
-                              value={(country.activeUsers / country.users) * 100}
+                              value={
+                                (country.activeUsers / country.users) * 100
+                              }
                               className="h-2"
                             />
                             <p className="text-xs text-muted-foreground">
-                              %{((country.activeUsers / country.users) * 100).toFixed(1)} aktivasyon
+                              %
+                              {(
+                                (country.activeUsers / country.users) *
+                                100
+                              ).toFixed(1)}{' '}
+                              aktivasyon
                             </p>
                           </div>
                           <div>
-                            <p className="text-sm font-medium mb-2">Top Şehirler</p>
+                            <p className="text-sm font-medium mb-2">
+                              Top Şehirler
+                            </p>
                             <div className="flex flex-wrap gap-2">
                               {country.topCities.map((city) => (
                                 <Badge key={city} variant="secondary">
@@ -410,7 +505,10 @@ export default function GeographicPage() {
                     <XAxis type="number" />
                     <YAxis dataKey="name" type="category" width={100} />
                     <Tooltip
-                      formatter={(value: number) => [value.toLocaleString('tr-TR'), 'Kullanıcı']}
+                      formatter={(value) => [
+                        (value as number).toLocaleString('tr-TR'),
+                        'Kullanıcı',
+                      ]}
                     />
                     <Bar dataKey="users" fill="#3b82f6" radius={[0, 4, 4, 0]} />
                   </BarChart>
@@ -445,11 +543,15 @@ export default function GeographicPage() {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
                         <p className="text-muted-foreground">Kullanıcı</p>
-                        <p className="font-semibold">{city.users.toLocaleString('tr-TR')}</p>
+                        <p className="font-semibold">
+                          {city.users.toLocaleString('tr-TR')}
+                        </p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Gelir</p>
-                        <p className="font-semibold">{formatCurrency(city.revenue, 'TRY')}</p>
+                        <p className="font-semibold">
+                          {formatCurrency(city.revenue, 'TRY')}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -465,7 +567,8 @@ export default function GeographicPage() {
             <CardHeader>
               <CardTitle>Aktivite Haritası</CardTitle>
               <CardDescription>
-                Haftalık aktivite yoğunluğu (saat bazlı ortalama aktif kullanıcı)
+                Haftalık aktivite yoğunluğu (saat bazlı ortalama aktif
+                kullanıcı)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -503,24 +606,29 @@ export default function GeographicPage() {
                     {heatmapData.map((row) => (
                       <tr key={row.hour}>
                         <td className="p-2 text-sm font-medium">{row.hour}</td>
-                        {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day) => {
-                          const value = row[day as keyof typeof row] as number;
-                          const maxValue = 680;
-                          const intensity = value / maxValue;
-                          return (
-                            <td key={day} className="p-1">
-                              <div
-                                className="flex h-10 w-full items-center justify-center rounded text-xs font-medium"
-                                style={{
-                                  backgroundColor: `rgba(59, 130, 246, ${intensity})`,
-                                  color: intensity > 0.5 ? 'white' : 'inherit',
-                                }}
-                              >
-                                {value}
-                              </div>
-                            </td>
-                          );
-                        })}
+                        {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(
+                          (day) => {
+                            const value = row[
+                              day as keyof typeof row
+                            ] as number;
+                            const maxValue = 680;
+                            const intensity = value / maxValue;
+                            return (
+                              <td key={day} className="p-1">
+                                <div
+                                  className="flex h-10 w-full items-center justify-center rounded text-xs font-medium"
+                                  style={{
+                                    backgroundColor: `rgba(59, 130, 246, ${intensity})`,
+                                    color:
+                                      intensity > 0.5 ? 'white' : 'inherit',
+                                  }}
+                                >
+                                  {value}
+                                </div>
+                              </td>
+                            );
+                          },
+                        )}
                       </tr>
                     ))}
                   </tbody>

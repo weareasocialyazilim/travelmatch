@@ -1,5 +1,5 @@
 export { Button } from './ui/Button';
-export { 
+export {
   ErrorBoundary,
   AppErrorBoundary,
   NavigationErrorBoundary,
@@ -7,7 +7,7 @@ export {
   ComponentErrorBoundary,
   type ErrorFallbackType,
 } from './ErrorBoundary';
-export { 
+export {
   withErrorBoundary,
   withNetworkErrorBoundary,
   withGenericErrorBoundary,
@@ -28,6 +28,7 @@ export { ShareMomentBottomSheet } from './ShareMomentBottomSheet';
 export { LanguageSelectionBottomSheet } from './LanguageSelectionBottomSheet';
 export { CurrencySelectionBottomSheet } from './CurrencySelectionBottomSheet';
 export { ClearCacheDialog } from './ClearCacheDialog';
+export { CityAutocomplete } from './CityAutocomplete';
 export { AddBankAccountBottomSheet } from './AddBankAccountBottomSheet';
 export { WithdrawConfirmationModal } from './WithdrawConfirmationModal';
 export { LimitReachedModal } from './LimitReachedModal';
@@ -51,6 +52,12 @@ export { FeedbackModal } from './FeedbackModal';
 export { EmptyStateIllustration } from './ui/EmptyStateIllustration';
 export { EmptyState } from './ui/EmptyState';
 export { Spinner } from './ui/Spinner';
+export { HapticButton } from './ui/HapticButton';
+export type {
+  HapticButtonProps,
+  ButtonVariant,
+  ButtonSize,
+} from './ui/HapticButton';
 
 // Loading States & Skeletons
 export { Skeleton } from './ui/Skeleton';

@@ -14,7 +14,6 @@
 import { supabase, SUPABASE_EDGE_URL } from '../config/supabase';
 import { logger } from '../utils/logger';
 import {
-  cacheInvalidationService,
   getCachedWallet,
   setCachedWallet,
   invalidateWallet,
@@ -23,8 +22,9 @@ import {
   invalidateTransactions,
   invalidateAllPaymentCache,
 } from './cacheInvalidationService';
-import { toJson, toRecord } from '../utils/jsonHelper';
+import { toRecord } from '../utils/jsonHelper';
 import type { Database } from '../types/database.types';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // Types
 export interface PaymentIntent {
@@ -469,7 +469,11 @@ class SecurePaymentService {
   /**
    * Subscribe to real-time payment updates
    */
-  subscribeToPaymentUpdates(callback: (payload: any) => void): () => void {
+  subscribeToPaymentUpdates(
+    callback: (
+      payload: RealtimePostgresChangesPayload<Record<string, unknown>>,
+    ) => void,
+  ): () => void {
     const channel = supabase
       .channel('payment-updates')
       .on(

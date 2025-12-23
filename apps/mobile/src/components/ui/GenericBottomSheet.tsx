@@ -137,28 +137,30 @@ export const GenericBottomSheet = forwardRef<
 
     // Pan responder for swipe gestures
     const panResponder = useRef(
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => swipeToDismiss,
-        onMoveShouldSetPanResponder: (_, gestureState) =>
-          swipeToDismiss && Math.abs(gestureState.dy) > 5,
-        onPanResponderMove: (_, gestureState) => {
-          if (gestureState.dy > 0) {
-            translateY.setValue(gestureState.dy);
-          }
-        },
-        onPanResponderRelease: (_, gestureState) => {
-          if (gestureState.dy > 100 || gestureState.vy > 0.5) {
-            closeSheet();
-          } else {
-            Animated.spring(translateY, {
-              toValue: 0,
-              useNativeDriver: true,
-              tension: 100,
-              friction: 10,
-            }).start();
-          }
-        },
-      }),
+      PanResponder?.create
+        ? PanResponder.create({
+            onStartShouldSetPanResponder: () => swipeToDismiss,
+            onMoveShouldSetPanResponder: (_, gestureState) =>
+              swipeToDismiss && Math.abs(gestureState.dy) > 5,
+            onPanResponderMove: (_, gestureState) => {
+              if (gestureState.dy > 0) {
+                translateY.setValue(gestureState.dy);
+              }
+            },
+            onPanResponderRelease: (_, gestureState) => {
+              if (gestureState.dy > 100 || gestureState.vy > 0.5) {
+                closeSheet();
+              } else {
+                Animated.spring(translateY, {
+                  toValue: 0,
+                  useNativeDriver: true,
+                  tension: 100,
+                  friction: 10,
+                }).start();
+              }
+            },
+          })
+        : { panHandlers: {} },
     ).current;
 
     const openSheet = useCallback(() => {
@@ -231,7 +233,11 @@ export const GenericBottomSheet = forwardRef<
       <>
         {/* Handle */}
         {showHandle && (
-          <View style={styles.handleContainer} {...panResponder.panHandlers}>
+          <View
+            style={styles.handleContainer}
+            testID={testID ? `${testID}-handle` : undefined}
+            {...panResponder.panHandlers}
+          >
             <View style={styles.handle} />
           </View>
         )}
@@ -240,7 +246,10 @@ export const GenericBottomSheet = forwardRef<
         {renderHeader
           ? renderHeader()
           : (title || subtitle) && (
-              <View style={styles.header}>
+              <View
+                style={styles.header}
+                testID={testID ? `${testID}-header` : undefined}
+              >
                 <View style={styles.titleContainer}>
                   {title && (
                     <Text style={styles.title} {...a11yProps.header(1, title)}>
@@ -253,6 +262,7 @@ export const GenericBottomSheet = forwardRef<
                   <TouchableOpacity
                     onPress={closeSheet}
                     style={styles.closeButton}
+                    testID={testID ? `${testID}-close-button` : undefined}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     {...a11yProps.button('Close', 'Close this sheet')}
                   >
@@ -271,6 +281,13 @@ export const GenericBottomSheet = forwardRef<
           style={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          testID={
+            testID
+              ? scrollable
+                ? `${testID}-scroll-view`
+                : `${testID}-content`
+              : undefined
+          }
         >
           {children}
         </ContentWrapper>
@@ -284,6 +301,11 @@ export const GenericBottomSheet = forwardRef<
       </>
     );
 
+    // Don't render anything when not visible
+    if (!visible) {
+      return null;
+    }
+
     return (
       <Modal
         visible={visible}
@@ -294,7 +316,10 @@ export const GenericBottomSheet = forwardRef<
       >
         <View style={styles.container}>
           {/* Backdrop */}
-          <TouchableWithoutFeedback onPress={handleBackdropPress}>
+          <TouchableWithoutFeedback
+            onPress={handleBackdropPress}
+            testID={testID ? `${testID}-backdrop` : undefined}
+          >
             <Animated.View
               style={[styles.backdrop, { opacity: backdropOpacity }]}
             />
@@ -305,6 +330,7 @@ export const GenericBottomSheet = forwardRef<
             testID={testID}
             accessibilityLabel={accessibilityLabel || title}
             accessibilityRole="none"
+            accessibilityLiveRegion="polite"
             accessible={true}
             style={[
               styles.sheet,
@@ -317,6 +343,8 @@ export const GenericBottomSheet = forwardRef<
               <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+                testID={testID ? `${testID}-keyboard-avoiding` : undefined}
               >
                 {content}
               </KeyboardAvoidingView>
@@ -378,6 +406,7 @@ export const ConfirmationBottomSheet: React.FC<
             style={[confirmStyles.button, confirmStyles.cancelButton]}
             onPress={onClose}
             disabled={loading}
+            testID="confirmation-cancel-button"
             {...a11yProps.button(cancelText)}
           >
             <Text style={confirmStyles.cancelText}>{cancelText}</Text>
@@ -391,16 +420,29 @@ export const ConfirmationBottomSheet: React.FC<
             ]}
             onPress={onConfirm}
             disabled={loading}
+            testID="confirmation-confirm-button"
             {...a11yProps.button(confirmText)}
           >
-            <Text
-              style={[
-                confirmStyles.confirmText,
-                confirmDestructive && confirmStyles.destructiveText,
-              ]}
-            >
-              {loading ? 'Loading...' : confirmText}
-            </Text>
+            {loading ? (
+              <Text
+                style={[
+                  confirmStyles.confirmText,
+                  confirmDestructive && confirmStyles.destructiveText,
+                ]}
+                testID="confirmation-loading-text"
+              >
+                Loading...
+              </Text>
+            ) : (
+              <Text
+                style={[
+                  confirmStyles.confirmText,
+                  confirmDestructive && confirmStyles.destructiveText,
+                ]}
+              >
+                {confirmText}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -453,6 +495,7 @@ export function SelectionBottomSheet<T = string>({
             style={[
               selectionStyles.option,
               option.disabled && selectionStyles.optionDisabled,
+              selectedValue === option.value && selectionStyles.optionSelected,
               index === options.length - 1 && selectionStyles.lastOption,
             ]}
             onPress={() => {
@@ -462,6 +505,7 @@ export function SelectionBottomSheet<T = string>({
               }
             }}
             disabled={option.disabled}
+            testID={`selection-option-${String(option.value)}`}
             {...a11yProps.button(
               option.label,
               option.description,
@@ -476,6 +520,7 @@ export function SelectionBottomSheet<T = string>({
                 size={24}
                 color={option.disabled ? COLORS.gray[300] : COLORS.text}
                 style={selectionStyles.optionIcon}
+                testID={`selection-option-${String(option.value)}-icon`}
               />
             )}
             <View style={selectionStyles.optionContent}>
@@ -498,6 +543,7 @@ export function SelectionBottomSheet<T = string>({
                 name="check"
                 size={24}
                 color={COLORS.primary}
+                testID={`selection-option-${String(option.value)}-check`}
               />
             )}
           </TouchableOpacity>
@@ -634,6 +680,9 @@ const selectionStyles = StyleSheet.create({
   },
   optionDisabled: {
     opacity: 0.5,
+  },
+  optionSelected: {
+    backgroundColor: COLORS.primary + '10',
   },
   optionIcon: {
     marginRight: 16,

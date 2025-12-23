@@ -4,7 +4,7 @@ import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -21,26 +21,45 @@ export async function GET(
 
     // Get user profile with related data
     const { data: user, error } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
 
     if (error || !user) {
-      return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Kullanıcı bulunamadı' },
+        { status: 404 },
+      );
     }
 
-    // Get user stats
+    // Get user stats - using type assertion for tables that may not exist in database types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sb = supabase as any;
     const [
       { count: momentCount },
       { count: matchCount },
       { count: reportCount },
       { data: recentTransactions },
     ] = await Promise.all([
-      supabase.from('moments').select('*', { count: 'exact', head: true }).eq('user_id', id),
-      supabase.from('matches').select('*', { count: 'exact', head: true }).or(`user1_id.eq.${id},user2_id.eq.${id}`),
-      supabase.from('reports').select('*', { count: 'exact', head: true }).eq('reported_user_id', id),
-      supabase.from('transactions').select('*').eq('user_id', id).order('created_at', { ascending: false }).limit(10),
+      supabase
+        .from('moments')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', id),
+      sb
+        .from('bookings')
+        .select('*', { count: 'exact', head: true })
+        .or(`host_id.eq.${id},guest_id.eq.${id}`),
+      supabase
+        .from('reports')
+        .select('*', { count: 'exact', head: true })
+        .eq('reported_user_id', id),
+      supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', id)
+        .order('created_at', { ascending: false })
+        .limit(10),
     ]);
 
     return NextResponse.json({
@@ -60,7 +79,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -78,13 +97,16 @@ export async function PATCH(
 
     // Get current user data
     const { data: currentUser, error: fetchError } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
 
     if (fetchError || !currentUser) {
-      return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Kullanıcı bulunamadı' },
+        { status: 404 },
+      );
     }
 
     // Allowed update fields
@@ -104,16 +126,19 @@ export async function PATCH(
       }
     }
 
-    // Handle suspension/ban timestamps
-    if (body.is_suspended === true && !currentUser.is_suspended) {
+    // Handle suspension/ban timestamps - using type assertion for optional fields
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const currentUserAny = currentUser as any;
+    if (body.is_suspended === true && !currentUserAny.is_suspended) {
       updateData.suspended_at = new Date().toISOString();
     }
-    if (body.is_banned === true && !currentUser.is_banned) {
+    if (body.is_banned === true && !currentUserAny.is_banned) {
       updateData.banned_at = new Date().toISOString();
     }
 
-    const { data: user, error } = await supabase
-      .from('profiles')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: user, error } = await (supabase as any)
+      .from('users')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -121,7 +146,10 @@ export async function PATCH(
 
     if (error) {
       console.error('User update error:', error);
-      return NextResponse.json({ error: 'Kullanıcı güncellenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Kullanıcı güncellenemedi' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -133,7 +161,7 @@ export async function PATCH(
       currentUser,
       user,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ user });

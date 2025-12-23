@@ -1,16 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
-<RCTView>
-  <RCTView>
+<RCTView
+  ref={null}
+>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="email-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -24,6 +31,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         Email
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -44,6 +52,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onFocus={[Function]}
           placeholder="Enter email"
           placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={false}
           style={
             [
@@ -63,15 +72,20 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
       </RCTView>
     </RCTView>
   </RCTView>
-  <RCTView>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="password-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -85,6 +99,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         Password
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -101,6 +116,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         <RCTText
           color="#9CA3AF"
           name="lock-outline"
+          ref={null}
           size={20}
           style={
             {
@@ -120,6 +136,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onFocus={[Function]}
           placeholder="Enter password"
           placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={true}
           style={
             [
@@ -150,6 +167,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           accessible={true}
           aria-label="Show password"
           onPress={[Function]}
+          ref={null}
           style={
             {
               "marginLeft": 12,
@@ -160,6 +178,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           <RCTText
             color="#9CA3AF"
             name="eye"
+            ref={null}
             size={20}
             testID="RCTText"
           >
@@ -169,15 +188,20 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
       </RCTView>
     </RCTView>
   </RCTView>
-  <RCTView>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="username-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -191,6 +215,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         Username
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -211,6 +236,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onFocus={[Function]}
           placeholder="Enter username"
           placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={false}
           style={
             [
@@ -230,15 +256,20 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
       </RCTView>
     </RCTView>
   </RCTView>
-  <RCTView>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="bio-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -252,6 +283,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         Bio
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -274,6 +306,336 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onFocus={[Function]}
           placeholder="Tell us about yourself"
           placeholderTextColor="#9CA3AF"
+          ref={null}
+          secureTextEntry={false}
+          style={
+            [
+              {
+                "color": "#1A1A1A",
+                "flex": 1,
+                "fontSize": 16,
+                "paddingVertical": 0,
+              },
+              undefined,
+              false,
+            ]
+          }
+          testID="bio-input"
+          value=""
+        />
+      </RCTView>
+    </RCTView>
+  </RCTView>
+</RCTView>
+`;
+
+exports[`ControlledInput Snapshots should match snapshot with errors 1`] = `
+<RCTView
+  ref={null}
+>
+  <RCTView
+    ref={null}
+  >
+    <RCTView
+      ref={null}
+      style={
+        {
+          "marginBottom": 16,
+        }
+      }
+      testID="email-input-container"
+    >
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#1A1A1A",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginBottom": 8,
+          }
+        }
+        testID="RCTText"
+      >
+        Email
+      </RCTText>
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E7EB",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "height": 52,
+            "paddingHorizontal": 16,
+          }
+        }
+      >
+        <RCTTextInput
+          accessibilityLabel="Email"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          placeholder="Enter email"
+          placeholderTextColor="#9CA3AF"
+          ref={null}
+          secureTextEntry={false}
+          style={
+            [
+              {
+                "color": "#1A1A1A",
+                "flex": 1,
+                "fontSize": 16,
+                "paddingVertical": 0,
+              },
+              undefined,
+              false,
+            ]
+          }
+          testID="email-input"
+          value="invalid"
+        />
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
+    ref={null}
+  >
+    <RCTView
+      ref={null}
+      style={
+        {
+          "marginBottom": 16,
+        }
+      }
+      testID="password-input-container"
+    >
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#1A1A1A",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginBottom": 8,
+          }
+        }
+        testID="RCTText"
+      >
+        Password
+      </RCTText>
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E7EB",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "height": 52,
+            "paddingHorizontal": 16,
+          }
+        }
+      >
+        <RCTText
+          color="#9CA3AF"
+          name="lock-outline"
+          ref={null}
+          size={20}
+          style={
+            {
+              "marginRight": 12,
+            }
+          }
+          testID="RCTText"
+        >
+          lock-outline
+        </RCTText>
+        <RCTTextInput
+          accessibilityLabel="Password"
+          autoCapitalize="none"
+          autoCorrect={false}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          placeholder="Enter password"
+          placeholderTextColor="#9CA3AF"
+          ref={null}
+          secureTextEntry={true}
+          style={
+            [
+              {
+                "color": "#1A1A1A",
+                "flex": 1,
+                "fontSize": 16,
+                "paddingVertical": 0,
+              },
+              {
+                "paddingLeft": 0,
+              },
+              {
+                "paddingRight": 0,
+              },
+            ]
+          }
+          testID="password-input"
+          value=""
+        />
+        <RCTTouchableOpacity
+          accessibilityLabel="Show password"
+          accessibilityState={
+            {
+              "disabled": false,
+            }
+          }
+          accessible={true}
+          aria-label="Show password"
+          onPress={[Function]}
+          ref={null}
+          style={
+            {
+              "marginLeft": 12,
+              "padding": 4,
+            }
+          }
+        >
+          <RCTText
+            color="#9CA3AF"
+            name="eye"
+            ref={null}
+            size={20}
+            testID="RCTText"
+          >
+            eye
+          </RCTText>
+        </RCTTouchableOpacity>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
+    ref={null}
+  >
+    <RCTView
+      ref={null}
+      style={
+        {
+          "marginBottom": 16,
+        }
+      }
+      testID="username-input-container"
+    >
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#1A1A1A",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginBottom": 8,
+          }
+        }
+        testID="RCTText"
+      >
+        Username
+      </RCTText>
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E7EB",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "height": 52,
+            "paddingHorizontal": 16,
+          }
+        }
+      >
+        <RCTTextInput
+          accessibilityLabel="Username"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          placeholder="Enter username"
+          placeholderTextColor="#9CA3AF"
+          ref={null}
+          secureTextEntry={false}
+          style={
+            [
+              {
+                "color": "#1A1A1A",
+                "flex": 1,
+                "fontSize": 16,
+                "paddingVertical": 0,
+              },
+              undefined,
+              false,
+            ]
+          }
+          testID="username-input"
+          value=""
+        />
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
+    ref={null}
+  >
+    <RCTView
+      ref={null}
+      style={
+        {
+          "marginBottom": 16,
+        }
+      }
+      testID="bio-input-container"
+    >
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#1A1A1A",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginBottom": 8,
+          }
+        }
+        testID="RCTText"
+      >
+        Bio
+      </RCTText>
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E7EB",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "height": 52,
+            "paddingHorizontal": 16,
+          }
+        }
+      >
+        <RCTTextInput
+          accessibilityLabel="Bio"
+          multiline={true}
+          numberOfLines={4}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          placeholder="Tell us about yourself"
+          placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={false}
           style={
             [
@@ -297,16 +659,23 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
 `;
 
 exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
-<RCTView>
-  <RCTView>
+<RCTView
+  ref={null}
+>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="email-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -320,6 +689,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         Email
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -340,6 +710,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onFocus={[Function]}
           placeholder="Enter email"
           placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={false}
           style={
             [
@@ -359,15 +730,20 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
       </RCTView>
     </RCTView>
   </RCTView>
-  <RCTView>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="password-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -381,6 +757,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         Password
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -397,6 +774,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         <RCTText
           color="#9CA3AF"
           name="lock-outline"
+          ref={null}
           size={20}
           style={
             {
@@ -416,6 +794,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onFocus={[Function]}
           placeholder="Enter password"
           placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={true}
           style={
             [
@@ -446,6 +825,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           accessible={true}
           aria-label="Show password"
           onPress={[Function]}
+          ref={null}
           style={
             {
               "marginLeft": 12,
@@ -456,6 +836,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           <RCTText
             color="#9CA3AF"
             name="eye"
+            ref={null}
             size={20}
             testID="RCTText"
           >
@@ -465,15 +846,20 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
       </RCTView>
     </RCTView>
   </RCTView>
-  <RCTView>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="username-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -487,6 +873,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         Username
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -507,6 +894,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onFocus={[Function]}
           placeholder="Enter username"
           placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={false}
           style={
             [
@@ -526,15 +914,20 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
       </RCTView>
     </RCTView>
   </RCTView>
-  <RCTView>
+  <RCTView
+    ref={null}
+  >
     <RCTView
+      ref={null}
       style={
         {
           "marginBottom": 16,
         }
       }
+      testID="bio-input-container"
     >
       <RCTText
+        ref={null}
         style={
           {
             "color": "#1A1A1A",
@@ -548,6 +941,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         Bio
       </RCTText>
       <RCTView
+        ref={null}
         style={
           {
             "alignItems": "center",
@@ -570,6 +964,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onFocus={[Function]}
           placeholder="Tell us about yourself"
           placeholderTextColor="#9CA3AF"
+          ref={null}
           secureTextEntry={false}
           style={
             [

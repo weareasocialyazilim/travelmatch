@@ -319,7 +319,10 @@ export function useWhyDidYouUpdate(
 
       if (Object.keys(changesObj).length > 0) {
         const changesList = Object.keys(changesObj)
-          .map((key) => `${key} (${typeof changesObj[key].to})`)
+          .map((key) => {
+            const change = changesObj[key];
+            return change ? `${key} (${typeof change.to})` : key;
+          })
           .join(', ');
 
         logger.debug(

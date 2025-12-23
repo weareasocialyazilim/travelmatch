@@ -8,9 +8,9 @@ import {
   ScrollView,
   Dimensions,
   Share,
-  Clipboard,
   Linking,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { logger } from '../utils/logger';
@@ -54,12 +54,12 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
 }) => {
   const { showToast } = useToast();
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     try {
-      Clipboard.setString(momentUrl);
+      await Clipboard.setStringAsync(momentUrl);
       showToast('Link copied to clipboard!', 'success');
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Link kopyalanamadı', 'error');
     }
   };
@@ -78,7 +78,9 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
 
   const handleWhatsApp = async () => {
     try {
-      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(`${momentTitle}\n${momentUrl}`)}`;
+      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(
+        `${momentTitle}\n${momentUrl}`,
+      )}`;
       const canOpen = await Linking.canOpenURL(whatsappUrl);
 
       if (canOpen) {
@@ -89,7 +91,10 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       onClose();
     } catch (error) {
       logger.error('WhatsApp share error:', error);
-      showToast('WhatsApp açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun', 'error');
+      showToast(
+        'WhatsApp açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun',
+        'error',
+      );
     }
   };
 
@@ -107,7 +112,10 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       onClose();
     } catch (error) {
       logger.error('Instagram share error:', error);
-      showToast('Instagram açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun', 'error');
+      showToast(
+        'Instagram açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun',
+        'error',
+      );
     }
   };
 

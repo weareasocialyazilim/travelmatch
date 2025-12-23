@@ -40,10 +40,10 @@ CREATE TABLE IF NOT EXISTS escrow_transactions (
   CONSTRAINT sender_recipient_check CHECK (sender_id != recipient_id)
 );
 
-CREATE INDEX idx_escrow_sender ON escrow_transactions(sender_id);
-CREATE INDEX idx_escrow_recipient ON escrow_transactions(recipient_id);
-CREATE INDEX idx_escrow_status ON escrow_transactions(status);
-CREATE INDEX idx_escrow_expires ON escrow_transactions(expires_at) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_escrow_sender ON escrow_transactions(sender_id);
+CREATE INDEX IF NOT EXISTS idx_escrow_recipient ON escrow_transactions(recipient_id);
+CREATE INDEX IF NOT EXISTS idx_escrow_status ON escrow_transactions(status);
+CREATE INDEX IF NOT EXISTS idx_escrow_expires ON escrow_transactions(expires_at) WHERE status = 'pending';
 
 COMMENT ON TABLE escrow_transactions IS
 'Holds funds in escrow for high-value transactions.
@@ -53,6 +53,7 @@ Funds are released when proof is verified or conditions are met.';
 ALTER TABLE escrow_transactions ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Users can view own escrow transactions" ON escrow_transactions;
 CREATE POLICY "Users can view own escrow transactions" ON escrow_transactions
 FOR SELECT USING (auth.uid() IN (sender_id, recipient_id));
 
@@ -76,7 +77,17 @@ DECLARE
   v_sender_balance DECIMAL;
   v_escrow_id UUID;
   v_txn_id UUID;
+  v_calling_user UUID;
 BEGIN
+  -- SECURITY: Verify caller is the sender
+  v_calling_user := auth.uid();
+  IF v_calling_user IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+  IF p_sender_id != v_calling_user THEN
+    RAISE EXCEPTION 'Unauthorized: Only sender can create escrow';
+  END IF;
+
   -- Validation
   IF p_sender_id = p_recipient_id THEN
     RAISE EXCEPTION 'Cannot escrow to yourself';
@@ -156,12 +167,24 @@ AS $$
 DECLARE
   v_escrow RECORD;
   v_txn_id UUID;
+  v_calling_user UUID;
 BEGIN
+  -- SECURITY: Check caller authentication
+  v_calling_user := auth.uid();
+  IF v_calling_user IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+
   -- Get and lock escrow record
   SELECT * INTO STRICT v_escrow
   FROM escrow_transactions
   WHERE id = p_escrow_id
   FOR UPDATE;
+
+  -- SECURITY: Only recipient or verified admin can release
+  IF v_calling_user != v_escrow.recipient_id AND p_verified_by IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized: Only recipient can release escrow';
+  END IF;
 
   -- Validation
   IF v_escrow.status != 'pending' THEN
@@ -227,12 +250,24 @@ AS $$
 DECLARE
   v_escrow RECORD;
   v_txn_id UUID;
+  v_calling_user UUID;
 BEGIN
+  -- SECURITY: Check caller authentication
+  v_calling_user := auth.uid();
+  IF v_calling_user IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+
   -- Get and lock escrow
   SELECT * INTO STRICT v_escrow
   FROM escrow_transactions
   WHERE id = p_escrow_id
   FOR UPDATE;
+
+  -- SECURITY: Only sender can request refund
+  IF v_calling_user != v_escrow.sender_id THEN
+    RAISE EXCEPTION 'Unauthorized: Only sender can refund escrow';
+  END IF;
 
   IF v_escrow.status != 'pending' THEN
     RAISE EXCEPTION 'Can only refund pending escrow';

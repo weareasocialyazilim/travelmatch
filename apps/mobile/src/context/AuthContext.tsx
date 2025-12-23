@@ -33,7 +33,11 @@ import React, {
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '../services/supabaseAuthService';
-import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '../utils/secureStorage';
+import {
+  secureStorage,
+  AUTH_STORAGE_KEYS,
+  StorageKeys,
+} from '../utils/secureStorage';
 import { logger } from '../utils/logger';
 import type { User, KYCStatus, Role } from '../types/index';
 
@@ -51,8 +55,8 @@ const createUser = (data: {
   name: data.name || '',
   avatar: data.avatar,
   role: 'Traveler' as Role,
-  kyc: 'Unverified' as KYCStatus,
-  location: { lat: 0, lng: 0 },
+  kycStatus: 'Unverified' as KYCStatus,
+  location: { latitude: 0, longitude: 0 },
 });
 
 /**
@@ -76,11 +80,13 @@ interface AuthTokens {
 type AuthState = 'loading' | 'authenticated' | 'unauthenticated';
 
 /**
- * Credentials for email/password login
+ * Credentials for email/password or phone/password login
  */
 interface LoginCredentials {
-  /** User's email address */
-  email: string;
+  /** User's email address (optional if phone is provided) */
+  email?: string;
+  /** User's phone number (optional if email is provided) */
+  phone?: string;
   /** User's password */
   password: string;
 }
@@ -91,6 +97,8 @@ interface LoginCredentials {
 interface RegisterData {
   /** User's email address */
   email: string;
+  /** User's phone number */
+  phone?: string;
   /** User's password (min 8 chars) */
   password: string;
   /** User's display name */
@@ -210,7 +218,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         ),
       ]);
       setTokens(newTokens);
-    } catch (error) {
+    } catch {
       // Silent fail - tokens will be re-fetched on next login
     }
   };
@@ -314,6 +322,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               expiresAt,
             };
 
+            // Ensure user profile exists in public.users (for users created before trigger)
+            await authService.ensureUserProfile(
+              parsedUser.id,
+              parsedUser.email,
+              parsedUser.name || 'User',
+              parsedUser.avatar,
+            );
+
             setUser(parsedUser);
             setTokens(parsedTokens);
             setAuthState('authenticated');
@@ -333,23 +349,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   /**
-   * Login with email/password
+   * Login with email/password or phone/password
    */
   const login = async (
     credentials: LoginCredentials,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
+      // Determine login method
+      const identifier = credentials.email || credentials.phone;
+      if (!identifier) {
+        return { success: false, error: 'Email or phone is required' };
+      }
+
       const {
         user: authUser,
         session,
         error,
       } = await authService.signInWithEmail(
-        credentials.email,
+        credentials.email || credentials.phone || '',
         credentials.password,
       );
 
       if (error) throw error;
       if (!authUser || !session) throw new Error('Login failed');
+
+      // Ensure user exists in public.users table (for RLS to work)
+      const { error: upsertError } = await authService.ensureUserProfile(
+        authUser.id,
+        authUser.email || '',
+        authUser.user_metadata?.name ||
+          authUser.user_metadata?.full_name ||
+          'User',
+        authUser.user_metadata?.avatar_url,
+      );
+
+      if (upsertError) {
+        logger.warn('[Auth] Failed to ensure user profile:', upsertError);
+        // Continue anyway - profile might already exist
+      }
 
       const newUser = createUser({
         id: authUser.id,
@@ -388,10 +425,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         error,
       } = await authService.signUpWithEmail(data.email, data.password, {
         name: data.name,
+        phone: data.phone,
       });
 
       if (error) throw error;
       if (!authUser) throw new Error('Registration failed');
+
+      // Ensure user profile exists in public.users table
+      await authService.ensureUserProfile(
+        authUser.id,
+        authUser.email || '',
+        data.name,
+        authUser.user_metadata?.avatar_url,
+      );
 
       if (session) {
         const newUser = createUser({
@@ -503,10 +549,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         return;
       }
 
+      // Ensure user profile exists in public.users table
+      await authService.ensureUserProfile(
+        authUser.id,
+        authUser.email || '',
+        authUser.user_metadata?.name ||
+          authUser.user_metadata?.full_name ||
+          authUser.email?.split('@')[0] ||
+          'User',
+        authUser.user_metadata?.avatar_url,
+      );
+
       const newUser = createUser({
         id: authUser.id,
         email: authUser.email || '',
-        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
+        name:
+          authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
         avatar: authUser.user_metadata?.avatar_url,
       });
 

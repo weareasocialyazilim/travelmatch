@@ -397,7 +397,7 @@ pnpm --filter @travelmatch/mobile test:e2e:cloud     # Maestro Cloud
 
 **3. Screen Tests (120 tests - 75% coverage)**
 
-- HomeScreen (feed, search, filters)
+- DiscoverScreen (feed, search, filters)
 - ProfileScreen (info, edit, settings)
 - DiscoverScreen (categories, map, search)
 

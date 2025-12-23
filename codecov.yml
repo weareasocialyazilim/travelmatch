@@ -1,0 +1,118 @@
+# Codecov Configuration for TravelMatch
+# https://docs.codecov.com/docs/codecov-yaml
+
+coverage:
+  # Coverage precision (number of decimal places)
+  precision: 2
+  round: down
+  range: '70...100'
+
+  status:
+    # Project-level coverage settings
+    project:
+      default:
+        # Require coverage to not drop more than 1%
+        target: auto
+        threshold: 1%
+        base: auto
+        if_not_found: success
+
+      # Mobile app coverage
+      mobile:
+        paths:
+          - 'apps/mobile/src/**'
+        target: 80%
+        threshold: 2%
+
+      # Shared packages coverage
+      shared:
+        paths:
+          - 'packages/shared/src/**'
+        target: 70%
+        threshold: 2%
+
+      # Design system coverage
+      design-system:
+        paths:
+          - 'packages/design-system/src/**'
+        target: 85%
+        threshold: 2%
+
+    # PR-level patch coverage (new code)
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+        if_not_found: success
+
+# Ignore certain paths from coverage
+ignore:
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.stories.ts'
+  - '**/*.stories.tsx'
+  - '**/__tests__/**'
+  - '**/__mocks__/**'
+  - '**/node_modules/**'
+  - '**/dist/**'
+  - '**/coverage/**'
+  - '**/*.d.ts'
+  - 'apps/mobile/src/navigation/**'
+  - 'apps/mobile/src/assets/**'
+  - 'packages/design-system/src/tokens/**'
+  - 'scripts/**'
+  - 'supabase/**'
+  - 'tests/**'
+  - 'docs/**'
+  - 'docker/**'
+
+# Bundle Analysis settings
+bundle_analysis:
+  # Bundle name for the web app
+  bundles:
+    - name: 'travelmatch-web'
+      # Warn if bundle size increases by more than 5%
+      warning_threshold: '5%'
+      # Fail if bundle size increases by more than 10%
+      fail_threshold: '10%'
+
+# Comment settings for PRs
+comment:
+  layout: 'condensed_header, condensed_files, condensed_footer'
+  behavior: default
+  require_changes: true
+  require_base: false
+  require_head: true
+
+  # Show bundle analysis in PR comments
+  show_bundle_analysis: true
+
+  # Show test results in PR comments
+  show_test_analytics: true
+
+# Flag management (organize coverage by component)
+flags:
+  unittests:
+    paths:
+      - apps/mobile/src/
+      - packages/shared/src/
+      - packages/design-system/src/
+    carryforward: true
+
+# Test analytics settings
+test_analytics:
+  # Detect flaky tests
+  flaky_test_detection:
+    enabled: true
+
+  # Test failure notifications
+  failure_rate_threshold: 5%
+
+# GitHub integration settings
+github_checks:
+  annotations: true
+
+# Notifications
+notify:
+  # Wait for all uploads before processing
+  wait_for_ci: true

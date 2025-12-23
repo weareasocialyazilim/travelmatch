@@ -15,6 +15,7 @@ import {
 } from '@/components/moment-detail';
 import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -70,7 +71,7 @@ const MomentDetailScreen: React.FC = () => {
     avatar:
       userSource?.avatar ||
       (userSource as { photoUrl?: string })?.photoUrl ||
-      'https://via.placeholder.com/150',
+      DEFAULT_IMAGES.AVATAR_LARGE,
     type: userSource?.type || 'traveler',
     isVerified: userSource?.isVerified || false,
     location: userSource?.location || 'Unknown',
@@ -106,7 +107,7 @@ const MomentDetailScreen: React.FC = () => {
           text: r.comment,
         }));
         setReviews(mappedReviews);
-      } catch (error) {
+      } catch {
         // Silent fail
       }
     };
@@ -129,7 +130,7 @@ const MomentDetailScreen: React.FC = () => {
             message: r.message || '',
           }));
           setPendingRequestsList(mappedRequests);
-        } catch (error) {
+        } catch {
           // Silent fail
         }
       };
@@ -218,34 +219,41 @@ const MomentDetailScreen: React.FC = () => {
     );
   }, [deleteMoment, moment.id, navigation, showToast]);
 
-  const handleAcceptRequest = useCallback((requestId: string) => {
-    showToast('The guest has been notified!', 'info');
-    setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-  }, [showToast]);
+  const handleAcceptRequest = useCallback(
+    (requestId: string) => {
+      showToast('The guest has been notified!', 'info');
+      setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
+    },
+    [showToast],
+  );
 
-  const handleDeclineRequest = useCallback((requestId: string) => {
-    showToast('The guest has been notified.', 'info');
-    setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-  }, [showToast]);
+  const handleDeclineRequest = useCallback(
+    (requestId: string) => {
+      showToast('The guest has been notified.', 'info');
+      setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
+    },
+    [showToast],
+  );
 
   const handleGiftOption = useCallback(() => {
     trackInteraction('gift_selected');
     setShowGiftSheet(false);
-    setGiftAmount(moment.price);
+    // Use price or pricePerGuest as fallback
+    setGiftAmount(moment.price ?? moment.pricePerGuest ?? 0);
 
     setTimeout(() => {
       setShowSuccessModal(true);
     }, VALUES.ANIMATION_DURATION);
-  }, [moment.price, trackInteraction]);
+  }, [moment.price, moment.pricePerGuest, trackInteraction]);
 
   const handleViewApprovals = useCallback(() => {
     setShowSuccessModal(false);
     navigation.navigate('ReceiverApproval', {
       momentTitle: moment.title,
-      totalAmount: moment.price,
+      totalAmount: moment.price ?? moment.pricePerGuest ?? 0,
       momentId: moment.id,
     });
-  }, [moment.price, moment.title, moment.id, navigation]);
+  }, [moment.price, moment.pricePerGuest, moment.title, moment.id, navigation]);
 
   const handleEdit = useCallback(() => {
     navigation.navigate('EditMoment', { momentId: moment.id });
@@ -288,7 +296,7 @@ const MomentDetailScreen: React.FC = () => {
         },
         user: {
           name: momentUser.name,
-          avatar: momentUser.avatar || 'https://via.placeholder.com/150',
+          avatar: momentUser.avatar || DEFAULT_IMAGES.AVATAR_LARGE,
           type: (momentUser.type as 'traveler' | 'local') || 'traveler',
           location:
             typeof momentUser.location === 'string'

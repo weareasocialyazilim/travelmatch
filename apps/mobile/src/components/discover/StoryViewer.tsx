@@ -185,8 +185,8 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
           <View style={styles.topSection} pointerEvents="box-none">
             {/* Progress Bars */}
             <View style={styles.progressContainer}>
-              {user.stories.map((_, index) => (
-                <View key={index} style={styles.progressBarWrapper}>
+              {user.stories.map((story, index) => (
+                <View key={story.id} style={styles.progressBarWrapper}>
                   <View style={styles.progressBarBg} />
                   {index < currentStoryIndex ? (
                     <View style={[styles.progressBarFill, styles.fullWidth]} />

@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react';
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Platform,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
 import * as Sentry from '../config/sentry';
@@ -11,18 +18,28 @@ import { spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { logger } from '../utils/logger';
 
-export type ErrorFallbackType = 
-  | 'generic' 
-  | 'network' 
-  | 'server' 
-  | 'notfound' 
-  | 'unauthorized' 
+// Safe __DEV__ check for Jest environment
+const isDev =
+  typeof __DEV__ !== 'undefined'
+    ? __DEV__
+    : process.env.NODE_ENV !== 'production';
+
+export type ErrorFallbackType =
+  | 'generic'
+  | 'network'
+  | 'server'
+  | 'notfound'
+  | 'unauthorized'
   | 'critical';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallbackType?: ErrorFallbackType;
-  fallback?: (error: Error, resetError: () => void, goHome: () => void) => ReactNode;
+  fallback?: (
+    error: Error,
+    resetError: () => void,
+    goHome: () => void,
+  ) => ReactNode;
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
   level?: 'app' | 'navigation' | 'screen' | 'component';
   navigation?: any; // Optional navigation prop for routing
@@ -56,7 +73,7 @@ export class ErrorBoundary extends Component<
     // Log error
     logger.error(`[${level.toUpperCase()} Error Boundary]`, error);
 
-    if (__DEV__) {
+    if (isDev) {
       logger.debug('Error Stack', { stack: error.stack });
       logger.debug('Component Stack', {
         componentStack: errorInfo.componentStack,
@@ -71,7 +88,7 @@ export class ErrorBoundary extends Component<
         errorMessage: error.message,
         errorName: error.name,
       });
-      
+
       Sentry.captureException(error, {
         level: level === 'app' || level === 'navigation' ? 'fatal' : 'error',
         tags: {
@@ -101,7 +118,7 @@ export class ErrorBoundary extends Component<
 
   handleGoHome = (): void => {
     const { navigation } = this.props;
-    
+
     this.setState({ hasError: false, error: null, errorInfo: null }, () => {
       if (navigation) {
         // Reset navigation to home screen
@@ -109,7 +126,7 @@ export class ErrorBoundary extends Component<
           CommonActions.reset({
             index: 0,
             routes: [{ name: 'Discover' }],
-          })
+          }),
         );
       }
     });
@@ -131,11 +148,20 @@ export class ErrorBoundary extends Component<
       const errorMessage = (error.message || '').toLowerCase();
       if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
         effectiveType = 'network';
-      } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+      } else if (
+        errorMessage.includes('404') ||
+        errorMessage.includes('not found')
+      ) {
         effectiveType = 'notfound';
-      } else if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
+      } else if (
+        errorMessage.includes('401') ||
+        errorMessage.includes('unauthorized')
+      ) {
         effectiveType = 'unauthorized';
-      } else if (errorMessage.includes('500') || errorMessage.includes('server')) {
+      } else if (
+        errorMessage.includes('500') ||
+        errorMessage.includes('server')
+      ) {
         effectiveType = 'server';
       }
     }
@@ -154,7 +180,8 @@ export class ErrorBoundary extends Component<
         return {
           icon: 'server-network-off',
           title: 'Sunucu Hatası',
-          message: 'Sunucularımızda bir sorun oluştu. Lütfen daha sonra tekrar deneyin.',
+          message:
+            'Sunucularımızda bir sorun oluştu. Lütfen daha sonra tekrar deneyin.',
           showRetry: true,
           showHome: true,
         };
@@ -181,7 +208,8 @@ export class ErrorBoundary extends Component<
         return {
           icon: 'alert-octagon-outline',
           title: 'Kritik Hata',
-          message: 'Beklenmeyen bir hata oluştu. Uygulamayı yeniden başlatmanız gerekebilir.',
+          message:
+            'Beklenmeyen bir hata oluştu. Uygulamayı yeniden başlatmanız gerekebilir.',
           showRetry: true,
           showHome: true,
         };
@@ -190,9 +218,10 @@ export class ErrorBoundary extends Component<
         return {
           icon: 'alert-circle-outline',
           title: level === 'app' ? 'Bir Şeyler Yanlış Gitti' : 'Hata Oluştu',
-          message: level === 'app'
-            ? 'Özür dileriz. Lütfen uygulamayı yeniden başlatın veya ana sayfaya dönün.'
-            : 'Lütfen tekrar deneyin veya geri dönün.',
+          message:
+            level === 'app'
+              ? 'Özür dileriz. Lütfen uygulamayı yeniden başlatın veya ana sayfaya dönün.'
+              : 'Lütfen tekrar deneyin veya geri dönün.',
           showRetry: true,
           showHome: level !== 'component',
         };
@@ -215,7 +244,7 @@ export class ErrorBoundary extends Component<
       // Default fallback UI
       return (
         <View style={styles.container}>
-          <ScrollView 
+          <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
@@ -231,7 +260,7 @@ export class ErrorBoundary extends Component<
               <Text style={styles.title}>{content.title}</Text>
               <Text style={styles.message}>{content.message}</Text>
 
-              {__DEV__ && error && (
+              {isDev && error && (
                 <View style={styles.debugContainer}>
                   <Text style={styles.debugTitle}>Debug Info:</Text>
                   <Text style={styles.errorDetails}>{error.toString()}</Text>
@@ -270,7 +299,9 @@ export class ErrorBoundary extends Component<
                       size={20}
                       color={COLORS.primary}
                     />
-                    <Text style={styles.buttonTextSecondary}>Ana Sayfaya Dön</Text>
+                    <Text style={styles.buttonTextSecondary}>
+                      Ana Sayfaya Dön
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -381,7 +412,7 @@ const styles = StyleSheet.create({
 /**
  * Convenience wrappers for different error boundary levels
  */
-export const AppErrorBoundary: React.FC<{ 
+export const AppErrorBoundary: React.FC<{
   children: ReactNode;
   navigation?: any;
 }> = ({ children, navigation }) => (
@@ -390,7 +421,7 @@ export const AppErrorBoundary: React.FC<{
   </ErrorBoundary>
 );
 
-export const NavigationErrorBoundary: React.FC<{ 
+export const NavigationErrorBoundary: React.FC<{
   children: ReactNode;
   navigation?: any;
 }> = ({ children, navigation }) => (
@@ -399,17 +430,21 @@ export const NavigationErrorBoundary: React.FC<{
   </ErrorBoundary>
 );
 
-export const ScreenErrorBoundary: React.FC<{ 
+export const ScreenErrorBoundary: React.FC<{
   children: ReactNode;
   fallbackType?: ErrorFallbackType;
   navigation?: any;
 }> = ({ children, fallbackType, navigation }) => (
-  <ErrorBoundary level="screen" fallbackType={fallbackType} navigation={navigation}>
+  <ErrorBoundary
+    level="screen"
+    fallbackType={fallbackType}
+    navigation={navigation}
+  >
     {children}
   </ErrorBoundary>
 );
 
-export const ComponentErrorBoundary: React.FC<{ 
+export const ComponentErrorBoundary: React.FC<{
   children: ReactNode;
   fallbackType?: ErrorFallbackType;
 }> = ({ children, fallbackType }) => (

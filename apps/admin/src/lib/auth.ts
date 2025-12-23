@@ -1,6 +1,20 @@
 import { cookies } from 'next/headers';
 import { createServiceClient } from '@/lib/supabase';
 import crypto from 'crypto';
+import type { Database } from '@/types/database';
+
+type AdminUser = Database['public']['Tables']['admin_users']['Row'];
+
+interface SessionWithAdmin {
+  id: string;
+  admin_id: string;
+  token_hash: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  expires_at: string;
+  created_at: string;
+  admin: AdminUser | null;
+}
 
 export interface AdminSession {
   admin: {
@@ -23,15 +37,21 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     }
 
     const supabase = createServiceClient();
-    const sessionHash = crypto.createHash('sha256').update(sessionToken).digest('hex');
+    const sessionHash = crypto
+      .createHash('sha256')
+      .update(sessionToken)
+      .digest('hex');
 
-    // Find session
-    const { data: session, error: sessionError } = await supabase
+    // Find session with admin user joined
+    const { data, error: sessionError } = await supabase
       .from('admin_sessions')
       .select('*, admin:admin_users(*)')
       .eq('token_hash', sessionHash)
       .gt('expires_at', new Date().toISOString())
       .single();
+
+    // Type assertion for joined query result
+    const session = data as SessionWithAdmin | null;
 
     if (sessionError || !session || !session.admin) {
       return null;
@@ -51,7 +71,8 @@ export async function getAdminSession(): Promise<AdminSession | null> {
         avatar_url: session.admin.avatar_url,
         role: session.admin.role,
       },
-      permissions: permissions || [],
+      permissions:
+        (permissions as Array<{ resource: string; action: string }>) || [],
     };
   } catch (error) {
     console.error('Session check error:', error);
@@ -62,7 +83,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
 export function hasPermission(
   session: AdminSession,
   resource: string,
-  action: string
+  action: string,
 ): boolean {
   // Super admins have all permissions
   if (session.admin.role === 'super_admin') {
@@ -70,7 +91,7 @@ export function hasPermission(
   }
 
   return session.permissions.some(
-    (p) => p.resource === resource && p.action === action
+    (p) => p.resource === resource && p.action === action,
   );
 }
 
@@ -82,7 +103,7 @@ export async function createAuditLog(
   oldValue?: unknown,
   newValue?: unknown,
   ipAddress?: string,
-  userAgent?: string
+  userAgent?: string,
 ): Promise<void> {
   try {
     const supabase = createServiceClient();

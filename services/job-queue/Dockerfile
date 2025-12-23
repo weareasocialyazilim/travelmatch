@@ -25,6 +25,10 @@ RUN pnpm build
 # Production stage
 FROM node:20-alpine AS production
 
+# SECURITY: Run as non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nodejs
+
 RUN npm install -g pnpm
 
 WORKDIR /app
@@ -37,6 +41,12 @@ RUN pnpm install --prod --frozen-lockfile
 
 # Copy built code from base stage
 COPY --from=base /app/dist ./dist
+
+# Change ownership to non-root user
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
 
 # Expose port
 EXPOSE 3002

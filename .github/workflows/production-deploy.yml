@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v2.0.0
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
@@ -59,15 +59,15 @@ jobs:
 
       - name: Run type check
         run: pnpm run type-check
-        continue-on-error: true
+        # SECURITY: Type check MUST pass for production deploy
 
       - name: Run tests
         run: pnpm test -- --ci --passWithNoTests
-        continue-on-error: true
+        # SECURITY: Tests MUST pass for production deploy
 
       - name: Security audit
         run: pnpm audit --audit-level=critical
-        continue-on-error: true
+        # SECURITY: Critical CVEs block production deploy
 
   build-ios:
     name: Build iOS Production
@@ -78,12 +78,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v2.0.0
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -101,14 +102,14 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Build iOS
         run: |
           cd apps/mobile
           eas build --platform ios --profile production --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
 
   build-android:
@@ -120,12 +121,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v2.0.0
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -143,14 +145,14 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Build Android
         run: |
           cd apps/mobile
           eas build --platform android --profile production --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
 
   submit-ios:
@@ -162,25 +164,26 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v2.0.0
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Submit to App Store
         run: |
           cd apps/mobile
           eas submit --platform ios --latest --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
 
   submit-android:
     name: Submit to Play Store
@@ -191,25 +194,26 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v2.0.0
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: travelmatch
           env-slug: prod
+          export-type: env
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Submit to Play Store
         run: |
           cd apps/mobile
           eas submit --platform android --latest --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
 
   notify-success:
     name: Notify Deployment Success

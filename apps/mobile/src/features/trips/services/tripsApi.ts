@@ -43,7 +43,7 @@ export interface UpdateTripDto {
 
 /**
  * Trips API Service
- * 
+ *
  * Trip yönetimi için tüm API çağrıları
  */
 export const tripsApi = {
@@ -77,7 +77,9 @@ export const tripsApi = {
       query = query.contains('tags', filters.tags);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
+    const { data, error } = await query.order('created_at', {
+      ascending: false,
+    });
 
     if (error) throw error;
     return data;
@@ -102,7 +104,9 @@ export const tripsApi = {
    * Yeni trip oluştur
    */
   create: async (trip: CreateTripDto) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -120,29 +124,53 @@ export const tripsApi = {
 
   /**
    * Trip güncelle
+   * SECURITY: Only trip owner can update
    */
   update: async (id: string, updates: UpdateTripDto) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('trips')
       .update(updates)
       .eq('id', id)
+      .eq('user_id', user.id) // SECURITY: Verify ownership
       .select()
       .single();
 
     if (error) throw error;
+    if (!data)
+      throw new Error(
+        'Trip not found or you do not have permission to update it',
+      );
     return data;
   },
 
   /**
    * Trip sil (soft delete)
+   * SECURITY: Only trip owner can delete
    */
   delete: async (id: string) => {
-    const { error } = await supabase
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
       .from('trips')
       .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', user.id) // SECURITY: Verify ownership
+      .select()
+      .single();
 
     if (error) throw error;
+    if (!data)
+      throw new Error(
+        'Trip not found or you do not have permission to delete it',
+      );
   },
 
   /**
@@ -152,7 +180,8 @@ export const tripsApi = {
     // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('trips')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         title,
@@ -167,7 +196,8 @@ export const tripsApi = {
         image_url,
         created_at,
         updated_at
-      `)
+      `,
+      )
       .eq('user_id', userId)
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
@@ -182,7 +212,7 @@ export const tripsApi = {
   getBooking: async (bookingId: string) => {
     const { data, error } = await supabase
       .from('bookings')
-      .select('*, trips(*), profiles(*)')
+      .select('*, trips(*), users(*)')
       .eq('id', bookingId)
       .single();
 
@@ -194,7 +224,9 @@ export const tripsApi = {
    * Trip'e katılım isteği gönder
    */
   requestJoin: async (tripId: string, message?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -214,8 +246,33 @@ export const tripsApi = {
 
   /**
    * Katılım isteğini onayla/reddet
+   * SECURITY: Only trip owner can respond to requests
    */
-  respondToRequest: async (requestId: string, status: 'approved' | 'rejected') => {
+  respondToRequest: async (
+    requestId: string,
+    status: 'approved' | 'rejected',
+  ) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // First verify the request belongs to a trip owned by this user
+    const { data: request, error: requestError } = await supabase
+      .from('trip_requests')
+      .select('id, trip_id, trips!inner(user_id)')
+      .eq('id', requestId)
+      .single();
+
+    if (requestError) throw requestError;
+    if (!request) throw new Error('Request not found');
+
+    // Type assertion for the nested trip data
+    const tripData = request as unknown as { trips: { user_id: string } };
+    if (tripData.trips?.user_id !== user.id) {
+      throw new Error('You do not have permission to respond to this request');
+    }
+
     const { data, error } = await supabase
       .from('trip_requests')
       .update({ status })

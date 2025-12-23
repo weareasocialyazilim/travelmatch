@@ -1,6 +1,6 @@
 /**
  * User Service
- * User profile, follow/unfollow, preferences, and account operations
+ * User profile, preferences, and account operations
  */
 
 import { supabase } from '../config/supabase';
@@ -10,14 +10,8 @@ import { encryptionService } from './encryptionService';
 import { usersService as dbUsersService } from './supabaseDbService';
 import type { Database } from '../types/database.types';
 import { uploadFile } from './supabaseStorageService';
-import {
-  NotificationPreferencesSchema,
-  PrivacySettingsSchema,
-  UpdateUserProfileSchema,
-} from '../schemas/user.schema';
 import { isNotNull } from '../types/guards';
 import type {
-  FollowRow,
   UserRow,
   UpdateProfilePayload,
   NotificationPreferences,
@@ -48,8 +42,6 @@ export interface UserProfile {
   rating: number;
   reviewCount: number;
   momentCount: number;
-  followerCount: number;
-  followingCount: number;
   giftsSent: number;
   giftsReceived: number;
 
@@ -63,8 +55,6 @@ export interface UserProfile {
   website?: string;
 
   // Relationship with current user
-  isFollowing?: boolean;
-  isFollowedBy?: boolean;
   isBlocked?: boolean;
   publicKey?: string;
 }
@@ -78,7 +68,7 @@ export interface UserPreferences {
   // Privacy
   showLocation: boolean;
   showLastActive: boolean;
-  allowMessages: 'everyone' | 'followers' | 'none';
+  allowMessages: 'everyone' | 'none';
 
   // Display
   language: string;
@@ -106,14 +96,45 @@ export interface UpdateProfileData {
   website?: string;
 }
 
-export interface FollowUser {
-  id: string;
-  name: string;
-  username: string;
-  avatar: string;
-  isVerified: boolean;
-  isFollowing: boolean;
-  isFollowedBy: boolean;
+// GDPR Export Data Types
+export interface UserDataExport {
+  exportDate: string;
+  userId: string;
+  profile: {
+    email: string;
+    name: string;
+    username: string;
+    bio?: string;
+    location?: Record<string, string>;
+    languages: string[];
+    interests: string[];
+    created_at: string;
+  };
+  moments: Array<{
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    created_at: string;
+  }>;
+  transactions: Array<{
+    id: string;
+    amount: number;
+    currency: string;
+    type: string;
+    created_at: string;
+  }>;
+  messages: Array<{
+    id: string;
+    content: string;
+    created_at: string;
+  }>;
+  metadata: {
+    profileCount: number;
+    momentsCount: number;
+    transactionsCount: number;
+    messagesCount: number;
+  };
 }
 
 // Lightweight DB user shape used for mapping - includes snake_case fields returned from PostgREST
@@ -180,13 +201,12 @@ export const userService = {
     if (!user) throw new Error('Not authenticated');
 
     // SECURITY: Only select public profile fields - never expose sensitive data like balance, kyc_status
+    // Note: Using only columns that exist in the database schema
     const { data: profile, error } = await supabase
       .from('users')
       .select(
         `
         id,
-        username,
-        name,
         full_name,
         email,
         avatar_url,
@@ -195,13 +215,8 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
         languages,
         interests,
-        instagram,
-        twitter,
-        website,
-        public_key,
         notification_preferences,
         created_at,
         updated_at
@@ -223,13 +238,12 @@ export const userService = {
    */
   getUserById: async (userId: string): Promise<{ user: UserProfile }> => {
     // SECURITY: Only select public profile fields
+    // Note: Using only columns that exist in the database schema
     const { data: profile, error } = await supabase
       .from('users')
       .select(
         `
         id,
-        username,
-        name,
         full_name,
         avatar_url,
         bio,
@@ -237,12 +251,9 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
         languages,
         interests,
-        instagram,
-        twitter,
-        website
+        created_at
       `,
       )
       .eq('id', userId)
@@ -257,19 +268,21 @@ export const userService = {
   },
 
   /**
-   * Get user profile by username
+   * Get user profile by email (username not available in schema)
+   * @deprecated Use getUserById instead
    */
   getUserByUsername: async (
     username: string,
   ): Promise<{ user: UserProfile }> => {
+    // Note: username column doesn't exist in users table
+    // This function attempts to find by email instead
     // SECURITY: Only select public profile fields
     const { data: profile, error } = await supabase
       .from('users')
       .select(
         `
         id,
-        username,
-        name,
+        email,
         full_name,
         avatar_url,
         bio,
@@ -277,19 +290,16 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
+        created_at,
         languages,
-        interests,
-        instagram,
-        twitter,
-        website
+        interests
       `,
       )
-      .eq('username', username)
+      .eq('email', username)
       .single();
 
     if (error) {
-      logger.error(`Error fetching user by username ${username}:`, error);
+      logger.error(`Error fetching user by email ${username}:`, error);
       throw error;
     }
 
@@ -297,17 +307,19 @@ export const userService = {
   },
 
   /**
-   * Check if username is available
+   * Check if email is available (username column doesn't exist)
+   * @deprecated Use email-based check instead
    */
   checkUsernameAvailability: async (username: string): Promise<boolean> => {
+    // Note: username column doesn't exist, checking email instead
     const { data, error } = await supabase
       .from('users')
       .select('id')
-      .eq('username', username)
+      .eq('email', username)
       .maybeSingle();
 
     if (error) {
-      logger.error(`Error checking username availability:`, error);
+      logger.error(`Error checking email availability:`, error);
       return false;
     }
 
@@ -323,7 +335,12 @@ export const userService = {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    if (!user) {
+      logger.error('updateProfile: Not authenticated - no user');
+      throw new Error('Not authenticated');
+    }
+
+    logger.info('updateProfile: Updating user', user.id, 'with data:', data);
 
     const { data: profile, error } = await supabase
       .from('users')
@@ -333,10 +350,16 @@ export const userService = {
       .single();
 
     if (error) {
-      logger.error('Error updating profile:', error);
+      logger.error('updateProfile: Error updating profile:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
       throw error;
     }
 
+    logger.info('updateProfile: Success, updated profile:', profile?.id);
     return { user: profile as unknown as UserProfile };
   },
 
@@ -354,7 +377,7 @@ export const userService = {
     if (!url) throw new Error('Upload failed');
 
     // Update user profile
-    const updatePayload: UpdateProfilePayload = { avatar: url };
+    const updatePayload: UpdateProfilePayload = { avatar_url: url };
     await userService.updateProfile(updatePayload);
 
     return { avatarUrl: url };
@@ -386,130 +409,8 @@ export const userService = {
    */
   deleteAvatar: async (): Promise<{ success: boolean }> => {
     // Just set avatar to default or null
-    const updatePayload: UpdateProfilePayload = { avatar: '' };
+    const updatePayload: UpdateProfilePayload = { avatar_url: '' };
     await userService.updateProfile(updatePayload);
-    return { success: true };
-  },
-
-  // --- Follow/Unfollow ---
-
-  /**
-   * Follow a user
-   */
-  followUser: async (userId: string): Promise<{ success: boolean }> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
-
-    const { error } = await dbUsersService.follow(user.id, userId);
-    if (error) throw error;
-    return { success: true };
-  },
-
-  /**
-   * Unfollow a user
-   */
-  unfollowUser: async (userId: string): Promise<{ success: boolean }> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
-
-    const { error } = await dbUsersService.unfollow(user.id, userId);
-    if (error) throw error;
-    return { success: true };
-  },
-
-  /**
-   * Get followers list
-   */
-  getFollowers: async (
-    userId: string,
-    params?: { page?: number; pageSize?: number },
-  ): Promise<{ followers: FollowUser[]; total: number }> => {
-    const {
-      data: { user: currentUser },
-    } = await supabase.auth.getUser();
-
-    // Get followers from DB
-    const { data, count, error } = await dbUsersService.getFollowers(userId);
-
-    if (error) throw error;
-
-    // NOTE: Follow system not implemented - platform does not have social follow features
-    // Returning empty relationships for backward compatibility
-    const myFollowingIds: Set<string> = new Set();
-    const myFollowerIds: Set<string> = new Set();
-
-    const allFollowers = ((data as unknown as UserRow[]) || []).map((follower) => ({
-      id: follower.id,
-      name: follower.full_name || follower.name || 'Unknown',
-      username: follower.email ? follower.email.split('@')[0] : '',
-      avatar: follower.avatar_url || follower.avatar || '',
-      isVerified: follower.verified || false,
-      isFollowing: myFollowingIds.has(follower.id),
-      isFollowedBy: myFollowerIds.has(follower.id),
-    }));
-
-    // Manual pagination since db service returns all
-    const start = (params?.page || 0) * (params?.pageSize || 10);
-    const end = start + (params?.pageSize || 10);
-    const paginatedFollowers = allFollowers.slice(start, end);
-
-    return { followers: paginatedFollowers, total: count || 0 };
-  },
-
-  /**
-   * Get following list
-   */
-  getFollowing: async (
-    userId: string,
-    params?: { page?: number; pageSize?: number },
-  ): Promise<{ following: FollowUser[]; total: number }> => {
-    const {
-      data: { user: currentUser },
-    } = await supabase.auth.getUser();
-
-    const { data, count, error } = await dbUsersService.getFollowing(userId);
-
-    if (error) throw error;
-
-    // NOTE: Follow system not implemented - platform does not have social follow features
-    // Returning empty relationships for backward compatibility
-    const myFollowingIds: Set<string> = new Set();
-    const myFollowerIds: Set<string> = new Set();
-
-    const allFollowing = ((data as unknown as UserRow[]) || []).map((followingUser) => ({
-      id: followingUser.id,
-      name: followingUser.full_name || followingUser.name || 'Unknown',
-      username: followingUser.email ? followingUser.email.split('@')[0] : '',
-      avatar: followingUser.avatar_url || followingUser.avatar || '',
-      isVerified: followingUser.verified || false,
-      isFollowing: myFollowingIds.has(followingUser.id),
-      isFollowedBy: myFollowerIds.has(followingUser.id),
-    }));
-
-    // Manual pagination
-    const start = (params?.page || 0) * (params?.pageSize || 10);
-    const end = start + (params?.pageSize || 10);
-    const paginatedFollowing = allFollowing.slice(start, end);
-
-    return { following: paginatedFollowing, total: count || 0 };
-  },
-
-  /**
-   * Remove a follower
-   */
-  removeFollower: async (userId: string): Promise<{ success: boolean }> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
-
-    const { error } = await dbUsersService.unfollow(userId, user.id);
-
-    if (error) throw error;
     return { success: true };
   },
 
@@ -729,7 +630,10 @@ export const userService = {
    * Export user data (GDPR Article 20 - Right to Data Portability)
    * Calls Supabase Edge Function to generate comprehensive data export
    */
-  exportData: async (): Promise<{ data: any; error: Error | null }> => {
+  exportData: async (): Promise<{
+    data: UserDataExport | null;
+    error: Error | null;
+  }> => {
     try {
       const {
         data: { session },
@@ -791,7 +695,7 @@ export const userService = {
         id: u.id || '',
         email: u.email || '',
         name: u.full_name || u.name || 'Unknown',
-        username: u.email ? u.email.split('@')[0] : '',
+        username: u.email?.split('@')[0] ?? '',
         avatar: u.avatar_url || u.avatar || '',
         languages: Array.isArray(u.languages) ? u.languages : [],
         interests: Array.isArray(u.interests) ? u.interests : [],
@@ -840,7 +744,7 @@ export const userService = {
         id: u.id || '',
         email: u.email || '',
         name: u.full_name || u.name || 'Unknown',
-        username: u.email ? u.email.split('@')[0] : '',
+        username: u.email?.split('@')[0] ?? '',
         avatar: u.avatar_url || u.avatar || '',
         languages: Array.isArray(u.languages) ? u.languages : [],
         interests: Array.isArray(u.interests) ? u.interests : [],

@@ -2,18 +2,23 @@
 export * from './supabase';
 
 // Authentication
-export * from './auth';
+export {
+  getAdminSession,
+  createAuditLog,
+  hasPermission as hasSessionPermission,
+} from './auth';
+export type { AdminSession } from './auth';
 
 // Audit logging
 export * from './audit';
 
 // Permissions
-export * from './permissions';
+export { hasPermission, PERMISSIONS } from './permissions';
 
-// Utilities
-export * from './utils';
+// Utilities - only cn function, avoid duplicates
+export { cn } from './utils';
 
-// Formatters
+// Formatters - all formatters from here
 export * from './formatters';
 
 // Validators

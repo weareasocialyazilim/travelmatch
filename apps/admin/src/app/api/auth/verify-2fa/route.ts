@@ -11,25 +11,33 @@ const ALGORITHM = 'aes-256-gcm';
 function getEncryptionConfig() {
   const key = process.env.TOTP_ENCRYPTION_KEY;
   const salt = process.env.TOTP_ENCRYPTION_SALT;
-  
+
   if (!key || key.length < 32) {
-    throw new Error('TOTP_ENCRYPTION_KEY must be set and at least 32 characters');
+    throw new Error(
+      'TOTP_ENCRYPTION_KEY must be set and at least 32 characters',
+    );
   }
-  
+
   if (!salt || salt.length < 16) {
-    throw new Error('TOTP_ENCRYPTION_SALT must be set and at least 16 characters');
+    throw new Error(
+      'TOTP_ENCRYPTION_SALT must be set and at least 16 characters',
+    );
   }
-  
+
   return { key, salt };
 }
 
 function decrypt(encryptedData: string): string {
   try {
     const { key, salt } = getEncryptionConfig();
-    const [ivHex, authTagHex, encryptedHex] = encryptedData.split(':');
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const encrypted = Buffer.from(encryptedHex, 'hex');
+    const parts = encryptedData.split(':');
+    if (parts.length !== 3) {
+      throw new Error('Invalid encrypted data format');
+    }
+    const [ivHex, authTagHex, encryptedHex] = parts;
+    const iv = Buffer.from(ivHex!, 'hex');
+    const authTag = Buffer.from(authTagHex!, 'hex');
+    const encrypted = Buffer.from(encryptedHex!, 'hex');
 
     const derivedKey = crypto.scryptSync(key, salt, 32);
     const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
@@ -51,7 +59,7 @@ export async function POST(request: NextRequest) {
     if (!userId || !code) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı ID ve kod gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -59,7 +67,7 @@ export async function POST(request: NextRequest) {
     if (!/^\d{6}$/.test(code)) {
       return NextResponse.json(
         { success: false, error: 'Geçersiz kod formatı' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -77,7 +85,7 @@ export async function POST(request: NextRequest) {
     if (userError || !adminUserData) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -87,7 +95,7 @@ export async function POST(request: NextRequest) {
     if (!adminUser.totp_enabled || !adminUser.totp_secret) {
       return NextResponse.json(
         { success: false, error: '2FA aktif değil' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -109,11 +117,13 @@ export async function POST(request: NextRequest) {
       console.error('TOTP decryption error:', decryptError);
       return NextResponse.json(
         { success: false, error: 'Doğrulama işlemi başarısız' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
+    const clientIp =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
     if (!isValid) {
@@ -128,7 +138,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         { success: false, error: 'Geçersiz doğrulama kodu' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -156,7 +166,10 @@ export async function POST(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from('admin_sessions').insert({
       admin_id: userId,
-      session_token: crypto.createHash('sha256').update(sessionToken).digest('hex'),
+      session_token: crypto
+        .createHash('sha256')
+        .update(sessionToken)
+        .digest('hex'),
       ip_address: clientIp,
       user_agent: userAgent,
       expires_at: expiresAt.toISOString(),
@@ -177,7 +190,7 @@ export async function POST(request: NextRequest) {
     console.error('2FA verification error:', error);
     return NextResponse.json(
       { success: false, error: 'Doğrulama işlemi başarısız' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

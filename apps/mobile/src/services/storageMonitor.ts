@@ -1,11 +1,11 @@
 /**
  * Storage Monitor Service
- * 
+ *
  * Monitors device storage capacity and warns about low storage conditions.
  * Helps prevent upload failures and app crashes due to insufficient storage.
  */
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -51,10 +51,10 @@ class StorageMonitorService {
       if (initial === null) {
         throw new Error('Init failed');
       }
-      
+
       // Setup periodic checks
       this.startMonitoring();
-      
+
       logger.info('StorageMonitor', 'Initialized');
     } catch (error) {
       logger.error('StorageMonitor', 'Failed to initialize', error);
@@ -94,12 +94,12 @@ class StorageMonitorService {
     try {
       const diskInfo = await FileSystem.getFreeDiskStorageAsync();
       const totalInfo = await FileSystem.getTotalDiskCapacityAsync();
-      
+
       const freeSpace = diskInfo;
       const totalSpace = totalInfo;
       const usedSpace = totalSpace - freeSpace;
       const freePercentage = (freeSpace / totalSpace) * 100;
-      
+
       // Determine storage level
       let level: StorageLevel;
       if (freeSpace <= CRITICAL_STORAGE_THRESHOLD) {
@@ -109,13 +109,15 @@ class StorageMonitorService {
       } else {
         level = StorageLevel.NORMAL;
       }
-      
+
       // Estimate uploads remaining (assuming 5MB average per upload)
-      const estimatedUploadsRemaining = Math.floor(freeSpace / (5 * 1024 * 1024));
-      
+      const estimatedUploadsRemaining = Math.floor(
+        freeSpace / (5 * 1024 * 1024),
+      );
+
       // Can upload if not critical
       const canUpload = level !== StorageLevel.CRITICAL;
-      
+
       return {
         totalSpace,
         freeSpace,
@@ -137,15 +139,19 @@ class StorageMonitorService {
   async checkStorage(): Promise<StorageInfo | null> {
     try {
       const storageInfo = await this.getStorageInfo();
-      
+
       if (!storageInfo) {
-        logger.error('StorageMonitor', 'Storage check failed', new Error('Failed to get storage info'));
+        logger.error(
+          'StorageMonitor',
+          'Storage check failed',
+          new Error('Failed to get storage info'),
+        );
         return null;
       }
-      
+
       // Log storage info
       await AsyncStorage.setItem(LAST_STORAGE_CHECK_KEY, Date.now().toString());
-      
+
       // Log based on level
       if (storageInfo.level === StorageLevel.CRITICAL) {
         logger.error('StorageMonitor', 'CRITICAL: Storage critically low', {
@@ -165,7 +171,7 @@ class StorageMonitorService {
           freePercentage: storageInfo.freePercentage.toFixed(1),
         });
       }
-      
+
       return storageInfo;
     } catch (error) {
       logger.error('StorageMonitor', 'Storage check failed', error);
@@ -176,10 +182,12 @@ class StorageMonitorService {
   /**
    * Check if upload is allowed based on storage
    */
-  async canUpload(fileSize: number): Promise<{ allowed: boolean; reason?: string }> {
+  async canUpload(
+    fileSize: number,
+  ): Promise<{ allowed: boolean; reason?: string }> {
     try {
       const storageInfo = await this.getStorageInfo();
-      
+
       if (!storageInfo) {
         // If we can't check, allow but log warning
         logger.warn('StorageMonitor', 'Cannot verify storage, allowing upload');
@@ -206,13 +214,15 @@ class StorageMonitorService {
           freeSpace: this.formatBytes(storageInfo.freeSpace),
           required: this.formatBytes(requiredSpace),
         });
-        
+
         return {
           allowed: false,
-          reason: `Insufficient storage. Need ${this.formatBytes(requiredSpace)}, have ${this.formatBytes(storageInfo.freeSpace)}`,
+          reason: `Insufficient storage. Need ${this.formatBytes(
+            requiredSpace,
+          )}, have ${this.formatBytes(storageInfo.freeSpace)}`,
         };
       }
-      
+
       // Warn if low but allow
       if (storageInfo.level !== StorageLevel.NORMAL) {
         logger.warn('StorageMonitor', 'Upload allowed but storage is low', {
@@ -220,10 +230,14 @@ class StorageMonitorService {
           freeSpace: this.formatBytes(storageInfo.freeSpace),
         });
       }
-      
+
       return { allowed: true };
     } catch (error) {
-      logger.error('StorageMonitor', 'Failed to check upload permission', error);
+      logger.error(
+        'StorageMonitor',
+        'Failed to check upload permission',
+        error,
+      );
       return { allowed: true }; // Allow on error, but logged
     }
   }
@@ -234,23 +248,23 @@ class StorageMonitorService {
   async shouldWarnUser(): Promise<boolean> {
     try {
       const storageInfo = await this.getStorageInfo();
-      
+
       if (!storageInfo || storageInfo.level === StorageLevel.NORMAL) {
         return false;
       }
-      
+
       // Check cooldown
       const now = Date.now();
       if (now - this.lastWarningTime < this.WARNING_COOLDOWN) {
         return false; // Already warned recently
       }
-      
+
       // Check if already shown this session
       const shown = await AsyncStorage.getItem(STORAGE_WARNING_SHOWN_KEY);
       if (shown === 'true') {
         return false;
       }
-      
+
       return true;
     } catch (error) {
       logger.error('StorageMonitor', 'Failed to check warning status', error);
@@ -286,11 +300,11 @@ class StorageMonitorService {
    */
   formatBytes(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     // If MB value is large (>=1000 MB), prefer displaying in GB rounded
     if (i === 2 && bytes / Math.pow(k, i) >= 1000) {
       return Math.round(bytes / Math.pow(k, 3)) + ' GB';
@@ -305,11 +319,11 @@ class StorageMonitorService {
   async getStorageStats(): Promise<string> {
     try {
       const info = await this.getStorageInfo();
-      
+
       if (!info) {
         return 'Failed to get storage stats';
       }
-      
+
       return `
 Storage Status:
 - Total: ${this.formatBytes(info.totalSpace)}
@@ -319,7 +333,7 @@ Storage Status:
 - Can Upload: ${info.canUpload ? 'Yes' : 'No'}
 - Est. Uploads: ~${info.estimatedUploadsRemaining} files
       `.trim();
-    } catch (error) {
+    } catch {
       return 'Failed to get storage stats';
     }
   }

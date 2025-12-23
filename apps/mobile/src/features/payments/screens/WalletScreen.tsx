@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
@@ -32,7 +31,6 @@ const WalletScreen = () => {
     balance,
     transactions,
     balanceLoading,
-    transactionsError: _error,
     refreshBalance,
     loadTransactions,
   } = usePayments();
@@ -73,7 +71,7 @@ const WalletScreen = () => {
       await refreshBalance();
       await loadTransactions();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   };
@@ -190,113 +188,109 @@ const WalletScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      {/* Main FlashList - avoids VirtualizedList nesting warning */}
+      <FlashList
+        data={filteredTransactions}
+        renderItem={renderTransactionItem}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
         }
-      >
-        {/* Balance Card */}
-        <View style={styles.balanceCard}>
-          <View style={styles.balanceInfo}>
-            <Text style={styles.balanceLabel}>Available Balance</Text>
-            <Text style={styles.balanceAmount}>
-              ${(balance?.available || 1250).toFixed(2)}
-            </Text>
-            <Text style={styles.escrowText}>
-              ${(balance?.pending || 300).toFixed(2)} in Escrow (waiting for
-              proof)
-            </Text>
-          </View>
-          <View style={styles.balanceActions}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={handleWithdraw}
-            >
-              <Text style={styles.primaryButtonText}>Withdraw</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleViewDetails}
-            >
-              <Text style={styles.secondaryButtonText}>View Details</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        ListHeaderComponent={
+          <>
+            {/* Balance Card */}
+            <View style={styles.balanceCard}>
+              <View style={styles.balanceInfo}>
+                <Text style={styles.balanceLabel}>Available Balance</Text>
+                <Text style={styles.balanceAmount}>
+                  ${(balance?.available ?? 0).toFixed(2)}
+                </Text>
+                {(balance?.pending ?? 0) > 0 && (
+                  <Text style={styles.escrowText}>
+                    ${(balance?.pending ?? 0).toFixed(2)} in Escrow (waiting for
+                    proof)
+                  </Text>
+                )}
+              </View>
+              <View style={styles.balanceActions}>
+                <TouchableOpacity
+                  style={styles.primaryButton}
+                  onPress={handleWithdraw}
+                >
+                  <Text style={styles.primaryButtonText}>Withdraw</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.secondaryButton}
+                  onPress={handleViewDetails}
+                >
+                  <Text style={styles.secondaryButtonText}>View Details</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
-        {/* Segmented Filter */}
-        <View style={styles.filterContainer}>
-          <View style={styles.segmentedControl}>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedFilter === 'all' && styles.filterButtonActive,
-              ]}
-              onPress={() => setSelectedFilter('all')}
-            >
-              <Text
-                style={[
-                  styles.filterButtonText,
-                  selectedFilter === 'all' && styles.filterButtonTextActive,
-                ]}
-              >
-                All
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedFilter === 'incoming' && styles.filterButtonActive,
-              ]}
-              onPress={() => setSelectedFilter('incoming')}
-            >
-              <Text
-                style={[
-                  styles.filterButtonText,
-                  selectedFilter === 'incoming' &&
-                    styles.filterButtonTextActive,
-                ]}
-              >
-                Incoming
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedFilter === 'outgoing' && styles.filterButtonActive,
-              ]}
-              onPress={() => setSelectedFilter('outgoing')}
-            >
-              <Text
-                style={[
-                  styles.filterButtonText,
-                  selectedFilter === 'outgoing' &&
-                    styles.filterButtonTextActive,
-                ]}
-              >
-                Outgoing
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            {/* Segmented Filter */}
+            <View style={styles.filterContainer}>
+              <View style={styles.segmentedControl}>
+                <TouchableOpacity
+                  style={[
+                    styles.filterButton,
+                    selectedFilter === 'all' && styles.filterButtonActive,
+                  ]}
+                  onPress={() => setSelectedFilter('all')}
+                >
+                  <Text
+                    style={[
+                      styles.filterButtonText,
+                      selectedFilter === 'all' && styles.filterButtonTextActive,
+                    ]}
+                  >
+                    All
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterButton,
+                    selectedFilter === 'incoming' && styles.filterButtonActive,
+                  ]}
+                  onPress={() => setSelectedFilter('incoming')}
+                >
+                  <Text
+                    style={[
+                      styles.filterButtonText,
+                      selectedFilter === 'incoming' &&
+                        styles.filterButtonTextActive,
+                    ]}
+                  >
+                    Incoming
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterButton,
+                    selectedFilter === 'outgoing' && styles.filterButtonActive,
+                  ]}
+                  onPress={() => setSelectedFilter('outgoing')}
+                >
+                  <Text
+                    style={[
+                      styles.filterButtonText,
+                      selectedFilter === 'outgoing' &&
+                        styles.filterButtonTextActive,
+                    ]}
+                  >
+                    Outgoing
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
-        {/* Section Header */}
-        <Text style={styles.sectionTitle}>Transactions</Text>
-
-        {/* Transaction List */}
-        <View style={{ minHeight: 300 }}>
-          <FlashList
-            data={filteredTransactions}
-            renderItem={renderTransactionItem}
-            ListEmptyComponent={renderEmptyState}
-            scrollEnabled={false}
-          />
-        </View>
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
+            {/* Section Header */}
+            <Text style={styles.sectionTitle}>Transactions</Text>
+          </>
+        }
+        ListEmptyComponent={renderEmptyState}
+        ListFooterComponent={<View style={styles.bottomSpacer} />}
+        contentContainerStyle={styles.listContent}
+      />
 
       {/* Bottom Navigation */}
       <BottomNav activeTab="Profile" />
@@ -329,10 +323,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
+  listContent: {
     paddingBottom: 16,
   },
   balanceCard: {

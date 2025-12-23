@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LayoutAnimation, Platform, UIManager, Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { logger } from '@/utils/logger';
 import { useRequests as useRequestsAPI } from '@/hooks/useRequests';
 import { useNotifications as useNotificationsAPI } from '@/hooks/useNotifications';
@@ -11,8 +13,8 @@ import type {
   NotificationItem,
   TabType,
 } from '../types/requests.types';
+import type { RootStackParamList } from '@/navigation/AppNavigator';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
 
 // Enable LayoutAnimation for Android
 if (
@@ -27,7 +29,8 @@ const STORAGE_KEYS = {
 };
 
 export const useRequestsScreen = (initialTab: TabType = 'pending') => {
-  const { showToast } = useToast();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const { showToast: _showToast } = useToast();
   const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
   const [hiddenRequestIds, setHiddenRequestIds] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -133,7 +136,7 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
     }
   };
 
-  const saveHiddenIds = async (ids: string[]) => {
+  const _saveHiddenIds = async (ids: string[]) => {
     try {
       await AsyncStorage.setItem(
         STORAGE_KEYS.HIDDEN_REQUESTS,
@@ -212,7 +215,8 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
 
   const handleUploadProof = (item: RequestItem) => {
     logger.info('Upload proof for:', item.id);
-    // TODO: Navigate to proof upload screen
+    // Navigate to ProofFlow screen for proof upload
+    navigation.navigate('ProofFlow');
   };
 
   const handleRefresh = async () => {

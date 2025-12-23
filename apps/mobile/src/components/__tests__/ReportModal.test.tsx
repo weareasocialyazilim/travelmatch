@@ -51,7 +51,7 @@ describe('ReportModal', () => {
 
     it('should not render when visible is false', () => {
       const { UNSAFE_getByType } = render(
-        <ReportModal {...defaultProps} visible={false} />
+        <ReportModal {...defaultProps} visible={false} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.visible).toBe(false);
@@ -64,21 +64,21 @@ describe('ReportModal', () => {
 
     it('should render the correct title for moment target type', () => {
       const { getByText } = render(
-        <ReportModal {...defaultProps} targetType="moment" />
+        <ReportModal {...defaultProps} targetType="moment" />,
       );
       expect(getByText('Report Moment')).toBeTruthy();
     });
 
     it('should render the correct title for message target type', () => {
       const { getByText } = render(
-        <ReportModal {...defaultProps} targetType="message" />
+        <ReportModal {...defaultProps} targetType="message" />,
       );
       expect(getByText('Report Message')).toBeTruthy();
     });
 
     it('should render the correct title for review target type', () => {
       const { getByText } = render(
-        <ReportModal {...defaultProps} targetType="review" />
+        <ReportModal {...defaultProps} targetType="review" />,
       );
       expect(getByText('Report Review')).toBeTruthy();
     });
@@ -106,17 +106,15 @@ describe('ReportModal', () => {
       const { getByText } = render(<ReportModal {...defaultProps} />);
       expect(
         getByText(
-          'Your report is confidential. We review all reports and take appropriate action.'
-        )
+          'Your report is confidential. We review all reports and take appropriate action.',
+        ),
       ).toBeTruthy();
     });
 
     it('should render close button in header', () => {
-      const { UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
-      );
+      const { UNSAFE_getAllByType } = render(<ReportModal {...defaultProps} />);
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       expect(touchables.length).toBeGreaterThan(0);
     });
@@ -131,9 +129,7 @@ describe('ReportModal', () => {
     });
 
     it('should allow typing in additional details', () => {
-      const { UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
-      );
+      const { UNSAFE_getAllByType } = render(<ReportModal {...defaultProps} />);
       const input = UNSAFE_getAllByType(require('react-native').TextInput)[0];
       fireEvent.changeText(input, 'This user is sending spam messages');
       // Check that value was updated
@@ -141,7 +137,7 @@ describe('ReportModal', () => {
 
     it('should show character count for description', () => {
       const { UNSAFE_getAllByType, getByText } = render(
-        <ReportModal {...defaultProps} />
+        <ReportModal {...defaultProps} />,
       );
       const input = UNSAFE_getAllByType(require('react-native').TextInput)[0];
       fireEvent.changeText(input, 'Test message');
@@ -149,11 +145,9 @@ describe('ReportModal', () => {
     });
 
     it('should call onClose when close button is pressed', () => {
-      const { UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
-      );
+      const { UNSAFE_getAllByType } = render(<ReportModal {...defaultProps} />);
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       // First touchable is the close button
       fireEvent.press(touchables[0]);
@@ -170,18 +164,18 @@ describe('ReportModal', () => {
       fireEvent.press(getByText('Submit Report'));
 
       await waitFor(() => {
-          expect(moderationService.createReport).toHaveBeenCalledWith({
-            targetType: 'user',
-            targetId: 'user-123',
-            reason: 'spam',
-            description: undefined,
-          });
+        expect(moderationService.createReport).toHaveBeenCalledWith({
+          targetType: 'user',
+          targetId: 'user-123',
+          reason: 'spam',
+          description: undefined,
+        });
       });
     });
 
     it('should include description in submission if provided', async () => {
       const { getByText, UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
+        <ReportModal {...defaultProps} />,
       );
 
       // Select reason and add description
@@ -193,12 +187,12 @@ describe('ReportModal', () => {
       fireEvent.press(getByText('Submit Report'));
 
       await waitFor(() => {
-          expect(moderationService.createReport).toHaveBeenCalledWith({
-            targetType: 'user',
-            targetId: 'user-123',
-            reason: 'scam_fraud',
-            description: 'Trying to scam users',
-          });
+        expect(moderationService.createReport).toHaveBeenCalledWith({
+          targetType: 'user',
+          targetId: 'user-123',
+          reason: 'scam_fraud',
+          description: 'Trying to scam users',
+        });
       });
     });
 
@@ -239,7 +233,7 @@ describe('ReportModal', () => {
     it('should have disabled submit button when no reason is selected', () => {
       const { UNSAFE_getAllByType } = render(<ReportModal {...defaultProps} />);
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       const submitButton = touchables[touchables.length - 1];
       expect(submitButton.props.disabled).toBe(true);
@@ -247,20 +241,18 @@ describe('ReportModal', () => {
 
     it('should enable submit button when reason is selected', () => {
       const { getByText, UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
+        <ReportModal {...defaultProps} />,
       );
       fireEvent.press(getByText('Spam'));
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       const submitButton = touchables[touchables.length - 1];
       expect(submitButton.props.disabled).toBe(false);
     });
 
     it('should limit description to 500 characters', () => {
-      const { UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
-      );
+      const { UNSAFE_getAllByType } = render(<ReportModal {...defaultProps} />);
       const input = UNSAFE_getAllByType(require('react-native').TextInput)[0];
       expect(input.props.maxLength).toBe(500);
     });
@@ -268,12 +260,12 @@ describe('ReportModal', () => {
 
   describe('Loading State', () => {
     it('should show loading indicator while submitting', async () => {
-      (moderationService.createReport ).mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 100))
+      moderationService.createReport.mockImplementation(
+        () => new Promise((resolve) => setTimeout(resolve, 100)),
       );
 
       const { getByText, UNSAFE_getByType } = render(
-        <ReportModal {...defaultProps} />
+        <ReportModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Spam'));
@@ -281,25 +273,25 @@ describe('ReportModal', () => {
 
       await waitFor(() => {
         expect(
-          UNSAFE_getByType(require('react-native').ActivityIndicator)
+          UNSAFE_getByType(require('react-native').ActivityIndicator),
         ).toBeTruthy();
       });
     });
 
     it('should disable submit button while loading', async () => {
-      (moderationService.createReport ).mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 100))
+      moderationService.createReport.mockImplementation(
+        () => new Promise((resolve) => setTimeout(resolve, 100)),
       );
 
       const { getByText, UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
+        <ReportModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Spam'));
       fireEvent.press(getByText('Submit Report'));
 
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       const submitButton = touchables[touchables.length - 1];
       expect(submitButton.props.disabled).toBe(true);
@@ -309,7 +301,7 @@ describe('ReportModal', () => {
   describe('Error Handling', () => {
     it('should show error toast when submission fails', async () => {
       (moderationService.createReport as jest.Mock).mockRejectedValueOnce(
-        new Error('Network error')
+        new Error('Network error'),
       );
 
       const { getByText } = render(<ReportModal {...defaultProps} />);
@@ -319,27 +311,34 @@ describe('ReportModal', () => {
 
       await waitFor(() => {
         expect(mockShowToast).toHaveBeenCalledWith(
-          expect.stringContaining(''),  // Accept any string (Turkish or English)
-          'error'
+          expect.stringContaining(''), // Accept any string (Turkish or English)
+          'error',
         );
       });
     });
 
     it('should not close modal when submission fails', async () => {
-      (moderationService.createReport ).mockRejectedValueOnce(
-        new Error('Network error')
+      const error = new Error('Network error');
+      (moderationService.createReport as jest.Mock).mockRejectedValueOnce(
+        error,
       );
 
-      const { getByText } = render(<ReportModal {...defaultProps} />);
+      const localMockOnClose = jest.fn();
+
+      const { getByText } = render(
+        <ReportModal {...defaultProps} onClose={localMockOnClose} />,
+      );
 
       fireEvent.press(getByText('Spam'));
       fireEvent.press(getByText('Submit Report'));
 
+      // Wait for the error to be handled
       await waitFor(() => {
-          expect(moderationService.createReport).toHaveBeenCalled();
+        expect(mockShowToast).toHaveBeenCalledWith(expect.any(String), 'error');
       });
 
-      expect(mockOnClose).not.toHaveBeenCalled();
+      // Modal should not close on error
+      expect(localMockOnClose).not.toHaveBeenCalled();
     });
   });
 
@@ -350,14 +349,14 @@ describe('ReportModal', () => {
           {...defaultProps}
           targetName={undefined}
           targetType="user"
-        />
+        />,
       );
       expect(getByText('Report User')).toBeTruthy();
     });
 
     it('should trim whitespace from description before submission', async () => {
       const { getByText, UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
+        <ReportModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Spam'));
@@ -378,7 +377,7 @@ describe('ReportModal', () => {
 
     it('should handle empty description by not including it', async () => {
       const { getByText, UNSAFE_getAllByType } = render(
-        <ReportModal {...defaultProps} />
+        <ReportModal {...defaultProps} />,
       );
 
       fireEvent.press(getByText('Spam'));
@@ -410,7 +409,7 @@ describe('ReportModal', () => {
 
     it('should render correctly for all target types', () => {
       const { rerender, getByText } = render(
-        <ReportModal {...defaultProps} targetType="moment" />
+        <ReportModal {...defaultProps} targetType="moment" />,
       );
       expect(getByText('Why are you reporting this moment?')).toBeTruthy();
 

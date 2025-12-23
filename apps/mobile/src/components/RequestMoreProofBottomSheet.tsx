@@ -33,7 +33,10 @@ export default function RequestMoreProofBottomSheet({
   const [isOther, setIsOther] = useState(false);
 
   const handleSend = () => {
-    const reason = isOther ? otherReason : PROOF_ISSUES[selectedReason];
+    const selectedIssue = PROOF_ISSUES[selectedReason];
+    const reason = isOther
+      ? otherReason
+      : (selectedIssue ?? PROOF_ISSUES[0] ?? '');
     onSend(reason, note);
     onClose();
   };
@@ -74,7 +77,7 @@ export default function RequestMoreProofBottomSheet({
             <View style={styles.optionsContainer}>
               {PROOF_ISSUES.map((issue, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={issue}
                   style={[
                     styles.radioOption,
                     selectedReason === index &&

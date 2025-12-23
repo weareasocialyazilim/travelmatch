@@ -116,7 +116,16 @@ export const OptimizedImage = memo<OptimizedImageProps>(
       setIsLoading(false);
       setHasError(true);
       onError?.(error);
-      console.error('OptimizedImage load error:', error);
+      // Only log in development, and use debug level for 404s (expected for placeholder images)
+      if (__DEV__) {
+        const errorMessage = error?.error || error?.message || 'Unknown error';
+        if (errorMessage.includes('404')) {
+          // 404 errors are common for placeholder/seed data images - no need to spam console
+          // logger.debug('OptimizedImage: Image not found (404)', imageSource);
+        } else {
+          console.warn('OptimizedImage load error:', error);
+        }
+      }
     };
 
     // Show error state

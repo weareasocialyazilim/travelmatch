@@ -1,13 +1,13 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   RefreshControl,
   StatusBar,
   ActivityIndicator,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
@@ -36,22 +36,22 @@ import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { NetworkGuard } from '../../../components/NetworkGuard';
+import { useDiscoverStore } from '@/stores/discoverStore';
 
 // Import modular components
-import type {
-  ViewMode,
-  UserStory,
-  PriceRange,
-} from '@/components/discover/types';
+import type { UserStory } from '@/components/discover/types';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { Moment } from '@/hooks/useMoments';
 import type { Moment as DomainMoment } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
 
+// PERFORMANCE: Constants outside component to prevent re-creation
+const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
+
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
-  const { props: a11y, announce } = useAccessibility();
+  const { props: a11y, announce: _announce } = useAccessibility();
 
   // Use moments hook for data fetching
   const {
@@ -64,37 +64,52 @@ const DiscoverScreen = () => {
     setFilters,
   } = useMoments();
 
-  // UI States
-  const [viewMode, setViewMode] = useState<ViewMode>('single');
-  const [refreshing, setRefreshing] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
-  const [showStoryViewer, setShowStoryViewer] = useState(false);
-  const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
-    null,
-  );
+  // Zustand Store - All UI and Filter State
+  const {
+    // UI State
+    viewMode,
+    refreshing,
+    showFilterModal,
+    showLocationModal,
+    showStoryViewer,
+    selectedStoryUser,
 
-  // Story viewer states
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [currentUserIndex, setCurrentUserIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+    // Story Viewer State
+    currentStoryIndex,
+    currentUserIndex,
+    isPaused,
 
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('nearest');
-  const [maxDistance, setMaxDistance] = useState(50);
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: 0,
-    max: 500,
-  });
+    // Filter State
+    selectedCategory,
+    sortBy,
+    maxDistance,
+    priceRange,
 
-  // Location state
-  const [selectedLocation, setSelectedLocation] = useState('San Francisco, CA');
-  const [recentLocations, setRecentLocations] = useState([
-    'New York, NY',
-    'Los Angeles, CA',
-    'Chicago, IL',
-  ]);
+    // Location State
+    selectedLocation,
+    recentLocations,
+
+    // Actions
+    setViewMode,
+    setRefreshing,
+    openFilterModal,
+    closeFilterModal,
+    openLocationModal,
+    closeLocationModal,
+    openStoryViewer,
+    closeStoryViewer,
+    setCurrentStoryIndex,
+    setCurrentUserIndex,
+    setSelectedStoryUser,
+    setIsPaused,
+    setSelectedCategory,
+    setSortBy,
+    setMaxDistance,
+    setPriceRange,
+    resetFilters,
+    addRecentLocation,
+    getActiveFilterCount,
+  } = useDiscoverStore();
 
   // Refresh handler with haptic feedback
   const onRefresh = useCallback(async () => {
@@ -103,12 +118,19 @@ const DiscoverScreen = () => {
     try {
       await refreshMoments();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setRefreshing(false);
     }
-  }, [refreshMoments]);
+  }, [refreshMoments, setRefreshing]);
+
+  // PERFORMANCE: Memoized view mode handlers
+  const handleSingleView = useCallback(
+    () => setViewMode('single'),
+    [setViewMode],
+  );
+  const handleGridView = useCallback(() => setViewMode('grid'), [setViewMode]);
 
   // Story navigation handlers
   const goToNextStory = useCallback(() => {
@@ -117,43 +139,99 @@ const DiscoverScreen = () => {
     const currentUserStories = selectedStoryUser.stories;
 
     if (currentStoryIndex < currentUserStories.length - 1) {
-      setCurrentStoryIndex((prev) => prev + 1);
+      setCurrentStoryIndex(currentStoryIndex + 1);
     } else {
       const nextUserIndex = currentUserIndex + 1;
       if (nextUserIndex < USER_STORIES.length) {
+        const nextUser = USER_STORIES[nextUserIndex];
         setCurrentUserIndex(nextUserIndex);
-        setSelectedStoryUser(USER_STORIES[nextUserIndex]);
+        setSelectedStoryUser(nextUser ?? null);
         setCurrentStoryIndex(0);
       } else {
         closeStoryViewer();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+  }, [
+    selectedStoryUser,
+    currentStoryIndex,
+    currentUserIndex,
+    setCurrentStoryIndex,
+    setCurrentUserIndex,
+    setSelectedStoryUser,
+    closeStoryViewer,
+  ]);
 
   const goToPreviousStory = useCallback(() => {
     if (!selectedStoryUser) return;
 
     if (currentStoryIndex > 0) {
-      setCurrentStoryIndex((prev) => prev - 1);
+      setCurrentStoryIndex(currentStoryIndex - 1);
     } else {
       const prevUserIndex = currentUserIndex - 1;
       if (prevUserIndex >= 0) {
         const prevUser = USER_STORIES[prevUserIndex];
-        setCurrentUserIndex(prevUserIndex);
-        setSelectedStoryUser(prevUser);
-        setCurrentStoryIndex(prevUser.stories.length - 1);
+        if (prevUser) {
+          setCurrentUserIndex(prevUserIndex);
+          setSelectedStoryUser(prevUser);
+          setCurrentStoryIndex(prevUser.stories.length - 1);
+        }
       }
     }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+  }, [
+    selectedStoryUser,
+    currentStoryIndex,
+    currentUserIndex,
+    setCurrentStoryIndex,
+    setCurrentUserIndex,
+    setSelectedStoryUser,
+  ]);
 
-  const closeStoryViewer = useCallback(() => {
-    setShowStoryViewer(false);
-    setSelectedStoryUser(null);
-    setCurrentStoryIndex(0);
-    setCurrentUserIndex(0);
-    setIsPaused(false);
-  }, []);
+  // PERFORMANCE: Memoized story view handler
+  const handleViewMoment = useCallback(
+    (story: {
+      id: string;
+      title: string;
+      imageUrl: string;
+      price: number;
+      description: string;
+      location: string;
+    }) => {
+      closeStoryViewer();
+      const domainMoment: DomainMoment = {
+        id: story.id,
+        title: story.title,
+        imageUrl: story.imageUrl,
+        image: story.imageUrl,
+        price: story.price,
+        story: story.description,
+        location: { city: story.location, country: '' },
+        category: { id: 'experience', label: 'Experience', emoji: '✨' },
+        user: selectedStoryUser
+          ? {
+              id: selectedStoryUser.id || '',
+              name: selectedStoryUser.name,
+              avatar: selectedStoryUser.avatar,
+              isVerified: false,
+              location: '',
+              type: 'traveler',
+              travelDays: 0,
+            }
+          : {
+              id: '',
+              name: 'Unknown',
+              avatar: '',
+              isVerified: false,
+              location: '',
+              type: 'traveler',
+              travelDays: 0,
+            },
+        availability: 'Available',
+        giftCount: 0,
+      };
+      navigation.navigate('MomentDetail', { moment: domainMoment });
+    },
+    [closeStoryViewer, selectedStoryUser, navigation],
+  );
 
   // Use API moments
   const baseMoments = useMemo(() => {
@@ -210,60 +288,78 @@ const DiscoverScreen = () => {
 
   // Apply filters to hook when category changes
   useEffect(() => {
-    if (selectedCategory !== 'all') {
+    if (selectedCategory === 'all') {
+      // Reset filters when category is 'all'
+      setFilters({});
+    } else {
       setFilters({ category: selectedCategory });
     }
   }, [selectedCategory, setFilters]);
 
   const handleMomentPress = useCallback(
     (moment: Moment) => {
-      // Cast to any to bridge hook Moment and domain Moment types
-      navigation.navigate('MomentDetail', {
-        moment: moment as unknown as import('@/types').Moment,
-      });
+      // Convert hook Moment type to domain Moment type with proper user object
+      const domainMoment: import('@/types').Moment = {
+        id: moment.id,
+        title: moment.title,
+        story: moment.description,
+        description: moment.description,
+        image: moment.image || moment.images?.[0],
+        imageUrl: moment.image || moment.images?.[0],
+        images: moment.images,
+        price: moment.price ?? moment.pricePerGuest,
+        pricePerGuest: moment.pricePerGuest,
+        location:
+          typeof moment.location === 'string'
+            ? { city: moment.location, country: '' }
+            : moment.location,
+        availability: Array.isArray(moment.availability)
+          ? moment.availability.join(', ')
+          : moment.availability?.[0],
+        distance: moment.distance,
+        status: moment.status,
+        category:
+          typeof moment.category === 'string'
+            ? { id: moment.category, label: moment.category, emoji: '✨' }
+            : moment.category,
+        // Properly map host info to user object
+        user: {
+          id: moment.hostId,
+          name: moment.hostName || 'Anonymous',
+          avatar: moment.hostAvatar,
+          isVerified: moment.hostRating > 4.5,
+          type: 'local',
+          travelDays: 0,
+        },
+        createdAt: moment.createdAt,
+        updatedAt: moment.updatedAt,
+      };
+      navigation.navigate('MomentDetail', { moment: domainMoment });
     },
     [navigation],
   );
 
-  const handleStoryPress = useCallback((user: UserStory) => {
-    const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
-    setCurrentUserIndex(userIndex);
-    setSelectedStoryUser(user);
-    setCurrentStoryIndex(0);
-    setShowStoryViewer(true);
-  }, []);
+  const handleStoryPress = useCallback(
+    (user: UserStory) => {
+      const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
+      openStoryViewer(user, userIndex);
+    },
+    [openStoryViewer],
+  );
 
   const handleLocationSelect = useCallback(
     (location: string) => {
-      if (
-        selectedLocation !== location &&
-        !recentLocations.includes(selectedLocation)
-      ) {
-        setRecentLocations((prev) => [selectedLocation, ...prev.slice(0, 2)]);
-      }
-      setSelectedLocation(location);
-      setShowLocationModal(false);
+      addRecentLocation(location);
+      closeLocationModal();
     },
-    [selectedLocation, recentLocations],
+    [addRecentLocation, closeLocationModal],
   );
 
-  // Active filter count
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (selectedCategory !== 'all') count++;
-    if (sortBy !== 'nearest') count++;
-    if (maxDistance !== 50) count++;
-    if (priceRange.min !== 0 || priceRange.max !== 500) count++;
-    return count;
-  }, [selectedCategory, sortBy, maxDistance, priceRange]);
-
-  // Clear all filters
-  const clearFilters = useCallback(() => {
-    setSelectedCategory('all');
-    setSortBy('nearest');
-    setMaxDistance(50);
-    setPriceRange({ min: 0, max: 500 });
-  }, []);
+  // Active filter count - computed from store (memoized)
+  const activeFilterCount = useMemo(
+    () => getActiveFilterCount(),
+    [getActiveFilterCount],
+  );
 
   // Memoized render functions
   const renderStoryItem = useCallback(
@@ -305,13 +401,9 @@ const DiscoverScreen = () => {
       {/* Header */}
       <DiscoverHeader
         location={selectedLocation}
-        viewMode={viewMode}
         activeFiltersCount={activeFilterCount}
-        onLocationPress={() => setShowLocationModal(true)}
-        onFilterPress={() => setShowFilterModal(true)}
-        onViewModeToggle={() =>
-          setViewMode(viewMode === 'single' ? 'grid' : 'single')
-        }
+        onLocationPress={openLocationModal}
+        onFilterPress={openFilterModal}
       />
 
       <NetworkGuard
@@ -322,9 +414,20 @@ const DiscoverScreen = () => {
         }
         onRetry={onRefresh}
       >
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
+        {/* Main FlashList - avoids VirtualizedList nesting warning */}
+        <FlashList
+          testID="moments-list"
+          data={filteredMoments}
+          renderItem={renderMomentCard}
+          numColumns={viewMode === 'grid' ? 2 : 1}
+          key={viewMode}
+          contentContainerStyle={
+            viewMode === 'single'
+              ? styles.singleListContainer
+              : styles.gridContainer
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl
               refreshing={refreshing || loading}
@@ -332,166 +435,144 @@ const DiscoverScreen = () => {
               tintColor={COLORS.mint}
             />
           }
-          onScroll={({ nativeEvent }) => {
-            const { layoutMeasurement, contentOffset, contentSize } =
-              nativeEvent;
-            const paddingToBottom = 50;
-            if (
-              layoutMeasurement.height + contentOffset.y >=
-              contentSize.height - paddingToBottom
-            ) {
-              handleLoadMore();
-            }
-          }}
-          scrollEventThrottle={400}
-        >
-          {/* Stories */}
-          <FlashList
-            data={USER_STORIES}
-            renderItem={renderStoryItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.storiesContainer}
-          />
-
-          {/* Results Bar */}
-          <View style={styles.resultsBar}>
-            <Text style={styles.resultsText}>
-              {loading
-                ? 'Loading...'
-                : `${filteredMoments.length} moments nearby`}
-            </Text>
-            <View style={styles.viewToggle}>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'single' && styles.viewToggleButtonActive,
-                ]}
-                onPress={() => setViewMode('single')}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                {...a11y.button(
-                  'Single column view',
-                  'Display moments in a single column',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'single' }}
-              >
-                <MaterialCommunityIcons
-                  name="square-outline"
-                  size={18}
-                  color={
-                    viewMode === 'single' ? COLORS.white : COLORS.textSecondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'grid' && styles.viewToggleButtonActive,
-                ]}
-                onPress={() => setViewMode('grid')}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                {...a11y.button(
-                  'Grid view',
-                  'Display moments in a grid layout',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'grid' }}
-              >
-                <MaterialCommunityIcons
-                  name="view-grid-outline"
-                  size={18}
-                  color={
-                    viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Error State */}
-          {error && !loading && (
-            <View style={styles.errorContainer}>
-              <MaterialCommunityIcons
-                name="alert-circle-outline"
-                size={48}
-                color={COLORS.error}
-                accessible={false}
+          ListHeaderComponent={
+            <>
+              {/* Stories - Horizontal FlatList (not FlashList to avoid nesting) */}
+              <FlatList
+                data={USER_STORIES}
+                renderItem={renderStoryItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.storiesContainer}
               />
-              <Text style={styles.errorText} {...a11y.alert(error)}>
-                {error}
-              </Text>
-              <TouchableOpacity
-                style={styles.retryButton}
-                onPress={onRefresh}
-                {...a11y.button('Try Again', 'Reload moments')}
-              >
-                <Text style={styles.retryButtonText}>Try Again</Text>
-              </TouchableOpacity>
-            </View>
-          )}
 
-          {/* Loading Skeleton */}
-          {loading && filteredMoments.length === 0 && !error && (
-            <SkeletonList
-              type="moment"
-              count={4}
-              show={loading}
-              minDisplayTime={400}
-            />
-          )}
+              {/* Results Bar */}
+              <View style={styles.resultsBar}>
+                <Text style={styles.resultsText}>
+                  {loading
+                    ? 'Loading...'
+                    : `${filteredMoments.length} moments nearby`}
+                </Text>
+                <View style={styles.viewToggle}>
+                  <TouchableOpacity
+                    style={[
+                      styles.viewToggleButton,
+                      viewMode === 'single' && styles.viewToggleButtonActive,
+                    ]}
+                    onPress={handleSingleView}
+                    hitSlop={HIT_SLOP}
+                    {...a11y.button(
+                      'Single column view',
+                      'Display moments in a single column',
+                      false,
+                    )}
+                    accessibilityState={{ selected: viewMode === 'single' }}
+                  >
+                    <MaterialCommunityIcons
+                      name="square-outline"
+                      size={18}
+                      color={
+                        viewMode === 'single'
+                          ? COLORS.white
+                          : COLORS.textSecondary
+                      }
+                      accessible={false}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.viewToggleButton,
+                      viewMode === 'grid' && styles.viewToggleButtonActive,
+                    ]}
+                    onPress={handleGridView}
+                    hitSlop={HIT_SLOP}
+                    {...a11y.button(
+                      'Grid view',
+                      'Display moments in a grid layout',
+                      false,
+                    )}
+                    accessibilityState={{ selected: viewMode === 'grid' }}
+                  >
+                    <MaterialCommunityIcons
+                      name="view-grid-outline"
+                      size={18}
+                      color={
+                        viewMode === 'grid'
+                          ? COLORS.white
+                          : COLORS.textSecondary
+                      }
+                      accessible={false}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-          {/* Moments List */}
-          {!error && filteredMoments.length > 0 && (
-            <View style={{ minHeight: 400 }}>
-              <FlashList
-                data={filteredMoments}
-                renderItem={renderMomentCard}
-                numColumns={viewMode === 'grid' ? 2 : 1}
-                key={viewMode}
-                contentContainerStyle={
-                  viewMode === 'single'
-                    ? styles.singleListContainer
-                    : styles.gridContainer
-                }
-                onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.5}
-                scrollEnabled={false}
+              {/* Error State */}
+              {error && !loading && (
+                <View style={styles.errorContainer}>
+                  <MaterialCommunityIcons
+                    name="alert-circle-outline"
+                    size={48}
+                    color={COLORS.error}
+                    accessible={false}
+                  />
+                  <Text style={styles.errorText} {...a11y.alert(error)}>
+                    {error}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.retryButton}
+                    onPress={onRefresh}
+                    {...a11y.button('Try Again', 'Reload moments')}
+                  >
+                    <Text style={styles.retryButtonText}>Try Again</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Loading Skeleton */}
+              {loading && filteredMoments.length === 0 && !error && (
+                <SkeletonList
+                  type="moment"
+                  count={4}
+                  show={loading}
+                  minDisplayTime={400}
+                  testID="loading-indicator"
+                />
+              )}
+            </>
+          }
+          ListEmptyComponent={
+            !loading && !error ? (
+              <EmptyState
+                icon="compass-off-outline"
+                title="No moments found"
+                description="Try adjusting your filters or location"
+                actionLabel="Clear Filters"
+                onAction={resetFilters}
               />
-            </View>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && filteredMoments.length === 0 && (
-            <EmptyState
-              icon="compass-off-outline"
-              title="No moments found"
-              description="Try adjusting your filters or location"
-              actionLabel="Clear Filters"
-              onAction={clearFilters}
-            />
-          )}
-
-          {/* Load More Indicator */}
-          {loading && filteredMoments.length > 0 && (
-            <View style={styles.loadMoreContainer}>
-              <ActivityIndicator size="small" color={COLORS.primary} />
-              <Text style={styles.loadMoreText}>Loading more...</Text>
-            </View>
-          )}
-
-          {/* Bottom Padding */}
-          {/* eslint-disable-next-line react-native/no-inline-styles */}
-          <View style={{ height: 100 }} />
-        </ScrollView>
+            ) : null
+          }
+          ListFooterComponent={
+            <>
+              {/* Load More Indicator */}
+              {loading && filteredMoments.length > 0 && (
+                <View style={styles.loadMoreContainer}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={styles.loadMoreText}>Loading more...</Text>
+                </View>
+              )}
+              {/* Bottom Padding */}
+              <View style={styles.bottomPadding} />
+            </>
+          }
+        />
       </NetworkGuard>
 
       {/* Modals - Using extracted components */}
       <LocationModal
         visible={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
+        onClose={closeLocationModal}
         onLocationSelect={handleLocationSelect}
         selectedLocation={selectedLocation}
         recentLocations={recentLocations}
@@ -501,7 +582,7 @@ const DiscoverScreen = () => {
 
       <FilterModal
         visible={showFilterModal}
-        onClose={() => setShowFilterModal(false)}
+        onClose={closeFilterModal}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         sortBy={sortBy}
@@ -519,47 +600,12 @@ const DiscoverScreen = () => {
         onClose={closeStoryViewer}
         onNextStory={goToNextStory}
         onPreviousStory={goToPreviousStory}
-        onViewMoment={(story) => {
-          closeStoryViewer();
-          // Convert story to moment format for navigation
-          const domainMoment: DomainMoment = {
-            id: story.id,
-            title: story.title,
-            imageUrl: story.imageUrl,
-            image: story.imageUrl,
-            price: story.price,
-            story: story.description,
-            location: { city: story.location, country: '' },
-            category: { id: 'experience', label: 'Experience', emoji: '✨' },
-            user: selectedStoryUser
-              ? {
-                  id: selectedStoryUser.id || '',
-                  name: selectedStoryUser.name,
-                  avatar: selectedStoryUser.avatar,
-                  isVerified: false,
-                  location: '',
-                  type: 'traveler',
-                  travelDays: 0,
-                }
-              : {
-                  id: '',
-                  name: 'Unknown',
-                  avatar: '',
-                  isVerified: false,
-                  location: '',
-                  type: 'traveler',
-                  travelDays: 0,
-                },
-            availability: 'Available',
-            giftCount: 0,
-          };
-          navigation.navigate('MomentDetail', {
-            moment: domainMoment,
-          });
-        }}
+        onViewMoment={handleViewMoment}
         onUserPress={(userId) => {
-          // Handle user profile navigation
-          logger.debug('Navigate to user:', userId);
+          // Navigate to user profile
+          if (userId) {
+            navigation.navigate('ProfileDetail', { userId });
+          }
         }}
         isPaused={isPaused}
         setIsPaused={setIsPaused}
@@ -576,8 +622,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  scrollView: {
-    flex: 1,
+  bottomPadding: {
+    height: 100,
   },
 
   // Results Bar
@@ -616,9 +662,7 @@ const styles = StyleSheet.create({
 
   // Grid Container
   gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
   },
 
   // Error State
@@ -644,26 +688,6 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: COLORS.white,
     fontWeight: '600',
-  },
-
-  // Empty State
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginTop: 16,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginTop: 8,
   },
 
   // Load More

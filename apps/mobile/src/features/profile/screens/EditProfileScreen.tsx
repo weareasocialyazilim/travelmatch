@@ -6,8 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  TextInput,  Platform,
-  // eslint-disable-next-line react-native/split-platform-components
+  TextInput,
+  Platform,
   ActionSheetIOS,
   KeyboardAvoidingView,
   ActivityIndicator,
@@ -16,17 +16,22 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
+import { ensureUserProfile } from '@/services/supabaseAuthService';
 import { editProfileSchema, type EditProfileInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
+import { CityAutocomplete } from '@/components/CityAutocomplete';
+import { logger } from '@/utils/logger';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -36,12 +41,8 @@ const EditProfileScreen = () => {
   // Original profile data from auth context
   const originalProfile = useMemo(() => {
     return {
-      avatarUrl:
-        user?.profilePhoto ||
-        user?.avatarUrl ||
-        'https://via.placeholder.com/150',
+      avatarUrl: user?.avatarUrl || user?.avatar || DEFAULT_IMAGES.AVATAR_LARGE,
       name: user?.name || '',
-      username: user?.username || '',
       bio: user?.bio || '',
       location:
         typeof user?.location === 'string'
@@ -51,26 +52,24 @@ const EditProfileScreen = () => {
   }, [user]);
 
   // Form state with RHF + Zod
-  const { control, handleSubmit, formState, watch, reset } = useForm<EditProfileInput>({
-    resolver: zodResolver(editProfileSchema),
-    mode: 'onChange',
-    defaultValues: {
-      fullName: originalProfile.name,
-      username: originalProfile.username,
-      bio: originalProfile.bio,
-      location: originalProfile.location,
-    },
-  });
+  const { control, handleSubmit, formState, watch, reset } =
+    useForm<EditProfileInput>({
+      resolver: zodResolver(editProfileSchema),
+      mode: 'onChange',
+      defaultValues: {
+        fullName: originalProfile.name,
+        bio: originalProfile.bio,
+        location: originalProfile.location,
+      },
+    });
 
   // Watch fields for real-time updates
-  const username = watch('username');
   const bio = watch('bio');
 
   // Update form when user data loads
   useEffect(() => {
     reset({
       fullName: originalProfile.name,
-      username: originalProfile.username,
       bio: originalProfile.bio,
       location: originalProfile.location,
     });
@@ -78,10 +77,6 @@ const EditProfileScreen = () => {
 
   // UI state
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
-    null,
-  );
-  const [checkingUsername, setCheckingUsername] = useState(false);
 
   const BIO_MAX_LENGTH = 200;
 
@@ -89,35 +84,6 @@ const EditProfileScreen = () => {
   const hasChanges = useCallback(() => {
     return avatarUri !== null || formState.isDirty;
   }, [avatarUri, formState.isDirty]);
-
-  // Username availability check (debounced)
-  useEffect(() => {
-    if (username === originalProfile.username) {
-      setUsernameAvailable(null);
-      return;
-    }
-
-    if (!username || username.length < 3) {
-      setUsernameAvailable(null);
-      return;
-    }
-
-    setCheckingUsername(true);
-    const timer = setTimeout(async () => {
-      try {
-        const isAvailable = await userService.checkUsernameAvailability(
-          username,
-        );
-        setUsernameAvailable(isAvailable);
-      } catch (error) {
-        // Ignore error
-      } finally {
-        setCheckingUsername(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [username, originalProfile.username]);
 
   const pickImage = async (useCamera: boolean) => {
     try {
@@ -137,10 +103,18 @@ const EditProfileScreen = () => {
           allowsEditing: true,
           aspect: [1, 1],
           quality: 0.8,
+          cameraType: ImagePicker.CameraType.front,
         });
 
-        if (!result.canceled) {
-          setAvatarUri(result.assets[0].uri);
+        if (!result.canceled && result.assets[0]) {
+          // Use the photo as-is without mirror flip
+          // User wants to see the photo exactly as they took it
+          const manipulated = await manipulateAsync(
+            result.assets[0].uri,
+            [], // No transformations - keep original orientation
+            { compress: 0.8, format: SaveFormat.JPEG },
+          );
+          setAvatarUri(manipulated.uri);
         }
       } else {
         const { status } =
@@ -161,11 +135,11 @@ const EditProfileScreen = () => {
           quality: 0.8,
         });
 
-        if (!result.canceled) {
+        if (!result.canceled && result.assets[0]) {
           setAvatarUri(result.assets[0].uri);
         }
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to pick image', 'error');
     }
   };
@@ -173,24 +147,39 @@ const EditProfileScreen = () => {
   const onSubmit = async (data: EditProfileInput) => {
     if (!hasChanges()) return;
 
-    if (usernameAvailable === false) {
-      showToast('Username is not available', 'error');
-      return;
-    }
-
     try {
-      // Upload avatar if changed
-      if (avatarUri) {
-        await userService.updateAvatar(avatarUri);
+      logger.info('[EditProfile] Starting profile update with data:', data);
+
+      // Ensure user exists in public.users table first
+      // This is needed for users created before the trigger was added
+      if (user?.id && user?.email) {
+        logger.info('[EditProfile] Ensuring user profile exists...');
+        await ensureUserProfile(
+          user.id,
+          user.email,
+          data.fullName || user.name || 'User',
+          user.avatar,
+        );
+        logger.info('[EditProfile] User profile ensured');
       }
 
-      // Update profile
-      await userService.updateProfile({
-        fullName: data.fullName,
-        username: data.username,
-        bio: data.bio,
-        location: data.location ? { city: data.location, country: '' } : undefined,
-      });
+      // Upload avatar if changed
+      if (avatarUri) {
+        logger.info('[EditProfile] Uploading new avatar...');
+        await userService.updateAvatar(avatarUri);
+        logger.info('[EditProfile] Avatar uploaded successfully');
+      }
+
+      // Update profile - convert to snake_case for database
+      const updateData: Record<string, unknown> = {
+        full_name: data.fullName,
+        bio: data.bio || null,
+        location: data.location || null,
+      };
+
+      logger.info('[EditProfile] Sending update to database:', updateData);
+      await userService.updateProfile(updateData);
+      logger.info('[EditProfile] Profile updated successfully');
 
       // Refresh user context
       await refreshUser();
@@ -199,14 +188,32 @@ const EditProfileScreen = () => {
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      showToast('Failed to update profile', 'error');
+      const err = error as Error & {
+        code?: string;
+        message?: string;
+        details?: string;
+        hint?: string;
+      };
+      logger.error('[EditProfile] Update error:', {
+        message: err.message,
+        code: err.code,
+        details: err.details,
+        hint: err.hint,
+      });
+      showToast(
+        `Failed to update profile: ${err.message || 'Unknown error'}`,
+        'error',
+      );
     }
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState }, {
-    requireDirty: false,
-    requireValid: true,
-  }) || usernameAvailable === false;
+  const isSubmitDisabled = !canSubmitForm(
+    { formState },
+    {
+      requireDirty: false,
+      requireValid: true,
+    },
+  );
 
   const handleChangeAvatar = () => {
     const options = avatarUri
@@ -298,12 +305,14 @@ const EditProfileScreen = () => {
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets
         >
           {/* Avatar Section */}
           <TouchableOpacity
@@ -338,7 +347,10 @@ const EditProfileScreen = () => {
                 <Controller
                   control={control}
                   name="fullName"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => (
                     <>
                       <TextInput
                         style={styles.textInput}
@@ -349,64 +361,9 @@ const EditProfileScreen = () => {
                         placeholderTextColor={COLORS.textSecondary}
                         maxLength={50}
                       />
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
-                    </>
-                  )}
-                />
-              </View>
-
-              <View style={styles.inputDivider} />
-
-              {/* Username */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Username</Text>
-                <Controller
-                  control={control}
-                  name="username"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                    <>
-                      <View style={styles.usernameInputContainer}>
-                        <Text style={styles.usernamePrefix}>@</Text>
-                        <TextInput
-                          style={[styles.textInput, styles.usernameInput]}
-                          value={value}
-                          onChangeText={(text) =>
-                            onChange(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))
-                          }
-                          onBlur={onBlur}
-                          placeholder="username"
-                          placeholderTextColor={COLORS.textSecondary}
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          maxLength={30}
-                        />
-                        {checkingUsername && (
-                          <ActivityIndicator
-                            size="small"
-                            color={COLORS.textSecondary}
-                          />
-                        )}
-                        {!checkingUsername && usernameAvailable === true && (
-                          <MaterialCommunityIcons
-                            name="check-circle"
-                            size={20}
-                            color={COLORS.mint}
-                          />
-                        )}
-                        {!checkingUsername && usernameAvailable === false && (
-                          <MaterialCommunityIcons
-                            name="close-circle"
-                            size={20}
-                            color={COLORS.coral}
-                          />
-                        )}
-                      </View>
-                      {usernameAvailable === false && (
-                        <Text style={styles.usernameError}>
-                          This username is already taken
-                        </Text>
+                      {error && (
+                        <Text style={styles.errorText}>{error.message}</Text>
                       )}
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
                     </>
                   )}
                 />
@@ -423,7 +380,8 @@ const EditProfileScreen = () => {
                       styles.charCount,
                       (bio?.length ?? 0) > BIO_MAX_LENGTH * 0.9 &&
                         styles.charCountWarning,
-                      (bio?.length ?? 0) >= BIO_MAX_LENGTH && styles.charCountError,
+                      (bio?.length ?? 0) >= BIO_MAX_LENGTH &&
+                        styles.charCountError,
                     ]}
                   >
                     {bio?.length ?? 0}/{BIO_MAX_LENGTH}
@@ -432,12 +390,17 @@ const EditProfileScreen = () => {
                 <Controller
                   control={control}
                   name="bio"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => (
                     <>
                       <TextInput
                         style={[styles.textInput, styles.bioInput]}
                         value={value}
-                        onChangeText={(text) => onChange(text.slice(0, BIO_MAX_LENGTH))}
+                        onChangeText={(text) =>
+                          onChange(text.slice(0, BIO_MAX_LENGTH))
+                        }
                         onBlur={onBlur}
                         placeholder="Tell us about yourself..."
                         placeholderTextColor={COLORS.textSecondary}
@@ -445,7 +408,9 @@ const EditProfileScreen = () => {
                         numberOfLines={3}
                         maxLength={BIO_MAX_LENGTH}
                       />
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                      {error && (
+                        <Text style={styles.errorText}>{error.message}</Text>
+                      )}
                     </>
                   )}
                 />
@@ -454,35 +419,26 @@ const EditProfileScreen = () => {
           </View>
 
           {/* Location Section */}
-          <View style={styles.section}>
+          <View style={[styles.section, { zIndex: 100 }]}>
             <Text style={styles.sectionTitle}>LOCATION</Text>
 
-            <View style={styles.inputCard}>
+            <View style={[styles.inputCard, { overflow: 'visible' }]}>
               {/* Location */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Location</Text>
                 <Controller
                   control={control}
                   name="location"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                    <>
-                      <View style={styles.locationInputContainer}>
-                        <MaterialCommunityIcons
-                          name="map-marker"
-                          size={18}
-                          color={COLORS.textSecondary}
-                        />
-                        <TextInput
-                          style={[styles.textInput, styles.locationInput]}
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          placeholder="City, Country"
-                          placeholderTextColor={COLORS.textSecondary}
-                        />
-                      </View>
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
-                    </>
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => (
+                    <CityAutocomplete
+                      value={value || ''}
+                      onSelect={onChange}
+                      placeholder="City, Country"
+                      error={error?.message}
+                    />
                   )}
                 />
               </View>

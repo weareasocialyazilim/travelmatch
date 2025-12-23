@@ -18,7 +18,10 @@ import {
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { sendGiftSchema, type SendGiftInput } from '../../../utils/forms/schemas';
+import {
+  sendGiftSchema,
+  type SendGiftInput,
+} from '../../../utils/forms/schemas';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
@@ -29,34 +32,32 @@ import { SPACING } from '../constants/spacing';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
+import {
+  usePaymentMethods,
+  useCreatePaymentIntent,
+} from '../hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { Moment } from '../types';
 import type { StackScreenProps } from '@react-navigation/stack';
 
-interface PaymentMethod {
+interface PaymentMethodDisplay {
   id: string;
-  type: 'card' | 'apple_pay' | 'google_pay';
+  type: 'card' | 'apple_pay' | 'google_pay' | 'wallet';
   name: string;
   icon: string;
   lastFour?: string;
 }
 
-const PAYMENT_METHODS: PaymentMethod[] = [
+// Static wallet payment options
+const WALLET_OPTIONS: PaymentMethodDisplay[] = [
   {
-    id: '1',
-    type: 'card',
-    name: 'Credit Card',
-    icon: 'credit-card',
-    lastFour: '4242',
-  },
-  {
-    id: '2',
+    id: 'apple_pay',
     type: 'apple_pay',
     name: 'Apple Pay',
     icon: 'apple',
   },
   {
-    id: '3',
+    id: 'google_pay',
     type: 'google_pay',
     name: 'Google Pay',
     icon: 'google',
@@ -92,12 +93,52 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   const [_selectedRecipient, _setSelectedRecipient] = useState<string>(
     recipientId || '',
   );
-  const [selectedPayment, setSelectedPayment] = useState<string>(
-    PAYMENT_METHODS[0].id,
-  );
+  const [selectedPayment, setSelectedPayment] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [submittedData, setSubmittedData] = useState<SendGiftInput | null>(null);
+  const [submittedData, setSubmittedData] = useState<SendGiftInput | null>(
+    null,
+  );
+
+  // Fetch real payment methods from API
+  const { data: apiPaymentMethods, isLoading: paymentMethodsLoading } =
+    usePaymentMethods();
+  const createPaymentIntentMutation = useCreatePaymentIntent();
+
+  // Combine real cards with wallet options
+  const paymentMethods: PaymentMethodDisplay[] = useMemo(() => {
+    const methods: PaymentMethodDisplay[] = [];
+
+    // Add real cards from API
+    if (apiPaymentMethods) {
+      apiPaymentMethods.forEach((pm) => {
+        methods.push({
+          id: pm.id,
+          type: pm.type === 'card' ? 'card' : 'wallet',
+          name: pm.brand
+            ? `${pm.brand.charAt(0).toUpperCase()}${pm.brand.slice(1)}`
+            : 'Card',
+          icon: 'credit-card',
+          lastFour: pm.last4,
+        });
+      });
+    }
+
+    // Add wallet options
+    methods.push(...WALLET_OPTIONS);
+
+    return methods;
+  }, [apiPaymentMethods]);
+
+  // Set default payment method once loaded
+  useEffect(() => {
+    if (paymentMethods.length > 0 && !selectedPayment) {
+      const firstMethod = paymentMethods[0];
+      if (firstMethod) {
+        setSelectedPayment(firstMethod.id);
+      }
+    }
+  }, [paymentMethods, selectedPayment]);
 
   const {
     control,
@@ -137,42 +178,83 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   );
 
   // Handle gift purchase
-  const onPurchase = useCallback((data: SendGiftInput) => {
-    setLoading(true);
-    setSubmittedData(data);
-    void impact('medium');
+  const onPurchase = useCallback(
+    async (data: SendGiftInput) => {
+      setLoading(true);
+      setSubmittedData(data);
+      void impact('medium');
 
-    trackEvent('gift_purchase_started', {
-      momentId: moment.id,
-      price: moment.price,
-      paymentMethod: selectedPayment,
-      hasMessage: !!data.message,
-    });
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-      impact('success');
-
-      trackInteraction('gift_completed', {
+      trackEvent('gift_purchase_started', {
         momentId: moment.id,
         price: moment.price,
         paymentMethod: selectedPayment,
+        hasMessage: !!data.message,
       });
 
-      trackEvent('gift_purchase_completed', {
-        momentId: moment.id,
-        price: moment.price,
-      });
-    }, 2000);
-  }, [
-    moment,
-    selectedPayment,
-    impact,
-    trackEvent,
-    trackInteraction,
-  ]);
+      try {
+        // Create payment intent via API
+        const paymentIntent = await createPaymentIntentMutation.mutateAsync({
+          amount: moment.price,
+          currency: 'USD',
+        });
+
+        // For wallet payments (Apple Pay/Google Pay), handle differently
+        const selectedMethod = paymentMethods.find(
+          (m) => m.id === selectedPayment,
+        );
+        if (
+          selectedMethod?.type === 'apple_pay' ||
+          selectedMethod?.type === 'google_pay'
+        ) {
+          // Wallet payments require native payment sheet handling
+          // This would integrate with Stripe's native payment sheet
+          console.log('Processing wallet payment:', selectedMethod.type);
+        }
+
+        // Confirm the payment with selected method
+        if (paymentIntent?.id) {
+          // Payment successful
+          setSuccess(true);
+          impact('success');
+
+          trackInteraction('gift_completed', {
+            momentId: moment.id,
+            price: moment.price,
+            paymentMethod: selectedPayment,
+          });
+
+          trackEvent('gift_purchase_completed', {
+            momentId: moment.id,
+            price: moment.price,
+            paymentIntentId: paymentIntent.id,
+          });
+        }
+      } catch (error) {
+        console.error('Gift purchase failed:', error);
+        trackEvent('gift_purchase_failed', {
+          momentId: moment.id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+        // Show error to user
+        alert(
+          error instanceof Error
+            ? error.message
+            : 'Payment failed. Please try again.',
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      moment,
+      selectedPayment,
+      paymentMethods,
+      createPaymentIntentMutation,
+      impact,
+      trackEvent,
+      trackInteraction,
+    ],
+  );
 
   // Handle share
   const handleShare = useCallback(() => {
@@ -258,7 +340,8 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -313,7 +396,9 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
               )}
             />
             {errors.recipientEmail && (
-              <Text style={styles.errorText}>{errors.recipientEmail.message}</Text>
+              <Text style={styles.errorText}>
+                {errors.recipientEmail.message}
+              </Text>
             )}
           </View>
 
@@ -347,39 +432,56 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
           {/* Payment Method Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Payment method</Text>
-            {PAYMENT_METHODS.map((method) => (
+            {paymentMethodsLoading ? (
+              <Text style={styles.loadingText}>Loading payment methods...</Text>
+            ) : paymentMethods.length === 0 ? (
               <TouchableOpacity
-                key={method.id}
-                style={[
-                  styles.paymentMethod,
-                  selectedPayment === method.id && styles.paymentMethodSelected,
-                ]}
-                onPress={() => handleSelectPayment(method.id)}
+                style={styles.addPaymentButton}
+                onPress={() => navigation.navigate('PaymentMethods')}
               >
-                <Icon
-                  name={
-                    method.icon as React.ComponentProps<typeof Icon>['name']
-                  }
-                  size={24}
-                  color={
-                    selectedPayment === method.id
-                      ? COLORS.primary
-                      : COLORS.textSecondary
-                  }
-                />
-                <View style={styles.paymentInfo}>
-                  <Text style={styles.paymentName}>{method.name}</Text>
-                  {method.lastFour && (
-                    <Text style={styles.paymentDetails}>
-                      •••• {method.lastFour}
-                    </Text>
-                  )}
-                </View>
-                {selectedPayment === method.id && (
-                  <Icon name="check-circle" size={24} color={COLORS.primary} />
-                )}
+                <Icon name="plus" size={24} color={COLORS.primary} />
+                <Text style={styles.addPaymentText}>Add payment method</Text>
               </TouchableOpacity>
-            ))}
+            ) : (
+              paymentMethods.map((method) => (
+                <TouchableOpacity
+                  key={method.id}
+                  style={[
+                    styles.paymentMethod,
+                    selectedPayment === method.id &&
+                      styles.paymentMethodSelected,
+                  ]}
+                  onPress={() => handleSelectPayment(method.id)}
+                >
+                  <Icon
+                    name={
+                      method.icon as React.ComponentProps<typeof Icon>['name']
+                    }
+                    size={24}
+                    color={
+                      selectedPayment === method.id
+                        ? COLORS.primary
+                        : COLORS.textSecondary
+                    }
+                  />
+                  <View style={styles.paymentInfo}>
+                    <Text style={styles.paymentName}>{method.name}</Text>
+                    {method.lastFour && (
+                      <Text style={styles.paymentDetails}>
+                        •••• {method.lastFour}
+                      </Text>
+                    )}
+                  </View>
+                  {selectedPayment === method.id && (
+                    <Icon
+                      name="check-circle"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  )}
+                </TouchableOpacity>
+              ))
+            )}
           </View>
 
           {/* Summary */}
@@ -728,5 +830,28 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
+  },
+  loadingText: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    padding: SPACING.md,
+  },
+  addPaymentButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: COLORS.primary,
+    borderRadius: RADII.md,
+    backgroundColor: COLORS.primary + '10',
+  },
+  addPaymentText: {
+    ...TYPOGRAPHY.bodyLarge,
+    color: COLORS.primary,
+    fontWeight: '600',
+    marginLeft: SPACING.sm,
   },
 });

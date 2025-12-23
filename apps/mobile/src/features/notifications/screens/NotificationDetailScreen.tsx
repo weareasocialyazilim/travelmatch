@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+
 import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -12,10 +12,9 @@ type NotificationDetailScreenProps = StackScreenProps<
   'NotificationDetail'
 >;
 
-export const NotificationDetailScreen: React.FC<NotificationDetailScreenProps> = ({
-  navigation,
-  route,
-}) => {
+export const NotificationDetailScreen: React.FC<
+  NotificationDetailScreenProps
+> = ({ navigation, route }) => {
   const { notificationId } = route.params;
 
   return (

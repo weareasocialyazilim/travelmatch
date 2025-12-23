@@ -41,14 +41,14 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       _setLoading(true);
       const { data } = await subscriptionsService.getPlans();
       if (data && data.length > 0) {
-        const mappedPlans: Plan[] = data.map((p: { id: string; name: string; price: number; currency?: string; interval: 'month' | 'year'; features?: Array<{ text: string; included: boolean }>; is_popular?: boolean }) => ({
+        const mappedPlans: Plan[] = data.map((p) => ({
           id: p.id,
           name: p.name,
           price: p.price,
           currency: p.currency || 'USD',
           interval: p.interval,
-          features: p.features || [],
-          popular: p.is_popular,
+          features: p.features.map((f) => ({ text: f, included: true })),
+          popular: p.name.toLowerCase().includes('pro'),
         }));
         _setPlans(mappedPlans);
       }
@@ -98,10 +98,21 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         )}
 
         <View style={styles.featuresContainer}>
-          {plan.features.map((feature, index) => (
-            <View key={index} style={styles.featureRow}>
-              <Icon name={feature.included ? "check-circle" : "close-circle"} size={16} color={feature.included ? COLORS.success : COLORS.textSecondary} />
-              <Text style={[styles.featureText, !feature.included && styles.featureDisabled]}>{feature.text}</Text>
+          {plan.features.map((feature) => (
+            <View key={`${plan.id}-${feature.text}`} style={styles.featureRow}>
+              <Icon
+                name={feature.included ? 'check-circle' : 'close-circle'}
+                size={16}
+                color={feature.included ? COLORS.success : COLORS.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.featureText,
+                  !feature.included && styles.featureDisabled,
+                ]}
+              >
+                {feature.text}
+              </Text>
             </View>
           ))}
         </View>

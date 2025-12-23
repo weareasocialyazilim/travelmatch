@@ -14,6 +14,36 @@ import NetInfo from '@react-native-community/netinfo';
 import { offlineSyncQueue } from '../offlineSyncQueue';
 import { useOfflineMutation } from '../../hooks/useOfflineData';
 
+// Create a fallback cache service if global is not defined
+const createFallbackCacheService = () => {
+  const store = new Map<string, unknown>();
+  return {
+    clearAll: () => store.clear(),
+    setQueryData: (key: string, data: unknown) => store.set(key, data),
+    getQueryData: (key: string) => store.get(key),
+    invalidateQuery: (key: string) => store.delete(key),
+    invalidateQueries: (
+      pattern: string | RegExp | ((key: string) => boolean),
+    ) => {
+      if (typeof pattern === 'function') {
+        for (const key of store.keys()) {
+          if (pattern(key)) store.delete(key);
+        }
+      } else {
+        const regex =
+          typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+        for (const key of store.keys()) {
+          if (regex.test(key)) store.delete(key);
+        }
+      }
+    },
+  };
+};
+
+// Access the global mock or create fallback
+const cacheService =
+  (global as any).cacheService || createFallbackCacheService();
+
 // Mock dependencies
 jest.mock('@react-native-community/netinfo', () => ({
   addEventListener: jest.fn(),
@@ -40,7 +70,9 @@ describe('Optimistic UI Updates', () => {
     });
 
     await offlineSyncQueue.clearAll();
-    cacheService.clearAll();
+    if (cacheService && typeof cacheService.clearAll === 'function') {
+      cacheService.clearAll();
+    }
   });
 
   describe('Optimistic State Updates', () => {
@@ -63,7 +95,9 @@ describe('Optimistic UI Updates', () => {
         getQueryData: (key: string) => mockCache[key],
       };
 
-      const { result } = renderHook(() => useOfflineMutation(mutationFn, { onSuccess }));
+      const { result } = renderHook(() =>
+        useOfflineMutation(mutationFn, { onSuccess }),
+      );
 
       // Cache current state
       const cacheKey = 'moment-123';

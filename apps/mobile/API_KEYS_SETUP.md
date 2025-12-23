@@ -11,6 +11,7 @@ Before launching to App Store / Google Play, you **MUST** add these API keys to 
 **Where to get:** https://account.mapbox.com/
 
 ### Steps:
+
 1. Create Mapbox account (Free tier: 50,000 map loads/month)
 2. Go to "Access Tokens" → "Create a token"
 3. **Public token:**
@@ -23,10 +24,13 @@ Before launching to App Store / Google Play, you **MUST** add these API keys to 
 
 4. **Secret token (for downloads, build-time only):**
    - Scopes: `downloads:read`
-   - Copy token → Add to `.env.production`:
+   - ⚠️ **DO NOT use EXPO*PUBLIC* prefix for secret tokens!**
+   - Copy token → Add to `.env.production` (build-time only, not bundled):
      ```bash
-     EXPO_PUBLIC_MAPBOX_SECRET_TOKEN=sk.eyJ1Ijoi...
+     # Build-time only - NOT exposed in client bundle
+     MAPBOX_DOWNLOAD_TOKEN=sk.eyJ1Ijoi...
      ```
+   - This token is referenced in `app.config.ts` for native SDK downloads only.
 
 ---
 
@@ -35,6 +39,7 @@ Before launching to App Store / Google Play, you **MUST** add these API keys to 
 **Where to get:** https://posthog.com/
 
 ### Steps:
+
 1. Sign up for PostHog (Free tier: 1M events/month)
 2. Create a new project
 3. Go to "Project Settings" → "API Keys" → "Project API Key"
@@ -51,6 +56,7 @@ Before launching to App Store / Google Play, you **MUST** add these API keys to 
 **Where to get:** https://sentry.io/
 
 ### Steps:
+
 1. Sign up for Sentry
 2. Create new project → Select "React Native"
 3. Copy DSN (looks like: `https://xxxxx@xxxxx.ingest.sentry.io/xxxxx`)
@@ -66,6 +72,7 @@ Before launching to App Store / Google Play, you **MUST** add these API keys to 
 **Where to get:** https://dash.cloudflare.com/
 
 ### Steps:
+
 1. Create Cloudflare account
 2. Enable "Cloudflare Images"
 3. Copy Account ID from Images dashboard URL
@@ -74,7 +81,8 @@ Before launching to App Store / Google Play, you **MUST** add these API keys to 
    EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_ID=your-account-id
    ```
 
-**Note:** Cloudflare Images API Token should be added to **Supabase Edge Functions** (server-side), NOT in `.env.production`!
+**Note:** Cloudflare Images API Token should be added to **Supabase Edge Functions** (server-side),
+NOT in `.env.production`!
 
 ---
 
@@ -104,17 +112,20 @@ pnpm dev
 
 ## 🚨 Security Warnings
 
-### ✅ SAFE to expose (EXPO_PUBLIC_* prefix):
-- Mapbox Public Token (`pk.xxx`)
-- PostHog API Key (`phc_xxx`)
-- Sentry DSN
-- Cloudflare Account ID
+### ✅ SAFE to expose (EXPO*PUBLIC*\* prefix):
 
-### ❌ NEVER expose to client:
-- Mapbox Secret Token (only used during build, not in bundle)
+- Mapbox Public Token (`pk.xxx`) - Read-only, scoped to specific features
+- PostHog API Key (`phc_xxx`) - Analytics ingestion only
+- Sentry DSN - Error reporting only
+- Cloudflare Account ID - Public identifier
+
+### ❌ NEVER expose to client (NO EXPO*PUBLIC* prefix):
+
+- Mapbox Download Token (`sk.xxx`) - Build-time only via MAPBOX_DOWNLOAD_TOKEN
 - Supabase Service Role Key → Add to Supabase Dashboard only!
-- Stripe Secret Key → Backend only!
-- Cloudflare Images Token → Backend only!
+- Stripe Secret Key → Backend/Edge Functions only!
+- Cloudflare Images Token → Backend/Edge Functions only!
+- Any token starting with `sk_`, `secret_`, or containing `_SECRET`
 
 ---
 
@@ -143,4 +154,5 @@ Before submitting to stores:
 
 ---
 
-**Need help?** See `INFISICAL_SETUP.md` for centralized secrets management (recommended for team workflows).
+**Need help?** See `INFISICAL_SETUP.md` for centralized secrets management (recommended for team
+workflows).

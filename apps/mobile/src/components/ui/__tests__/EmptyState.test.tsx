@@ -3,6 +3,9 @@
  * Tests empty state component with illustrations and actions
  */
 
+// Unmock EmptyState so we test the real component
+jest.unmock('@/components/ui/EmptyState');
+
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { Text } from 'react-native';

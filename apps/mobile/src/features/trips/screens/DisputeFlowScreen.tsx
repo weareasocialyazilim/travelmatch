@@ -35,20 +35,15 @@ export const DisputeFlowScreen: React.FC = () => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    formState,
-    watch,
-    setValue,
-  } = useForm<DisputeInput>({
-    resolver: zodResolver(disputeSchema),
-    mode: 'onChange',
-    defaultValues: {
-      reason: '',
-      evidence: [],
-    },
-  });
+  const { control, handleSubmit, formState, watch, setValue } =
+    useForm<DisputeInput>({
+      resolver: zodResolver(disputeSchema),
+      mode: 'onChange',
+      defaultValues: {
+        reason: '',
+        evidence: [],
+      },
+    });
 
   const reason = watch('reason');
   const evidence = watch('evidence') || [];
@@ -82,27 +77,35 @@ export const DisputeFlowScreen: React.FC = () => {
   };
 
   const handleRemoveFile = (index: number) => {
-    setValue('evidence', evidence.filter((_, i) => i !== index));
+    setValue(
+      'evidence',
+      evidence.filter((_, i) => i !== index),
+    );
   };
 
   const onSubmit = async (formData: DisputeInput) => {
     setLoading(true);
     try {
-      const _table =
-        type === 'transaction' ? 'transaction_disputes' : 'proof_disputes';
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        showToast('You must be logged in to submit a dispute.', 'error');
+        return;
+      }
+
       const foreignKey = type === 'transaction' ? 'transaction_id' : 'proof_id';
 
       // In a real app, you would upload files to storage first and get URLs
 
-      const { error } = await supabase
-        .from('disputes') // Assuming a unified disputes table or separate ones
-        .insert({
-          [foreignKey]: id,
-          reason: formData.reason,
-          evidence: formData.evidence || [],
-          status: 'pending',
-          type: type,
-        });
+      const { error } = await supabase.from('disputes').insert({
+        reporter_id: user.id,
+        [foreignKey]: id,
+        reason: formData.reason,
+        evidence: formData.evidence || [],
+        status: 'pending',
+        type: type,
+      });
 
       if (error) {
         // Fallback for demo/mock if table doesn't exist yet
@@ -138,7 +141,10 @@ export const DisputeFlowScreen: React.FC = () => {
       <Controller
         control={control}
         name="reason"
-        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
           <>
             <TextInput
               style={[styles.textArea, error && styles.inputError]}
@@ -174,15 +180,17 @@ export const DisputeFlowScreen: React.FC = () => {
       </Text>
 
       <View style={styles.uploadArea}>
-        {evidence.map((file, index) => (
-          <View key={index} style={styles.fileItem}>
+        {evidence.map((file) => (
+          <View key={file} style={styles.fileItem}>
             <MaterialCommunityIcons
               name="file-document-outline"
               size={24}
               color={COLORS.text}
             />
             <Text style={styles.fileName}>{file}</Text>
-            <TouchableOpacity onPress={() => handleRemoveFile(index)}>
+            <TouchableOpacity
+              onPress={() => handleRemoveFile(evidence.indexOf(file))}
+            >
               <MaterialCommunityIcons
                 name="close"
                 size={20}

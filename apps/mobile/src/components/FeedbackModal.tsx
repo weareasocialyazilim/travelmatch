@@ -63,22 +63,16 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   const { impact } = useHaptics();
 
-  const {
-    control,
-    handleSubmit,
-    formState,
-    setValue,
-    watch,
-    reset,
-  } = useForm<FeedbackInput>({
-    resolver: zodResolver(feedbackSchema),
-    mode: 'onChange',
-    defaultValues: {
-      rating: 0,
-      category: '',
-      comment: '',
-    },
-  });
+  const { control, handleSubmit, formState, setValue, watch, reset } =
+    useForm<FeedbackInput>({
+      resolver: zodResolver(feedbackSchema),
+      mode: 'onChange',
+      defaultValues: {
+        rating: 0,
+        category: '',
+        comment: '',
+      },
+    });
 
   const rating = watch('rating');
   const category = watch('category');
@@ -148,7 +142,8 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     >
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <TouchableOpacity
           style={styles.backdrop}
@@ -209,8 +204,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   <Text
                     style={[
                       styles.categoryText,
-                      category === cat &&
-                        styles.categoryTextActive,
+                      category === cat && styles.categoryTextActive,
                     ]}
                   >
                     {cat}
@@ -239,7 +233,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     onBlur={onBlur}
                     maxLength={500}
                   />
-                  <Text style={styles.charCount}>{(value?.length || 0)}/500</Text>
+                  <Text style={styles.charCount}>{value?.length || 0}/500</Text>
                 </>
               )}
             />

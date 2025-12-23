@@ -8,7 +8,7 @@
 
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
-import { toJson, toRecord } from '../utils/jsonHelper';
+import { toRecord } from '../utils/jsonHelper';
 
 export interface PaymentMethod {
   id: string;
@@ -169,16 +169,29 @@ export const paymentsApi = {
 
       if (error) throw error;
 
-      return (data || []).map((tx: any) => ({
-        id: tx.id,
-        type: tx.type as TransactionRecord['type'],
-        amount: tx.amount,
-        currency: tx.currency ?? '',
-        status: tx.status as TransactionRecord['status'],
-        createdAt: tx.created_at ?? '',
-        description: tx.description ?? undefined,
-        metadata: toRecord(tx.metadata),
-      }));
+      type TransactionRow = {
+        id: string;
+        type: string;
+        amount: number;
+        currency: string | null;
+        status: string;
+        created_at: string | null;
+        description: string | null;
+        metadata: unknown;
+      };
+      return (data || []).map((tx) => {
+        const t = tx as unknown as TransactionRow;
+        return {
+          id: t.id,
+          type: t.type as TransactionRecord['type'],
+          amount: t.amount,
+          currency: t.currency ?? '',
+          status: t.status as TransactionRecord['status'],
+          createdAt: t.created_at ?? '',
+          description: t.description ?? undefined,
+          metadata: toRecord(t.metadata),
+        };
+      });
     } catch (error) {
       logger.error('Failed to get transaction history', { error });
       throw error;
@@ -351,7 +364,12 @@ export const paymentsApi = {
 
       if (error) throw error;
 
-      const row: any = data;
+      type KYCRow = {
+        kyc_status: string | null;
+        verified: boolean | null;
+        verified_at: string | null;
+      };
+      const row = data as KYCRow;
       return {
         status: (row?.kyc_status || 'pending') as
           | 'pending'

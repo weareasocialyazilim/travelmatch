@@ -11,8 +11,6 @@ import type { Database } from '../../types/database.types';
 // Type aliases for convenience
 type Tables = Database['public']['Tables'];
 type Moment = Tables['moments']['Row'];
-type User = Tables['users']['Row'];
-type Request = Tables['requests']['Row'];
 
 /**
  * ============================================
@@ -496,6 +494,8 @@ export const checkRelationship = async (
   conditions: Record<string, unknown>,
 ) => {
   const { data, error } = await supabase
+
+    // @ts-ignore - Dynamic table name for generic helper
     .from(table)
     .select('id')
     .match(conditions)
@@ -512,7 +512,10 @@ export const getCount = async (
   table: string,
   filters?: Record<string, unknown>,
 ) => {
-  let query = supabase.from(table).select('*', { count: 'exact', head: true });
+  // @ts-ignore - Dynamic table name for generic helper
+  let query = supabase
+    .from(table as any)
+    .select('*', { count: 'exact', head: true });
 
   if (filters) {
     query = query.match(filters);

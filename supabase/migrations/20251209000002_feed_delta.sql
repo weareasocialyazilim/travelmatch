@@ -13,21 +13,23 @@ CREATE TABLE IF NOT EXISTS public.feed_delta (
 );
 
 -- Create indexes for fast queries
-CREATE INDEX idx_feed_delta_version ON public.feed_delta(version);
-CREATE INDEX idx_feed_delta_user_version ON public.feed_delta(user_id, version);
-CREATE INDEX idx_feed_delta_user_created ON public.feed_delta(user_id, created_at DESC);
-CREATE INDEX idx_feed_delta_item ON public.feed_delta(item_type, item_id);
+CREATE INDEX IF NOT EXISTS idx_feed_delta_version ON public.feed_delta(version);
+CREATE INDEX IF NOT EXISTS idx_feed_delta_user_version ON public.feed_delta(user_id, version);
+CREATE INDEX IF NOT EXISTS idx_feed_delta_user_created ON public.feed_delta(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_feed_delta_item ON public.feed_delta(item_type, item_id);
 
 -- Enable Row Level Security
 ALTER TABLE public.feed_delta ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can only see their own delta changes
+DROP POLICY IF EXISTS "Users can view their own feed delta" ON public.feed_delta;
 CREATE POLICY "Users can view their own feed delta"
   ON public.feed_delta
   FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Policy: Service role can insert delta records
+DROP POLICY IF EXISTS "Service role can insert feed delta" ON public.feed_delta;
 CREATE POLICY "Service role can insert feed delta"
   ON public.feed_delta
   FOR INSERT

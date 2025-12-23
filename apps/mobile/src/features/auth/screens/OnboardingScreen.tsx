@@ -5,19 +5,22 @@ import type {
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ImageSourcePropType } from 'react-native';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const iconImage = require('../../../../assets/icon.png') as ImageSourcePropType;
+
 import {
   Animated,
   Dimensions,
-  FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 
-const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
-  Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface OnboardingPage {
   id: string;
@@ -28,11 +31,10 @@ interface OnboardingPage {
 
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { logger } from '../../../utils/logger';
+import { logger } from '@/utils/logger';
 import { COLORS } from '@/constants/colors';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { HORIZONTAL_LIST_CONFIG } from '@/utils/listOptimization';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
@@ -45,18 +47,16 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
+  const flashListRef = useRef<FlashListRef<OnboardingPage>>(null);
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
-  
+
   // Animated values for fade-in effect
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Dynamic onboarding pages from i18n
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const iconImage = require('../../../../assets/icon.png') as ImageSourcePropType;
-  
+
   const ONBOARDING_PAGES: OnboardingPage[] = [
     {
       id: '1',
@@ -100,29 +100,37 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     ]).start(() => {
       if (currentIndex < ONBOARDING_PAGES.length - 1) {
         const nextIndex = currentIndex + 1;
-        flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-        setCurrentIndex(nextIndex);
-        
-        // Track page view
-        analytics.trackEvent('onboarding_page_view', {
-          screen: 'onboarding',
-          page_number: nextIndex + 1,
-          page_title: ONBOARDING_PAGES[nextIndex].title,
+        flashListRef.current?.scrollToIndex({
+          index: nextIndex,
+          animated: true,
         });
+        setCurrentIndex(nextIndex);
+
+        // Track page view
+        const nextPage = ONBOARDING_PAGES[nextIndex];
+        if (nextPage) {
+          analytics.trackEvent('onboarding_page_view', {
+            screen: 'onboarding',
+            page_number: nextIndex + 1,
+            page_title: nextPage.title,
+          });
+        }
       } else {
         analytics.trackEvent('onboarding_completed', {
           screen: 'onboarding',
           total_screens: ONBOARDING_PAGES.length,
         });
-        completeOnboarding().then(() => {
-          navigation.replace('Welcome');
-        }).catch((error: unknown) => {
-          logger.error('Onboarding completion error', { error });
-          // Fallback: still navigate even if storage fails
-          navigation.replace('Welcome');
-        });
+        completeOnboarding()
+          .then(() => {
+            navigation.replace('Welcome');
+          })
+          .catch((error: unknown) => {
+            logger.error('Onboarding completion error', { error });
+            // Fallback: still navigate even if storage fails
+            navigation.replace('Welcome');
+          });
       }
-      
+
       // Restore animation
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -150,8 +158,14 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     navigation.replace('Welcome');
   };
 
-  const renderPage = ({ item, index }: { item: OnboardingPage; index: number }) => (
-    <Animated.View 
+  const renderPage = ({
+    item,
+    index,
+  }: {
+    item: OnboardingPage;
+    index: number;
+  }) => (
+    <Animated.View
       style={[
         styles.pageContainer,
         {
@@ -166,7 +180,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       <View style={styles.textSection}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
-        
+
         {/* Progress indicator text */}
         <Text style={styles.progressText}>
           {index + 1} / {ONBOARDING_PAGES.length}
@@ -178,8 +192,8 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.contentWrapper}>
-        <FlatList<OnboardingPage>
-          ref={flatListRef}
+        <FlashList<OnboardingPage>
+          ref={flashListRef}
           data={ONBOARDING_PAGES}
           renderItem={renderPage}
           horizontal
@@ -194,7 +208,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           }}
           scrollEnabled={true}
           style={styles.flatList}
-          {...HORIZONTAL_LIST_CONFIG}
           showsHorizontalScrollIndicator={false}
         />
       </View>
@@ -203,9 +216,9 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       <View style={styles.bottomSection}>
         {/* Pagination Dots */}
         <View style={styles.paginationContainer}>
-          {ONBOARDING_PAGES.map((_, index) => (
+          {ONBOARDING_PAGES.map((page, index) => (
             <View
-              key={index}
+              key={page.id}
               style={[
                 styles.dot,
                 index === currentIndex && styles.activeDot,
@@ -226,10 +239,14 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           </TouchableOpacity>
         </View>
 
-        {/* Skip Link */}
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-        </TouchableOpacity>
+        {/* Skip Link - Only visible after page 2 */}
+        {currentIndex >= 1 ? (
+          <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+            <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.skipButtonPlaceholder} />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -345,6 +362,11 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     alignItems: 'center',
+    paddingTop: 8,
+    minHeight: 32,
+  },
+  skipButtonPlaceholder: {
+    minHeight: 32,
     paddingTop: 8,
   },
   skipText: {

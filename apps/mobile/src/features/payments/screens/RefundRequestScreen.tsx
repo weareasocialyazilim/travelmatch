@@ -52,22 +52,23 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
   const { showToast: _showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
   const { transactionId } = route.params;
-  
-  const { control, handleSubmit, formState, watch, setValue } = useForm<RefundRequestInput>({
-    resolver: zodResolver(refundRequestSchema),
-    mode: 'onChange',
-    defaultValues: {
-      reason: undefined,
-      description: '',
-      amount: 0,
-    },
-  });
+
+  const { control, handleSubmit, formState, watch, setValue } =
+    useForm<RefundRequestInput>({
+      resolver: zodResolver(refundRequestSchema),
+      mode: 'onChange',
+      defaultValues: {
+        reason: undefined,
+        description: '',
+        amount: 0,
+      },
+    });
 
   const _reason = watch('reason');
   const _description = watch('description');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (data: RefundRequestInput) => {
+  const onSubmit = async (_data: RefundRequestInput) => {
     setIsSubmitting(true);
 
     // Mock API call - gerçek uygulamada backend'e gönderilecek
@@ -86,10 +87,13 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
     }, 1500);
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState }, {
-    requireDirty: false,
-    requireValid: true,
-  });
+  const isSubmitDisabled = !canSubmitForm(
+    { formState },
+    {
+      requireDirty: false,
+      requireValid: true,
+    },
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -152,7 +156,12 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
                         styles.reasonCard,
                         value === reasonOption.id && styles.reasonCardSelected,
                       ]}
-                      onPress={() => setValue('reason', reasonOption.id as RefundRequestInput['reason'])}
+                      onPress={() =>
+                        setValue(
+                          'reason',
+                          reasonOption.id as RefundRequestInput['reason'],
+                        )
+                      }
                       activeOpacity={0.7}
                     >
                       <Icon
@@ -167,13 +176,18 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
                       <Text
                         style={[
                           styles.reasonLabel,
-                          value === reasonOption.id && styles.reasonLabelSelected,
+                          value === reasonOption.id &&
+                            styles.reasonLabelSelected,
                         ]}
                       >
                         {reasonOption.label}
                       </Text>
                       {value === reasonOption.id && (
-                        <Icon name="check-circle" size={20} color={COLORS.mint} />
+                        <Icon
+                          name="check-circle"
+                          size={20}
+                          color={COLORS.mint}
+                        />
                       )}
                     </TouchableOpacity>
                   ))}
@@ -193,7 +207,10 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
           <Controller
             control={control}
             name="description"
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
               <>
                 <View style={styles.textAreaContainer}>
                   <TextInput
@@ -464,7 +481,9 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ScreenErrorBoundary for critical refund functionality
-const RefundRequestScreenWithErrorBoundary = (props: RefundRequestScreenProps) => (
+const RefundRequestScreenWithErrorBoundary = (
+  props: RefundRequestScreenProps,
+) => (
   <ScreenErrorBoundary>
     <RefundRequestScreen {...props} />
   </ScreenErrorBoundary>

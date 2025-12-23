@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   View,
   Text,
@@ -18,6 +24,7 @@ import { SkeletonList } from '@/components/ui';
 import { FadeInView as _FadeInView } from '@/components/AnimatedComponents';
 import BottomNav from '@/components/BottomNav';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { useRealtime, useRealtimeEvent } from '@/context/RealtimeContext';
 import { useMessages } from '@/hooks/useMessages';
@@ -65,6 +72,21 @@ const MessagesScreen: React.FC = () => {
     new Set(),
   );
 
+  // MEMORY LEAK FIX: Track timeouts for cleanup
+  const typingTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  // MEMORY LEAK FIX: Cleanup all timeouts on unmount
+  useEffect(() => {
+    const timeouts = typingTimeoutsRef.current;
+    return () => {
+      // Clear all pending timeouts when component unmounts
+      timeouts.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      timeouts.clear();
+    };
+  }, []);
+
   // Fetch conversations on mount
   useEffect(() => {
     refreshConversations();
@@ -81,35 +103,50 @@ const MessagesScreen: React.FC = () => {
   );
 
   // Listen for typing indicators
-  useRealtimeEvent<{
-    conversationId: string;
-    userId: string;
-    isTyping: boolean;
-  }>(
-    'message:typing',
-    (data) => {
-      if (data.isTyping) {
-        setTypingConversations(
-          (prev) => new Set([...prev, data.conversationId]),
-        );
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
+  // MEMORY LEAK FIX: Properly track and cleanup timeouts
+  const handleTypingEvent = useCallback(
+    (data: { conversationId: string; userId: string; isTyping: boolean }) => {
+      const { conversationId, isTyping } = data;
+
+      // Clear any existing timeout for this conversation
+      const existingTimeout = typingTimeoutsRef.current.get(conversationId);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+        typingTimeoutsRef.current.delete(conversationId);
+      }
+
+      if (isTyping) {
+        setTypingConversations((prev) => new Set([...prev, conversationId]));
+
+        // Auto-remove after 5 seconds with proper cleanup tracking
+        const timeoutId = setTimeout(() => {
           setTypingConversations((prev) => {
             const next = new Set(prev);
-            next.delete(data.conversationId);
+            next.delete(conversationId);
             return next;
           });
+          // Remove from tracking map after execution
+          typingTimeoutsRef.current.delete(conversationId);
         }, 5000);
+
+        // Track this timeout for cleanup
+        typingTimeoutsRef.current.set(conversationId, timeoutId);
       } else {
         setTypingConversations((prev) => {
           const next = new Set(prev);
-          next.delete(data.conversationId);
+          next.delete(conversationId);
           return next;
         });
       }
     },
     [],
   );
+
+  useRealtimeEvent<{
+    conversationId: string;
+    userId: string;
+    isTyping: boolean;
+  }>('message:typing', handleTypingEvent, [handleTypingEvent]);
 
   const totalUnreadCount = useMemo(
     () => conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0),
@@ -133,104 +170,114 @@ const MessagesScreen: React.FC = () => {
     refreshConversations();
   }, [refreshConversations]);
 
-  const handleChatPress = (conversation: Conversation) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('Chat', {
-      otherUser: {
-        id: conversation.participantId || '',
-        name: conversation.participantName || 'User',
-        avatar: conversation.participantAvatar,
-        isVerified: conversation.participantVerified,
-        role: 'Traveler',
-        kyc: 'Verified',
-        location: '',
-      },
-      conversationId: conversation.id,
-    });
-  };
+  // PERFORMANCE: Memoized chat press handler
+  const handleChatPress = useCallback(
+    (conversation: Conversation) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      navigation.navigate('Chat', {
+        otherUser: {
+          id: conversation.participantId || '',
+          name: conversation.participantName || 'User',
+          avatar: conversation.participantAvatar ?? undefined,
+          isVerified: conversation.participantVerified ?? undefined,
+          role: 'Traveler',
+          kyc: 'Verified',
+          kycStatus: 'Verified',
+          email: '',
+          location: '',
+        },
+        conversationId: conversation.id,
+      });
+    },
+    [navigation],
+  );
 
-  const renderChatItem = ({ item }: { item: Conversation }) => {
-    const isOnline = item.participantId
-      ? isUserOnline(item.participantId)
-      : false;
-    const isTyping = typingConversations.has(item.id);
+  // PERFORMANCE: Memoized render function for FlashList
+  const renderChatItem = useCallback(
+    ({ item }: { item: Conversation }) => {
+      const isOnline = item.participantId
+        ? isUserOnline(item.participantId)
+        : false;
+      const isTyping = typingConversations.has(item.id);
 
-    return (
-      <TouchableOpacity
-        style={styles.chatItem}
-        onPress={() => handleChatPress(item)}
-        activeOpacity={0.7}
-        accessibilityLabel={`Chat with ${item.participantName || 'User'}${
-          item.unreadCount ? `, ${item.unreadCount} unread messages` : ''
-        }`}
-        accessibilityRole="button"
-        accessibilityHint="Opens conversation"
-      >
-        {/* Avatar */}
-        <View style={styles.avatarContainer}>
-          <Image
-            source={{
-              uri: item.participantAvatar || 'https://via.placeholder.com/100',
-            }}
-            style={styles.avatar}
-            accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
-          />
-          {isOnline && <View style={styles.onlineIndicator} />}
-        </View>
-
-        {/* Content */}
-        <View style={styles.chatContent}>
-          <View style={styles.chatHeader}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.personName}>
-                {item.participantName || 'User'}
-              </Text>
-              {item.participantVerified && (
-                <MaterialCommunityIcons
-                  name="check-decagram"
-                  size={14}
-                  color={COLORS.primary}
-                />
-              )}
-            </View>
-            <Text style={styles.timeText}>
-              {item.lastMessageAt ? formatTimeAgo(item.lastMessageAt) : ''}
-            </Text>
+      return (
+        <TouchableOpacity
+          style={styles.chatItem}
+          onPress={() => handleChatPress(item)}
+          activeOpacity={0.7}
+          accessibilityLabel={`Chat with ${item.participantName || 'User'}${
+            item.unreadCount ? `, ${item.unreadCount} unread messages` : ''
+          }`}
+          accessibilityRole="button"
+          accessibilityHint="Opens conversation"
+        >
+          {/* Avatar */}
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{
+                uri: item.participantAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
+              }}
+              style={styles.avatar}
+              accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
+            />
+            {isOnline && <View style={styles.onlineIndicator} />}
           </View>
 
-          {/* Moment Badge */}
-          {item.momentId && (
-            <View style={styles.momentBadge}>
-              <Text style={styles.momentEmoji}>✨</Text>
-              <Text style={styles.momentTitle}>{item.momentTitle}</Text>
-            </View>
-          )}
-
-          {/* Last Message */}
-          <View style={styles.messageRow}>
-            {isTyping ? (
-              <Text style={styles.typingText}>typing...</Text>
-            ) : (
-              <Text
-                style={[
-                  styles.lastMessage,
-                  (item.unreadCount || 0) > 0 && styles.lastMessageUnread,
-                ]}
-                numberOfLines={1}
-              >
-                {item.lastMessage || 'Start a conversation'}
+          {/* Content */}
+          <View style={styles.chatContent}>
+            <View style={styles.chatHeader}>
+              <View style={styles.nameContainer}>
+                <Text style={styles.personName}>
+                  {item.participantName || 'User'}
+                </Text>
+                {item.participantVerified && (
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={14}
+                    color={COLORS.primary}
+                  />
+                )}
+              </View>
+              <Text style={styles.timeText}>
+                {item.lastMessageAt ? formatTimeAgo(item.lastMessageAt) : ''}
               </Text>
-            )}
-            {(item.unreadCount || 0) > 0 && (
-              <View style={styles.unreadBadge}>
-                <Text style={styles.unreadText}>{item.unreadCount}</Text>
+            </View>
+
+            {/* Moment Badge */}
+            {item.momentId && (
+              <View style={styles.momentBadge}>
+                <Text style={styles.momentEmoji}>✨</Text>
+                <Text style={styles.momentTitle}>{item.momentTitle}</Text>
               </View>
             )}
+
+            {/* Last Message */}
+            <View style={styles.messageRow}>
+              {isTyping ? (
+                <Text style={styles.typingText}>typing...</Text>
+              ) : (
+                <Text
+                  style={[
+                    styles.lastMessage,
+                    (item.unreadCount || 0) > 0 && styles.lastMessageUnread,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {item.lastMessage || 'Start a conversation'}
+                </Text>
+              )}
+              {(item.unreadCount || 0) > 0 && (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadText}>{item.unreadCount}</Text>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+        </TouchableOpacity>
+      );
+    },
+    [handleChatPress, isUserOnline, typingConversations],
+  );
 
   const renderEmptyState = () => (
     <EmptyState
@@ -371,38 +418,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.background,
     flex: 1,
-  },
-  discoverButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    marginTop: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-  },
-  discoverButtonText: {
-    color: COLORS.white,
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-  },
-  emptyState: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-    paddingTop: 80,
-  },
-  emptySubtitle: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.body,
-    lineHeight: 22,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  emptyTitle: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.h3,
-    fontWeight: '600',
-    marginTop: 16,
   },
   lastMessage: {
     color: COLORS.textSecondary,

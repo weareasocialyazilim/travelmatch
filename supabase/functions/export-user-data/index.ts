@@ -41,23 +41,23 @@ import {
 interface UserDataExport {
   exportDate: string;
   userId: string;
-  profile: any;
-  moments: any[];
+  profile: Record<string, unknown> | null;
+  moments: Record<string, unknown>[];
   requests: {
-    sent: any[];
-    received: any[];
+    sent: Record<string, unknown>[];
+    received: Record<string, unknown>[];
   };
-  messages: any[];
-  conversations: any[];
-  transactions: any[];
+  messages: Record<string, unknown>[];
+  conversations: Record<string, unknown>[];
+  transactions: Record<string, unknown>[];
   reviews: {
-    written: any[];
-    received: any[];
+    written: Record<string, unknown>[];
+    received: Record<string, unknown>[];
   };
-  notifications: any[];
-  favorites: any[];
-  blocks: any[];
-  reports: any[];
+  notifications: Record<string, unknown>[];
+  favorites: Record<string, unknown>[];
+  blocks: Record<string, unknown>[];
+  reports: Record<string, unknown>[];
   metadata: {
     totalMoments: number;
     totalRequests: number;

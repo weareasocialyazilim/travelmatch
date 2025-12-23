@@ -109,10 +109,12 @@ export const BookingDetailScreen: React.FC = () => {
       navigation.navigate('Chat', {
         otherUser: {
           id: 'host-1',
+          email: '',
           name: booking.hostName,
           avatar: booking.hostAvatar,
           role: 'Local',
           kyc: 'Verified',
+          kycStatus: 'Verified',
           location: '',
         },
       });
@@ -122,7 +124,8 @@ export const BookingDetailScreen: React.FC = () => {
   const handleCancelBooking = () => {
     showConfirmation({
       title: 'Cancel Booking',
-      message: 'Are you sure you want to cancel this booking? This action cannot be undone.',
+      message:
+        'Are you sure you want to cancel this booking? This action cannot be undone.',
       type: 'danger',
       icon: 'close-circle',
       confirmText: 'Cancel Booking',

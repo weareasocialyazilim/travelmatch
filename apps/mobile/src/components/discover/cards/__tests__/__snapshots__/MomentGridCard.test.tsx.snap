@@ -9,8 +9,10 @@ exports[`MomentGridCard Component Snapshots matches snapshot for left column 1`]
   }
   accessible={true}
   onPress={[Function]}
+  ref={null}
 >
   <RCTText
+    ref={null}
     testID="RCTText"
   >
     Test Moment
@@ -27,8 +29,10 @@ exports[`MomentGridCard Component Snapshots matches snapshot for right column 1`
   }
   accessible={true}
   onPress={[Function]}
+  ref={null}
 >
   <RCTText
+    ref={null}
     testID="RCTText"
   >
     Test Moment

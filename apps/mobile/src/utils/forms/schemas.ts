@@ -1,6 +1,6 @@
 /**
  * Centralized Form Validation Schemas
- * 
+ *
  * All form validation schemas using Zod
  * Consistent patterns across the entire app
  */
@@ -74,22 +74,36 @@ export const messageValidation = z
 // AUTH SCHEMAS
 // ============================================================================
 
+// Login can be with email OR phone
 export const loginSchema = z.object({
-  email: emailValidation,
+  identifier: z.string().min(1, 'forms.validation.identifier.required'),
   password: z.string().min(1, 'forms.validation.password.required'),
 });
 
 export const registerSchema = z
   .object({
-    email: emailValidation,
-    password: passwordValidation,
-    confirmPassword: z.string().min(1, 'forms.validation.confirmPassword.required'),
     fullName: nameValidation,
+    email: emailValidation,
+    phone: phoneValidation,
+    password: passwordValidation,
+    confirmPassword: z
+      .string()
+      .min(1, 'forms.validation.confirmPassword.required'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'forms.validation.confirmPassword.mismatch',
     path: ['confirmPassword'],
   });
+
+// Email verification code
+export const emailVerificationSchema = z.object({
+  code: z.string().length(6, 'forms.validation.code.length'),
+});
+
+// Phone verification code
+export const phoneVerificationSchema = z.object({
+  code: z.string().length(6, 'forms.validation.code.length'),
+});
 
 export const forgotPasswordSchema = z.object({
   email: emailValidation,
@@ -98,7 +112,9 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z
   .object({
     password: passwordValidation,
-    confirmPassword: z.string().min(1, 'forms.validation.confirmPassword.required'),
+    confirmPassword: z
+      .string()
+      .min(1, 'forms.validation.confirmPassword.required'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'forms.validation.confirmPassword.mismatch',
@@ -107,9 +123,13 @@ export const resetPasswordSchema = z
 
 export const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, 'forms.validation.currentPassword.required'),
+    currentPassword: z
+      .string()
+      .min(1, 'forms.validation.currentPassword.required'),
     newPassword: passwordValidation,
-    confirmPassword: z.string().min(1, 'forms.validation.confirmPassword.required'),
+    confirmPassword: z
+      .string()
+      .min(1, 'forms.validation.confirmPassword.required'),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: 'forms.validation.confirmPassword.mismatch',
@@ -122,7 +142,10 @@ export const changePasswordSchema = z
 
 export const phoneAuthSchema = z.object({
   phone: phoneValidation,
-  otp: z.string().regex(/^\d{6}$/, 'forms.validation.otp.invalid').optional(),
+  otp: z
+    .string()
+    .regex(/^\d{6}$/, 'forms.validation.otp.invalid')
+    .optional(),
 });
 
 export const emailAuthSchema = z.object({
@@ -139,7 +162,6 @@ export const verifyCodeSchema = z.object({
 
 export const editProfileSchema = z.object({
   fullName: nameValidation,
-  username: usernameValidation.optional(),
   bio: bioValidation,
   location: z.string().max(100, 'forms.validation.location.max').optional(),
   website: urlValidation,
@@ -147,14 +169,11 @@ export const editProfileSchema = z.object({
 });
 
 export const completeProfileSchema = z.object({
-  fullName: nameValidation,
-  username: usernameValidation,
   bio: bioValidation,
-  avatar: z.string().optional().or(z.literal('')),
   interests: z
     .array(z.string())
-    .min(1, 'forms.validation.interests.min')
-    .max(5, 'forms.validation.interests.max'),
+    .max(5, 'forms.validation.interests.max')
+    .default([]),
 });
 
 // ============================================================================
@@ -171,7 +190,11 @@ export const withdrawSchema = z.object({
     .refine((val) => parseFloat(val) <= 100000, {
       message: 'forms.validation.amount.max',
     }),
-  note: z.string().max(500, 'forms.validation.note.max').optional().or(z.literal('')),
+  note: z
+    .string()
+    .max(500, 'forms.validation.note.max')
+    .optional()
+    .or(z.literal('')),
 });
 
 export const addPaymentMethodSchema = z.object({
@@ -186,9 +209,7 @@ export const addPaymentMethodSchema = z.object({
   expiryYear: z
     .number()
     .min(new Date().getFullYear(), 'forms.validation.expiryYear.min'),
-  cvv: z
-    .string()
-    .regex(/^[0-9]{3,4}$/, 'forms.validation.cvv.invalid'),
+  cvv: z.string().regex(/^[0-9]{3,4}$/, 'forms.validation.cvv.invalid'),
   cardHolderName: nameValidation,
 });
 
@@ -213,20 +234,19 @@ export const refundRequestSchema = z.object({
 // TRIP SCHEMAS
 // ============================================================================
 
-export const createTripSchema = z.object({
-  destination: z.string().min(1, 'forms.validation.destination.required'),
-  startDate: z.date(),
-  endDate: z.date(),
-  budget: amountValidation.optional(),
-  description: messageValidation.optional(),
-  companions: z.number().min(1).max(10).optional(),
-}).refine(
-  (data) => data.endDate > data.startDate,
-  {
+export const createTripSchema = z
+  .object({
+    destination: z.string().min(1, 'forms.validation.destination.required'),
+    startDate: z.date(),
+    endDate: z.date(),
+    budget: amountValidation.optional(),
+    description: messageValidation.optional(),
+    companions: z.number().min(1).max(10).optional(),
+  })
+  .refine((data) => data.endDate > data.startDate, {
     message: 'forms.validation.endDate.afterStart',
     path: ['endDate'],
-  }
-);
+  });
 
 export const tripRequestSchema = z.object({
   tripId: z.string().uuid('forms.validation.tripId.invalid'),
@@ -241,13 +261,13 @@ export const tripRequestSchema = z.object({
 export const createMomentSchema = z.object({
   title: z
     .string()
-    .min(5, 'forms.validation.title.minMoment')
-    .max(100, 'forms.validation.title.max'),
-  category: z.string().min(1, 'forms.validation.category.required'),
+    .min(3, 'Title must be at least 3 characters')
+    .max(100, 'Title must be less than 100 characters'),
+  category: z.string().min(1, 'Please select a category'),
   amount: z
     .number()
-    .positive('forms.validation.amount.positive')
-    .max(10000, 'forms.validation.amount.maxMoment'),
+    .min(0, 'Amount cannot be negative')
+    .max(10000, 'Maximum amount is $10,000'),
   date: z.date(),
   story: z
     .string()
@@ -327,21 +347,20 @@ export const disputeSchema = z.object({
     .string()
     .min(1, 'forms.validation.reason.required')
     .max(1000, 'forms.validation.reason.max'),
-  evidence: z.array(z.string()).max(3, 'forms.validation.evidence.max').optional(),
+  evidence: z
+    .array(z.string())
+    .max(3, 'forms.validation.evidence.max')
+    .optional(),
 });
 
 export const deleteAccountSchema = z.object({
-  confirmation: z
-    .string()
-    .refine((val) => val.toUpperCase() === 'DELETE', {
-      message: 'forms.validation.confirmation.delete',
-    }),
+  confirmation: z.string().refine((val) => val.toUpperCase() === 'DELETE', {
+    message: 'forms.validation.confirmation.delete',
+  }),
 });
 
 export const twoFactorSetupSchema = z.object({
-  verificationCode: z
-    .string()
-    .regex(/^\d{6}$/, 'forms.validation.code.length'),
+  verificationCode: z.string().regex(/^\d{6}$/, 'forms.validation.code.length'),
 });
 
 // ============================================================================
@@ -371,19 +390,16 @@ export const kycDocumentSchema = z.object({
 
 export const contactSupportSchema = z.object({
   subject: z.string().min(1, 'forms.validation.subject.required'),
-  category: z.enum([
-    'account',
-    'payment',
-    'technical',
-    'safety',
-    'other',
-  ]),
+  category: z.enum(['account', 'payment', 'technical', 'safety', 'other']),
   message: messageValidation,
   email: emailValidation.optional(),
 });
 
 export const feedbackSchema = z.object({
-  rating: z.number().min(1, 'forms.validation.rating.required').max(5, 'forms.validation.rating.max'),
+  rating: z
+    .number()
+    .min(1, 'forms.validation.rating.required')
+    .max(5, 'forms.validation.rating.max'),
   category: z.string().min(1, 'forms.validation.category.required'),
   comment: messageValidation.optional(),
 });
@@ -393,13 +409,19 @@ export const feedbackSchema = z.object({
 // ============================================================================
 
 export const trustNoteSchema = z.object({
-  note: z.string().min(10, 'forms.validation.trustNote.min').max(500, 'forms.validation.trustNote.max'),
+  note: z
+    .string()
+    .min(10, 'forms.validation.trustNote.min')
+    .max(500, 'forms.validation.trustNote.max'),
   rating: z.number().min(1).max(5),
   category: z.enum(['meet', 'trip', 'help', 'other']).optional(),
 });
 
 export const proofUploadSchema = z.object({
-  title: z.string().min(1, 'forms.validation.title.required').max(100, 'forms.validation.title.max'),
+  title: z
+    .string()
+    .min(1, 'forms.validation.title.required')
+    .max(100, 'forms.validation.title.max'),
   description: messageValidation.optional(),
   category: z.enum(['travel', 'education', 'work', 'skill', 'other']),
 });

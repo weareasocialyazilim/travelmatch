@@ -13,7 +13,6 @@ import type {
   SendMessageRequest,
 } from '../services/messageService';
 import type { MessageType, MessageStatus } from '../types/message.types';
-import { isNotNull } from '../types/guards';
 
 interface UseMessagesReturn {
   // Conversations
@@ -374,7 +373,6 @@ export const useMessages = (): UseMessagesReturn => {
       logger.info('useMessages', 'Unsubscribing from message updates');
       supabase.removeChannel(channel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Real-time subscription for conversation updates (new conversations, unread counts)

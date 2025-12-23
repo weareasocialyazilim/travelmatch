@@ -1,18 +1,21 @@
 /**
  * TravelMatch Types - Central Export Hub
- * 
+ *
  * TYPE HIERARCHY:
- * 1. db.ts - Database types (SINGLE SOURCE OF TRUTH)
- * 2. domain.ts - Business domain types
- * 3. core.ts - Core application types
- * 4. api.ts - API response wrappers
- * 
- * PREFER using types from db.ts for any database-related work.
- * The types in domain.ts and core.ts are maintained for backward
- * compatibility but should eventually be consolidated.
+ * 1. @travelmatch/shared - Canonical types (SINGLE SOURCE OF TRUTH for domain types)
+ * 2. db.ts - Database types (SINGLE SOURCE OF TRUTH for database schemas)
+ * 3. adapters.ts - API response normalizers (snake_case → camelCase)
+ * 4. domain.ts - Mobile-specific domain types + re-exports from shared
+ * 5. core.ts - Re-exports core types from shared
+ * 6. api.ts - API response wrappers
+ *
+ * PREFER:
+ * - Types from @travelmatch/shared for domain models (User, Moment, etc.)
+ * - Types from db.ts for database operations
+ * - Adapters from adapters.ts for API response normalization
  */
 
-// Database types - SINGLE SOURCE OF TRUTH
+// Database types - SINGLE SOURCE OF TRUTH for database schemas
 // Use Db* prefix for database row types
 export {
   // Database Row types
@@ -32,7 +35,7 @@ export {
   DbKycVerification,
   DbSubscriptionPlan,
   DbUserSubscription,
-  
+
   // Insert types
   DbUserInsert,
   DbMomentInsert,
@@ -43,7 +46,7 @@ export {
   DbReviewInsert,
   DbNotificationInsert,
   DbFavoriteInsert,
-  
+
   // Update types
   DbUserUpdate,
   DbMomentUpdate,
@@ -51,7 +54,7 @@ export {
   DbConversationUpdate,
   DbTransactionUpdate,
   DbRequestUpdate,
-  
+
   // Extended types (with frontend fields)
   type User as ExtendedUser,
   type Moment as ExtendedMoment,
@@ -60,20 +63,23 @@ export {
   type Transaction as ExtendedTransaction,
   type Request as ExtendedRequest,
   type Notification as ExtendedNotification,
-  
+
   // Utility types
   type TableName,
   type TableRow,
   type TableInsert,
   type TableUpdate,
   type Json,
-  
+
   // Type guards
   isDbUser,
   isDbMoment,
   isDbMessage,
 } from './db';
 
-// Domain and core types (legacy exports for backward compatibility)
+// Domain and core types (now re-exported from @travelmatch/shared)
 export * from './domain';
 export * from './core';
+
+// API normalizers
+export * from './adapters';

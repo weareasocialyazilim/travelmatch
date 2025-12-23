@@ -1,9 +1,11 @@
 /**
  * Example: Moments Feed with Skeleton + Preload + Offline Cache
+ * Using FlashList for optimal scroll performance
  */
 
 import React from 'react';
-import { FlatList, RefreshControl } from 'react-native';
+import { RefreshControl } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FeedSkeleton, MomentCardSkeleton } from '../components/skeletons';
 import { useImagePreload } from '../services/imagePreloader';
@@ -11,30 +13,24 @@ import { cacheKeys, CACHE_CONFIG } from '../services/offlineCache';
 
 export function MomentsFeedScreen() {
   const { prefetchNextPage, prefetchMomentsImages } = useImagePreload();
-  
+
   // Infinite query with offline support
-  const {
-    data,
-    isLoading,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
-    refetch,
-  } = useInfiniteQuery({
-    queryKey: cacheKeys.moments.feed(),
-    queryFn: ({ pageParam = 0 }) => momentService.getFeed(pageParam),
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    
-    // Cache configuration
-    staleTime: CACHE_CONFIG.moments.staleTime,
-    cacheTime: CACHE_CONFIG.moments.cacheTime,
-    
-    // Prefetch images when data loads
-    onSuccess: (data) => {
-      const allMoments = data.pages.flatMap((page) => page.moments);
-      prefetchMomentsImages(allMoments);
-    },
-  });
+  const { data, isLoading, isFetching, hasNextPage, fetchNextPage, refetch } =
+    useInfiniteQuery({
+      queryKey: cacheKeys.moments.feed(),
+      queryFn: ({ pageParam = 0 }) => momentService.getFeed(pageParam),
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+
+      // Cache configuration
+      staleTime: CACHE_CONFIG.moments.staleTime,
+      cacheTime: CACHE_CONFIG.moments.cacheTime,
+
+      // Prefetch images when data loads
+      onSuccess: (data) => {
+        const allMoments = data.pages.flatMap((page) => page.moments);
+        prefetchMomentsImages(allMoments);
+      },
+    });
 
   // Flatten pages into single array
   const moments = data?.pages.flatMap((page) => page.moments) ?? [];
@@ -49,8 +45,9 @@ export function MomentsFeedScreen() {
   // Prefetch next page when approaching end
   const handleScroll = (event: any) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-    const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
-    
+    const distanceFromBottom =
+      contentSize.height - layoutMeasurement.height - contentOffset.y;
+
     // Prefetch when 500px from bottom
     if (distanceFromBottom < 500 && hasNextPage && !isFetching) {
       const currentPage = data?.pages.length ?? 0;
@@ -64,7 +61,7 @@ export function MomentsFeedScreen() {
   }
 
   return (
-    <FlatList
+    <FlashList
       data={moments}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <MomentCard moment={item} />}

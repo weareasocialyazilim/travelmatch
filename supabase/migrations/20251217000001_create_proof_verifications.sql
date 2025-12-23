@@ -71,12 +71,14 @@ COMMENT ON COLUMN public.proof_verifications.red_flags IS
 ALTER TABLE public.proof_verifications ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own verifications
+DROP POLICY IF EXISTS "Users can view own proof verifications" ON public.proof_verifications;
 CREATE POLICY "Users can view own proof verifications"
   ON public.proof_verifications
   FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Users can view verifications for moments they created
+DROP POLICY IF EXISTS "Users can view verifications for their moments" ON public.proof_verifications;
 CREATE POLICY "Users can view verifications for their moments"
   ON public.proof_verifications
   FOR SELECT
@@ -89,12 +91,14 @@ CREATE POLICY "Users can view verifications for their moments"
   );
 
 -- Service role can insert (used by verify-proof Edge Function)
+DROP POLICY IF EXISTS "Service role can insert proof verifications" ON public.proof_verifications;
 CREATE POLICY "Service role can insert proof verifications"
   ON public.proof_verifications
   FOR INSERT
   WITH CHECK (true); -- Service role bypasses RLS anyway
 
 -- Service role can update (for admin corrections)
+DROP POLICY IF EXISTS "Service role can update proof verifications" ON public.proof_verifications;
 CREATE POLICY "Service role can update proof verifications"
   ON public.proof_verifications
   FOR UPDATE
@@ -109,6 +113,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS proof_verifications_updated_at ON public.proof_verifications;
 CREATE TRIGGER proof_verifications_updated_at
   BEFORE UPDATE ON public.proof_verifications
   FOR EACH ROW

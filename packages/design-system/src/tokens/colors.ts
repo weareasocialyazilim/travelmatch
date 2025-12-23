@@ -1,143 +1,198 @@
 /**
  * Design Tokens - Colors
- * Manually managed design tokens for TravelMatch
- * Update these values to maintain brand consistency
+ * UNIFIED TravelMatch Brand Colors
+ *
+ * IMPORTANT: This file is the CANONICAL source of truth for colors.
+ * All platforms (mobile, web, admin) should import from here.
+ *
+ * Brand Identity:
+ * - Primary: Coral (#FF6B6B) - Warmth, adventure, passion
+ * - Secondary: Mint (#4ECDC4) - Trust, freshness, growth
+ * - Accent: Lavender (#9B59B6) - Premium, unique experiences
  */
 
+// ============================================================================
+// BASE COLOR PALETTE
+// ============================================================================
+
+const palette = {
+  // Brand Colors
+  coral: '#FF6B6B',
+  mint: '#4ECDC4',
+  lavender: '#9B59B6',
+  sky: '#3498DB',
+  peach: '#FFEAA7',
+
+  // Semantic
+  warning: '#FFE66D',
+  error: '#FF6B6B',
+  info: '#4A90E2',
+
+  // Grayscale
+  white: '#FFFFFF',
+  black: '#000000',
+  gray50: '#FAFAFA',
+  gray100: '#F5F5F5',
+  gray200: '#EEEEEE',
+  gray300: '#E0E0E0',
+  gray400: '#BDBDBD',
+  gray500: '#9E9E9E',
+  gray600: '#757575',
+  gray700: '#616161',
+  gray800: '#424242',
+  gray900: '#212121',
+
+  // Backgrounds
+  background: '#F8F9FA',
+  backgroundDark: '#121212',
+
+  // Text
+  text: '#212121',
+  textSecondary: '#757575',
+  textDisabled: '#9E9E9E',
+
+  // Border
+  border: '#E0E0E0',
+} as const;
+
+// ============================================================================
+// EXPORTED COLORS OBJECT
+// ============================================================================
+
 export const colors = {
-  // Primary Colors
+  // Primary Colors - TravelMatch Coral
   primary: {
-    50: '#E3F2FD',
-    100: '#BBDEFB',
-    200: '#90CAF9',
-    300: '#64B5F6',
-    400: '#42A5F5',
-    500: '#2196F3', // Main primary
-    600: '#1E88E5',
-    700: '#1976D2',
-    800: '#1565C0',
-    900: '#0D47A1',
+    50: '#FFF0F0',
+    100: '#FFE0E0',
+    200: '#FFC1C1',
+    300: '#FFA3A3',
+    400: '#FF8A8A',
+    500: palette.coral,
+    600: '#E85555',
+    700: '#D14040',
+    800: '#BA2C2C',
+    900: '#8B1F1F',
   },
 
-  // Secondary Colors
+  // Secondary Colors - TravelMatch Mint
   secondary: {
-    50: '#FCE4EC',
-    100: '#F8BBD0',
-    200: '#F48FB1',
-    300: '#F06292',
-    400: '#EC407A',
-    500: '#E91E63', // Main secondary
-    600: '#D81B60',
-    700: '#C2185B',
-    800: '#AD1457',
-    900: '#880E4F',
+    50: '#E8FAF8',
+    100: '#D1F5F1',
+    200: '#A3EBE3',
+    300: '#75E0D5',
+    400: '#5CD9CB',
+    500: palette.mint,
+    600: '#3EB8B0',
+    700: '#2EA39C',
+    800: '#1F8E88',
+    900: '#106963',
   },
 
-  // Accent Colors
+  // Accent Colors - TravelMatch Lavender
   accent: {
-    50: '#FFF3E0',
-    100: '#FFE0B2',
-    200: '#FFCC80',
-    300: '#FFB74D',
-    400: '#FFA726',
-    500: '#FF9800', // Main accent
-    600: '#FB8C00',
-    700: '#F57C00',
-    800: '#EF6C00',
-    900: '#E65100',
+    50: '#F5EEFA',
+    100: '#EBDDF5',
+    200: '#D7BBEB',
+    300: '#C39AE0',
+    400: '#AF78D6',
+    500: palette.lavender,
+    600: '#8647A3',
+    700: '#713590',
+    800: '#5C237D',
+    900: '#47116A',
   },
 
   // Semantic Colors
   success: {
-    50: '#E8F5E9',
-    100: '#C8E6C9',
-    200: '#A5D6A7',
-    300: '#81C784',
-    400: '#66BB6A',
-    500: '#4CAF50', // Main success
-    600: '#43A047',
-    700: '#388E3C',
-    800: '#2E7D32',
-    900: '#1B5E20',
+    50: '#E8FAF8',
+    100: '#D1F5F1',
+    200: '#A3EBE3',
+    300: '#75E0D5',
+    400: '#5CD9CB',
+    500: palette.mint,
+    600: '#3EB8B0',
+    700: '#2EA39C',
+    800: '#1F8E88',
+    900: '#106963',
   },
 
   warning: {
-    50: '#FFF8E1',
-    100: '#FFECB3',
-    200: '#FFE082',
-    300: '#FFD54F',
-    400: '#FFCA28',
-    500: '#FFC107', // Main warning
-    600: '#FFB300',
-    700: '#FFA000',
-    800: '#FF8F00',
-    900: '#FF6F00',
+    50: '#FFFEF0',
+    100: '#FFFCE0',
+    200: '#FFF9C1',
+    300: '#FFF6A3',
+    400: '#FFF084',
+    500: palette.warning,
+    600: '#E6CF5A',
+    700: '#CCB847',
+    800: '#B3A134',
+    900: '#998A21',
   },
 
   error: {
-    50: '#FFEBEE',
-    100: '#FFCDD2',
-    200: '#EF9A9A',
-    300: '#E57373',
-    400: '#EF5350',
-    500: '#F44336', // Main error
-    600: '#E53935',
-    700: '#D32F2F',
-    800: '#C62828',
-    900: '#B71C1C',
+    50: '#FFF0F0',
+    100: '#FFE0E0',
+    200: '#FFC1C1',
+    300: '#FFA3A3',
+    400: '#FF8A8A',
+    500: palette.error,
+    600: '#E85555',
+    700: '#D14040',
+    800: '#BA2C2C',
+    900: '#8B1F1F',
   },
 
   info: {
-    50: '#E1F5FE',
-    100: '#B3E5FC',
-    200: '#81D4FA',
-    300: '#4FC3F7',
-    400: '#29B6F6',
-    500: '#03A9F4', // Main info
-    600: '#039BE5',
-    700: '#0288D1',
-    800: '#0277BD',
-    900: '#01579B',
+    50: '#EBF5FF',
+    100: '#D6EBFF',
+    200: '#ADD6FF',
+    300: '#85C2FF',
+    400: '#5CADFF',
+    500: palette.info,
+    600: '#3A7ACC',
+    700: '#2A65B6',
+    800: '#1A50A0',
+    900: '#0A3B8A',
   },
 
   // Neutral Colors
   neutral: {
-    0: '#FFFFFF',
-    50: '#FAFAFA',
-    100: '#F5F5F5',
-    200: '#EEEEEE',
-    300: '#E0E0E0',
-    400: '#BDBDBD',
-    500: '#9E9E9E',
-    600: '#757575',
-    700: '#616161',
-    800: '#424242',
-    900: '#212121',
-    1000: '#000000',
+    0: palette.white,
+    50: palette.gray50,
+    100: palette.gray100,
+    200: palette.gray200,
+    300: palette.gray300,
+    400: palette.gray400,
+    500: palette.gray500,
+    600: palette.gray600,
+    700: palette.gray700,
+    800: palette.gray800,
+    900: palette.gray900,
+    1000: palette.black,
   },
 
   // Background Colors
   background: {
-    primary: '#FFFFFF',
-    secondary: '#F5F5F5',
-    tertiary: '#EEEEEE',
-    dark: '#121212',
+    primary: palette.white,
+    secondary: palette.background,
+    tertiary: palette.gray100,
+    dark: palette.backgroundDark,
     darkSecondary: '#1E1E1E',
   },
 
   // Text Colors
   text: {
-    primary: '#212121',
-    secondary: '#757575',
-    disabled: '#BDBDBD',
-    inverse: '#FFFFFF',
+    primary: palette.text,
+    secondary: palette.textSecondary,
+    disabled: palette.textDisabled,
+    inverse: palette.white,
   },
 
   // Border Colors
   border: {
-    light: '#E0E0E0',
-    medium: '#BDBDBD',
-    dark: '#757575',
+    light: palette.gray200,
+    medium: palette.border,
+    dark: palette.gray600,
   },
 
   // Overlay Colors
@@ -146,6 +201,18 @@ export const colors = {
     medium: 'rgba(0, 0, 0, 0.3)',
     dark: 'rgba(0, 0, 0, 0.6)',
   },
+
+  // Brand accent colors (for quick access)
+  brand: {
+    coral: palette.coral,
+    mint: palette.mint,
+    lavender: palette.lavender,
+    sky: palette.sky,
+    peach: palette.peach,
+  },
 } as const;
 
 export type Colors = typeof colors;
+
+// Export palette for direct access if needed
+export { palette as COLORS };

@@ -10,6 +10,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { DEFAULT_IMAGES } from '@/constants/defaultValues';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -71,8 +72,8 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
           status === 'pending_verification'
             ? 'current'
             : status === 'verified'
-            ? 'completed'
-            : 'pending',
+              ? 'completed'
+              : 'pending',
         time: status === 'verified' ? '1 day ago' : undefined,
       },
       {
@@ -108,12 +109,14 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
       navigation.navigate('Chat', {
         otherUser: {
           id: gestureId,
+          email: '',
           name: senderName || 'Anonymous',
-          avatar: senderAvatar || 'https://via.placeholder.com/100',
+          avatar: senderAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
           isVerified: true,
           type: 'traveler',
           role: 'Traveler',
           kyc: 'Verified',
+          kycStatus: 'Verified',
           location: '',
         },
       });
@@ -183,7 +186,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
               <View style={styles.senderInfo}>
                 <Image
                   source={{
-                    uri: senderAvatar || 'https://via.placeholder.com/100',
+                    uri: senderAvatar || DEFAULT_IMAGES.AVATAR_MEDIUM,
                   }}
                   style={styles.senderAvatar}
                 />

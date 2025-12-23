@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
+import type { Database } from '@/types/database';
+
+type TaskStatus = Database['public']['Enums']['task_status'];
+type TaskPriority = Database['public']['Enums']['task_priority'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,23 +24,26 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('tasks')
-      .select('*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)', {
-        count: 'exact',
-      })
+      .select(
+        '*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)',
+        {
+          count: 'exact',
+        },
+      )
       .order('priority', { ascending: false })
       .order('created_at', { ascending: true })
       .range(offset, offset + limit - 1);
 
     // Filter by status
     if (status) {
-      query = query.eq('status', status);
+      query = query.eq('status', status as TaskStatus);
     } else {
-      query = query.in('status', ['pending', 'in_progress']);
+      query = query.in('status', ['pending', 'in_progress'] as TaskStatus[]);
     }
 
     // Filter by priority
     if (priority) {
-      query = query.eq('priority', priority);
+      query = query.eq('priority', priority as TaskPriority);
     }
 
     // Filter by assignee
@@ -50,14 +57,19 @@ export async function GET(request: NextRequest) {
 
     // Role-based filtering for non-admin roles
     if (!['super_admin', 'manager'].includes(session.admin.role)) {
-      query = query.or(`assigned_to.eq.${session.admin.id},assigned_roles.cs.{${session.admin.role}}`);
+      query = query.or(
+        `assigned_to.eq.${session.admin.id},assigned_roles.cs.{${session.admin.role}}`,
+      );
     }
 
     const { data: tasks, count, error } = await query;
 
     if (error) {
       console.error('Tasks query error:', error);
-      return NextResponse.json({ error: 'Görevler yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Görevler yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -96,7 +108,7 @@ export async function POST(request: NextRequest) {
     if (!type || !title || !resource_type || !resource_id) {
       return NextResponse.json(
         { error: 'Gerekli alanlar eksik' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -121,7 +133,10 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Task creation error:', error);
-      return NextResponse.json({ error: 'Görev oluşturulamadı' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Görev oluşturulamadı' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -130,8 +145,11 @@ export async function POST(request: NextRequest) {
       action: 'create_task',
       resource_type: 'task',
       resource_id: task.id,
-      new_value: task,
-      ip_address: request.headers.get('x-forwarded-for') || request.ip,
+      new_value: task as Record<string, unknown>,
+      ip_address:
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        'unknown',
       user_agent: request.headers.get('user-agent'),
     });
 

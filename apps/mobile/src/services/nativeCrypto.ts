@@ -1,13 +1,13 @@
 /**
  * Native Web Crypto API Migration Plan
- * 
+ *
  * NOTE: This file uses Web APIs (CompressionStream, DecompressionStream, crypto.subtle)
  * which are only available in web environments. For React Native, use expo-crypto instead.
- * 
+ *
  * Replaces deprecated/heavy npm packages with native browser APIs:
  * - pako → CompressionStream/DecompressionStream API
  * - tweetnacl → Web Crypto API (subtle.crypto)
- * 
+ *
  * Benefits:
  * - Smaller bundle size (~50KB reduction)
  * - Better performance (native implementation)
@@ -29,7 +29,7 @@ declare global {
 }
 
 // Platform check - these APIs only work on web
-const isWeb = Platform.OS === 'web';
+const _isWeb = Platform.OS === 'web';
 
 // ============================================
 // COMPRESSION API (replaces pako)
@@ -38,35 +38,34 @@ const isWeb = Platform.OS === 'web';
 /**
  * Compress data using native CompressionStream API
  * Replaces: pako.gzip()
- * 
+ *
  * @example
  * const compressed = await compressData(jsonString);
  * const base64 = await blobToBase64(compressed);
  */
-export async function compressData(
-  data: string | ArrayBuffer,
-): Promise<Blob> {
+export async function compressData(data: string | ArrayBuffer): Promise<Blob> {
   try {
     const startTime = performance.now();
-    
+
     // Convert to stream
-    const input = typeof data === 'string' 
-      ? new Blob([data], { type: 'text/plain' })
-      : new Blob([data]);
+    const input =
+      typeof data === 'string'
+        ? new Blob([data], { type: 'text/plain' })
+        : new Blob([data]);
 
     // Create compression stream (gzip format)
     const compressionStream = new CompressionStream('gzip');
-    
+
     // Pipe through compression
     const compressedStream = input.stream().pipeThrough(compressionStream);
-    
+
     // Convert back to blob
     const compressedBlob = await new Response(compressedStream).blob();
 
     logger.info('[Compression] Data compressed', {
       original: input.size,
       compressed: compressedBlob.size,
-      ratio: (compressedBlob.size / input.size * 100).toFixed(2) + '%',
+      ratio: ((compressedBlob.size / input.size) * 100).toFixed(2) + '%',
       duration: (performance.now() - startTime).toFixed(2) + 'ms',
     });
 
@@ -80,7 +79,7 @@ export async function compressData(
 /**
  * Decompress data using native DecompressionStream API
  * Replaces: pako.ungzip()
- * 
+ *
  * @example
  * const decompressed = await decompressData(compressedBlob);
  * const text = await decompressed.text();
@@ -90,18 +89,19 @@ export async function decompressData(
 ): Promise<Blob> {
   try {
     const startTime = performance.now();
-    
+
     // Convert to blob if needed
-    const input = compressedData instanceof Blob
-      ? compressedData
-      : new Blob([compressedData]);
+    const input =
+      compressedData instanceof Blob
+        ? compressedData
+        : new Blob([compressedData]);
 
     // Create decompression stream
     const decompressionStream = new DecompressionStream('gzip');
-    
+
     // Pipe through decompression
     const decompressedStream = input.stream().pipeThrough(decompressionStream);
-    
+
     // Convert back to blob
     const decompressedBlob = await new Response(decompressedStream).blob();
 
@@ -136,11 +136,11 @@ export async function blobToBase64(blob: Blob): Promise<string> {
 export function base64ToBlob(base64: string, contentType = ''): Blob {
   const byteCharacters = atob(base64.split(',')[1] || base64);
   const byteNumbers = new Array(byteCharacters.length);
-  
+
   for (let i = 0; i < byteCharacters.length; i++) {
     byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
-  
+
   const byteArray = new Uint8Array(byteNumbers);
   return new Blob([byteArray], { type: contentType });
 }
@@ -200,7 +200,7 @@ export async function generateSymmetricKey(): Promise<CryptoKey> {
 /**
  * Encrypt data using Web Crypto API
  * Replaces: tweetnacl.box()
- * 
+ *
  * @example
  * const key = await generateSymmetricKey();
  * const encrypted = await encryptData('sensitive data', key);
@@ -211,11 +211,10 @@ export async function encryptData(
 ): Promise<{ encrypted: ArrayBuffer; iv: Uint8Array }> {
   try {
     const startTime = performance.now();
-    
+
     // Convert string to ArrayBuffer
-    const dataBuffer = typeof data === 'string'
-      ? new TextEncoder().encode(data)
-      : data;
+    const dataBuffer =
+      typeof data === 'string' ? new TextEncoder().encode(data) : data;
 
     // Generate random IV (Initialization Vector)
     const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -253,7 +252,7 @@ export async function decryptData(
 ): Promise<string> {
   try {
     const startTime = performance.now();
-    
+
     // Decrypt
     const decrypted = await crypto.subtle.decrypt(
       {
@@ -290,10 +289,11 @@ export function generateRandomBytes(length: number): Uint8Array {
  * Hash data using SHA-256
  * Replaces: tweetnacl.hash()
  */
-export async function hashData(data: string | ArrayBuffer): Promise<ArrayBuffer> {
-  const dataBuffer = typeof data === 'string'
-    ? new TextEncoder().encode(data)
-    : data;
+export async function hashData(
+  data: string | ArrayBuffer,
+): Promise<ArrayBuffer> {
+  const dataBuffer =
+    typeof data === 'string' ? new TextEncoder().encode(data) : data;
 
   return await crypto.subtle.digest('SHA-256', dataBuffer);
 }
@@ -306,9 +306,8 @@ export async function signData(
   data: string | ArrayBuffer,
   key: CryptoKey,
 ): Promise<ArrayBuffer> {
-  const dataBuffer = typeof data === 'string'
-    ? new TextEncoder().encode(data)
-    : data;
+  const dataBuffer =
+    typeof data === 'string' ? new TextEncoder().encode(data) : data;
 
   return await crypto.subtle.sign(
     {
@@ -329,9 +328,8 @@ export async function verifySignature(
   data: string | ArrayBuffer,
   key: CryptoKey,
 ): Promise<boolean> {
-  const dataBuffer = typeof data === 'string'
-    ? new TextEncoder().encode(data)
-    : data;
+  const dataBuffer =
+    typeof data === 'string' ? new TextEncoder().encode(data) : data;
 
   return await crypto.subtle.verify(
     {
@@ -360,8 +358,8 @@ export async function importKey(
   base64Key: string,
   algorithm: 'AES-GCM' | 'HMAC' = 'AES-GCM',
 ): Promise<CryptoKey> {
-  const keyData = Uint8Array.from(atob(base64Key), c => c.charCodeAt(0));
-  
+  const keyData = Uint8Array.from(atob(base64Key), (c) => c.charCodeAt(0));
+
   return await crypto.subtle.importKey(
     'raw',
     keyData,
@@ -388,7 +386,7 @@ export const pakoMigrationGuide = {
    * const compressed = pako.gzip(data);
    * const decompressed = pako.ungzip(compressed);
    * ```
-   * 
+   *
    * AFTER (native):
    * ```typescript
    * import { compressData, decompressData } from './nativeCrypto';
@@ -410,7 +408,7 @@ export const tweetnaclMigrationGuide = {
    * const keyPair = nacl.box.keyPair();
    * const encrypted = nacl.box(message, nonce, theirPublicKey, mySecretKey);
    * ```
-   * 
+   *
    * AFTER (Web Crypto API):
    * ```typescript
    * import { generateSymmetricKey, encryptData } from './nativeCrypto';
@@ -425,17 +423,19 @@ export const tweetnaclMigrationGuide = {
  */
 export async function benchmarkCompression(data: string) {
   logger.debug('🔬 Compression Benchmark\n');
-  
+
   // Native API
   const nativeStart = performance.now();
   const nativeCompressed = await compressData(data);
   const nativeDuration = performance.now() - nativeStart;
-  
+
   logger.debug('Native CompressionStream API:');
   logger.debug(`  Duration: ${nativeDuration.toFixed(2)}ms`);
   logger.debug(`  Size: ${nativeCompressed.size} bytes`);
-  logger.debug(`  Ratio: ${(nativeCompressed.size / data.length * 100).toFixed(2)}%\n`);
-  
+  logger.debug(
+    `  Ratio: ${((nativeCompressed.size / data.length) * 100).toFixed(2)}%\n`,
+  );
+
   return {
     native: { duration: nativeDuration, size: nativeCompressed.size },
   };
@@ -447,7 +447,7 @@ export default {
   decompressData,
   blobToBase64,
   base64ToBlob,
-  
+
   // Encryption
   generateEncryptionKey,
   generateSymmetricKey,
@@ -459,7 +459,7 @@ export default {
   verifySignature,
   exportKey,
   importKey,
-  
+
   // Benchmarking
   benchmarkCompression,
 };

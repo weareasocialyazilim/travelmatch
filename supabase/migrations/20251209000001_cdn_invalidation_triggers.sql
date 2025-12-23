@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS public.cdn_invalidation_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_cdn_invalidation_logs_created_at ON public.cdn_invalidation_logs(created_at DESC);
-CREATE INDEX idx_cdn_invalidation_logs_type ON public.cdn_invalidation_logs(type);
+CREATE INDEX IF NOT EXISTS idx_cdn_invalidation_logs_created_at ON public.cdn_invalidation_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_cdn_invalidation_logs_type ON public.cdn_invalidation_logs(type);
 
 COMMENT ON TABLE public.cdn_invalidation_logs IS 'Logs of CDN cache invalidation requests';
 

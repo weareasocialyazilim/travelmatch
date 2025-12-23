@@ -1,3 +1,13 @@
 {
-  "expo": {}
+  "ios": {
+    "bundleIdentifier": "com.travelmatch.travelmatch-new",
+    "infoPlist": {
+      "ITSAppUsesNonExemptEncryption": false
+    }
+  },
+  "extra": {
+    "eas": {
+      "projectId": "1e869585-47ed-4578-a554-eb820ea0fedb"
+    }
+  }
 }

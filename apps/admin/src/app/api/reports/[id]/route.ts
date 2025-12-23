@@ -3,30 +3,30 @@ import { createClient } from '@/lib/supabase';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const supabase = createClient();
 
     const { data: report, error } = await supabase
       .from('reports')
-      .select(`
+      .select(
+        `
         *,
         reporter:profiles!reporter_id(id, full_name, avatar_url, email),
         reported:profiles!reported_id(id, full_name, avatar_url, email),
         assigned_to:admin_users!assigned_to(id, full_name),
         actions:report_actions(*)
-      `)
-      .eq('id', params.id)
+      `,
+      )
+      .eq('id', id)
       .single();
 
     if (error) throw error;
 
     if (!report) {
-      return NextResponse.json(
-        { error: 'Report not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
 
     return NextResponse.json(report);
@@ -34,16 +34,17 @@ export async function GET(
     console.error('Get report error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch report' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const supabase = createClient();
     const body = await request.json();
 
@@ -54,10 +55,11 @@ export async function PATCH(
         priority: body.priority,
         assigned_to: body.assigned_to,
         resolution: body.resolution,
-        resolved_at: body.status === 'resolved' ? new Date().toISOString() : null,
+        resolved_at:
+          body.status === 'resolved' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -68,7 +70,7 @@ export async function PATCH(
     console.error('Update report error:', error);
     return NextResponse.json(
       { error: 'Failed to update report' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

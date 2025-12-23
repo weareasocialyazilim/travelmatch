@@ -23,15 +23,18 @@ interface ExpoFileSystemExtended {
 
 const FileSystemExtended = FileSystem as typeof FileSystem &
   ExpoFileSystemExtended;
-const File = FileSystemExtended.File;
-const Paths = FileSystemExtended.Paths;
+const _File = FileSystemExtended.File;
+const _Paths = FileSystemExtended.Paths;
 
 // ArrayBuffer to Base64 conversion
 const encode = (buffer: ArrayBuffer): string => {
   const bytes = new Uint8Array(buffer);
   let binary = '';
   for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    const byte = bytes[i];
+    if (byte !== undefined) {
+      binary += String.fromCharCode(byte);
+    }
   }
   return btoa(binary);
 };

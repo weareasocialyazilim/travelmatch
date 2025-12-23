@@ -8,16 +8,27 @@ import type { AdminUser } from '@/types/admin';
 
 export function useAuth() {
   const router = useRouter();
-  const { user, isAuthenticated, is2FAVerified, isLoading, setUser, set2FAVerified, setLoading, logout: logoutStore } = useAuthStore();
+  const {
+    user,
+    isAuthenticated,
+    is2FAVerified,
+    isLoading,
+    setUser,
+    set2FAVerified,
+    setLoading,
+    logout: logoutStore,
+  } = useAuthStore();
   const supabase = getClient();
 
   // Check session on mount
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-        if (session?.user) {
+        if (session?.user?.email) {
           // Fetch admin user profile
           const { data: adminUser } = await supabase
             .from('admin_users')
@@ -51,7 +62,9 @@ export function useAuth() {
     checkSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         logoutStore();
         router.push('/login');
@@ -63,70 +76,78 @@ export function useAuth() {
     };
   }, [supabase, setUser, setLoading, logoutStore, router]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+  const login = useCallback(
+    async (email: string, password: string) => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        // Check if user is an admin
+        const { data: adminUser, error: adminError } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('email', email)
+          .eq('is_active', true)
+          .single();
+
+        if (adminError || !adminUser) {
+          await supabase.auth.signOut();
+          throw new Error(
+            'Bu hesap admin paneline erişim yetkisine sahip değil.',
+          );
+        }
+
+        setUser(adminUser as AdminUser);
+
+        // If 2FA is required and enabled, redirect to 2FA page
+        if (adminUser.requires_2fa && adminUser.totp_enabled) {
+          set2FAVerified(false);
+          return { success: true, requires2FA: true };
+        }
+
+        // If 2FA is required but not set up, redirect to setup
+        if (adminUser.requires_2fa && !adminUser.totp_enabled) {
+          set2FAVerified(false);
+          return { success: true, requires2FASetup: true };
+        }
+
+        set2FAVerified(true);
+        return { success: true };
+      } catch (error) {
+        setLoading(false);
+        throw error;
+      }
+    },
+    [supabase, setUser, setLoading, set2FAVerified],
+  );
+
+  const verify2FA = useCallback(
+    async (code: string) => {
+      if (!user) throw new Error('Kullanıcı bulunamadı');
+
+      // Verify TOTP code via API route
+      const response = await fetch('/api/auth/verify-2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, code }),
       });
 
-      if (error) throw error;
+      const result = await response.json();
 
-      // Check if user is an admin
-      const { data: adminUser, error: adminError } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('email', email)
-        .eq('is_active', true)
-        .single();
-
-      if (adminError || !adminUser) {
-        await supabase.auth.signOut();
-        throw new Error('Bu hesap admin paneline erişim yetkisine sahip değil.');
-      }
-
-      setUser(adminUser as AdminUser);
-
-      // If 2FA is required and enabled, redirect to 2FA page
-      if (adminUser.requires_2fa && adminUser.totp_enabled) {
-        set2FAVerified(false);
-        return { success: true, requires2FA: true };
-      }
-
-      // If 2FA is required but not set up, redirect to setup
-      if (adminUser.requires_2fa && !adminUser.totp_enabled) {
-        set2FAVerified(false);
-        return { success: true, requires2FASetup: true };
+      if (!result.success) {
+        throw new Error(result.error || '2FA doğrulama başarısız');
       }
 
       set2FAVerified(true);
       return { success: true };
-    } catch (error) {
-      setLoading(false);
-      throw error;
-    }
-  }, [supabase, setUser, setLoading, set2FAVerified]);
-
-  const verify2FA = useCallback(async (code: string) => {
-    if (!user) throw new Error('Kullanıcı bulunamadı');
-
-    // Verify TOTP code via API route
-    const response = await fetch('/api/auth/verify-2fa', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id, code }),
-    });
-
-    const result = await response.json();
-
-    if (!result.success) {
-      throw new Error(result.error || '2FA doğrulama başarısız');
-    }
-
-    set2FAVerified(true);
-    return { success: true };
-  }, [user, set2FAVerified]);
+    },
+    [user, set2FAVerified],
+  );
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut();

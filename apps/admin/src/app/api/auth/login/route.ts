@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email ve şifre gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     if (userError || !adminUserData) {
       return NextResponse.json(
         { error: 'Geçersiz kimlik bilgileri' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -37,15 +37,16 @@ export async function POST(request: NextRequest) {
     const adminUser = adminUserData as any;
 
     // Authenticate with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (authError) {
       return NextResponse.json(
         { error: 'Geçersiz kimlik bilgileri' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -53,14 +54,20 @@ export async function POST(request: NextRequest) {
     if (adminUser.totp_enabled) {
       // Create temporary session token for 2FA verification
       const tempToken = crypto.randomBytes(32).toString('hex');
-      const tokenHash = crypto.createHash('sha256').update(tempToken).digest('hex');
+      const tokenHash = crypto
+        .createHash('sha256')
+        .update(tempToken)
+        .digest('hex');
 
       // Store temp session
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any).from('admin_sessions').insert({
         admin_id: adminUser.id,
         token_hash: tokenHash,
-        ip_address: request.headers.get('x-forwarded-for') || request.ip,
+        ip_address:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          'unknown',
         user_agent: request.headers.get('user-agent'),
         expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutes for 2FA
       });
@@ -74,14 +81,20 @@ export async function POST(request: NextRequest) {
 
     // Create session token
     const sessionToken = crypto.randomBytes(32).toString('hex');
-    const sessionHash = crypto.createHash('sha256').update(sessionToken).digest('hex');
+    const sessionHash = crypto
+      .createHash('sha256')
+      .update(sessionToken)
+      .digest('hex');
 
     // Store session
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from('admin_sessions').insert({
       admin_id: adminUser.id,
       token_hash: sessionHash,
-      ip_address: request.headers.get('x-forwarded-for') || request.ip,
+      ip_address:
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        'unknown',
       user_agent: request.headers.get('user-agent'),
       expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
     });
@@ -124,7 +137,7 @@ export async function POST(request: NextRequest) {
     console.error('Login error:', error);
     return NextResponse.json(
       { error: 'Giriş yapılırken bir hata oluştu' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

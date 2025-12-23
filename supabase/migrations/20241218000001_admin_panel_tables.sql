@@ -36,7 +36,7 @@ CREATE TYPE task_status AS ENUM (
 -- ADMIN USERS TABLE
 -- =====================================================
 
-CREATE TABLE admin_users (
+CREATE TABLE IF NOT EXISTS admin_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
@@ -53,15 +53,15 @@ CREATE TABLE admin_users (
 );
 
 -- Index for email lookups
-CREATE INDEX idx_admin_users_email ON admin_users(email);
-CREATE INDEX idx_admin_users_role ON admin_users(role);
-CREATE INDEX idx_admin_users_active ON admin_users(is_active);
+CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);
+CREATE INDEX IF NOT EXISTS idx_admin_users_role ON admin_users(role);
+CREATE INDEX IF NOT EXISTS idx_admin_users_active ON admin_users(is_active);
 
 -- =====================================================
 -- ADMIN SESSIONS TABLE
 -- =====================================================
 
-CREATE TABLE admin_sessions (
+CREATE TABLE IF NOT EXISTS admin_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   admin_id UUID NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
   token_hash TEXT NOT NULL,
@@ -72,17 +72,17 @@ CREATE TABLE admin_sessions (
 );
 
 -- Index for session lookups
-CREATE INDEX idx_admin_sessions_admin_id ON admin_sessions(admin_id);
-CREATE INDEX idx_admin_sessions_expires ON admin_sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_admin_sessions_admin_id ON admin_sessions(admin_id);
+CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires ON admin_sessions(expires_at);
 
--- Cleanup expired sessions
-CREATE INDEX idx_admin_sessions_cleanup ON admin_sessions(expires_at) WHERE expires_at < now();
+-- Note: Partial index with now() removed as now() is not IMMUTABLE
+-- Expired session cleanup handled via scheduled job instead
 
 -- =====================================================
 -- ROLE PERMISSIONS TABLE
 -- =====================================================
 
-CREATE TABLE role_permissions (
+CREATE TABLE IF NOT EXISTS role_permissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   role admin_role NOT NULL,
   resource TEXT NOT NULL,
@@ -92,13 +92,14 @@ CREATE TABLE role_permissions (
 );
 
 -- Index for permission lookups
-CREATE INDEX idx_role_permissions_role ON role_permissions(role);
+CREATE INDEX IF NOT EXISTS idx_role_permissions_role ON role_permissions(role);
 
 -- =====================================================
--- AUDIT LOGS TABLE
+-- ADMIN AUDIT LOGS TABLE (Şirket içi - Admin Panel)
+-- NOT: Kullanıcı audit_logs tablosu ayrı (20241207000000_payment_security.sql)
 -- =====================================================
 
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS admin_audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   admin_id UUID REFERENCES admin_users(id),
   action TEXT NOT NULL,
@@ -111,11 +112,11 @@ CREATE TABLE audit_logs (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Indexes for audit log queries
-CREATE INDEX idx_audit_logs_admin_id ON audit_logs(admin_id);
-CREATE INDEX idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX idx_audit_logs_resource ON audit_logs(resource_type, resource_id);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+-- Indexes for admin audit log queries
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_admin_id ON admin_audit_logs(admin_id);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_action ON admin_audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_resource ON admin_audit_logs(resource_type, resource_id);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_created_at ON admin_audit_logs(created_at DESC);
 
 -- Partition by month for better performance (optional, uncomment if needed)
 -- CREATE INDEX idx_audit_logs_created_month ON audit_logs(date_trunc('month', created_at));
@@ -124,7 +125,7 @@ CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
 -- TASKS TABLE (Task Queue)
 -- =====================================================
 
-CREATE TABLE tasks (
+CREATE TABLE IF NOT EXISTS tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   type TEXT NOT NULL,
   title TEXT NOT NULL,
@@ -144,11 +145,11 @@ CREATE TABLE tasks (
 );
 
 -- Indexes for task queries
-CREATE INDEX idx_tasks_status ON tasks(status);
-CREATE INDEX idx_tasks_priority ON tasks(priority);
-CREATE INDEX idx_tasks_assigned_to ON tasks(assigned_to);
-CREATE INDEX idx_tasks_resource ON tasks(resource_type, resource_id);
-CREATE INDEX idx_tasks_queue ON tasks(status, priority DESC, created_at ASC)
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
+CREATE INDEX IF NOT EXISTS idx_tasks_assigned_to ON tasks(assigned_to);
+CREATE INDEX IF NOT EXISTS idx_tasks_resource ON tasks(resource_type, resource_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_queue ON tasks(status, priority DESC, created_at ASC)
   WHERE status IN ('pending', 'in_progress');
 
 -- =====================================================
@@ -159,15 +160,17 @@ CREATE INDEX idx_tasks_queue ON tasks(status, priority DESC, created_at ASC)
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE role_permissions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
 -- Admin users can only see active users
+DROP POLICY IF EXISTS "Admin users can view active admins" ON admin_users;
 CREATE POLICY "Admin users can view active admins"
   ON admin_users FOR SELECT
   USING (is_active = true);
 
 -- Super admins can manage all admin users
+DROP POLICY IF EXISTS "Super admins can manage admin users" ON admin_users;
 CREATE POLICY "Super admins can manage admin users"
   ON admin_users FOR ALL
   USING (
@@ -180,23 +183,27 @@ CREATE POLICY "Super admins can manage admin users"
   );
 
 -- Users can view their own sessions
+DROP POLICY IF EXISTS "Admins can view own sessions" ON admin_sessions;
 CREATE POLICY "Admins can view own sessions"
   ON admin_sessions FOR SELECT
   USING (admin_id = auth.uid());
 
 -- Admins can delete their own sessions
+DROP POLICY IF EXISTS "Admins can delete own sessions" ON admin_sessions;
 CREATE POLICY "Admins can delete own sessions"
   ON admin_sessions FOR DELETE
   USING (admin_id = auth.uid());
 
 -- All admins can view role permissions
+DROP POLICY IF EXISTS "Admins can view role permissions" ON role_permissions;
 CREATE POLICY "Admins can view role permissions"
   ON role_permissions FOR SELECT
   USING (true);
 
--- Audit logs - admins can view based on their role
-CREATE POLICY "Admins can view audit logs"
-  ON audit_logs FOR SELECT
+-- Admin audit logs - admins can view based on their role
+DROP POLICY IF EXISTS "Admins can view admin audit logs" ON admin_audit_logs;
+CREATE POLICY "Admins can view admin audit logs"
+  ON admin_audit_logs FOR SELECT
   USING (
     EXISTS (
       SELECT 1 FROM admin_users au
@@ -206,12 +213,14 @@ CREATE POLICY "Admins can view audit logs"
     )
   );
 
--- All authenticated admins can insert audit logs
-CREATE POLICY "Admins can insert audit logs"
-  ON audit_logs FOR INSERT
+-- All authenticated admins can insert admin audit logs
+DROP POLICY IF EXISTS "Admins can insert admin audit logs" ON admin_audit_logs;
+CREATE POLICY "Admins can insert admin audit logs"
+  ON admin_audit_logs FOR INSERT
   WITH CHECK (admin_id = auth.uid());
 
 -- Tasks - admins can view tasks assigned to them or their role
+DROP POLICY IF EXISTS "Admins can view assigned tasks" ON tasks;
 CREATE POLICY "Admins can view assigned tasks"
   ON tasks FOR SELECT
   USING (
@@ -241,6 +250,7 @@ BEGIN
   NEW.updated_at = now();
   RETURN NEW;
 END;
+DROP TRIGGER IF EXISTS admin_users_updated_at ON admin_users;
 $$ LANGUAGE plpgsql;
 
 -- Apply updated_at trigger to admin_users
@@ -250,6 +260,7 @@ CREATE TRIGGER admin_users_updated_at
   EXECUTE FUNCTION update_updated_at();
 
 -- Apply updated_at trigger to tasks
+DROP TRIGGER IF EXISTS tasks_updated_at ON tasks;
 CREATE TRIGGER tasks_updated_at
   BEFORE UPDATE ON tasks
   FOR EACH ROW
@@ -399,5 +410,5 @@ INSERT INTO role_permissions (role, resource, action) VALUES
 COMMENT ON TABLE admin_users IS 'Admin panel users with role-based access';
 COMMENT ON TABLE admin_sessions IS 'Admin user sessions for security tracking';
 COMMENT ON TABLE role_permissions IS 'Permission definitions for each admin role';
-COMMENT ON TABLE audit_logs IS 'Audit trail for all admin actions';
+COMMENT ON TABLE admin_audit_logs IS 'Audit trail for all admin actions (şirket içi)';
 COMMENT ON TABLE tasks IS 'Task queue for admin workflow management';

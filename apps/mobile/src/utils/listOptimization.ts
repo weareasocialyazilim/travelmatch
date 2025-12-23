@@ -1,12 +1,14 @@
 /**
- * FlatList Performance Helpers
+ * FlashList Performance Helpers
  * Optimized configurations for different list types
+ * Using Shopify's FlashList for better scroll performance
  */
 
 /**
- * Standard item heights for getItemLayout
+ * Standard estimated item sizes for FlashList
+ * These values represent the average height/width of list items
  */
-export const ITEM_HEIGHTS = {
+export const ESTIMATED_ITEM_SIZES = {
   SMALL: 60, // Small list items (notifications, simple rows)
   MEDIUM: 120, // Medium cards (user cards, simple moments)
   LARGE: 420, // Large cards (moment cards, detailed items)
@@ -14,7 +16,62 @@ export const ITEM_HEIGHTS = {
   STORY_GRID: 240, // Story grid items
 } as const;
 
-// Performance settings without generic FlatListProps to avoid type conflicts
+/**
+ * @deprecated Use ESTIMATED_ITEM_SIZES instead
+ * Legacy name kept for backward compatibility
+ */
+export const ITEM_HEIGHTS = ESTIMATED_ITEM_SIZES;
+
+/**
+ * FlashList performance configuration
+ * FlashList handles most optimizations automatically
+ */
+interface FlashListConfig {
+  estimatedItemSize: number;
+  showsVerticalScrollIndicator?: boolean;
+  showsHorizontalScrollIndicator?: boolean;
+  horizontal?: boolean;
+  inverted?: boolean;
+}
+
+/**
+ * Performance configuration for vertical lists with FlashList
+ */
+export const VERTICAL_FLASH_LIST_CONFIG: FlashListConfig = {
+  estimatedItemSize: ESTIMATED_ITEM_SIZES.MEDIUM,
+  showsVerticalScrollIndicator: false,
+};
+
+/**
+ * Performance configuration for horizontal lists with FlashList
+ */
+export const HORIZONTAL_FLASH_LIST_CONFIG: FlashListConfig = {
+  estimatedItemSize: ESTIMATED_ITEM_SIZES.MEDIUM,
+  showsHorizontalScrollIndicator: false,
+  horizontal: true,
+};
+
+/**
+ * Performance configuration for grid lists with FlashList
+ */
+export const GRID_FLASH_LIST_CONFIG: FlashListConfig = {
+  estimatedItemSize: ESTIMATED_ITEM_SIZES.STORY_GRID,
+  showsVerticalScrollIndicator: false,
+};
+
+/**
+ * Performance configuration for chat/message lists with FlashList
+ */
+export const CHAT_FLASH_LIST_CONFIG: FlashListConfig = {
+  estimatedItemSize: ESTIMATED_ITEM_SIZES.CHAT_MESSAGE,
+  showsVerticalScrollIndicator: false,
+  inverted: true,
+};
+
+/**
+ * @deprecated Use FlashList configs instead (VERTICAL_FLASH_LIST_CONFIG, etc.)
+ * Legacy FlatList configuration - kept for backward compatibility
+ */
 interface ListPerformanceConfig {
   removeClippedSubviews: boolean;
   initialNumToRender: number;
@@ -28,7 +85,7 @@ interface ListPerformanceConfig {
 }
 
 /**
- * Performance configuration for vertical lists
+ * @deprecated Use VERTICAL_FLASH_LIST_CONFIG instead
  */
 export const VERTICAL_LIST_CONFIG: ListPerformanceConfig = {
   removeClippedSubviews: true,
@@ -40,7 +97,7 @@ export const VERTICAL_LIST_CONFIG: ListPerformanceConfig = {
 };
 
 /**
- * Performance configuration for horizontal lists
+ * @deprecated Use HORIZONTAL_FLASH_LIST_CONFIG instead
  */
 export const HORIZONTAL_LIST_CONFIG: ListPerformanceConfig = {
   removeClippedSubviews: true,
@@ -53,7 +110,7 @@ export const HORIZONTAL_LIST_CONFIG: ListPerformanceConfig = {
 };
 
 /**
- * Performance configuration for grid lists
+ * @deprecated Use GRID_FLASH_LIST_CONFIG instead
  */
 export const GRID_LIST_CONFIG: ListPerformanceConfig = {
   removeClippedSubviews: true,
@@ -65,7 +122,7 @@ export const GRID_LIST_CONFIG: ListPerformanceConfig = {
 };
 
 /**
- * Performance configuration for chat/message lists
+ * @deprecated Use CHAT_FLASH_LIST_CONFIG instead
  */
 export const CHAT_LIST_CONFIG: ListPerformanceConfig = {
   removeClippedSubviews: true,
@@ -78,7 +135,8 @@ export const CHAT_LIST_CONFIG: ListPerformanceConfig = {
 };
 
 /**
- * Create getItemLayout function for fixed height items
+ * @deprecated FlashList doesn't use getItemLayout. Use estimatedItemSize prop instead.
+ * Create getItemLayout function for fixed height items (FlatList only)
  */
 export const createGetItemLayout = (itemHeight: number) => {
   return (_data: unknown, index: number) => ({
@@ -90,6 +148,7 @@ export const createGetItemLayout = (itemHeight: number) => {
 
 /**
  * Default key extractor for items with 'id' property
+ * Works with both FlatList and FlashList
  */
 export const defaultKeyExtractor = <T extends { id: string | number }>(
   item: T,

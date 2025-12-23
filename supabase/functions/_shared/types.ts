@@ -347,3 +347,98 @@ export const HTTP_STATUS = {
 } as const;
 
 export type HttpStatus = typeof HTTP_STATUS[keyof typeof HTTP_STATUS];
+
+// =============================================================================
+// SUPABASE CLIENT TYPE
+// =============================================================================
+
+import { SupabaseClient as BaseSupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+/**
+ * Typed Supabase client for Edge Functions
+ */
+export type SupabaseClient = BaseSupabaseClient;
+
+// =============================================================================
+// GDPR EXPORT TYPES
+// =============================================================================
+
+export interface UserDataExport {
+  exportDate: string;
+  userId: string;
+  profile: User | null;
+  moments: Moment[];
+  requests: {
+    sent: Request[];
+    received: Request[];
+  };
+  messages: Message[];
+  conversations: Conversation[];
+  transactions: Transaction[];
+  reviews: {
+    written: Review[];
+    received: Review[];
+  };
+  notifications: Notification[];
+  favorites: Favorite[];
+  blocks: Block[];
+  reports: Report[];
+  metadata: {
+    totalMoments: number;
+    totalRequests: number;
+    totalMessages: number;
+    totalTransactions: number;
+    totalReviews: number;
+    accountCreatedAt: string;
+    lastActivityAt: string;
+  };
+}
+
+export interface Review {
+  id: string;
+  reviewer_id: string;
+  reviewed_id: string;
+  moment_id: string | null;
+  rating: number;
+  content: string | null;
+  created_at: string;
+}
+
+export interface Favorite {
+  id: string;
+  user_id: string;
+  moment_id: string;
+  created_at: string;
+}
+
+export interface Block {
+  id: string;
+  blocker_id: string;
+  blocked_id: string;
+  reason: string | null;
+  created_at: string;
+}
+
+export interface Report {
+  id: string;
+  reporter_id: string;
+  reported_id: string | null;
+  moment_id: string | null;
+  reason: string;
+  description: string | null;
+  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+  created_at: string;
+}
+
+// =============================================================================
+// WEBHOOK AUDIT TYPES
+// =============================================================================
+
+export interface AuditLogEntry {
+  action: string;
+  metadata: Record<string, unknown>;
+  created_at?: string;
+  user_id?: string;
+  ip_address?: string;
+  user_agent?: string;
+}

@@ -98,7 +98,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
             setLanguageState('tr');
           }
         }
-      } catch (error) {
+      } catch {
         // Use default language on error
       } finally {
         setIsInitialized(true);
@@ -113,7 +113,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     try {
       await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
       setLanguageState(lang);
-    } catch (error) {
+    } catch {
       // Silent fail, still update state
       setLanguageState(lang);
     }

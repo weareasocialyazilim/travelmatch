@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Platform,
   Alert,
-  // eslint-disable-next-line react-native/split-platform-components
   ActionSheetIOS,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -66,7 +65,7 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
           if (!result.canceled && result.assets[0]) {
             onPhotoSelected(result.assets[0].uri);
           }
-        } catch (error) {
+        } catch {
           showToast(STRINGS.ERRORS.PHOTO_SELECT, 'error');
         }
       };

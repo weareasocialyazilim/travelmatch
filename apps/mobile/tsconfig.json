@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "target": "ES2020",
     "lib": ["ES2020", "DOM"],
@@ -17,8 +17,8 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
-    "strictPropertyInitialization": false,
-    "noUncheckedIndexedAccess": false,
+    "strictPropertyInitialization": true,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
