@@ -4,7 +4,7 @@
  */
 
 import React, { ReactElement, createContext, useContext } from 'react';
-import { render, RenderOptions, screen } from '@testing-library/react-native';
+import { render, RenderOptions } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
 // Mock Network Context for tests
