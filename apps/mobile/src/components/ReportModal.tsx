@@ -95,7 +95,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
       showToast('Şikayetiniz başarıyla gönderildi', 'success');
       handleClose();
-    } catch (_error) {
+    } catch (error) {
       showToast('Şikayetiniz gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setLoading(false);

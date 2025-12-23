@@ -18,7 +18,7 @@ import {
   getRoleDisplayName,
   getRoleBadgeColor,
 } from '../permissions';
-import type { AdminRole, Resource } from '@/types/admin';
+import type { AdminRole, Resource, Action } from '@/types/admin';
 
 describe('Permissions', () => {
   describe('PERMISSIONS constant', () => {
@@ -115,21 +115,13 @@ describe('Permissions', () => {
 
   describe('hasAnyPermission', () => {
     it('should return true when role has any of the permissions', () => {
-      expect(hasAnyPermission('viewer', 'users', ['view', 'create'])).toBe(
-        true,
-      );
-      expect(
-        hasAnyPermission('moderator', 'moments', ['update', 'delete']),
-      ).toBe(true);
+      expect(hasAnyPermission('viewer', 'users', ['view', 'create'])).toBe(true);
+      expect(hasAnyPermission('moderator', 'moments', ['update', 'delete'])).toBe(true);
     });
 
     it('should return false when role has none of the permissions', () => {
-      expect(hasAnyPermission('viewer', 'users', ['create', 'delete'])).toBe(
-        false,
-      );
-      expect(hasAnyPermission('support', 'settings', ['view', 'update'])).toBe(
-        false,
-      );
+      expect(hasAnyPermission('viewer', 'users', ['create', 'delete'])).toBe(false);
+      expect(hasAnyPermission('support', 'settings', ['view', 'update'])).toBe(false);
     });
 
     it('should handle empty actions array', () => {
@@ -139,21 +131,13 @@ describe('Permissions', () => {
 
   describe('hasAllPermissions', () => {
     it('should return true when role has all permissions', () => {
-      expect(
-        hasAllPermissions('super_admin', 'users', ['view', 'create', 'delete']),
-      ).toBe(true);
-      expect(hasAllPermissions('manager', 'users', ['view', 'update'])).toBe(
-        true,
-      );
+      expect(hasAllPermissions('super_admin', 'users', ['view', 'create', 'delete'])).toBe(true);
+      expect(hasAllPermissions('manager', 'users', ['view', 'update'])).toBe(true);
     });
 
     it('should return false when role lacks any permission', () => {
-      expect(hasAllPermissions('viewer', 'users', ['view', 'create'])).toBe(
-        false,
-      );
-      expect(
-        hasAllPermissions('moderator', 'moments', ['create', 'update']),
-      ).toBe(false);
+      expect(hasAllPermissions('viewer', 'users', ['view', 'create'])).toBe(false);
+      expect(hasAllPermissions('moderator', 'moments', ['create', 'update'])).toBe(false);
     });
 
     it('should handle empty actions array', () => {
@@ -258,12 +242,8 @@ describe('Permissions', () => {
       });
 
       it('should manage admin_users', () => {
-        expect(hasPermission('super_admin', 'admin_users', 'create')).toBe(
-          true,
-        );
-        expect(hasPermission('super_admin', 'admin_users', 'delete')).toBe(
-          true,
-        );
+        expect(hasPermission('super_admin', 'admin_users', 'create')).toBe(true);
+        expect(hasPermission('super_admin', 'admin_users', 'delete')).toBe(true);
       });
 
       it('should access settings', () => {

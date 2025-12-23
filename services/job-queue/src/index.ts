@@ -1,9 +1,10 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
 import { ExpressAdapter } from '@bull-board/express';
+import crypto from 'crypto';
 import {
   KycJobSchema,
   ImageJobSchema,
@@ -24,6 +25,101 @@ const app = express();
 app.disable('x-powered-by');
 
 app.use(express.json());
+
+// ============================================================
+// SECURITY: API Key Authentication Middleware (VULN-002 FIX)
+// ============================================================
+const JOB_QUEUE_API_KEY = process.env.JOB_QUEUE_API_KEY;
+
+if (!JOB_QUEUE_API_KEY) {
+  console.error('CRITICAL: JOB_QUEUE_API_KEY environment variable is not set!');
+  console.error('The job queue service will reject all requests until this is configured.');
+}
+
+/**
+ * Constant-time string comparison to prevent timing attacks
+ */
+function secureCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
+
+/**
+ * Authentication middleware for protected endpoints
+ * Requires X-API-Key header with valid API key
+ */
+function authenticateApiKey(req: Request, res: Response, next: NextFunction): void {
+  const apiKey = req.headers['x-api-key'] as string | undefined;
+
+  if (!JOB_QUEUE_API_KEY) {
+    res.status(503).json({
+      error: 'Service temporarily unavailable',
+      message: 'API key not configured on server',
+    });
+    return;
+  }
+
+  if (!apiKey) {
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Missing X-API-Key header',
+    });
+    return;
+  }
+
+  if (!secureCompare(apiKey, JOB_QUEUE_API_KEY)) {
+    // Log failed authentication attempts
+    console.warn(`[SECURITY] Failed authentication attempt from IP: ${req.ip}`);
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Invalid API key',
+    });
+    return;
+  }
+
+  next();
+}
+
+// Rate limiting for job queue (simple in-memory implementation)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute per IP
+
+function rateLimitMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    next();
+    return;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
+    res.status(429).json({
+      error: 'Too many requests',
+      retryAfter: Math.ceil((entry.resetAt - now) / 1000),
+    });
+    return;
+  }
+
+  entry.count++;
+  next();
+}
+
+// Clean up old rate limit entries every minute
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap.entries()) {
+    if (now > entry.resetAt) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}, RATE_LIMIT_WINDOW_MS);
 
 // Create Redis connection
 const redis = new Redis(process.env.REDIS_URL!, {
@@ -54,7 +150,13 @@ createBullBoard({
   serverAdapter,
 });
 
-app.use('/admin/queues', serverAdapter.getRouter());
+// SECURITY: Protect Bull Board admin UI with authentication (VULN-002)
+app.use('/admin/queues', authenticateApiKey, serverAdapter.getRouter());
+
+// SECURITY: Apply rate limiting and authentication to all job endpoints (VULN-002)
+app.use('/jobs', rateLimitMiddleware, authenticateApiKey);
+app.use('/admin', authenticateApiKey);
+app.use('/stats', authenticateApiKey);
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {

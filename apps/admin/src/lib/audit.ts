@@ -17,13 +17,12 @@ export async function logAuditAction(
   metadata?: {
     ip_address?: string;
     user_agent?: string;
-  },
+  }
 ): Promise<void> {
   const supabase = getClient();
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('audit_logs') as any).insert({
+    await supabase.from('audit_logs').insert({
       admin_id: adminId,
       action: entry.action,
       resource_type: entry.resource_type,
@@ -100,10 +99,7 @@ export type AuditAction = (typeof AuditActions)[keyof typeof AuditActions];
  */
 export function withAudit<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
-  _getAuditEntry: (
-    args: Parameters<T>,
-    result: Awaited<ReturnType<T>>,
-  ) => AuditLogEntry,
+  getAuditEntry: (args: Parameters<T>, result: Awaited<ReturnType<T>>) => AuditLogEntry
 ): T {
   return (async (...args: Parameters<T>) => {
     const result = await fn(...args);

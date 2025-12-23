@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import {
-  RealtimeChannel,
-  RealtimePostgresChangesPayload,
-} from '@supabase/supabase-js';
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { getClient } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -24,31 +21,22 @@ interface RealtimeConfig<T> {
 /**
  * Hook for subscribing to real-time Postgres changes
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useRealtimeSubscription<T = any>(config: RealtimeConfig<T>) {
+export function useRealtimeSubscription<T extends Record<string, unknown>>(
+  config: RealtimeConfig<T>
+) {
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const supabase = getClient();
-    const {
-      table,
-      schema = 'public',
-      event = '*',
-      filter,
-      onInsert,
-      onUpdate,
-      onDelete,
-      showToast,
-    } = config;
+    const { table, schema = 'public', event = '*', filter, onInsert, onUpdate, onDelete, showToast } = config;
 
     const channelName = `realtime:${schema}:${table}:${filter || 'all'}`;
 
     const newChannel = supabase
       .channel(channelName)
-      // @ts-expect-error Supabase realtime API type issue
-      .on(
+      .on<T>(
         'postgres_changes',
         {
           event,
@@ -56,8 +44,7 @@ export function useRealtimeSubscription<T = any>(config: RealtimeConfig<T>) {
           table,
           filter,
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (payload: any) => {
+        (payload: RealtimePostgresChangesPayload<T>) => {
           switch (payload.eventType) {
             case 'INSERT':
               if (onInsert) {
@@ -81,7 +68,7 @@ export function useRealtimeSubscription<T = any>(config: RealtimeConfig<T>) {
               }
               break;
           }
-        },
+        }
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -121,7 +108,7 @@ export function useRealtimeSubscription<T = any>(config: RealtimeConfig<T>) {
  */
 export function useRealtimeTaskQueue(
   onNewTask?: (task: TaskQueueItem) => void,
-  onTaskUpdate?: (task: TaskQueueItem) => void,
+  onTaskUpdate?: (task: TaskQueueItem) => void
 ) {
   return useRealtimeSubscription<TaskQueueItem>({
     table: 'admin_task_queue',
@@ -149,7 +136,7 @@ interface TaskQueueItem {
  */
 export function useRealtimeNotifications(
   adminId: string,
-  onNewNotification?: (notification: AdminNotification) => void,
+  onNewNotification?: (notification: AdminNotification) => void
 ) {
   return useRealtimeSubscription<AdminNotification>({
     table: 'admin_notifications',
@@ -181,7 +168,7 @@ interface AdminNotification {
  */
 export function useRealtimeDisputes(
   onNewDispute?: (dispute: Dispute) => void,
-  onDisputeUpdate?: (dispute: Dispute) => void,
+  onDisputeUpdate?: (dispute: Dispute) => void
 ) {
   return useRealtimeSubscription<Dispute>({
     table: 'disputes',
@@ -212,7 +199,7 @@ interface Dispute {
  */
 export function useRealtimePayouts(
   onNewPayout?: (payout: Payout) => void,
-  onPayoutUpdate?: (payout: Payout) => void,
+  onPayoutUpdate?: (payout: Payout) => void
 ) {
   return useRealtimeSubscription<Payout>({
     table: 'payouts',
@@ -236,15 +223,14 @@ interface Payout {
  */
 export function useRealtimeUserStatus(
   userId: string,
-  onStatusChange?: (isOnline: boolean) => void,
+  onStatusChange?: (isOnline: boolean) => void
 ) {
   const [isOnline, setIsOnline] = useState(false);
 
   useEffect(() => {
     const supabase = getClient();
 
-    const channel = supabase
-      .channel(`presence:user:${userId}`)
+    const channel = supabase.channel(`presence:user:${userId}`)
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
         const online = Object.keys(state).length > 0;
@@ -270,8 +256,7 @@ export function useAdminPresence(adminId: string) {
   useEffect(() => {
     const supabase = getClient();
 
-    const channel = supabase
-      .channel('admin_presence')
+    const channel = supabase.channel('admin_presence')
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
         const admins = Object.values(state)
@@ -319,7 +304,7 @@ export function useRealtimeStats() {
         () => {
           // Refetch stats when disputes change
           fetchStats();
-        },
+        }
       )
       .subscribe();
 
@@ -330,7 +315,7 @@ export function useRealtimeStats() {
         { event: '*', schema: 'public', table: 'payouts' },
         () => {
           fetchStats();
-        },
+        }
       )
       .subscribe();
 
@@ -360,7 +345,7 @@ export function useRealtimeStats() {
  * Hook for real-time audit log streaming
  */
 export function useRealtimeAuditLog(
-  onNewEntry?: (entry: AuditLogEntry) => void,
+  onNewEntry?: (entry: AuditLogEntry) => void
 ) {
   const [recentEntries, setRecentEntries] = useState<AuditLogEntry[]>([]);
 

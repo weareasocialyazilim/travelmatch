@@ -86,6 +86,11 @@ interface LoginCredentials {
 }
 
 /**
+ * Gender options matching database constraint
+ */
+type Gender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
+
+/**
  * Data for new user registration
  */
 interface RegisterData {
@@ -95,6 +100,10 @@ interface RegisterData {
   password: string;
   /** User's display name */
   name: string;
+  /** User's gender */
+  gender: Gender;
+  /** User's date of birth */
+  dateOfBirth: Date;
 }
 
 /**
@@ -388,6 +397,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         error,
       } = await authService.signUpWithEmail(data.email, data.password, {
         name: data.name,
+        gender: data.gender,
+        date_of_birth: data.dateOfBirth.toISOString().split('T')[0], // YYYY-MM-DD format
       });
 
       if (error) throw error;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
+import { escapeSupabaseFilter } from '@/lib/security';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,22 +18,29 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const status = searchParams.get('status');
     const verified = searchParams.get('verified');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100); // Cap at 100
+    const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
     const sortBy = searchParams.get('sort_by') || 'created_at';
     const sortOrder = searchParams.get('sort_order') || 'desc';
+
+    // Validate sortBy to prevent arbitrary column access
+    const allowedSortColumns = ['created_at', 'updated_at', 'display_name', 'email'];
+    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'created_at';
 
     const supabase = createServiceClient();
 
     let query = supabase
       .from('profiles')
       .select('*', { count: 'exact' })
-      .order(sortBy, { ascending: sortOrder === 'asc' })
+      .order(safeSortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
-    // Search by name or email
+    // Search by name or email - sanitize input to prevent injection
     if (search) {
-      query = query.or(`display_name.ilike.%${search}%,email.ilike.%${search}%`);
+      const safeSearch = escapeSupabaseFilter(search);
+      if (safeSearch) {
+        query = query.or(`display_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`);
+      }
     }
 
     // Filter by status

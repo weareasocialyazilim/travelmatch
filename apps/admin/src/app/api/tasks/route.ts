@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
+import {
+  validatePagination,
+  sanitizeUUID,
+  buildSafeUUIDFilter,
+  buildSafeArrayContainsFilter,
+} from '@/lib/query-utils';
+
+// Whitelist of valid status values
+const VALID_STATUSES = ['pending', 'in_progress', 'completed', 'cancelled'];
+// Whitelist of valid priority values
+const VALID_PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,11 +21,17 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const priority = searchParams.get('priority');
+    const rawStatus = searchParams.get('status');
+    const rawPriority = searchParams.get('priority');
     const assignedTo = searchParams.get('assigned_to');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const { limit, offset } = validatePagination(
+      searchParams.get('limit'),
+      searchParams.get('offset')
+    );
+
+    // SECURITY: Validate status and priority against whitelists
+    const status = rawStatus && VALID_STATUSES.includes(rawStatus) ? rawStatus : null;
+    const priority = rawPriority && VALID_PRIORITIES.includes(rawPriority) ? rawPriority : null;
 
     const supabase = createServiceClient();
 
@@ -45,12 +62,24 @@ export async function GET(request: NextRequest) {
     } else if (assignedTo === 'unassigned') {
       query = query.is('assigned_to', null);
     } else if (assignedTo) {
-      query = query.eq('assigned_to', assignedTo);
+      // SECURITY: Validate assignedTo UUID
+      const sanitizedAssignee = sanitizeUUID(assignedTo);
+      if (sanitizedAssignee) {
+        query = query.eq('assigned_to', sanitizedAssignee);
+      }
     }
 
     // Role-based filtering for non-admin roles
+    // SECURITY: Use safe filter builders for session data (VULN-001)
     if (!['super_admin', 'manager'].includes(session.admin.role)) {
-      query = query.or(`assigned_to.eq.${session.admin.id},assigned_roles.cs.{${session.admin.role}}`);
+      const uuidFilter = buildSafeUUIDFilter('assigned_to', session.admin.id);
+      const roleFilter = buildSafeArrayContainsFilter('assigned_roles', session.admin.role);
+
+      if (uuidFilter && roleFilter) {
+        query = query.or(`${uuidFilter},${roleFilter}`);
+      } else if (uuidFilter) {
+        query = query.eq('assigned_to', session.admin.id);
+      }
     }
 
     const { data: tasks, count, error } = await query;

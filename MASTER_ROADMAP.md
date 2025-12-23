@@ -1,14 +1,16 @@
 # TravelMatch Master Roadmap
 
-**Version:** 1.0 **Created:** December 23, 2025 **Status:** Pre-Launch - Comprehensive Plan **Total
-Branches to Merge:** 18 **Total Tasks:** 100+
+**Version:** 1.0
+**Created:** December 23, 2025
+**Status:** Pre-Launch - Comprehensive Plan
+**Total Branches to Merge:** 18
+**Total Tasks:** 100+
 
 ---
 
 ## Executive Summary
 
-Bu doküman TravelMatch projesinin tüm geliştirme, merge, entegrasyon ve lansman süreçlerini
-kapsamaktadır.
+Bu doküman TravelMatch projesinin tüm geliştirme, merge, entegrasyon ve lansman süreçlerini kapsamaktadır.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -43,15 +45,15 @@ kapsamaktadır.
 
 ## Project Statistics
 
-| Category                    | Count                       |
-| --------------------------- | --------------------------- |
-| **Git Branches**            | 18 (to merge) + 1 (current) |
-| **Mobile Source Files**     | 665+ TypeScript/TSX         |
-| **Mobile Screens**          | 80+                         |
-| **Supabase Migrations**     | 52+                         |
-| **Supabase Edge Functions** | 21+                         |
-| **Database Tables**         | 33+                         |
-| **RLS Policies**            | 184+                        |
+| Category | Count |
+|----------|-------|
+| **Git Branches** | 18 (to merge) + 1 (current) |
+| **Mobile Source Files** | 665+ TypeScript/TSX |
+| **Mobile Screens** | 80+ |
+| **Supabase Migrations** | 52+ |
+| **Supabase Edge Functions** | 21+ |
+| **Database Tables** | 33+ |
+| **RLS Policies** | 184+ |
 
 ---
 
@@ -59,12 +61,12 @@ kapsamaktadır.
 
 ### 0.1 Bug Fixes - DONE
 
-| Task                        | File                       | Status |
-| --------------------------- | -------------------------- | ------ |
-| Moment görsel yükleme       | `hooks/useMoments.ts`      | ✅     |
-| Kayıtta cinsiyet/yaş alma   | `RegisterScreen.tsx`       | ✅     |
-| Database trigger güncelleme | `migrations/20251223*.sql` | ✅     |
-| Roadmap v3.0 güncelleme     | `MOBILE_FIRST_ROADMAP.md`  | ✅     |
+| Task | File | Status |
+|------|------|--------|
+| Moment görsel yükleme | `hooks/useMoments.ts` | ✅ |
+| Kayıtta cinsiyet/yaş alma | `RegisterScreen.tsx` | ✅ |
+| Database trigger güncelleme | `migrations/20251223*.sql` | ✅ |
+| Roadmap v3.0 güncelleme | `MOBILE_FIRST_ROADMAP.md` | ✅ |
 
 ### 0.2 Commits in This Session
 
@@ -82,19 +84,18 @@ kapsamaktadır.
 
 > Bu branch'ler sadece dokümantasyon içeriyor, hiçbir kod değişikliği yok.
 
-| Branch                             | İçerik                                      | Aksiyon |
-| ---------------------------------- | ------------------------------------------- | ------- |
-| `architecture-documentation-mLfcb` | C4 model, ADR'ler, security arch (11 dosya) | MERGE   |
-| `database-architect-setup-vPpId`   | DATABASE_ARCHITECTURE.md, ERD.md (3 dosya)  | MERGE   |
-| `code-reviewer-tool-ZoGn0`         | CODE_REVIEW_REPORT.md                       | MERGE   |
-| `compliance-specialist-tool-UViVR` | COMPLIANCE docs                             | MERGE   |
-| `setup-pentest-specialist-NYqwG`   | PENTEST_REPORT_2025-12-22.md                | MERGE   |
-| `ui-design-system-toolkit-zJx0g`   | Design system Python scripts                | MERGE   |
-| `ux-research-design-toolkit-eVD3U` | UX research Python scripts                  | MERGE   |
-| `algorithmic-art-p5js-X9xy5`       | p5.js art generator                         | MERGE   |
+| Branch | İçerik | Aksiyon |
+|--------|--------|---------|
+| `architecture-documentation-mLfcb` | C4 model, ADR'ler, security arch (11 dosya) | MERGE |
+| `database-architect-setup-vPpId` | DATABASE_ARCHITECTURE.md, ERD.md (3 dosya) | MERGE |
+| `code-reviewer-tool-ZoGn0` | CODE_REVIEW_REPORT.md | MERGE |
+| `compliance-specialist-tool-UViVR` | COMPLIANCE docs | MERGE |
+| `setup-pentest-specialist-NYqwG` | PENTEST_REPORT_2025-12-22.md | MERGE |
+| `ui-design-system-toolkit-zJx0g` | Design system Python scripts | MERGE |
+| `ux-research-design-toolkit-eVD3U` | UX research Python scripts | MERGE |
+| `algorithmic-art-p5js-X9xy5` | p5.js art generator | MERGE |
 
 **Merge Komutları:**
-
 ```bash
 git checkout main
 git merge origin/claude/architecture-documentation-mLfcb --no-edit
@@ -109,19 +110,17 @@ git merge origin/claude/algorithmic-art-p5js-X9xy5 --no-edit
 
 ### 1.2 Bug Fix Branch (Risk: DÜŞÜK)
 
-| Branch                         | İçerik                       | Çakışma          |
-| ------------------------------ | ---------------------------- | ---------------- |
+| Branch | İçerik | Çakışma |
+|--------|--------|---------|
 | `setup-debugger-session-go0zT` | TypeScript compilation fixes | `pnpm-lock.yaml` |
 
 **Değişen Dosyalar:**
-
 - `apps/admin/src/lib/auth.ts` - Auth düzeltmeleri
 - `apps/admin/src/lib/index.ts` - Export düzeltmeleri
 - `apps/admin/tsconfig.json` - TypeScript config
 - `apps/admin/src/app/api/auth/*.ts` - API route düzeltmeleri
 
 **Merge Komutu:**
-
 ```bash
 git merge origin/claude/setup-debugger-session-go0zT
 pnpm install
@@ -130,20 +129,18 @@ pnpm build
 
 ### 1.3 Security Branches (Risk: YÜKSEK - DİKKATLİ!)
 
-| Branch                       | İçerik                   | Çakışan Dosyalar             |
-| ---------------------------- | ------------------------ | ---------------------------- |
-| `api-security-audit-cEmbI`   | OWASP API security fixes | `next.config.js`, API routes |
-| `security-audit-owasp-Fod9p` | OWASP compliance         | `next.config.js`, API routes |
+| Branch | İçerik | Çakışan Dosyalar |
+|--------|--------|------------------|
+| `api-security-audit-cEmbI` | OWASP API security fixes | `next.config.js`, API routes |
+| `security-audit-owasp-Fod9p` | OWASP compliance | `next.config.js`, API routes |
 
 **Çakışan Dosyalar:**
-
 - `apps/admin/next.config.js`
 - `apps/admin/src/app/api/admin-users/route.ts`
 - `apps/admin/src/app/api/users/route.ts`
 - `SECURITY_AUDIT_REPORT.md`
 
 **Merge Stratejisi:**
-
 ```bash
 # 1. İlk security branch
 git merge origin/claude/api-security-audit-cEmbI
@@ -175,18 +172,16 @@ pnpm build && pnpm test
 
 ### 2.1 Performance Branches (Risk: ORTA)
 
-| Branch                             | İçerik            | Çakışan Dosyalar      |
-| ---------------------------------- | ----------------- | --------------------- |
+| Branch | İçerik | Çakışan Dosyalar |
+|--------|--------|------------------|
 | `optimize-react-performance-CGcu3` | React memoization | `RealtimeContext.tsx` |
 | `optimize-supabase-realtime-j1BOO` | Supabase realtime | `RealtimeContext.tsx` |
 
 **Yeni Dosyalar:**
-
 - `apps/mobile/src/utils/performanceOptimization.ts`
 - `apps/mobile/src/services/realtimeChannelManager.ts`
 
 **Merge Stratejisi:**
-
 ```bash
 git merge origin/claude/optimize-react-performance-CGcu3
 git merge origin/claude/optimize-supabase-realtime-j1BOO
@@ -199,13 +194,12 @@ git merge origin/claude/optimize-supabase-realtime-j1BOO
 
 ### 2.2 Test Branches (Risk: DÜŞÜK)
 
-| Branch                        | İçerik                          | Çakışan Dosyalar                   |
-| ----------------------------- | ------------------------------- | ---------------------------------- |
-| `test-automation-setup-KnWmC` | Jest, Playwright, CI (34 dosya) | `jest.config.js`                   |
-| `generate-test-suite-HHP8p`   | Unit test suite (13 dosya)      | `jest.config.js`, `pnpm-lock.yaml` |
+| Branch | İçerik | Çakışan Dosyalar |
+|--------|--------|------------------|
+| `test-automation-setup-KnWmC` | Jest, Playwright, CI (34 dosya) | `jest.config.js` |
+| `generate-test-suite-HHP8p` | Unit test suite (13 dosya) | `jest.config.js`, `pnpm-lock.yaml` |
 
 **Yeni Dosyalar/Klasörler:**
-
 - `packages/test-utils/` - Test utilities package
 - `tests/e2e-playwright/` - E2E tests
 - `playwright.config.ts`
@@ -213,7 +207,6 @@ git merge origin/claude/optimize-supabase-realtime-j1BOO
 - `packages/shared/src/__tests__/`
 
 **Merge Stratejisi:**
-
 ```bash
 git merge origin/claude/test-automation-setup-KnWmC
 git merge origin/claude/generate-test-suite-HHP8p
@@ -227,8 +220,8 @@ pnpm test
 
 ### 2.3 Code Quality Branch (Risk: DÜŞÜK)
 
-| Branch                        | İçerik                            |
-| ----------------------------- | --------------------------------- |
+| Branch | İçerik |
+|--------|--------|
 | `refactor-code-quality-vOrxf` | TypeScript fixes, file extensions |
 
 ```bash
@@ -238,8 +231,8 @@ pnpm build && pnpm typecheck
 
 ### 2.4 Database Schema Branch (Risk: YÜKSEK - STAGING'DE TEST!)
 
-| Branch                         | İçerik                                          |
-| ------------------------------ | ----------------------------------------------- |
+| Branch | İçerik |
+|--------|--------|
 | `postgres-schema-design-lYSj1` | PostgreSQL schema best practices, new migration |
 
 ```bash
@@ -266,16 +259,15 @@ supabase db push
 
 ### 3.1 Security & Monitoring
 
-| Task                     | File                           | Priority | Status |
-| ------------------------ | ------------------------------ | -------- | ------ |
-| Mapbox token fix         | `app.config.ts:74`             | P0       | ⬜     |
-| Cloudflare token removal | `services/cloudflareImages.ts` | P0       | ⬜     |
-| env.config.ts update     | `FORBIDDEN_PUBLIC_VARS`        | P0       | ⬜     |
-| Error Boundary           | `components/ErrorBoundary.tsx` | P1       | ⬜     |
-| Sentry Integration       | `App.tsx`                      | P1       | ⬜     |
+| Task | File | Priority | Status |
+|------|------|----------|--------|
+| Mapbox token fix | `app.config.ts:74` | P0 | ⬜ |
+| Cloudflare token removal | `services/cloudflareImages.ts` | P0 | ⬜ |
+| env.config.ts update | `FORBIDDEN_PUBLIC_VARS` | P0 | ⬜ |
+| Error Boundary | `components/ErrorBoundary.tsx` | P1 | ⬜ |
+| Sentry Integration | `App.tsx` | P1 | ⬜ |
 
 **Mapbox Fix:**
-
 ```typescript
 // apps/mobile/app.config.ts:74
 // ❌ YANLIŞ
@@ -286,21 +278,20 @@ RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
 ```
 
 **Sentry Setup:**
-
 ```bash
 npx @sentry/wizard@latest -i reactNative
 ```
 
 ### 3.2 Type Safety (7 `any` tipi)
 
-| File                   | Line | Current            | Fix                |
-| ---------------------- | ---- | ------------------ | ------------------ |
-| `supabaseDbService.ts` | 436  | `item: any`        | `MomentWithUser`   |
-| `supabaseDbService.ts` | 579  | `data: any[]`      | `Transaction[]`    |
-| `supabaseDbService.ts` | 1327 | `report: any`      | `ReportInput`      |
-| `supabaseDbService.ts` | 1360 | `block: any`       | `BlockUserInput`   |
-| `supabaseDbService.ts` | 1469 | `user: any`        | `User \| null`     |
-| `supabaseDbService.ts` | 1474 | `authRes: any`     | `AuthResponse`     |
+| File | Line | Current | Fix |
+|------|------|---------|-----|
+| `supabaseDbService.ts` | 436 | `item: any` | `MomentWithUser` |
+| `supabaseDbService.ts` | 579 | `data: any[]` | `Transaction[]` |
+| `supabaseDbService.ts` | 1327 | `report: any` | `ReportInput` |
+| `supabaseDbService.ts` | 1360 | `block: any` | `BlockUserInput` |
+| `supabaseDbService.ts` | 1469 | `user: any` | `User \| null` |
+| `supabaseDbService.ts` | 1474 | `authRes: any` | `AuthResponse` |
 | `supabaseDbService.ts` | 1531 | `transaction: any` | `TransactionInput` |
 
 ### 3.3 User Type Update
@@ -321,16 +312,15 @@ export interface User {
 
 ### 3.4 Internationalization (i18n)
 
-| Task                 | Description           | Status |
-| -------------------- | --------------------- | ------ |
-| i18n setup           | react-i18next         | ⬜     |
-| Turkish translations | Tüm UI metinleri      | ⬜     |
-| English translations | Tüm UI metinleri      | ⬜     |
-| Language selector    | Ayarlardan dil seçimi | ⬜     |
-| Form error messages  | Validation çevirileri | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| i18n setup | react-i18next | ⬜ |
+| Turkish translations | Tüm UI metinleri | ⬜ |
+| English translations | Tüm UI metinleri | ⬜ |
+| Language selector | Ayarlardan dil seçimi | ⬜ |
+| Form error messages | Validation çevirileri | ⬜ |
 
 **Klasör Yapısı:**
-
 ```
 src/i18n/
 ├── index.ts
@@ -358,50 +348,49 @@ src/i18n/
 
 ### 4.1 Profile Age Display
 
-| Task                    | File                         | Status |
-| ----------------------- | ---------------------------- | ------ |
-| ProfileScreen'de yaş    | `ProfileScreen.tsx`          | ⬜     |
-| OtherUserProfile'da yaş | `OtherUserProfileScreen.tsx` | ⬜     |
-| calculateAge utility    | `utils/age.ts`               | ⬜     |
+| Task | File | Status |
+|------|------|--------|
+| ProfileScreen'de yaş | `ProfileScreen.tsx` | ⬜ |
+| OtherUserProfile'da yaş | `OtherUserProfileScreen.tsx` | ⬜ |
+| calculateAge utility | `utils/age.ts` | ⬜ |
 
 ### 4.2 Gender & Age Filters
 
-| Task                     | Description              | Status |
-| ------------------------ | ------------------------ | ------ |
-| FilterModal component    | Yeni filter modal        | ⬜     |
-| Gender filter            | Erkek/Kadın/Hepsi        | ⬜     |
-| Age range filter         | 18-25, 25-35, 35-45, 45+ | ⬜     |
-| useMoments filter update | Hook güncelleme          | ⬜     |
-| Database query           | Supabase query update    | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| FilterModal component | Yeni filter modal | ⬜ |
+| Gender filter | Erkek/Kadın/Hepsi | ⬜ |
+| Age range filter | 18-25, 25-35, 35-45, 45+ | ⬜ |
+| useMoments filter update | Hook güncelleme | ⬜ |
+| Database query | Supabase query update | ⬜ |
 
 ### 4.3 Moment Sharing
 
-| Task                 | Description                 | Status |
-| -------------------- | --------------------------- | ------ |
-| Share button         | Detay sayfasına             | ⬜     |
-| Deep link generation | `travelmatch://moment/{id}` | ⬜     |
-| WhatsApp share       | Native share                | ⬜     |
-| Instagram Stories    | Stories paylaşımı           | ⬜     |
-| Copy link            | Clipboard                   | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| Share button | Detay sayfasına | ⬜ |
+| Deep link generation | `travelmatch://moment/{id}` | ⬜ |
+| WhatsApp share | Native share | ⬜ |
+| Instagram Stories | Stories paylaşımı | ⬜ |
+| Copy link | Clipboard | ⬜ |
 
 ### 4.4 Map View
 
-| Task             | Description           | Status |
-| ---------------- | --------------------- | ------ |
-| ExploreMapScreen | Yakınımdaki momentler | ⬜     |
-| Moment markers   | Harita işaretleri     | ⬜     |
-| Cluster markers  | Gruplama              | ⬜     |
-| Map/List toggle  | Geçiş butonu          | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| ExploreMapScreen | Yakınımdaki momentler | ⬜ |
+| Moment markers | Harita işaretleri | ⬜ |
+| Cluster markers | Gruplama | ⬜ |
+| Map/List toggle | Geçiş butonu | ⬜ |
 
 ### 4.5 Performance Improvements
 
-| Task                 | Description        | Status |
-| -------------------- | ------------------ | ------ |
-| FlatList → FlashList | 6 component        | ⬜     |
-| Skeleton loading     | Reusable component | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| FlatList → FlashList | 6 component | ⬜ |
+| Skeleton loading | Reusable component | ⬜ |
 
 **FlashList Migration:**
-
 - `OnboardingScreen.tsx:181`
 - `RecentSearches.tsx:43`
 - `TopPicksSection.tsx:29`
@@ -411,22 +400,22 @@ src/i18n/
 
 ### 4.6 UX Improvements
 
-| Task              | Description      | Priority | Status |
-| ----------------- | ---------------- | -------- | ------ |
-| Dark Mode         | Sistem desteği   | P2       | ⬜     |
-| Biometric Auth    | Face ID/Touch ID | P2       | ⬜     |
-| Haptic Feedback   | Titreşim         | P3       | ⬜     |
-| Empty States      | İllüstrasyonlar  | P3       | ⬜     |
-| App Rating Prompt | Mağaza puanı     | P3       | ⬜     |
+| Task | Description | Priority | Status |
+|------|-------------|----------|--------|
+| Dark Mode | Sistem desteği | P2 | ⬜ |
+| Biometric Auth | Face ID/Touch ID | P2 | ⬜ |
+| Haptic Feedback | Titreşim | P3 | ⬜ |
+| Empty States | İllüstrasyonlar | P3 | ⬜ |
+| App Rating Prompt | Mağaza puanı | P3 | ⬜ |
 
 ### 4.7 Analytics & Extras
 
-| Task                  | Description      | Status |
-| --------------------- | ---------------- | ------ |
-| Analytics             | PostHog/Mixpanel | ⬜     |
-| Verification Badge    | Host rozeti      | ⬜     |
-| Calendar Integration  | Takvim sync      | ⬜     |
-| Notification Settings | Detaylı kontrol  | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| Analytics | PostHog/Mixpanel | ⬜ |
+| Verification Badge | Host rozeti | ⬜ |
+| Calendar Integration | Takvim sync | ⬜ |
+| Notification Settings | Detaylı kontrol | ⬜ |
 
 ### 4.8 STAGE 4 Checklist
 
@@ -446,20 +435,20 @@ src/i18n/
 
 ### 5.1 Existing Migrations (APPLIED)
 
-| Migration                                         | Purpose            | Status |
-| ------------------------------------------------- | ------------------ | ------ |
-| `20251217100000_critical_security_fixes.sql`      | Security hardening | ✅     |
-| `20251217200000_enable_atomic_transfer.sql`       | Atomic transfers   | ✅     |
-| `20251217200001_fix_cache_invalidation_rls.sql`   | RLS fix            | ✅     |
-| `20251218100000_final_security_audit.sql`         | Final audit        | ✅     |
-| `20251223000000_add_gender_birthdate_trigger.sql` | Profile trigger    | ✅     |
+| Migration | Purpose | Status |
+|-----------|---------|--------|
+| `20251217100000_critical_security_fixes.sql` | Security hardening | ✅ |
+| `20251217200000_enable_atomic_transfer.sql` | Atomic transfers | ✅ |
+| `20251217200001_fix_cache_invalidation_rls.sql` | RLS fix | ✅ |
+| `20251218100000_final_security_audit.sql` | Final audit | ✅ |
+| `20251223000000_add_gender_birthdate_trigger.sql` | Profile trigger | ✅ |
 
 ### 5.2 Pending Migrations
 
-| Task                | Description            | Status |
-| ------------------- | ---------------------- | ------ |
-| Age filter index    | Performance için index | ⬜     |
-| Gender filter index | Performance için index | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| Age filter index | Performance için index | ⬜ |
+| Gender filter index | Performance için index | ⬜ |
 
 ```sql
 -- Önerilen migration
@@ -469,15 +458,14 @@ CREATE INDEX idx_users_gender ON users (gender);
 
 ### 5.3 Edge Functions
 
-| Function                  | Purpose          | Status  |
-| ------------------------- | ---------------- | ------- |
-| `verify-kyc`              | KYC verification | ⚠️ MOCK |
-| `upload-image`            | Image uploads    | ✅      |
-| `upload-cloudflare-image` | Cloudflare proxy | ✅      |
-| Diğer 18+ function        | Çeşitli          | ✅      |
+| Function | Purpose | Status |
+|----------|---------|--------|
+| `verify-kyc` | KYC verification | ⚠️ MOCK |
+| `upload-image` | Image uploads | ✅ |
+| `upload-cloudflare-image` | Cloudflare proxy | ✅ |
+| Diğer 18+ function | Çeşitli | ✅ |
 
 **KYC Real Implementation:**
-
 ```typescript
 // supabase/functions/verify-kyc/index.ts
 // ⚠️ MOCK - Production'da değiştirilmeli
@@ -490,11 +478,11 @@ CREATE INDEX idx_users_gender ON users (gender);
 
 ### 5.4 Realtime Subscriptions
 
-| Channel    | Purpose        | Status  |
-| ---------- | -------------- | ------- |
-| `messages` | Chat messages  | ⬜ Test |
-| `moments`  | Moment updates | ⬜ Test |
-| `requests` | Trip requests  | ⬜ Test |
+| Channel | Purpose | Status |
+|---------|---------|--------|
+| `messages` | Chat messages | ⬜ Test |
+| `moments` | Moment updates | ⬜ Test |
+| `requests` | Trip requests | ⬜ Test |
 
 ### 5.5 STAGE 5 Checklist
 
@@ -510,37 +498,49 @@ CREATE INDEX idx_users_gender ON users (gender);
 
 ### 6.1 Store Requirements
 
-**iOS (App Store)** | Task | Status | |------|--------| | Apple Developer Account ($99) | ⬜ | | App
-Store Connect setup | ⬜ | | Screenshots (6.7", 6.5", 5.5") | ⬜ | | App description (TR & EN) | ⬜
-| | Privacy Policy URL | ✅ | | App icon (1024x1024) | ⬜ |
+**iOS (App Store)**
+| Task | Status |
+|------|--------|
+| Apple Developer Account ($99) | ⬜ |
+| App Store Connect setup | ⬜ |
+| Screenshots (6.7", 6.5", 5.5") | ⬜ |
+| App description (TR & EN) | ⬜ |
+| Privacy Policy URL | ✅ |
+| App icon (1024x1024) | ⬜ |
 
-**Android (Play Store)** | Task | Status | |------|--------| | Google Developer Account ($25) | ⬜ |
-| Play Console setup | ⬜ | | Feature graphic (1024x500) | ⬜ | | Screenshots | ⬜ | | Data safety
-form | ⬜ | | App icon (512x512) | ⬜ |
+**Android (Play Store)**
+| Task | Status |
+|------|--------|
+| Google Developer Account ($25) | ⬜ |
+| Play Console setup | ⬜ |
+| Feature graphic (1024x500) | ⬜ |
+| Screenshots | ⬜ |
+| Data safety form | ⬜ |
+| App icon (512x512) | ⬜ |
 
 ### 6.2 Production Checklist
 
-| Task                      | Status |
-| ------------------------- | ------ |
-| Stripe production keys    | ⬜     |
-| Sentry production DSN     | ⬜     |
-| Analytics production      | ⬜     |
-| Deep links configured     | ⬜     |
-| Push notifications tested | ⬜     |
-| Performance profiled      | ⬜     |
-| Security audit passed     | ⬜     |
+| Task | Status |
+|------|--------|
+| Stripe production keys | ⬜ |
+| Sentry production DSN | ⬜ |
+| Analytics production | ⬜ |
+| Deep links configured | ⬜ |
+| Push notifications tested | ⬜ |
+| Performance profiled | ⬜ |
+| Security audit passed | ⬜ |
 
 ### 6.3 Final Testing
 
-| Test                        | Status |
-| --------------------------- | ------ |
-| Full registration flow      | ⬜     |
-| Moment creation with images | ⬜     |
-| Payment flow (Stripe)       | ⬜     |
-| Chat functionality          | ⬜     |
-| Push notifications          | ⬜     |
-| Deep linking                | ⬜     |
-| Offline mode                | ⬜     |
+| Test | Status |
+|------|--------|
+| Full registration flow | ⬜ |
+| Moment creation with images | ⬜ |
+| Payment flow (Stripe) | ⬜ |
+| Chat functionality | ⬜ |
+| Push notifications | ⬜ |
+| Deep linking | ⬜ |
+| Offline mode | ⬜ |
 
 ### 6.4 STAGE 6 Checklist
 
@@ -585,41 +585,41 @@ git push origin --delete claude/ux-research-design-toolkit-eVD3U
 
 ## Success Criteria Summary
 
-| Stage       | Complete When                              |
-| ----------- | ------------------------------------------ |
-| **Stage 0** | ✅ Bug fixes done                          |
+| Stage | Complete When |
+|-------|---------------|
+| **Stage 0** | ✅ Bug fixes done |
 | **Stage 1** | All 18 branches merged, no secrets in code |
-| **Stage 2** | Tests passing, performance optimized       |
-| **Stage 3** | i18n complete, error handling in place     |
-| **Stage 4** | All new features implemented               |
-| **Stage 5** | Backend production-ready                   |
-| **Stage 6** | Apps in stores, approved                   |
+| **Stage 2** | Tests passing, performance optimized |
+| **Stage 3** | i18n complete, error handling in place |
+| **Stage 4** | All new features implemented |
+| **Stage 5** | Backend production-ready |
+| **Stage 6** | Apps in stores, approved |
 
 ---
 
 ## Risk Matrix
 
-| Risk                   | Impact   | Probability | Mitigation              |
-| ---------------------- | -------- | ----------- | ----------------------- |
-| Branch merge conflicts | Medium   | High        | Follow merge order      |
-| Token leak             | Critical | Low         | Fix in Stage 1          |
-| Store rejection        | High     | Medium      | Follow guidelines       |
-| KYC mock in prod       | High     | Medium      | Integrate real provider |
-| DB migration failure   | High     | Low         | Test in staging first   |
-| Performance issues     | Medium   | Low         | FlashList + profiling   |
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| Branch merge conflicts | Medium | High | Follow merge order |
+| Token leak | Critical | Low | Fix in Stage 1 |
+| Store rejection | High | Medium | Follow guidelines |
+| KYC mock in prod | High | Medium | Integrate real provider |
+| DB migration failure | High | Low | Test in staging first |
+| Performance issues | Medium | Low | FlashList + profiling |
 
 ---
 
 ## Timeline Estimate
 
-| Stage   | Duration | Cumulative |
-| ------- | -------- | ---------- |
-| Stage 1 | 1 gün    | 1 gün      |
-| Stage 2 | 2 gün    | 3 gün      |
-| Stage 3 | 3 gün    | 6 gün      |
-| Stage 4 | 5 gün    | 11 gün     |
-| Stage 5 | 3 gün    | 14 gün     |
-| Stage 6 | 7 gün    | 21 gün     |
+| Stage | Duration | Cumulative |
+|-------|----------|------------|
+| Stage 1 | 1 gün | 1 gün |
+| Stage 2 | 2 gün | 3 gün |
+| Stage 3 | 3 gün | 6 gün |
+| Stage 4 | 5 gün | 11 gün |
+| Stage 5 | 3 gün | 14 gün |
+| Stage 6 | 7 gün | 21 gün |
 
 **Toplam Süre:** ~3 hafta (21 gün)
 
@@ -658,5 +658,6 @@ git merge origin/claude/postgres-schema-design-lYSj1
 
 ---
 
-**Document Owner:** Development Team **Last Updated:** December 23, 2025 **Status:** Active - Stage
-0 Complete
+**Document Owner:** Development Team
+**Last Updated:** December 23, 2025
+**Status:** Active - Stage 0 Complete

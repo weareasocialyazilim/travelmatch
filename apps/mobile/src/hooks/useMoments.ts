@@ -11,6 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../config/supabase';
 import { momentsService } from '../services/supabaseDbService';
+import { uploadMomentImages } from '../services/supabaseStorageService';
 import { logger } from '../utils/logger';
 import { ErrorHandler } from '../utils/errorHandler';
 import { usePagination, type PaginatedResponse } from './usePagination';
@@ -289,6 +290,43 @@ export const useMoments = (): UseMomentsReturn => {
         } = await supabase.auth.getUser();
         if (!user) throw new Error('Not authenticated');
 
+        // Generate a unique moment ID for organizing uploaded images
+        const momentId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+        // Upload images to Supabase Storage first
+        let uploadedImageUrls: string[] = [];
+        if (data.images && data.images.length > 0) {
+          logger.info('[createMoment] Uploading images...', { count: data.images.length });
+
+          const uploadResults = await uploadMomentImages(
+            data.images,
+            user.id,
+            momentId,
+          );
+
+          // Filter successful uploads and get URLs
+          uploadedImageUrls = uploadResults
+            .filter((result) => result.url !== null)
+            .map((result) => result.url as string);
+
+          // Check if any uploads failed
+          const failedUploads = uploadResults.filter((result) => result.error !== null);
+          if (failedUploads.length > 0) {
+            logger.warn('[createMoment] Some images failed to upload:', {
+              failed: failedUploads.length,
+              total: data.images.length,
+            });
+          }
+
+          if (uploadedImageUrls.length === 0) {
+            throw new Error('Failed to upload images');
+          }
+
+          logger.info('[createMoment] Images uploaded successfully', {
+            count: uploadedImageUrls.length,
+          });
+        }
+
         const momentData = {
           user_id: user.id,
           title: data.title,
@@ -302,7 +340,7 @@ export const useMoments = (): UseMomentsReturn => {
           longitude: data.location?.coordinates?.lng ?? null,
           date: new Date().toISOString(),
           max_participants: data.maxGuests || 1,
-          images: data.images,
+          images: uploadedImageUrls, // Use uploaded URLs instead of local URIs
           price: data.pricePerGuest,
           currency: data.currency,
           max_guests: data.maxGuests,
@@ -344,17 +382,52 @@ export const useMoments = (): UseMomentsReturn => {
       data: Partial<CreateMomentData>,
     ): Promise<Moment | null> => {
       try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
+
         const updates: any = {};
         if (data.title) updates.title = data.title;
         if (data.description) updates.description = data.description;
         if (data.category) updates.category = data.category;
         if (data.location) updates.location = data.location;
-        if (data.images) updates.images = data.images;
         if (data.pricePerGuest) updates.price = data.pricePerGuest;
         if (data.currency) updates.currency = data.currency;
         if (data.maxGuests) updates.max_guests = data.maxGuests;
         if (data.duration) updates.duration = data.duration;
         if (data.availability) updates.availability = data.availability;
+
+        // Handle images - upload new local files, keep existing URLs
+        if (data.images && data.images.length > 0) {
+          const existingUrls: string[] = [];
+          const localUris: string[] = [];
+
+          // Separate existing URLs from new local URIs
+          for (const image of data.images) {
+            if (image.startsWith('file://') || image.startsWith('content://')) {
+              localUris.push(image);
+            } else {
+              existingUrls.push(image);
+            }
+          }
+
+          // Upload new local images if any
+          if (localUris.length > 0) {
+            logger.info('[updateMoment] Uploading new images...', { count: localUris.length });
+
+            const uploadResults = await uploadMomentImages(localUris, user.id, id);
+            const uploadedUrls = uploadResults
+              .filter((result) => result.url !== null)
+              .map((result) => result.url as string);
+
+            logger.info('[updateMoment] New images uploaded', { count: uploadedUrls.length });
+
+            updates.images = [...existingUrls, ...uploadedUrls];
+          } else {
+            updates.images = existingUrls;
+          }
+        }
 
         const { data: moment, error } = await momentsService.update(
           id,

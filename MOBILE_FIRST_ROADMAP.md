@@ -1,15 +1,17 @@
 # TravelMatch Mobile-First Implementation Roadmap
 
-**Version:** 3.0 **Created:** December 22, 2025 **Updated:** December 23, 2025 **Status:**
-Pre-Launch - Active Development **Priority:** MOBILE FIRST **Architecture Guide:**
-[docs/ARCHITECTURE_BEST_PRACTICES.md](./docs/ARCHITECTURE_BEST_PRACTICES.md)
+**Version:** 3.0
+**Created:** December 22, 2025
+**Updated:** December 23, 2025
+**Status:** Pre-Launch - Active Development
+**Priority:** MOBILE FIRST
+**Architecture Guide:** [docs/ARCHITECTURE_BEST_PRACTICES.md](./docs/ARCHITECTURE_BEST_PRACTICES.md)
 
 ---
 
 ## Executive Summary
 
-Mobile app is the core product. All efforts prioritize mobile stability, security, and performance
-before other platforms.
+Mobile app is the core product. All efforts prioritize mobile stability, security, and performance before other platforms.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -41,15 +43,15 @@ before other platforms.
 
 ## Current Stats
 
-| Metric       | Value                                              |
-| ------------ | -------------------------------------------------- |
-| Source Files | 665+ TypeScript/TSX                                |
-| Features     | Auth, Moments, Payments, Chat, Profile, Trips, KYC |
-| Screens      | 80+ screens                                        |
-| Framework    | React Native 0.81.5 + Expo SDK 54                  |
-| State        | Zustand                                            |
-| Backend      | Supabase (21+ Edge Functions, 52+ Migrations)      |
-| Database     | 33+ tables, 184+ RLS policies                      |
+| Metric | Value |
+|--------|-------|
+| Source Files | 665+ TypeScript/TSX |
+| Features | Auth, Moments, Payments, Chat, Profile, Trips, KYC |
+| Screens | 80+ screens |
+| Framework | React Native 0.81.5 + Expo SDK 54 |
+| State | Zustand |
+| Backend | Supabase (21+ Edge Functions, 52+ Migrations) |
+| Database | 33+ tables, 184+ RLS policies |
 
 ---
 
@@ -57,14 +59,13 @@ before other platforms.
 
 ### 0.1 Bu Oturumda Düzeltilen Hatalar
 
-| Task                        | File                              | Status  |
-| --------------------------- | --------------------------------- | ------- |
-| Moment görsel yükleme       | `hooks/useMoments.ts`             | ✅ DONE |
-| Kayıtta cinsiyet/yaş alma   | `RegisterScreen.tsx`              | ✅ DONE |
+| Task | File | Status |
+|------|------|--------|
+| Moment görsel yükleme | `hooks/useMoments.ts` | ✅ DONE |
+| Kayıtta cinsiyet/yaş alma | `RegisterScreen.tsx` | ✅ DONE |
 | Database trigger güncelleme | `migrations/20251223000000_*.sql` | ✅ DONE |
 
 **0.1.1 Moment Image Upload Fix** ✅
-
 ```typescript
 // hooks/useMoments.ts - createMoment & updateMoment
 // Artık görseller Supabase Storage'a yükleniyor
@@ -72,7 +73,6 @@ before other platforms.
 ```
 
 **0.1.2 Gender & Date of Birth in Registration** ✅
-
 ```typescript
 // RegisterScreen.tsx
 // - Cinsiyet seçici (pill buttons)
@@ -86,14 +86,13 @@ before other platforms.
 
 ### 1.1 Secret Sızıntıları (BLOCKER)
 
-| Task                     | File                           | Priority | Status |
-| ------------------------ | ------------------------------ | -------- | ------ |
-| Mapbox token fix         | `app.config.ts:74`             | P0       | ⬜     |
-| Cloudflare token removal | `services/cloudflareImages.ts` | P0       | ⬜     |
-| env.config.ts update     | `FORBIDDEN_PUBLIC_VARS`        | P0       | ⬜     |
+| Task | File | Priority | Status |
+|------|------|----------|--------|
+| Mapbox token fix | `app.config.ts:74` | P0 | ⬜ |
+| Cloudflare token removal | `services/cloudflareImages.ts` | P0 | ⬜ |
+| env.config.ts update | `FORBIDDEN_PUBLIC_VARS` | P0 | ⬜ |
 
 **1.1.1 Mapbox Secret Token**
-
 ```typescript
 // apps/mobile/app.config.ts:74
 // ❌ YANLIŞ
@@ -104,7 +103,6 @@ RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
 ```
 
 **1.1.2 Cloudflare Images Token**
-
 ```typescript
 // ❌ apps/mobile/src/services/cloudflareImages.ts - SİL veya Edge Function kullan
 
@@ -113,7 +111,7 @@ import { supabase } from './supabase';
 
 export async function uploadImage(imageBlob: Blob) {
   const { data, error } = await supabase.functions.invoke('upload-image', {
-    body: { file: imageBlob },
+    body: { file: imageBlob }
   });
   return { data, error };
 }
@@ -121,30 +119,30 @@ export async function uploadImage(imageBlob: Blob) {
 
 ### 1.2 Database & Backend
 
-| Task                    | File                                            | Status  |
-| ----------------------- | ----------------------------------------------- | ------- |
-| atomic_transfer RPC     | `20251217200000_enable_atomic_transfer.sql`     | ✅ DONE |
-| cache_invalidation RLS  | `20251217200001_fix_cache_invalidation_rls.sql` | ✅ DONE |
-| KYC real implementation | `functions/verify-kyc/index.ts:110`             | ⚠️ MOCK |
+| Task | File | Status |
+|------|------|--------|
+| atomic_transfer RPC | `20251217200000_enable_atomic_transfer.sql` | ✅ DONE |
+| cache_invalidation RLS | `20251217200001_fix_cache_invalidation_rls.sql` | ✅ DONE |
+| KYC real implementation | `functions/verify-kyc/index.ts:110` | ⚠️ MOCK |
 
 ### 1.3 Type Safety (7 `any` tipi)
 
-| File                   | Line | Current            | Fix                             |
-| ---------------------- | ---- | ------------------ | ------------------------------- |
-| `supabaseDbService.ts` | 436  | `item: any`        | `item: MomentWithUser`          |
-| `supabaseDbService.ts` | 579  | `data: any[]`      | `data: Transaction[]`           |
-| `supabaseDbService.ts` | 1327 | `report: any`      | `report: ReportInput`           |
-| `supabaseDbService.ts` | 1360 | `block: any`       | `block: BlockUserInput`         |
-| `supabaseDbService.ts` | 1469 | `user: any`        | `user: User \| null`            |
-| `supabaseDbService.ts` | 1474 | `authRes: any`     | `authRes: AuthResponse`         |
+| File | Line | Current | Fix |
+|------|------|---------|-----|
+| `supabaseDbService.ts` | 436 | `item: any` | `item: MomentWithUser` |
+| `supabaseDbService.ts` | 579 | `data: any[]` | `data: Transaction[]` |
+| `supabaseDbService.ts` | 1327 | `report: any` | `report: ReportInput` |
+| `supabaseDbService.ts` | 1360 | `block: any` | `block: BlockUserInput` |
+| `supabaseDbService.ts` | 1469 | `user: any` | `user: User \| null` |
+| `supabaseDbService.ts` | 1474 | `authRes: any` | `authRes: AuthResponse` |
 | `supabaseDbService.ts` | 1531 | `transaction: any` | `transaction: TransactionInput` |
 
 ### 1.4 User Type Güncellemesi
 
-| Task                         | File             | Status |
-| ---------------------------- | ---------------- | ------ |
-| User type'a gender ekle      | `types/index.ts` | ⬜     |
-| User type'a dateOfBirth ekle | `types/index.ts` | ⬜     |
+| Task | File | Status |
+|------|------|--------|
+| User type'a gender ekle | `types/index.ts` | ⬜ |
+| User type'a dateOfBirth ekle | `types/index.ts` | ⬜ |
 
 ```typescript
 // types/index.ts
@@ -158,10 +156,10 @@ export interface User {
 
 ### 1.5 Error Handling & Monitoring
 
-| Task               | Description                    | Priority | Status |
-| ------------------ | ------------------------------ | -------- | ------ |
-| Error Boundary     | Crash durumlarında fallback UI | P1       | ⬜     |
-| Sentry Integration | Production crash raporlama     | P1       | ⬜     |
+| Task | Description | Priority | Status |
+|------|-------------|----------|--------|
+| Error Boundary | Crash durumlarında fallback UI | P1 | ⬜ |
+| Sentry Integration | Production crash raporlama | P1 | ⬜ |
 
 ```typescript
 // components/ErrorBoundary.tsx
@@ -177,16 +175,16 @@ export class ErrorBoundary extends React.Component {
 
 ### 1.6 Deliverables - Phase 1
 
-| Deliverable                | Status | Effort   |
-| -------------------------- | ------ | -------- |
-| Mapbox token fix           | ⬜     | 15 min   |
-| Cloudflare service rewrite | ⬜     | 1 saat   |
-| env.config.ts update       | ⬜     | 15 min   |
-| Type safety fixes (7 any)  | ⬜     | 2 saat   |
-| User type update           | ⬜     | 30 min   |
-| Error Boundary             | ⬜     | 1 saat   |
-| Sentry integration         | ⬜     | 2 saat   |
-| KYC real implementation    | ⬜     | 2-4 saat |
+| Deliverable | Status | Effort |
+|-------------|--------|--------|
+| Mapbox token fix | ⬜ | 15 min |
+| Cloudflare service rewrite | ⬜ | 1 saat |
+| env.config.ts update | ⬜ | 15 min |
+| Type safety fixes (7 any) | ⬜ | 2 saat |
+| User type update | ⬜ | 30 min |
+| Error Boundary | ⬜ | 1 saat |
+| Sentry integration | ⬜ | 2 saat |
+| KYC real implementation | ⬜ | 2-4 saat |
 
 ---
 
@@ -194,16 +192,15 @@ export class ErrorBoundary extends React.Component {
 
 ### 2.1 Internationalization (i18n)
 
-| Task                 | Description                          | Priority | Status |
-| -------------------- | ------------------------------------ | -------- | ------ |
-| i18n setup           | react-i18next veya expo-localization | P1       | ⬜     |
-| Turkish translations | Tüm UI metinleri Türkçe              | P1       | ⬜     |
-| English translations | Tüm UI metinleri İngilizce           | P1       | ⬜     |
-| Language selector    | Ayarlardan dil seçimi                | P1       | ⬜     |
-| Form error messages  | Validation hata mesajları çevirisi   | P1       | ⬜     |
+| Task | Description | Priority | Status |
+|------|-------------|----------|--------|
+| i18n setup | react-i18next veya expo-localization | P1 | ⬜ |
+| Turkish translations | Tüm UI metinleri Türkçe | P1 | ⬜ |
+| English translations | Tüm UI metinleri İngilizce | P1 | ⬜ |
+| Language selector | Ayarlardan dil seçimi | P1 | ⬜ |
+| Form error messages | Validation hata mesajları çevirisi | P1 | ⬜ |
 
 **i18n Klasör Yapısı:**
-
 ```
 src/
 ├── i18n/
@@ -215,7 +212,6 @@ src/
 ```
 
 **Örnek Kullanım:**
-
 ```typescript
 import { useTranslation } from '@/i18n';
 
@@ -228,23 +224,23 @@ const { t, locale, setLocale } = useTranslation();
 
 ### 2.2 FlatList → FlashList Migration (6 Component)
 
-| Component             | File                                             | Status |
-| --------------------- | ------------------------------------------------ | ------ |
-| OnboardingScreen      | `features/auth/screens/OnboardingScreen.tsx:181` | ⬜     |
-| RecentSearches        | `components/RecentSearches.tsx:43`               | ⬜     |
-| TopPicksSection       | `components/TopPicksSection.tsx:29`              | ⬜     |
-| EnhancedSearchBar     | `components/ui/EnhancedSearchBar.tsx:152`        | ⬜     |
-| MomentsFeedExample    | `examples/MomentsFeedExample.tsx:67`             | ⬜     |
-| usePagination.stories | `hooks/usePagination.stories.tsx:136`            | ⬜     |
+| Component | File | Status |
+|-----------|------|--------|
+| OnboardingScreen | `features/auth/screens/OnboardingScreen.tsx:181` | ⬜ |
+| RecentSearches | `components/RecentSearches.tsx:43` | ⬜ |
+| TopPicksSection | `components/TopPicksSection.tsx:29` | ⬜ |
+| EnhancedSearchBar | `components/ui/EnhancedSearchBar.tsx:152` | ⬜ |
+| MomentsFeedExample | `examples/MomentsFeedExample.tsx:67` | ⬜ |
+| usePagination.stories | `hooks/usePagination.stories.tsx:136` | ⬜ |
 
 ### 2.3 Skeleton Loading
 
-| Task                     | Description                 | Status |
-| ------------------------ | --------------------------- | ------ |
-| SkeletonLoader component | Reusable skeleton component | ⬜     |
-| MomentCard skeleton      | Moment kartı için skeleton  | ⬜     |
-| ProfileCard skeleton     | Profil kartı için skeleton  | ⬜     |
-| Feed skeleton            | Feed yüklenirken skeleton   | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| SkeletonLoader component | Reusable skeleton component | ⬜ |
+| MomentCard skeleton | Moment kartı için skeleton | ⬜ |
+| ProfileCard skeleton | Profil kartı için skeleton | ⬜ |
+| Feed skeleton | Feed yüklenirken skeleton | ⬜ |
 
 ```typescript
 // components/ui/Skeleton.tsx
@@ -264,14 +260,14 @@ export const Skeleton = ({ width, height, borderRadius = 8 }) => (
 
 ### 2.4 Deliverables - Phase 2
 
-| Deliverable             | Status | Effort |
-| ----------------------- | ------ | ------ |
-| i18n setup              | ⬜     | 2 saat |
-| Turkish translations    | ⬜     | 4 saat |
-| English translations    | ⬜     | 2 saat |
-| Language selector       | ⬜     | 1 saat |
-| FlashList migration (6) | ⬜     | 2 saat |
-| Skeleton components     | ⬜     | 2 saat |
+| Deliverable | Status | Effort |
+|-------------|--------|--------|
+| i18n setup | ⬜ | 2 saat |
+| Turkish translations | ⬜ | 4 saat |
+| English translations | ⬜ | 2 saat |
+| Language selector | ⬜ | 1 saat |
+| FlashList migration (6) | ⬜ | 2 saat |
+| Skeleton components | ⬜ | 2 saat |
 
 ---
 
@@ -279,11 +275,11 @@ export const Skeleton = ({ width, height, borderRadius = 8 }) => (
 
 ### 3.1 Profil Yaş Gösterimi
 
-| Task                           | File                                                  | Status |
-| ------------------------------ | ----------------------------------------------------- | ------ |
-| ProfileScreen'de yaş göster    | `features/profile/screens/ProfileScreen.tsx`          | ⬜     |
-| OtherUserProfile'da yaş göster | `features/profile/screens/OtherUserProfileScreen.tsx` | ⬜     |
-| Yaş hesaplama utility          | `utils/age.ts`                                        | ⬜     |
+| Task | File | Status |
+|------|------|--------|
+| ProfileScreen'de yaş göster | `features/profile/screens/ProfileScreen.tsx` | ⬜ |
+| OtherUserProfile'da yaş göster | `features/profile/screens/OtherUserProfileScreen.tsx` | ⬜ |
+| Yaş hesaplama utility | `utils/age.ts` | ⬜ |
 
 ```typescript
 // utils/age.ts
@@ -304,13 +300,13 @@ export const calculateAge = (birthDate: Date | string): number => {
 
 ### 3.2 Filtreleme (Cinsiyet & Yaş)
 
-| Task                     | File                            | Status |
-| ------------------------ | ------------------------------- | ------ |
-| FilterModal component    | `components/FilterModal.tsx`    | ⬜     |
-| Gender filter            | Sadece erkek/kadın/hepsi        | ⬜     |
-| Age range filter         | 18-25, 25-35, 35-45, 45+        | ⬜     |
-| useMoments filter update | `hooks/useMoments.ts`           | ⬜     |
-| Database query update    | `services/supabaseDbService.ts` | ⬜     |
+| Task | File | Status |
+|------|------|--------|
+| FilterModal component | `components/FilterModal.tsx` | ⬜ |
+| Gender filter | Sadece erkek/kadın/hepsi | ⬜ |
+| Age range filter | 18-25, 25-35, 35-45, 45+ | ⬜ |
+| useMoments filter update | `hooks/useMoments.ts` | ⬜ |
+| Database query update | `services/supabaseDbService.ts` | ⬜ |
 
 ```typescript
 // FilterModal.tsx
@@ -334,13 +330,13 @@ const AGE_RANGES = [
 
 ### 3.3 Moment Paylaşma
 
-| Task                 | Description                          | Status |
-| -------------------- | ------------------------------------ | ------ |
-| Share button         | Moment detay sayfasına paylaş butonu | ⬜     |
-| Deep link generation | travelmatch://moment/{id}            | ⬜     |
-| WhatsApp share       | WhatsApp'a moment paylaşımı          | ⬜     |
-| Instagram Stories    | Stories'e moment paylaşımı           | ⬜     |
-| Copy link            | Link kopyalama                       | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| Share button | Moment detay sayfasına paylaş butonu | ⬜ |
+| Deep link generation | travelmatch://moment/{id} | ⬜ |
+| WhatsApp share | WhatsApp'a moment paylaşımı | ⬜ |
+| Instagram Stories | Stories'e moment paylaşımı | ⬜ |
+| Copy link | Link kopyalama | ⬜ |
 
 ```typescript
 // utils/share.ts
@@ -360,12 +356,12 @@ export const shareMoment = async (moment: Moment) => {
 
 ### 3.4 Harita Görünümü
 
-| Task            | Description                    | Status |
-| --------------- | ------------------------------ | ------ |
-| MapView screen  | Yakınımdaki momentler haritası | ⬜     |
-| Moment markers  | Haritada moment işaretleri     | ⬜     |
-| Cluster markers | Yakın momentleri gruplama      | ⬜     |
-| Map/List toggle | Harita ve liste arası geçiş    | ⬜     |
+| Task | Description | Status |
+|------|-------------|--------|
+| MapView screen | Yakınımdaki momentler haritası | ⬜ |
+| Moment markers | Haritada moment işaretleri | ⬜ |
+| Cluster markers | Yakın momentleri gruplama | ⬜ |
+| Map/List toggle | Harita ve liste arası geçiş | ⬜ |
 
 ```typescript
 // screens/ExploreMapScreen.tsx
@@ -393,35 +389,35 @@ export const ExploreMapScreen = () => {
 
 ### 3.5 Diğer UX Geliştirmeleri
 
-| Task              | Description                      | Priority | Status |
-| ----------------- | -------------------------------- | -------- | ------ |
-| Dark Mode         | Sistem dark mode desteği         | P2       | ⬜     |
-| Biometric Auth    | Face ID / Touch ID               | P2       | ⬜     |
-| Haptic Feedback   | Önemli aksiyonlarda titreşim     | P3       | ⬜     |
-| Empty States      | İllüstrasyonlu boş durumlar      | P3       | ⬜     |
-| App Rating Prompt | Olumlu deneyim sonrası puan iste | P3       | ⬜     |
+| Task | Description | Priority | Status |
+|------|-------------|----------|--------|
+| Dark Mode | Sistem dark mode desteği | P2 | ⬜ |
+| Biometric Auth | Face ID / Touch ID | P2 | ⬜ |
+| Haptic Feedback | Önemli aksiyonlarda titreşim | P3 | ⬜ |
+| Empty States | İllüstrasyonlu boş durumlar | P3 | ⬜ |
+| App Rating Prompt | Olumlu deneyim sonrası puan iste | P3 | ⬜ |
 
 ### 3.6 Analytics & Verification
 
-| Task                  | Description                          | Priority | Status |
-| --------------------- | ------------------------------------ | -------- | ------ |
-| Analytics Integration | PostHog veya Mixpanel                | P2       | ⬜     |
-| Verification Badge    | Doğrulanmış host rozeti              | P2       | ⬜     |
-| Calendar Integration  | Kabul edilen momentleri takvime ekle | P2       | ⬜     |
-| Notification Settings | Detaylı bildirim kontrolü            | P3       | ⬜     |
+| Task | Description | Priority | Status |
+|------|-------------|----------|--------|
+| Analytics Integration | PostHog veya Mixpanel | P2 | ⬜ |
+| Verification Badge | Doğrulanmış host rozeti | P2 | ⬜ |
+| Calendar Integration | Kabul edilen momentleri takvime ekle | P2 | ⬜ |
+| Notification Settings | Detaylı bildirim kontrolü | P3 | ⬜ |
 
 ### 3.7 Deliverables - Phase 3
 
-| Deliverable         | Status | Effort |
-| ------------------- | ------ | ------ |
-| Profile age display | ⬜     | 1 saat |
-| Gender/Age filters  | ⬜     | 3 saat |
-| Moment sharing      | ⬜     | 2 saat |
-| Map view            | ⬜     | 4 saat |
-| Dark mode           | ⬜     | 3 saat |
-| Biometric auth      | ⬜     | 2 saat |
-| Analytics           | ⬜     | 2 saat |
-| Verification badge  | ⬜     | 2 saat |
+| Deliverable | Status | Effort |
+|-------------|--------|--------|
+| Profile age display | ⬜ | 1 saat |
+| Gender/Age filters | ⬜ | 3 saat |
+| Moment sharing | ⬜ | 2 saat |
+| Map view | ⬜ | 4 saat |
+| Dark mode | ⬜ | 3 saat |
+| Biometric auth | ⬜ | 2 saat |
+| Analytics | ⬜ | 2 saat |
+| Verification badge | ⬜ | 2 saat |
 
 ---
 
@@ -470,25 +466,25 @@ export const ExploreMapScreen = () => {
 
 ### 4.3 Migration Tasks
 
-| Task                      | Priority | Status | Effort |
-| ------------------------- | -------- | ------ | ------ |
-| Create `features/shared/` | P1       | ⬜     | 30 min |
-| Move UI components        | P1       | ⬜     | 2 saat |
-| Move feedback components  | P1       | ⬜     | 1 saat |
-| Move media components     | P1       | ⬜     | 30 min |
-| Rename `utils/` to `lib/` | P2       | ⬜     | 1 saat |
-| Update all import paths   | P2       | ⬜     | 2 saat |
-| Create barrel exports     | P2       | ⬜     | 1 saat |
+| Task | Priority | Status | Effort |
+|------|----------|--------|--------|
+| Create `features/shared/` | P1 | ⬜ | 30 min |
+| Move UI components | P1 | ⬜ | 2 saat |
+| Move feedback components | P1 | ⬜ | 1 saat |
+| Move media components | P1 | ⬜ | 30 min |
+| Rename `utils/` to `lib/` | P2 | ⬜ | 1 saat |
+| Update all import paths | P2 | ⬜ | 2 saat |
+| Create barrel exports | P2 | ⬜ | 1 saat |
 
 ### 4.4 Deliverables - Phase 4
 
-| Deliverable                   | Status | Effort |
-| ----------------------------- | ------ | ------ |
-| features/shared/ structure    | ⬜     | 30 min |
-| UI components migration       | ⬜     | 2 saat |
-| Feedback components migration | ⬜     | 1 saat |
-| utils/ → lib/ rename          | ⬜     | 1 saat |
-| Import paths update           | ⬜     | 2 saat |
+| Deliverable | Status | Effort |
+|-------------|--------|--------|
+| features/shared/ structure | ⬜ | 30 min |
+| UI components migration | ⬜ | 2 saat |
+| Feedback components migration | ⬜ | 1 saat |
+| utils/ → lib/ rename | ⬜ | 1 saat |
+| Import paths update | ⬜ | 2 saat |
 
 **Total Effort:** ~8-10 saat
 
@@ -498,39 +494,39 @@ export const ExploreMapScreen = () => {
 
 ### 5.1 Store Requirements
 
-| Platform | Task                           | Status |
-| -------- | ------------------------------ | ------ |
-| iOS      | Apple Developer Account ($99)  | ⬜     |
-| iOS      | App Store Connect setup        | ⬜     |
-| iOS      | Screenshots (6.7", 6.5", 5.5") | ⬜     |
-| iOS      | App description (4000 chars)   | ⬜     |
-| iOS      | Privacy Policy URL             | ✅     |
-| Android  | Google Developer Account ($25) | ⬜     |
-| Android  | Play Console setup             | ⬜     |
-| Android  | Feature graphic (1024x500)     | ⬜     |
-| Android  | Screenshots                    | ⬜     |
-| Android  | Data safety form               | ⬜     |
+| Platform | Task | Status |
+|----------|------|--------|
+| iOS | Apple Developer Account ($99) | ⬜ |
+| iOS | App Store Connect setup | ⬜ |
+| iOS | Screenshots (6.7", 6.5", 5.5") | ⬜ |
+| iOS | App description (4000 chars) | ⬜ |
+| iOS | Privacy Policy URL | ✅ |
+| Android | Google Developer Account ($25) | ⬜ |
+| Android | Play Console setup | ⬜ |
+| Android | Feature graphic (1024x500) | ⬜ |
+| Android | Screenshots | ⬜ |
+| Android | Data safety form | ⬜ |
 
 ### 5.2 Production Readiness
 
-| Task                   | Status |
-| ---------------------- | ------ |
-| Stripe production keys | ⬜     |
-| Sentry production DSN  | ⬜     |
-| Analytics production   | ⬜     |
-| Deep links test        | ⬜     |
-| Performance profiling  | ⬜     |
-| Crash-free rate check  | ⬜     |
+| Task | Status |
+|------|--------|
+| Stripe production keys | ⬜ |
+| Sentry production DSN | ⬜ |
+| Analytics production | ⬜ |
+| Deep links test | ⬜ |
+| Performance profiling | ⬜ |
+| Crash-free rate check | ⬜ |
 
 ### 5.3 Deliverables - Phase 5
 
-| Deliverable              | Status | Effort |
-| ------------------------ | ------ | ------ |
-| Store accounts setup     | ⬜     | 1 gün  |
-| Screenshots & assets     | ⬜     | 2 gün  |
-| Store metadata (TR & EN) | ⬜     | 1 gün  |
-| Production build test    | ⬜     | 1 gün  |
-| Store submission         | ⬜     | 1 gün  |
+| Deliverable | Status | Effort |
+|-------------|--------|--------|
+| Store accounts setup | ⬜ | 1 gün |
+| Screenshots & assets | ⬜ | 2 gün |
+| Store metadata (TR & EN) | ⬜ | 1 gün |
+| Production build test | ⬜ | 1 gün |
+| Store submission | ⬜ | 1 gün |
 
 ---
 
@@ -587,21 +583,18 @@ PARALEL (Phase 4 - Architecture):
 ## Success Criteria
 
 ### Phase 1 Complete When:
-
 - [ ] No secrets in client bundle
 - [ ] Error boundaries in place
 - [ ] Sentry capturing errors
 - [ ] Zero `any` types in critical paths
 
 ### Phase 2 Complete When:
-
 - [ ] Full Turkish & English support
 - [ ] Language switching works
 - [ ] All lists use FlashList
 - [ ] Skeleton loading implemented
 
 ### Phase 3 Complete When:
-
 - [ ] Age displayed on profiles
 - [ ] Gender/Age filtering works
 - [ ] Moment sharing functional
@@ -609,14 +602,12 @@ PARALEL (Phase 4 - Architecture):
 - [ ] Dark mode supported
 
 ### Phase 4 Complete When:
-
 - [ ] `features/shared/` created
 - [ ] `utils/` renamed to `lib/`
 - [ ] All imports updated
 - [ ] Barrel exports working
 
 ### Phase 5 Complete When:
-
 - [ ] App Store approved
 - [ ] Play Store approved
 - [ ] Crash-free rate > 99.9%
@@ -625,26 +616,27 @@ PARALEL (Phase 4 - Architecture):
 
 ## Risk Matrix
 
-| Risk                      | Impact   | Probability | Mitigation              |
-| ------------------------- | -------- | ----------- | ----------------------- |
-| Token leak before fix     | Critical | Low         | Fix TODAY               |
-| Store rejection           | High     | Medium      | Follow guidelines       |
-| i18n missing translations | Medium   | Medium      | Translation review      |
-| Performance issues        | Medium   | Low         | FlashList + profiling   |
-| KYC mock in production    | High     | Medium      | Integrate real provider |
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| Token leak before fix | Critical | Low | Fix TODAY |
+| Store rejection | High | Medium | Follow guidelines |
+| i18n missing translations | Medium | Medium | Translation review |
+| Performance issues | Medium | Low | FlashList + profiling |
+| KYC mock in production | High | Medium | Integrate real provider |
 
 ---
 
 ## Recent Commits (This Session)
 
-| Commit    | Description                                                           |
-| --------- | --------------------------------------------------------------------- |
-| `3dd45cc` | feat: add gender and date of birth to user registration               |
-| `6098020` | fix: upload moment images to storage before saving to database        |
-| `1141d29` | docs: add Supabase/backend status to mobile roadmap                   |
+| Commit | Description |
+|--------|-------------|
+| `3dd45cc` | feat: add gender and date of birth to user registration |
+| `6098020` | fix: upload moment images to storage before saving to database |
+| `1141d29` | docs: add Supabase/backend status to mobile roadmap |
 | `5b56df0` | docs: add architecture best practices based on Darius Cosden patterns |
 
 ---
 
-**Document Status:** Active Implementation **Owner:** Development Team **Last Updated:** December
-23, 2025
+**Document Status:** Active Implementation
+**Owner:** Development Team
+**Last Updated:** December 23, 2025

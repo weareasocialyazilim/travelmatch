@@ -2,33 +2,16 @@
 export * from './supabase';
 
 // Authentication
-export {
-  getAdminSession,
-  hasPermission as authHasPermission,
-  createAuditLog,
-  type AdminSession,
-} from './auth';
+export * from './auth';
 
 // Audit logging
 export * from './audit';
 
-// Permissions (canonical source)
+// Permissions
 export * from './permissions';
 
 // Utilities
-export {
-  cn,
-  formatDate,
-  formatRelativeDate,
-  formatCurrency,
-  formatNumber,
-  truncate,
-  generateId,
-  getInitials,
-  sleep,
-  debounce,
-  parseError,
-} from './utils';
+export * from './utils';
 
 // Formatters
 export * from './formatters';

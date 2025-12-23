@@ -7,20 +7,14 @@
  */
 export function simulateResize(width: number, height: number): void {
   Object.defineProperty(window, 'innerWidth', { value: width, writable: true });
-  Object.defineProperty(window, 'innerHeight', {
-    value: height,
-    writable: true,
-  });
+  Object.defineProperty(window, 'innerHeight', { value: height, writable: true });
   window.dispatchEvent(new Event('resize'));
 }
 
 /**
  * Simulate viewport for responsive testing
  */
-export function setViewport(
-  preset: 'mobile' | 'tablet' | 'desktop' | 'custom',
-  options?: { width?: number; height?: number },
-): void {
+export function setViewport(preset: 'mobile' | 'tablet' | 'desktop' | 'custom', options?: { width?: number; height?: number }): void {
   const presets = {
     mobile: { width: 375, height: 667 },
     tablet: { width: 768, height: 1024 },
@@ -28,7 +22,7 @@ export function setViewport(
   };
 
   const dimensions = preset === 'custom' ? options! : presets[preset];
-  simulateResize(dimensions?.width ?? 375, dimensions?.height ?? 812);
+  simulateResize(dimensions.width, dimensions.height);
 }
 
 /**
@@ -63,8 +57,7 @@ export function isVisibleInViewport(element: HTMLElement): boolean {
   return (
     rect.top >= 0 &&
     rect.left >= 0 &&
-    rect.bottom <=
-      (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
     rect.right <= (window.innerWidth || document.documentElement.clientWidth)
   );
 }

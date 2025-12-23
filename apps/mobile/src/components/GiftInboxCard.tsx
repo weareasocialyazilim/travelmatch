@@ -3,7 +3,7 @@
  * Displays a single gift item in the inbox
  */
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
 

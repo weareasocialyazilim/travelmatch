@@ -25,12 +25,22 @@ export const getSession = async (): Promise<{
 };
 
 /**
+ * User metadata for registration
+ */
+interface SignUpMetadata {
+  name?: string;
+  avatar_url?: string;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  date_of_birth?: string; // YYYY-MM-DD format
+}
+
+/**
  * Sign up with email and password
  */
 export const signUpWithEmail = async (
   email: string,
   password: string,
-  metadata?: { name?: string; avatar_url?: string },
+  metadata?: SignUpMetadata,
 ): Promise<AuthResult> => {
   if (!isSupabaseConfigured()) {
     logger.warn('[Auth] Supabase not configured');

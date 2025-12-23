@@ -68,7 +68,7 @@ export function createDelayedRejectMock(error: Error, delayMs: number) {
 export function createFailingThenSucceedingMock<T>(
   failCount: number,
   successValue: T,
-  errorMessage = 'Mock error',
+  errorMessage = 'Mock error'
 ) {
   let callCount = 0;
 
@@ -96,9 +96,7 @@ export function createTimedMock<T>(value: T) {
     mock,
     calls,
     getCallGaps: () => {
-      return calls
-        .slice(1)
-        .map((call, index) => call.timestamp - (calls[index]?.timestamp ?? 0));
+      return calls.slice(1).map((call, index) => call.timestamp - calls[index].timestamp);
     },
   };
 }

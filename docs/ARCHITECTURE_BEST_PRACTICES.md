@@ -1,7 +1,8 @@
 # TravelMatch Architecture Best Practices
 
-**Version:** 1.0 **Created:** December 22, 2025 **Based on:** Darius Cosden's React Architecture
-Principles
+**Version:** 1.0
+**Created:** December 22, 2025
+**Based on:** Darius Cosden's React Architecture Principles
 
 ---
 
@@ -39,7 +40,6 @@ features/
 ### 2. Single Responsibility Principle
 
 Her şey sadece BİR iş yapmalı:
-
 - Components: 1 şey render eder
 - Hooks: 1 şey yapar
 - Utility functions: 1 şey yapar
@@ -388,25 +388,25 @@ features/payments/components/WalletListItem.tsx
 
 ```typescript
 // UI Components
-import { Button, Card, Input } from '@/features/shared/components/ui';
+import { Button, Card, Input } from '@/features/shared/components/ui'
 
 // Feedback Components
-import { ErrorState, LoadingState } from '@/features/shared/components/feedback';
+import { ErrorState, LoadingState } from '@/features/shared/components/feedback'
 
 // Feature Components
-import { MomentCard } from '@/features/moments/components';
+import { MomentCard } from '@/features/moments/components'
 
 // Hooks
-import { useDebounce } from '@/features/shared/hooks';
-import { useMoments } from '@/features/moments/hooks';
+import { useDebounce } from '@/features/shared/hooks'
+import { useMoments } from '@/features/moments/hooks'
 
 // Lib utilities
-import { supabase } from '@/lib/supabase';
-import { formatCurrency } from '@/lib/formatters';
+import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/formatters'
 
 // Types
-import type { User, Moment } from '@/features/shared/types';
-import type { PaymentMethod } from '@/features/payments/types';
+import type { User, Moment } from '@/features/shared/types'
+import type { PaymentMethod } from '@/features/payments/types'
 ```
 
 ---
@@ -426,4 +426,5 @@ import type { PaymentMethod } from '@/features/payments/types';
 
 ---
 
-**Document Status:** Active **Last Updated:** December 22, 2025
+**Document Status:** Active
+**Last Updated:** December 22, 2025

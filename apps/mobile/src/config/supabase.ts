@@ -47,9 +47,33 @@ const SupabaseStorage = {
 export const SUPABASE_EDGE_URL = SUPABASE_URL;
 
 /**
+ * Realtime configuration for optimal performance
+ */
+const REALTIME_CONFIG = {
+  params: {
+    eventsPerSecond: 10, // Rate limit to prevent flooding
+  },
+  // Heartbeat interval to detect disconnections early
+  heartbeatIntervalMs: 15000, // 15 seconds
+  // Reconnect configuration with exponential backoff
+  reconnectAfterMs: (tries: number) => {
+    // Exponential backoff with jitter: base * 2^tries + random jitter
+    const baseDelay = 1000;
+    const maxDelay = 30000;
+    const exponentialDelay = Math.min(baseDelay * Math.pow(2, tries), maxDelay);
+    // Add jitter (0-25% of delay) to prevent thundering herd
+    const jitter = exponentialDelay * Math.random() * 0.25;
+    return Math.floor(exponentialDelay + jitter);
+  },
+  // Connection timeout
+  timeout: 10000, // 10 seconds
+};
+
+/**
  * Supabase client instance
  * Configured with SecureStore for session persistence in React Native
  * Uses auto-generated Database types from @/types/database.types.ts
+ * Optimized realtime configuration for better performance and reliability
  */
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -64,6 +88,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, 
       'x-app-version': '1.0.0',
     },
   },
+  realtime: REALTIME_CONFIG,
 });
 
 /**

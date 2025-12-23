@@ -24,9 +24,7 @@ export interface MockRouter {
 /**
  * Create a mock Next.js router for testing
  */
-export function createMockRouter(
-  overrides: Partial<MockRouter> = {},
-): MockRouter {
+export function createMockRouter(overrides: Partial<MockRouter> = {}): MockRouter {
   return {
     push: jest.fn().mockResolvedValue(true),
     replace: jest.fn().mockResolvedValue(true),
@@ -60,8 +58,7 @@ export function createMockSearchParams(params: Record<string, string> = {}) {
     entries: () => searchParams.entries(),
     keys: () => searchParams.keys(),
     values: () => searchParams.values(),
-    forEach: (callback: (value: string, key: string) => void) =>
-      searchParams.forEach(callback),
+    forEach: (callback: (value: string, key: string) => void) => searchParams.forEach(callback),
     toString: () => searchParams.toString(),
   };
 }
@@ -69,13 +66,11 @@ export function createMockSearchParams(params: Record<string, string> = {}) {
 /**
  * Setup function to mock next/navigation
  */
-export function setupNextNavigationMocks(
-  options: {
-    pathname?: string;
-    searchParams?: Record<string, string>;
-    router?: Partial<MockRouter>;
-  } = {},
-) {
+export function setupNextNavigationMocks(options: {
+  pathname?: string;
+  searchParams?: Record<string, string>;
+  router?: Partial<MockRouter>;
+} = {}) {
   const router = createMockRouter(options.router);
   const searchParams = createMockSearchParams(options.searchParams);
   const pathname = options.pathname ?? '/';
@@ -93,22 +88,18 @@ export function setupNextNavigationMocks(
 /**
  * Mock fetch for API testing
  */
-export function createMockFetch(
-  responses: Array<{ data: unknown; status?: number; ok?: boolean }>,
-) {
+export function createMockFetch(responses: Array<{ data: unknown; status?: number; ok?: boolean }>) {
   let callIndex = 0;
 
   return jest.fn().mockImplementation(() => {
     const response = responses[callIndex] ?? responses[responses.length - 1];
     callIndex++;
 
-    const responseData = response ?? { data: {}, ok: true, status: 200 };
-
     return Promise.resolve({
-      ok: responseData.ok ?? true,
-      status: responseData.status ?? 200,
-      json: () => Promise.resolve(responseData.data),
-      text: () => Promise.resolve(JSON.stringify(responseData.data)),
+      ok: response.ok ?? true,
+      status: response.status ?? 200,
+      json: () => Promise.resolve(response.data),
+      text: () => Promise.resolve(JSON.stringify(response.data)),
       headers: new Headers(),
     });
   });
