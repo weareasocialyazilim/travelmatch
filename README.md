@@ -14,6 +14,7 @@ A social travel platform connecting travelers through shared experiences and gif
 
 **Quick Links:**
 
+- 📱 [Mobile-First Roadmap](./MOBILE_FIRST_ROADMAP.md) - Critical security fixes & launch plan
 - 📘 [Full Analysis](./docs/COMPREHENSIVE_PROJECT_ANALYSIS.md) - 50 pages, detailed technical
   analysis
 - ⚡ [Quick Action Plan](./docs/QUICK_ACTION_PLAN.md) - 5 pages, TL;DR version
@@ -31,7 +32,7 @@ travelmatch/
 ├── apps/
 │   ├── mobile/          # React Native + Expo mobile app
 │   ├── web/             # Next.js landing page
-│   └── admin/           # React admin panel (Refine)
+│   └── admin/           # Next.js 16 admin panel (90% complete)
 ├── packages/
 │   ├── shared/          # Shared utilities and types
 │   ├── design-system/   # UI components and tokens
