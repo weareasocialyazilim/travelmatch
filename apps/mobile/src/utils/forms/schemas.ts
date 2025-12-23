@@ -70,6 +70,27 @@ export const messageValidation = z
   .min(1, 'forms.validation.message.required')
   .max(1000, 'forms.validation.message.max');
 
+export const genderValidation = z.enum(
+  ['male', 'female', 'other', 'prefer_not_to_say'],
+  { errorMap: () => ({ message: 'forms.validation.gender.required' }) }
+);
+
+export const dateOfBirthValidation = z
+  .date()
+  .refine(
+    (date) => {
+      const today = new Date();
+      const minAge = 18;
+      const maxAge = 120;
+      const age = Math.floor((today.getTime() - date.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      return age >= minAge && age <= maxAge;
+    },
+    { message: 'forms.validation.dateOfBirth.age' }
+  );
+
+// Gender type export
+export type Gender = z.infer<typeof genderValidation>;
+
 // ============================================================================
 // AUTH SCHEMAS
 // ============================================================================
@@ -85,6 +106,8 @@ export const registerSchema = z
     password: passwordValidation,
     confirmPassword: z.string().min(1, 'forms.validation.confirmPassword.required'),
     fullName: nameValidation,
+    gender: genderValidation,
+    dateOfBirth: dateOfBirthValidation,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'forms.validation.confirmPassword.mismatch',
