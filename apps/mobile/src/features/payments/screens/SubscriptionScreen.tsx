@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator as _ActivityIndicator,
+  Platform,
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -20,6 +21,17 @@ import { logger } from '@/utils/logger';
 import type { Plan } from '../constants/plans';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+
+/**
+ * SubscriptionScreen - Membership plans selection
+ *
+ * Design Guidelines (Adrian K / DESIGNME):
+ * - Clearly show available plans, pricing, and features
+ * - Highlight the most popular option
+ * - Briefly describe benefits and include a clear call to action
+ * - Keep the process simple
+ * - Implement biometric authentication for quick verification
+ */
 
 type SubscriptionScreenProps = StackScreenProps<
   RootStackParamList,
@@ -223,6 +235,40 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           </View>
         </View>
 
+        {/* Benefits Summary */}
+        <View style={styles.benefitsCard}>
+          <Text style={styles.benefitsTitle}>Why Go Pro?</Text>
+          <View style={styles.benefitsList}>
+            <View style={styles.benefitItem}>
+              <Icon name="check-decagram" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Unlimited connections with locals</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <Icon name="check-decagram" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Priority support & faster responses</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <Icon name="check-decagram" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Exclusive experiences & early access</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Biometric Payment Hint */}
+        <View style={styles.biometricHint}>
+          <Icon
+            name={Platform.OS === 'ios' ? 'face-recognition' : 'fingerprint'}
+            size={24}
+            color={COLORS.primary}
+          />
+          <View style={styles.biometricContent}>
+            <Text style={styles.biometricTitle}>Quick & Secure Checkout</Text>
+            <Text style={styles.biometricText}>
+              Use {Platform.OS === 'ios' ? 'Face ID' : 'Fingerprint'} for fast payment verification
+            </Text>
+          </View>
+        </View>
+
         {/* FAQ Link */}
         <TouchableOpacity
           style={styles.faqButton}
@@ -264,6 +310,55 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
     marginRight: LAYOUT.padding / 4,
+  },
+  benefitsCard: {
+    backgroundColor: COLORS.mintTransparent,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+  },
+  benefitsTitle: {
+    ...TYPOGRAPHY.h4,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: LAYOUT.padding,
+  },
+  benefitsList: {
+    gap: LAYOUT.padding,
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: LAYOUT.padding,
+  },
+  benefitText: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.text,
+    flex: 1,
+  },
+  biometricHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+    gap: LAYOUT.padding,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  biometricContent: {
+    flex: 1,
+  },
+  biometricTitle: {
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: LAYOUT.padding / 4,
+  },
+  biometricText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
   },
   faqButton: {
     alignItems: 'center',

@@ -22,6 +22,7 @@ import {
   LocationModal,
   DiscoverHeader,
   StoryItem,
+  HomeWelcomeCard,
   POPULAR_CITIES,
   USER_STORIES,
 } from '@/components/discover';
@@ -37,6 +38,7 @@ import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { NetworkGuard } from '../../../components/NetworkGuard';
 import { useDiscoverStore } from '@/stores/discoverStore';
+import { useAuth } from '@/context/AuthContext';
 
 // Import modular components
 import type { UserStory } from '@/components/discover/types';
@@ -52,6 +54,7 @@ const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const { props: a11y, announce: _announce } = useAccessibility();
+  const { user } = useAuth();
 
   // Use moments hook for data fetching
   const {
@@ -361,6 +364,20 @@ const DiscoverScreen = () => {
     [getActiveFilterCount],
   );
 
+  // Check if user is new (no moments viewed or few interactions)
+  const isNewUser = useMemo(() => {
+    return apiMoments.length === 0 && !loading;
+  }, [apiMoments.length, loading]);
+
+  // Welcome card navigation handlers
+  const handleSetupProfile = useCallback(() => {
+    navigation.navigate('EditProfile');
+  }, [navigation]);
+
+  const handleExploreNearby = useCallback(() => {
+    openLocationModal();
+  }, [openLocationModal]);
+
   // Memoized render functions
   const renderStoryItem = useCallback(
     ({ item }: { item: UserStory }) => (
@@ -437,6 +454,15 @@ const DiscoverScreen = () => {
           }
           ListHeaderComponent={
             <>
+              {/* Welcome Card for New Users */}
+              {isNewUser && (
+                <HomeWelcomeCard
+                  userName={user?.name}
+                  onSetupProfile={handleSetupProfile}
+                  onExplore={handleExploreNearby}
+                />
+              )}
+
               {/* Stories - Horizontal FlatList (not FlashList to avoid nesting) */}
               <FlatList
                 data={USER_STORIES}

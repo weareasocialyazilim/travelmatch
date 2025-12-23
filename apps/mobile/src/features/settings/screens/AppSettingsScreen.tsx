@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
+  TextInput,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -41,6 +42,9 @@ const AppSettingsScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const { showToast } = useToast();
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Notification settings
   const [pushEnabled, setPushEnabled] = useState(true);
@@ -98,6 +102,30 @@ const AppSettingsScreen: React.FC = () => {
     marketingNotifications,
   ].filter(Boolean).length;
 
+  // Settings sections for search filtering
+  const settingsSections = useMemo(() => [
+    { id: 'notifications', label: 'Notifications', keywords: ['push', 'alert', 'sound', 'chat', 'request', 'marketing'] },
+    { id: 'privacy', label: 'Profile Visibility', keywords: ['privacy', 'visible', 'discoverable', 'hidden'] },
+    { id: 'language', label: 'Language', keywords: ['language', 'english', 'turkish', 'translate'] },
+    { id: 'invite', label: 'Invite Friends', keywords: ['invite', 'share', 'friends', 'referral'] },
+    { id: 'terms', label: 'Terms of Service', keywords: ['terms', 'legal', 'agreement'] },
+    { id: 'privacyPolicy', label: 'Privacy Policy', keywords: ['privacy', 'policy', 'data', 'gdpr'] },
+  ], []);
+
+  // Filter sections based on search query
+  const filteredSections = useMemo(() => {
+    if (!searchQuery.trim()) return settingsSections.map(s => s.id);
+    const query = searchQuery.toLowerCase();
+    return settingsSections
+      .filter(section =>
+        section.label.toLowerCase().includes(query) ||
+        section.keywords.some(keyword => keyword.includes(query))
+      )
+      .map(s => s.id);
+  }, [searchQuery, settingsSections]);
+
+  const shouldShowSection = (sectionId: string) => filteredSections.includes(sectionId);
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Offline Banner */}
@@ -123,6 +151,35 @@ const AppSettingsScreen: React.FC = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
         <View style={styles.placeholder} />
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputWrapper}>
+          <MaterialCommunityIcons
+            name="magnify"
+            size={20}
+            color={COLORS.textSecondary}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search settings..."
+            placeholderTextColor={COLORS.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <MaterialCommunityIcons
+                name="close-circle"
+                size={18}
+                color={COLORS.textSecondary}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView
@@ -156,6 +213,7 @@ const AppSettingsScreen: React.FC = () => {
         )}
 
         {/* Notifications - Expandable */}
+        {shouldShowSection('notifications') && (
         <View style={styles.section}>
           <TouchableOpacity
             style={styles.settingsCard}
@@ -239,8 +297,10 @@ const AppSettingsScreen: React.FC = () => {
             )}
           </TouchableOpacity>
         </View>
+        )}
 
         {/* Privacy */}
+        {shouldShowSection('privacy') && (
         <View style={styles.section}>
           <View style={styles.settingsCard}>
             <View style={styles.settingItem}>
@@ -271,8 +331,10 @@ const AppSettingsScreen: React.FC = () => {
             </View>
           </View>
         </View>
+        )}
 
         {/* Language */}
+        {shouldShowSection('language') && (
         <View style={styles.section}>
           <View style={styles.settingsCard}>
             <TouchableOpacity
@@ -303,8 +365,10 @@ const AppSettingsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        )}
 
         {/* Share */}
+        {shouldShowSection('invite') && (
         <View style={styles.section}>
           <View style={styles.settingsCard}>
             <TouchableOpacity
@@ -335,8 +399,10 @@ const AppSettingsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        )}
 
         {/* Legal Links */}
+        {(shouldShowSection('terms') || shouldShowSection('privacyPolicy')) && (
         <View style={styles.section}>
           <View style={styles.settingsCard}>
             <TouchableOpacity
@@ -368,6 +434,21 @@ const AppSettingsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        )}
+
+        {/* No Results */}
+        {filteredSections.length === 0 && searchQuery.trim() !== '' && (
+          <View style={styles.noResults}>
+            <MaterialCommunityIcons
+              name="magnify-close"
+              size={48}
+              color={COLORS.textSecondary}
+            />
+            <Text style={styles.noResultsText}>
+              No settings found for "{searchQuery}"
+            </Text>
+          </View>
+        )}
 
         {/* Sign Out & Delete Account - Side by Side */}
         <View style={styles.actionButtonsContainer}>
@@ -442,6 +523,40 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 44,
+    gap: 10,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: COLORS.text,
+  },
+  noResults: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    gap: 12,
+  },
+  noResultsText: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
