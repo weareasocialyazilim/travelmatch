@@ -5,6 +5,9 @@
  * - Passport ($0): Free tier for casual explorers
  * - First Class ($10): Enhanced features for serious travelers
  * - Concierge ($25): Premium experience with all features unlocked
+ *
+ * TravelMatch is a peer-to-peer travel experience marketplace.
+ * Core features: Moments (experiences), Messaging, Gifts, Trust/Verification
  */
 
 export interface PlanFeature {
@@ -16,9 +19,8 @@ export interface PlanLimits {
   momentsPerMonth: number; // -1 = unlimited
   messagesPerDay: number; // -1 = unlimited
   giftsPerMonth: number; // -1 = unlimited
-  superLikesPerDay: number;
-  spotlightPerWeek: number; // profile boost
-  rewindsPerDay: number; // undo swipe
+  savedMoments: number; // -1 = unlimited
+  photoPerMoment: number; // max photos per moment
 }
 
 export interface SubscriptionPlan {
@@ -50,22 +52,22 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     color: '#6B7280', // gray
     limits: {
       momentsPerMonth: 3,
-      messagesPerDay: 10,
+      messagesPerDay: 15,
       giftsPerMonth: 1,
-      superLikesPerDay: 0,
-      spotlightPerWeek: 0,
-      rewindsPerDay: 0,
+      savedMoments: 10,
+      photoPerMoment: 3,
     },
     features: [
       { text: '3 moments per month', included: true },
-      { text: '10 messages per day', included: true },
+      { text: '15 messages per day', included: true },
       { text: '1 gift per month', included: true },
+      { text: '10 saved moments', included: true },
+      { text: '3 photos per moment', included: true },
       { text: 'Basic discovery filters', included: true },
-      { text: 'See who liked you', included: false },
-      { text: 'SuperLikes', included: false },
-      { text: 'Profile Spotlight', included: false },
-      { text: 'Rewind swipes', included: false },
-      { text: 'Travel Mode', included: false },
+      { text: 'Advanced filters', included: false },
+      { text: 'See who viewed you', included: false },
+      { text: 'Verified badge', included: false },
+      { text: 'Incognito browsing', included: false },
       { text: 'Ad-free experience', included: false },
     ],
   },
@@ -83,23 +85,22 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       momentsPerMonth: 15,
       messagesPerDay: -1, // unlimited
       giftsPerMonth: 10,
-      superLikesPerDay: 3,
-      spotlightPerWeek: 1,
-      rewindsPerDay: 5,
+      savedMoments: 50,
+      photoPerMoment: 10,
     },
     features: [
       { text: '15 moments per month', included: true },
       { text: 'Unlimited messages', included: true },
       { text: '10 gifts per month', included: true },
-      { text: 'See who liked you', included: true },
-      { text: '3 SuperLikes per day', included: true },
-      { text: '1 Spotlight per week', included: true },
-      { text: '5 Rewinds per day', included: true },
-      { text: 'Travel Mode', included: true },
-      { text: 'Advanced filters', included: true },
+      { text: '50 saved moments', included: true },
+      { text: '10 photos per moment', included: true },
+      { text: 'Advanced discovery filters', included: true },
+      { text: 'See who viewed you', included: true },
       { text: 'Ad-free experience', included: true },
+      { text: 'Priority in search results', included: true },
       { text: 'Verified badge', included: false },
-      { text: 'Incognito Mode', included: false },
+      { text: 'Incognito browsing', included: false },
+      { text: 'Analytics dashboard', included: false },
     ],
   },
   {
@@ -115,23 +116,21 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       momentsPerMonth: -1, // unlimited
       messagesPerDay: -1, // unlimited
       giftsPerMonth: -1, // unlimited
-      superLikesPerDay: -1, // unlimited
-      spotlightPerWeek: -1, // unlimited
-      rewindsPerDay: -1, // unlimited
+      savedMoments: -1, // unlimited
+      photoPerMoment: 20,
     },
     features: [
       { text: 'Unlimited moments', included: true },
       { text: 'Unlimited messages', included: true },
       { text: 'Unlimited gifts', included: true },
-      { text: 'Unlimited SuperLikes', included: true },
-      { text: 'Unlimited Spotlight', included: true },
-      { text: 'Unlimited Rewinds', included: true },
-      { text: 'See who liked you', included: true },
-      { text: 'Travel Mode', included: true },
+      { text: 'Unlimited saved moments', included: true },
+      { text: '20 photos per moment', included: true },
       { text: 'All premium filters', included: true },
+      { text: 'See who viewed you', included: true },
       { text: 'Ad-free experience', included: true },
+      { text: 'Top priority in search', included: true },
       { text: 'Verified badge', included: true },
-      { text: 'Incognito Mode', included: true },
+      { text: 'Incognito browsing', included: true },
       { text: 'Analytics dashboard', included: true },
       { text: 'Early access to features', included: true },
     ],

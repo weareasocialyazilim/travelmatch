@@ -202,20 +202,24 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <Text style={styles.benefitsTitle}>Why Upgrade?</Text>
           <View style={styles.benefitsList}>
             <View style={styles.benefitItem}>
-              <Icon name="airplane" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>Connect with more travelers & locals</Text>
+              <Icon name="compass" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Create more moments & share experiences</Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="map-marker-star" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>Stand out with Spotlight & SuperLikes</Text>
+              <Icon name="message-text" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Unlimited messaging with travelers</Text>
             </View>
             <View style={styles.benefitItem}>
               <Icon name="gift" size={20} color={COLORS.success} />
               <Text style={styles.benefitText}>Send more gifts & show appreciation</Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="incognito" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>Travel discreetly with Incognito Mode</Text>
+              <Icon name="eye" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>See who viewed your profile</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <Icon name="shield-check" size={20} color={COLORS.success} />
+              <Text style={styles.benefitText}>Get verified badge & build trust</Text>
             </View>
           </View>
         </View>
