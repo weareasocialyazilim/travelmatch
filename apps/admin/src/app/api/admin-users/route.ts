@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
+import {
+  buildSafeSearchFilter,
+  validatePagination,
+} from '@/lib/query-utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,8 +21,10 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const role = searchParams.get('role');
     const isActive = searchParams.get('is_active');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const { limit, offset } = validatePagination(
+      searchParams.get('limit'),
+      searchParams.get('offset')
+    );
 
     const supabase = createServiceClient();
 
@@ -29,8 +35,10 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
-    if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+    // SECURITY: Use safe search filter to prevent PostgREST injection (VULN-001)
+    const searchFilter = buildSafeSearchFilter(['name', 'email'], search);
+    if (searchFilter) {
+      query = query.or(searchFilter);
     }
 
     if (role) {

@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
-import type { Database } from '@/types/database';
+import {
+  validatePagination,
+  sanitizeUUID,
+  buildSafeUUIDFilter,
+  buildSafeArrayContainsFilter,
+} from '@/lib/query-utils';
 
-type TaskStatus = Database['public']['Enums']['task_status'];
-type TaskPriority = Database['public']['Enums']['task_priority'];
+// Whitelist of valid status values
+const VALID_STATUSES = ['pending', 'in_progress', 'completed', 'cancelled'];
+// Whitelist of valid priority values
+const VALID_PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,36 +21,39 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const priority = searchParams.get('priority');
+    const rawStatus = searchParams.get('status');
+    const rawPriority = searchParams.get('priority');
     const assignedTo = searchParams.get('assigned_to');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const { limit, offset } = validatePagination(
+      searchParams.get('limit'),
+      searchParams.get('offset')
+    );
+
+    // SECURITY: Validate status and priority against whitelists
+    const status = rawStatus && VALID_STATUSES.includes(rawStatus) ? rawStatus : null;
+    const priority = rawPriority && VALID_PRIORITIES.includes(rawPriority) ? rawPriority : null;
 
     const supabase = createServiceClient();
 
     let query = supabase
       .from('tasks')
-      .select(
-        '*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)',
-        {
-          count: 'exact',
-        },
-      )
+      .select('*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)', {
+        count: 'exact',
+      })
       .order('priority', { ascending: false })
       .order('created_at', { ascending: true })
       .range(offset, offset + limit - 1);
 
     // Filter by status
     if (status) {
-      query = query.eq('status', status as TaskStatus);
+      query = query.eq('status', status);
     } else {
-      query = query.in('status', ['pending', 'in_progress'] as TaskStatus[]);
+      query = query.in('status', ['pending', 'in_progress']);
     }
 
     // Filter by priority
     if (priority) {
-      query = query.eq('priority', priority as TaskPriority);
+      query = query.eq('priority', priority);
     }
 
     // Filter by assignee
@@ -52,24 +62,31 @@ export async function GET(request: NextRequest) {
     } else if (assignedTo === 'unassigned') {
       query = query.is('assigned_to', null);
     } else if (assignedTo) {
-      query = query.eq('assigned_to', assignedTo);
+      // SECURITY: Validate assignedTo UUID
+      const sanitizedAssignee = sanitizeUUID(assignedTo);
+      if (sanitizedAssignee) {
+        query = query.eq('assigned_to', sanitizedAssignee);
+      }
     }
 
     // Role-based filtering for non-admin roles
+    // SECURITY: Use safe filter builders for session data (VULN-001)
     if (!['super_admin', 'manager'].includes(session.admin.role)) {
-      query = query.or(
-        `assigned_to.eq.${session.admin.id},assigned_roles.cs.{${session.admin.role}}`,
-      );
+      const uuidFilter = buildSafeUUIDFilter('assigned_to', session.admin.id);
+      const roleFilter = buildSafeArrayContainsFilter('assigned_roles', session.admin.role);
+
+      if (uuidFilter && roleFilter) {
+        query = query.or(`${uuidFilter},${roleFilter}`);
+      } else if (uuidFilter) {
+        query = query.eq('assigned_to', session.admin.id);
+      }
     }
 
     const { data: tasks, count, error } = await query;
 
     if (error) {
       console.error('Tasks query error:', error);
-      return NextResponse.json(
-        { error: 'Görevler yüklenemedi' },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: 'Görevler yüklenemedi' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -108,7 +125,7 @@ export async function POST(request: NextRequest) {
     if (!type || !title || !resource_type || !resource_id) {
       return NextResponse.json(
         { error: 'Gerekli alanlar eksik' },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -133,10 +150,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Task creation error:', error);
-      return NextResponse.json(
-        { error: 'Görev oluşturulamadı' },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: 'Görev oluşturulamadı' }, { status: 500 });
     }
 
     // Create audit log
@@ -145,11 +159,8 @@ export async function POST(request: NextRequest) {
       action: 'create_task',
       resource_type: 'task',
       resource_id: task.id,
-      new_value: task as Record<string, unknown>,
-      ip_address:
-        request.headers.get('x-forwarded-for') ||
-        request.headers.get('x-real-ip') ||
-        'unknown',
+      new_value: task,
+      ip_address: request.headers.get('x-forwarded-for') || request.ip,
       user_agent: request.headers.get('user-agent'),
     });
 

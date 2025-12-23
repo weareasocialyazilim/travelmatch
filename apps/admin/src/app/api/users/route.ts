@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
+import {
+  buildSafeSearchFilter,
+  validatePagination,
+  validateSortColumn,
+  validateSortOrder,
+} from '@/lib/query-utils';
+
+// Whitelist of allowed sort columns (VULN-014)
+const ALLOWED_SORT_COLUMNS = [
+  'created_at',
+  'display_name',
+  'email',
+  'is_verified',
+  'is_active',
+  'last_active_at',
+];
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,35 +33,39 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const status = searchParams.get('status');
     const verified = searchParams.get('verified');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const sortBy = searchParams.get('sort_by') || 'created_at';
-    const sortOrder = searchParams.get('sort_order') || 'desc';
+    const { limit, offset } = validatePagination(
+      searchParams.get('limit'),
+      searchParams.get('offset')
+    );
+    // SECURITY: Validate sort column against whitelist (VULN-014)
+    const sortBy = validateSortColumn(
+      searchParams.get('sort_by'),
+      ALLOWED_SORT_COLUMNS,
+      'created_at'
+    );
+    const sortOrder = validateSortOrder(searchParams.get('sort_order'));
 
     const supabase = createServiceClient();
 
     let query = supabase
-      .from('users')
+      .from('profiles')
       .select('*', { count: 'exact' })
       .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
-    // Search by name or email
-    if (search) {
-      query = query.or(
-        `display_name.ilike.%${search}%,email.ilike.%${search}%`,
-      );
+    // SECURITY: Use safe search filter to prevent PostgREST injection (VULN-001)
+    const searchFilter = buildSafeSearchFilter(['display_name', 'email'], search);
+    if (searchFilter) {
+      query = query.or(searchFilter);
     }
 
     // Filter by status
     if (status === 'active') {
       query = query.eq('is_active', true);
     } else if (status === 'suspended') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      query = (query as any).eq('is_suspended', true);
+      query = query.eq('is_suspended', true);
     } else if (status === 'banned') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      query = (query as any).eq('is_banned', true);
+      query = query.eq('is_banned', true);
     }
 
     // Filter by verification
@@ -59,10 +79,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Users query error:', error);
-      return NextResponse.json(
-        { error: 'Kullanıcılar yüklenemedi' },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: 'Kullanıcılar yüklenemedi' }, { status: 500 });
     }
 
     return NextResponse.json({
