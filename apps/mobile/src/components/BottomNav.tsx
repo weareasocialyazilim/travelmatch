@@ -1,3 +1,9 @@
+/**
+ * BottomNav Component - iOS 26.3 Redesigned
+ *
+ * Glass effect bottom navigation with updated icons for gift-moment concept.
+ * Part of iOS 26.3 design system for TravelMatch.
+ */
 import React, { memo, useCallback, useMemo } from 'react';
 import {
   View,
@@ -6,9 +12,11 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../constants/colors';
+import { COLORS, GRADIENTS } from '../constants/colors';
 import { useHaptics } from '../hooks/useHaptics';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import type { NavigationProp } from '@react-navigation/native';
@@ -47,140 +55,151 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
     [messagesBadge],
   );
 
+  // Use BlurView on iOS, fallback to solid background on Android
+  const NavContainer = Platform.OS === 'ios' ? BlurView : View;
+  const containerProps = Platform.OS === 'ios'
+    ? { intensity: 90, tint: 'light' as const }
+    : {};
+
   return (
     <View style={styles.bottomNav}>
-      {/* Discover Tab */}
-      <TouchableOpacity
-        testID="nav-discover-tab"
-        style={styles.navItem}
-        onPress={() => handleTabPress('Discover')}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: activeTab === 'Discover' }}
-        accessibilityLabel="Discover tab"
-        accessibilityHint="Browse moments and hosts"
-      >
-        <MaterialCommunityIcons
-          name={activeTab === 'Discover' ? 'compass' : 'compass-outline'}
-          size={24}
-          color={
-            activeTab === 'Discover' ? COLORS.primary : COLORS.textSecondary
-          }
-        />
-        <Text
-          style={
-            activeTab === 'Discover' ? styles.navTextActive : styles.navText
-          }
+      <NavContainer {...containerProps} style={styles.navContent}>
+        {/* Wishes Tab (renamed from Discover) */}
+        <TouchableOpacity
+          testID="nav-discover-tab"
+          style={styles.navItem}
+          onPress={() => handleTabPress('Discover')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'Discover' }}
+          accessibilityLabel="Wishes tab"
+          accessibilityHint="Browse wishes and gift moments"
         >
-          Discover
-        </Text>
-      </TouchableOpacity>
-
-      {/* Requests Tab */}
-      <TouchableOpacity
-        testID="nav-requests-tab"
-        style={styles.navItem}
-        onPress={() => handleTabPress('Requests')}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: activeTab === 'Requests' }}
-        accessibilityLabel="Requests tab"
-        accessibilityHint="View pending requests"
-      >
-        <View style={styles.iconContainer}>
           <MaterialCommunityIcons
-            name={activeTab === 'Requests' ? 'inbox-full' : 'inbox-outline'}
+            name={activeTab === 'Discover' ? 'gift' : 'gift-outline'}
             size={24}
             color={
-              activeTab === 'Requests' ? COLORS.primary : COLORS.textSecondary
+              activeTab === 'Discover' ? COLORS.primary : COLORS.textSecondary
             }
           />
-          {requestsBadge > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{requestsBadgeText}</Text>
-            </View>
-          )}
-        </View>
-        <Text
-          style={
-            activeTab === 'Requests' ? styles.navTextActive : styles.navText
-          }
+          <Text
+            style={
+              activeTab === 'Discover' ? styles.navTextActive : styles.navText
+            }
+          >
+            Wishes
+          </Text>
+        </TouchableOpacity>
+
+        {/* Gifts Tab (renamed from Requests) */}
+        <TouchableOpacity
+          testID="nav-requests-tab"
+          style={styles.navItem}
+          onPress={() => handleTabPress('Requests')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'Requests' }}
+          accessibilityLabel="Gifts tab"
+          accessibilityHint="View your gifts"
         >
-          Requests
-        </Text>
-      </TouchableOpacity>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name={activeTab === 'Requests' ? 'heart' : 'heart-outline'}
+              size={24}
+              color={
+                activeTab === 'Requests' ? COLORS.primary : COLORS.textSecondary
+              }
+            />
+            {requestsBadge > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{requestsBadgeText}</Text>
+              </View>
+            )}
+          </View>
+          <Text
+            style={
+              activeTab === 'Requests' ? styles.navTextActive : styles.navText
+            }
+          >
+            Gifts
+          </Text>
+        </TouchableOpacity>
 
-      {/* Create/+ Tab */}
-      <TouchableOpacity
-        testID="nav-create-tab"
-        style={styles.navItem}
-        onPress={() => handleTabPress('CreateMoment')}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: activeTab === 'Create' }}
-        accessibilityLabel="Create moment"
-        accessibilityHint="Create a new moment"
-      >
-        <View style={styles.createButton}>
-          <MaterialCommunityIcons name="plus" size={28} color={COLORS.white} />
-        </View>
-      </TouchableOpacity>
+        {/* Create/+ Tab with gradient */}
+        <TouchableOpacity
+          testID="nav-create-tab"
+          style={styles.navItem}
+          onPress={() => handleTabPress('CreateMoment')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'Create' }}
+          accessibilityLabel="Create wish"
+          accessibilityHint="Create a new wish"
+        >
+          <LinearGradient
+            colors={GRADIENTS.giftButton}
+            style={styles.createButton}
+          >
+            <MaterialCommunityIcons name="plus" size={28} color={COLORS.white} />
+          </LinearGradient>
+        </TouchableOpacity>
 
-      {/* Messages Tab */}
-      <TouchableOpacity
-        testID="nav-messages-tab"
-        style={styles.navItem}
-        onPress={() => handleTabPress('Messages')}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: activeTab === 'Messages' }}
-        accessibilityLabel="Messages tab"
-        accessibilityHint="View your conversations"
-      >
-        <View style={styles.iconContainer}>
+        {/* Messages Tab */}
+        <TouchableOpacity
+          testID="nav-messages-tab"
+          style={styles.navItem}
+          onPress={() => handleTabPress('Messages')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'Messages' }}
+          accessibilityLabel="Messages tab"
+          accessibilityHint="View your conversations"
+        >
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name={activeTab === 'Messages' ? 'chat' : 'chat-outline'}
+              size={24}
+              color={
+                activeTab === 'Messages' ? COLORS.primary : COLORS.textSecondary
+              }
+            />
+            {messagesBadge > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{messagesBadgeText}</Text>
+              </View>
+            )}
+          </View>
+          <Text
+            style={
+              activeTab === 'Messages' ? styles.navTextActive : styles.navText
+            }
+          >
+            Chat
+          </Text>
+        </TouchableOpacity>
+
+        {/* Profile Tab */}
+        <TouchableOpacity
+          testID="nav-profile-tab"
+          style={styles.navItem}
+          onPress={() => handleTabPress('Profile')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'Profile' }}
+          accessibilityLabel="Profile tab"
+          accessibilityHint="Navigate to Profile screen"
+        >
           <MaterialCommunityIcons
-            name={activeTab === 'Messages' ? 'chat' : 'chat-outline'}
+            name={activeTab === 'Profile' ? 'account' : 'account-outline'}
             size={24}
             color={
-              activeTab === 'Messages' ? COLORS.primary : COLORS.textSecondary
+              activeTab === 'Profile' ? COLORS.primary : COLORS.textSecondary
             }
           />
-          {messagesBadge > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{messagesBadgeText}</Text>
-            </View>
-          )}
-        </View>
-        <Text
-          style={
-            activeTab === 'Messages' ? styles.navTextActive : styles.navText
-          }
-        >
-          Messages
-        </Text>
-      </TouchableOpacity>
-
-      {/* Profile Tab */}
-      <TouchableOpacity
-        testID="nav-profile-tab"
-        style={styles.navItem}
-        onPress={() => handleTabPress('Profile')}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: activeTab === 'Profile' }}
-        accessibilityLabel="Profile tab"
-        accessibilityHint="Navigate to Profile screen"
-      >
-        <MaterialCommunityIcons
-          name={activeTab === 'Profile' ? 'account' : 'account-outline'}
-          size={24}
-          color={
-            activeTab === 'Profile' ? COLORS.primary : COLORS.textSecondary
-          }
-        />
-        <Text
-          style={
-            activeTab === 'Profile' ? styles.navTextActive : styles.navText
-          }
-        >
-          Profile
-        </Text>
-      </TouchableOpacity>
+          <Text
+            style={
+              activeTab === 'Profile' ? styles.navTextActive : styles.navText
+            }
+          >
+            Profile
+          </Text>
+        </TouchableOpacity>
+      </NavContainer>
     </View>
   );
 });
@@ -204,22 +223,24 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   bottomNav: {
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderTopColor: COLORS.border,
-    borderTopWidth: 1,
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    left: 0,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
-    paddingTop: 12,
     position: 'absolute',
+    bottom: 0,
+    left: 0,
     right: 0,
+    overflow: 'hidden',
+  },
+  navContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: Platform.OS === 'android' ? COLORS.glassBackground : 'transparent',
   },
   createButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
     borderRadius: 24,
     height: 48,
     justifyContent: 'center',
@@ -229,6 +250,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     width: 48,
+    elevation: 6,
   },
   iconContainer: {
     position: 'relative',
@@ -237,7 +259,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
     minHeight: 44,
-    minWidth: 60, // Increased touch target width
+    minWidth: 60,
     justifyContent: 'center',
     paddingVertical: 4,
   },

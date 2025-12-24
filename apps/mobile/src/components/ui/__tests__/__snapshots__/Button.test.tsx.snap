@@ -111,7 +111,7 @@ exports[`Button Component Snapshots matches snapshot for loading state 1`] = `
         "justifyContent": "center",
       },
       {
-        "backgroundColor": "#A6E5C1",
+        "backgroundColor": "#F59E0B",
         "borderWidth": 0,
       },
       {
@@ -124,7 +124,7 @@ exports[`Button Component Snapshots matches snapshot for loading state 1`] = `
   }
 >
   <RCTActivityIndicator
-    color="#1A1A1A"
+    color="#1F2937"
     ref={null}
     size="small"
     testID="RCTActivityIndicator"
@@ -166,7 +166,7 @@ exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
         "justifyContent": "center",
       },
       {
-        "backgroundColor": "#A6E5C1",
+        "backgroundColor": "#F59E0B",
         "borderWidth": 0,
       },
       {
@@ -196,7 +196,7 @@ exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
             "fontWeight": "700",
           },
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 16,
           },
           undefined,
