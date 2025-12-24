@@ -82,7 +82,7 @@ export const EmailAuthScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-          {...a11y('Back button')}
+          {...a11y.button('Back button')}
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -127,7 +127,7 @@ export const EmailAuthScreen: React.FC = () => {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
-                {...a11y('Email address input')}
+                {...a11y.textInput('Email address input')}
               />
             </View>
 
@@ -138,7 +138,11 @@ export const EmailAuthScreen: React.FC = () => {
               ]}
               onPress={handleSendMagicLink}
               disabled={!isValidEmail(email) || isLoading}
-              {...a11y('Send magic link')}
+              {...a11y.button(
+                'Send magic link',
+                undefined,
+                !isValidEmail(email) || isLoading,
+              )}
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFF" />
@@ -180,7 +184,7 @@ export const EmailAuthScreen: React.FC = () => {
 
             <TouchableOpacity
               style={styles.openEmailButton}
-              {...a11y('Open email app')}
+              {...a11y.button('Open email app')}
             >
               <MaterialCommunityIcons
                 name="email-open-outline"
@@ -194,7 +198,7 @@ export const EmailAuthScreen: React.FC = () => {
               style={styles.resendButton}
               onPress={handleResendLink}
               disabled={isLoading}
-              {...a11y('Resend magic link')}
+              {...a11y.button('Resend magic link', undefined, isLoading)}
             >
               <Text style={styles.resendText}>
                 {isLoading ? 'Sending...' : 'Resend Magic Link'}
@@ -204,7 +208,7 @@ export const EmailAuthScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.changeEmailButton}
               onPress={() => setStep('email')}
-              {...a11y('Use different email')}
+              {...a11y.button('Use different email')}
             >
               <Text style={styles.changeEmailText}>Use a Different Email</Text>
             </TouchableOpacity>

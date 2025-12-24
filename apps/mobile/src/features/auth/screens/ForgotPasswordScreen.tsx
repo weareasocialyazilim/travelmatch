@@ -67,7 +67,7 @@ export const ForgotPasswordScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-          {...a11y('Back button')}
+          {...a11y.button('Back button')}
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -112,7 +112,7 @@ export const ForgotPasswordScreen: React.FC = () => {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
-                {...a11y('Email address input')}
+                {...a11y.textInput('Email address input')}
               />
             </View>
 
@@ -123,7 +123,11 @@ export const ForgotPasswordScreen: React.FC = () => {
               ]}
               onPress={handleResetPassword}
               disabled={!isValidEmail(email) || isLoading}
-              {...a11y('Send reset link')}
+              {...a11y.button(
+                'Send reset link',
+                undefined,
+                !isValidEmail(email) || isLoading,
+              )}
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFF" />
@@ -135,7 +139,7 @@ export const ForgotPasswordScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.backToLoginButton}
               onPress={() => navigation.goBack()}
-              {...a11y('Back to login')}
+              {...a11y.button('Back to login')}
             >
               <MaterialCommunityIcons
                 name="arrow-left"
@@ -168,7 +172,7 @@ export const ForgotPasswordScreen: React.FC = () => {
                 handleResetPassword();
               }}
               disabled={isLoading}
-              {...a11y('Resend reset link')}
+              {...a11y.button('Resend reset link', undefined, isLoading)}
             >
               <Text style={styles.resendText}>
                 {isLoading ? 'Sending...' : 'Resend Reset Link'}
@@ -178,7 +182,7 @@ export const ForgotPasswordScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.backToLoginButton}
               onPress={() => navigation.goBack()}
-              {...a11y('Back to login')}
+              {...a11y.button('Back to login')}
             >
               <MaterialCommunityIcons
                 name="arrow-left"

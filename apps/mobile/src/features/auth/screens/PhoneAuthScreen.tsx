@@ -157,7 +157,7 @@ export const PhoneAuthScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-          {...a11y('Back button')}
+          {...a11y.button('Back button')}
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -198,7 +198,7 @@ export const PhoneAuthScreen: React.FC = () => {
                 keyboardType="phone-pad"
                 maxLength={14}
                 editable={!isLoading}
-                {...a11y('Phone number input')}
+                {...a11y.textInput('Phone number input')}
               />
             </View>
 
@@ -206,7 +206,7 @@ export const PhoneAuthScreen: React.FC = () => {
               style={[styles.button, isLoading && styles.buttonDisabled]}
               onPress={handleSendOtp}
               disabled={isLoading}
-              {...a11y('Send verification code')}
+              {...a11y.button('Send verification code', undefined, isLoading)}
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFF" />
@@ -222,7 +222,9 @@ export const PhoneAuthScreen: React.FC = () => {
               {otpCode.map((digit, index) => (
                 <TextInput
                   key={index}
-                  ref={(ref) => (otpInputRefs.current[index] = ref)}
+                  ref={(ref) => {
+                    otpInputRefs.current[index] = ref;
+                  }}
                   style={[styles.otpInput, digit && styles.otpInputFilled]}
                   value={digit}
                   onChangeText={(value) => handleOtpChange(index, value)}
@@ -232,7 +234,7 @@ export const PhoneAuthScreen: React.FC = () => {
                   keyboardType="number-pad"
                   maxLength={1}
                   editable={!isLoading}
-                  {...a11y(`Digit ${index + 1} of verification code`)}
+                  {...a11y.textInput(`Digit ${index + 1} of verification code`)}
                 />
               ))}
             </View>
@@ -241,7 +243,7 @@ export const PhoneAuthScreen: React.FC = () => {
               style={[styles.button, isLoading && styles.buttonDisabled]}
               onPress={handleVerifyOtp}
               disabled={isLoading}
-              {...a11y('Verify code')}
+              {...a11y.button('Verify code', undefined, isLoading)}
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFF" />
@@ -254,10 +256,12 @@ export const PhoneAuthScreen: React.FC = () => {
               style={styles.resendButton}
               onPress={handleResendOtp}
               disabled={countdown > 0}
-              {...a11y(
+              {...a11y.button(
                 countdown > 0
                   ? `Resend code in ${countdown} seconds`
                   : 'Resend code',
+                undefined,
+                countdown > 0,
               )}
             >
               <Text
@@ -276,7 +280,7 @@ export const PhoneAuthScreen: React.FC = () => {
                 setStep('phone');
                 setOtpCode(['', '', '', '', '', '']);
               }}
-              {...a11y('Change phone number')}
+              {...a11y.button('Change phone number')}
             >
               <Text style={styles.changePhoneText}>Change Phone Number</Text>
             </TouchableOpacity>

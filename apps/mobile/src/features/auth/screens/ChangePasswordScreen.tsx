@@ -101,12 +101,12 @@ export const ChangePasswordScreen: React.FC = () => {
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           editable={!isLoading}
-          {...a11y(accessibilityLabel)}
+          {...a11y.textInput(accessibilityLabel)}
         />
         <TouchableOpacity
           onPress={() => setShowPassword(!showPassword)}
           style={styles.eyeButton}
-          {...a11y(showPassword ? 'Hide password' : 'Show password')}
+          {...a11y.button(showPassword ? 'Hide password' : 'Show password')}
         >
           <MaterialCommunityIcons
             name={showPassword ? 'eye-off-outline' : 'eye-outline'}
@@ -130,7 +130,7 @@ export const ChangePasswordScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-          {...a11y('Back button')}
+          {...a11y.button('Back button')}
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -212,7 +212,11 @@ export const ChangePasswordScreen: React.FC = () => {
             ]}
             onPress={handleChangePassword}
             disabled={!canSubmit || isLoading}
-            {...a11y('Update password')}
+            {...a11y.button(
+              'Update password',
+              undefined,
+              !canSubmit || isLoading,
+            )}
           >
             {isLoading ? (
               <ActivityIndicator color="#FFF" />
