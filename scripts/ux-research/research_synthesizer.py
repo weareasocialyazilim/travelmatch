@@ -24,12 +24,30 @@ import argparse
 import json
 import re
 import sys
+import os
 from collections import Counter
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from enum import Enum
 from typing import Optional
 import statistics
+
+
+def validate_safe_path(filepath: str, base_dir: str = None) -> str:
+    """
+    Validate and sanitize file path to prevent path traversal attacks.
+    Returns the resolved absolute path if safe, raises ValueError otherwise.
+    """
+    if base_dir is None:
+        base_dir = os.getcwd()
+    
+    abs_path = os.path.abspath(os.path.join(base_dir, filepath))
+    abs_base = os.path.abspath(base_dir)
+    
+    if not abs_path.startswith(abs_base + os.sep) and abs_path != abs_base:
+        raise ValueError(f"Path '{filepath}' would escape the base directory")
+    
+    return abs_path
 
 
 class InsightType(Enum):
@@ -862,18 +880,27 @@ Output Types:
     if args.files:
         for file_path in args.files:
             try:
-                with open(file_path, 'r') as f:
+                safe_path = validate_safe_path(file_path)
+                # deepcode ignore PT: Path validated via validate_safe_path() above
+                with open(safe_path, 'r') as f:
                     data = json.load(f)
                 synthesizer.load_from_json(data if isinstance(data, list) else [data])
+            except ValueError as e:
+                print(f"Warning: {e}, skipping", file=sys.stderr)
             except FileNotFoundError:
                 print(f"Warning: File '{file_path}' not found, skipping", file=sys.stderr)
             except json.JSONDecodeError as e:
                 print(f"Warning: Invalid JSON in '{file_path}': {e}, skipping", file=sys.stderr)
     elif args.interview:
         try:
-            with open(args.interview, 'r') as f:
+            safe_path = validate_safe_path(args.interview)
+            # deepcode ignore PT: Path validated via validate_safe_path() above
+            with open(safe_path, 'r') as f:
                 transcript = f.read()
             synthesizer.analyze_interview(transcript)
+        except ValueError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
         except FileNotFoundError:
             print(f"Error: File '{args.interview}' not found", file=sys.stderr)
             sys.exit(1)

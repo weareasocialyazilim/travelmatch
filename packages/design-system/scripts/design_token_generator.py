@@ -27,8 +27,28 @@ import colorsys
 import json
 import sys
 import re
+import os
 from datetime import datetime
 from typing import Dict, Any, Tuple, List
+
+
+def validate_safe_path(filepath: str, base_dir: str = None) -> str:
+    """
+    Validate and sanitize file path to prevent path traversal attacks.
+    Returns the resolved absolute path if safe, raises ValueError otherwise.
+    """
+    if base_dir is None:
+        base_dir = os.getcwd()
+    
+    # Resolve the absolute path
+    abs_path = os.path.abspath(os.path.join(base_dir, filepath))
+    abs_base = os.path.abspath(base_dir)
+    
+    # Ensure the path is within the base directory
+    if not abs_path.startswith(abs_base + os.sep) and abs_path != abs_base:
+        raise ValueError(f"Path '{filepath}' would escape the base directory")
+    
+    return abs_path
 
 
 def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
@@ -767,9 +787,17 @@ def main():
     }
     filename = f"tokens.generated.{extensions[output_format]}"
 
-    # Write to file
-    with open(filename, 'w') as f:
-        f.write(output)
+    # Write to file with path validation
+    # The path is validated using validate_safe_path() which prevents path traversal attacks
+    # by ensuring the resolved path stays within the current working directory
+    try:
+        safe_path = validate_safe_path(filename)
+        # deepcode ignore PT: Path validated via validate_safe_path() above
+        with open(safe_path, 'w') as f:
+            f.write(output)
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
     print(f"Tokens generated successfully!")
     print(f"Output file: {filename}")

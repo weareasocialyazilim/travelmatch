@@ -19,7 +19,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -57,7 +57,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -87,7 +87,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -141,7 +141,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -203,7 +203,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -241,7 +241,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -271,7 +271,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -311,7 +311,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -348,7 +348,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -386,7 +386,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -416,7 +416,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -470,7 +470,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -532,7 +532,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -570,7 +570,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -600,7 +600,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -640,7 +640,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           style={
             [
               {
-                "color": "#1A1A1A",
+                "color": "#1F2937",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,

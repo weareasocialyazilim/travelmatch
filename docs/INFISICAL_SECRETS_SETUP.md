@@ -9,7 +9,7 @@
 │                                                             │
 │  ┌─────────────────┐          ┌─────────────────────────┐  │
 │  │  GitHub Secrets │          │       Infisical         │  │
-│  │   (4 secrets)   │          │     (27+ secrets)       │  │
+│  │   (4 secrets)   │          │     (41+ secrets)       │  │
 │  ├─────────────────┤          ├─────────────────────────┤  │
 │  │ INFISICAL_*     │─────────▶│ All app secrets:        │  │
 │  │ TURBO_*         │          │ - Supabase              │  │
@@ -19,6 +19,8 @@
 │                               │ - Cloudflare            │  │
 │                               │ - Mapbox                │  │
 │                               │ - PostHog               │  │
+│                               │ - Twilio (SMS)          │  │
+│                               │ - SendGrid (Email)      │  │
 │                               └─────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -38,7 +40,7 @@
 
 ## Infisical Secrets
 
-### Production (`prod`) - 27 secrets
+### Production (`prod`) - 41 secrets
 
 ```
 CLOUDFLARE_ACCOUNT_HASH
@@ -156,6 +158,30 @@ infisical secrets --env=staging
 
 ```bash
 infisical secrets set MY_SECRET="value" --env=prod
+```
+
+### Add Twilio Secrets (SMS/Phone)
+
+```bash
+# Twilio credentials (from console.twilio.com)
+infisical secrets set TWILIO_ACCOUNT_SID="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" --env=prod
+infisical secrets set TWILIO_AUTH_TOKEN="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" --env=prod
+infisical secrets set TWILIO_PHONE_NUMBER="+1xxxxxxxxxx" --env=prod
+infisical secrets set TWILIO_VERIFY_SERVICE_SID="VAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" --env=prod
+```
+
+### Add SendGrid Secrets (Email)
+
+```bash
+# SendGrid credentials (from app.sendgrid.com)
+infisical secrets set SENDGRID_API_KEY="SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxx" --env=prod
+infisical secrets set SENDGRID_FROM_EMAIL="noreply@travelmatch.app" --env=prod
+infisical secrets set SENDGRID_FROM_NAME="TravelMatch" --env=prod
+
+# Optional: Dynamic Template IDs
+infisical secrets set SENDGRID_TEMPLATE_WELCOME="d-xxxxxxxx" --env=prod
+infisical secrets set SENDGRID_TEMPLATE_EMAIL_VERIFICATION="d-xxxxxxxx" --env=prod
+infisical secrets set SENDGRID_TEMPLATE_PASSWORD_RESET="d-xxxxxxxx" --env=prod
 ```
 
 ### Delete secret

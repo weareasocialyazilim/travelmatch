@@ -147,9 +147,10 @@ class PaymentMigrationService {
       );
 
       // If dual-write is enabled, also write to old system
+      // Note: Currently no legacy system - this is a placeholder for future migrations
       if (this.config.dualWrite && !this.config.useNewSystem) {
         try {
-          // TODO: Call old payment API
+          // Legacy system write (currently no-op)
           await this.writeToLegacySystem(transaction);
         } catch (legacyError) {
           logger.error(
@@ -590,26 +591,32 @@ class PaymentMigrationService {
 
   /**
    * Helper: Write to legacy system (placeholder)
+   * @deprecated This is a placeholder for legacy system integration.
+   * Currently no legacy system exists - this service uses Supabase directly.
+   * If a legacy system needs to be supported, implement the API call here.
    */
   private async writeToLegacySystem(transaction: any): Promise<void> {
-    // TODO: Implement legacy API call
+    // No legacy system to write to - Supabase is the primary system
+    // If migration from another system is needed, implement the API call here
     logger.debug(
       'PaymentMigration',
-      'Would write to legacy system:',
-      transaction,
+      'Legacy system write skipped (no legacy system):',
+      transaction.id,
     );
   }
 
   /**
    * Helper: Read from legacy system (placeholder)
+   * @deprecated This is a placeholder for legacy system integration.
+   * Currently no legacy system exists - reads should come from Supabase.
    */
   private async readFromLegacySystem(
     transactionId: string,
   ): Promise<PaymentTransaction | null> {
-    // TODO: Implement legacy API call
+    // No legacy system to read from - Supabase is the primary system
     logger.debug(
       'PaymentMigration',
-      'Would read from legacy system:',
+      'Legacy system read skipped (no legacy system):',
       transactionId,
     );
     return null;
@@ -617,15 +624,17 @@ class PaymentMigrationService {
 
   /**
    * Helper: Update legacy system status (placeholder)
+   * @deprecated This is a placeholder for legacy system integration.
+   * Currently no legacy system exists - status updates go to Supabase only.
    */
   private async updateLegacySystemStatus(
     transactionId: string,
     status: string,
   ): Promise<void> {
-    // TODO: Implement legacy API call
+    // No legacy system to update - Supabase is the primary system
     logger.debug(
       'PaymentMigration',
-      'Would update legacy system:',
+      'Legacy system update skipped (no legacy system):',
       transactionId,
       status,
     );

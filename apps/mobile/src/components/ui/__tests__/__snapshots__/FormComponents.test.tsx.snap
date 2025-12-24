@@ -13,7 +13,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for basic in
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 14,
         "fontWeight": "600",
         "marginBottom": 8,
@@ -29,7 +29,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for basic in
       {
         "alignItems": "center",
         "backgroundColor": "#FFFFFF",
-        "borderColor": "#E5E5E5",
+        "borderColor": "#E5E7EB",
         "borderRadius": 12,
         "borderWidth": 1.5,
         "flexDirection": "row",
@@ -57,7 +57,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for basic in
       style={
         [
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "flex": 1,
             "fontSize": 16,
             "paddingVertical": 0,
@@ -86,7 +86,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for disabled
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 14,
         "fontWeight": "600",
         "marginBottom": 8,
@@ -102,7 +102,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for disabled
       {
         "alignItems": "center",
         "backgroundColor": "#F3F4F6",
-        "borderColor": "#E5E5E5",
+        "borderColor": "#E5E7EB",
         "borderRadius": 12,
         "borderWidth": 1.5,
         "flexDirection": "row",
@@ -130,7 +130,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for disabled
       style={
         [
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "flex": 1,
             "fontSize": 16,
             "paddingVertical": 0,
@@ -159,7 +159,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for multilin
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 14,
         "fontWeight": "600",
         "marginBottom": 8,
@@ -175,7 +175,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for multilin
       {
         "alignItems": "flex-start",
         "backgroundColor": "#FFFFFF",
-        "borderColor": "#E5E5E5",
+        "borderColor": "#E5E7EB",
         "borderRadius": 12,
         "borderWidth": 1.5,
         "flexDirection": "row",
@@ -203,7 +203,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot for multilin
       style={
         [
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "flex": 1,
             "fontSize": 16,
             "paddingVertical": 0,
@@ -235,7 +235,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 14,
         "fontWeight": "600",
         "marginBottom": 8,
@@ -278,7 +278,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
       style={
         [
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "flex": 1,
             "fontSize": 16,
             "paddingVertical": 0,

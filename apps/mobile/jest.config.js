@@ -33,7 +33,9 @@ module.exports = {
     '/node_modules/',
     '/__tests__\\.backup/',
     '/tests\\.backup/',
-    '\\.helper\\.tsx?$',
+    '\\.helper\\.(ts|tsx)$',
+    'testUtilsRender\\.helper\\.tsx$',
+    'testUtilsAsync\\.helper\\.ts$',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -56,5 +58,8 @@ module.exports = {
       functions: 75,
       lines: 80,
     },
+  },
+  globals: {
+    __DEV__: true,
   },
 };

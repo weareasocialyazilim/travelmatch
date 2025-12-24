@@ -19,7 +19,9 @@ import { VALUES } from '../constants/values';
 let MOCK_CARDS: PaymentCard[] = [];
 let MOCK_BANKS: BankAccount[] = [];
 
-if (!__DEV__) {
+// Handle __DEV__ being undefined in test environments
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+if (!isDev) {
   logger.warn('Mock payment methods should not be used in production!');
 }
 
@@ -586,7 +588,8 @@ export const paymentService = {
       });
 
       if (error) throw error;
-      if (!transaction) throw new Error('Failed to create withdrawal transaction');
+      if (!transaction)
+        throw new Error('Failed to create withdrawal transaction');
 
       return {
         transaction: {

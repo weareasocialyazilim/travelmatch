@@ -11,8 +11,11 @@ import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
 import { logger } from '../utils/logger';
 
+// Handle __DEV__ being undefined in test environments
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+
 // Sentry DSN from environment variables (configured in EAS)
-const SENTRY_DSN = __DEV__
+const SENTRY_DSN = isDev
   ? '' // Disable in development
   : (Constants.expoConfig?.extra?.sentryDsn as string | undefined) || '';
 

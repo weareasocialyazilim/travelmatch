@@ -14,12 +14,12 @@ const mockUseSearchStore = jest.fn(() => ({
   setSortBy: mockSetSortBy,
 }));
 
-jest.mock('@/stores/searchStore', () => ({
+jest.mock('../../../stores/searchStore', () => ({
   useSearchStore: () => mockUseSearchStore(),
 }));
 
 // Mock useTranslation
-jest.mock('@/hooks/useTranslation', () => ({
+jest.mock('../../../hooks/useTranslation', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
@@ -40,7 +40,7 @@ describe('SortSelector Component', () => {
     it('renders when visible is true', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Sort By')).toBeTruthy();
@@ -49,7 +49,7 @@ describe('SortSelector Component', () => {
     it('does not render content when visible is false', () => {
       const onClose = jest.fn();
       const { queryByText } = render(
-        <SortSelector visible={false} onClose={onClose} />
+        <SortSelector visible={false} onClose={onClose} />,
       );
 
       // Modal still exists but content may not be visible
@@ -59,7 +59,7 @@ describe('SortSelector Component', () => {
     it('renders all sort options', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Most Recent')).toBeTruthy();
@@ -72,7 +72,7 @@ describe('SortSelector Component', () => {
     it('renders with required props only', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Sort By')).toBeTruthy();
@@ -92,7 +92,7 @@ describe('SortSelector Component', () => {
       });
 
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       const recentOption = getByText('Most Recent');
@@ -107,7 +107,7 @@ describe('SortSelector Component', () => {
       });
 
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Most Popular')).toBeTruthy();
@@ -121,7 +121,7 @@ describe('SortSelector Component', () => {
       });
 
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Price: Low to High')).toBeTruthy();
@@ -135,7 +135,7 @@ describe('SortSelector Component', () => {
       });
 
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Price: High to Low')).toBeTruthy();
@@ -149,7 +149,7 @@ describe('SortSelector Component', () => {
       });
 
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Highest Rated')).toBeTruthy();
@@ -164,7 +164,7 @@ describe('SortSelector Component', () => {
     it('calls setSortBy when option selected', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
@@ -176,7 +176,7 @@ describe('SortSelector Component', () => {
       const onClose = jest.fn();
       const onSelect = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />
+        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
@@ -187,7 +187,7 @@ describe('SortSelector Component', () => {
     it('calls onClose after selection', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
@@ -198,7 +198,7 @@ describe('SortSelector Component', () => {
     it('selects recent option', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Most Recent'));
@@ -209,7 +209,7 @@ describe('SortSelector Component', () => {
     it('selects price-low option', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Price: Low to High'));
@@ -220,7 +220,7 @@ describe('SortSelector Component', () => {
     it('selects price-high option', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Price: High to Low'));
@@ -231,7 +231,7 @@ describe('SortSelector Component', () => {
     it('selects rating option', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Highest Rated'));
@@ -248,12 +248,12 @@ describe('SortSelector Component', () => {
     it('calls onClose when overlay pressed', () => {
       const onClose = jest.fn();
       const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       // Find overlay TouchableOpacity
       const touchables = UNSAFE_root.findAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       const overlay = touchables[0]; // First TouchableOpacity is the overlay
 
@@ -265,11 +265,11 @@ describe('SortSelector Component', () => {
     it('calls onClose on modal request close', () => {
       const onClose = jest.fn();
       const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       const modal = UNSAFE_root.findByType(require('react-native').Modal);
-      
+
       if (modal.props.onRequestClose) {
         modal.props.onRequestClose();
       }
@@ -280,7 +280,7 @@ describe('SortSelector Component', () => {
     it('renders with transparent background', () => {
       const onClose = jest.fn();
       const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       const modal = UNSAFE_root.findByType(require('react-native').Modal);
@@ -290,7 +290,7 @@ describe('SortSelector Component', () => {
     it('uses fade animation', () => {
       const onClose = jest.fn();
       const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       const modal = UNSAFE_root.findByType(require('react-native').Modal);
@@ -306,7 +306,7 @@ describe('SortSelector Component', () => {
     it('works without onSelect callback', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(() => {
@@ -318,7 +318,7 @@ describe('SortSelector Component', () => {
       const onClose = jest.fn();
       const onSelect = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />
+        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
@@ -332,7 +332,7 @@ describe('SortSelector Component', () => {
       const onClose = jest.fn();
       const onSelect = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />
+        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
 
       fireEvent.press(getByText('Highest Rated'));
@@ -349,17 +349,17 @@ describe('SortSelector Component', () => {
     it('handles selecting same option twice', () => {
       const onClose = jest.fn();
       const { getByText, rerender } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
-      
+
       // Reopen modal
       onClose.mockClear();
       mockSetSortBy.mockClear();
-      
+
       rerender(<SortSelector visible={true} onClose={onClose} />);
-      
+
       fireEvent.press(getByText('Most Popular'));
 
       expect(mockSetSortBy).toHaveBeenCalledWith('popular');
@@ -368,11 +368,11 @@ describe('SortSelector Component', () => {
     it('handles changing selection', () => {
       const onClose = jest.fn();
       const { getByText, rerender } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
-      
+
       // Update store
       mockUseSearchStore.mockReturnValue({
         sortBy: 'popular',
@@ -398,7 +398,7 @@ describe('SortSelector Component', () => {
     it('renders title', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Sort By')).toBeTruthy();
@@ -407,7 +407,7 @@ describe('SortSelector Component', () => {
     it('renders all option labels', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       const labels = [
@@ -426,11 +426,11 @@ describe('SortSelector Component', () => {
     it('renders icons for all options', () => {
       const onClose = jest.fn();
       const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       const icons = UNSAFE_root.findAllByType(
-        require('@expo/vector-icons').MaterialCommunityIcons
+        require('@expo/vector-icons').MaterialCommunityIcons,
       );
 
       // 5 option icons + checkmark for selected = 6 total
@@ -446,7 +446,7 @@ describe('SortSelector Component', () => {
     it('handles rapid selection changes', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
@@ -461,7 +461,7 @@ describe('SortSelector Component', () => {
     it('handles visibility toggle', () => {
       const onClose = jest.fn();
       const { getByText, rerender } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Sort By')).toBeTruthy();
@@ -480,7 +480,7 @@ describe('SortSelector Component', () => {
       });
 
       const { getByText, rerender } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Most Popular')).toBeTruthy();
@@ -501,7 +501,7 @@ describe('SortSelector Component', () => {
       const onClose = jest.fn();
       const onSelect = jest.fn();
       const { getByText, rerender } = render(
-        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />
+        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
 
       const options = [
@@ -518,11 +518,7 @@ describe('SortSelector Component', () => {
         mockSetSortBy.mockClear();
 
         rerender(
-          <SortSelector
-            visible={true}
-            onClose={onClose}
-            onSelect={onSelect}
-          />
+          <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
         );
 
         fireEvent.press(getByText(option.label));
@@ -536,7 +532,7 @@ describe('SortSelector Component', () => {
     it('integrates with store updates', () => {
       const onClose = jest.fn();
       const { getByText, rerender } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       fireEvent.press(getByText('Most Popular'));
@@ -561,7 +557,7 @@ describe('SortSelector Component', () => {
     it('renders search results sort menu', () => {
       const onClose = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       expect(getByText('Sort By')).toBeTruthy();
@@ -573,7 +569,7 @@ describe('SortSelector Component', () => {
       const onClose = jest.fn();
       const onSelect = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />
+        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
 
       fireEvent.press(getByText('Price: Low to High'));
@@ -587,7 +583,7 @@ describe('SortSelector Component', () => {
       const onClose = jest.fn();
       const onSelect = jest.fn();
       const { getByText } = render(
-        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />
+        <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
 
       fireEvent.press(getByText('Highest Rated'));
@@ -600,11 +596,11 @@ describe('SortSelector Component', () => {
     it('closes on overlay tap (dismissal)', () => {
       const onClose = jest.fn();
       const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />
+        <SortSelector visible={true} onClose={onClose} />,
       );
 
       const touchables = UNSAFE_root.findAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       const overlay = touchables[0];
 

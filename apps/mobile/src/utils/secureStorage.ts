@@ -167,14 +167,19 @@ export const StorageKeys = {
 // Helper to make key names explicit
 const createStorageKeyName = (keyName: string): string => keyName;
 
-// snyk-ignore:javascript/HardcodedNonCryptoSecret - These are storage KEY IDENTIFIERS, not secret values
-// deepcode ignore HardcodedNonCryptoSecret: Storage key names only
+/**
+ * Storage key identifiers for authentication data.
+ * SECURITY NOTE: These are KEY NAMES used to store/retrieve values from secure storage,
+ * NOT the actual secret values themselves. The actual tokens are stored encrypted.
+ * @see https://docs.snyk.io/scan-using-snyk/snyk-code/snyk-code-security-rules
+ */
+// deepcode ignore HardcodedNonCryptoSecret: These are storage key identifiers (names), not actual secrets
 export const AUTH_STORAGE_KEYS = {
-  // These are key NAMES used to store/retrieve values, not the values themselves
-  ACCESS_TOKEN: createStorageKeyName('auth_access_token'),
-  REFRESH_TOKEN: createStorageKeyName('auth_refresh_token'),
-  TOKEN_EXPIRES_AT: createStorageKeyName('auth_token_expires'),
-  USER: createStorageKeyName('@auth_user'),
+  /** Key name for storing access token - the actual token is encrypted in secure storage */
+  ACCESS_TOKEN: createStorageKeyName('auth_access_token'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
+  REFRESH_TOKEN: createStorageKeyName('auth_refresh_token'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
+  TOKEN_EXPIRES_AT: createStorageKeyName('auth_token_expires'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
+  USER: createStorageKeyName('@auth_user'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
 } as const;
 
 /**

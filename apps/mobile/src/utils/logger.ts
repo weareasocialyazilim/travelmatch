@@ -141,17 +141,20 @@ class Logger {
   private flushInterval: NodeJS.Timeout | null = null;
 
   constructor(config: LoggerConfig = {}) {
+    // Handle __DEV__ being undefined in test environments
+    const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+
     this.config = {
       enableInProduction: false,
       prefix: '[TravelMatch]',
       minLevel: 'debug',
       enableRemoteLogging: false, // default off; tests enable explicitly
-      jsonFormat: !__DEV__,
+      jsonFormat: !isDev,
       ...config,
     };
 
     // Start remote log flush interval if enabled
-    if (this.config.enableRemoteLogging && !__DEV__) {
+    if (this.config.enableRemoteLogging && !isDev) {
       this.startRemoteFlush();
     }
   }
@@ -317,9 +320,11 @@ class Logger {
   private isJestEnv(): boolean {
     // Detect running under Jest by common env flags or globals
     try {
-      const env = (typeof process !== 'undefined' && (process.env as any)) || {};
+      const env =
+        (typeof process !== 'undefined' && (process.env as any)) || {};
       if (env.NODE_ENV === 'test') return true;
-      if (Object.prototype.hasOwnProperty.call(env, 'JEST_WORKER_ID')) return true;
+      if (Object.prototype.hasOwnProperty.call(env, 'JEST_WORKER_ID'))
+        return true;
     } catch {
       // ignore
     }
@@ -331,7 +336,8 @@ class Logger {
   private formatErrorValue(err: unknown): string {
     if (err instanceof Error) return err.stack || err.message;
     try {
-      if (typeof err === 'object') return JSON.stringify(this.sanitizeData(err));
+      if (typeof err === 'object')
+        return JSON.stringify(this.sanitizeData(err));
     } catch {
       // fallback
     }
@@ -413,10 +419,12 @@ class Logger {
       if (this.config.jsonFormat && (!__DEV__ || isJest)) {
         // eslint-disable-next-line no-console
         const glConsole = (globalThis as any).console || console;
-        if (glConsole.info) glConsole.info(this.formatJSON('debug', message, args));
+        if (glConsole.info)
+          glConsole.info(this.formatJSON('debug', message, args));
       } else {
         const glConsole = (globalThis as any).console || console;
-        if (glConsole.info) glConsole.info(this.formatMessage('debug', message), ...args);
+        if (glConsole.info)
+          glConsole.info(this.formatMessage('debug', message), ...args);
       }
     }
   }
@@ -429,7 +437,12 @@ class Logger {
       if (this.config.jsonFormat && (!__DEV__ || isJest)) {
         const out = this.formatJSON('info', message, sanitizedArgs);
         // Decide what to pass as the second argument: single arg -> object, multiple -> array
-        const secondArg = sanitizedArgs.length === 1 ? sanitizedArgs[0] : (sanitizedArgs.length ? sanitizedArgs : undefined);
+        const secondArg =
+          sanitizedArgs.length === 1
+            ? sanitizedArgs[0]
+            : sanitizedArgs.length
+            ? sanitizedArgs
+            : undefined;
         // Call console via globalThis to ensure test spies receive the call
         if (glConsole.info) {
           if (typeof secondArg !== 'undefined') glConsole.info(out, secondArg);
@@ -445,12 +458,18 @@ class Logger {
           .filter(Boolean)
           .join(' ');
         const outFull = argsString ? `${out} ${argsString}` : out;
-        const secondArg = sanitizedArgs.length === 1 ? sanitizedArgs[0] : (sanitizedArgs.length ? sanitizedArgs : undefined);
+        const secondArg =
+          sanitizedArgs.length === 1
+            ? sanitizedArgs[0]
+            : sanitizedArgs.length
+            ? sanitizedArgs
+            : undefined;
         // Always pass sanitized args as the second parameter when present so tests
         // can inspect structured data. Preserve child prefix visibility inside
         // the formatted output string itself.
         if (glConsole.info) {
-          if (typeof secondArg !== 'undefined') glConsole.info(outFull, secondArg);
+          if (typeof secondArg !== 'undefined')
+            glConsole.info(outFull, secondArg);
           else glConsole.info(outFull);
         }
         // Record to __testLogs so tests can assert on logger output
@@ -497,7 +516,11 @@ class Logger {
     } else {
       // Convert error to string/stack for consistent console output in tests
       const formattedError = this.formatErrorValue(error);
-      console.error(this.formatMessage('error', message), formattedError, ...args);
+      console.error(
+        this.formatMessage('error', message),
+        formattedError,
+        ...args,
+      );
     }
     this.queueRemoteLog({
       level: 'error',
@@ -527,7 +550,8 @@ class Logger {
     if (this.shouldLog('debug')) {
       const glConsole = (globalThis as any).console || console;
       // Log data at INFO level so it's visible in standard logs
-      if (glConsole.info) glConsole.info(this.formatMessage('info', label), String(label));
+      if (glConsole.info)
+        glConsole.info(this.formatMessage('info', label), String(label));
       // Sanitize table data before logging
       const tableData = Array.isArray(data)
         ? (data as any[]).map((d) => this.sanitizeData(d))
@@ -544,7 +568,8 @@ class Logger {
     if (this.shouldLog('debug') || isJest) {
       this.timers.set(label, performance.now());
       const glConsole = (globalThis as any).console || console;
-      if (glConsole.time) glConsole.time(this.formatMessage('debug', `⏱️ ${label}`));
+      if (glConsole.time)
+        glConsole.time(this.formatMessage('debug', `⏱️ ${label}`));
     }
   }
 
@@ -560,16 +585,21 @@ class Logger {
         const duration = performance.now() - startTime;
         this.timers.delete(label);
         const glConsole = (globalThis as any).console || console;
-        if (glConsole.timeEnd) glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
+        if (glConsole.timeEnd)
+          glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
         // Also surface duration via info so tests can assert
-        const durationMsg = this.formatMessage('info', `${label} ${Math.round(duration)}ms`);
+        const durationMsg = this.formatMessage(
+          'info',
+          `${label} ${Math.round(duration)}ms`,
+        );
         if (glConsole.info) glConsole.info(durationMsg);
         // mirror
         if (glConsole.log) glConsole.log(durationMsg);
         return duration;
       }
       const glConsole = (globalThis as any).console || console;
-      if (glConsole.timeEnd) glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
+      if (glConsole.timeEnd)
+        glConsole.timeEnd(this.formatMessage('debug', `⏱️ ${label}`));
       // If this instance is the library default singleton, return 0 for missing timers
       // Otherwise return undefined so test-created instances can assert undefined.
       // The singleton exported below sets `__isDefault = true` on the instance.
@@ -640,10 +670,10 @@ class Logger {
 
 // Export singleton instance
 export const logger = new Logger();
-  // Mark default singleton so instance methods can detect default behavior in tests
-  // (some tests expect different return values from the singleton)
-  // @ts-ignore
-  (logger as any).__isDefault = true;
+// Mark default singleton so instance methods can detect default behavior in tests
+// (some tests expect different return values from the singleton)
+// @ts-ignore
+(logger as any).__isDefault = true;
 
 // Export class for custom instances
 export { Logger };

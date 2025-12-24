@@ -14,7 +14,14 @@
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 import { Storage } from '../utils/storage';
-import type { ViewMode, UserStory, PriceRange } from '@/components/discover/types';
+import type {
+  ViewMode,
+  UserStory,
+  PriceRange,
+} from '@/components/discover/types';
+
+// Handle __DEV__ being undefined in test environments
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 
 interface DiscoverState {
   // ========== UI State (not persisted) ==========
@@ -81,7 +88,11 @@ const DEFAULT_SORT = 'nearest';
 const DEFAULT_MAX_DISTANCE = 50;
 const DEFAULT_PRICE_RANGE: PriceRange = { min: 0, max: 500 };
 const DEFAULT_LOCATION = 'San Francisco, CA';
-const DEFAULT_RECENT_LOCATIONS = ['New York, NY', 'Los Angeles, CA', 'Chicago, IL'];
+const DEFAULT_RECENT_LOCATIONS = [
+  'New York, NY',
+  'Los Angeles, CA',
+  'Chicago, IL',
+];
 
 export const useDiscoverStore = create<DiscoverState>()(
   devtools(
@@ -131,7 +142,11 @@ export const useDiscoverStore = create<DiscoverState>()(
           set({ showLocationModal: true }, false, 'discover/openLocationModal'),
 
         closeLocationModal: () =>
-          set({ showLocationModal: false }, false, 'discover/closeLocationModal'),
+          set(
+            { showLocationModal: false },
+            false,
+            'discover/closeLocationModal',
+          ),
 
         // Story Viewer Actions
         openStoryViewer: (user, userIndex) =>
@@ -161,23 +176,38 @@ export const useDiscoverStore = create<DiscoverState>()(
           ),
 
         setCurrentStoryIndex: (index) =>
-          set({ currentStoryIndex: index }, false, 'discover/setCurrentStoryIndex'),
+          set(
+            { currentStoryIndex: index },
+            false,
+            'discover/setCurrentStoryIndex',
+          ),
 
         setCurrentUserIndex: (index) =>
-          set({ currentUserIndex: index }, false, 'discover/setCurrentUserIndex'),
+          set(
+            { currentUserIndex: index },
+            false,
+            'discover/setCurrentUserIndex',
+          ),
 
         setSelectedStoryUser: (user) =>
-          set({ selectedStoryUser: user }, false, 'discover/setSelectedStoryUser'),
+          set(
+            { selectedStoryUser: user },
+            false,
+            'discover/setSelectedStoryUser',
+          ),
 
         setIsPaused: (value) =>
           set({ isPaused: value }, false, 'discover/setIsPaused'),
 
         // ========== Filter Actions ==========
         setSelectedCategory: (category) =>
-          set({ selectedCategory: category }, false, 'discover/setSelectedCategory'),
+          set(
+            { selectedCategory: category },
+            false,
+            'discover/setSelectedCategory',
+          ),
 
-        setSortBy: (sort) =>
-          set({ sortBy: sort }, false, 'discover/setSortBy'),
+        setSortBy: (sort) => set({ sortBy: sort }, false, 'discover/setSortBy'),
 
         setMaxDistance: (distance) =>
           set({ maxDistance: distance }, false, 'discover/setMaxDistance'),
@@ -199,20 +229,34 @@ export const useDiscoverStore = create<DiscoverState>()(
 
         // Location Actions
         setSelectedLocation: (location) =>
-          set({ selectedLocation: location }, false, 'discover/setSelectedLocation'),
+          set(
+            { selectedLocation: location },
+            false,
+            'discover/setSelectedLocation',
+          ),
 
         addRecentLocation: (location) =>
-          set((state) => {
-            const currentLocation = state.selectedLocation;
-            // Add current location to recent if it's different from new location and not already in recents
-            if (currentLocation !== location && !state.recentLocations.includes(currentLocation)) {
-              return {
-                selectedLocation: location,
-                recentLocations: [currentLocation, ...state.recentLocations.slice(0, 2)],
-              };
-            }
-            return { selectedLocation: location };
-          }, false, 'discover/addRecentLocation'),
+          set(
+            (state) => {
+              const currentLocation = state.selectedLocation;
+              // Add current location to recent if it's different from new location and not already in recents
+              if (
+                currentLocation !== location &&
+                !state.recentLocations.includes(currentLocation)
+              ) {
+                return {
+                  selectedLocation: location,
+                  recentLocations: [
+                    currentLocation,
+                    ...state.recentLocations.slice(0, 2),
+                  ],
+                };
+              }
+              return { selectedLocation: location };
+            },
+            false,
+            'discover/addRecentLocation',
+          ),
 
         // ========== Computed ==========
         getActiveFilterCount: () => {
@@ -221,8 +265,11 @@ export const useDiscoverStore = create<DiscoverState>()(
           if (state.selectedCategory !== DEFAULT_CATEGORY) count++;
           if (state.sortBy !== DEFAULT_SORT) count++;
           if (state.maxDistance !== DEFAULT_MAX_DISTANCE) count++;
-          if (state.priceRange.min !== DEFAULT_PRICE_RANGE.min ||
-              state.priceRange.max !== DEFAULT_PRICE_RANGE.max) count++;
+          if (
+            state.priceRange.min !== DEFAULT_PRICE_RANGE.min ||
+            state.priceRange.max !== DEFAULT_PRICE_RANGE.max
+          )
+            count++;
           return count;
         },
       }),
@@ -242,7 +289,7 @@ export const useDiscoverStore = create<DiscoverState>()(
     ),
     {
       name: 'DiscoverStore',
-      enabled: __DEV__,
+      enabled: isDev,
     },
   ),
 );

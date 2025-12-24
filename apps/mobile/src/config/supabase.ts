@@ -11,15 +11,29 @@ import type { Database } from '@/types/database.types';
 // Re-export Database type for use in services
 export type { Database } from '@/types/database.types';
 
+// Safe check for __DEV__ (undefined during Jest module evaluation)
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+
+// Check if we're in test environment
+const isTestEnvironment =
+  process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
+
 // Supabase credentials from environment variables
+// In test environment, provide mock values to prevent "supabaseUrl is required" error
 const SUPABASE_URL: string =
-  (process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined) ?? (process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined) ?? '';
+  (process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined) ??
+  (process.env.EXPO_PUBLIC_SUPABASE_URL as string | undefined) ??
+  (isTestEnvironment ? 'https://mock-test.supabase.co' : '');
 const SUPABASE_ANON_KEY: string =
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY as string | undefined) ?? (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string | undefined) ?? '';
+  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY as
+    | string
+    | undefined) ??
+  (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string | undefined) ??
+  (isTestEnvironment ? 'mock-anon-key-for-testing' : '');
 
 // Validate configuration
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  if (__DEV__) {
+  if (isDev) {
     logger.warn(
       '[Supabase] Missing configuration. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in your .env file',
     );
@@ -75,21 +89,25 @@ const REALTIME_CONFIG = {
  * Uses auto-generated Database types from @/types/database.types.ts
  * Optimized realtime configuration for better performance and reliability
  */
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    storage: SupabaseStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false, // Disable for React Native
-  },
-  global: {
-    headers: {
-      'x-app-name': 'TravelMatch',
-      'x-app-version': '1.0.0',
+export const supabase = createClient<Database>(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  {
+    auth: {
+      storage: SupabaseStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false, // Disable for React Native
     },
+    global: {
+      headers: {
+        'x-app-name': 'TravelMatch',
+        'x-app-version': '1.0.0',
+      },
+    },
+    realtime: REALTIME_CONFIG,
   },
-  realtime: REALTIME_CONFIG,
-});
+);
 
 /**
  * Typed Supabase client

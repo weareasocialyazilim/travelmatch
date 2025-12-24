@@ -10,7 +10,7 @@ exports[`Card Component Snapshots matches snapshot for basic card 1`] = `
       "elevation": 3,
       "overflow": "hidden",
       "padding": 16,
-      "shadowColor": "#000",
+      "shadowColor": "#000000",
       "shadowOffset": {
         "height": 2,
         "width": 0,
@@ -54,7 +54,7 @@ exports[`Card Component Snapshots matches snapshot for disabled card 1`] = `
         "opacity": 0.5,
         "overflow": "hidden",
         "padding": 16,
-        "shadowColor": "#000",
+        "shadowColor": "#000000",
         "shadowOffset": {
           "height": 2,
           "width": 0,
@@ -97,7 +97,7 @@ exports[`Card Component Snapshots matches snapshot for pressable card 1`] = `
         "elevation": 3,
         "overflow": "hidden",
         "padding": 16,
-        "shadowColor": "#000",
+        "shadowColor": "#000000",
         "shadowOffset": {
           "height": 2,
           "width": 0,

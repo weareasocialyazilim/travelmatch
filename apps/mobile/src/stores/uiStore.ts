@@ -10,6 +10,9 @@ import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 import { Storage } from '../utils/storage';
 
+// Handle __DEV__ being undefined in test environments
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+
 export type Theme = 'light' | 'dark' | 'system';
 export type Language = 'en' | 'tr';
 
@@ -61,7 +64,7 @@ export const useUIStore = create<UIState>()(
     ),
     {
       name: 'UIStore',
-      enabled: __DEV__,
+      enabled: isDev,
     },
   ),
 );

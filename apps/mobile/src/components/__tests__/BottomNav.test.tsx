@@ -1,8 +1,13 @@
+// Unmock BottomNav - it's mocked globally in jest setup
+jest.unmock('@/components/BottomNav');
+
+// Mock expo-blur as it's not available in test environment
+jest.mock('expo-blur', () => ({
+  BlurView: 'BlurView',
+}));
+
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-
-// Unmock BottomNav to test the actual component
-jest.unmock('@/components/BottomNav');
 
 import BottomNav from '../BottomNav';
 
@@ -31,14 +36,17 @@ describe('BottomNav', () => {
   describe('Rendering', () => {
     it('renders all 5 tabs', () => {
       const { getByText } = render(<BottomNav activeTab="Discover" />);
-      expect(getByText('Discover')).toBeTruthy();
-      expect(getByText('Requests')).toBeTruthy();
-      expect(getByText('Messages')).toBeTruthy();
+      // Component uses "Wishes", "Gifts", and "Chat" labels now
+      expect(getByText('Wishes')).toBeTruthy();
+      expect(getByText('Gifts')).toBeTruthy();
+      expect(getByText('Chat')).toBeTruthy();
       expect(getByText('Profile')).toBeTruthy();
     });
 
     it('renders all tab icons', () => {
-      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
+      const { UNSAFE_getAllByType } = render(
+        <BottomNav activeTab="Discover" />,
+      );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       // 5 icons (Discover, Requests, Create button, Messages, Profile)
@@ -46,23 +54,29 @@ describe('BottomNav', () => {
     });
 
     it('highlights active tab with filled icon', () => {
-      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
+      const { UNSAFE_getAllByType } = render(
+        <BottomNav activeTab="Discover" />,
+      );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-      expect(icons[0].props.name).toBe('compass'); // Active = filled
+      expect(icons[0].props.name).toBe('gift'); // Active = filled (Wishes tab)
     });
 
     it('shows outlined icon for inactive tabs', () => {
-      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
+      const { UNSAFE_getAllByType } = render(
+        <BottomNav activeTab="Discover" />,
+      );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-      expect(icons[1].props.name).toBe('inbox-outline'); // Inactive = outline
+      expect(icons[1].props.name).toBe('heart-outline'); // Inactive = outline (Gifts tab)
       expect(icons[3].props.name).toBe('chat-outline');
       expect(icons[4].props.name).toBe('account-outline');
     });
 
     it('renders create button with plus icon', () => {
-      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Discover" />);
+      const { UNSAFE_getAllByType } = render(
+        <BottomNav activeTab="Discover" />,
+      );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       expect(icons[2].props.name).toBe('plus');
@@ -76,13 +90,13 @@ describe('BottomNav', () => {
 
     it('has correct accessibility state for active tab', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const discoverTab = getByLabelText('Discover tab');
+      const discoverTab = getByLabelText('Wishes tab');
       expect(discoverTab.props.accessibilityState.selected).toBe(true);
     });
 
     it('has correct accessibility state for inactive tabs', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const requestsTab = getByLabelText('Requests tab');
+      const requestsTab = getByLabelText('Gifts tab');
       expect(requestsTab.props.accessibilityState.selected).toBe(false);
     });
   });
@@ -90,21 +104,21 @@ describe('BottomNav', () => {
   describe('Badge Display', () => {
     it('shows requests badge when count > 0', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={3} />
+        <BottomNav activeTab="Discover" requestsBadge={3} />,
       );
       expect(getByText('3')).toBeTruthy();
     });
 
     it('shows messages badge when count > 0', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" messagesBadge={5} />
+        <BottomNav activeTab="Discover" messagesBadge={5} />,
       );
       expect(getByText('5')).toBeTruthy();
     });
 
     it('does not show badge when count is 0', () => {
       const { queryByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={0} messagesBadge={0} />
+        <BottomNav activeTab="Discover" requestsBadge={0} messagesBadge={0} />,
       );
       // No badge numbers should be visible
       expect(queryByText('0')).toBeNull();
@@ -112,21 +126,21 @@ describe('BottomNav', () => {
 
     it('shows "9+" for requests badge when count > 9', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={15} />
+        <BottomNav activeTab="Discover" requestsBadge={15} />,
       );
       expect(getByText('9+')).toBeTruthy();
     });
 
     it('shows "9+" for messages badge when count > 9', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" messagesBadge={42} />
+        <BottomNav activeTab="Discover" messagesBadge={42} />,
       );
       expect(getByText('9+')).toBeTruthy();
     });
 
     it('shows both badges simultaneously', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={3} messagesBadge={7} />
+        <BottomNav activeTab="Discover" requestsBadge={3} messagesBadge={7} />,
       );
       expect(getByText('3')).toBeTruthy();
       expect(getByText('7')).toBeTruthy();
@@ -134,14 +148,14 @@ describe('BottomNav', () => {
 
     it('handles exactly 9 requests badge', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={9} />
+        <BottomNav activeTab="Discover" requestsBadge={9} />,
       );
       expect(getByText('9')).toBeTruthy();
     });
 
     it('handles exactly 10 requests badge as 9+', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={10} />
+        <BottomNav activeTab="Discover" requestsBadge={10} />,
       );
       expect(getByText('9+')).toBeTruthy();
     });
@@ -150,21 +164,21 @@ describe('BottomNav', () => {
   describe('Tab Navigation', () => {
     it('navigates to Discover when Discover tab pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Profile" />);
-      const discoverTab = getByLabelText('Discover tab');
+      const discoverTab = getByLabelText('Wishes tab');
       fireEvent.press(discoverTab);
       expect(mockNavigate).toHaveBeenCalledWith('Discover');
     });
 
     it('navigates to Requests when Requests tab pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const requestsTab = getByLabelText('Requests tab');
+      const requestsTab = getByLabelText('Gifts tab');
       fireEvent.press(requestsTab);
       expect(mockNavigate).toHaveBeenCalledWith('Requests');
     });
 
     it('navigates to CreateMoment when Create button pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const createButton = getByLabelText('Create moment');
+      const createButton = getByLabelText('Create wish');
       fireEvent.press(createButton);
       expect(mockNavigate).toHaveBeenCalledWith('CreateMoment');
     });
@@ -185,7 +199,7 @@ describe('BottomNav', () => {
 
     it('allows pressing same tab again', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const discoverTab = getByLabelText('Discover tab');
+      const discoverTab = getByLabelText('Wishes tab');
       fireEvent.press(discoverTab);
       expect(mockNavigate).toHaveBeenCalledWith('Discover');
     });
@@ -194,19 +208,19 @@ describe('BottomNav', () => {
   describe('Active Tab States', () => {
     it('highlights Discover when active', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const discoverTab = getByLabelText('Discover tab');
+      const discoverTab = getByLabelText('Wishes tab');
       expect(discoverTab.props.accessibilityState.selected).toBe(true);
     });
 
     it('highlights Requests when active', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Requests" />);
-      const requestsTab = getByLabelText('Requests tab');
+      const requestsTab = getByLabelText('Gifts tab');
       expect(requestsTab.props.accessibilityState.selected).toBe(true);
     });
 
     it('highlights Create when active', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Create" />);
-      const createButton = getByLabelText('Create moment');
+      const createButton = getByLabelText('Create wish');
       expect(createButton.props.accessibilityState.selected).toBe(true);
     });
 
@@ -223,14 +237,18 @@ describe('BottomNav', () => {
     });
 
     it('shows filled icon for active Requests tab', () => {
-      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Requests" />);
+      const { UNSAFE_getAllByType } = render(
+        <BottomNav activeTab="Requests" />,
+      );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-      expect(icons[1].props.name).toBe('inbox-full');
+      expect(icons[1].props.name).toBe('heart'); // Gifts tab uses heart icon now
     });
 
     it('shows filled icon for active Messages tab', () => {
-      const { UNSAFE_getAllByType } = render(<BottomNav activeTab="Messages" />);
+      const { UNSAFE_getAllByType } = render(
+        <BottomNav activeTab="Messages" />,
+      );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       expect(icons[3].props.name).toBe('chat');
@@ -247,21 +265,21 @@ describe('BottomNav', () => {
   describe('Edge Cases', () => {
     it('handles rapid tab switching', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      
-      fireEvent.press(getByLabelText('Requests tab'));
+
+      fireEvent.press(getByLabelText('Gifts tab'));
       fireEvent.press(getByLabelText('Messages tab'));
       fireEvent.press(getByLabelText('Profile tab'));
-      
+
       expect(mockNavigate).toHaveBeenCalledTimes(3);
     });
 
     it('handles badge with undefined values', () => {
       const { queryByText } = render(
-        <BottomNav 
-          activeTab="Discover" 
-          requestsBadge={undefined} 
-          messagesBadge={undefined} 
-        />
+        <BottomNav
+          activeTab="Discover"
+          requestsBadge={undefined}
+          messagesBadge={undefined}
+        />,
       );
       // Should not crash, no badges shown
       expect(queryByText('0')).toBeNull();
@@ -269,25 +287,31 @@ describe('BottomNav', () => {
 
     it('handles very large badge numbers', () => {
       const { getByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={999} />
+        <BottomNav activeTab="Discover" requestsBadge={999} />,
       );
       expect(getByText('9+')).toBeTruthy();
     });
 
     it('re-renders when activeTab changes', () => {
       const { rerender, getByLabelText } = render(
-        <BottomNav activeTab="Discover" />
+        <BottomNav activeTab="Discover" />,
       );
-      expect(getByLabelText('Discover tab').props.accessibilityState.selected).toBe(true);
+      expect(
+        getByLabelText('Wishes tab').props.accessibilityState.selected,
+      ).toBe(true);
 
       rerender(<BottomNav activeTab="Profile" />);
-      expect(getByLabelText('Profile tab').props.accessibilityState.selected).toBe(true);
-      expect(getByLabelText('Discover tab').props.accessibilityState.selected).toBe(false);
+      expect(
+        getByLabelText('Profile tab').props.accessibilityState.selected,
+      ).toBe(true);
+      expect(
+        getByLabelText('Wishes tab').props.accessibilityState.selected,
+      ).toBe(false);
     });
 
     it('re-renders when badge counts change', () => {
       const { rerender, getByText, queryByText } = render(
-        <BottomNav activeTab="Discover" requestsBadge={0} />
+        <BottomNav activeTab="Discover" requestsBadge={0} />,
       );
       expect(queryByText('5')).toBeNull();
 
@@ -297,11 +321,7 @@ describe('BottomNav', () => {
 
     it('handles all tabs having badges', () => {
       const { getByText } = render(
-        <BottomNav 
-          activeTab="Discover" 
-          requestsBadge={2} 
-          messagesBadge={8} 
-        />
+        <BottomNav activeTab="Discover" requestsBadge={2} messagesBadge={8} />,
       );
       expect(getByText('2')).toBeTruthy();
       expect(getByText('8')).toBeTruthy();

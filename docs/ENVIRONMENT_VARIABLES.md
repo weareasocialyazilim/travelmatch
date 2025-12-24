@@ -39,6 +39,42 @@ OPENAI_API_KEY=sk-xxxxx
 OPENAI_ORG_ID=org-xxxxx
 ```
 
+### 📱 Twilio (SMS/Phone Verification)
+
+```bash
+# Account Credentials (from Twilio Console > Account Info)
+TWILIO_ACCOUNT_SID=ACxxxxx
+TWILIO_AUTH_TOKEN=xxxxx
+
+# Phone Number (from Twilio Console > Phone Numbers)
+TWILIO_PHONE_NUMBER=+1xxxxx
+
+# Verify Service (from Twilio Console > Verify > Services)
+# Used for OTP verification
+TWILIO_VERIFY_SERVICE_SID=VAxxxxx
+
+# Messaging Service (optional, from Twilio Console > Messaging > Services)
+TWILIO_MESSAGING_SERVICE_SID=MGxxxxx
+```
+
+### 📧 SendGrid (Email)
+
+```bash
+# API Key (from SendGrid Settings > API Keys)
+SENDGRID_API_KEY=SG.xxxxx
+
+# Sender Configuration
+SENDGRID_FROM_EMAIL=noreply@travelmatch.app
+SENDGRID_FROM_NAME=TravelMatch
+
+# Template IDs (from SendGrid Dynamic Templates)
+SENDGRID_TEMPLATE_WELCOME=d-xxxxx
+SENDGRID_TEMPLATE_VERIFICATION=d-xxxxx
+SENDGRID_TEMPLATE_PASSWORD_RESET=d-xxxxx
+SENDGRID_TEMPLATE_PAYMENT_RECEIPT=d-xxxxx
+SENDGRID_TEMPLATE_GIFT_NOTIFICATION=d-xxxxx
+```
+
 ### 📱 Mobile App (Expo)
 
 ```bash
@@ -135,6 +171,17 @@ SUPABASE_SERVICE_KEY=eyJhbGci...
 OPENAI_API_KEY=sk-xxxxx
 STRIPE_SECRET_KEY=sk_test_xxxxx
 STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+
+# Twilio
+TWILIO_ACCOUNT_SID=ACxxxxx
+TWILIO_AUTH_TOKEN=xxxxx
+TWILIO_PHONE_NUMBER=+1xxxxx
+TWILIO_VERIFY_SERVICE_SID=VAxxxxx
+
+# SendGrid
+SENDGRID_API_KEY=SG.xxxxx
+SENDGRID_FROM_EMAIL=noreply@travelmatch.app
+SENDGRID_FROM_NAME=TravelMatch
 ```
 
 ---
@@ -155,11 +202,11 @@ services/.env
 
 ### Use Different Keys for Environments
 
-| Environment | Stripe | OpenAI | Supabase |
-|-------------|--------|--------|----------|
-| **Development** | `pk_test_xxxxx` | `sk-xxxxx` (dev) | Project A |
-| **Staging** | `pk_test_xxxxx` | `sk-xxxxx` (dev) | Project B |
-| **Production** | `pk_live_xxxxx` | `sk-xxxxx` (prod) | Project C |
+| Environment     | Stripe          | OpenAI            | Supabase  |
+| --------------- | --------------- | ----------------- | --------- |
+| **Development** | `pk_test_xxxxx` | `sk-xxxxx` (dev)  | Project A |
+| **Staging**     | `pk_test_xxxxx` | `sk-xxxxx` (dev)  | Project B |
+| **Production**  | `pk_live_xxxxx` | `sk-xxxxx` (prod) | Project C |
 
 ### Rotate Keys Regularly
 
@@ -171,15 +218,18 @@ services/.env
 ### Store Secrets Securely
 
 **Local Development:**
+
 - Use `.env.local` files (git-ignored)
 - Use password managers for team sharing
 
 **CI/CD:**
+
 - GitHub Secrets (encrypted)
 - Vercel Environment Variables
 - Supabase Secrets (for Edge Functions)
 
 **Production:**
+
 - Environment variables (encrypted at rest)
 - Secret management services (AWS Secrets Manager, etc.)
 
@@ -190,12 +240,14 @@ services/.env
 ### 1. Get API Keys
 
 #### Supabase
+
 1. Go to [Supabase Dashboard](https://app.supabase.com)
 2. Select your project
 3. Go to Settings → API
 4. Copy `URL`, `anon key`, and `service_role key`
 
 #### Stripe
+
 1. Go to [Stripe Dashboard](https://dashboard.stripe.com)
 2. Developers → API keys
 3. Copy `Publishable key` and `Secret key`
@@ -203,6 +255,7 @@ services/.env
 5. Copy `Signing secret`
 
 #### OpenAI
+
 1. Go to [OpenAI Platform](https://platform.openai.com)
 2. API keys → Create new secret key
 3. Copy and save immediately (shown once)
@@ -250,21 +303,15 @@ pnpm run dev
 // services/shared/utils/env-check.ts
 
 export function checkRequiredEnvVars(vars: string[]): void {
-  const missing = vars.filter(v => !Deno.env.get(v));
-  
+  const missing = vars.filter((v) => !Deno.env.get(v));
+
   if (missing.length > 0) {
-    throw new Error(
-      `Missing required environment variables: ${missing.join(', ')}`
-    );
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 }
 
 // Usage in Edge Functions
-checkRequiredEnvVars([
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_KEY',
-  'OPENAI_API_KEY',
-]);
+checkRequiredEnvVars(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'OPENAI_API_KEY']);
 ```
 
 ---
@@ -277,10 +324,20 @@ checkRequiredEnvVars([
 - [ ] Added webhook endpoint in Stripe
 - [ ] Created OpenAI account
 - [ ] Generated OpenAI API key
+- [ ] **Created Twilio account**
+- [ ] **Purchased Twilio phone number**
+- [ ] **Created Twilio Verify service**
+- [ ] **Created SendGrid account**
+- [ ] **Verified sender domain in SendGrid**
+- [ ] **Created SendGrid dynamic templates**
 - [ ] Created all `.env` files
 - [ ] Updated all environment variables
 - [ ] Added secrets to GitHub repository
+- [ ] **Added Twilio secrets to Supabase Edge Functions**
+- [ ] **Added SendGrid secrets to Supabase Edge Functions**
 - [ ] Tested local development
+- [ ] **Tested SMS OTP flow**
+- [ ] **Tested email verification flow**
 - [ ] Verified CI/CD pipeline
 - [ ] Documented keys in password manager
 - [ ] Set calendar reminder for key rotation

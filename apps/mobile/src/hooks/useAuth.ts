@@ -1,9 +1,11 @@
-import { useMemo } from 'react';
+/**
+ * useAuth Hook
+ *
+ * Re-exports useAuth from AuthContext for convenience.
+ * This file exists for backward compatibility and cleaner imports.
+ *
+ * @module hooks/useAuth
+ */
 
-export function useAuth() {
-  // Minimal stub for tests that mock this module
-  const auth = useMemo(() => ({ user: null, isAuthenticated: false }), []);
-  return auth;
-}
-
-export default useAuth;
+export { useAuth } from '../context/AuthContext';
+export { default } from '../context/AuthContext';

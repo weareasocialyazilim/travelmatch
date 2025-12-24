@@ -13,7 +13,7 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 14,
         "fontWeight": "600",
         "marginBottom": 8,
@@ -51,7 +51,7 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
       style={
         [
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "flex": 1,
             "fontSize": 16,
             "paddingVertical": 0,
@@ -78,7 +78,7 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 14,
         "fontWeight": "600",
         "marginBottom": 8,
@@ -115,7 +115,7 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
       style={
         [
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "flex": 1,
             "fontSize": 16,
             "paddingVertical": 0,
@@ -155,7 +155,7 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 14,
         "fontWeight": "600",
         "marginBottom": 8,
@@ -206,7 +206,7 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
       style={
         [
           {
-            "color": "#1A1A1A",
+            "color": "#1F2937",
             "flex": 1,
             "fontSize": 16,
             "paddingVertical": 0,

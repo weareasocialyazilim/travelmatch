@@ -36,7 +36,10 @@ interface BlockedUser {
   avatarUrl: string;
 }
 
-const MOCK_BLOCKED_USERS: BlockedUser[] = __DEV__
+// Handle __DEV__ being undefined in test environments
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+
+const MOCK_BLOCKED_USERS: BlockedUser[] = isDev
   ? [
       {
         id: '1',

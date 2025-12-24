@@ -8,6 +8,9 @@ import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 import { Storage } from '../utils/storage';
 
+// Handle __DEV__ being undefined in test environments
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
+
 export interface SearchFilters {
   category?: string;
   minPrice?: number;
@@ -127,7 +130,7 @@ export const useSearchStore = create<SearchState>()(
     ),
     {
       name: 'SearchStore',
-      enabled: __DEV__,
+      enabled: isDev,
     },
   ),
 );

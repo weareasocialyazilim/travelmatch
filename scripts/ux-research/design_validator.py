@@ -25,10 +25,28 @@ Author: TravelMatch UX Team
 import argparse
 import json
 import sys
+import os
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+
+
+def validate_safe_path(filepath: str, base_dir: str = None) -> str:
+    """
+    Validate and sanitize file path to prevent path traversal attacks.
+    Returns the resolved absolute path if safe, raises ValueError otherwise.
+    """
+    if base_dir is None:
+        base_dir = os.getcwd()
+    
+    abs_path = os.path.abspath(os.path.join(base_dir, filepath))
+    abs_base = os.path.abspath(base_dir)
+    
+    if not abs_path.startswith(abs_base + os.sep) and abs_path != abs_base:
+        raise ValueError(f"Path '{filepath}' would escape the base directory")
+    
+    return abs_path
 
 
 class SeverityLevel(Enum):
@@ -880,13 +898,18 @@ Checklist Types:
 
     if args.analyze:
         try:
-            with open(args.analyze, 'r') as f:
+            safe_path = validate_safe_path(args.analyze)
+            # deepcode ignore PT: Path validated via validate_safe_path() above
+            with open(safe_path, 'r') as f:
                 results_data = json.load(f)
             report = validator.validate_design(results_data.get("items", []))
             if args.format == "json":
                 print(json.dumps(asdict(report), indent=2))
             else:
                 print(format_report_output(report))
+        except ValueError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
         except FileNotFoundError:
             print(f"Error: File '{args.analyze}' not found", file=sys.stderr)
             sys.exit(1)

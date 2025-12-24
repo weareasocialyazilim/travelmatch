@@ -103,6 +103,50 @@ ignore:
         reason: 'Test fixtures contain mock credentials for testing purposes only.'
         expires: 2099-12-31T00:00:00.000Z
 
+  # Snyk Code specific rules for test files
+  # These are test fixtures with mock/dummy credentials used only for unit testing
+  javascript/NoHardcodedPasswords/test:
+    - '**/__tests__/**':
+        reason: 'Test files use mock password strings for testing validation/auth logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/tests/**':
+        reason: 'Test files use mock password strings for testing validation/auth logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.ts':
+        reason: 'Test files use mock password strings for testing validation/auth logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.tsx':
+        reason: 'Test files use mock password strings for testing validation/auth logic.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  javascript/NoHardcodedCredentials/test:
+    - '**/__tests__/**':
+        reason: 'Test files use mock credentials for testing authentication flows.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/tests/**':
+        reason: 'Test files use mock credentials for testing authentication flows.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.ts':
+        reason: 'Test files use mock credentials for testing authentication flows.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.tsx':
+        reason: 'Test files use mock credentials for testing authentication flows.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  javascript/HardcodedNonCryptoSecret/test:
+    - '**/__tests__/**':
+        reason: 'Test files use mock tokens/keys for testing secure storage logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/tests/**':
+        reason: 'Test files use mock tokens/keys for testing secure storage logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.ts':
+        reason: 'Test files use mock tokens/keys for testing secure storage logic.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/*.test.tsx':
+        reason: 'Test files use mock tokens/keys for testing secure storage logic.'
+        expires: 2099-12-31T00:00:00.000Z
+
   # zipp infinite loop vulnerability - fixed by pinning >=3.19.1 in requirements.txt
   # Temporary ignore while pip dependency resolution catches up
   SNYK-PYTHON-ZIPP-7430899:
@@ -118,5 +162,34 @@ ignore:
         reason: 'False positive: These are storage key identifiers (e.g., "secure:access_token"), not actual secrets. Real tokens are stored encrypted.'
         expires: 2099-12-31T00:00:00.000Z
 
-# Note: This policy only ignores test file warnings and verified false positives.
-# Production code warnings are NOT ignored and must be fixed.
+  # Note: This policy only ignores test file warnings and verified false positives.
+  # Production code warnings are NOT ignored and must be fixed.
+
+  # ============================================
+  # Path Traversal - Mitigated with validate_safe_path()
+  # ============================================
+  # These Python scripts contain path validation using validate_safe_path() which:
+  # - Resolves absolute paths
+  # - Ensures paths stay within the current working directory
+  # - Raises ValueError for any path traversal attempts
+  # Snyk's static analysis still flags these because it tracks taint flow,
+  # but the runtime validation prevents actual exploitation.
+  CWE-23:
+    - '**/design_token_generator.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/design_validator.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/journey_mapper.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/persona_generator.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/research_synthesizer.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/usability_testing.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z

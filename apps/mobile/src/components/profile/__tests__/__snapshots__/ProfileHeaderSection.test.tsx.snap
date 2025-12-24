@@ -56,7 +56,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 22,
         "fontWeight": "700",
         "marginBottom": 4,
@@ -78,7 +78,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     }
   >
     <RCTText
-      color="#666666"
+      color="#6B7280"
       name="map-marker"
       ref={null}
       size={16}
@@ -90,7 +90,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       ref={null}
       style={
         {
-          "color": "#666666",
+          "color": "#6B7280",
           "fontSize": 14,
         }
       }
@@ -114,7 +114,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgba(166, 229, 193, 0.12)",
+        "backgroundColor": "rgba(16, 185, 129, 0.12)",
         "borderRadius": 20,
         "flexDirection": "row",
         "gap": 6,
@@ -125,7 +125,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     }
   >
     <RCTText
-      color="#A6E5C1"
+      color="#10B981"
       name="shield-check"
       ref={null}
       size={16}
@@ -137,7 +137,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       ref={null}
       style={
         {
-          "color": "#A6E5C1",
+          "color": "#10B981",
           "fontSize": 14,
           "fontWeight": "600",
         }
@@ -149,7 +149,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       %
     </RCTText>
     <RCTText
-      color="#A6E5C1"
+      color="#10B981"
       name="chevron-right"
       ref={null}
       size={16}
@@ -237,7 +237,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     ref={null}
     style={
       {
-        "color": "#1A1A1A",
+        "color": "#1F2937",
         "fontSize": 22,
         "fontWeight": "700",
         "marginBottom": 4,
@@ -259,7 +259,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     }
   >
     <RCTText
-      color="#666666"
+      color="#6B7280"
       name="map-marker"
       ref={null}
       size={16}
@@ -271,7 +271,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       ref={null}
       style={
         {
-          "color": "#666666",
+          "color": "#6B7280",
           "fontSize": 14,
         }
       }
@@ -295,7 +295,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgba(166, 229, 193, 0.12)",
+        "backgroundColor": "rgba(16, 185, 129, 0.12)",
         "borderRadius": 20,
         "flexDirection": "row",
         "gap": 6,
@@ -306,7 +306,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     }
   >
     <RCTText
-      color="#A6E5C1"
+      color="#10B981"
       name="shield-check"
       ref={null}
       size={16}
@@ -318,7 +318,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       ref={null}
       style={
         {
-          "color": "#A6E5C1",
+          "color": "#10B981",
           "fontSize": 14,
           "fontWeight": "600",
         }
@@ -330,7 +330,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       %
     </RCTText>
     <RCTText
-      color="#A6E5C1"
+      color="#10B981"
       name="chevron-right"
       ref={null}
       size={16}

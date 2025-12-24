@@ -52,11 +52,33 @@ enable_signup = true
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
-enable_confirmations = false
+enable_confirmations = true
+# SendGrid SMTP configuration (production)
+# Configure in Supabase Dashboard > Authentication > Email Templates
+# SMTP Settings:
+#   Host: smtp.sendgrid.net
+#   Port: 587
+#   Username: apikey
+#   Password: env(SENDGRID_API_KEY)
+#   Sender email: noreply@travelmatch.app
+#   Sender name: TravelMatch
 
 [auth.sms]
-enable_signup = false
-enable_confirmations = false
+enable_signup = true
+enable_confirmations = true
+# Twilio SMS configuration (production)
+# Configure in Supabase Dashboard > Authentication > Phone
+# Provider: Twilio
+#   Account SID: env(TWILIO_ACCOUNT_SID)
+#   Auth Token: env(TWILIO_AUTH_TOKEN)
+#   Message Service SID: env(TWILIO_MESSAGING_SERVICE_SID) or Phone Number
+#   Verify Service SID: env(TWILIO_VERIFY_SERVICE_SID) (for OTP)
+# See: https://supabase.com/docs/guides/auth/phone-login
+
+# SMS OTP settings
+# max_frequency = 60 (seconds between OTP requests)
+# otp_length = 6
+# otp_exp = 300 (5 minutes)
 
 [auth.external.apple]
 enabled = false

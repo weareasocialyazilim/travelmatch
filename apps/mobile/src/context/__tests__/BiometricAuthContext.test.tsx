@@ -10,8 +10,11 @@
  * - Context provider and hook
  */
 
-// Unmock the context for this test file - we need the real implementation
+// Unmock BiometricAuthContext - it's mocked globally in jest.setup but we need the real implementation
 jest.unmock('@/context/BiometricAuthContext');
+
+// Note: BiometricAuthContext is NOT globally mocked in jest.setup.afterEnv.js
+// so we can use the real implementation directly
 
 import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react-native';

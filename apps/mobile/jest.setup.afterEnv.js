@@ -957,6 +957,52 @@ try {
 // Note: BiometricAuthContext is NOT mocked globally because it has its own unit tests
 // that need the real implementation. Component tests should mock it locally if needed.
 
+// Mock NetworkContext to avoid netinfo native module issues
+try {
+  jest.mock('@/context/NetworkContext', () => {
+    const React = require('react');
+    const MockNetworkContext = React.createContext({
+      isConnected: true,
+      status: {
+        isConnected: true,
+        isInternetReachable: true,
+        type: 'wifi',
+        isWifi: true,
+        isCellular: false,
+      },
+      refresh: jest.fn(() => Promise.resolve()),
+    });
+
+    const NetworkProvider = ({ children }) => {
+      return React.createElement(
+        MockNetworkContext.Provider,
+        {
+          value: {
+            isConnected: true,
+            status: {
+              isConnected: true,
+              isInternetReachable: true,
+              type: 'wifi',
+              isWifi: true,
+              isCellular: false,
+            },
+            refresh: jest.fn(() => Promise.resolve()),
+          },
+        },
+        children,
+      );
+    };
+
+    return {
+      __esModule: true,
+      default: NetworkProvider,
+      NetworkProvider,
+      useNetworkStatus: () => React.useContext(MockNetworkContext),
+      useNetwork: () => React.useContext(MockNetworkContext),
+    };
+  });
+} catch (_) {}
+
 // Mock ProfileScreen
 try {
   jest.mock('@/screens/ProfileScreen', () => {

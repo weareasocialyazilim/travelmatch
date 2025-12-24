@@ -6,7 +6,47 @@
 import React, { ReactElement, createContext, useContext } from 'react';
 import { render, RenderOptions, screen } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { NetworkProvider } from '@/context/NetworkContext';
+
+// Mock Network Context for tests (replaces @/context/NetworkContext import)
+const MockNetworkContext = createContext({
+  isConnected: true,
+  status: {
+    isConnected: true,
+    isInternetReachable: true,
+    type: 'wifi',
+    isWifi: true,
+    isCellular: false,
+  },
+  refresh: jest.fn(() => Promise.resolve()),
+});
+
+export const useNetworkStatus = () => useContext(MockNetworkContext);
+export const useNetwork = useNetworkStatus;
+
+const MockNetworkProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <MockNetworkContext.Provider
+      value={{
+        isConnected: true,
+        status: {
+          isConnected: true,
+          isInternetReachable: true,
+          type: 'wifi',
+          isWifi: true,
+          isCellular: false,
+        },
+        refresh: jest.fn(() => Promise.resolve()),
+      }}
+    >
+      {children}
+    </MockNetworkContext.Provider>
+  );
+};
+
+// Alias for compatibility with import { NetworkProvider } from '@/context/NetworkContext'
+export const NetworkProvider = MockNetworkProvider;
 
 // Mock Biometric Context for tests
 const MockBiometricContext = createContext({
@@ -119,9 +159,9 @@ const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) => {
     <NavigationContainer>
       <MockBiometricProvider>
         <MockAuthProvider>
-          <NetworkProvider>
+          <MockNetworkProvider>
             <MockToastProvider>{children}</MockToastProvider>
-          </NetworkProvider>
+          </MockNetworkProvider>
         </MockAuthProvider>
       </MockBiometricProvider>
     </NavigationContainer>
