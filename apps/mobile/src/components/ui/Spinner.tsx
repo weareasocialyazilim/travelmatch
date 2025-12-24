@@ -7,7 +7,7 @@ import React from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { COLORS } from '../../constants/colors';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 
 interface SpinnerProps {
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   fullScreenContainer: {
     alignItems: 'center',
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   message: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
-    marginTop: spacing.md,
+    marginTop: SPACING.md,
     textAlign: 'center',
   },
 });

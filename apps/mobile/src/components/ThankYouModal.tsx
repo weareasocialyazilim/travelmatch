@@ -11,7 +11,7 @@ import Animated, {
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 
 interface ThankYouModalProps {
@@ -107,16 +107,16 @@ const styles = StyleSheet.create({
   },
   gradient: {
     alignItems: 'center',
-    padding: spacing.xl,
+    padding: SPACING.xl,
   },
   iconContainer: {
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
   },
   message: {
     ...TYPOGRAPHY.body,
     color: COLORS.white,
     lineHeight: 24,
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
     opacity: 0.95,
     textAlign: 'center',
   },
@@ -131,9 +131,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.whiteTransparent,
     borderRadius: radii.md,
     flexDirection: 'row',
-    marginBottom: spacing.xl,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    marginBottom: SPACING.xl,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
   },
   noteText: {
     ...TYPOGRAPHY.bodySmall,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: '600',
     lineHeight: 20,
-    marginLeft: spacing.md,
+    marginLeft: SPACING.md,
   },
   overlay: {
     alignItems: 'center',
@@ -152,13 +152,13 @@ const styles = StyleSheet.create({
   title: {
     ...TYPOGRAPHY.h1,
     color: COLORS.white,
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
     textAlign: 'center',
   },
   whiteButton: {
     alignItems: 'center',
     backgroundColor: COLORS.white,
     borderRadius: radii.md,
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
   },
 });

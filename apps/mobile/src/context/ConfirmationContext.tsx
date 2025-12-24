@@ -18,7 +18,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { logger } from '../utils/logger';
 
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.overlay50,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   backdropTouchable: {
     position: 'absolute',
@@ -275,10 +275,10 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   container: {
-    width: Math.min(SCREEN_WIDTH - spacing.lg * 2, 340),
+    width: Math.min(SCREEN_WIDTH - SPACING.lg * 2, 340),
     backgroundColor: COLORS.card,
     borderRadius: radii.xl,
-    padding: spacing.xl,
+    padding: SPACING.xl,
     alignItems: 'center',
     ...SHADOWS.lg,
   },
@@ -288,31 +288,31 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
   },
   title: {
     ...TYPOGRAPHY.h3,
     color: COLORS.text,
     textAlign: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: SPACING.sm,
   },
   message: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
     lineHeight: 22,
   },
   buttonContainer: {
     flexDirection: 'row',
     width: '100%',
-    gap: spacing.sm,
+    gap: SPACING.sm,
   },
   cancelButton: {
     flex: 1,
     backgroundColor: COLORS.backgroundLight,
     borderRadius: radii.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
     alignItems: 'center',
   },
   cancelButtonText: {
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   confirmButton: {
     flex: 1,
     borderRadius: radii.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
     alignItems: 'center',
   },
   confirmButtonText: {

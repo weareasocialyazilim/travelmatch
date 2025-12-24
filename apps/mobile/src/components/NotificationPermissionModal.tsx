@@ -13,7 +13,7 @@ import { logger } from '@/utils/logger';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 
 interface NotificationPermissionModalProps {
@@ -111,7 +111,7 @@ export const NotificationPermissionModal: React.FC<
 const styles = StyleSheet.create({
   allowButton: {
     borderRadius: radii.md,
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
     overflow: 'hidden',
     width: '100%',
   },
@@ -122,32 +122,32 @@ const styles = StyleSheet.create({
   },
   allowGradient: {
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
   },
   benefit: {
     alignItems: 'center',
     borderBottomColor: COLORS.border,
     borderBottomWidth: 1,
     flexDirection: 'row',
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
   },
   benefitText: {
     ...TYPOGRAPHY.body,
-    marginLeft: spacing.md,
+    marginLeft: SPACING.md,
   },
   benefitsContainer: {
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
     width: '100%',
   },
   description: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
     lineHeight: 24,
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
     textAlign: 'center',
   },
   iconContainer: {
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
   },
   iconGradient: {
     alignItems: 'center',
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.white,
     borderRadius: radii.xl,
-    padding: spacing.xl,
+    padding: SPACING.xl,
     width: '100%',
     ...SHADOWS.lg,
   },
@@ -169,10 +169,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.modalBackdrop,
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: SPACING.lg,
   },
   skipButton: {
-    paddingVertical: spacing.sm,
+    paddingVertical: SPACING.sm,
   },
   skipButtonText: {
     ...TYPOGRAPHY.bodySmall,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...TYPOGRAPHY.h1,
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
     textAlign: 'center',
   },
 });

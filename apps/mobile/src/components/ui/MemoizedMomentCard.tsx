@@ -15,13 +15,13 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import type { Moment } from '../../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - spacing.lg * 2;
-const GRID_CARD_WIDTH = (SCREEN_WIDTH - spacing.lg * 3) / 2;
+const CARD_WIDTH = SCREEN_WIDTH - SPACING.lg * 2;
+const GRID_CARD_WIDTH = (SCREEN_WIDTH - SPACING.lg * 3) / 2;
 
 interface MomentCardProps {
   moment: Moment;
@@ -308,15 +308,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: spacing.xs,
+    marginTop: SPACING.xs,
   },
   categoryBadge: {
     backgroundColor: COLORS.primary,
     borderRadius: radii.sm,
-    bottom: spacing.sm,
-    left: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    bottom: SPACING.sm,
+    left: SPACING.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
     position: 'absolute',
   },
   categoryText: {
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
     borderRadius: radii.lg,
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
     overflow: 'hidden',
     shadowColor: COLORS.shadowColor,
     shadowOffset: { width: 0, height: 2 },
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   content: {
-    padding: spacing.md,
+    padding: SPACING.md,
   },
   distanceContainer: {
     alignItems: 'center',
@@ -357,26 +357,26 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     position: 'absolute',
-    right: spacing.sm,
-    top: spacing.sm,
+    right: SPACING.sm,
+    top: SPACING.sm,
     width: 40,
   },
   hostAvatar: {
     borderRadius: 12,
     height: 24,
-    marginRight: spacing.xs,
+    marginRight: SPACING.xs,
     width: 24,
   },
   hostName: {
     ...TYPOGRAPHY.bodySmall,
     color: COLORS.textSecondary,
     flex: 1,
-    marginRight: spacing.xs,
+    marginRight: SPACING.xs,
   },
   hostRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    marginTop: spacing.xs,
+    marginTop: SPACING.xs,
   },
   image: {
     height: '100%',
@@ -394,13 +394,13 @@ const styles = StyleSheet.create({
   locationRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    marginTop: spacing.xs,
+    marginTop: SPACING.xs,
   },
   locationText: {
     ...TYPOGRAPHY.bodySmall,
     color: COLORS.textSecondary,
     flex: 1,
-    marginLeft: spacing.xs,
+    marginLeft: SPACING.xs,
   },
   locationTextGrid: {
     fontSize: 11,
@@ -415,18 +415,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: radii.md,
     flexDirection: 'row',
-    marginBottom: spacing.sm,
-    padding: spacing.md,
+    marginBottom: SPACING.sm,
+    padding: SPACING.md,
   },
   messageContent: {
     flex: 1,
-    marginLeft: spacing.md,
+    marginLeft: SPACING.md,
   },
   messageHeader: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: spacing.xs,
+    marginBottom: SPACING.xs,
   },
   onlineIndicator: {
     backgroundColor: COLORS.success,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     height: 24,
     justifyContent: 'center',
     minWidth: 24,
-    paddingHorizontal: spacing.xs,
+    paddingHorizontal: SPACING.xs,
   },
   unreadCount: {
     ...TYPOGRAPHY.caption,

@@ -3,7 +3,7 @@ import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { Button } from './Button';
 import { EmptyStateIllustration } from './EmptyStateIllustration';
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.xl,
+    padding: SPACING.xl,
     flex: 1,
   },
   iconContainer: {
@@ -93,19 +93,19 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     height: 100,
     justifyContent: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
     width: 100,
   },
   title: {
     ...TYPOGRAPHY.h3,
     color: COLORS.text,
-    marginBottom: spacing.xs,
+    marginBottom: SPACING.xs,
     textAlign: 'center',
   },
   description: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
     textAlign: 'center',
     maxWidth: '80%',
   },
@@ -114,6 +114,6 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     minWidth: 120,
-    marginTop: spacing.sm,
+    marginTop: SPACING.sm,
   },
 });

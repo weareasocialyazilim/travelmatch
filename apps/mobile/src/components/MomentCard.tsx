@@ -14,7 +14,7 @@ import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } f
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePressScale } from '../utils/animations';
@@ -229,23 +229,23 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.card,
     borderRadius: radii.xl,
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
     overflow: 'hidden',
     ...SHADOWS.md,
   },
   cardActions: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.md,
+    gap: SPACING.md,
+    marginTop: SPACING.md,
   },
   cardContent: {
-    padding: spacing.md,
+    padding: SPACING.md,
   },
   cardDetails: {
     borderTopColor: COLORS.glassBorder,
     borderTopWidth: 1,
-    gap: spacing.sm,
-    paddingTop: spacing.md,
+    gap: SPACING.sm,
+    paddingTop: SPACING.md,
   },
   cardImage: {
     height: 200,
@@ -259,16 +259,16 @@ const styles = StyleSheet.create({
   cardLocation: {
     ...TYPOGRAPHY.bodySmall,
     color: COLORS.textSecondary,
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
   },
   cardTitle: {
     ...TYPOGRAPHY.h3,
-    marginBottom: spacing.xs,
+    marginBottom: SPACING.xs,
   },
   shareButton: {
     position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
+    top: SPACING.sm,
+    right: SPACING.sm,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   detailItem: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: SPACING.sm,
   },
   detailText: {
     ...TYPOGRAPHY.bodySmall,
@@ -328,9 +328,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.overlay75,
     borderRadius: 18,
-    bottom: spacing.sm,
+    bottom: SPACING.sm,
     flexDirection: 'row',
-    left: spacing.sm,
+    left: SPACING.sm,
     paddingRight: 12,
     paddingLeft: 6,
     paddingVertical: 6,
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   userInfo: {
-    marginLeft: spacing.xs,
+    marginLeft: SPACING.xs,
   },
   userName: {
     ...TYPOGRAPHY.body,

@@ -12,7 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { logger } from '../utils/logger';
 
@@ -141,13 +141,13 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
 const styles = StyleSheet.create({
   closeButton: {
     position: 'absolute',
-    right: spacing.md,
-    top: spacing.md,
+    right: SPACING.md,
+    top: SPACING.md,
   },
   container: {
     backgroundColor: COLORS.white,
     borderRadius: radii.xl,
-    padding: spacing.xl,
+    padding: SPACING.xl,
     width: '100%',
     ...Platform.select({
       ios: SHADOWS.lg,
@@ -157,15 +157,15 @@ const styles = StyleSheet.create({
     }),
   },
   copyButton: {
-    padding: spacing.sm,
+    padding: SPACING.sm,
   },
   linkContainer: {
     alignItems: 'center',
     backgroundColor: COLORS.gray[100],
     borderRadius: radii.md,
     flexDirection: 'row',
-    marginBottom: spacing.xl,
-    paddingHorizontal: spacing.md,
+    marginBottom: SPACING.xl,
+    paddingHorizontal: SPACING.md,
   },
   linkInput: {
     ...TYPOGRAPHY.bodySmall,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.modalBackdrop,
     flex: 1,
     justifyContent: 'center',
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   socialButton: {
     alignItems: 'center',
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.full,
     height: 64,
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: SPACING.sm,
     width: 64,
   },
   socialLabel: {
@@ -203,12 +203,12 @@ const styles = StyleSheet.create({
   subtitle: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
     textAlign: 'center',
   },
   title: {
     ...TYPOGRAPHY.h2,
-    marginBottom: spacing.sm,
+    marginBottom: SPACING.sm,
     textAlign: 'center',
   },
 });

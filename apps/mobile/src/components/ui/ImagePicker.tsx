@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import {
@@ -215,12 +215,12 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: spacing.md,
+    padding: SPACING.md,
   },
   actions: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.md,
+    gap: SPACING.md,
+    marginBottom: SPACING.md,
   },
   actionButton: {
     flex: 1,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.border,
     borderRadius: radii.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
     alignItems: 'center',
   },
   actionButtonText: {
@@ -236,10 +236,10 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   preview: {
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
   },
   imageContainer: {
-    marginRight: spacing.md,
+    marginRight: SPACING.md,
     position: 'relative',
   },
   image: {
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   imageInfo: {
-    marginTop: spacing.xs,
+    marginTop: SPACING.xs,
   },
   imageInfoText: {
     ...TYPOGRAPHY.caption,
@@ -272,13 +272,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   progressContainer: {
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
     alignItems: 'center',
   },
   progressText: {
     ...TYPOGRAPHY.caption,
     color: COLORS.textSecondary,
-    marginVertical: spacing.xs,
+    marginVertical: SPACING.xs,
   },
   progressBar: {
     width: '100%',
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   uploadButton: {
     backgroundColor: COLORS.primary,
     borderRadius: radii.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
     alignItems: 'center',
   },
   uploadButtonText: {

@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePressScale } from '../utils/animations';
 
@@ -77,9 +77,9 @@ const styles = StyleSheet.create({
     borderRadius: radii.full,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: spacing.sm,
-    marginRight: spacing.sm,
-    paddingHorizontal: spacing.md,
+    gap: SPACING.sm,
+    marginRight: SPACING.sm,
+    paddingHorizontal: SPACING.md,
     paddingVertical: 10,
   },
   filterPillActive: {

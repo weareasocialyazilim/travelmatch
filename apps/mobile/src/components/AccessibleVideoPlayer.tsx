@@ -4,10 +4,17 @@
  */
 
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import Video from 'react-native-video';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { colors, spacing, typography } from '@travelmatch/design-system/tokens';
+import { SPACING } from '../constants/spacing';
 import { logger } from '@/utils/logger';
 
 interface Caption {
@@ -39,12 +46,12 @@ export function AccessibleVideoPlayer({
 }: AccessibleVideoPlayerProps) {
   const videoRef = useRef<Video>(null);
   const { announce } = useAccessibility();
-  
+
   const [paused, setPaused] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [selectedCaptions, setSelectedCaptions] = useState<string | null>(
-    captions.length > 0 ? captions[0].language : null
+    captions.length > 0 ? captions[0].language : null,
   );
   const [showTranscript, setShowTranscript] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
@@ -65,7 +72,10 @@ export function AccessibleVideoPlayer({
     announce(paused ? 'Playing' : 'Paused', 'assertive');
   };
 
-  const handleProgress = (data: { currentTime: number; playableDuration: number }) => {
+  const handleProgress = (data: {
+    currentTime: number;
+    playableDuration: number;
+  }) => {
     setCurrentTime(data.currentTime);
     onProgress?.({ currentTime: data.currentTime, duration });
   };
@@ -94,7 +104,10 @@ export function AccessibleVideoPlayer({
 
   const toggleTranscript = () => {
     setShowTranscript(!showTranscript);
-    announce(showTranscript ? 'Transcript hidden' : 'Transcript shown', 'assertive');
+    announce(
+      showTranscript ? 'Transcript hidden' : 'Transcript shown',
+      'assertive',
+    );
   };
 
   const changePlaybackSpeed = () => {
@@ -107,7 +120,12 @@ export function AccessibleVideoPlayer({
 
   const seekTo = (seconds: number) => {
     videoRef.current?.seek(currentTime + seconds);
-    announce(`Skipped ${seconds > 0 ? 'forward' : 'backward'} ${Math.abs(seconds)} seconds`, 'assertive');
+    announce(
+      `Skipped ${seconds > 0 ? 'forward' : 'backward'} ${Math.abs(
+        seconds,
+      )} seconds`,
+      'assertive',
+    );
   };
 
   const formatTime = (seconds: number): string => {
@@ -127,9 +145,7 @@ export function AccessibleVideoPlayer({
         >
           {title}
         </Text>
-        {description && (
-          <Text style={styles.description}>{description}</Text>
-        )}
+        {description && <Text style={styles.description}>{description}</Text>}
       </View>
 
       {/* Video Player */}
@@ -148,7 +164,7 @@ export function AccessibleVideoPlayer({
             logger.error('Video error:', error);
             announce('Video failed to load', 'assertive');
           }}
-          textTracks={captions.map(caption => ({
+          textTracks={captions.map((caption) => ({
             title: caption.label,
             language: caption.language,
             type: 'text/vtt',
@@ -184,9 +200,7 @@ export function AccessibleVideoPlayer({
           accessibilityLabel={paused ? 'Play video' : 'Pause video'}
           accessibilityRole="button"
         >
-          <Text style={styles.playPauseIcon}>
-            {paused ? '▶' : '⏸'}
-          </Text>
+          <Text style={styles.playPauseIcon}>{paused ? '▶' : '⏸'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -195,12 +209,17 @@ export function AccessibleVideoPlayer({
         {/* Progress bar */}
         <View style={styles.progressContainer}>
           <View
-            style={[styles.progressBar, { width: `${(currentTime / duration) * 100}%` }]}
+            style={[
+              styles.progressBar,
+              { width: `${(currentTime / duration) * 100}%` },
+            ]}
             accessible={false}
           />
           <Text
             style={styles.timeText}
-            accessibilityLabel={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+            accessibilityLabel={`${formatTime(currentTime)} of ${formatTime(
+              duration,
+            )}`}
           >
             {formatTime(currentTime)} / {formatTime(duration)}
           </Text>
@@ -252,7 +271,9 @@ export function AccessibleVideoPlayer({
               style={styles.secondaryButton}
               onPress={toggleCaptions}
               accessible={true}
-              accessibilityLabel={selectedCaptions ? 'Disable captions' : 'Enable captions'}
+              accessibilityLabel={
+                selectedCaptions ? 'Disable captions' : 'Enable captions'
+              }
               accessibilityRole="button"
               accessibilityState={{ selected: !!selectedCaptions }}
             >
@@ -279,13 +300,13 @@ export function AccessibleVideoPlayer({
               style={styles.secondaryButton}
               onPress={toggleTranscript}
               accessible={true}
-              accessibilityLabel={showTranscript ? 'Hide transcript' : 'Show transcript'}
+              accessibilityLabel={
+                showTranscript ? 'Hide transcript' : 'Show transcript'
+              }
               accessibilityRole="button"
               accessibilityState={{ selected: showTranscript }}
             >
-              <Text style={styles.secondaryButtonText}>
-                📄 Transcript
-              </Text>
+              <Text style={styles.secondaryButtonText}>📄 Transcript</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -312,12 +333,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   header: {
-    padding: spacing.md,
+    padding: SPACING.md,
   },
   title: {
     ...typography.styles.h3,
     color: colors.text.primary,
-    marginBottom: spacing.xs,
+    marginBottom: SPACING.xs,
   },
   description: {
     ...typography.styles.body2,
@@ -341,7 +362,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: colors.neutral[0],
-    marginTop: spacing.md,
+    marginTop: SPACING.md,
     ...typography.styles.body1,
   },
   playPauseOverlay: {
@@ -361,7 +382,7 @@ const styles = StyleSheet.create({
     color: colors.neutral[0],
   },
   controls: {
-    padding: spacing.md,
+    padding: SPACING.md,
     backgroundColor: colors.background.secondary,
   },
   progressContainer: {
@@ -369,7 +390,7 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: colors.neutral[300],
     borderRadius: 2,
-    marginBottom: spacing.sm,
+    marginBottom: SPACING.sm,
   },
   progressBar: {
     height: '100%',
@@ -379,20 +400,20 @@ const styles = StyleSheet.create({
   timeText: {
     ...typography.styles.caption,
     color: colors.text.secondary,
-    marginTop: spacing.xs,
+    marginTop: SPACING.xs,
     textAlign: 'right',
   },
   controlButtons: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.md,
-    marginBottom: spacing.md,
+    gap: SPACING.md,
+    marginBottom: SPACING.md,
   },
   controlButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: SPACING.sm,
     backgroundColor: colors.neutral[200],
     minWidth: 48,
     minHeight: 48,
@@ -401,7 +422,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: colors.primary[500],
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: SPACING.lg,
   },
   controlButtonText: {
     ...typography.styles.button,
@@ -414,12 +435,12 @@ const styles = StyleSheet.create({
   secondaryControls: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: spacing.sm,
+    gap: SPACING.sm,
   },
   secondaryButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: SPACING.sm,
     backgroundColor: colors.neutral[100],
     minWidth: 48,
     minHeight: 48,
@@ -431,7 +452,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
   },
   transcriptPanel: {
-    padding: spacing.md,
+    padding: SPACING.md,
     backgroundColor: colors.background.secondary,
     borderTopWidth: 1,
     borderTopColor: colors.border.light,
@@ -439,7 +460,7 @@ const styles = StyleSheet.create({
   transcriptTitle: {
     ...typography.styles.h4,
     color: colors.text.primary,
-    marginBottom: spacing.sm,
+    marginBottom: SPACING.sm,
   },
   transcriptText: {
     ...typography.styles.body2,

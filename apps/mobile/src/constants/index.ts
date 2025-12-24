@@ -6,12 +6,12 @@ export * from './spacing';
 export * from './radii';
 export * from './strings';
 // Re-export colors explicitly to avoid duplicate names with typography
-export { 
+export {
   COLORS,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  TYPOGRAPHY_EXTENDED,
-  CARD_SHADOW
+  GRADIENTS,
+  CARD_SHADOW,
+  CARD_SHADOW_LIGHT,
+  CARD_SHADOW_HEAVY,
 } from './colors';
 export * from './shadows';
 export * from './typography';

@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
@@ -109,11 +109,11 @@ export const EnhancedLoginForm: React.FC<EnhancedLoginFormProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   debug: {
-    marginTop: spacing.md,
-    padding: spacing.sm,
+    marginTop: SPACING.md,
+    padding: SPACING.sm,
   },
   debugText: {
     ...TYPOGRAPHY.caption,
@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: COLORS.primary,
     borderRadius: radii.lg,
-    marginTop: spacing.md,
-    paddingVertical: spacing.md,
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.md,
   },
   submitButtonDisabled: {
     opacity: 0.5,

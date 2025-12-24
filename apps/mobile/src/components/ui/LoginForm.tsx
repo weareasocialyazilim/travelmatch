@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useToast } from '../../context/ToastContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
@@ -102,13 +102,13 @@ export const LoginForm: React.FC<{
 
 const styles = StyleSheet.create({
   container: {
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   submitButton: {
     backgroundColor: COLORS.primary,
     borderRadius: radii.lg,
-    marginTop: spacing.md,
-    paddingVertical: spacing.md,
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.md,
   },
   submitButtonDisabled: {
     opacity: 0.6,

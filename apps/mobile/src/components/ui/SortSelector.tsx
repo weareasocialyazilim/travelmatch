@@ -9,7 +9,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSearchStore } from '../../stores/searchStore';
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     borderRadius: radii.lg,
     borderWidth: 1,
-    padding: spacing.lg,
+    padding: SPACING.lg,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
@@ -132,21 +132,21 @@ const styles = StyleSheet.create({
   title: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
     borderRadius: radii.md,
-    marginBottom: spacing.xs,
+    marginBottom: SPACING.xs,
   },
   optionSelected: {
     backgroundColor: COLORS.primaryMuted,
   },
   icon: {
-    marginRight: spacing.md,
+    marginRight: SPACING.md,
   },
   optionText: {
     ...TYPOGRAPHY.body,

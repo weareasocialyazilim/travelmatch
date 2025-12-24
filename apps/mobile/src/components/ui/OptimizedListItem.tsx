@@ -7,7 +7,7 @@ import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 
 interface OptimizedListItemProps {
@@ -72,9 +72,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: radii.md,
     flexDirection: 'row',
-    marginBottom: spacing.sm,
+    marginBottom: SPACING.sm,
     overflow: 'hidden',
-    padding: spacing.md,
+    padding: SPACING.md,
   },
   content: {
     flex: 1,
@@ -83,13 +83,13 @@ const styles = StyleSheet.create({
   image: {
     borderRadius: radii.sm,
     height: 60,
-    marginRight: spacing.md,
+    marginRight: SPACING.md,
     width: 60,
   },
   subtitle: {
     ...TYPOGRAPHY.bodySmall,
     color: COLORS.textSecondary,
-    marginTop: spacing.xs,
+    marginTop: SPACING.xs,
   },
   title: {
     ...TYPOGRAPHY.body,

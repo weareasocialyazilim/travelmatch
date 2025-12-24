@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import type { ViewStyle } from 'react-native';
 
@@ -165,28 +165,28 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   content: {
     alignItems: 'center',
     maxWidth: 320,
   },
   iconContainer: {
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
   },
   title: {
     ...TYPOGRAPHY.h2,
     fontSize: 20,
     fontWeight: '600',
     color: COLORS.text,
-    marginBottom: spacing.sm,
+    marginBottom: SPACING.sm,
     textAlign: 'center',
   },
   message: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
     lineHeight: 22,
   },
   retryButton: {
@@ -194,11 +194,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.primary,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
     borderRadius: 12,
     minWidth: 160,
-    gap: spacing.xs,
+    gap: SPACING.xs,
   },
   retryButtonText: {
     color: COLORS.white,
@@ -212,8 +212,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: COLORS.warningLight,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: SPACING.sm,
   },
   compactMessage: {
     ...TYPOGRAPHY.bodySmall,
@@ -229,8 +229,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   compactRetryButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
     borderRadius: 8,
     backgroundColor: COLORS.white,
     minWidth: 80,

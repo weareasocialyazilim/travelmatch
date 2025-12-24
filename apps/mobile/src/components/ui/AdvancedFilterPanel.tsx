@@ -14,7 +14,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { radii } from '@/constants/radii';
-import { spacing } from '@/constants/spacing';
+import { spacing, SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSearchStore } from '@/stores/searchStore';
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.lg,
+    padding: SPACING.lg,
     borderBottomWidth: 1,
   },
   title: {
@@ -268,42 +268,42 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   section: {
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
   },
   sectionTitle: {
     ...TYPOGRAPHY.h3,
     fontWeight: '600',
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
   },
   chipGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    gap: SPACING.sm,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
     borderRadius: radii.full,
     borderWidth: 1,
   },
   chipIcon: {
-    marginRight: spacing.xs,
+    marginRight: SPACING.xs,
   },
   chipText: {
     ...TYPOGRAPHY.body,
     fontWeight: '500',
   },
   priceGrid: {
-    gap: spacing.sm,
+    gap: SPACING.sm,
   },
   priceChip: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     borderRadius: radii.md,
     borderWidth: 1,
   },
@@ -315,13 +315,13 @@ const styles = StyleSheet.create({
   difficultyGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    gap: SPACING.sm,
   },
   difficultyChip: {
     flex: 1,
     minWidth: '45%',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
     borderRadius: radii.md,
     borderWidth: 1,
   },
@@ -332,8 +332,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
-    gap: spacing.md,
-    padding: spacing.lg,
+    gap: SPACING.md,
+    padding: SPACING.lg,
     borderTopWidth: 1,
   },
   footerButton: {

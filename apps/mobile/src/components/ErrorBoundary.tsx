@@ -7,7 +7,7 @@ import * as Sentry from '../config/sentry';
 import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { radii } from '../constants/radii';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { logger } from '../utils/logger';
 
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   content: {
     alignItems: 'center',
@@ -301,13 +301,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   iconContainer: {
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
   },
   title: {
     ...TYPOGRAPHY.h1,
     fontSize: 24,
     fontWeight: '700',
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
     textAlign: 'center',
     color: COLORS.text,
   },
@@ -315,27 +315,27 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.body,
     fontSize: 16,
     color: COLORS.textSecondary,
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
     textAlign: 'center',
     lineHeight: 24,
   },
   debugContainer: {
     backgroundColor: COLORS.errorBackground,
     borderRadius: radii.md,
-    padding: spacing.md,
-    marginBottom: spacing.xl,
+    padding: SPACING.md,
+    marginBottom: SPACING.xl,
     width: '100%',
   },
   debugTitle: {
     fontSize: 12,
     fontWeight: '600',
     color: COLORS.error,
-    marginBottom: spacing.xs,
+    marginBottom: SPACING.xs,
   },
   errorDetails: {
     fontSize: 11,
     color: COLORS.softRed,
-    marginBottom: spacing.xs,
+    marginBottom: SPACING.xs,
   },
   errorStack: {
     fontSize: 10,
@@ -344,17 +344,17 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    gap: spacing.md,
+    gap: SPACING.md,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radii.lg,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
     minHeight: 48,
-    gap: spacing.xs,
+    gap: SPACING.xs,
   },
   buttonPrimary: {
     backgroundColor: COLORS.primary,

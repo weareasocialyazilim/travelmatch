@@ -18,7 +18,7 @@ import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 
 interface Props {
   visible: boolean;
@@ -117,11 +117,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.modalBackdrop,
     flex: 1,
     justifyContent: 'center',
-    padding: spacing.lg,
+    padding: SPACING.lg,
   },
   buttonContainer: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: SPACING.md,
     width: '100%',
   },
   cancelButton: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gray[100],
     borderRadius: radii.full,
     flex: 1,
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
   },
   cancelButtonText: {
     color: COLORS.text,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.buttonDark,
     borderRadius: radii.full,
     flex: 1,
-    paddingVertical: spacing.md,
+    paddingVertical: SPACING.md,
   },
   confirmButtonText: {
     color: COLORS.white,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: radii.xl,
     maxWidth: LAYOUT.size.modalMax,
-    padding: spacing.xl,
+    padding: SPACING.xl,
     width: '100%',
     ...Platform.select({
       ios: SHADOWS.lg,
@@ -168,14 +168,14 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     height: LAYOUT.size.iconSm,
     justifyContent: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: SPACING.lg,
     width: LAYOUT.size.iconSm,
   },
   message: {
     color: COLORS.textSecondary,
     fontSize: 16,
     lineHeight: 24,
-    marginBottom: spacing.xl,
+    marginBottom: SPACING.xl,
     textAlign: 'center',
   },
   recipient: {
@@ -186,6 +186,6 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: 22,
     fontWeight: '700',
-    marginBottom: spacing.md,
+    marginBottom: SPACING.md,
   },
 });

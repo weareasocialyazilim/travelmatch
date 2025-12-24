@@ -1,17 +1,17 @@
 import { radii } from './radii';
-import { spacing } from './spacing';
+import { spacing, SPACING } from './spacing';
 
 export const LAYOUT = {
   // Convenience padding (legacy keys used across codebase)
-  padding: spacing.md,
+  padding: SPACING.md,
   // Keep existing spacing object for newer code
   // Spacing
   spacing: {
-    xs: spacing.xs,
-    sm: spacing.sm,
-    md: spacing.md,
-    lg: spacing.lg,
-    xl: spacing.xl,
+    xs: SPACING.xs,
+    sm: SPACING.sm,
+    md: SPACING.md,
+    lg: SPACING.lg,
+    xl: SPACING.xl,
   },
 
   // Border radius
@@ -42,30 +42,30 @@ export const LAYOUT = {
   card: {
     imageAspectRatio: 16 / 9,
     borderRadius: radii.xl,
-    padding: spacing.md,
+    padding: SPACING.md,
   },
 
   // Filter pill
   filterPill: {
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: SPACING.md,
     paddingVertical: 10,
   },
 
   // Bottom nav
   bottomNav: {
     gradientHeight: 96,
-    marginHorizontal: spacing.md,
-    marginBottomIOS: spacing.sm,
-    marginBottomAndroid: spacing.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
+    marginHorizontal: SPACING.md,
+    marginBottomIOS: SPACING.sm,
+    marginBottomAndroid: SPACING.md,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.sm,
   },
 
   // List
   list: {
-    contentPaddingHorizontal: spacing.md,
+    contentPaddingHorizontal: SPACING.md,
     contentPaddingBottom: 120,
-    contentPaddingTop: spacing.sm,
+    contentPaddingTop: SPACING.sm,
   },
 
   // Shadow offsets

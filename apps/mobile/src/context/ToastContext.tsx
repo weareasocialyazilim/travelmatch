@@ -16,7 +16,7 @@ import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing } from '../constants/spacing';
+import { spacing, SPACING } from '../constants/spacing';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -226,7 +226,7 @@ ToastItem.displayName = 'ToastItem';
 const styles = StyleSheet.create({
   container: {
     left: 0,
-    padding: spacing.md,
+    padding: SPACING.md,
     position: 'absolute',
     right: 0,
     top: 0,
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     ...TYPOGRAPHY.h3,
     fontWeight: 'bold',
-    marginRight: spacing.sm,
+    marginRight: SPACING.sm,
   },
   message: {
     ...TYPOGRAPHY.body,
@@ -247,9 +247,9 @@ const styles = StyleSheet.create({
   toast: {
     ...SHADOWS.md,
     borderRadius: radii.lg,
-    marginBottom: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    marginBottom: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
   },
   toastContent: {
     alignItems: 'center',

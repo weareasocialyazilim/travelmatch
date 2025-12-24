@@ -16,7 +16,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing } from '../../constants/spacing';
+import { spacing, SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSearchStore } from '../../stores/searchStore';
@@ -204,11 +204,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderRadius: radii.lg,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: SPACING.md,
     height: 50,
   },
   icon: {
-    marginRight: spacing.sm,
+    marginRight: SPACING.sm,
   },
   input: {
     ...TYPOGRAPHY.body,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   clearButton: {
-    padding: spacing.xs,
+    padding: SPACING.xs,
   },
   suggestions: {
     position: 'absolute',
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.md,
+    padding: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.blackTransparentDark,
   },
@@ -261,16 +261,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing.md,
+    padding: SPACING.md,
   },
   suggestionIcon: {
-    marginRight: spacing.sm,
+    marginRight: SPACING.sm,
   },
   suggestionText: {
     ...TYPOGRAPHY.body,
     flex: 1,
   },
   deleteButton: {
-    padding: spacing.md,
+    padding: SPACING.md,
   },
 });
