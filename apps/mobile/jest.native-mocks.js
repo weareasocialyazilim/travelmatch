@@ -1,15 +1,20 @@
 /**
  * Comprehensive React Native Native Module Mocks
- * 
+ *
  * Purpose: Mock React Native's native infrastructure (UIManager, ViewManager, etc.)
  * to enable component testing in Jest environment.
- * 
+ *
  * Background: React Native components require native modules (ViewManager, UIManager)
  * for rendering. Jest doesn't provide these by default, causing:
  * "Cannot set properties of null (setting 'getViewManagerConfig')"
- * 
+ *
  * This file provides complete native infrastructure mocking.
  */
+
+// Define __DEV__ immediately before any imports that might use it
+if (typeof global.__DEV__ === 'undefined') {
+  global.__DEV__ = true;
+}
 
 const React = require('react');
 
@@ -31,7 +36,7 @@ const mockUIManager = {
     onSuccess(0, 0, 100, 100);
   }),
   setLayoutAnimationEnabledExperimental: jest.fn(),
-  
+
   // ViewManager config - Returns empty config for any view component
   getViewManagerConfig: jest.fn((viewManagerName) => {
     return {
@@ -41,7 +46,7 @@ const mockUIManager = {
       directEventTypes: {},
     };
   }),
-  
+
   // Additional UIManager methods
   blur: jest.fn(),
   focus: jest.fn(),
@@ -52,21 +57,21 @@ const mockUIManager = {
   removeSubviewsFromContainerWithID: jest.fn(),
   replaceExistingNonRootView: jest.fn(),
   dispatchViewManagerCommand: jest.fn(),
-  
+
   // Layout animation
   configureNextLayoutAnimation: jest.fn((config, onComplete) => {
     onComplete && onComplete();
   }),
-  
+
   // View hierarchy
   __takeSnapshot: jest.fn(),
   findSubviewIn: jest.fn(),
   viewIsDescendantOf: jest.fn(() => false),
-  
+
   // Custom direct event types (for event handling)
   customDirectEventTypes: {},
   customBubblingEventTypes: {},
-  
+
   // Constants
   getConstants: jest.fn(() => ({
     customDirectEventTypes: {},
@@ -83,7 +88,7 @@ jest.mock('react-native/Libraries/ReactNative/UIManager', () => mockUIManager);
 const mockNativeModules = {
   // UI Manager reference
   UIManager: mockUIManager,
-  
+
   // Platform constants
   PlatformConstants: {
     isTesting: true,
@@ -93,14 +98,14 @@ const mockNativeModules = {
     systemName: 'iOS',
     interfaceIdiom: 'phone',
   },
-  
+
   // Networking
   Networking: {
     sendRequest: jest.fn(),
     abortRequest: jest.fn(),
     clearCookies: jest.fn(),
   },
-  
+
   // Status bar
   StatusBarManager: {
     getHeight: jest.fn((callback) => callback({ height: 20 })),
@@ -109,20 +114,20 @@ const mockNativeModules = {
     setHidden: jest.fn(),
     setNetworkActivityIndicatorVisible: jest.fn(),
   },
-  
+
   // Keyboard
   KeyboardObserver: {
     addListener: jest.fn(),
     removeListeners: jest.fn(),
   },
-  
+
   // Appearance
   Appearance: {
     getColorScheme: jest.fn(() => 'light'),
     addChangeListener: jest.fn(),
     removeChangeListener: jest.fn(),
   },
-  
+
   // DeviceInfo (already mocked in TurboModuleRegistry, but backup here)
   DeviceInfo: {
     getConstants: jest.fn(() => ({
@@ -132,36 +137,36 @@ const mockNativeModules = {
       },
     })),
   },
-  
+
   // Image loader
   ImageLoader: {
     getSize: jest.fn((uri, success) => success(100, 100)),
     prefetchImage: jest.fn(() => Promise.resolve(true)),
     queryCache: jest.fn(() => Promise.resolve({})),
   },
-  
+
   // Clipboard
   Clipboard: {
     getString: jest.fn(() => Promise.resolve('')),
     setString: jest.fn(),
   },
-  
+
   // Vibration
   Vibration: {
     vibrate: jest.fn(),
     cancel: jest.fn(),
   },
-  
+
   // Share
   Share: {
     share: jest.fn(() => Promise.resolve({ action: 'sharedAction' })),
   },
-  
+
   // Alert
   AlertManager: {
     alertWithArgs: jest.fn(),
   },
-  
+
   // Animated
   NativeAnimatedModule: {
     createAnimatedNode: jest.fn(),
@@ -175,7 +180,7 @@ const mockNativeModules = {
     addListener: jest.fn(),
     removeListeners: jest.fn(),
   },
-  
+
   // SettingsManager
   SettingsManager: {
     settings: {},
@@ -185,7 +190,63 @@ const mockNativeModules = {
 };
 
 // Mock NativeModules globally
-jest.mock('react-native/Libraries/BatchedBridge/NativeModules', () => mockNativeModules);
+jest.mock(
+  'react-native/Libraries/BatchedBridge/NativeModules',
+  () => mockNativeModules,
+);
+
+// ============================================================================
+// TurboModuleRegistry - Mock for new architecture modules
+// ============================================================================
+
+const mockTurboModuleRegistry = {
+  get: jest.fn((name) => {
+    // Return mock modules based on name
+    const modules = {
+      DeviceInfo: {
+        getConstants: jest.fn(() => ({
+          Dimensions: {
+            window: { width: 375, height: 667, scale: 2, fontScale: 1 },
+            screen: { width: 375, height: 667, scale: 2, fontScale: 1 },
+          },
+        })),
+      },
+      PlatformConstants: {
+        getConstants: jest.fn(() => ({
+          isTesting: true,
+          reactNativeVersion: { major: 0, minor: 83, patch: 0 },
+        })),
+      },
+      SourceCode: {
+        getConstants: jest.fn(() => ({
+          scriptURL: 'http://localhost:8081/index.bundle',
+        })),
+      },
+      NativeReactNativeFeatureFlagsCxx: {
+        getConstants: jest.fn(() => ({})),
+      },
+      BackHandler: {
+        getConstants: jest.fn(() => ({})),
+        addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+        removeEventListener: jest.fn(),
+        exitApp: jest.fn(),
+      },
+    };
+    return (
+      modules[name] || {
+        getConstants: jest.fn(() => ({})),
+      }
+    );
+  }),
+  getEnforcing: jest.fn((name) => {
+    return mockTurboModuleRegistry.get(name);
+  }),
+};
+
+jest.mock(
+  'react-native/Libraries/TurboModule/TurboModuleRegistry',
+  () => mockTurboModuleRegistry,
+);
 
 // ============================================================================
 // React Native Core Components - Mock native component implementations
@@ -199,7 +260,7 @@ const createMockComponent = (componentName, additionalProps = {}) => {
   const MockComponent = React.forwardRef((props, ref) => {
     // Separate children from other props
     const { children, ...otherProps } = props;
-    
+
     // Create a basic element with the component name as the type
     // This allows React Testing Library to find and interact with it
     return React.createElement(
@@ -211,10 +272,10 @@ const createMockComponent = (componentName, additionalProps = {}) => {
         // Add testID if not present for easier testing
         testID: props.testID || componentName,
       },
-      children
+      children,
     );
   });
-  
+
   MockComponent.displayName = `Mock(${componentName})`;
   return MockComponent;
 };
@@ -225,12 +286,12 @@ const createMockComponent = (componentName, additionalProps = {}) => {
 const mockViewComponent = () => {
   const ViewComponent = React.forwardRef((props, ref) => {
     const { children, style, ...otherProps } = props;
-    
+
     // Flatten style arrays (React Native supports style arrays)
     const flatStyle = Array.isArray(style)
       ? Object.assign({}, ...style.filter(Boolean))
       : style;
-    
+
     return React.createElement(
       'RCTView',
       {
@@ -238,10 +299,10 @@ const mockViewComponent = () => {
         style: flatStyle,
         ref,
       },
-      children
+      children,
     );
   });
-  
+
   ViewComponent.displayName = 'View';
   return ViewComponent;
 };
@@ -252,19 +313,19 @@ const mockViewComponent = () => {
 const mockScrollViewComponent = () => {
   const ScrollViewComponent = React.forwardRef((props, ref) => {
     const { children, style, contentContainerStyle, ...otherProps } = props;
-    
+
     // ScrollView has both style and contentContainerStyle
     const flatStyle = Array.isArray(style)
       ? Object.assign({}, ...style.filter(Boolean))
       : style;
-    
+
     // Expose scroll methods via ref
     React.useImperativeHandle(ref, () => ({
       scrollTo: jest.fn(),
       scrollToEnd: jest.fn(),
       flashScrollIndicators: jest.fn(),
     }));
-    
+
     return React.createElement(
       'RCTScrollView',
       {
@@ -274,11 +335,11 @@ const mockScrollViewComponent = () => {
       React.createElement(
         'RCTScrollContentView',
         { style: contentContainerStyle },
-        children
-      )
+        children,
+      ),
     );
   });
-  
+
   ScrollViewComponent.displayName = 'ScrollView';
   return ScrollViewComponent;
 };
@@ -289,7 +350,7 @@ const mockScrollViewComponent = () => {
 const mockTextInputComponent = () => {
   const TextInputComponent = React.forwardRef((props, ref) => {
     const { value, onChangeText, style, ...otherProps } = props;
-    
+
     // Expose TextInput methods via ref
     React.useImperativeHandle(ref, () => ({
       focus: jest.fn(),
@@ -297,7 +358,7 @@ const mockTextInputComponent = () => {
       clear: jest.fn(),
       isFocused: jest.fn(() => false),
     }));
-    
+
     return React.createElement('RCTTextInput', {
       ...otherProps,
       value,
@@ -310,7 +371,7 @@ const mockTextInputComponent = () => {
       ref,
     });
   });
-  
+
   TextInputComponent.displayName = 'TextInput';
   return TextInputComponent;
 };
@@ -321,7 +382,7 @@ const mockTextInputComponent = () => {
 const mockImageComponent = () => {
   const ImageComponent = React.forwardRef((props, ref) => {
     const { source, onLoad, onError, style, ...otherProps } = props;
-    
+
     // Trigger onLoad in next tick to simulate async loading
     React.useEffect(() => {
       if (onLoad) {
@@ -338,7 +399,7 @@ const mockImageComponent = () => {
         }, 0);
       }
     }, [source, onLoad]);
-    
+
     return React.createElement('RCTImage', {
       ...otherProps,
       source: typeof source === 'object' ? source.uri : source,
@@ -346,14 +407,14 @@ const mockImageComponent = () => {
       ref,
     });
   });
-  
+
   ImageComponent.displayName = 'Image';
-  
+
   // Add static methods
   ImageComponent.getSize = jest.fn((uri, success) => success(100, 100));
   ImageComponent.prefetch = jest.fn(() => Promise.resolve(true));
   ImageComponent.queryCache = jest.fn(() => Promise.resolve({}));
-  
+
   return ImageComponent;
 };
 
@@ -363,12 +424,12 @@ const mockImageComponent = () => {
  */
 const mockTouchableComponent = (componentName) => {
   const TouchableComponent = React.forwardRef((props, ref) => {
-    const { 
-      children, 
-      onPress, 
-      onPressIn, 
-      onPressOut, 
-      disabled, 
+    const {
+      children,
+      onPress,
+      onPressIn,
+      onPressOut,
+      disabled,
       style,
       accessibilityLabel,
       accessibilityHint,
@@ -376,12 +437,12 @@ const mockTouchableComponent = (componentName) => {
       accessibilityRole,
       accessible = true,
       testID,
-      ...otherProps 
+      ...otherProps
     } = props;
-    
+
     // Create a wrapper that respects disabled state for fireEvent.press
     const handlePress = disabled ? undefined : onPress;
-    
+
     // Build accessibility props
     const a11yProps = {
       accessible,
@@ -394,7 +455,7 @@ const mockTouchableComponent = (componentName) => {
       },
       testID,
     };
-    
+
     return React.createElement(
       componentName,
       {
@@ -411,10 +472,10 @@ const mockTouchableComponent = (componentName) => {
         'aria-disabled': disabled,
         role: accessibilityRole,
       },
-      children
+      children,
     );
   });
-  
+
   TouchableComponent.displayName = componentName;
   return TouchableComponent;
 };
@@ -424,19 +485,22 @@ const mockTouchableComponent = (componentName) => {
 // ============================================================================
 
 // Mock Platform constants module FIRST
-jest.mock('react-native/Libraries/Utilities/NativePlatformConstantsIOS', () => ({
-  __esModule: true,
-  default: {
-    getConstants: jest.fn(() => ({
-      isTesting: true,
-      reactNativeVersion: { major: 0, minor: 76, patch: 5 },
-      forceTouchAvailable: false,
-      osVersion: '14.0',
-      systemName: 'iOS',
-      interfaceIdiom: 'phone',
-    })),
-  },
-}));
+jest.mock(
+  'react-native/Libraries/Utilities/NativePlatformConstantsIOS',
+  () => ({
+    __esModule: true,
+    default: {
+      getConstants: jest.fn(() => ({
+        isTesting: true,
+        reactNativeVersion: { major: 0, minor: 76, patch: 5 },
+        forceTouchAvailable: false,
+        osVersion: '14.0',
+        systemName: 'iOS',
+        interfaceIdiom: 'phone',
+      })),
+    },
+  }),
+);
 
 jest.mock('react-native', () => {
   // Don't spread RN.Animated - create it from scratch
@@ -471,11 +535,18 @@ jest.mock('react-native', () => {
     y: { _value: 0 },
   }));
 
-  const mockAnimation = () => ({
-    start: jest.fn((callback) => callback && callback({ finished: true })),
-    stop: jest.fn(),
-    reset: jest.fn(),
-  });
+  // Create a mock animation object that properly supports chaining
+  const createMockAnimation = () => {
+    const animation = {
+      start: jest.fn((callback) => {
+        if (callback) callback({ finished: true });
+        return animation; // Return self for chaining
+      }),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    };
+    return animation;
+  };
 
   const mockAnimated = {
     View: createMockComponent('RCTAnimatedView'),
@@ -484,17 +555,13 @@ jest.mock('react-native', () => {
     ScrollView: createMockComponent('RCTAnimatedScrollView'),
     Value: mockAnimatedValue,
     ValueXY: mockAnimatedValueXY,
-    timing: jest.fn(mockAnimation),
-    spring: jest.fn(mockAnimation),
-    decay: jest.fn(mockAnimation),
-    sequence: jest.fn(mockAnimation),
-    parallel: jest.fn(mockAnimation),
-    stagger: jest.fn(mockAnimation),
-    loop: jest.fn(() => ({
-      start: jest.fn(),
-      stop: jest.fn(),
-      reset: jest.fn(),
-    })),
+    timing: jest.fn(() => createMockAnimation()),
+    spring: jest.fn(() => createMockAnimation()),
+    decay: jest.fn(() => createMockAnimation()),
+    sequence: jest.fn(() => createMockAnimation()),
+    parallel: jest.fn(() => createMockAnimation()),
+    stagger: jest.fn(() => createMockAnimation()),
+    loop: jest.fn(() => createMockAnimation()),
     event: jest.fn(),
     createAnimatedComponent: (Component) => Component,
     add: jest.fn(),
@@ -504,7 +571,7 @@ jest.mock('react-native', () => {
     modulo: jest.fn(),
     diffClamp: jest.fn(),
   };
-  
+
   return {
     // Core View Components
     View: mockViewComponent(),
@@ -513,17 +580,23 @@ jest.mock('react-native', () => {
     ScrollView: mockScrollViewComponent(),
     FlatList: createMockComponent('RCTFlatList'),
     SectionList: createMockComponent('RCTSectionList'),
-    
+
     // Input Components
     TextInput: mockTextInputComponent(),
     Switch: createMockComponent('RCTSwitch'),
-    
+
     // Touchable Components
     TouchableOpacity: mockTouchableComponent('RCTTouchableOpacity'),
     TouchableHighlight: mockTouchableComponent('RCTTouchableHighlight'),
-    TouchableWithoutFeedback: mockTouchableComponent('RCTTouchableWithoutFeedback'),
+    TouchableWithoutFeedback: mockTouchableComponent(
+      'RCTTouchableWithoutFeedback',
+    ),
     Pressable: mockTouchableComponent('RCTPressable'),
-    
+    // PanResponder is used by bottom sheets and draggable components; provide minimal mock
+    PanResponder: {
+      create: jest.fn(() => ({ panHandlers: {} })),
+    },
+
     // Other Components
     ActivityIndicator: createMockComponent('RCTActivityIndicator'),
     Modal: createMockComponent('RCTModal'),
@@ -531,7 +604,7 @@ jest.mock('react-native', () => {
     SafeAreaView: createMockComponent('RCTSafeAreaView'),
     StatusBar: createMockComponent('RCTStatusBar'),
     KeyboardAvoidingView: createMockComponent('RCTKeyboardAvoidingView'),
-    
+
     // Platform
     Platform: {
       OS: 'ios',
@@ -548,17 +621,20 @@ jest.mock('react-native', () => {
         interfaceIdiom: 'phone',
       },
     },
-    
+
     // Dimensions
     Dimensions: {
-      get: jest.fn((dim) => ({
-        window: { width: 375, height: 667, scale: 2, fontScale: 1 },
-        screen: { width: 375, height: 667, scale: 2, fontScale: 1 },
-      })[dim]),
+      get: jest.fn(
+        (dim) =>
+          ({
+            window: { width: 375, height: 667, scale: 2, fontScale: 1 },
+            screen: { width: 375, height: 667, scale: 2, fontScale: 1 },
+          }[dim]),
+      ),
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
     },
-    
+
     // PixelRatio
     PixelRatio: {
       get: jest.fn(() => 2),
@@ -566,7 +642,7 @@ jest.mock('react-native', () => {
       getPixelSizeForLayoutSize: jest.fn((size) => size * 2),
       roundToNearestPixel: jest.fn((size) => Math.round(size * 2) / 2),
     },
-    
+
     // StyleSheet
     StyleSheet: {
       create: (styles) => styles,
@@ -592,10 +668,10 @@ jest.mock('react-native', () => {
       },
       hairlineWidth: 1,
     },
-    
+
     // Animated - Use our mock instead of spreading RN.Animated
     Animated: mockAnimated,
-    
+
     // Easing
     Easing: {
       linear: (t) => t,
@@ -612,9 +688,10 @@ jest.mock('react-native', () => {
       bezier: () => (t) => t,
       in: (easing) => easing,
       out: (easing) => (t) => 1 - easing(1 - t),
-      inOut: (easing) => (t) => (t < 0.5 ? easing(t * 2) / 2 : 1 - easing((1 - t) * 2) / 2),
+      inOut: (easing) => (t) =>
+        t < 0.5 ? easing(t * 2) / 2 : 1 - easing((1 - t) * 2) / 2,
     },
-    
+
     // Keyboard
     Keyboard: {
       addListener: jest.fn(() => ({ remove: jest.fn() })),
@@ -623,14 +700,14 @@ jest.mock('react-native', () => {
       dismiss: jest.fn(),
       scheduleLayoutAnimation: jest.fn(),
     },
-    
+
     // AppState
     AppState: {
       currentState: 'active',
       addEventListener: jest.fn(() => ({ remove: jest.fn() })),
       removeEventListener: jest.fn(),
     },
-    
+
     // Linking
     Linking: {
       openURL: jest.fn(() => Promise.resolve()),
@@ -639,31 +716,31 @@ jest.mock('react-native', () => {
       addEventListener: jest.fn(() => ({ remove: jest.fn() })),
       removeEventListener: jest.fn(),
     },
-    
+
     // Alert
     Alert: {
       alert: jest.fn(),
       prompt: jest.fn(),
     },
-    
+
     // Share
     Share: {
       share: jest.fn(() => Promise.resolve({ action: 'sharedAction' })),
     },
-    
+
     // Vibration
     Vibration: {
       vibrate: jest.fn(),
       cancel: jest.fn(),
     },
-    
+
     // BackHandler
     BackHandler: {
       addEventListener: jest.fn(() => ({ remove: jest.fn() })),
       removeEventListener: jest.fn(),
       exitApp: jest.fn(),
     },
-    
+
     // PermissionsAndroid
     PermissionsAndroid: {
       check: jest.fn(() => Promise.resolve(true)),
@@ -676,10 +753,10 @@ jest.mock('react-native', () => {
         NEVER_ASK_AGAIN: 'never_ask_again',
       },
     },
-    
+
     // NativeModules
     NativeModules: mockNativeModules,
-    
+
     // NativeEventEmitter
     NativeEventEmitter: jest.fn(() => ({
       addListener: jest.fn(() => ({ remove: jest.fn() })),

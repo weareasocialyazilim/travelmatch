@@ -38,12 +38,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
 
-  const {
-    control,
-    handleSubmit,
-    formState,
-    watch,
-  } = useForm<RegisterInput>({
+  const { control, handleSubmit, formState, watch } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     mode: 'onChange',
     defaultValues: {
@@ -66,9 +61,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       });
 
       if (result.success) {
-        navigation.navigate('CompleteProfile');
+        navigation.navigate('CompleteProfile', {});
       } else {
-        showToast(result.error || 'Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin', 'error');
+        showToast(
+          result.error || 'Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin',
+          'error',
+        );
       }
     } catch (error) {
       logger.error('Registration error:', error);
@@ -80,7 +78,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
 
   const handleSocialLogin = (provider: string) => {
     logger.debug('Social register:', provider);
-    navigation.navigate('CompleteProfile');
+    navigation.navigate('CompleteProfile', {});
   };
 
   return (
@@ -156,9 +154,14 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             <Controller
               control={control}
               name="email"
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
                 <>
-                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                  <View
+                    style={[styles.inputWrapper, error && styles.inputError]}
+                  >
                     <Icon
                       name="email-outline"
                       size={20}
@@ -179,7 +182,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                       blurOnSubmit={false}
                     />
                   </View>
-                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                  {error && (
+                    <Text style={styles.errorText}>{error.message}</Text>
+                  )}
                 </>
               )}
             />
@@ -191,9 +196,14 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             <Controller
               control={control}
               name="password"
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
                 <>
-                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                  <View
+                    style={[styles.inputWrapper, error && styles.inputError]}
+                  >
                     <Icon
                       name="lock-outline"
                       size={20}
@@ -210,10 +220,14 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                       secureTextEntry={!showPassword}
                       autoCapitalize="none"
                       returnKeyType="next"
-                      onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+                      onSubmitEditing={() =>
+                        confirmPasswordRef.current?.focus()
+                      }
                       blurOnSubmit={false}
                     />
-                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                    >
                       <Icon
                         name={showPassword ? 'eye-off' : 'eye'}
                         size={20}
@@ -221,7 +235,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                       />
                     </TouchableOpacity>
                   </View>
-                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                  {error && (
+                    <Text style={styles.errorText}>{error.message}</Text>
+                  )}
                 </>
               )}
             />
@@ -233,9 +249,14 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             <Controller
               control={control}
               name="confirmPassword"
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
                 <>
-                  <View style={[styles.inputWrapper, error && styles.inputError]}>
+                  <View
+                    style={[styles.inputWrapper, error && styles.inputError]}
+                  >
                     <Icon
                       name="lock-check-outline"
                       size={20}
@@ -255,7 +276,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                       onSubmitEditing={handleSubmit(onSubmit)}
                     />
                     <TouchableOpacity
-                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onPress={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
                       <Icon
                         name={showConfirmPassword ? 'eye-off' : 'eye'}
@@ -264,7 +287,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                       />
                     </TouchableOpacity>
                   </View>
-                  {error && <Text style={styles.errorText}>{error.message}</Text>}
+                  {error && (
+                    <Text style={styles.errorText}>{error.message}</Text>
+                  )}
                 </>
               )}
             />

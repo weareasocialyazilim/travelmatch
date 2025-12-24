@@ -202,7 +202,7 @@ export const handleOAuthCallback = async (
     // Supabase returns tokens in URL hash after OAuth redirect
     const urlObj = new URL(url);
     const hashParams = new URLSearchParams(urlObj.hash.substring(1));
-    
+
     const accessToken = hashParams.get('access_token');
     const refreshToken = hashParams.get('refresh_token');
 
@@ -346,6 +346,66 @@ export const deleteAccount = async (): Promise<{ error: AuthError | null }> => {
 };
 
 /**
+ * Sign in with phone number (OTP)
+ * Sends an OTP SMS to the provided phone number
+ */
+export const signInWithPhone = async (
+  phone: string,
+): Promise<{ error: AuthError | null }> => {
+  if (!isSupabaseConfigured()) {
+    logger.warn('[Auth] Supabase not configured');
+    return { error: { message: 'Supabase not configured' } as AuthError };
+  }
+
+  try {
+    const { error } = await auth.signInWithOtp({ phone });
+
+    if (error) {
+      logger.error('[Auth] Send OTP error:', error);
+      return { error };
+    }
+
+    logger.info('[Auth] OTP sent successfully', { phone: phone.slice(-4) });
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] Send OTP exception:', error);
+    return { error: error as AuthError };
+  }
+};
+
+/**
+ * Verify phone OTP code
+ */
+export const verifyPhoneOtp = async (
+  phone: string,
+  token: string,
+): Promise<{ error: AuthError | null }> => {
+  if (!isSupabaseConfigured()) {
+    logger.warn('[Auth] Supabase not configured');
+    return { error: { message: 'Supabase not configured' } as AuthError };
+  }
+
+  try {
+    const { error } = await auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms',
+    });
+
+    if (error) {
+      logger.error('[Auth] Verify OTP error:', error);
+      return { error };
+    }
+
+    logger.info('[Auth] Phone verified successfully');
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] Verify OTP exception:', error);
+    return { error: error as AuthError };
+  }
+};
+
+/**
  * Listen to auth state changes
  */
 export const onAuthStateChange = (
@@ -369,5 +429,7 @@ export default {
   updatePassword,
   updateProfile,
   deleteAccount,
+  signInWithPhone,
+  verifyPhoneOtp,
   onAuthStateChange,
 };

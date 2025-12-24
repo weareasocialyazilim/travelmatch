@@ -21,12 +21,15 @@ describe('AuthStore', () => {
   const mockUser = {
     id: 'user-1',
     email: 'admin@example.com',
+    name: 'Admin User',
     full_name: 'Admin User',
+    avatar_url: null,
     role: 'super_admin' as const,
     is_active: true,
     requires_2fa: true,
     totp_enabled: true,
     created_at: '2024-01-01T00:00:00Z',
+    created_by: null,
     last_login_at: '2024-01-01T00:00:00Z',
   };
 

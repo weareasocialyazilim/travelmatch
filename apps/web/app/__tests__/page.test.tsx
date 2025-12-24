@@ -1,11 +1,18 @@
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import Home from '../page';
 
 // Mock Link component for testing
 jest.mock('next/link', () => {
-  return ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  );
+  const MockLink = ({
+    children,
+    href,
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }) => <a href={href}>{children}</a>;
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 });
 
 describe('Home Page', () => {
@@ -21,7 +28,9 @@ describe('Home Page', () => {
 
     it('renders the tagline', () => {
       expect(
-        screen.getByText(/connect with solo travelers and explore the world together/i)
+        screen.getByText(
+          /connect with solo travelers and explore the world together/i,
+        ),
       ).toBeInTheDocument();
     });
 
@@ -46,7 +55,9 @@ describe('Home Page', () => {
 
     it('renders Match feature card', () => {
       expect(screen.getByText('Match')).toBeInTheDocument();
-      expect(screen.getByText('Find your travel companions')).toBeInTheDocument();
+      expect(
+        screen.getByText('Find your travel companions'),
+      ).toBeInTheDocument();
     });
 
     it('renders Share feature card', () => {
@@ -88,7 +99,9 @@ describe('Home Page', () => {
     });
 
     it('renders Safety Tips link', () => {
-      expect(screen.getByText('Safety Tips & Event Etiquette')).toBeInTheDocument();
+      expect(
+        screen.getByText('Safety Tips & Event Etiquette'),
+      ).toBeInTheDocument();
     });
 
     it('renders Community Guidelines link', () => {
@@ -102,7 +115,9 @@ describe('Home Page', () => {
     it('renders copyright notice with current year', () => {
       const currentYear = new Date().getFullYear();
       expect(
-        screen.getByText(new RegExp(`© ${currentYear} TravelMatch Inc. All rights reserved.`))
+        screen.getByText(
+          new RegExp(`© ${currentYear} TravelMatch Inc. All rights reserved.`),
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -119,7 +134,9 @@ describe('Home Page', () => {
     });
 
     it('has correct href for partner link in footer', () => {
-      const partnerLink = screen.getByText('Partner with TravelMatch').closest('a');
+      const partnerLink = screen
+        .getByText('Partner with TravelMatch')
+        .closest('a');
       expect(partnerLink).toHaveAttribute('href', '/partner');
     });
   });

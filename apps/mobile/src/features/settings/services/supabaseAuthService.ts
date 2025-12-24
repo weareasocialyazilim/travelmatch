@@ -99,9 +99,71 @@ export async function requestDataExport(): Promise<{
   }
 }
 
+/**
+ * Sign in with phone number (OTP)
+ * Sends an OTP SMS to the provided phone number
+ */
+export async function signInWithPhone(phone: string): Promise<{
+  error: Error | null;
+}> {
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+    });
+
+    if (error) {
+      logger.error('[SignInWithPhone] Failed to send OTP', { error });
+      return { error };
+    }
+
+    logger.info('[SignInWithPhone] OTP sent successfully', {
+      phone: phone.slice(-4),
+    });
+    return { error: null };
+  } catch (error) {
+    logger.error('[SignInWithPhone] Unexpected error', { error });
+    return {
+      error: error instanceof Error ? error : new Error('Unknown error'),
+    };
+  }
+}
+
+/**
+ * Verify phone OTP code
+ */
+export async function verifyPhoneOtp(
+  phone: string,
+  token: string,
+): Promise<{
+  error: Error | null;
+}> {
+  try {
+    const { error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms',
+    });
+
+    if (error) {
+      logger.error('[VerifyPhoneOtp] Verification failed', { error });
+      return { error };
+    }
+
+    logger.info('[VerifyPhoneOtp] Phone verified successfully');
+    return { error: null };
+  } catch (error) {
+    logger.error('[VerifyPhoneOtp] Unexpected error', { error });
+    return {
+      error: error instanceof Error ? error : new Error('Unknown error'),
+    };
+  }
+}
+
 export const supabaseAuthService = {
   deleteAccount,
   requestDataExport,
+  signInWithPhone,
+  verifyPhoneOtp,
 };
 
 export default supabaseAuthService;

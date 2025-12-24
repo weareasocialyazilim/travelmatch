@@ -10,6 +10,7 @@ exports[`OptimizedFlatList Snapshots should match snapshot for empty list 1`] = 
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
+  ref={null}
   refreshing={false}
   removeClippedSubviews={true}
   renderItem={[Function]}
@@ -63,6 +64,7 @@ exports[`OptimizedFlatList Snapshots should match snapshot for list with items 1
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
+  ref={null}
   refreshing={false}
   removeClippedSubviews={true}
   renderItem={[Function]}
@@ -141,6 +143,7 @@ exports[`OptimizedFlatList Snapshots should match snapshot for loading state 1`]
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
+  ref={null}
   refreshing={false}
   removeClippedSubviews={true}
   renderItem={[Function]}

@@ -2,19 +2,26 @@
 export * from './supabase';
 
 // Authentication
-export * from './auth';
+export { getAdminSession, hasPermission, createAuditLog } from './auth';
 
 // Audit logging
-export * from './audit';
+export { logAuditAction, AuditActions, withAudit } from './audit';
 
 // Permissions
-export * from './permissions';
+export { PERMISSIONS } from './permissions';
 
-// Utilities
-export * from './utils';
+// Utilities (selective export to avoid conflicts)
+export { cn, debounce, generateId, sleep } from './utils';
 
-// Formatters
-export * from './formatters';
+// Formatters (selective export to avoid conflicts)
+export {
+  formatDateTime,
+  formatRelativeTime,
+  formatPercentage,
+  formatFileSize,
+  formatDuration,
+  formatCompactNumber,
+} from './formatters';
 
 // Validators
 export * from './validators';

@@ -39,7 +39,10 @@ const calculateAge = (birthDate: Date): number => {
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
   return age;
@@ -55,18 +58,19 @@ export const RegisterScreen: React.FC = () => {
   const defaultDate = new Date();
   defaultDate.setFullYear(defaultDate.getFullYear() - 18);
 
-  const { control, handleSubmit, formState, setValue, watch } = useForm<RegisterInput>({
-    resolver: zodResolver(registerSchema),
-    mode: 'onChange',
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      fullName: '',
-      gender: undefined,
-      dateOfBirth: undefined,
-    },
-  });
+  const { control, handleSubmit, formState, setValue, watch } =
+    useForm<RegisterInput>({
+      resolver: zodResolver(registerSchema),
+      mode: 'onChange',
+      defaultValues: {
+        email: '',
+        password: '',
+        confirmPassword: '',
+        fullName: '',
+        gender: undefined,
+        dateOfBirth: undefined,
+      },
+    });
 
   const selectedGender = watch('gender');
   const selectedDate = watch('dateOfBirth');
@@ -117,6 +121,7 @@ export const RegisterScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Ad Soyad</Text>
             <TextInput
+              testID="fullname-input"
               style={[styles.input, error && styles.inputError]}
               placeholder="Adınız ve soyadınız"
               value={value}
@@ -141,6 +146,7 @@ export const RegisterScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>E-posta</Text>
             <TextInput
+              testID="email-input"
               style={[styles.input, error && styles.inputError]}
               placeholder="ornek@email.com"
               value={value}
@@ -168,15 +174,19 @@ export const RegisterScreen: React.FC = () => {
                   key={option.value}
                   style={[
                     styles.genderOption,
-                    selectedGender === option.value && styles.genderOptionSelected,
+                    selectedGender === option.value &&
+                      styles.genderOptionSelected,
                   ]}
-                  onPress={() => setValue('gender', option.value, { shouldValidate: true })}
+                  onPress={() =>
+                    setValue('gender', option.value, { shouldValidate: true })
+                  }
                   disabled={isLoading}
                 >
                   <Text
                     style={[
                       styles.genderOptionText,
-                      selectedGender === option.value && styles.genderOptionTextSelected,
+                      selectedGender === option.value &&
+                        styles.genderOptionTextSelected,
                     ]}
                   >
                     {option.label}
@@ -197,13 +207,21 @@ export const RegisterScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Doğum Tarihi</Text>
             <TouchableOpacity
-              style={[styles.input, styles.dateInput, error && styles.inputError]}
+              style={[
+                styles.input,
+                styles.dateInput,
+                error && styles.inputError,
+              ]}
               onPress={() => setShowDatePicker(true)}
               disabled={isLoading}
             >
-              <Text style={selectedDate ? styles.dateText : styles.datePlaceholder}>
+              <Text
+                style={selectedDate ? styles.dateText : styles.datePlaceholder}
+              >
                 {selectedDate
-                  ? `${formatDate(selectedDate)} (${calculateAge(selectedDate)} yaş)`
+                  ? `${formatDate(selectedDate)} (${calculateAge(
+                      selectedDate,
+                    )} yaş)`
                   : 'Doğum tarihinizi seçin'}
               </Text>
             </TouchableOpacity>
@@ -269,6 +287,7 @@ export const RegisterScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Şifre</Text>
             <TextInput
+              testID="password-input"
               style={[styles.input, error && styles.inputError]}
               placeholder="En az 8 karakter"
               value={value}
@@ -293,6 +312,7 @@ export const RegisterScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Şifre Tekrar</Text>
             <TextInput
+              testID="confirm-password-input"
               style={[styles.input, error && styles.inputError]}
               placeholder="Şifrenizi tekrar girin"
               value={value}

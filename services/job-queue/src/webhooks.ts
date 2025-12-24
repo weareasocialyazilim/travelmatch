@@ -20,7 +20,7 @@ const supabase = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
+  },
 );
 
 /**
@@ -31,30 +31,49 @@ app.post('/webhooks/job-complete', async (req, res) => {
   try {
     const { jobId, userId, type, status, result, error } = req.body;
 
-    console.log(`Webhook received: ${type} job ${jobId} for user ${userId} - ${status}`);
+    // Sanitize input for logging to prevent log injection
+    const safeUserId = String(userId || '')
+      .replace(/[\n\r\t%]/g, '')
+      .slice(0, 100);
+    const safeJobId = String(jobId || '')
+      .replace(/[\n\r\t%]/g, '')
+      .slice(0, 100);
+    const safeType = String(type || '')
+      .replace(/[\n\r\t%]/g, '')
+      .slice(0, 50);
+    const safeStatus = String(status || '')
+      .replace(/[\n\r\t%]/g, '')
+      .slice(0, 50);
+
+    console.log('Webhook received:', {
+      type: safeType,
+      jobId: safeJobId,
+      userId: safeUserId,
+      status: safeStatus,
+    });
 
     // Handle different job types
     switch (type) {
       case 'kyc-verification':
-        await handleKycComplete(userId, status, result, error);
+        await handleKycComplete(safeUserId, status, result, error);
         break;
 
       case 'image-processing':
-        await handleImageComplete(userId, status, result, error);
+        await handleImageComplete(safeUserId, status, result, error);
         break;
 
       case 'email':
-        await handleEmailComplete(userId, status, result, error);
+        await handleEmailComplete(safeUserId, status, result, error);
         break;
 
       default:
-        console.warn(`Unknown job type: ${type}`);
+        console.warn('Unknown job type:', safeType);
     }
 
     res.json({ success: true });
   } catch (err: any) {
-    console.error('Webhook error:', err);
-    res.status(500).json({ error: err.message });
+    console.error('Webhook error:', err?.message || 'Unknown error');
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -65,7 +84,7 @@ async function handleKycComplete(
   userId: string,
   status: string,
   result: any,
-  error: any
+  error: any,
 ): Promise<void> {
   if (status === 'completed') {
     // Update user KYC status
@@ -81,7 +100,10 @@ async function handleKycComplete(
     await supabase.from('notifications').insert({
       user_id: userId,
       type: 'kyc_update',
-      title: result.status === 'verified' ? 'KYC Verified ✓' : 'KYC Verification Failed',
+      title:
+        result.status === 'verified'
+          ? 'KYC Verified ✓'
+          : 'KYC Verification Failed',
       body:
         result.status === 'verified'
           ? 'Your identity has been verified successfully!'
@@ -94,7 +116,10 @@ async function handleKycComplete(
       created_at: new Date().toISOString(),
     });
 
-    console.log(`KYC verification ${result.status} for user ${userId}`);
+    console.log('KYC verification completed:', {
+      status: result.status,
+      userId,
+    });
   } else if (status === 'failed') {
     // Update to failed status
     await supabase
@@ -119,10 +144,14 @@ async function handleKycComplete(
     });
 
     // Sanitize error for logging to prevent log injection
-    const sanitizedError = typeof error === 'string' 
-      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
-      : JSON.stringify(error).slice(0, 500);
-    console.error(`KYC verification failed for user ${userId}:`, sanitizedError);
+    const sanitizedError =
+      typeof error === 'string'
+        ? error.replace(/[\n\r\t%]/g, ' ').slice(0, 500)
+        : JSON.stringify(error).slice(0, 500);
+    console.error('KYC verification failed:', {
+      userId,
+      error: sanitizedError,
+    });
   }
 }
 
@@ -133,18 +162,22 @@ async function handleImageComplete(
   userId: string,
   status: string,
   _result: unknown,
-  error: unknown
+  error: unknown,
 ): Promise<void> {
   if (status === 'completed') {
-    console.log(`Image processing completed for user ${userId}`);
+    console.log('Image processing completed:', { userId });
     // Update image URLs in database
     // Send notification if needed
   } else {
     // Sanitize error for logging to prevent log injection
-    const sanitizedError = typeof error === 'string' 
-      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
-      : JSON.stringify(error).slice(0, 500);
-    console.error(`Image processing failed for user ${userId}:`, sanitizedError);
+    const sanitizedError =
+      typeof error === 'string'
+        ? error.replace(/[\n\r\t%]/g, ' ').slice(0, 500)
+        : JSON.stringify(error).slice(0, 500);
+    console.error('Image processing failed:', {
+      userId,
+      error: sanitizedError,
+    });
   }
 }
 
@@ -155,16 +188,17 @@ async function handleEmailComplete(
   userId: string,
   status: string,
   _result: unknown,
-  error: unknown
+  error: unknown,
 ): Promise<void> {
   if (status === 'completed') {
-    console.log(`Email sent successfully to user ${userId}`);
+    console.log('Email sent successfully:', { userId });
   } else {
     // Sanitize error for logging to prevent log injection
-    const sanitizedError = typeof error === 'string' 
-      ? error.replace(/[\n\r\t]/g, ' ').slice(0, 500) 
-      : JSON.stringify(error).slice(0, 500);
-    console.error(`Email sending failed for user ${userId}:`, sanitizedError);
+    const sanitizedError =
+      typeof error === 'string'
+        ? error.replace(/[\n\r\t%]/g, ' ').slice(0, 500)
+        : JSON.stringify(error).slice(0, 500);
+    console.error('Email sending failed:', { userId, error: sanitizedError });
     // Retry logic or alert admin
   }
 }

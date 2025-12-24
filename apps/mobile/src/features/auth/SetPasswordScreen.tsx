@@ -29,14 +29,15 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { control, handleSubmit, formState, watch } = useForm<ResetPasswordInput>({
-    resolver: zodResolver(resetPasswordSchema),
-    mode: 'onChange',
-    defaultValues: {
-      password: '',
-      confirmPassword: '',
-    },
-  });
+  const { control, handleSubmit, formState, watch } =
+    useForm<ResetPasswordInput>({
+      resolver: zodResolver(resetPasswordSchema),
+      mode: 'onChange',
+      defaultValues: {
+        password: '',
+        confirmPassword: '',
+      },
+    });
 
   const newPassword = watch('password');
   const confirmPassword = watch('confirmPassword');
@@ -68,7 +69,7 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
 
   const handleSetPassword = (_data: ResetPasswordInput) => {
     // Navigate to success or home
-    navigation.navigate('CompleteProfile');
+    navigation.navigate('CompleteProfile', {});
   };
 
   return (
@@ -102,7 +103,10 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
           <Controller
             control={control}
             name="password"
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>New password</Text>
                 <View style={styles.inputWrapper}>
@@ -127,9 +131,7 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
                     />
                   </TouchableOpacity>
                 </View>
-                {error && (
-                  <Text style={styles.errorText}>{error.message}</Text>
-                )}
+                {error && <Text style={styles.errorText}>{error.message}</Text>}
               </View>
             )}
           />
@@ -138,7 +140,10 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
           <Controller
             control={control}
             name="confirmPassword"
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Confirm new password</Text>
                 <View style={styles.inputWrapper}>
@@ -163,9 +168,7 @@ export const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
                     />
                   </TouchableOpacity>
                 </View>
-                {error && (
-                  <Text style={styles.errorText}>{error.message}</Text>
-                )}
+                {error && <Text style={styles.errorText}>{error.message}</Text>}
               </View>
             )}
           />

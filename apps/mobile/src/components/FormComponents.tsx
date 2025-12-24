@@ -212,6 +212,7 @@ export const FormInput: React.FC<FormInputProps> = ({
             accessibilityLabel={
               isSecureVisible ? 'Hide password' : 'Show password'
             }
+            testID={testID ? `${testID}-toggle-visibility` : undefined}
           >
             <MaterialCommunityIcons
               name={isSecureVisible ? 'eye-off-outline' : 'eye-outline'}
@@ -226,6 +227,7 @@ export const FormInput: React.FC<FormInputProps> = ({
             onPress={onRightIconPress}
             style={styles.rightIconButton}
             disabled={!onRightIconPress}
+            testID={testID ? `${testID}-right-icon` : undefined}
           >
             <MaterialCommunityIcons
               name={rightIcon}

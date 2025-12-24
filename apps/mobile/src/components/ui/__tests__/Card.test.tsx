@@ -14,7 +14,7 @@ describe('Card Component', () => {
       const { getByText } = render(
         <Card>
           <Text>Card Content</Text>
-        </Card>
+        </Card>,
       );
       expect(getByText('Card Content')).toBeTruthy();
     });
@@ -23,7 +23,7 @@ describe('Card Component', () => {
       const { getByText } = render(
         <Card>
           <Text>Static Card</Text>
-        </Card>
+        </Card>,
       );
       const card = getByText('Static Card').parent;
       // Should not be pressable
@@ -33,7 +33,7 @@ describe('Card Component', () => {
       const { getByText } = render(
         <Card onPress={jest.fn()}>
           <Text>Pressable Card</Text>
-        </Card>
+        </Card>,
       );
       expect(getByText('Pressable Card')).toBeTruthy();
     });
@@ -45,22 +45,22 @@ describe('Card Component', () => {
       const { getByText } = render(
         <Card onPress={onPress}>
           <Text>Click Me</Text>
-        </Card>
+        </Card>,
       );
-      
+
       fireEvent.press(getByText('Click Me'));
       expect(onPress).toHaveBeenCalledTimes(1);
     });
 
     it('does not call onPress when disabled', () => {
       const onPress = jest.fn();
-      const { getByText } = render(
-        <Card onPress={onPress} disabled>
+      const { getByTestId } = render(
+        <Card testID="disabled-card" onPress={onPress} disabled>
           <Text>Disabled Card</Text>
-        </Card>
+        </Card>,
       );
-      
-      fireEvent.press(getByText('Disabled Card'));
+
+      fireEvent.press(getByTestId('disabled-card'));
       expect(onPress).not.toHaveBeenCalled();
     });
   });
@@ -70,7 +70,7 @@ describe('Card Component', () => {
       const { getByText } = render(
         <Card variant="elevated">
           <Text>Elevated</Text>
-        </Card>
+        </Card>,
       );
       expect(getByText('Elevated')).toBeTruthy();
     });
@@ -79,7 +79,7 @@ describe('Card Component', () => {
       const { getByText } = render(
         <Card variant="outlined">
           <Text>Outlined</Text>
-        </Card>
+        </Card>,
       );
       expect(getByText('Outlined')).toBeTruthy();
     });
@@ -88,7 +88,7 @@ describe('Card Component', () => {
       const { getByText } = render(
         <Card variant="filled">
           <Text>Filled</Text>
-        </Card>
+        </Card>,
       );
       expect(getByText('Filled')).toBeTruthy();
     });
@@ -100,70 +100,66 @@ describe('Card Component', () => {
       const { getByTestId } = render(
         <Card style={customStyle} testID="custom-card">
           <Text>Styled Card</Text>
-        </Card>
+        </Card>,
       );
       const card = getByTestId('custom-card');
-      expect(card.props.style).toContainEqual(
-        expect.objectContaining(customStyle)
-      );
+      expect(card.props.style).toEqual(expect.objectContaining(customStyle));
     });
   });
 
   describe('Disabled State', () => {
     it('renders with disabled styling', () => {
-      const { getByText } = render(
-        <Card disabled>
+      const { getByTestId } = render(
+        <Card testID="disabled-style-card" disabled>
           <Text>Disabled</Text>
-        </Card>
+        </Card>,
       );
-      const card = getByText('Disabled').parent;
-      // Should have disabled opacity or styling
+      const card = getByTestId('disabled-style-card');
+      // Should have disabled opacity or styling - non-pressable card just has style
+      expect(card).toBeTruthy();
     });
 
     it('prevents interaction when disabled', () => {
       const onPress = jest.fn();
-      const { getByText } = render(
-        <Card onPress={onPress} disabled>
+      const { getByTestId } = render(
+        <Card testID="disabled-interact-card" onPress={onPress} disabled>
           <Text>Disabled</Text>
-        </Card>
+        </Card>,
       );
-      
-      fireEvent.press(getByText('Disabled'));
+
+      fireEvent.press(getByTestId('disabled-interact-card'));
       expect(onPress).not.toHaveBeenCalled();
     });
   });
 
   describe('Accessibility', () => {
     it('has button role when pressable', () => {
-      const { getByText } = render(
-        <Card onPress={jest.fn()}>
+      const { getByTestId } = render(
+        <Card testID="pressable-card" onPress={jest.fn()}>
           <Text>Pressable</Text>
-        </Card>
+        </Card>,
       );
-      const card = getByText('Pressable').parent?.parent;
-      expect(card?.props.accessible).toBe(true);
+      const card = getByTestId('pressable-card');
+      expect(card.props.accessible).toBe(true);
     });
 
     it('announces disabled state', () => {
-      const { getByText } = render(
-        <Card onPress={jest.fn()} disabled>
+      const { getByTestId } = render(
+        <Card testID="disabled-card" onPress={jest.fn()} disabled>
           <Text>Disabled</Text>
-        </Card>
+        </Card>,
       );
-      const card = getByText('Disabled').parent?.parent;
-      expect(card?.props.accessibilityState).toEqual(
-        expect.objectContaining({ disabled: true })
+      const card = getByTestId('disabled-card');
+      expect(card.props.accessibilityState).toEqual(
+        expect.objectContaining({ disabled: true }),
       );
     });
 
     it('has custom accessibility label', () => {
       const { getByLabelText } = render(
-        <Card 
-          onPress={jest.fn()}
-          accessibilityLabel="Product card"
-        >
+        <Card onPress={jest.fn()} accessibilityLabel="Product card">
           <Text>Product</Text>
-        </Card>
+        </Card>,
       );
       expect(getByLabelText('Product card')).toBeTruthy();
     });
@@ -174,7 +170,7 @@ describe('Card Component', () => {
       const { toJSON } = render(
         <Card>
           <Text>Basic Card</Text>
-        </Card>
+        </Card>,
       );
       expect(toJSON()).toMatchSnapshot();
     });
@@ -183,7 +179,7 @@ describe('Card Component', () => {
       const { toJSON } = render(
         <Card onPress={jest.fn()}>
           <Text>Pressable Card</Text>
-        </Card>
+        </Card>,
       );
       expect(toJSON()).toMatchSnapshot();
     });
@@ -192,7 +188,7 @@ describe('Card Component', () => {
       const { toJSON } = render(
         <Card onPress={jest.fn()} disabled>
           <Text>Disabled Card</Text>
-        </Card>
+        </Card>,
       );
       expect(toJSON()).toMatchSnapshot();
     });

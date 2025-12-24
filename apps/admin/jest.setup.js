@@ -1,4 +1,5 @@
 // Jest setup file for admin app
+require('@testing-library/jest-dom');
 
 // Mock date-fns/locale with proper formatDistance function
 jest.mock('date-fns/locale', () => ({

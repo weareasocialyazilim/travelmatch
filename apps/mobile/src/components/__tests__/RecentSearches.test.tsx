@@ -1,5 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+import { TouchableOpacity } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { RecentSearches } from '../RecentSearches';
 
 describe('RecentSearches', () => {
@@ -30,53 +32,50 @@ describe('RecentSearches', () => {
       expect(getByText('Clear All')).toBeTruthy();
     });
 
-    it('renders FlatList with items data', () => {
+    it('renders FlashList with items data', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      expect(flatList.props.data).toEqual(mockItems);
+      const flashList = UNSAFE_getByType(FlashList);
+      expect(flashList.props.data).toEqual(mockItems);
     });
 
-    it('renders FlatList with scrollEnabled false', () => {
+    it('renders FlashList with scrollEnabled false', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      expect(flatList.props.scrollEnabled).toBe(false);
+      const flashList = UNSAFE_getByType(FlashList);
+      expect(flashList.props.scrollEnabled).toBe(false);
     });
 
     it('returns null when items is empty', () => {
-      const { toJSON } = render(<RecentSearches {...defaultProps} items={[]} />);
+      const { toJSON } = render(
+        <RecentSearches {...defaultProps} items={[]} />,
+      );
       expect(toJSON()).toBeNull();
     });
 
-    it('renders FlatList with correct keyExtractor', () => {
+    it('renders FlashList with correct keyExtractor', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      const key = flatList.props.keyExtractor('test item', 0);
+      const flashList = UNSAFE_getByType(FlashList);
+      const key = flashList.props.keyExtractor('test item', 0);
       expect(key).toBe('test item-0');
     });
   });
 
-  describe('FlatList renderItem', () => {
+  describe('FlashList renderItem', () => {
     it('renderItem function renders search text', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { getByText } = render(
-        flatList.props.renderItem({ item: 'coffee shops in Paris', index: 0 })
+        flashList.props.renderItem({ item: 'coffee shops in Paris', index: 0 }),
       );
       expect(getByText('coffee shops in Paris')).toBeTruthy();
     });
 
     it('renderItem includes history icon', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { UNSAFE_getAllByType } = render(
-        flatList.props.renderItem({ item: 'test search', index: 0 })
+        flashList.props.renderItem({ item: 'test search', index: 0 }),
       );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
@@ -86,11 +85,10 @@ describe('RecentSearches', () => {
 
     it('renderItem includes close icon', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { UNSAFE_getAllByType } = render(
-        flatList.props.renderItem({ item: 'test search', index: 0 })
+        flashList.props.renderItem({ item: 'test search', index: 0 }),
       );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
@@ -99,13 +97,11 @@ describe('RecentSearches', () => {
 
     it('renderItem creates pressable item', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { UNSAFE_getAllByType } = render(
-        flatList.props.renderItem({ item: 'test search', index: 0 })
+        flashList.props.renderItem({ item: 'test search', index: 0 }),
       );
-      const { TouchableOpacity } = require('react-native');
       const touchables = UNSAFE_getAllByType(TouchableOpacity);
       expect(touchables.length).toBe(2); // main item + remove button
     });
@@ -114,15 +110,13 @@ describe('RecentSearches', () => {
   describe('Item Interactions', () => {
     it('calls onSelect when item is pressed', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { UNSAFE_getAllByType } = render(
-        flatList.props.renderItem({ item: 'coffee shops', index: 0 })
+        flashList.props.renderItem({ item: 'coffee shops', index: 0 }),
       );
-      const { TouchableOpacity } = require('react-native');
       const touchables = UNSAFE_getAllByType(TouchableOpacity);
-      
+
       // First touchable is the main item
       fireEvent.press(touchables[0]);
       expect(mockOnSelect).toHaveBeenCalledWith('coffee shops');
@@ -130,15 +124,13 @@ describe('RecentSearches', () => {
 
     it('calls onRemove when close button is pressed', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { UNSAFE_getAllByType } = render(
-        flatList.props.renderItem({ item: 'museums', index: 0 })
+        flashList.props.renderItem({ item: 'museums', index: 0 }),
       );
-      const { TouchableOpacity } = require('react-native');
       const touchables = UNSAFE_getAllByType(TouchableOpacity);
-      
+
       // Second touchable is the remove button
       fireEvent.press(touchables[1]);
       expect(mockOnRemove).toHaveBeenCalledWith('museums');
@@ -146,36 +138,32 @@ describe('RecentSearches', () => {
 
     it('does not call onRemove when selecting item', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { UNSAFE_getAllByType } = render(
-        flatList.props.renderItem({ item: 'test', index: 0 })
+        flashList.props.renderItem({ item: 'test', index: 0 }),
       );
-      const { TouchableOpacity } = require('react-native');
       const touchables = UNSAFE_getAllByType(TouchableOpacity);
-      
+
       fireEvent.press(touchables[0]);
       expect(mockOnRemove).not.toHaveBeenCalled();
     });
 
     it('handles pressing different items', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       // Test first item
       const { UNSAFE_getAllByType: getAllFirst } = render(
-        flatList.props.renderItem({ item: 'first', index: 0 })
+        flashList.props.renderItem({ item: 'first', index: 0 }),
       );
-      const { TouchableOpacity } = require('react-native');
       const firstTouchables = getAllFirst(TouchableOpacity);
       fireEvent.press(firstTouchables[0]);
       expect(mockOnSelect).toHaveBeenCalledWith('first');
-      
+
       // Test second item
       const { UNSAFE_getAllByType: getAllSecond } = render(
-        flatList.props.renderItem({ item: 'second', index: 1 })
+        flashList.props.renderItem({ item: 'second', index: 1 }),
       );
       const secondTouchables = getAllSecond(TouchableOpacity);
       fireEvent.press(secondTouchables[0]);
@@ -208,10 +196,10 @@ describe('RecentSearches', () => {
     it('handles multiple Clear All presses', () => {
       const { getByText } = render(<RecentSearches {...defaultProps} />);
       const clearAllButton = getByText('Clear All');
-      
+
       fireEvent.press(clearAllButton);
       fireEvent.press(clearAllButton);
-      
+
       expect(mockOnClearAll).toHaveBeenCalledTimes(2);
     });
   });
@@ -219,34 +207,32 @@ describe('RecentSearches', () => {
   describe('Text Display', () => {
     it('displays search with special characters', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { getByText } = render(
-        flatList.props.renderItem({ item: 'café in Paris', index: 0 })
+        flashList.props.renderItem({ item: 'café in Paris', index: 0 }),
       );
       expect(getByText('café in Paris')).toBeTruthy();
     });
 
     it('displays search with emoji', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { getByText } = render(
-        flatList.props.renderItem({ item: 'coffee ☕', index: 0 })
+        flashList.props.renderItem({ item: 'coffee ☕', index: 0 }),
       );
       expect(getByText('coffee ☕')).toBeTruthy();
     });
 
     it('displays long search text', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
-      const longText = 'very long search query that might need to truncate in the UI';
+      const flashList = UNSAFE_getByType(FlashList);
+
+      const longText =
+        'very long search query that might need to truncate in the UI';
       const { getByText } = render(
-        flatList.props.renderItem({ item: longText, index: 0 })
+        flashList.props.renderItem({ item: longText, index: 0 }),
       );
       expect(getByText(longText)).toBeTruthy();
     });
@@ -255,68 +241,64 @@ describe('RecentSearches', () => {
   describe('Edge Cases', () => {
     it('handles single item', () => {
       const { UNSAFE_getByType } = render(
-        <RecentSearches {...defaultProps} items={['single']} />
+        <RecentSearches {...defaultProps} items={['single']} />,
       );
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      expect(flatList.props.data).toEqual(['single']);
+      const flashList = UNSAFE_getByType(FlashList);
+      expect(flashList.props.data).toEqual(['single']);
     });
 
     it('handles many items', () => {
       const manyItems = Array.from({ length: 10 }, (_, i) => `search ${i + 1}`);
       const { UNSAFE_getByType } = render(
-        <RecentSearches {...defaultProps} items={manyItems} />
+        <RecentSearches {...defaultProps} items={manyItems} />,
       );
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      expect(flatList.props.data.length).toBe(10);
+      const flashList = UNSAFE_getByType(FlashList);
+      expect(flashList.props.data.length).toBe(10);
     });
 
     it('handles empty string in items', () => {
       const itemsWithEmpty = ['valid search', '', 'another search'];
       const { UNSAFE_getByType } = render(
-        <RecentSearches {...defaultProps} items={itemsWithEmpty} />
+        <RecentSearches {...defaultProps} items={itemsWithEmpty} />,
       );
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      expect(flatList.props.data).toEqual(itemsWithEmpty);
+      const flashList = UNSAFE_getByType(FlashList);
+      expect(flashList.props.data).toEqual(itemsWithEmpty);
     });
 
     it('re-renders when items prop changes', () => {
       const { rerender, UNSAFE_getByType } = render(
-        <RecentSearches {...defaultProps} items={['first']} />
+        <RecentSearches {...defaultProps} items={['first']} />,
       );
-      const { FlatList } = require('react-native');
-      let flatList = UNSAFE_getByType(FlatList);
-      expect(flatList.props.data).toEqual(['first']);
+      let flashList = UNSAFE_getByType(FlashList);
+      expect(flashList.props.data).toEqual(['first']);
 
-      rerender(<RecentSearches {...defaultProps} items={['first', 'second']} />);
-      flatList = UNSAFE_getByType(FlatList);
-      expect(flatList.props.data).toEqual(['first', 'second']);
+      rerender(
+        <RecentSearches {...defaultProps} items={['first', 'second']} />,
+      );
+      flashList = UNSAFE_getByType(FlashList);
+      expect(flashList.props.data).toEqual(['first', 'second']);
     });
 
     it('handles transition from items to empty', () => {
       const { rerender, toJSON } = render(<RecentSearches {...defaultProps} />);
-      
+
       rerender(<RecentSearches {...defaultProps} items={[]} />);
       expect(toJSON()).toBeNull();
     });
 
     it('handles rapid item selection', () => {
       const { UNSAFE_getByType } = render(<RecentSearches {...defaultProps} />);
-      const { FlatList } = require('react-native');
-      const flatList = UNSAFE_getByType(FlatList);
-      
+      const flashList = UNSAFE_getByType(FlashList);
+
       const { UNSAFE_getAllByType } = render(
-        flatList.props.renderItem({ item: 'test', index: 0 })
+        flashList.props.renderItem({ item: 'test', index: 0 }),
       );
-      const { TouchableOpacity } = require('react-native');
       const touchables = UNSAFE_getAllByType(TouchableOpacity);
-      
+
       fireEvent.press(touchables[0]);
       fireEvent.press(touchables[0]);
       fireEvent.press(touchables[0]);
-      
+
       expect(mockOnSelect).toHaveBeenCalledTimes(3);
     });
   });

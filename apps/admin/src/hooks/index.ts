@@ -2,8 +2,16 @@
 export * from './use-auth';
 export * from './use-permission';
 
-// Real-time
-export * from './use-realtime';
+// Real-time (excluding useRealtimeStats to avoid conflict with use-stats)
+export {
+  useRealtimeSubscription,
+  useRealtimeTasks,
+  useRealtimeNotifications,
+  useRealtimeDisputes,
+  useRealtimePayouts,
+  useRealtimeMetrics,
+  useRealtimeAuditLogs,
+} from './use-realtime';
 
 // Data Hooks
 export * from './use-tasks';

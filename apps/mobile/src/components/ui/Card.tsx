@@ -26,6 +26,12 @@ interface CardProps {
   onPress?: () => void;
   /** Additional container styles */
   style?: ViewStyle;
+  /** Disable card interaction */
+  disabled?: boolean;
+  /** Accessibility label for the card */
+  accessibilityLabel?: string;
+  /** Test ID for testing */
+  testID?: string;
 }
 
 /**
@@ -50,7 +56,16 @@ interface CardProps {
  * ```
  */
 export const Card: React.FC<CardProps> = memo(
-  ({ children, variant = 'elevated', padding = 'md', onPress, style }) => {
+  ({
+    children,
+    variant = 'elevated',
+    padding = 'md',
+    onPress,
+    style,
+    disabled,
+    accessibilityLabel,
+    testID,
+  }) => {
     // Memoize variant styles calculation
     const variantStyles = useMemo((): ViewStyle => {
       switch (variant) {
@@ -95,17 +110,37 @@ export const Card: React.FC<CardProps> = memo(
     }, [padding]);
 
     const cardContent = (
-      <View style={[styles.base, variantStyles, paddingStyles, style]}>
+      <View
+        testID={!onPress ? testID : undefined}
+        style={[
+          styles.base,
+          variantStyles,
+          paddingStyles,
+          style,
+          disabled && styles.disabled,
+        ]}
+      >
         {children}
       </View>
     );
 
     if (onPress) {
+      const handlePress = () => {
+        if (!disabled) {
+          onPress();
+        }
+      };
+
       return (
         <Pressable
-          onPress={onPress}
-          style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}
+          testID={testID}
+          onPress={handlePress}
+          disabled={disabled}
+          style={({ pressed }) => [{ opacity: pressed && !disabled ? 0.9 : 1 }]}
           accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+          accessibilityState={{ disabled }}
+          accessible={true}
         >
           {cardContent}
         </Pressable>
@@ -122,6 +157,9 @@ const styles = StyleSheet.create({
   base: {
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });
 

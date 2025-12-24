@@ -282,7 +282,9 @@ export const useMessages = (): UseMessagesReturn => {
   }, [refreshConversations]);
 
   // Track current conversation for subscription
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
 
   // Update active conversation when loading messages
   useEffect(() => {
@@ -301,71 +303,87 @@ export const useMessages = (): UseMessagesReturn => {
 
     // Subscribe to messages using the channel manager
     // This enables channel multiplexing if multiple components subscribe to the same conversation
-    const unsubscribe = realtimeChannelManager.subscribeToTable<{
+    interface DbMessage {
       id: string;
       conversation_id: string;
       sender_id: string;
       content: string;
       type: string;
       image_url?: string;
-      location?: unknown;
+      location?: { lat: number; lng: number; name: string } | null;
       created_at: string;
       read_at?: string;
-    }>('messages', {
-      filter: `conversation_id=eq.${activeConversationId}`,
-      onInsert: (payload) => {
-        if (!mountedRef.current) return;
+      [key: string]: unknown; // Index signature for Supabase realtime
+    }
 
-        logger.info('useMessages', 'New message received:', payload.new);
+    const unsubscribe = realtimeChannelManager.subscribeToTable<DbMessage>(
+      'messages',
+      {
+        filter: `conversation_id=eq.${activeConversationId}`,
+        onInsert: (payload) => {
+          if (!mountedRef.current) return;
 
-        const dbMessage = payload.new;
-        if (!dbMessage || typeof dbMessage !== 'object') return;
+          logger.info('useMessages', 'New message received:', payload.new);
 
-        const newMessage: Message = {
-          id: String(dbMessage.id || ''),
-          conversationId: String(dbMessage.conversation_id || ''),
-          senderId: String(dbMessage.sender_id || ''),
-          content: String(dbMessage.content || ''),
-          type: (dbMessage.type as MessageType) || 'text',
-          imageUrl: dbMessage.image_url
-            ? String(dbMessage.image_url)
-            : undefined,
-          location: dbMessage.location || undefined,
-          createdAt: String(dbMessage.created_at || new Date().toISOString()),
-          status: 'sent' as MessageStatus,
-        };
+          const dbMessage = payload.new as DbMessage | null;
+          if (
+            !dbMessage ||
+            typeof dbMessage !== 'object' ||
+            !('id' in dbMessage)
+          )
+            return;
 
-        // Add message if not already in list (avoid duplicates)
-        setMessages((prev) => {
-          const exists = prev.some((msg) => msg.id === newMessage.id);
-          if (exists) return prev;
-          return [newMessage, ...prev];
-        });
+          const newMessage: Message = {
+            id: String(dbMessage.id || ''),
+            conversationId: String(dbMessage.conversation_id || ''),
+            senderId: String(dbMessage.sender_id || ''),
+            content: String(dbMessage.content || ''),
+            type: (dbMessage.type as MessageType) || 'text',
+            imageUrl: dbMessage.image_url
+              ? String(dbMessage.image_url)
+              : undefined,
+            location: dbMessage.location ?? undefined,
+            createdAt: String(dbMessage.created_at || new Date().toISOString()),
+            status: 'sent' as MessageStatus,
+          };
+
+          // Add message if not already in list (avoid duplicates)
+          setMessages((prev) => {
+            const exists = prev.some((msg) => msg.id === newMessage.id);
+            if (exists) return prev;
+            return [newMessage, ...prev];
+          });
+        },
+        onUpdate: (payload) => {
+          if (!mountedRef.current) return;
+
+          logger.info('useMessages', 'Message updated:', payload.new);
+
+          const dbMessage = payload.new as DbMessage | null;
+          if (
+            !dbMessage ||
+            typeof dbMessage !== 'object' ||
+            !('id' in dbMessage)
+          )
+            return;
+
+          setMessages((prev) =>
+            prev.map((msg) => {
+              if (msg.id === String(dbMessage.id || '')) {
+                return {
+                  ...msg,
+                  content: String(dbMessage.content || msg.content),
+                  readAt: dbMessage.read_at
+                    ? String(dbMessage.read_at)
+                    : undefined,
+                };
+              }
+              return msg;
+            }),
+          );
+        },
       },
-      onUpdate: (payload) => {
-        if (!mountedRef.current) return;
-
-        logger.info('useMessages', 'Message updated:', payload.new);
-
-        const dbMessage = payload.new;
-        if (!dbMessage || typeof dbMessage !== 'object') return;
-
-        setMessages((prev) =>
-          prev.map((msg) => {
-            if (msg.id === String(dbMessage.id || '')) {
-              return {
-                ...msg,
-                content: String(dbMessage.content || msg.content),
-                readAt: dbMessage.read_at
-                  ? String(dbMessage.read_at)
-                  : undefined,
-              };
-            }
-            return msg;
-          }),
-        );
-      },
-    });
+    );
 
     // Cleanup - channel manager handles the unsubscription
     return () => {
@@ -381,53 +399,60 @@ export const useMessages = (): UseMessagesReturn => {
 
     // Subscribe to conversation updates using channel manager
     // This provides channel multiplexing and better connection management
-    const unsubscribe = realtimeChannelManager.subscribeToTable<{
+    interface DbConversation {
       id: string;
       last_message_content?: string;
       updated_at?: string;
-    }>('conversations', {
-      // TODO: Add filter when user context is available: `participant_ids=cs.{${userId}}`
-      onInsert: (payload) => {
-        if (!mountedRef.current) return;
+      [key: string]: unknown; // Index signature for Supabase realtime
+    }
 
-        logger.info('useMessages', 'New conversation created:', payload.new);
+    const unsubscribe = realtimeChannelManager.subscribeToTable<DbConversation>(
+      'conversations',
+      {
+        // TODO: Add filter when user context is available: `participant_ids=cs.{${userId}}`
+        onInsert: (payload) => {
+          if (!mountedRef.current) return;
 
-        // Refresh conversations to get the new one with full data
-        void refreshConversations();
-      },
-      onUpdate: (payload) => {
-        if (!mountedRef.current) return;
+          logger.info('useMessages', 'New conversation created:', payload.new);
 
-        logger.info('useMessages', 'Conversation updated:', payload.new);
+          // Refresh conversations to get the new one with full data
+          void refreshConversations();
+        },
+        onUpdate: (payload) => {
+          if (!mountedRef.current) return;
 
-        const dbConv = payload.new;
-        if (!dbConv || typeof dbConv !== 'object') return;
+          logger.info('useMessages', 'Conversation updated:', payload.new);
 
-        // Update only if this conversation is in our list
-        // (RLS will filter on the server, but we double-check client-side)
-        setConversations((prev) => {
-          const existingConv = prev.find(
-            (conv) => conv.id === String(dbConv.id || '')
-          );
-          if (!existingConv) return prev;
+          const dbConv = payload.new as DbConversation | null;
+          if (!dbConv || typeof dbConv !== 'object' || !('id' in dbConv))
+            return;
 
-          return prev.map((conv) => {
-            if (conv.id === String(dbConv.id || '')) {
-              return {
-                ...conv,
-                lastMessage: String(
-                  dbConv.last_message_content || conv.lastMessage,
-                ),
-                lastMessageAt: String(
-                  dbConv.updated_at || conv.lastMessageAt,
-                ),
-              };
-            }
-            return conv;
+          // Update only if this conversation is in our list
+          // (RLS will filter on the server, but we double-check client-side)
+          setConversations((prev) => {
+            const existingConv = prev.find(
+              (conv) => conv.id === String(dbConv.id || ''),
+            );
+            if (!existingConv) return prev;
+
+            return prev.map((conv) => {
+              if (conv.id === String(dbConv.id || '')) {
+                return {
+                  ...conv,
+                  lastMessage: String(
+                    dbConv.last_message_content || conv.lastMessage,
+                  ),
+                  lastMessageAt: String(
+                    dbConv.updated_at || conv.lastMessageAt,
+                  ),
+                };
+              }
+              return conv;
+            });
           });
-        });
+        },
       },
-    });
+    );
 
     return () => {
       unsubscribe();

@@ -1,13 +1,13 @@
 /**
  * Message Arrival and Real-time Handling Tests
- * 
+ *
  * Tests for real-time message features including:
  * - New message arrival
  * - Message read receipts
  * - Typing indicators
  * - Notification badge updates
  * - Unread count management
- * 
+ *
  * Coverage:
  * - Real-time message insertion
  * - Message state updates
@@ -18,7 +18,7 @@
 
 // @ts-nocheck - React hooks and realtime mocks
 
-import { renderHook, act, waitFor } from '@testing-library/react-hooks';
+import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { useMessages } from '../../apps/mobile/src/hooks/useMessages';
 import { supabase } from '../../apps/mobile/src/config/supabase';
 
@@ -51,8 +51,8 @@ describe('Message Arrival Handling', () => {
       unsubscribe: jest.fn(),
     };
 
-    (supabase.channel ).mockReturnValue(mockChannel);
-    (supabase.removeChannel ).mockImplementation(() => {});
+    supabase.channel.mockReturnValue(mockChannel);
+    supabase.removeChannel.mockImplementation(() => {});
   });
 
   // ===========================
@@ -177,7 +177,9 @@ describe('Message Arrival Handling', () => {
 
       await waitFor(() => {
         expect(result.current.messages[0].type).toBe('image');
-        expect(result.current.messages[0].imageUrl).toBe('https://example.com/image.jpg');
+        expect(result.current.messages[0].imageUrl).toBe(
+          'https://example.com/image.jpg',
+        );
       });
     });
 
@@ -190,7 +192,7 @@ describe('Message Arrival Handling', () => {
 
       const location = {
         latitude: 40.7128,
-        longitude: -74.0060,
+        longitude: -74.006,
         name: 'New York',
       };
 
@@ -418,7 +420,7 @@ describe('Message Arrival Handling', () => {
 
     it('should auto-clear typing after timeout', async () => {
       jest.useFakeTimers();
-      
+
       const { result } = renderHook(() => useMessages('conv-123'));
 
       await waitFor(() => {
@@ -563,7 +565,7 @@ describe('Message Arrival Handling', () => {
 
       const totalUnread = conversations.reduce(
         (sum, conv) => sum + conv.unreadCount,
-        0
+        0,
       );
 
       expect(totalUnread).toBe(8);

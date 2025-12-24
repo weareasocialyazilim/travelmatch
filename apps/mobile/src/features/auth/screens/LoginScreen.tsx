@@ -111,6 +111,7 @@ export const LoginScreen: React.FC = () => {
           }) => (
             <View style={styles.inputContainer}>
               <TextInput
+                testID="email-input"
                 style={[styles.input, error && styles.inputError]}
                 placeholder="Email"
                 value={value}
@@ -145,6 +146,7 @@ export const LoginScreen: React.FC = () => {
           }) => (
             <View style={styles.inputContainer}>
               <TextInput
+                testID="password-input"
                 style={[styles.input, error && styles.inputError]}
                 placeholder="Password"
                 value={value}

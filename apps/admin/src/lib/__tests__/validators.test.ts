@@ -22,7 +22,8 @@ import {
   createTaskSchema,
   createReportSchema,
   notificationCampaignSchema,
-  marketingCampaignSchema,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  marketingCampaignSchema as _marketingCampaignSchema,
   resolveDisputeSchema,
 } from '../validators';
 
@@ -73,7 +74,7 @@ describe('Admin Validators', () => {
         loginSchema.parse({
           email: 'admin@travelmatch.com',
           password: 'password123',
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -82,7 +83,7 @@ describe('Admin Validators', () => {
         loginSchema.parse({
           email: 'admin@travelmatch.com',
           password: '',
-        })
+        }),
       ).toThrow();
     });
 
@@ -91,7 +92,7 @@ describe('Admin Validators', () => {
         loginSchema.parse({
           email: 'invalid',
           password: 'password123',
-        })
+        }),
       ).toThrow();
     });
   });
@@ -103,7 +104,7 @@ describe('Admin Validators', () => {
           email: 'admin@travelmatch.com',
           name: 'John Doe',
           role: 'moderator',
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -124,7 +125,7 @@ describe('Admin Validators', () => {
             email: 'admin@travelmatch.com',
             name: 'Test User',
             role,
-          })
+          }),
         ).not.toThrow();
       });
     });
@@ -135,7 +136,7 @@ describe('Admin Validators', () => {
           email: 'admin@travelmatch.com',
           name: 'Test User',
           role: 'invalid_role',
-        })
+        }),
       ).toThrow();
     });
 
@@ -145,7 +146,7 @@ describe('Admin Validators', () => {
           email: 'admin@travelmatch.com',
           name: 'A',
           role: 'moderator',
-        })
+        }),
       ).toThrow();
     });
 
@@ -166,7 +167,7 @@ describe('Admin Validators', () => {
           full_name: 'John Doe',
           status: 'active',
           kyc_status: 'verified',
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -174,38 +175,32 @@ describe('Admin Validators', () => {
       expect(() =>
         updateUserSchema.parse({
           status: 'suspended',
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         updateUserSchema.parse({
           kyc_status: 'pending',
-        })
+        }),
       ).not.toThrow();
     });
 
     it('should accept all valid statuses', () => {
       const statuses = ['active', 'suspended', 'banned', 'pending'];
       statuses.forEach((status) => {
-        expect(() =>
-          updateUserSchema.parse({ status })
-        ).not.toThrow();
+        expect(() => updateUserSchema.parse({ status })).not.toThrow();
       });
     });
 
     it('should accept all valid KYC statuses', () => {
       const kycStatuses = ['not_started', 'pending', 'verified', 'rejected'];
       kycStatuses.forEach((kyc_status) => {
-        expect(() =>
-          updateUserSchema.parse({ kyc_status })
-        ).not.toThrow();
+        expect(() => updateUserSchema.parse({ kyc_status })).not.toThrow();
       });
     });
 
     it('should reject invalid status', () => {
-      expect(() =>
-        updateUserSchema.parse({ status: 'invalid' })
-      ).toThrow();
+      expect(() => updateUserSchema.parse({ status: 'invalid' })).toThrow();
     });
   });
 
@@ -218,7 +213,7 @@ describe('Admin Validators', () => {
           priority: 'high',
           resource_type: 'user',
           resource_id: '550e8400-e29b-41d4-a716-446655440000',
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -241,7 +236,7 @@ describe('Admin Validators', () => {
             priority: 'medium',
             resource_type: 'user',
             resource_id: '550e8400-e29b-41d4-a716-446655440000',
-          })
+          }),
         ).not.toThrow();
       });
     });
@@ -256,7 +251,7 @@ describe('Admin Validators', () => {
             priority,
             resource_type: 'user',
             resource_id: '550e8400-e29b-41d4-a716-446655440000',
-          })
+          }),
         ).not.toThrow();
       });
     });
@@ -269,7 +264,7 @@ describe('Admin Validators', () => {
           priority: 'high',
           resource_type: 'user',
           resource_id: '550e8400-e29b-41d4-a716-446655440000',
-        })
+        }),
       ).toThrow();
     });
 
@@ -281,7 +276,7 @@ describe('Admin Validators', () => {
           priority: 'high',
           resource_type: 'user',
           resource_id: 'not-a-uuid',
-        })
+        }),
       ).toThrow();
     });
 
@@ -307,8 +302,9 @@ describe('Admin Validators', () => {
           reported_id: '550e8400-e29b-41d4-a716-446655440000',
           type: 'harassment',
           reason: 'User is harassing me in messages',
-          description: 'This user has been sending threatening messages repeatedly over the past week.',
-        })
+          description:
+            'This user has been sending threatening messages repeatedly over the past week.',
+        }),
       ).not.toThrow();
     });
 
@@ -330,7 +326,7 @@ describe('Admin Validators', () => {
             type,
             reason: 'Valid reason text here',
             description: 'This is a valid description with enough characters.',
-          })
+          }),
         ).not.toThrow();
       });
     });
@@ -342,7 +338,7 @@ describe('Admin Validators', () => {
           type: 'spam',
           reason: 'Short',
           description: 'This is a valid description with enough characters.',
-        })
+        }),
       ).toThrow();
     });
 
@@ -353,7 +349,7 @@ describe('Admin Validators', () => {
           type: 'spam',
           reason: 'Valid reason text here',
           description: 'Too short',
-        })
+        }),
       ).toThrow();
     });
 
@@ -362,8 +358,12 @@ describe('Admin Validators', () => {
         reported_id: '550e8400-e29b-41d4-a716-446655440000',
         type: 'harassment',
         reason: 'User is harassing me in messages',
-        description: 'This user has been sending threatening messages repeatedly.',
-        evidence: ['https://example.com/screenshot1.png', 'https://example.com/screenshot2.png'],
+        description:
+          'This user has been sending threatening messages repeatedly.',
+        evidence: [
+          'https://example.com/screenshot1.png',
+          'https://example.com/screenshot2.png',
+        ],
       });
       expect(result.evidence).toHaveLength(2);
     });
@@ -379,7 +379,7 @@ describe('Admin Validators', () => {
           target_audience: {
             segments: ['active_users'],
           },
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -392,7 +392,7 @@ describe('Admin Validators', () => {
             message: 'Test notification message content here.',
             type,
             target_audience: {},
-          })
+          }),
         ).not.toThrow();
       });
     });
@@ -404,7 +404,7 @@ describe('Admin Validators', () => {
           message: 'Test notification message content here.',
           type: 'push',
           target_audience: {},
-        })
+        }),
       ).toThrow();
     });
 
@@ -415,7 +415,7 @@ describe('Admin Validators', () => {
           message: 'Test notification message content here.',
           type: 'push',
           target_audience: {},
-        })
+        }),
       ).toThrow();
     });
 
@@ -426,7 +426,7 @@ describe('Admin Validators', () => {
           message: 'Short',
           type: 'push',
           target_audience: {},
-        })
+        }),
       ).toThrow();
     });
 
@@ -437,7 +437,7 @@ describe('Admin Validators', () => {
           message: 'A'.repeat(501),
           type: 'push',
           target_audience: {},
-        })
+        }),
       ).toThrow();
     });
   });
@@ -454,8 +454,9 @@ describe('Admin Validators', () => {
     it('should accept valid dispute resolution data', () => {
       expect(() =>
         resolveDisputeSchema.parse({
-          resolution: 'After reviewing the evidence, we have determined that...',
-        })
+          resolution:
+            'After reviewing the evidence, we have determined that...',
+        }),
       ).not.toThrow();
     });
 
@@ -466,7 +467,7 @@ describe('Admin Validators', () => {
           resolveDisputeSchema.parse({
             resolution: 'The dispute has been reviewed and resolved.',
             action_taken,
-          })
+          }),
         ).not.toThrow();
       });
     });
@@ -475,7 +476,7 @@ describe('Admin Validators', () => {
       expect(() =>
         resolveDisputeSchema.parse({
           resolution: 'Too short',
-        })
+        }),
       ).toThrow();
     });
 

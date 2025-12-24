@@ -1,9 +1,8 @@
 /**
  * Mock for @expo/vector-icons
- * All icon components return a simple View for testing
+ * All icon components return a simple element for testing
  */
 const React = require('react');
-const { View, Text } = require('react-native');
 
 const createIconSetMock = (name) => {
   const IconComponent = ({
@@ -14,14 +13,21 @@ const createIconSetMock = (name) => {
     testID,
     ...props
   }) => {
-    return React.createElement(View, {
+    return React.createElement('RCTIconView', {
       testID: testID || `${name}-icon`,
       style: [{ width: size || 24, height: size || 24 }, style],
       accessibilityLabel: iconName,
+      iconName,
       ...props,
     });
   };
   IconComponent.displayName = name;
+  IconComponent.glyphMap = new Proxy(
+    {},
+    {
+      get: () => true, // Any icon name is valid
+    },
+  );
   return IconComponent;
 };
 

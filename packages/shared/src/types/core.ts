@@ -63,3 +63,42 @@ export interface Place {
   city?: string;
   country?: string;
 }
+
+/**
+ * Moment types
+ */
+export interface MomentLocation {
+  latitude: number;
+  longitude: number;
+  address?: string;
+  city?: string;
+  country?: string;
+  venue_name?: string;
+}
+
+export interface MomentUser {
+  id: string;
+  full_name: string;
+  avatar_url?: string;
+  role?: Role;
+  trust_score?: number;
+}
+
+export interface Moment {
+  id: string;
+  creator_id: string;
+  title: string;
+  description?: string;
+  category?: string;
+  location?: MomentLocation;
+  start_time?: string;
+  end_time?: string;
+  max_participants?: number;
+  current_participants?: number;
+  status: 'draft' | 'active' | 'completed' | 'cancelled';
+  images?: string[];
+  tags?: string[];
+  creator?: MomentUser;
+  created_at: string;
+  updated_at: string;
+}

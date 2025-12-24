@@ -16,9 +16,12 @@ import {
   formatCurrency,
   formatNumber,
   formatPercentage,
-  formatDate,
-  formatDateTime,
-  formatRelativeTime,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  formatDate as _formatDate,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  formatDateTime as _formatDateTime,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  formatRelativeTime as _formatRelativeTime,
   formatFileSize,
   formatPhoneNumber,
   truncate,
@@ -40,7 +43,9 @@ describe('Admin Formatters', () => {
       expect(usdResult.includes('$') || usdResult.includes('US')).toBe(true);
 
       const eurResult = formatCurrency(100, 'EUR');
-      expect(eurResult.includes('\u20AC') || eurResult.includes('EUR')).toBe(true);
+      expect(eurResult.includes('\u20AC') || eurResult.includes('EUR')).toBe(
+        true,
+      );
     });
 
     it('should handle zero amounts', () => {

@@ -116,7 +116,12 @@ export const Input: React.FC<InputProps> = memo(
 
     return (
       <View style={[styles.container, containerStyle]}>
-        {label && <Text style={styles.label}>{label}</Text>}
+        {label && (
+          <Text style={styles.label}>
+            {label}
+            {rest.required && <Text style={styles.required}> *</Text>}
+          </Text>
+        )}
 
         <View
           style={[
@@ -148,6 +153,7 @@ export const Input: React.FC<InputProps> = memo(
             secureTextEntry={isPassword && !showPassword}
             accessibilityLabel={label}
             accessibilityHint={hint}
+            accessibilityRole="none"
           />
 
           {isPassword && (
@@ -171,6 +177,7 @@ export const Input: React.FC<InputProps> = memo(
               onPress={onRightIconPress}
               style={styles.rightIconContainer}
               disabled={!onRightIconPress}
+              testID={rest.testID ? `${rest.testID}-toggle` : undefined}
             >
               <MaterialCommunityIcons
                 name={rightIcon}
@@ -243,6 +250,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
     marginTop: 4,
+  },
+  required: {
+    color: COLORS.error,
+    fontWeight: '600',
   },
 });
 

@@ -231,7 +231,11 @@ export const GenericBottomSheet = forwardRef<
       <>
         {/* Handle */}
         {showHandle && (
-          <View style={styles.handleContainer} {...panResponder.panHandlers}>
+          <View
+            style={styles.handleContainer}
+            {...panResponder.panHandlers}
+            testID={testID ? `${testID}-handle` : 'bottom-sheet-handle'}
+          >
             <View style={styles.handle} />
           </View>
         )}
@@ -254,6 +258,7 @@ export const GenericBottomSheet = forwardRef<
                     onPress={closeSheet}
                     style={styles.closeButton}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    testID={testID ? `${testID}-close-button` : 'close-button'}
                     {...a11yProps.button('Close', 'Close this sheet')}
                   >
                     <MaterialCommunityIcons
@@ -271,6 +276,13 @@ export const GenericBottomSheet = forwardRef<
           style={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          testID={
+            scrollable
+              ? testID
+                ? `${testID}-scroll-view`
+                : 'bottom-sheet-scroll-view'
+              : undefined
+          }
         >
           {children}
         </ContentWrapper>
@@ -296,6 +308,7 @@ export const GenericBottomSheet = forwardRef<
           {/* Backdrop */}
           <TouchableWithoutFeedback onPress={handleBackdropPress}>
             <Animated.View
+              testID={testID ? `${testID}-backdrop` : 'backdrop'}
               style={[styles.backdrop, { opacity: backdropOpacity }]}
             />
           </TouchableWithoutFeedback>
@@ -317,6 +330,11 @@ export const GenericBottomSheet = forwardRef<
               <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
+                testID={
+                  testID
+                    ? `${testID}-keyboard-avoiding`
+                    : 'bottom-sheet-keyboard-avoiding'
+                }
               >
                 {content}
               </KeyboardAvoidingView>
@@ -391,16 +409,30 @@ export const ConfirmationBottomSheet: React.FC<
             ]}
             onPress={onConfirm}
             disabled={loading}
+            testID="confirm-button"
             {...a11yProps.button(confirmText)}
           >
-            <Text
-              style={[
-                confirmStyles.confirmText,
-                confirmDestructive && confirmStyles.destructiveText,
-              ]}
-            >
-              {loading ? 'Loading...' : confirmText}
-            </Text>
+            {loading ? (
+              <View testID="loading-indicator">
+                <Text
+                  style={[
+                    confirmStyles.confirmText,
+                    confirmDestructive && confirmStyles.destructiveText,
+                  ]}
+                >
+                  Loading...
+                </Text>
+              </View>
+            ) : (
+              <Text
+                style={[
+                  confirmStyles.confirmText,
+                  confirmDestructive && confirmStyles.destructiveText,
+                ]}
+              >
+                {confirmText}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -462,6 +494,7 @@ export function SelectionBottomSheet<T = string>({
               }
             }}
             disabled={option.disabled}
+            testID={`option-${String(option.value)}`}
             {...a11yProps.button(
               option.label,
               option.description,
@@ -476,6 +509,7 @@ export function SelectionBottomSheet<T = string>({
                 size={24}
                 color={option.disabled ? COLORS.gray[300] : COLORS.text}
                 style={selectionStyles.optionIcon}
+                testID={`option-icon-${option.icon}`}
               />
             )}
             <View style={selectionStyles.optionContent}>

@@ -22,6 +22,8 @@ module.exports = {
     '^expo-image$': '<rootDir>/__mocks__/expo-image.js',
     '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',
     '^@travelmatch/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',
+    '^@react-native-community/datetimepicker$': '<rootDir>/__mocks__/@react-native-community/datetimepicker.js',
+    '^react-native-svg$': '<rootDir>/__mocks__/react-native-svg.js',
   },
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',

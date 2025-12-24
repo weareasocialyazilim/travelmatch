@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 /**
  * Global Error Boundary Component
@@ -45,7 +46,8 @@ export default function Error({
             Something went wrong!
           </h1>
           <p className="text-muted-foreground">
-            We apologize for the inconvenience. An unexpected error has occurred.
+            We apologize for the inconvenience. An unexpected error has
+            occurred.
           </p>
           {error.digest && (
             <p className="text-xs text-muted-foreground font-mono">
@@ -75,7 +77,7 @@ export default function Error({
             </svg>
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-input bg-background text-foreground font-medium hover:bg-accent hover:text-accent-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
@@ -93,7 +95,7 @@ export default function Error({
               />
             </svg>
             Go home
-          </a>
+          </Link>
         </div>
 
         {/* Help link */}

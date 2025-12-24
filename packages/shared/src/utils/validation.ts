@@ -35,7 +35,8 @@ export const isValidUrl = (url: string): boolean => {
  * UUID validation
  */
 export const isValidUuid = (uuid: string): boolean => {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 };
 
@@ -91,7 +92,7 @@ export const checkPasswordStrength = (password: string): PasswordStrength => {
  * Sanitize string (remove special characters)
  */
 export const sanitizeString = (str: string): string => {
-  return str.replace(/[<>\"']/g, '');
+  return str.replace(/[<>"']/g, '');
 };
 
 /**
@@ -99,28 +100,28 @@ export const sanitizeString = (str: string): string => {
  */
 export const isValidCreditCard = (cardNumber: string): boolean => {
   const digits = cardNumber.replace(/\s/g, '');
-  
+
   if (!/^\d+$/.test(digits)) return false;
   if (digits.length < 13 || digits.length > 19) return false;
-  
+
   let sum = 0;
   let isEven = false;
-  
+
   for (let i = digits.length - 1; i >= 0; i--) {
     const digitStr = digits[i];
     if (!digitStr) continue;
     let digit = parseInt(digitStr, 10);
-    
+
     if (isEven) {
       digit *= 2;
       if (digit > 9) {
         digit -= 9;
       }
     }
-    
+
     sum += digit;
     isEven = !isEven;
   }
-  
+
   return sum % 10 === 0;
 };

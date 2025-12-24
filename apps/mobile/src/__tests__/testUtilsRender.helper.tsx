@@ -8,6 +8,47 @@ import { render, RenderOptions, screen } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { NetworkProvider } from '@/context/NetworkContext';
 
+// Mock Biometric Context for tests
+const MockBiometricContext = createContext({
+  biometricAvailable: false,
+  biometricEnabled: false,
+  biometricType: null as string | null,
+  biometricTypeName: 'Biometric',
+  isLoading: false,
+  enableBiometric: jest.fn(() => Promise.resolve(true)),
+  disableBiometric: jest.fn(() => Promise.resolve()),
+  authenticate: jest.fn(() => Promise.resolve(true)),
+  authenticateForAppLaunch: jest.fn(() => Promise.resolve(true)),
+  authenticateForAction: jest.fn(() => Promise.resolve(true)),
+  refresh: jest.fn(() => Promise.resolve()),
+});
+
+export const useBiometric = () => useContext(MockBiometricContext);
+
+const MockBiometricProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <MockBiometricContext.Provider
+      value={{
+        biometricAvailable: false,
+        biometricEnabled: false,
+        biometricType: null,
+        biometricTypeName: 'Biometric',
+        isLoading: false,
+        enableBiometric: jest.fn(() => Promise.resolve(true)),
+        disableBiometric: jest.fn(() => Promise.resolve()),
+        authenticate: jest.fn(() => Promise.resolve(true)),
+        authenticateForAppLaunch: jest.fn(() => Promise.resolve(true)),
+        authenticateForAction: jest.fn(() => Promise.resolve(true)),
+        refresh: jest.fn(() => Promise.resolve()),
+      }}
+    >
+      {children}
+    </MockBiometricContext.Provider>
+  );
+};
+
 // Mock Toast Context for tests (avoids React Native Animated issues)
 const MockToastContext = createContext({
   showToast: jest.fn(),
@@ -17,13 +58,17 @@ const MockToastContext = createContext({
 
 export const useToast = () => useContext(MockToastContext);
 
-const MockToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const MockToastProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
-    <MockToastContext.Provider value={{
-      showToast: jest.fn(),
-      hideToast: jest.fn(),
-      toast: null,
-    }}>
+    <MockToastContext.Provider
+      value={{
+        showToast: jest.fn(),
+        hideToast: jest.fn(),
+        toast: null,
+      }}
+    >
       {children}
     </MockToastContext.Provider>
   );
@@ -42,17 +87,21 @@ const MockAuthContext = createContext({
 
 export const useAuth = () => useContext(MockAuthContext);
 
-const MockAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const MockAuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
-    <MockAuthContext.Provider value={{
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      login: jest.fn(),
-      logout: jest.fn(),
-      register: jest.fn(),
-      checkAuth: jest.fn(),
-    }}>
+    <MockAuthContext.Provider
+      value={{
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        login: jest.fn(),
+        logout: jest.fn(),
+        register: jest.fn(),
+        checkAuth: jest.fn(),
+      }}
+    >
       {children}
     </MockAuthContext.Provider>
   );
@@ -68,20 +117,20 @@ interface AllTheProvidersProps {
 const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children }) => {
   return (
     <NavigationContainer>
-      <MockAuthProvider>
-        <NetworkProvider>
-          <MockToastProvider>
-            {children}
-          </MockToastProvider>
-        </NetworkProvider>
-      </MockAuthProvider>
+      <MockBiometricProvider>
+        <MockAuthProvider>
+          <NetworkProvider>
+            <MockToastProvider>{children}</MockToastProvider>
+          </NetworkProvider>
+        </MockAuthProvider>
+      </MockBiometricProvider>
     </NavigationContainer>
   );
 };
 
 const customRender = (
   ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
+  options?: Omit<RenderOptions, 'wrapper'>,
 ) => {
   // If the caller passes a `navigation` prop directly to the root component,
   // expose it as a global used by the test navigation mock in jest.setup.
@@ -183,7 +232,8 @@ export const mockFilter = (overrides = {}) => ({
 /**
  * Wait helpers
  */
-export const waitForAsync = () => new Promise(resolve => setTimeout(resolve, 0));
+export const waitForAsync = () =>
+  new Promise((resolve) => setTimeout(resolve, 0));
 
 export const flushPromises = () => new Promise(setImmediate);
 
@@ -203,15 +253,15 @@ export const createMockEvent = (overrides = {}) => ({
 export const waitForCondition = async (
   condition: () => boolean,
   timeout = 5000,
-  interval = 100
+  interval = 100,
 ): Promise<void> => {
   const startTime = Date.now();
-  
+
   while (!condition()) {
     if (Date.now() - startTime > timeout) {
       throw new Error('Timeout waiting for condition');
     }
-    await new Promise(resolve => setTimeout(resolve, interval));
+    await new Promise((resolve) => setTimeout(resolve, interval));
   }
 };
 

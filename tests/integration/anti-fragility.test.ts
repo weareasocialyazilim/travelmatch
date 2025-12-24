@@ -1,9 +1,9 @@
 /**
  * Anti-Fragility Tests
- * 
+ *
  * Tests application resilience against various error scenarios.
  * Each flow must handle at least 10 error scenarios gracefully.
- * 
+ *
  * @module tests/integration/anti-fragility
  */
 
@@ -20,7 +20,9 @@ const mockSupabase = {
     getUser: jest.fn(),
     signInWithPassword: jest.fn(),
     signOut: jest.fn(),
-    onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+    onAuthStateChange: jest.fn(() => ({
+      data: { subscription: { unsubscribe: jest.fn() } },
+    })),
   },
   from: jest.fn(() => ({
     select: jest.fn().mockReturnThis(),
@@ -39,7 +41,7 @@ const mockSupabase = {
   removeChannel: jest.fn(),
 };
 
-vi.mock('@/config/supabase', () => ({
+jest.mock('@/config/supabase', () => ({
   supabase: mockSupabase,
 }));
 
@@ -52,19 +54,23 @@ const originalFetch = global.fetch;
 
 describe('Authentication Flow Anti-Fragility', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   // Error 1: Network timeout during login
   it('should handle network timeout during login', async () => {
     mockSupabase.auth.signInWithPassword.mockImplementation(
-      () => new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Network timeout')), 100)
-      )
+      () =>
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Network timeout')), 100),
+        ),
     );
 
     await expect(
-      mockSupabase.auth.signInWithPassword({ email: 'test@test.com', password: 'password' })
+      mockSupabase.auth.signInWithPassword({
+        email: 'test@test.com',
+        password: 'password',
+      }),
     ).rejects.toThrow('Network timeout');
   });
 
@@ -173,33 +179,42 @@ describe('Authentication Flow Anti-Fragility', () => {
   // Error 9: DNS resolution failure
   it('should handle DNS resolution failure', async () => {
     mockSupabase.auth.signInWithPassword.mockRejectedValue(
-      new Error('getaddrinfo ENOTFOUND')
+      new Error('getaddrinfo ENOTFOUND'),
     );
 
     await expect(
-      mockSupabase.auth.signInWithPassword({ email: 'test@test.com', password: 'password' })
+      mockSupabase.auth.signInWithPassword({
+        email: 'test@test.com',
+        password: 'password',
+      }),
     ).rejects.toThrow('getaddrinfo ENOTFOUND');
   });
 
   // Error 10: SSL/TLS handshake failure
   it('should handle SSL certificate errors', async () => {
     mockSupabase.auth.signInWithPassword.mockRejectedValue(
-      new Error('SSL certificate problem')
+      new Error('SSL certificate problem'),
     );
 
     await expect(
-      mockSupabase.auth.signInWithPassword({ email: 'test@test.com', password: 'password' })
+      mockSupabase.auth.signInWithPassword({
+        email: 'test@test.com',
+        password: 'password',
+      }),
     ).rejects.toThrow('SSL certificate problem');
   });
 
   // Error 11: Connection reset
   it('should handle connection reset', async () => {
     mockSupabase.auth.signInWithPassword.mockRejectedValue(
-      new Error('ECONNRESET')
+      new Error('ECONNRESET'),
     );
 
     await expect(
-      mockSupabase.auth.signInWithPassword({ email: 'test@test.com', password: 'password' })
+      mockSupabase.auth.signInWithPassword({
+        email: 'test@test.com',
+        password: 'password',
+      }),
     ).rejects.toThrow('ECONNRESET');
   });
 });
@@ -217,105 +232,113 @@ describe('Payment Flow Anti-Fragility', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   // Error 1: Card declined
   it('should handle card declined error', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
-      new Error('Your card was declined')
+      new Error('Your card was declined'),
     );
 
     await expect(
-      mockPaymentService.confirmPayment('pi_123', 'pm_123')
+      mockPaymentService.confirmPayment('pi_123', 'pm_123'),
     ).rejects.toThrow('Your card was declined');
   });
 
   // Error 2: Insufficient funds
   it('should handle insufficient funds', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
-      new Error('Insufficient funds')
+      new Error('Insufficient funds'),
     );
 
     await expect(
-      mockPaymentService.confirmPayment('pi_123', 'pm_123')
+      mockPaymentService.confirmPayment('pi_123', 'pm_123'),
     ).rejects.toThrow('Insufficient funds');
   });
 
   // Error 3: Expired card
   it('should handle expired card', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
-      new Error('Your card has expired')
+      new Error('Your card has expired'),
     );
 
     await expect(
-      mockPaymentService.confirmPayment('pi_123', 'pm_123')
+      mockPaymentService.confirmPayment('pi_123', 'pm_123'),
     ).rejects.toThrow('Your card has expired');
   });
 
   // Error 4: Invalid card number
   it('should handle invalid card number', async () => {
     mockPaymentService.createPaymentIntent.mockRejectedValue(
-      new Error('Invalid card number')
+      new Error('Invalid card number'),
     );
 
     await expect(
-      mockPaymentService.createPaymentIntent('moment_123', 1000)
+      mockPaymentService.createPaymentIntent('moment_123', 1000),
     ).rejects.toThrow('Invalid card number');
   });
 
   // Error 5: Processing error (Stripe)
   it('should handle Stripe processing error', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
-      new Error('An error occurred while processing your card')
+      new Error('An error occurred while processing your card'),
     );
 
     await expect(
-      mockPaymentService.confirmPayment('pi_123', 'pm_123')
+      mockPaymentService.confirmPayment('pi_123', 'pm_123'),
     ).rejects.toThrow('An error occurred while processing your card');
   });
 
   // Error 6: Duplicate payment attempt
   it('should handle duplicate payment attempt', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
-      new Error('Payment intent already processed')
+      new Error('Payment intent already processed'),
     );
 
     await expect(
-      mockPaymentService.confirmPayment('pi_123', 'pm_123')
+      mockPaymentService.confirmPayment('pi_123', 'pm_123'),
     ).rejects.toThrow('Payment intent already processed');
   });
 
   // Error 7: Currency not supported
   it('should handle unsupported currency', async () => {
     mockPaymentService.createPaymentIntent.mockRejectedValue(
-      new Error('Currency not supported')
+      new Error('Currency not supported'),
     );
 
     await expect(
-      mockPaymentService.createPaymentIntent('moment_123', 1000)
+      mockPaymentService.createPaymentIntent('moment_123', 1000),
     ).rejects.toThrow('Currency not supported');
   });
 
   // Error 8: Withdrawal limit exceeded
   it('should handle withdrawal limit exceeded', async () => {
     mockPaymentService.withdrawFunds.mockRejectedValue(
-      new Error('Withdrawal limit exceeded')
+      new Error('Withdrawal limit exceeded'),
     );
 
     await expect(
-      mockPaymentService.withdrawFunds({ amount: 100000, bankAccountId: 'ba_123', currency: 'USD' })
+      mockPaymentService.withdrawFunds({
+        amount: 100000,
+        bankAccountId: 'ba_123',
+        currency: 'USD',
+      }),
     ).rejects.toThrow('Withdrawal limit exceeded');
   });
 
   // Error 9: Bank account not verified
   it('should handle unverified bank account', async () => {
     mockPaymentService.withdrawFunds.mockRejectedValue(
-      new Error('Bank account not verified')
+      new Error('Bank account not verified'),
     );
 
     await expect(
-      mockPaymentService.withdrawFunds({ amount: 100, bankAccountId: 'ba_123', currency: 'USD' })
+      mockPaymentService.withdrawFunds({
+        amount: 100,
+        bankAccountId: 'ba_123',
+        currency: 'USD',
+      }),
     ).rejects.toThrow('Bank account not verified');
   });
 
@@ -334,22 +357,22 @@ describe('Payment Flow Anti-Fragility', () => {
   // Error 11: Payment intent timeout
   it('should handle payment intent expiration', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
-      new Error('Payment intent has expired')
+      new Error('Payment intent has expired'),
     );
 
     await expect(
-      mockPaymentService.confirmPayment('pi_123', 'pm_123')
+      mockPaymentService.confirmPayment('pi_123', 'pm_123'),
     ).rejects.toThrow('Payment intent has expired');
   });
 
   // Error 12: Fraud detection block
   it('should handle fraud detection block', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
-      new Error('Payment blocked for suspected fraud')
+      new Error('Payment blocked for suspected fraud'),
     );
 
     await expect(
-      mockPaymentService.confirmPayment('pi_123', 'pm_123')
+      mockPaymentService.confirmPayment('pi_123', 'pm_123'),
     ).rejects.toThrow('Payment blocked for suspected fraud');
   });
 });
@@ -367,74 +390,91 @@ describe('Message Flow Anti-Fragility', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   // Error 1: Message send timeout
   it('should handle message send timeout', async () => {
     mockMessageService.sendMessage.mockImplementation(
-      () => new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 100)
-      )
+      () =>
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timeout')), 100),
+        ),
     );
 
     await expect(
-      mockMessageService.sendMessage({ conversationId: 'conv_123', content: 'Hello' })
+      mockMessageService.sendMessage({
+        conversationId: 'conv_123',
+        content: 'Hello',
+      }),
     ).rejects.toThrow('Request timeout');
   });
 
   // Error 2: Conversation not found
   it('should handle conversation not found', async () => {
     mockMessageService.getMessages.mockRejectedValue(
-      new Error('Conversation not found')
+      new Error('Conversation not found'),
     );
 
     await expect(
-      mockMessageService.getMessages('invalid_conv')
+      mockMessageService.getMessages('invalid_conv'),
     ).rejects.toThrow('Conversation not found');
   });
 
   // Error 3: User blocked
   it('should handle blocked user scenario', async () => {
     mockMessageService.sendMessage.mockRejectedValue(
-      new Error('You cannot send messages to this user')
+      new Error('You cannot send messages to this user'),
     );
 
     await expect(
-      mockMessageService.sendMessage({ conversationId: 'conv_123', content: 'Hello' })
+      mockMessageService.sendMessage({
+        conversationId: 'conv_123',
+        content: 'Hello',
+      }),
     ).rejects.toThrow('You cannot send messages to this user');
   });
 
   // Error 4: Message too long
   it('should handle message length exceeded', async () => {
     mockMessageService.sendMessage.mockRejectedValue(
-      new Error('Message exceeds maximum length')
+      new Error('Message exceeds maximum length'),
     );
 
     await expect(
-      mockMessageService.sendMessage({ conversationId: 'conv_123', content: 'x'.repeat(10001) })
+      mockMessageService.sendMessage({
+        conversationId: 'conv_123',
+        content: 'x'.repeat(10001),
+      }),
     ).rejects.toThrow('Message exceeds maximum length');
   });
 
   // Error 5: Rate limited
   it('should handle message rate limiting', async () => {
     mockMessageService.sendMessage.mockRejectedValue(
-      new Error('Too many messages. Please wait.')
+      new Error('Too many messages. Please wait.'),
     );
 
     await expect(
-      mockMessageService.sendMessage({ conversationId: 'conv_123', content: 'Hello' })
+      mockMessageService.sendMessage({
+        conversationId: 'conv_123',
+        content: 'Hello',
+      }),
     ).rejects.toThrow('Too many messages. Please wait.');
   });
 
   // Error 6: Attachment upload failed
   it('should handle attachment upload failure', async () => {
     mockMessageService.sendMessage.mockRejectedValue(
-      new Error('Failed to upload attachment')
+      new Error('Failed to upload attachment'),
     );
 
     await expect(
-      mockMessageService.sendMessage({ conversationId: 'conv_123', content: '', imageUrl: 'blob:...' })
+      mockMessageService.sendMessage({
+        conversationId: 'conv_123',
+        content: '',
+        imageUrl: 'blob:...',
+      }),
     ).rejects.toThrow('Failed to upload attachment');
   });
 
@@ -451,52 +491,60 @@ describe('Message Flow Anti-Fragility', () => {
 
     const channel = mockSupabase.channel('messages');
     let status = '';
-    channel.subscribe((s: string) => { status = s; });
-    
+    channel.subscribe((s: string) => {
+      status = s;
+    });
+
     expect(status).toBe('CHANNEL_ERROR');
   });
 
   // Error 8: Conversation deleted
   it('should handle deleted conversation', async () => {
     mockMessageService.getMessages.mockRejectedValue(
-      new Error('This conversation has been deleted')
+      new Error('This conversation has been deleted'),
     );
 
     await expect(
-      mockMessageService.getMessages('deleted_conv')
+      mockMessageService.getMessages('deleted_conv'),
     ).rejects.toThrow('This conversation has been deleted');
   });
 
   // Error 9: Unauthorized access
   it('should handle unauthorized conversation access', async () => {
     mockMessageService.getMessages.mockRejectedValue(
-      new Error('You do not have access to this conversation')
+      new Error('You do not have access to this conversation'),
     );
 
     await expect(
-      mockMessageService.getMessages('private_conv')
+      mockMessageService.getMessages('private_conv'),
     ).rejects.toThrow('You do not have access to this conversation');
   });
 
   // Error 10: Server maintenance
   it('should handle server maintenance mode', async () => {
     mockMessageService.sendMessage.mockRejectedValue(
-      new Error('Service temporarily unavailable')
+      new Error('Service temporarily unavailable'),
     );
 
     await expect(
-      mockMessageService.sendMessage({ conversationId: 'conv_123', content: 'Hello' })
+      mockMessageService.sendMessage({
+        conversationId: 'conv_123',
+        content: 'Hello',
+      }),
     ).rejects.toThrow('Service temporarily unavailable');
   });
 
   // Error 11: Invalid message format
   it('should handle invalid message format', async () => {
     mockMessageService.sendMessage.mockRejectedValue(
-      new Error('Invalid message format')
+      new Error('Invalid message format'),
     );
 
     await expect(
-      mockMessageService.sendMessage({ conversationId: 'conv_123', content: null as any })
+      mockMessageService.sendMessage({
+        conversationId: 'conv_123',
+        content: null as any,
+      }),
     ).rejects.toThrow('Invalid message format');
   });
 });
@@ -507,7 +555,7 @@ describe('Message Flow Anti-Fragility', () => {
 
 describe('Data Loading Anti-Fragility', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   // Error 1: Empty response
@@ -523,10 +571,13 @@ describe('Data Loading Anti-Fragility', () => {
 
   // Error 2: Partial data response
   it('should handle partial data', async () => {
-    mockSupabase.from().select().single.mockResolvedValue({
-      data: { id: '123', name: null, email: undefined },
-      error: null,
-    });
+    mockSupabase
+      .from()
+      .select()
+      .single.mockResolvedValue({
+        data: { id: '123', name: null, email: undefined },
+        error: null,
+      });
 
     const result = await mockSupabase.from('users').select('*').single();
     expect(result.data.name).toBeNull();
@@ -535,32 +586,39 @@ describe('Data Loading Anti-Fragility', () => {
 
   // Error 3: Database connection error
   it('should handle database connection error', async () => {
-    mockSupabase.from().select().single.mockRejectedValue(
-      new Error('Could not establish database connection')
-    );
+    mockSupabase
+      .from()
+      .select()
+      .single.mockRejectedValue(
+        new Error('Could not establish database connection'),
+      );
 
     await expect(
-      mockSupabase.from('users').select('*').single()
+      mockSupabase.from('users').select('*').single(),
     ).rejects.toThrow('Could not establish database connection');
   });
 
   // Error 4: Query timeout
   it('should handle query timeout', async () => {
-    mockSupabase.from().select().single.mockRejectedValue(
-      new Error('Query timeout exceeded')
-    );
+    mockSupabase
+      .from()
+      .select()
+      .single.mockRejectedValue(new Error('Query timeout exceeded'));
 
     await expect(
-      mockSupabase.from('moments').select('*').single()
+      mockSupabase.from('moments').select('*').single(),
     ).rejects.toThrow('Query timeout exceeded');
   });
 
   // Error 5: Invalid foreign key
   it('should handle invalid foreign key', async () => {
-    mockSupabase.from().select().single.mockResolvedValue({
-      data: null,
-      error: { code: '23503', message: 'Foreign key violation' },
-    });
+    mockSupabase
+      .from()
+      .select()
+      .single.mockResolvedValue({
+        data: null,
+        error: { code: '23503', message: 'Foreign key violation' },
+      });
 
     const result = await mockSupabase.from('moments').select('*').single();
     expect(result.error.code).toBe('23503');
@@ -568,10 +626,13 @@ describe('Data Loading Anti-Fragility', () => {
 
   // Error 6: Permission denied
   it('should handle RLS policy violation', async () => {
-    mockSupabase.from().select().single.mockResolvedValue({
-      data: null,
-      error: { code: '42501', message: 'Permission denied' },
-    });
+    mockSupabase
+      .from()
+      .select()
+      .single.mockResolvedValue({
+        data: null,
+        error: { code: '42501', message: 'Permission denied' },
+      });
 
     const result = await mockSupabase.from('private_data').select('*').single();
     expect(result.error.code).toBe('42501');
@@ -579,21 +640,25 @@ describe('Data Loading Anti-Fragility', () => {
 
   // Error 7: Malformed query
   it('should handle malformed query', async () => {
-    mockSupabase.from().select().single.mockRejectedValue(
-      new Error('Malformed query syntax')
-    );
+    mockSupabase
+      .from()
+      .select()
+      .single.mockRejectedValue(new Error('Malformed query syntax'));
 
     await expect(
-      mockSupabase.from('users').select('invalid{syntax}').single()
+      mockSupabase.from('users').select('invalid{syntax}').single(),
     ).rejects.toThrow('Malformed query syntax');
   });
 
   // Error 8: Too many rows
   it('should handle result limit exceeded', async () => {
-    mockSupabase.from().select().single.mockResolvedValue({
-      data: null,
-      error: { message: 'Multiple (or no) rows returned' },
-    });
+    mockSupabase
+      .from()
+      .select()
+      .single.mockResolvedValue({
+        data: null,
+        error: { message: 'Multiple (or no) rows returned' },
+      });
 
     const result = await mockSupabase.from('users').select('*').single();
     expect(result.error.message).toContain('rows returned');
@@ -601,34 +666,42 @@ describe('Data Loading Anti-Fragility', () => {
 
   // Error 9: Network interruption
   it('should handle network interruption during query', async () => {
-    mockSupabase.from().select().single.mockRejectedValue(
-      new Error('Network request failed')
-    );
+    mockSupabase
+      .from()
+      .select()
+      .single.mockRejectedValue(new Error('Network request failed'));
 
     await expect(
-      mockSupabase.from('users').select('*').single()
+      mockSupabase.from('users').select('*').single(),
     ).rejects.toThrow('Network request failed');
   });
 
   // Error 10: Schema mismatch
   it('should handle schema version mismatch', async () => {
-    mockSupabase.from().select().single.mockResolvedValue({
-      data: null,
-      error: { message: 'Column does not exist' },
-    });
+    mockSupabase
+      .from()
+      .select()
+      .single.mockResolvedValue({
+        data: null,
+        error: { message: 'Column does not exist' },
+      });
 
-    const result = await mockSupabase.from('users').select('nonexistent_column').single();
+    const result = await mockSupabase
+      .from('users')
+      .select('nonexistent_column')
+      .single();
     expect(result.error.message).toContain('Column does not exist');
   });
 
   // Error 11: Connection pool exhausted
   it('should handle connection pool exhaustion', async () => {
-    mockSupabase.from().select().single.mockRejectedValue(
-      new Error('Connection pool exhausted')
-    );
+    mockSupabase
+      .from()
+      .select()
+      .single.mockRejectedValue(new Error('Connection pool exhausted'));
 
     await expect(
-      mockSupabase.from('users').select('*').single()
+      mockSupabase.from('users').select('*').single(),
     ).rejects.toThrow('Connection pool exhausted');
   });
 });
@@ -646,94 +719,107 @@ describe('File Upload Anti-Fragility', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   // Error 1: File too large
   it('should handle file size exceeded', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('File size exceeds limit (10MB)')
+      new Error('File size exceeds limit (10MB)'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['x'.repeat(20 * 1024 * 1024)]) })
+      mockStorageService.uploadFile({
+        file: new Blob(['x'.repeat(20 * 1024 * 1024)]),
+      }),
     ).rejects.toThrow('File size exceeds limit');
   });
 
   // Error 2: Invalid file type
   it('should handle invalid file type', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('File type not allowed')
+      new Error('File type not allowed'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob([''], { type: 'application/exe' }) })
+      mockStorageService.uploadFile({
+        file: new Blob([''], { type: 'application/exe' }),
+      }),
     ).rejects.toThrow('File type not allowed');
   });
 
   // Error 3: Storage quota exceeded
   it('should handle storage quota exceeded', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('Storage quota exceeded')
+      new Error('Storage quota exceeded'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['data']) })
+      mockStorageService.uploadFile({ file: new Blob(['data']) }),
     ).rejects.toThrow('Storage quota exceeded');
   });
 
   // Error 4: Upload interrupted
   it('should handle upload interruption', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('Upload interrupted')
+      new Error('Upload interrupted'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['data']) })
+      mockStorageService.uploadFile({ file: new Blob(['data']) }),
     ).rejects.toThrow('Upload interrupted');
   });
 
   // Error 5: Invalid filename
   it('should handle invalid filename', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('Invalid filename')
+      new Error('Invalid filename'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['data']), filename: '../../../etc/passwd' })
+      mockStorageService.uploadFile({
+        file: new Blob(['data']),
+        filename: '../../../etc/passwd',
+      }),
     ).rejects.toThrow('Invalid filename');
   });
 
   // Error 6: Bucket not found
   it('should handle bucket not found', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('Bucket not found')
+      new Error('Bucket not found'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['data']), bucket: 'nonexistent' })
+      mockStorageService.uploadFile({
+        file: new Blob(['data']),
+        bucket: 'nonexistent',
+      }),
     ).rejects.toThrow('Bucket not found');
   });
 
   // Error 7: Duplicate file
   it('should handle duplicate file upload', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('File already exists')
+      new Error('File already exists'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['data']), filename: 'existing.jpg' })
+      mockStorageService.uploadFile({
+        file: new Blob(['data']),
+        filename: 'existing.jpg',
+      }),
     ).rejects.toThrow('File already exists');
   });
 
   // Error 8: Corrupt file
   it('should handle corrupt file', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('File appears to be corrupt')
+      new Error('File appears to be corrupt'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['corrupted']) })
+      mockStorageService.uploadFile({ file: new Blob(['corrupted']) }),
     ).rejects.toThrow('File appears to be corrupt');
   });
 
@@ -745,29 +831,31 @@ describe('File Upload Anti-Fragility', () => {
       error: 'CDN sync failed',
     });
 
-    const result = await mockStorageService.uploadFile({ file: new Blob(['data']) });
+    const result = await mockStorageService.uploadFile({
+      file: new Blob(['data']),
+    });
     expect(result.cdnSynced).toBe(false);
   });
 
   // Error 10: Malware detected
   it('should handle malware detection', async () => {
     mockStorageService.uploadFile.mockRejectedValue(
-      new Error('File flagged as potential malware')
+      new Error('File flagged as potential malware'),
     );
 
     await expect(
-      mockStorageService.uploadFile({ file: new Blob(['malicious']) })
+      mockStorageService.uploadFile({ file: new Blob(['malicious']) }),
     ).rejects.toThrow('File flagged as potential malware');
   });
 
   // Error 11: Signed URL generation failure
   it('should handle signed URL generation failure', async () => {
     mockStorageService.getSignedUrl.mockRejectedValue(
-      new Error('Failed to generate signed URL')
+      new Error('Failed to generate signed URL'),
     );
 
     await expect(
-      mockStorageService.getSignedUrl('uploads/file.jpg')
+      mockStorageService.getSignedUrl('uploads/file.jpg'),
     ).rejects.toThrow('Failed to generate signed URL');
   });
 });
@@ -778,7 +866,7 @@ describe('File Upload Anti-Fragility', () => {
 
 describe('Network Resilience Anti-Fragility', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     global.fetch = originalFetch;
   });
 
@@ -788,18 +876,23 @@ describe('Network Resilience Anti-Fragility', () => {
 
   // Error 1: No network connection
   it('should handle offline mode', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network request failed'));
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(new Error('Network request failed'));
 
     await expect(fetch('/api/data')).rejects.toThrow('Network request failed');
   });
 
   // Error 2: Slow network (timeout)
   it('should handle slow network timeout', async () => {
-    global.fetch = jest.fn().mockImplementation(
-      () => new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 100)
-      )
-    );
+    global.fetch = jest
+      .fn()
+      .mockImplementation(
+        () =>
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout')), 100),
+          ),
+      );
 
     await expect(fetch('/api/data')).rejects.toThrow('Timeout');
   });
@@ -842,11 +935,13 @@ describe('Network Resilience Anti-Fragility', () => {
 
   // Error 6: CORS error
   it('should handle CORS error', async () => {
-    global.fetch = jest.fn().mockRejectedValue(
-      new TypeError('Failed to fetch')
-    );
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(new TypeError('Failed to fetch'));
 
-    await expect(fetch('https://other-domain.com/api')).rejects.toThrow('Failed to fetch');
+    await expect(fetch('https://other-domain.com/api')).rejects.toThrow(
+      'Failed to fetch',
+    );
   });
 
   // Error 7: Invalid JSON response
@@ -863,30 +958,42 @@ describe('Network Resilience Anti-Fragility', () => {
   // Error 8: Request aborted
   it('should handle request abort', async () => {
     const controller = new AbortController();
-    global.fetch = jest.fn().mockRejectedValue(new DOMException('Aborted', 'AbortError'));
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(new DOMException('Aborted', 'AbortError'));
 
     controller.abort();
     await expect(
-      fetch('/api/data', { signal: controller.signal })
+      fetch('/api/data', { signal: controller.signal }),
     ).rejects.toThrow('Aborted');
   });
 
   // Error 9: Certificate error
   it('should handle SSL certificate error', async () => {
-    global.fetch = jest.fn().mockRejectedValue(
-      new Error('SSL certificate problem: unable to get local issuer certificate')
-    );
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(
+        new Error(
+          'SSL certificate problem: unable to get local issuer certificate',
+        ),
+      );
 
-    await expect(fetch('https://invalid-cert.com')).rejects.toThrow('SSL certificate');
+    await expect(fetch('https://invalid-cert.com')).rejects.toThrow(
+      'SSL certificate',
+    );
   });
 
   // Error 10: DNS lookup failure
   it('should handle DNS lookup failure', async () => {
-    global.fetch = jest.fn().mockRejectedValue(
-      new Error('getaddrinfo ENOTFOUND nonexistent.domain.com')
-    );
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(
+        new Error('getaddrinfo ENOTFOUND nonexistent.domain.com'),
+      );
 
-    await expect(fetch('https://nonexistent.domain.com')).rejects.toThrow('ENOTFOUND');
+    await expect(fetch('https://nonexistent.domain.com')).rejects.toThrow(
+      'ENOTFOUND',
+    );
   });
 
   // Error 11: Response too large
@@ -917,10 +1024,10 @@ describe('Anti-Fragility Test Summary', () => {
     ];
 
     const totalScenarios = flows.reduce((sum, f) => sum + f.scenarios, 0);
-    
+
     expect(totalScenarios).toBeGreaterThanOrEqual(60);
-    
-    flows.forEach(flow => {
+
+    flows.forEach((flow) => {
       expect(flow.scenarios).toBeGreaterThanOrEqual(10);
     });
   });

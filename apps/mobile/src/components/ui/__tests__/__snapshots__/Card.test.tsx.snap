@@ -2,6 +2,7 @@
 
 exports[`Card Component Snapshots matches snapshot for basic card 1`] = `
 <RCTView
+  ref={null}
   style={
     {
       "backgroundColor": "#FFFFFF",
@@ -20,6 +21,7 @@ exports[`Card Component Snapshots matches snapshot for basic card 1`] = `
   }
 >
   <RCTText
+    ref={null}
     testID="RCTText"
   >
     Basic Card
@@ -32,20 +34,24 @@ exports[`Card Component Snapshots matches snapshot for disabled card 1`] = `
   accessibilityRole="button"
   accessibilityState={
     {
-      "disabled": false,
+      "disabled": true,
     }
   }
   accessible={true}
-  onPress={[MockFunction]}
+  aria-disabled={true}
+  disabled={true}
+  ref={null}
   role="button"
   style={[Function]}
 >
   <RCTView
+    ref={null}
     style={
       {
         "backgroundColor": "#FFFFFF",
         "borderRadius": 16,
         "elevation": 3,
+        "opacity": 0.5,
         "overflow": "hidden",
         "padding": 16,
         "shadowColor": "#000",
@@ -59,6 +65,7 @@ exports[`Card Component Snapshots matches snapshot for disabled card 1`] = `
     }
   >
     <RCTText
+      ref={null}
       testID="RCTText"
     >
       Disabled Card
@@ -72,15 +79,17 @@ exports[`Card Component Snapshots matches snapshot for pressable card 1`] = `
   accessibilityRole="button"
   accessibilityState={
     {
-      "disabled": false,
+      "disabled": undefined,
     }
   }
   accessible={true}
-  onPress={[MockFunction]}
+  onPress={[Function]}
+  ref={null}
   role="button"
   style={[Function]}
 >
   <RCTView
+    ref={null}
     style={
       {
         "backgroundColor": "#FFFFFF",
@@ -99,6 +108,7 @@ exports[`Card Component Snapshots matches snapshot for pressable card 1`] = `
     }
   >
     <RCTText
+      ref={null}
       testID="RCTText"
     >
       Pressable Card

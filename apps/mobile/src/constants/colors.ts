@@ -7,6 +7,7 @@ export const COLORS = {
   primaryLight: '#C4F0D5',
   primaryMuted: 'rgba(166, 229, 193, 0.15)',
   mint: '#A6E5C1',
+  mintLight: '#d1fae5',
   coral: '#FF6F61',
   success: '#28A745',
 

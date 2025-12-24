@@ -2,30 +2,409 @@
  * Type Adapters - API Response Normalizers
  *
  * These functions normalize API responses (snake_case) to canonical types (camelCase)
- * from @travelmatch/shared package.
+ * This file defines extended types for mobile app that are compatible with shared package.
  *
  * @packageDocumentation
  */
 
 import type {
-  User,
-  UserLocation,
-  Gesture,
-  GiftItem,
-  Place,
-  Message,
-  Proof,
-  ProofLocation,
-  Transaction,
-  TransactionParticipant,
-  ProofStory,
-  ProofStoryAuthor,
-  GiverSlot,
-  GiverInfo,
-  Moment,
-  MomentUser,
-  MomentLocation,
+  Role,
+  KYCStatus,
+  ProofType,
+  ProofStatus,
+  TransactionType,
+  TransactionStatus,
 } from '@travelmatch/shared';
+
+// Re-export base types from shared for external use
+export type {
+  Role,
+  KYCStatus,
+  ProofType,
+  ProofStatus,
+  TransactionType,
+  TransactionStatus,
+};
+
+/**
+ * Extended Mobile App Types
+ * These types extend shared package types with additional mobile-specific fields
+ */
+
+export interface UserLocation {
+  latitude: number;
+  longitude: number;
+  address?: string;
+  city?: string;
+  country?: string;
+}
+
+export interface User {
+  id: string;
+  email?: string;
+  full_name?: string;
+  fullName?: string;
+  name?: string;
+  username?: string;
+  age?: number;
+  avatar_url?: string;
+  avatarUrl?: string;
+  phone?: string;
+  phoneNumber?: string;
+  role?: Role;
+  type?: string;
+  kyc_status?: KYCStatus;
+  kycStatus?: KYCStatus;
+  isVerified?: boolean;
+  bio?: string;
+  languages?: string[];
+  interests?: string[];
+  location?: UserLocation | string;
+  member_since?: string;
+  memberSince?: string;
+  total_gifts_given?: number;
+  totalGiftsGiven?: number;
+  total_gifts_received?: number;
+  totalGiftsReceived?: number;
+  trust_score?: number;
+  trustScore?: number;
+  travelDays?: number;
+  visitingUntil?: string;
+  lastActive?: string;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
+}
+
+export interface GiftItem {
+  id: string;
+  placeId?: string;
+  placeName?: string;
+  name: string;
+  title?: string;
+  emoji: string;
+  icon?: string;
+  category: string;
+  type?: 'coffee' | 'ticket' | 'dinner' | 'other';
+  typical_price?: number;
+  typicalPrice?: number;
+  description?: string;
+}
+
+export interface Gesture {
+  id: string;
+  moment_id?: string;
+  momentId?: string;
+  giver_id?: string;
+  giverId?: string;
+  receiver_id?: string;
+  receiverId?: string;
+  item?: GiftItem;
+  amount: number;
+  amountUSD?: number;
+  currency: string;
+  tier?: 'low' | 'mid' | 'high';
+  status: 'pending' | 'completed' | 'refunded';
+  state?: string;
+  message?: string;
+  proof?: {
+    id: string;
+    type: string;
+    mediaUrl?: string;
+    status: string;
+    createdAt?: string;
+  };
+  expiresAt?: string;
+  created_at?: string;
+  createdAt?: string;
+  completed_at?: string;
+  completedAt?: string;
+  updatedAt?: string;
+}
+
+export interface Place {
+  id?: string;
+  name: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  country?: string;
+  distance?: string;
+  logo?: string;
+}
+
+export interface Message {
+  id: string;
+  conversation_id?: string;
+  conversationId?: string;
+  sender_id?: string;
+  senderId?: string;
+  receiver_id?: string;
+  receiverId?: string;
+  text?: string;
+  content: string;
+  attachment_url?: string;
+  attachmentUrl?: string;
+  timestamp?: string | null;
+  isMine?: boolean;
+  read: boolean;
+  proofId?: string;
+  created_at?: string;
+  createdAt?: string;
+}
+
+export interface ProofLocation {
+  latitude: number;
+  longitude: number;
+  lat?: number;
+  lng?: number;
+  address?: string;
+  city?: string;
+  country?: string;
+  name?: string;
+}
+
+export interface Proof {
+  id: string;
+  momentId?: string;
+  moment_id?: string;
+  userId?: string;
+  user_id?: string;
+  type: ProofType | string;
+  title?: string;
+  description?: string;
+  image_urls?: string[];
+  images?: string[];
+  imageUrls?: string[];
+  video?: string;
+  mediaUrl?: string;
+  location?: ProofLocation;
+  status: ProofStatus | string;
+  verification_method?: 'photo' | 'receipt' | 'witness' | 'gps';
+  verificationMethod?: string;
+  verificationStatus?: string;
+  verified_by?: string;
+  verifiedBy?: string;
+  verified_at?: string;
+  verifiedAt?: string;
+  rejection_reason?: string;
+  rejectionReason?: string;
+  aiScore?: number;
+  communityScore?: number;
+  trustScore?: number;
+  metadata?: Record<string, unknown>;
+  created_at?: string | null;
+  createdAt?: string | null;
+  updated_at?: string;
+  updatedAt?: string;
+}
+
+export interface TransactionParticipant {
+  id: string;
+  name: string;
+  avatar?: string;
+  avatar_url?: string;
+  avatarUrl?: string;
+}
+
+export interface Transaction {
+  id: string;
+  transaction_id?: string;
+  transactionId?: string;
+  type: TransactionType | string;
+  status: TransactionStatus | string;
+  amount: number;
+  currency?: string | null;
+  senderId?: string;
+  receiverId?: string;
+  from_user?: TransactionParticipant;
+  fromUser?: TransactionParticipant;
+  to_user?: TransactionParticipant;
+  toUser?: TransactionParticipant;
+  giver?: TransactionParticipant;
+  receiver?: TransactionParticipant;
+  moment_id?: string;
+  momentId?: string;
+  proofId?: string;
+  paymentMethod?: string;
+  description?: string;
+  note?: string;
+  stripePaymentIntentId?: string;
+  stripeTransferId?: string;
+  stripe_payment_intent_id?: string;
+  stripe_transfer_id?: string;
+  metadata?: Record<string, unknown>;
+  created_at?: string | null;
+  createdAt?: string | null;
+  completed_at?: string | null;
+  completedAt?: string | null;
+  failed_at?: string;
+  failedAt?: string;
+  failure_reason?: string;
+  failureReason?: string;
+}
+
+export interface ProofStoryAuthor {
+  id: string;
+  name: string;
+  avatar?: string;
+  avatar_url?: string;
+  avatarUrl?: string;
+  trustScore?: number;
+}
+
+export interface ProofStoryStats {
+  views?: number;
+  likes?: number;
+  comments?: number;
+  shares?: number;
+}
+
+export interface ProofStory {
+  id: string;
+  proof_id?: string;
+  proofId?: string;
+  userId?: string;
+  type?: 'micro-kindness' | 'verified-experience';
+  author?: ProofStoryAuthor;
+  title?: string;
+  description?: string;
+  content?: string;
+  media_url?: string;
+  mediaUrl?: string;
+  media_type?: 'image' | 'video';
+  mediaType?: 'image' | 'video';
+  images?: string[];
+  location?: ProofLocation;
+  stats?: ProofStoryStats;
+  date?: string;
+  expires_at?: string;
+  expiresAt?: string;
+  created_at?: string | null;
+  createdAt?: string | null;
+}
+
+export interface GiverInfo {
+  id: string;
+  name: string;
+  avatar?: string;
+  avatar_url?: string;
+  avatarUrl?: string;
+  amount?: number;
+  message?: string;
+  trustScore?: number;
+}
+
+export interface GiverSlot {
+  id: string;
+  slot_number?: number;
+  slotNumber?: number;
+  position?: number;
+  giver?: GiverInfo;
+  is_filled?: boolean;
+  isFilled?: boolean;
+  amount?: number;
+  amount_contributed?: number;
+  amountContributed?: number;
+  message?: string;
+  timestamp?: string;
+}
+
+export interface MomentLocation {
+  latitude?: number;
+  longitude?: number;
+  address?: string;
+  city?: string;
+  country?: string;
+  venue_name?: string;
+  name?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+}
+
+export interface MomentUser {
+  id: string;
+  full_name?: string;
+  name?: string;
+  avatar_url?: string;
+  avatar?: string;
+  avatarUrl?: string;
+  role?: Role | string;
+  type?: 'traveler' | 'local';
+  trust_score?: number;
+  trustScore?: number;
+  location?: string;
+  travelDays?: number;
+  travel_days?: number;
+  isVerified?: boolean;
+  is_verified?: boolean;
+  visitingUntil?: string;
+  visiting_until?: string;
+}
+
+export interface Moment {
+  id: string;
+  creator_id?: string;
+  creatorId?: string;
+  title: string;
+  description?: string;
+  story?: string;
+  category?: string | { id: string; label: string; emoji: string };
+  location?: MomentLocation;
+  start_time?: string;
+  startTime?: string;
+  startDate?: string;
+  end_time?: string;
+  endTime?: string;
+  endDate?: string;
+  max_participants?: number;
+  maxParticipants?: number;
+  current_participants?: number;
+  currentParticipants?: number;
+  status?:
+    | 'draft'
+    | 'active'
+    | 'completed'
+    | 'cancelled'
+    | 'pending'
+    | 'paused'
+    | 'deleted';
+  images?: string[];
+  image?: string;
+  imageUrl?: string;
+  image_url?: string;
+  tags?: string[];
+  creator?: MomentUser;
+  user?: MomentUser;
+  distance?: string;
+  price?: number;
+  pricePerGuest?: number;
+  price_per_guest?: number;
+  place?: string;
+  availability?: string;
+  giftCount?: number;
+  gift_count?: number;
+  date?: string;
+  completedDate?: string;
+  completed_date?: string;
+  rating?: number;
+  requestCount?: number;
+  request_count?: number;
+  dateRange?: { start: Date; end: Date };
+  date_range?: string | { start?: string; end?: string };
+  isLiked?: boolean;
+  isSaved?: boolean;
+  likesCount?: number;
+  commentsCount?: number;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
+}
 
 /**
  * API response types (snake_case from backend)
@@ -372,11 +751,11 @@ export function normalizeGiftItemFromAPI(apiItem: ApiGiftItem): GiftItem {
     id: apiItem.id,
     placeId: apiItem.place_id ?? apiItem.placeId,
     placeName: apiItem.place_name ?? apiItem.placeName,
-    name: apiItem.name ?? apiItem.title,
+    name: apiItem.name ?? apiItem.title ?? 'Unknown Item',
     title: apiItem.title ?? apiItem.name,
-    emoji: apiItem.emoji,
+    emoji: apiItem.emoji ?? '🎁',
     icon: apiItem.icon,
-    category: apiItem.category,
+    category: apiItem.category ?? 'other',
     type: normalizedType,
     typicalPrice: apiItem.typical_price ?? apiItem.typicalPrice,
     description: apiItem.description,
@@ -396,8 +775,8 @@ export function normalizeGestureFromAPI(apiGesture: ApiGesture): Gesture {
       apiGesture.item && apiGesture.item.id
         ? normalizeGiftItemFromAPI(apiGesture.item as ApiGiftItem)
         : undefined,
-    amount: apiGesture.amount,
-    amountUSD: apiGesture.amount_usd ?? apiGesture.amount,
+    amount: apiGesture.amount ?? 0,
+    amountUSD: apiGesture.amount_usd ?? apiGesture.amount ?? 0,
     currency: apiGesture.currency ?? 'USD',
     tier: apiGesture.tier,
     status: (apiGesture.status ?? apiGesture.state ?? 'pending') as any,
@@ -452,12 +831,12 @@ export function normalizeMessageFromAPI(apiMessage: ApiMessage): Message {
     conversationId: apiMessage.conversation_id,
     senderId: apiMessage.sender_id,
     receiverId: apiMessage.receiver_id,
-    text: apiMessage.text ?? apiMessage.content,
-    content: apiMessage.content ?? apiMessage.text,
+    text: apiMessage.text ?? apiMessage.content ?? '',
+    content: apiMessage.content ?? apiMessage.text ?? '',
     attachmentUrl: apiMessage.attachment_url,
     timestamp: apiMessage.timestamp,
-    isMine: apiMessage.is_mine,
-    read: apiMessage.read,
+    isMine: apiMessage.is_mine ?? false,
+    read: apiMessage.read ?? false,
     proofId: apiMessage.proof_id,
     createdAt: apiMessage.created_at,
   };
@@ -485,8 +864,8 @@ export function normalizeProofLocationFromAPI(
   }
 
   return {
-    latitude: location.latitude ?? location.lat,
-    longitude: location.longitude ?? location.lng,
+    latitude: location.latitude ?? location.lat ?? 0,
+    longitude: location.longitude ?? location.lng ?? 0,
     lat: location.lat ?? location.latitude,
     lng: location.lng ?? location.longitude,
     address: location.address,

@@ -54,7 +54,7 @@ export function useStableCallback<T extends (...args: never[]) => unknown>(
  * }
  */
 export function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
+  const ref = useRef<T | undefined>(undefined);
   useEffect(() => {
     ref.current = value;
   }, [value]);
@@ -108,7 +108,7 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
   callback: T,
   delay: number,
 ): T {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const callbackRef = useRef<T>(callback);
 
   // Keep callback ref up to date
@@ -156,7 +156,7 @@ export function useThrottleCallback<T extends (...args: never[]) => unknown>(
   delay: number,
 ): T {
   const lastRunRef = useRef<number>(0);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const callbackRef = useRef<T>(callback);
 
   // Keep callback ref up to date
@@ -220,14 +220,12 @@ export function useMemoizedCallback<T extends (...args: never[]) => unknown>(
  * @param deps Dependencies to compare
  * @returns Memoized value
  */
-export function useShallowMemo<T>(
-  factory: () => T,
-  deps: DependencyList,
-): T {
-  const prevDepsRef = useRef<DependencyList>();
-  const valueRef = useRef<T>();
+export function useShallowMemo<T>(factory: () => T, deps: DependencyList): T {
+  const prevDepsRef = useRef<DependencyList | undefined>(undefined);
+  const valueRef = useRef<T | undefined>(undefined);
 
-  const depsChanged = !prevDepsRef.current || !shallowEqual(prevDepsRef.current, deps);
+  const depsChanged =
+    !prevDepsRef.current || !shallowEqual(prevDepsRef.current, deps);
 
   if (depsChanged) {
     valueRef.current = factory();
@@ -412,7 +410,7 @@ export function useWhyDidUpdate(
   componentName: string,
   props: Record<string, unknown>,
 ): void {
-  const prevProps = useRef<Record<string, unknown>>();
+  const prevProps = useRef<Record<string, unknown> | undefined>(undefined);
 
   useEffect(() => {
     if (!__DEV__) return;

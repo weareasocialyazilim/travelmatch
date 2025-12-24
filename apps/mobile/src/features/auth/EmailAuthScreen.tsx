@@ -46,13 +46,13 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
     setTimeout(() => {
       setLoading(false);
       // Navigate to verification code screen
-      navigation.navigate('CompleteProfile');
+      navigation.navigate('CompleteProfile', {});
     }, 1500);
   };
 
   const handleSocialLogin = (provider: string) => {
     logger.debug('Social login:', provider);
-    navigation.navigate('CompleteProfile');
+    navigation.navigate('CompleteProfile', {});
   };
 
   return (
@@ -107,7 +107,10 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
           <Controller
             control={control}
             name="email"
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Email address</Text>
                 <TextInput
@@ -121,9 +124,7 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
-                {error && (
-                  <Text style={styles.errorText}>{error.message}</Text>
-                )}
+                {error && <Text style={styles.errorText}>{error.message}</Text>}
               </View>
             )}
           />
@@ -134,7 +135,8 @@ export const EmailAuthScreen: React.FC<EmailAuthScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.continueButton,
-              (!canSubmitForm({ formState }) || loading) && styles.continueButtonDisabled,
+              (!canSubmitForm({ formState }) || loading) &&
+                styles.continueButtonDisabled,
             ]}
             onPress={handleSubmit(handleContinue)}
             disabled={!canSubmitForm({ formState }) || loading}

@@ -1,9 +1,10 @@
 /**
  * Navigation States - Storybook Stories
- * 
+ *
  * Interactive examples of all navigation state variations
  */
 
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
@@ -155,7 +156,9 @@ export const ErrorWithoutRetry = () => (
 
 export const LoadingDefault = () => <LoadingState />;
 
-export const LoadingWithMessage = () => <LoadingState message="Loading trips..." />;
+export const LoadingWithMessage = () => (
+  <LoadingState message="Loading trips..." />
+);
 
 export const LoadingSmall = () => (
   <View style={styles.smallLoadingContainer}>
@@ -170,7 +173,9 @@ export const LoadingWithoutMessage = () => <LoadingState message="" />;
 // ============================================================================
 
 export const RealWorldExample = () => {
-  const [state, setState] = React.useState<'loading' | 'empty' | 'error' | 'offline' | 'content'>('loading');
+  const [state, setState] = React.useState<
+    'loading' | 'empty' | 'error' | 'offline' | 'content'
+  >('loading');
 
   React.useEffect(() => {
     // Simulate loading

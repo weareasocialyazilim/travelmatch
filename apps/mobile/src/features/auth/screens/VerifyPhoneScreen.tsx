@@ -13,7 +13,7 @@ import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 import { LoadingState } from '@/components/LoadingState';
 import { useToast } from '@/context/ToastContext';
-import supabaseAuthService from '@/services/supabaseAuthService';
+import { twilioClient } from '@/services/twilioService';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -55,15 +55,15 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
   const sendSmsCode = async () => {
     setLoading(true);
     try {
-      const result = await supabaseAuthService.signInWithPhone(phone);
+      const result = await twilioClient.sendPhoneOtp(phone);
 
-      if (!result.error) {
+      if (result.success) {
         setResendCooldown(RESEND_COOLDOWN);
         showToast('Verification code sent to your phone', 'success');
         // Focus first input after SMS sent
         setTimeout(() => inputRefs.current[0]?.focus(), 500);
       } else {
-        showToast(result.error?.message || 'Failed to send SMS', 'error');
+        showToast(result.error || 'Failed to send SMS', 'error');
       }
     } catch (error) {
       logger.error('Send SMS error:', error);
@@ -115,12 +115,9 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
 
     setLoading(true);
     try {
-      const result = await supabaseAuthService.verifyPhoneOtp(
-        phone,
-        codeToVerify,
-      );
+      const result = await twilioClient.verifyPhoneOtp(phone, codeToVerify);
 
-      if (!result.error) {
+      if (result.success && result.valid) {
         showToast('Phone verified successfully!', 'success');
         // Navigate to complete profile
         navigation.navigate('CompleteProfile', {
@@ -129,10 +126,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
           fullName,
         });
       } else {
-        showToast(
-          result.error?.message || 'Invalid verification code',
-          'error',
-        );
+        showToast(result.error || 'Invalid verification code', 'error');
         // Clear the code
         setCode(Array(CODE_LENGTH).fill(''));
         inputRefs.current[0]?.focus();

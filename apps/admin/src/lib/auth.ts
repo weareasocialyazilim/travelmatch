@@ -23,10 +23,14 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     }
 
     const supabase = createServiceClient();
-    const sessionHash = crypto.createHash('sha256').update(sessionToken).digest('hex');
+    const sessionHash = crypto
+      .createHash('sha256')
+      .update(sessionToken)
+      .digest('hex');
 
     // Find session
-    const { data: session, error: sessionError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: session, error: sessionError } = await (supabase as any)
       .from('admin_sessions')
       .select('*, admin:admin_users(*)')
       .eq('token_hash', sessionHash)
@@ -38,7 +42,8 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     }
 
     // Get permissions
-    const { data: permissions } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: permissions } = await (supabase as any)
       .from('role_permissions')
       .select('resource, action')
       .eq('role', session.admin.role);
@@ -62,7 +67,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
 export function hasPermission(
   session: AdminSession,
   resource: string,
-  action: string
+  action: string,
 ): boolean {
   // Super admins have all permissions
   if (session.admin.role === 'super_admin') {
@@ -70,7 +75,7 @@ export function hasPermission(
   }
 
   return session.permissions.some(
-    (p) => p.resource === resource && p.action === action
+    (p) => p.resource === resource && p.action === action,
   );
 }
 
@@ -82,11 +87,12 @@ export async function createAuditLog(
   oldValue?: unknown,
   newValue?: unknown,
   ipAddress?: string,
-  userAgent?: string
+  userAgent?: string,
 ): Promise<void> {
   try {
     const supabase = createServiceClient();
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('audit_logs').insert({
       admin_id: adminId,
       action,
       resource_type: resourceType,

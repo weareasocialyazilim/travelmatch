@@ -13,7 +13,9 @@ import * as SecureStore from 'expo-secure-store';
 const isSecureStoreAvailable = async (): Promise<boolean> => {
   if (Platform.OS === 'web') return false;
   // Use promise-catch to avoid a try/catch wrapper flagged by lint rules
-  return SecureStore.isAvailableAsync().then(Boolean).catch(() => false);
+  return SecureStore.isAvailableAsync()
+    .then(Boolean)
+    .catch(() => false);
 };
 
 /**
@@ -30,13 +32,13 @@ export const secureStorage = {
       try {
         await SecureStore.setItemAsync(key, value);
         return;
-        } catch (err) {
-          void err;
-          // Try AsyncStorage as a fallback when SecureStore fails
-          // Let AsyncStorage errors propagate to the caller (no need to rethrow)
-          await AsyncStorage.setItem(`@secure_${key}`, value);
-          return;
-        }
+      } catch (err) {
+        void err;
+        // Try AsyncStorage as a fallback when SecureStore fails
+        // Let AsyncStorage errors propagate to the caller (no need to rethrow)
+        await AsyncStorage.setItem(`@secure_${key}`, value);
+        return;
+      }
     }
 
     // When SecureStore not available (web or unavailable), use AsyncStorage first
@@ -112,11 +114,11 @@ export const secureStorage = {
 
 /**
  * Storage keys classification for GDPR and security compliance
- * 
+ *
  * NOTE: These are KEY NAMES (identifiers), not actual secrets.
  * The actual sensitive data is stored encrypted in SecureStore.
  * Key names are intentionally descriptive for debugging/logging.
- * 
+ *
  * @security These constants define WHERE to store data, not the data itself.
  * @snyk-ignore CWE-547 - These are storage key identifiers, not secrets
  */
@@ -159,18 +161,21 @@ export const StorageKeys = {
  * @deprecated Use StorageKeys.SECURE instead
  * @security These are KEY NAMES for AsyncStorage, not actual secrets.
  * Legacy keys kept for migration purposes only.
- * 
- * deepcode ignore HardcodedNonCryptoSecret: These are storage key identifiers/names, not actual secret values
- * snyk:ignore CWE-547
+ * The strings below are storage key identifiers (like 'auth_access_token'),
+ * NOT the actual secret values stored at those keys.
  */
-const legacyKey = (name: string) => name;
+// Helper to make key names explicit
+const createStorageKeyName = (keyName: string): string => keyName;
+
+// snyk-ignore:javascript/HardcodedNonCryptoSecret - These are storage KEY IDENTIFIERS, not secret values
+// deepcode ignore HardcodedNonCryptoSecret: Storage key names only
 export const AUTH_STORAGE_KEYS = {
-  // deepcode ignore HardcodedNonCryptoSecret: Storage key name, not a secret
-  ACCESS_TOKEN: legacyKey('auth_access_token'), // Key name for migration
-  REFRESH_TOKEN: legacyKey('auth_refresh_token'), // Key name for migration
-  TOKEN_EXPIRES_AT: legacyKey('auth_token_expires'),
-  USER: legacyKey('@auth_user'),
-};
+  // These are key NAMES used to store/retrieve values, not the values themselves
+  ACCESS_TOKEN: createStorageKeyName('auth_access_token'),
+  REFRESH_TOKEN: createStorageKeyName('auth_refresh_token'),
+  TOKEN_EXPIRES_AT: createStorageKeyName('auth_token_expires'),
+  USER: createStorageKeyName('@auth_user'),
+} as const;
 
 /**
  * Migration helper - moves data from old AsyncStorage keys to new secure keys

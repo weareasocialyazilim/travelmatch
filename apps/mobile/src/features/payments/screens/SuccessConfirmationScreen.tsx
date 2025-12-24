@@ -18,7 +18,7 @@ export const SuccessConfirmationScreen: React.FC = () => {
 
   const handleStartOnboarding = () => {
     // Navigate to CompleteProfile or first onboarding step
-    navigation.navigate('CompleteProfile');
+    navigation.navigate('CompleteProfile', {});
   };
 
   return (

@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Button } from '../button';
 
@@ -5,7 +6,9 @@ describe('Button', () => {
   describe('Rendering', () => {
     it('renders children correctly', () => {
       render(<Button>Click me</Button>);
-      expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /click me/i }),
+      ).toBeInTheDocument();
     });
 
     it('applies default variant and size', () => {
@@ -86,7 +89,7 @@ describe('Button', () => {
       render(
         <Button onClick={handleClick} disabled>
           Disabled
-        </Button>
+        </Button>,
       );
 
       fireEvent.click(screen.getByRole('button'));
@@ -114,7 +117,7 @@ describe('Button', () => {
       render(
         <Button onClick={handleClick} loading>
           Loading
-        </Button>
+        </Button>,
       );
 
       fireEvent.click(screen.getByRole('button'));
@@ -145,7 +148,7 @@ describe('Button', () => {
       render(
         <Button asChild>
           <a href="/test">Link Button</a>
-        </Button>
+        </Button>,
       );
       const link = screen.getByRole('link', { name: /link button/i });
       expect(link).toBeInTheDocument();

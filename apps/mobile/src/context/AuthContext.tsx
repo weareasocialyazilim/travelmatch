@@ -33,7 +33,11 @@ import React, {
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '../services/supabaseAuthService';
-import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '../utils/secureStorage';
+import {
+  secureStorage,
+  AUTH_STORAGE_KEYS,
+  StorageKeys,
+} from '../utils/secureStorage';
 import { logger } from '../utils/logger';
 import type { User, KYCStatus, Role } from '../types/index';
 
@@ -100,10 +104,10 @@ interface RegisterData {
   password: string;
   /** User's display name */
   name: string;
-  /** User's gender */
-  gender: Gender;
-  /** User's date of birth */
-  dateOfBirth: Date;
+  /** User's gender (optional during initial registration) */
+  gender?: Gender;
+  /** User's date of birth (optional during initial registration) */
+  dateOfBirth?: Date;
 }
 
 /**
@@ -398,7 +402,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       } = await authService.signUpWithEmail(data.email, data.password, {
         name: data.name,
         gender: data.gender,
-        date_of_birth: data.dateOfBirth.toISOString().split('T')[0], // YYYY-MM-DD format
+        date_of_birth: data.dateOfBirth?.toISOString().split('T')[0], // YYYY-MM-DD format
       });
 
       if (error) throw error;
@@ -517,7 +521,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const newUser = createUser({
         id: authUser.id,
         email: authUser.email || '',
-        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
+        name:
+          authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
         avatar: authUser.user_metadata?.avatar_url,
       });
 

@@ -45,13 +45,13 @@ export interface ConnectionHealth {
   connectionQuality: 'excellent' | 'good' | 'fair' | 'poor';
 }
 
-type PostgresChangeHandler<T = Record<string, unknown>> = (
-  payload: RealtimePostgresChangesPayload<T>
-) => void;
+type PostgresChangeHandler<
+  T extends { [key: string]: unknown } = { [key: string]: unknown },
+> = (payload: RealtimePostgresChangesPayload<T>) => void;
 
 type PresenceHandler = (
   event: 'sync' | 'join' | 'leave',
-  payload: unknown
+  payload: unknown,
 ) => void;
 
 type BroadcastHandler = (payload: { event: string; payload: unknown }) => void;
@@ -101,7 +101,9 @@ class RealtimeChannelManager {
    * Get or create a channel for postgres_changes subscriptions
    * Multiplexes listeners on the same channel
    */
-  subscribeToTable<T extends Record<string, unknown> = Record<string, unknown>>(
+  subscribeToTable<
+    T extends { [key: string]: unknown } = { [key: string]: unknown },
+  >(
     table: string,
     options: {
       event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
@@ -111,7 +113,7 @@ class RealtimeChannelManager {
       onUpdate?: (payload: RealtimePostgresChangesPayload<T>) => void;
       onDelete?: (payload: RealtimePostgresChangesPayload<T>) => void;
       onChange?: (payload: RealtimePostgresChangesPayload<T>) => void;
-    }
+    },
   ): () => void {
     const channelName = this.getChannelName(table, options.filter);
     const listenerId = this.generateListenerId();
@@ -137,7 +139,11 @@ class RealtimeChannelManager {
         // Track latency
         this.recordLatency(channelName, Date.now() - startTime);
       } catch (error) {
-        logger.error('RealtimeChannelManager', `Handler error: ${table}`, error);
+        logger.error(
+          'RealtimeChannelManager',
+          `Handler error: ${table}`,
+          error,
+        );
         this.incrementErrorCount(channelName);
       }
     };
@@ -183,9 +189,17 @@ class RealtimeChannelManager {
     options: {
       presenceKey: string;
       onSync?: (state: Record<string, unknown[]>) => void;
-      onJoin?: (key: string, currentPresences: unknown[], newPresences: unknown[]) => void;
-      onLeave?: (key: string, currentPresences: unknown[], leftPresences: unknown[]) => void;
-    }
+      onJoin?: (
+        key: string,
+        currentPresences: unknown[],
+        newPresences: unknown[],
+      ) => void;
+      onLeave?: (
+        key: string,
+        currentPresences: unknown[],
+        leftPresences: unknown[],
+      ) => void;
+    },
   ): () => void {
     const listenerId = this.generateListenerId();
     const fullChannelName = `presence:${channelName}`;
@@ -206,12 +220,28 @@ class RealtimeChannelManager {
           options.onSync?.(managedChannel!.channel?.presenceState() || {});
           break;
         case 'join':
-          const joinPayload = payload as { key: string; currentPresences: unknown[]; newPresences: unknown[] };
-          options.onJoin?.(joinPayload.key, joinPayload.currentPresences, joinPayload.newPresences);
+          const joinPayload = payload as {
+            key: string;
+            currentPresences: unknown[];
+            newPresences: unknown[];
+          };
+          options.onJoin?.(
+            joinPayload.key,
+            joinPayload.currentPresences,
+            joinPayload.newPresences,
+          );
           break;
         case 'leave':
-          const leavePayload = payload as { key: string; currentPresences: unknown[]; leftPresences: unknown[] };
-          options.onLeave?.(leavePayload.key, leavePayload.currentPresences, leavePayload.leftPresences);
+          const leavePayload = payload as {
+            key: string;
+            currentPresences: unknown[];
+            leftPresences: unknown[];
+          };
+          options.onLeave?.(
+            leavePayload.key,
+            leavePayload.currentPresences,
+            leavePayload.leftPresences,
+          );
           break;
       }
     };
@@ -241,7 +271,7 @@ class RealtimeChannelManager {
     options: {
       events: string[];
       onMessage: (event: string, payload: unknown) => void;
-    }
+    },
   ): () => void {
     const listenerId = this.generateListenerId();
     const fullChannelName = `broadcast:${channelName}`;
@@ -294,7 +324,7 @@ class RealtimeChannelManager {
     } else {
       logger.warn(
         'RealtimeChannelManager',
-        `Cannot broadcast to disconnected channel: ${fullChannelName}`
+        `Cannot broadcast to disconnected channel: ${fullChannelName}`,
       );
     }
   }
@@ -304,7 +334,7 @@ class RealtimeChannelManager {
    */
   async trackPresence(
     channelName: string,
-    presenceData: Record<string, unknown>
+    presenceData: Record<string, unknown>,
   ): Promise<void> {
     const fullChannelName = `presence:${channelName}`;
     const managedChannel = this.channels.get(fullChannelName);
@@ -319,11 +349,11 @@ class RealtimeChannelManager {
    */
   getConnectionHealth(): ConnectionHealth {
     const activeChannels = Array.from(this.channels.values()).filter(
-      (c) => c.status === 'connected'
+      (c) => c.status === 'connected',
     );
 
     const allLatencies = activeChannels.flatMap(
-      (c) => c.metrics.latencyMs.slice(-10) // Last 10 latency readings
+      (c) => c.metrics.latencyMs.slice(-10), // Last 10 latency readings
     );
 
     const averageLatencyMs =
@@ -333,7 +363,7 @@ class RealtimeChannelManager {
 
     const totalListeners = activeChannels.reduce(
       (sum, c) => sum + c.listeners.size,
-      0
+      0,
     );
 
     // Determine connection quality
@@ -403,7 +433,10 @@ class RealtimeChannelManager {
     const managedChannel = this.channels.get(channelName);
     if (!managedChannel) return;
 
-    logger.info('RealtimeChannelManager', `Reconnecting channel: ${channelName}`);
+    logger.info(
+      'RealtimeChannelManager',
+      `Reconnecting channel: ${channelName}`,
+    );
 
     if (managedChannel.channel) {
       await supabase.removeChannel(managedChannel.channel);
@@ -418,10 +451,7 @@ class RealtimeChannelManager {
 
   // Private methods
 
-  private createChannel(
-    name: string,
-    config: ChannelConfig
-  ): ManagedChannel {
+  private createChannel(name: string, config: ChannelConfig): ManagedChannel {
     const managedChannel: ManagedChannel = {
       name,
       channel: null,
@@ -458,7 +488,7 @@ class RealtimeChannelManager {
     logger.info(
       'RealtimeChannelManager',
       `Connecting to channel: ${channelName}`,
-      { table, filter }
+      { table, filter },
     );
 
     const channel = supabase.channel(channelName);
@@ -486,12 +516,12 @@ class RealtimeChannelManager {
                 logger.error(
                   'RealtimeChannelManager',
                   `Listener error: ${listener.id}`,
-                  error
+                  error,
                 );
               }
             }
           }
-        }
+        },
       );
     }
 
@@ -504,7 +534,7 @@ class RealtimeChannelManager {
 
   private connectPresenceChannel(
     channelName: string,
-    presenceKey: string
+    presenceKey: string,
   ): void {
     const managedChannel = this.channels.get(channelName);
     if (!managedChannel || managedChannel.status === 'connecting') return;
@@ -524,28 +554,36 @@ class RealtimeChannelManager {
           }
         }
       })
-      .on('presence', { event: 'join' }, ({ key, currentPresences, newPresences }) => {
-        for (const listener of managedChannel.listeners.values()) {
-          if (listener.type === 'presence') {
-            (listener.handler as PresenceHandler)('join', {
-              key,
-              currentPresences,
-              newPresences,
-            });
+      .on(
+        'presence',
+        { event: 'join' },
+        ({ key, currentPresences, newPresences }) => {
+          for (const listener of managedChannel.listeners.values()) {
+            if (listener.type === 'presence') {
+              (listener.handler as PresenceHandler)('join', {
+                key,
+                currentPresences,
+                newPresences,
+              });
+            }
           }
-        }
-      })
-      .on('presence', { event: 'leave' }, ({ key, currentPresences, leftPresences }) => {
-        for (const listener of managedChannel.listeners.values()) {
-          if (listener.type === 'presence') {
-            (listener.handler as PresenceHandler)('leave', {
-              key,
-              currentPresences,
-              leftPresences,
-            });
+        },
+      )
+      .on(
+        'presence',
+        { event: 'leave' },
+        ({ key, currentPresences, leftPresences }) => {
+          for (const listener of managedChannel.listeners.values()) {
+            if (listener.type === 'presence') {
+              (listener.handler as PresenceHandler)('leave', {
+                key,
+                currentPresences,
+                leftPresences,
+              });
+            }
           }
-        }
-      })
+        },
+      )
       .subscribe((status) => {
         this.handleChannelStatus(channelName, status);
       });
@@ -553,10 +591,7 @@ class RealtimeChannelManager {
     managedChannel.channel = channel;
   }
 
-  private connectBroadcastChannel(
-    channelName: string,
-    events: string[]
-  ): void {
+  private connectBroadcastChannel(channelName: string, events: string[]): void {
     const managedChannel = this.channels.get(channelName);
     if (!managedChannel || managedChannel.status === 'connecting') return;
 
@@ -582,7 +617,7 @@ class RealtimeChannelManager {
               logger.error(
                 'RealtimeChannelManager',
                 `Broadcast handler error: ${listener.id}`,
-                error
+                error,
               );
             }
           }
@@ -599,7 +634,7 @@ class RealtimeChannelManager {
 
   private handleChannelStatus(
     channelName: string,
-    status: REALTIME_SUBSCRIBE_STATES
+    status: REALTIME_SUBSCRIBE_STATES,
   ): void {
     const managedChannel = this.channels.get(channelName);
     if (!managedChannel) return;
@@ -612,7 +647,7 @@ class RealtimeChannelManager {
         managedChannel.metrics.reconnectAttempts = 0;
         logger.info(
           'RealtimeChannelManager',
-          `Channel connected: ${channelName}`
+          `Channel connected: ${channelName}`,
         );
         break;
 
@@ -620,10 +655,7 @@ class RealtimeChannelManager {
         managedChannel.status = 'error';
         managedChannel.metrics.status = 'error';
         managedChannel.metrics.errorCount++;
-        logger.error(
-          'RealtimeChannelManager',
-          `Channel error: ${channelName}`
-        );
+        logger.error('RealtimeChannelManager', `Channel error: ${channelName}`);
         break;
 
       case 'TIMED_OUT':
@@ -632,7 +664,7 @@ class RealtimeChannelManager {
         managedChannel.metrics.disconnectedAt = new Date();
         logger.warn(
           'RealtimeChannelManager',
-          `Channel timed out: ${channelName}`
+          `Channel timed out: ${channelName}`,
         );
         break;
 
@@ -640,10 +672,7 @@ class RealtimeChannelManager {
         managedChannel.status = 'disconnected';
         managedChannel.metrics.status = 'disconnected';
         managedChannel.metrics.disconnectedAt = new Date();
-        logger.info(
-          'RealtimeChannelManager',
-          `Channel closed: ${channelName}`
-        );
+        logger.info('RealtimeChannelManager', `Channel closed: ${channelName}`);
         break;
     }
 
@@ -662,7 +691,7 @@ class RealtimeChannelManager {
     if (managedChannel.listeners.size === 0) {
       logger.info(
         'RealtimeChannelManager',
-        `No listeners, disconnecting: ${channelName}`
+        `No listeners, disconnecting: ${channelName}`,
       );
       this.disconnectChannel(channelName);
     }
@@ -730,11 +759,7 @@ class RealtimeChannelManager {
       try {
         callback(health);
       } catch (error) {
-        logger.error(
-          'RealtimeChannelManager',
-          'Health listener error',
-          error
-        );
+        logger.error('RealtimeChannelManager', 'Health listener error', error);
       }
     }
   }

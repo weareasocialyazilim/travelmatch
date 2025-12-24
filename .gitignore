@@ -106,3 +106,6 @@ out/
 apps/**/package-lock.json
 apps/**/yarn.lock
 apps/**/pnpm-lock.yaml
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md

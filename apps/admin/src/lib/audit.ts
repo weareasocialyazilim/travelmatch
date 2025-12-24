@@ -17,12 +17,13 @@ export async function logAuditAction(
   metadata?: {
     ip_address?: string;
     user_agent?: string;
-  }
+  },
 ): Promise<void> {
   const supabase = getClient();
 
   try {
-    await supabase.from('audit_logs').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('audit_logs').insert({
       admin_id: adminId,
       action: entry.action,
       resource_type: entry.resource_type,
@@ -99,12 +100,15 @@ export type AuditAction = (typeof AuditActions)[keyof typeof AuditActions];
  */
 export function withAudit<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
-  getAuditEntry: (args: Parameters<T>, result: Awaited<ReturnType<T>>) => AuditLogEntry
+  _getAuditEntry: (
+    args: Parameters<T>,
+    result: Awaited<ReturnType<T>>,
+  ) => AuditLogEntry,
 ): T {
   return (async (...args: Parameters<T>) => {
     const result = await fn(...args);
     // In a real implementation, you'd get adminId from context
-    // logAuditAction(adminId, getAuditEntry(args, result));
+    // logAuditAction(adminId, _getAuditEntry(args, result));
     return result;
   }) as T;
 }

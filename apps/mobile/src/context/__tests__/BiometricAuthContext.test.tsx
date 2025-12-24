@@ -1,6 +1,6 @@
 /**
  * BiometricAuthContext - Comprehensive Tests
- * 
+ *
  * Tests for biometric authentication:
  * - Biometric availability detection
  * - Enable/disable biometric
@@ -9,6 +9,9 @@
  * - Multiple authentication types
  * - Context provider and hook
  */
+
+// Unmock the context for this test file - we need the real implementation
+jest.unmock('@/context/BiometricAuthContext');
 
 import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react-native';
@@ -45,8 +48,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockBiometricAuth = biometricAuth ;
-const mockLogger = logger ;
+const mockBiometricAuth = biometricAuth;
+const mockLogger = logger;
 
 describe('BiometricAuthContext', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -88,7 +91,9 @@ describe('BiometricAuthContext', () => {
       expect(mockBiometricAuth.initialize).toHaveBeenCalled();
       expect(result.current.biometricAvailable).toBe(true);
       expect(result.current.biometricEnabled).toBe(false);
-      expect(result.current.biometricType).toBe(BiometricType.FACIAL_RECOGNITION);
+      expect(result.current.biometricType).toBe(
+        BiometricType.FACIAL_RECOGNITION,
+      );
       expect(result.current.biometricTypeName).toBe('Face ID');
     });
 
@@ -106,7 +111,7 @@ describe('BiometricAuthContext', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'BiometricAuthContext',
         'Failed to initialize',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -196,7 +201,7 @@ describe('BiometricAuthContext', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'BiometricAuthContext',
         'Failed to enable',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -226,7 +231,9 @@ describe('BiometricAuthContext', () => {
       });
 
       // Set up mock to reject after initial setup
-      mockBiometricAuth.disable.mockRejectedValueOnce(new Error('Disable failed'));
+      mockBiometricAuth.disable.mockRejectedValueOnce(
+        new Error('Disable failed'),
+      );
 
       await act(async () => {
         try {
@@ -239,7 +246,7 @@ describe('BiometricAuthContext', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'BiometricAuthContext',
         'Failed to disable',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -256,7 +263,9 @@ describe('BiometricAuthContext', () => {
 
       let authenticated = false;
       await act(async () => {
-        authenticated = await result.current.authenticate('Verify your identity');
+        authenticated = await result.current.authenticate(
+          'Verify your identity',
+        );
       });
 
       expect(authenticated).toBe(true);
@@ -303,7 +312,9 @@ describe('BiometricAuthContext', () => {
     });
 
     it('should handle authentication error', async () => {
-      mockBiometricAuth.authenticate.mockRejectedValue(new Error('Auth failed'));
+      mockBiometricAuth.authenticate.mockRejectedValue(
+        new Error('Auth failed'),
+      );
 
       const { result } = renderHook(() => useBiometric(), { wrapper });
 
@@ -320,7 +331,7 @@ describe('BiometricAuthContext', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'BiometricAuthContext',
         'Authentication failed',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -353,18 +364,20 @@ describe('BiometricAuthContext', () => {
 
       let authenticated = false;
       await act(async () => {
-        authenticated = await result.current.authenticateForAction('Withdraw Funds');
+        authenticated = await result.current.authenticateForAction(
+          'Withdraw Funds',
+        );
       });
 
       expect(authenticated).toBe(true);
-      expect(mockBiometricAuth.authenticateForSensitiveAction).toHaveBeenCalledWith(
-        'Withdraw Funds'
-      );
+      expect(
+        mockBiometricAuth.authenticateForSensitiveAction,
+      ).toHaveBeenCalledWith('Withdraw Funds');
     });
 
     it('should handle app launch authentication failure', async () => {
       mockBiometricAuth.authenticateForAppLaunch.mockRejectedValue(
-        new Error('Launch auth failed')
+        new Error('Launch auth failed'),
       );
 
       const { result } = renderHook(() => useBiometric(), { wrapper });
@@ -382,13 +395,13 @@ describe('BiometricAuthContext', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'BiometricAuthContext',
         'App launch authentication failed',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
     it('should handle sensitive action authentication failure', async () => {
       mockBiometricAuth.authenticateForSensitiveAction.mockRejectedValue(
-        new Error('Action auth failed')
+        new Error('Action auth failed'),
       );
 
       const { result } = renderHook(() => useBiometric(), { wrapper });
@@ -399,14 +412,16 @@ describe('BiometricAuthContext', () => {
 
       let authenticated = false;
       await act(async () => {
-        authenticated = await result.current.authenticateForAction('Make Payment');
+        authenticated = await result.current.authenticateForAction(
+          'Make Payment',
+        );
       });
 
       expect(authenticated).toBe(false);
       expect(mockLogger.error).toHaveBeenCalledWith(
         'BiometricAuthContext',
         'Action authentication failed',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -446,7 +461,9 @@ describe('BiometricAuthContext', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.biometricType).toBe(BiometricType.FACIAL_RECOGNITION);
+      expect(result.current.biometricType).toBe(
+        BiometricType.FACIAL_RECOGNITION,
+      );
       expect(result.current.biometricTypeName).toBe('Face ID');
     });
 
@@ -457,7 +474,9 @@ describe('BiometricAuthContext', () => {
         supportedTypes: [BiometricType.IRIS],
         hasHardware: true,
       });
-      mockBiometricAuth.getBiometricTypeName.mockReturnValue('Iris Recognition');
+      mockBiometricAuth.getBiometricTypeName.mockReturnValue(
+        'Iris Recognition',
+      );
 
       const { result } = renderHook(() => useBiometric(), { wrapper });
 
@@ -503,7 +522,9 @@ describe('BiometricAuthContext', () => {
       });
 
       // After refresh, initialize should be called one more time
-      expect(mockBiometricAuth.initialize).toHaveBeenCalledTimes(initialCallCount + 1);
+      expect(mockBiometricAuth.initialize).toHaveBeenCalledTimes(
+        initialCallCount + 1,
+      );
     });
 
     it('should update state after refresh', async () => {
@@ -563,7 +584,11 @@ describe('BiometricAuthContext', () => {
       const auth2 = result.current.authenticate('Request 2');
       const auth3 = result.current.authenticate('Request 3');
 
-      const [result1, result2, result3] = await Promise.all([auth1, auth2, auth3]);
+      const [result1, result2, result3] = await Promise.all([
+        auth1,
+        auth2,
+        auth3,
+      ]);
 
       expect(result1).toBe(true);
       expect(result2).toBe(true);
