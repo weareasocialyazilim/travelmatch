@@ -1,3 +1,10 @@
+/**
+ * OnboardingScreen - iOS 26.3 Redesigned
+ *
+ * 5-slide onboarding flow introducing TravelMatch gift-moment concept.
+ * Features full-screen imagery, gradient overlays, and animated transitions.
+ * Part of iOS 26.3 design system for TravelMatch.
+ */
 import type {
   StackNavigationProp,
   StackScreenProps,
@@ -9,14 +16,16 @@ import {
   Animated,
   Dimensions,
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 
-const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
   Dimensions.get('window');
 
 interface OnboardingPage {
@@ -24,12 +33,14 @@ interface OnboardingPage {
   title: string;
   description: string;
   image: ImageSourcePropType;
+  gradient: readonly [string, string];
+  icon?: string;
 }
 
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { logger } from '../../../utils/logger';
-import { COLORS } from '@/constants/colors';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { HORIZONTAL_LIST_CONFIG } from '@/utils/listOptimization';
@@ -48,39 +59,54 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const flatListRef = useRef<FlatList>(null);
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
-  
+
   // Animated values for fade-in effect
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  // Dynamic onboarding pages from i18n
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const iconImage = require('../../../../assets/icon.png') as ImageSourcePropType;
-  
+
+  // New 5-slide onboarding flow for gift-moment concept
   const ONBOARDING_PAGES: OnboardingPage[] = [
     {
       id: '1',
-      title: t('onboarding.page1.title'),
-      description: t('onboarding.page1.description'),
-      image: iconImage,
+      title: 'Ya birisi sana bugün\nbir kahve ısmarlasa?',
+      description: 'Yabancılar arasında dostluk kurmanın yeni yolu',
+      image: iconImage, // TODO: Replace with coffee.jpg
+      gradient: GRADIENTS.giftButton,
     },
     {
       id: '2',
-      title: t('onboarding.page2.title'),
-      description: t('onboarding.page2.description'),
-      image: iconImage,
+      title: 'Bir dilek tut 🌟',
+      description: 'İstediğin deneyimi paylaş,\nbiri onu sana hediye etsin',
+      image: iconImage, // TODO: Replace with wish.jpg
+      gradient: GRADIENTS.aurora,
+      icon: 'star-shooting',
     },
     {
       id: '3',
-      title: t('onboarding.page3.title'),
-      description: t('onboarding.page3.description'),
-      image: iconImage,
+      title: 'Birinin gününü\ngüzelleştir 🎁',
+      description: 'Küçük bir hediye, büyük bir mutluluk',
+      image: iconImage, // TODO: Replace with gift.jpg
+      gradient: GRADIENTS.sunset,
+      icon: 'gift',
     },
     {
       id: '4',
-      title: t('onboarding.page4.title'),
-      description: t('onboarding.page4.description'),
-      image: iconImage,
+      title: 'Güvenli kasada,\nmerak etme 🔒',
+      description: 'Paran deneyim gerçekleşene kadar koruma altında',
+      image: iconImage, // TODO: Replace with vault.jpg
+      gradient: GRADIENTS.trust,
+      icon: 'lock-check',
+    },
+    {
+      id: '5',
+      title: 'Hazır mısın?',
+      description: 'Dilekler seni bekliyor',
+      image: iconImage, // TODO: Replace with world.jpg
+      gradient: GRADIENTS.celebration,
+      icon: 'rocket-launch',
     },
   ];
 
@@ -151,7 +177,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   };
 
   const renderPage = ({ item, index }: { item: OnboardingPage; index: number }) => (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.pageContainer,
         {
@@ -160,47 +186,69 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         },
       ]}
     >
-      <View style={styles.imageSection}>
-        <Image source={item.image} style={styles.image} resizeMode="contain" />
-      </View>
-      <View style={styles.textSection}>
+      {/* Full-screen background image */}
+      <Image
+        source={item.image}
+        style={styles.backgroundImage}
+        contentFit="cover"
+      />
+
+      {/* Gradient overlay */}
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.8)']}
+        style={styles.gradientOverlay}
+      />
+
+      {/* Icon (if present) */}
+      {item.icon && (
+        <View style={styles.iconContainer}>
+          <LinearGradient
+            colors={item.gradient}
+            style={styles.iconGradient}
+          >
+            <MaterialCommunityIcons
+              name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+              size={48}
+              color={COLORS.white}
+            />
+          </LinearGradient>
+        </View>
+      )}
+
+      {/* Content */}
+      <View style={styles.contentSection}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
-        
-        {/* Progress indicator text */}
-        <Text style={styles.progressText}>
-          {index + 1} / {ONBOARDING_PAGES.length}
-        </Text>
       </View>
     </Animated.View>
   );
 
+  const isLastPage = currentIndex === ONBOARDING_PAGES.length - 1;
+
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.contentWrapper}>
-        <FlatList<OnboardingPage>
-          ref={flatListRef}
-          data={ONBOARDING_PAGES}
-          renderItem={renderPage}
-          horizontal
-          pagingEnabled
-          bounces={false}
-          keyExtractor={(item) => item.id}
-          onMomentumScrollEnd={(event) => {
-            const index = Math.round(
-              event.nativeEvent.contentOffset.x / SCREEN_WIDTH,
-            );
-            setCurrentIndex(index);
-          }}
-          scrollEnabled={true}
-          style={styles.flatList}
-          {...HORIZONTAL_LIST_CONFIG}
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
+    <View style={styles.container}>
+      <FlatList<OnboardingPage>
+        ref={flatListRef}
+        data={ONBOARDING_PAGES}
+        renderItem={renderPage}
+        horizontal
+        pagingEnabled
+        bounces={false}
+        keyExtractor={(item) => item.id}
+        onMomentumScrollEnd={(event) => {
+          const index = Math.round(
+            event.nativeEvent.contentOffset.x / SCREEN_WIDTH,
+          );
+          setCurrentIndex(index);
+        }}
+        scrollEnabled={true}
+        style={styles.flatList}
+        {...HORIZONTAL_LIST_CONFIG}
+        showsHorizontalScrollIndicator={false}
+      />
 
       {/* Bottom Controls Section */}
-      <View style={styles.bottomSection}>
+      <SafeAreaView style={styles.bottomSection} edges={['bottom']}>
         {/* Pagination Dots */}
         <View style={styles.paginationContainer}>
           {ONBOARDING_PAGES.map((_, index) => (
@@ -208,148 +256,168 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
               key={index}
               style={[
                 styles.dot,
-                index === currentIndex && styles.activeDot,
-                index !== currentIndex && styles.inactiveDot,
+                index === currentIndex ? styles.activeDot : styles.inactiveDot,
               ]}
             />
           ))}
         </View>
 
-        {/* Next Button */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
-            <Text style={styles.nextText}>
-              {currentIndex < ONBOARDING_PAGES.length - 1
-                ? t('onboarding.next')
-                : t('onboarding.getStarted')}
-            </Text>
+        {/* Buttons */}
+        <View style={styles.buttonsRow}>
+          {!isLastPage && (
+            <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+              <Text style={styles.skipText}>Atla</Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity onPress={handleNext} style={styles.nextButtonWrapper}>
+            <LinearGradient
+              colors={ONBOARDING_PAGES[currentIndex].gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.nextButton}
+            >
+              <Text style={styles.nextText}>
+                {isLastPage ? 'Başla' : 'Devam'}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Skip Link */}
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        {/* Explore link on last page */}
+        {isLastPage && (
+          <TouchableOpacity onPress={handleSkip} style={styles.exploreLink}>
+            <Text style={styles.exploreLinkText}>Önce keşfet →</Text>
+          </TouchableOpacity>
+        )}
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  contentWrapper: {
-    flex: 1,
+    backgroundColor: '#000',
   },
   flatList: {
     flex: 1,
   },
   pageContainer: {
     width: SCREEN_WIDTH,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
+    height: SCREEN_HEIGHT,
+    position: 'relative',
   },
-  imageSection: {
-    flex: 1,
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
+    height: '100%',
+  },
+  gradientOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  iconContainer: {
+    position: 'absolute',
+    top: SCREEN_HEIGHT * 0.25,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  iconGradient: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  image: {
-    width: SCREEN_WIDTH * 0.8,
-    height: SCREEN_WIDTH * 0.8,
-  },
-  textSection: {
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: COLORS.text,
-    textAlign: 'center',
-    paddingTop: 24,
-    paddingBottom: 12,
-    letterSpacing: -0.5,
-  },
-  description: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingBottom: 12,
-    paddingTop: 4,
-  },
-  progressText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.primary,
-    textAlign: 'center',
-    marginTop: 16,
-    opacity: 0.7,
-  },
-  bottomSection: {
-    backgroundColor: COLORS.background,
-    paddingBottom: 24,
-    paddingTop: 16,
-    paddingHorizontal: 16,
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-  },
-  dot: {
-    height: 8,
-    borderRadius: 9999,
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    width: 8,
-    backgroundColor: COLORS.primary,
-  },
-  inactiveDot: {
-    width: 8,
-    backgroundColor: COLORS.primary,
-    opacity: 0.2,
-  },
-  buttonContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  nextButton: {
-    height: 56,
-    backgroundColor: COLORS.primary,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    shadowColor: COLORS.primary,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
   },
-  nextText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.text,
-    letterSpacing: 0.5,
+  contentSection: {
+    position: 'absolute',
+    bottom: 220,
+    left: 24,
+    right: 24,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: COLORS.white,
+    marginBottom: 16,
+    lineHeight: 44,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  description: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: 26,
+  },
+  bottomSection: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  dot: {
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    width: 24,
+    backgroundColor: COLORS.white,
+  },
+  inactiveDot: {
+    width: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  buttonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   skipButton: {
-    alignItems: 'center',
-    paddingTop: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
   },
   skipText: {
-    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 16,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+  },
+  nextButtonWrapper: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  nextButton: {
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nextText: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  exploreLink: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  exploreLinkText: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 16,
   },
 });
