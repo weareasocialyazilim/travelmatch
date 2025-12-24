@@ -4,6 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'TravelMatch',
   slug: 'travelmatch',
+  owner: 'travelmatch',
   version: '1.0.0',
   orientation: 'portrait',
   // Custom entry point to fix AppEntry.js resolution in monorepo
@@ -11,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'travelmatch',
-  newArchEnabled: false,
+  newArchEnabled: true,
   splash: {
     image: './assets/splash-icon.png',
     resizeMode: 'contain',
@@ -19,7 +20,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.travelmatch.app',
+    bundleIdentifier: 'com.travelmatch.mobile',
     buildNumber: '1',
     associatedDomains: ['applinks:travelmatch.app'],
     config: {},
