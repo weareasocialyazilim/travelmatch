@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   },
   genderOptionSelected: {
     borderColor: COLORS?.mint || '#10b981',
-    backgroundColor: COLORS?.mintLight || '#d1fae5',
+    backgroundColor: COLORS?.mintBackground || '#d1fae5',
   },
   genderOptionText: {
     fontSize: 14,

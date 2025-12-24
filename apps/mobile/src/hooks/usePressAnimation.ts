@@ -33,11 +33,11 @@ interface UsePressAnimationReturn {
   /** Handler for press out event */
   onPressOut: () => void;
   /** Current scale value */
-  scale: ReturnType<typeof useSharedValue>;
+  scale: ReturnType<typeof useSharedValue<number>>;
 }
 
 export const usePressAnimation = (
-  options: UsePressAnimationOptions = {}
+  options: UsePressAnimationOptions = {},
 ): UsePressAnimationReturn => {
   const {
     scaleAmount = 0.97,
@@ -82,9 +82,7 @@ interface UseBounceAnimationOptions {
   enableHaptics?: boolean;
 }
 
-export const useBounceAnimation = (
-  options: UseBounceAnimationOptions = {}
-) => {
+export const useBounceAnimation = (options: UseBounceAnimationOptions = {}) => {
   const { enableHaptics = true } = options;
 
   const scale = useSharedValue(1);
