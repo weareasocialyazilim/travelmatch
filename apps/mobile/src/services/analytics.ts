@@ -30,9 +30,12 @@ class AnalyticsService {
   /**
    * Initialize PostHog analytics
    * Must be called before any tracking
+   * Uses timeout to prevent blocking app startup on network issues
    */
   public async init() {
     if (this.initialized) return;
+
+    const INIT_TIMEOUT_MS = 5000; // 5 second timeout for initialization
 
     try {
       const apiKey = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
@@ -46,7 +49,8 @@ class AnalyticsService {
         return;
       }
 
-      this.posthog = await PostHog.initAsync(apiKey, {
+      // Wrap PostHog initialization with timeout to prevent blocking app startup
+      const initPromise = PostHog.initAsync(apiKey, {
         host,
         // Automatic event tracking
         captureApplicationLifecycleEvents: true,
@@ -58,11 +62,20 @@ class AnalyticsService {
         flushInterval: 30000, // Every 30 seconds
       });
 
+      const timeoutPromise = new Promise<null>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('PostHog initialization timed out'));
+        }, INIT_TIMEOUT_MS);
+      });
+
+      this.posthog = await Promise.race([initPromise, timeoutPromise]);
+
       this.initialized = true;
       logger.info('[Analytics] PostHog initialized successfully');
     } catch (error) {
-      logger.error('[Analytics] Failed to initialize PostHog:', error);
-      Sentry.captureException(error);
+      logger.warn('[Analytics] PostHog initialization failed or timed out, analytics disabled:', error);
+      // Don't throw - analytics failure shouldn't block app startup
+      // Don't report to Sentry here as it may also be down
     }
   }
 

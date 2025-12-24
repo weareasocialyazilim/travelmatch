@@ -96,7 +96,26 @@ export default Sentry.wrap(function App() {
     useFeedbackPrompt();
 
   useEffect(() => {
+    // Timeout wrapper to prevent app from hanging indefinitely
+    const withTimeout = <T,>(
+      promise: Promise<T>,
+      timeoutMs: number,
+      operationName: string,
+    ): Promise<T | null> => {
+      return Promise.race([
+        promise,
+        new Promise<null>((resolve) => {
+          setTimeout(() => {
+            logger.warn('App', `${operationName} timed out after ${timeoutMs}ms`);
+            resolve(null);
+          }, timeoutMs);
+        }),
+      ]);
+    };
+
     async function prepare() {
+      const INIT_TIMEOUT_MS = 10000; // 10 second timeout for each init step
+
       try {
         // 1. Security Check: Root/Jailbreak Detection (Warning Only)
         const isRooted = await Device.isRootedExperimentalAsync();
@@ -123,14 +142,22 @@ export default Sentry.wrap(function App() {
           );
         }
 
-        // 3. Session: Initialize and validate stored session
-        const sessionState = await sessionManager.initialize();
-        logger.info('App', `Session state: ${sessionState}`);
+        // 3. Session: Initialize and validate stored session (with timeout)
+        const sessionState = await withTimeout(
+          sessionManager.initialize(),
+          INIT_TIMEOUT_MS,
+          'Session initialization',
+        );
+        logger.info('App', `Session state: ${sessionState ?? 'timed out'}`);
 
         // If session is expired, try to refresh automatically
         if (sessionState === 'expired') {
           logger.info('App', 'Attempting automatic session refresh');
-          const isValid = await sessionManager.isSessionValid();
+          const isValid = await withTimeout(
+            sessionManager.isSessionValid(),
+            INIT_TIMEOUT_MS,
+            'Session validation',
+          );
           if (!isValid) {
             logger.warn(
               'App',
@@ -144,11 +171,15 @@ export default Sentry.wrap(function App() {
         // 4. Initialize Services
         messageService.init();
 
-        // Initialize cache service with size limits and cleanup
-        await cacheService.initialize();
+        // Initialize cache service with size limits and cleanup (with timeout)
+        await withTimeout(
+          cacheService.initialize(),
+          INIT_TIMEOUT_MS,
+          'Cache service initialization',
+        );
         logger.info('CacheService initialized with 50MB limit');
 
-        // 5. Initialize Analytics (PostHog + Sentry)
+        // 5. Initialize Analytics (PostHog + Sentry) - has its own internal timeout
         await analytics.init();
 
         // Set device properties as super properties
@@ -163,8 +194,12 @@ export default Sentry.wrap(function App() {
         // Increment session count
         incrementSessionCount();
 
-        // Initialize feature flags
-        await initializeFeatureFlags('user-123');
+        // Initialize feature flags (with timeout)
+        await withTimeout(
+          initializeFeatureFlags('user-123'),
+          INIT_TIMEOUT_MS,
+          'Feature flags initialization',
+        );
         logger.info('FeatureFlags initialized');
 
         // Import Sentry dynamically
@@ -175,20 +210,26 @@ export default Sentry.wrap(function App() {
         storageMonitor.initialize();
         logger.info('Storage monitor initialized');
 
-        // 7. Check Pending Transactions (app crash recovery)
-        const { hasPayments, hasUploads } =
-          await pendingTransactionsService.checkPendingOnStartup();
-        if (hasPayments || hasUploads) {
-          logger.info(
-            'App',
-            `Found pending transactions - payments: ${hasPayments}, uploads: ${hasUploads}`,
-          );
-          const payments =
-            await pendingTransactionsService.getPendingPayments();
-          const uploads = await pendingTransactionsService.getPendingUploads();
-          setPendingPayments(payments);
-          setPendingUploads(uploads);
-          setShowPendingModal(true);
+        // 7. Check Pending Transactions (app crash recovery) - with timeout
+        const pendingResult = await withTimeout(
+          pendingTransactionsService.checkPendingOnStartup(),
+          INIT_TIMEOUT_MS,
+          'Pending transactions check',
+        );
+        if (pendingResult) {
+          const { hasPayments, hasUploads } = pendingResult;
+          if (hasPayments || hasUploads) {
+            logger.info(
+              'App',
+              `Found pending transactions - payments: ${hasPayments}, uploads: ${hasUploads}`,
+            );
+            const payments =
+              await pendingTransactionsService.getPendingPayments();
+            const uploads = await pendingTransactionsService.getPendingUploads();
+            setPendingPayments(payments);
+            setPendingUploads(uploads);
+            setShowPendingModal(true);
+          }
         }
 
         // Load fonts or other assets here if needed
