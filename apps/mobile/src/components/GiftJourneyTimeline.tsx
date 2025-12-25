@@ -97,7 +97,7 @@ const StepCircle: React.FC<{
   isCompleted: boolean;
   isCurrent: boolean;
   isPending: boolean;
-}> = ({ step, isCompleted, isCurrent, _isPending }) => {
+}> = ({ step, isCompleted, isCurrent, isPending: _isPending }) => {
   const pulseScale = useSharedValue(1);
 
   useEffect(() => {
