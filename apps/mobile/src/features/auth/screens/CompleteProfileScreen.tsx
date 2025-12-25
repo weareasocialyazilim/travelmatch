@@ -22,7 +22,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { COLORS } from '@/constants/colors';
 import {
   showErrorAlert,
-  AppError,
+  FriendlyAppError,
   AppErrorCode,
 } from '@/utils/friendlyErrorHandler';
 import {
@@ -85,7 +85,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
       if (useCamera) {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          throw new AppError(
+          throw new FriendlyAppError(
             AppErrorCode.PERMISSION_CAMERA_DENIED,
             'Camera permission denied',
           );
@@ -103,7 +103,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         const { status } =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          throw new AppError(
+          throw new FriendlyAppError(
             AppErrorCode.PERMISSION_STORAGE_DENIED,
             'Storage permission denied',
           );

@@ -16,7 +16,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
-import { showErrorAlert, AppErrorCode, AppError } from '@/utils/friendlyErrorHandler';
+import { showErrorAlert, AppErrorCode, FriendlyAppError } from '@/utils/friendlyErrorHandler';
 import { LoadingState } from '@/components/LoadingState';
 import SocialButton from '@/components/SocialButton';
 import { useAuth } from '@/context/AuthContext';
@@ -58,7 +58,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         });
       } else {
         // Show user-friendly error
-        throw new AppError(
+        throw new FriendlyAppError(
           AppErrorCode.AUTH_INVALID_CREDENTIALS,
           result.error || 'Invalid credentials',
         );
