@@ -19,7 +19,9 @@
 import { z } from 'zod';
 import { Linking } from 'react-native';
 import type { NavigationContainerRef } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+// NOTE: Using inline type to avoid circular dependency with AppNavigator
+// AppNavigator imports deepLinkHandler, so we can't import RootStackParamList from there
+type DeepLinkNavigator = NavigationContainerRef<Record<string, unknown>>;
 import { logger } from '../utils/logger';
 import { sessionManager } from '../services/sessionManager';
 
@@ -498,7 +500,7 @@ class DeepLinkHandler {
   navigateToError(error: DeepLinkError, message: string) {
     if (!this.navigation || !this.navigation.isReady()) return;
 
-    const nav = this.navigation as NavigationContainerRef<RootStackParamList>;
+    const nav = this.navigation as DeepLinkNavigator;
 
     if (error === DeepLinkError.EXPIRED) {
       nav.navigate('LinkExpired', { message });
