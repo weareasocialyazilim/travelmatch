@@ -24,7 +24,10 @@ import Animated, {
   withSpring,
   withSequence,
   withTiming,
+<<<<<<< Updated upstream
   withDelay,
+=======
+>>>>>>> Stashed changes
 } from 'react-native-reanimated';
 import { COLORS, GRADIENTS } from '../constants/colors';
 

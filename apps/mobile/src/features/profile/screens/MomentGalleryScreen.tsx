@@ -57,8 +57,8 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
         if (data?.images && Array.isArray(data.images)) {
           setImages(data.images);
         }
-      } catch (error) {
-        logger.error('Error fetching gallery', error);
+      } catch {
+        logger.error('Error fetching gallery', _error);
       } finally {
         setLoading(false);
       }
