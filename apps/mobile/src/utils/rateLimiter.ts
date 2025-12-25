@@ -120,19 +120,19 @@ export const checkRateLimit = (
  * try {
  *   const results = await rateLimitedSearch(query);
  * } catch (error) {
- *   if (error instanceof RateLimitError) {
+ *   if (error instanceof RateLimiterError) {
  *     showToast(`Too many requests. Wait ${error.retryAfter}s`);
  *   }
  * }
  * ```
  */
-export class RateLimitError extends Error {
+export class RateLimiterError extends Error {
   public readonly retryAfter: number;
   public readonly key: string;
 
   constructor(key: string, retryAfter: number) {
     super(`Rate limit exceeded for ${key}. Retry after ${retryAfter} seconds.`);
-    this.name = 'RateLimitError';
+    this.name = 'RateLimiterError';
     this.retryAfter = retryAfter;
     this.key = key;
   }
@@ -148,7 +148,7 @@ export function withRateLimit<
     const { allowed, retryAfter } = checkRateLimit(key, config);
 
     if (!allowed) {
-      throw new RateLimitError(key, retryAfter);
+      throw new RateLimiterError(key, retryAfter);
     }
 
     return fn(...args) as ReturnType<T>;
@@ -229,7 +229,7 @@ export class DebouncedRateLimiter {
         const { allowed, retryAfter } = checkRateLimit(this.key, this.config);
 
         if (!allowed) {
-          reject(new RateLimitError(this.key, retryAfter));
+          reject(new RateLimiterError(this.key, retryAfter));
           return;
         }
 
@@ -261,6 +261,6 @@ export default {
   resetAllRateLimits,
   getRateLimitStatus,
   RATE_LIMIT_CONFIGS,
-  RateLimitError,
+  RateLimiterError,
   DebouncedRateLimiter,
 };

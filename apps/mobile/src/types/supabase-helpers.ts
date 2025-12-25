@@ -60,14 +60,14 @@ export class DatabaseError extends Error {
   }
 }
 
-export class ValidationError extends Error {
+export class SupabaseValidationError extends Error {
   constructor(
     message: string,
     public field?: string,
     public constraint?: string
   ) {
     super(message);
-    this.name = 'ValidationError';
+    this.name = 'SupabaseValidationError';
   }
 }
 

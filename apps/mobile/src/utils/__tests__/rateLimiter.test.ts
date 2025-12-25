@@ -4,7 +4,7 @@ import {
   resetRateLimit,
   resetAllRateLimits,
   getRateLimitStatus,
-  RateLimitError,
+  RateLimiterError,
   DebouncedRateLimiter,
   RATE_LIMIT_CONFIGS,
 } from '../../utils/rateLimiter';
@@ -194,12 +194,12 @@ describe('rateLimiter', () => {
     });
   });
 
-  describe('RateLimitError', () => {
+  describe('RateLimiterError', () => {
     it('should create error with correct properties', () => {
-      const error = new RateLimitError('test-key', 30);
+      const error = new RateLimiterError('test-key', 30);
 
       expect(error).toBeInstanceOf(Error);
-      expect(error.name).toBe('RateLimitError');
+      expect(error.name).toBe('RateLimiterError');
       expect(error.key).toBe('test-key');
       expect(error.retryAfter).toBe(30);
       expect(error.message).toContain('test-key');
@@ -207,7 +207,7 @@ describe('rateLimiter', () => {
     });
 
     it('should be catchable as Error', () => {
-      const error = new RateLimitError('key', 10);
+      const error = new RateLimiterError('key', 10);
 
       expect(() => {
         throw error;
@@ -227,7 +227,7 @@ describe('rateLimiter', () => {
       expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2');
     });
 
-    it('should throw RateLimitError when rate limited', async () => {
+    it('should throw RateLimiterError when rate limited', async () => {
       const mockFn = jest.fn().mockResolvedValue('success');
       const config = { maxRequests: 1, windowMs: 1000 };
 
@@ -235,7 +235,7 @@ describe('rateLimiter', () => {
 
       await wrapped(); // First call succeeds
 
-      await expect(wrapped()).rejects.toThrow(RateLimitError);
+      await expect(wrapped()).rejects.toThrow(RateLimiterError);
       expect(mockFn).toHaveBeenCalledTimes(1); // Only first call executed
     });
 
@@ -429,7 +429,7 @@ describe('rateLimiter', () => {
       const promise2 = limiter.execute(mockFn);
       jest.advanceTimersByTime(100);
 
-      await expect(promise2).rejects.toThrow(RateLimitError);
+      await expect(promise2).rejects.toThrow(RateLimiterError);
 
       jest.useRealTimers();
     });

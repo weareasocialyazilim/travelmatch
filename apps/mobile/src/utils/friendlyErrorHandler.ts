@@ -69,9 +69,11 @@ export enum AppErrorCode {
 }
 
 /**
- * Application error with user-friendly message support
+ * User-friendly application error with i18n support
+ * Note: This is separate from the base AppError in appErrors.ts
+ * Use this for user-facing errors that need localization
  */
-export class AppError extends Error {
+export class FriendlyAppError extends Error {
   code: AppErrorCode;
   details?: Record<string, unknown>;
   retryable: boolean;
@@ -84,7 +86,7 @@ export class AppError extends Error {
     retryable = false,
   ) {
     super(message || code);
-    this.name = 'AppError';
+    this.name = 'FriendlyAppError';
     this.code = code;
     this.details = details;
     this.retryable = retryable;
@@ -92,69 +94,69 @@ export class AppError extends Error {
 }
 
 /**
- * Parse unknown error into AppError
+ * Parse unknown error into FriendlyAppError
  */
-export function parseError(error: unknown): AppError {
-  if (error instanceof AppError) {
+export function parseError(error: unknown): FriendlyAppError {
+  if (error instanceof FriendlyAppError) {
     return error;
   }
 
   if (error instanceof Error) {
     // Network errors
-    if (error.message.includes('Network request failed') || 
+    if (error.message.includes('Network request failed') ||
         error.message.includes('Failed to fetch')) {
-      return new AppError(AppErrorCode.NETWORK_ERROR, error.message, {}, true);
+      return new FriendlyAppError(AppErrorCode.NETWORK_ERROR, error.message, {}, true);
     }
 
     // Timeout errors
     if (error.message.toLowerCase().includes('timeout')) {
-      return new AppError(AppErrorCode.TIMEOUT, error.message, {}, true);
+      return new FriendlyAppError(AppErrorCode.TIMEOUT, error.message, {}, true);
     }
 
-    return new AppError(AppErrorCode.UNKNOWN_ERROR, error.message);
+    return new FriendlyAppError(AppErrorCode.UNKNOWN_ERROR, error.message);
   }
 
   // Supabase/API errors
   if (typeof error === 'object' && error !== null) {
     const err = error as Record<string, unknown>;
-    
+
     if ('code' in err && 'message' in err) {
       const code = String(err.code);
       const message = String(err.message);
-      
+
       // Map specific error codes
       if (code === 'PGRST116' || code === '404') {
-        return new AppError(AppErrorCode.RESOURCE_NOT_FOUND, message);
+        return new FriendlyAppError(AppErrorCode.RESOURCE_NOT_FOUND, message);
       }
       if (code === '23505') {
-        return new AppError(AppErrorCode.RESOURCE_ALREADY_EXISTS, message);
+        return new FriendlyAppError(AppErrorCode.RESOURCE_ALREADY_EXISTS, message);
       }
       if (code === '401') {
-        return new AppError(AppErrorCode.AUTH_SESSION_EXPIRED, message);
+        return new FriendlyAppError(AppErrorCode.AUTH_SESSION_EXPIRED, message);
       }
       if (code === '429') {
-        return new AppError(AppErrorCode.RATE_LIMIT_EXCEEDED, message, {}, true);
+        return new FriendlyAppError(AppErrorCode.RATE_LIMIT_EXCEEDED, message, {}, true);
       }
       if (code.startsWith('5')) {
-        return new AppError(AppErrorCode.SERVER_ERROR, message, {}, true);
+        return new FriendlyAppError(AppErrorCode.SERVER_ERROR, message, {}, true);
       }
     }
 
     if ('status' in err) {
       const status = Number(err.status);
       if (status === 404) {
-        return new AppError(AppErrorCode.RESOURCE_NOT_FOUND, String(err.message || 'Not found'));
+        return new FriendlyAppError(AppErrorCode.RESOURCE_NOT_FOUND, String(err.message || 'Not found'));
       }
       if (status === 401 || status === 403) {
-        return new AppError(AppErrorCode.AUTH_SESSION_EXPIRED, String(err.message || 'Session expired'));
+        return new FriendlyAppError(AppErrorCode.AUTH_SESSION_EXPIRED, String(err.message || 'Session expired'));
       }
       if (status >= 500) {
-        return new AppError(AppErrorCode.SERVER_ERROR, String(err.message || 'Server error'), {}, true);
+        return new FriendlyAppError(AppErrorCode.SERVER_ERROR, String(err.message || 'Server error'), {}, true);
       }
     }
   }
 
-  return new AppError(AppErrorCode.UNKNOWN_ERROR, String(error));
+  return new FriendlyAppError(AppErrorCode.UNKNOWN_ERROR, String(error));
 }
 
 /**
@@ -211,7 +213,7 @@ export function showErrorAlert(
 /**
  * Get error title based on error code
  */
-export function getErrorTitle(error: AppError, t: TFunction): string {
+export function getErrorTitle(error: FriendlyAppError, t: TFunction): string {
   if (error.code.startsWith('AUTH_')) {
     return t('errors.titles.authentication');
   }
@@ -237,7 +239,7 @@ export function getErrorTitle(error: AppError, t: TFunction): string {
 /**
  * Get localized error message
  */
-export function getErrorMessage(error: AppError, t: TFunction): string {
+export function getErrorMessage(error: FriendlyAppError, t: TFunction): string {
   const key = `errors.${error.code}`;
   const translated = t(key, error.details || {});
   
@@ -257,7 +259,7 @@ export async function withErrorHandling<T>(
   fn: () => Promise<T>,
   t: TFunction,
   options?: {
-    onError?: (error: AppError) => void;
+    onError?: (error: FriendlyAppError) => void;
     showAlert?: boolean;
     onRetry?: () => void;
     customErrorMessage?: string;
@@ -289,11 +291,11 @@ export async function withErrorHandling<T>(
 }
 
 /**
- * Validation helpers that throw AppError
+ * Validation helpers that throw FriendlyAppError
  */
 export function validateRequired(value: string | null | undefined, fieldName?: string): asserts value is string {
   if (!value || value.trim() === '') {
-    throw new AppError(
+    throw new FriendlyAppError(
       AppErrorCode.VALIDATION_REQUIRED_FIELD,
       `${fieldName || 'Field'} is required`,
       { field: fieldName },
@@ -304,13 +306,13 @@ export function validateRequired(value: string | null | undefined, fieldName?: s
 export function validateEmail(email: string): asserts email is string {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    throw new AppError(AppErrorCode.VALIDATION_INVALID_EMAIL, 'Invalid email address');
+    throw new FriendlyAppError(AppErrorCode.VALIDATION_INVALID_EMAIL, 'Invalid email address');
   }
 }
 
 export function validatePassword(password: string): asserts password is string {
   if (password.length < 8) {
-    throw new AppError(
+    throw new FriendlyAppError(
       AppErrorCode.VALIDATION_PASSWORD_TOO_SHORT,
       'Password must be at least 8 characters',
     );
@@ -320,7 +322,7 @@ export function validatePassword(password: string): asserts password is string {
 export function validatePhone(phone: string): asserts phone is string {
   const phoneRegex = /^\+?[1-9]\d{1,14}$/;
   if (!phoneRegex.test(phone.replace(/[\s-]/g, ''))) {
-    throw new AppError(AppErrorCode.VALIDATION_INVALID_PHONE, 'Invalid phone number');
+    throw new FriendlyAppError(AppErrorCode.VALIDATION_INVALID_PHONE, 'Invalid phone number');
   }
 }
 
@@ -328,29 +330,29 @@ export function validatePhone(phone: string): asserts phone is string {
  * Create specific error types
  */
 export const createError = {
-  network: (message?: string) => 
-    new AppError(AppErrorCode.NETWORK_ERROR, message, {}, true),
-  
-  timeout: (message?: string) => 
-    new AppError(AppErrorCode.TIMEOUT, message, {}, true),
-  
-  auth: (message?: string) => 
-    new AppError(AppErrorCode.AUTH_INVALID_CREDENTIALS, message),
-  
-  sessionExpired: () => 
-    new AppError(AppErrorCode.AUTH_SESSION_EXPIRED, 'Session expired'),
-  
-  notFound: (resource?: string) => 
-    new AppError(AppErrorCode.RESOURCE_NOT_FOUND, `${resource || 'Resource'} not found`),
-  
-  validation: (field: string) => 
-    new AppError(AppErrorCode.VALIDATION_REQUIRED_FIELD, `${field} is required`, { field }),
-  
-  payment: (message?: string) => 
-    new AppError(AppErrorCode.PAYMENT_FAILED, message),
-  
-  server: (message?: string) => 
-    new AppError(AppErrorCode.SERVER_ERROR, message, {}, true),
+  network: (message?: string) =>
+    new FriendlyAppError(AppErrorCode.NETWORK_ERROR, message, {}, true),
+
+  timeout: (message?: string) =>
+    new FriendlyAppError(AppErrorCode.TIMEOUT, message, {}, true),
+
+  auth: (message?: string) =>
+    new FriendlyAppError(AppErrorCode.AUTH_INVALID_CREDENTIALS, message),
+
+  sessionExpired: () =>
+    new FriendlyAppError(AppErrorCode.AUTH_SESSION_EXPIRED, 'Session expired'),
+
+  notFound: (resource?: string) =>
+    new FriendlyAppError(AppErrorCode.RESOURCE_NOT_FOUND, `${resource || 'Resource'} not found`),
+
+  validation: (field: string) =>
+    new FriendlyAppError(AppErrorCode.VALIDATION_REQUIRED_FIELD, `${field} is required`, { field }),
+
+  payment: (message?: string) =>
+    new FriendlyAppError(AppErrorCode.PAYMENT_FAILED, message),
+
+  server: (message?: string) =>
+    new FriendlyAppError(AppErrorCode.SERVER_ERROR, message, {}, true),
 };
 
 /**

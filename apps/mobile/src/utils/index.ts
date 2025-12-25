@@ -26,7 +26,7 @@ export type { StandardizedError, UseErrorHandlerReturn } from './errorHandler';
 // Performance
 export * from './performance';
 
-// Rate Limiter (RateLimitError excluded - use from appErrors instead)
+// Rate Limiter (RateLimiterError is local to rateLimiter, use RateLimitError from appErrors for app-wide usage)
 export {
   checkRateLimit,
   withRateLimit,
@@ -34,6 +34,7 @@ export {
   resetAllRateLimits,
   getRateLimitStatus,
   DebouncedRateLimiter,
+  RateLimiterError,
   RATE_LIMIT_CONFIGS,
 } from './rateLimiter';
 
