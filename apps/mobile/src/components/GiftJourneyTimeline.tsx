@@ -97,11 +97,7 @@ const StepCircle: React.FC<{
   isCompleted: boolean;
   isCurrent: boolean;
   isPending: boolean;
-<<<<<<< Updated upstream
 }> = ({ step, isCompleted, isCurrent, isPending: _isPending }) => {
-=======
-}> = ({ step, isCompleted, isCurrent, _isPending }) => {
->>>>>>> Stashed changes
   const pulseScale = useSharedValue(1);
 
   useEffect(() => {
