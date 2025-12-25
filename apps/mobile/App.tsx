@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { StyleSheet, AppState, Platform } from 'react-native';
-import * as Device from 'expo-device';
+import { StyleSheet, AppState } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { FeedbackModal } from './src/components/FeedbackModal';
-import { initializeFeatureFlags } from './src/config/featureFlags';
+import { InitializationScreen } from './src/components/InitializationScreen';
 import { AuthProvider } from './src/context/AuthContext';
 import { BiometricAuthProvider } from './src/context/BiometricAuthContext';
 import { ConfirmationProvider } from './src/context/ConfirmationContext';
@@ -17,17 +16,16 @@ import { ToastProvider } from './src/context/ToastContext';
 import { useFeedbackPrompt } from './src/hooks/useFeedbackPrompt';
 import AppNavigator from './src/navigation/AppNavigator';
 import { logger } from './src/utils/logger';
-import { validateEnvironment, env } from './src/config/env.config';
-import { migrateSensitiveDataToSecure } from './src/utils/secureStorage';
 import { initSecurityMonitoring } from './src/utils/securityChecks';
 import './src/config/i18n'; // Initialize i18n
 
-import { analytics } from './src/services/analytics';
-import { messageService } from './src/services/messageService';
-import { cacheService } from './src/services/cacheService';
-import { sessionManager } from './src/services/sessionManager';
+// Services
+import { appBootstrap } from './src/services/appBootstrap';
+import type {
+  BootstrapProgress,
+  ServiceName,
+} from './src/services/appBootstrap';
 import { pendingTransactionsService } from './src/services/pendingTransactionsService';
-import { storageMonitor } from './src/services/storageMonitor';
 import { PendingTransactionsModal } from './src/components/PendingTransactionsModal';
 import type {
   PendingPayment,
@@ -64,15 +62,6 @@ Sentry.init({
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-// Validate environment on app startup (fail-fast)
-try {
-  validateEnvironment();
-  logger.info('App', '✅ Environment validation passed');
-} catch (error) {
-  logger.error('App', '🚨 Environment validation failed', error);
-  throw error; // Crash app if env is invalid
-}
-
 // Initialize security monitoring (DEV mode only)
 if (__DEV__) {
   initSecurityMonitoring();
@@ -85,201 +74,131 @@ const styles = StyleSheet.create({
   },
 });
 
+type AppInitState = 'initializing' | 'ready' | 'error';
+
 export default Sentry.wrap(function App() {
-  const [appIsReady, setAppIsReady] = useState(false);
+  // App state
+  const [appInitState, setAppInitState] =
+    useState<AppInitState>('initializing');
+  const [bootstrapProgress, setBootstrapProgress] =
+    useState<BootstrapProgress | null>(null);
+
+  // Background/foreground state
   const [_isBackground, setIsBackground] = useState(false);
+  const appStateRef = useRef(AppState.currentState);
+
+  // Pending transactions modal
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [pendingPayments, setPendingPayments] = useState<PendingPayment[]>([]);
   const [pendingUploads, setPendingUploads] = useState<PendingUpload[]>([]);
-  const appState = useRef(AppState.currentState);
+
+  // Feedback prompt
   const { showFeedback, dismissFeedback, incrementSessionCount } =
     useFeedbackPrompt();
 
+  // Initialize app with new bootstrap service
   useEffect(() => {
-    // Timeout wrapper to prevent app from hanging indefinitely
-    const withTimeout = <T,>(
-      promise: Promise<T>,
-      timeoutMs: number,
-      operationName: string,
-    ): Promise<T | null> => {
-      return Promise.race([
-        promise,
-        new Promise<null>((resolve) => {
-          setTimeout(() => {
-            logger.warn('App', `${operationName} timed out after ${timeoutMs}ms`);
-            resolve(null);
-          }, timeoutMs);
-        }),
-      ]);
-    };
-
-    async function prepare() {
-      const INIT_TIMEOUT_MS = 10000; // 10 second timeout for each init step
-
+    async function initializeApp() {
       try {
-        // 1. Security Check: Root/Jailbreak Detection (Warning Only)
-        const isRooted = await Device.isRootedExperimentalAsync();
-        if (isRooted) {
-          logger.warn(
-            'App',
-            'Device is rooted/jailbroken - security risk. Data security may be compromised.',
-          );
-          // Continue with app initialization - warning logged
-        }
-
-        // Note: Screenshot protection is now handled per-screen via useScreenSecurity() hook
-        // Applied to: WithdrawScreen, GiftScreen, PaymentMethodScreen, BankAccountScreen
-
-        // 2. Security: Migrate sensitive data to SecureStore (one-time)
-        try {
-          await migrateSensitiveDataToSecure();
-          logger.info('App', 'Sensitive data migration completed');
-        } catch (migrationError) {
-          logger.warn(
-            'App',
-            'Data migration failed (may already be migrated)',
-            migrationError,
-          );
-        }
-
-        // 3. Session: Initialize and validate stored session (with timeout)
-        const sessionState = await withTimeout(
-          sessionManager.initialize(),
-          INIT_TIMEOUT_MS,
-          'Session initialization',
-        );
-        logger.info('App', `Session state: ${sessionState ?? 'timed out'}`);
-
-        // If session is expired, try to refresh automatically
-        if (sessionState === 'expired') {
-          logger.info('App', 'Attempting automatic session refresh');
-          const isValid = await withTimeout(
-            sessionManager.isSessionValid(),
-            INIT_TIMEOUT_MS,
-            'Session validation',
-          );
-          if (!isValid) {
-            logger.warn(
-              'App',
-              'Session refresh failed - user needs to re-login',
-            );
-          } else {
-            logger.info('App', 'Session refreshed successfully');
-          }
-        }
-
-        // 4. Initialize Services
-        messageService.init();
-
-        // Initialize cache service with size limits and cleanup (with timeout)
-        await withTimeout(
-          cacheService.initialize(),
-          INIT_TIMEOUT_MS,
-          'Cache service initialization',
-        );
-        logger.info('CacheService initialized with 50MB limit');
-
-        // 5. Initialize Analytics (PostHog + Sentry) - has its own internal timeout
-        await analytics.init();
-
-        // Set device properties as super properties
-        analytics.setUserProperties({
-          platform: Platform.OS,
-          device_model: Device.modelName || 'unknown',
-          os_version: String(Platform.Version),
-          app_version: '1.0.0',
-          app_env: env.APP_ENV,
+        // Set up progress callback for UI updates
+        appBootstrap.onProgress((progress) => {
+          setBootstrapProgress(progress);
         });
 
-        // Increment session count
-        incrementSessionCount();
+        // Run initialization
+        const finalProgress = await appBootstrap.initialize();
+        setBootstrapProgress(finalProgress);
 
-        // Initialize feature flags (with timeout)
-        await withTimeout(
-          initializeFeatureFlags('user-123'),
-          INIT_TIMEOUT_MS,
-          'Feature flags initialization',
-        );
-        logger.info('FeatureFlags initialized');
-
-        // Import Sentry dynamically
-        const { initSentry } = await import('./src/config/sentry');
-        void initSentry();
-
-        // 6. Initialize Storage Monitor
-        storageMonitor.initialize();
-        logger.info('Storage monitor initialized');
-
-        // 7. Check Pending Transactions (app crash recovery) - with timeout
-        const pendingResult = await withTimeout(
-          pendingTransactionsService.checkPendingOnStartup(),
-          INIT_TIMEOUT_MS,
-          'Pending transactions check',
-        );
-        if (pendingResult) {
-          const { hasPayments, hasUploads } = pendingResult;
-          if (hasPayments || hasUploads) {
-            logger.info(
-              'App',
-              `Found pending transactions - payments: ${hasPayments}, uploads: ${hasUploads}`,
-            );
-            const payments =
-              await pendingTransactionsService.getPendingPayments();
-            const uploads = await pendingTransactionsService.getPendingUploads();
-            setPendingPayments(payments);
-            setPendingUploads(uploads);
-            setShowPendingModal(true);
-          }
+        // Check if we can continue
+        if (!finalProgress.canContinue) {
+          setAppInitState('error');
+          logger.error('App', 'Critical services failed, app cannot continue');
+          return;
         }
 
-        // Load fonts or other assets here if needed
-        // await Font.loadAsync({ ... });
-      } catch (e) {
-        logger.warn('Error during app initialization:', e);
-      } finally {
-        setAppIsReady(true);
+        // Initialize Sentry dynamically
+        try {
+          const { initSentry } = await import('./src/config/sentry');
+          void initSentry();
+        } catch (sentryError) {
+          logger.warn('App', 'Sentry initialization failed', sentryError);
+        }
+
+        // Increment session count for feedback prompt
+        incrementSessionCount();
+
+        // Check for pending transactions
+        const pendingResult = appBootstrap.getPendingTransactionsResult();
+        if (
+          pendingResult &&
+          (pendingResult.hasPayments || pendingResult.hasUploads)
+        ) {
+          const payments =
+            await pendingTransactionsService.getPendingPayments();
+          const uploads = await pendingTransactionsService.getPendingUploads();
+          setPendingPayments(payments);
+          setPendingUploads(uploads);
+          setShowPendingModal(true);
+        }
+
+        // Mark app as ready
+        setAppInitState('ready');
+        logger.info('App', '✅ App initialization complete');
+      } catch (error) {
+        logger.error('App', 'Fatal error during initialization', error);
+        setAppInitState('error');
       }
     }
 
-    void prepare();
+    void initializeApp();
 
-    // 3. Security: Privacy Blur on Background (iOS)
+    // Handle app state changes (background/foreground)
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (
-        appState.current.match(/inactive|background/) &&
+        appStateRef.current.match(/inactive|background/) &&
         nextAppState === 'active'
       ) {
         setIsBackground(false);
       } else if (
-        appState.current === 'active' &&
+        appStateRef.current === 'active' &&
         nextAppState.match(/inactive|background/)
       ) {
         setIsBackground(true);
       }
-      appState.current = nextAppState;
+      appStateRef.current = nextAppState;
     });
 
+    // Cleanup
     return () => {
       subscription.remove();
-      // Cleanup cache service on app shutdown
-      cacheService.destroy();
-      // Cleanup storage monitor
-      storageMonitor.destroy();
+      appBootstrap.cleanup();
     };
   }, [incrementSessionCount]);
 
+  // Handle retry of failed services
+  const handleRetryService = useCallback(async (serviceName: ServiceName) => {
+    logger.info('App', `Retrying service: ${serviceName}`);
+    const success = await appBootstrap.retryService(serviceName);
+
+    if (success) {
+      const progress = appBootstrap.getProgress();
+      setBootstrapProgress(progress);
+
+      if (progress.canContinue) {
+        setAppInitState('ready');
+      }
+    }
+  }, []);
+
+  // Pending transactions handlers
   const handleResumePayment = useCallback(async (payment: PendingPayment) => {
     logger.info('App', `Resuming payment: ${payment.id} (${payment.type})`);
-    // TODO: Navigate to payment screen with pre-filled data
-    // For now, just dismiss
     await pendingTransactionsService.removePendingPayment(payment.id);
     setPendingPayments((prev) => prev.filter((p) => p.id !== payment.id));
   }, []);
 
   const handleResumeUpload = useCallback(async (upload: PendingUpload) => {
     logger.info('App', `Retrying upload: ${upload.id} (${upload.type})`);
-    // TODO: Trigger upload service retry
-    // For now, just increment retry count
     await pendingTransactionsService.incrementUploadRetry(upload.id);
     const uploads = await pendingTransactionsService.getPendingUploads();
     setPendingUploads(uploads);
@@ -301,16 +220,33 @@ export default Sentry.wrap(function App() {
     setShowPendingModal(false);
   }, []);
 
+  // Hide splash screen when ready
   const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
+    if (appInitState === 'ready' || appInitState === 'error') {
       await SplashScreen.hideAsync();
     }
-  }, [appIsReady]);
+  }, [appInitState]);
 
-  if (!appIsReady) {
-    return null;
+  // Show initialization screen during bootstrap
+  if (appInitState === 'initializing' || appInitState === 'error') {
+    return (
+      <GestureHandlerRootView
+        style={styles.container}
+        onLayout={onLayoutRootView}
+      >
+        <ErrorBoundary level="app">
+          {bootstrapProgress && (
+            <InitializationScreen
+              progress={bootstrapProgress}
+              onRetry={handleRetryService}
+            />
+          )}
+        </ErrorBoundary>
+      </GestureHandlerRootView>
+    );
   }
 
+  // Main app content
   return (
     <GestureHandlerRootView
       style={styles.container}

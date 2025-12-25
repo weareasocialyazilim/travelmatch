@@ -1,0 +1,7 @@
+[defaults]
+url = https://de.sentry.io/
+org = travelmatch-2p
+project = react-native
+
+[auth]
+token = ${SENTRY_AUTH_TOKEN}
