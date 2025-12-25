@@ -25,11 +25,9 @@ import React from 'react';
 import * as FileSystem from 'expo-file-system';
 import { cacheDirectory } from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import { logger } from '../utils/logger';
 import {
   getImageUrl,
-  getResponsiveUrls,
   uploadToCloudflare,
   type ImageVariant,
 } from './cloudflareImages';
@@ -403,7 +401,7 @@ class ImageCacheManager {
           await FileSystem.deleteAsync(entry.localPath, { idempotent: true });
           freedSpace += entry.size;
           this.metadata.delete(key);
-        } catch (error) {
+        } catch {
           logger.warn('[ImageCache] Failed to delete:', entry.localPath);
         }
       }
@@ -525,7 +523,7 @@ class ImageCacheManager {
         const cacheKey = await this.getCacheKey(url, variant);
         try {
           await this.fetchAndCache(url, cacheKey);
-        } catch (error) {
+        } catch {
           // Ignore prefetch errors
         }
       }),
@@ -557,7 +555,7 @@ class ImageCacheManager {
             await FileSystem.deleteAsync(entry.localPath, { idempotent: true });
             this.stats.diskSize -= entry.size;
             cleaned++;
-          } catch (error) {
+          } catch {
             // Ignore
           }
         }
@@ -634,7 +632,7 @@ try {
 
 // Provide legacy-compatible public helpers used by tests and older code
 // These delegate to the internal implementations.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 (imageCacheManager as any).clear = async function (options?: {
   memory?: boolean;
   disk?: boolean;
@@ -643,7 +641,7 @@ try {
 };
 
 // pruneExpiredEntries -> cleanExpired
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 (imageCacheManager as any).pruneExpiredEntries = async function () {
   return (
     (await (imageCacheManager as any).cleanExpired?.()) || Promise.resolve()
@@ -651,7 +649,7 @@ try {
 };
 
 // cleanupDiskCache helper
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 (imageCacheManager as any).cleanupDiskCache = async function () {
   // Prefer evictLRU to reclaim space; fall back to cleaning expired entries
   try {
@@ -664,12 +662,11 @@ try {
 };
 
 // prefetchImages and prefetchResponsiveVariants
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 (imageCacheManager as any).prefetchImages = async function (uris: string[]) {
   return Promise.all((uris || []).map((u) => imageCacheManager.getImage(u)));
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (imageCacheManager as any).prefetchResponsiveVariants = async function (
   uri: string,
   cloudflareId?: string,

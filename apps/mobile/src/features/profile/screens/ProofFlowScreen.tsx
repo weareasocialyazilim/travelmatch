@@ -6,7 +6,7 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Image,  // eslint-disable-next-line react-native/split-platform-components
+  Image,
   ActionSheetIOS,
   Platform,
   Alert,
@@ -82,7 +82,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   navigation,
 }) => {
   const { showToast } = useToast();
-  const { showConfirmation } = useConfirmation();
+  const { showConfirmation: _showConfirmation } = useConfirmation();
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [loading, setLoading] = useState(false);
 
@@ -228,7 +228,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         });
 
         Alert.alert('Location Set', locationName);
-      } catch (error) {
+      } catch {
         showToast('Could not get current location', 'error');
       }
     };
@@ -275,10 +275,13 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   };
 
   const handleRemovePhoto = (photoUri: string) => {
-    setValue('photos', photos.filter((p) => p !== photoUri));
+    setValue(
+      'photos',
+      photos.filter((p) => p !== photoUri),
+    );
   };
 
-  const onSubmit = (data: ProofInput) => {
+  const onSubmit = (_data: ProofInput) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -458,7 +461,9 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
                   placeholderTextColor={COLORS.textSecondary}
                   keyboardType="decimal-pad"
                   value={value?.toString() || ''}
-                  onChangeText={(text) => onChange(parseFloat(text) || undefined)}
+                  onChangeText={(text) =>
+                    onChange(parseFloat(text) || undefined)
+                  }
                 />
               )}
             />
@@ -539,9 +544,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
         <View style={styles.reviewSection}>
           <Text style={styles.reviewLabel}>Photos</Text>
-          <Text style={styles.reviewValue}>
-            {photos?.length || 0} photos
-          </Text>
+          <Text style={styles.reviewValue}>{photos?.length || 0} photos</Text>
         </View>
       </View>
 
@@ -554,7 +557,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       </View>
 
       <TouchableOpacity
-        style={[styles.submitButton, (loading || !isValid) && styles.submitButtonDisabled]}
+        style={[
+          styles.submitButton,
+          (loading || !isValid) && styles.submitButtonDisabled,
+        ]}
         onPress={handleSubmit(onSubmit)}
         disabled={loading || !isValid}
       >
@@ -571,7 +577,8 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       </TouchableOpacity>
       {!loading && (
         <Text style={styles.uploadHint}>
-          This may take a moment to upload your photos. Please don't close the screen.
+          This may take a moment to upload your photos. Please don't close the
+          screen.
         </Text>
       )}
     </View>

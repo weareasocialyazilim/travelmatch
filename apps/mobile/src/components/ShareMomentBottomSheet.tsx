@@ -59,7 +59,7 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       Clipboard.setString(momentUrl);
       showToast('Link copied to clipboard!', 'success');
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Link kopyalanamadı', 'error');
     }
   };
@@ -89,7 +89,10 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       onClose();
     } catch (error) {
       logger.error('WhatsApp share error:', error);
-      showToast('WhatsApp açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun', 'error');
+      showToast(
+        'WhatsApp açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun',
+        'error',
+      );
     }
   };
 
@@ -107,7 +110,10 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       onClose();
     } catch (error) {
       logger.error('Instagram share error:', error);
-      showToast('Instagram açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun', 'error');
+      showToast(
+        'Instagram açılamadı. Lütfen uygulamanın yüklü olduğundan emin olun',
+        'error',
+      );
     }
   };
 

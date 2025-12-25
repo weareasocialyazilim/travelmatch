@@ -7,7 +7,7 @@ import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing, SPACING } from '../../constants/spacing';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 
 interface OptimizedListItemProps {

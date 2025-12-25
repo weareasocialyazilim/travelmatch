@@ -7,7 +7,6 @@ import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { notificationsService as dbNotificationsService } from './supabaseDbService';
 import { toRecord } from '../utils/jsonHelper';
-import type { Database } from '../types/database.types';
 
 // Types
 export type NotificationType =

@@ -411,18 +411,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.text,
   },
-  input: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
   bottomSpacer: {
     height: 24,
   },

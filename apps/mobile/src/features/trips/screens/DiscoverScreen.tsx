@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from 'react';
 import {
   View,
   Text,
@@ -16,7 +22,7 @@ import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import BottomNav from '@/components/BottomNav';
 import {
   StoryViewer,
@@ -53,7 +59,7 @@ import type { NavigationProp } from '@react-navigation/native';
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
-  const { props: a11y, announce } = useAccessibility();
+  const { props: a11y, announce: _announce } = useAccessibility();
 
   // Use moments hook for data fetching
   const {
@@ -105,7 +111,7 @@ const DiscoverScreen = () => {
     try {
       await refreshMoments();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setRefreshing(false);
@@ -216,10 +222,12 @@ const DiscoverScreen = () => {
   // Memoized scroll handler to prevent re-creation on every render
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+      const { layoutMeasurement, contentOffset, contentSize } =
+        event.nativeEvent;
       const paddingToBottom = 50;
       const isCloseToBottom =
-        layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+        layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingToBottom;
 
       if (isCloseToBottom && !isLoadingMoreRef.current) {
         isLoadingMoreRef.current = true;
@@ -672,26 +680,6 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: COLORS.white,
     fontWeight: '600',
-  },
-
-  // Empty State
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginTop: 16,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginTop: 8,
   },
 
   // Load More

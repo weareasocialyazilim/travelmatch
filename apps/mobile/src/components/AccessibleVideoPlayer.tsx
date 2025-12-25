@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import Video from 'react-native-video';
 import { useAccessibility } from '@/hooks/useAccessibility';
-import { colors, spacing, typography } from '@travelmatch/design-system/tokens';
+import { colors, typography } from '@travelmatch/design-system/tokens';
 import { SPACING } from '../constants/spacing';
 import { logger } from '@/utils/logger';
 

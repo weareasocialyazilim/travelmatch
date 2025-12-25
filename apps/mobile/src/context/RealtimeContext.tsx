@@ -142,7 +142,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   // Refs for Supabase channels and handlers
   const presenceChannelRef = useRef<RealtimeChannel | null>(null);
   const notificationChannelRef = useRef<RealtimeChannel | null>(null);
-  const typingChannelUnsubscribeRef = useRef<(() => void) | null>(null);
+  const _typingChannelUnsubscribeRef = useRef<(() => void) | null>(null);
   const handlersRef = useRef<EventHandlers>(new Map());
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const typingDebounceRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
@@ -193,14 +193,14 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
         const online = new Set(Object.keys(state));
-        
+
         logger.debug('RealtimeContext', `Online users: ${online.size}`);
         setOnlineUsers(online);
       })
       .on('presence', { event: 'join' }, ({ key }) => {
         logger.debug('RealtimeContext', `User joined: ${key}`);
         setOnlineUsers((prev) => new Set([...prev, key]));
-        
+
         emit('user:online', { userId: key, isOnline: true });
       })
       .on('presence', { event: 'leave' }, ({ key }) => {
@@ -210,7 +210,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
           next.delete(key);
           return next;
         });
-        
+
         emit('user:offline', {
           userId: key,
           isOnline: false,
@@ -251,10 +251,10 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
         },
         (payload) => {
           logger.info('RealtimeContext', 'New notification:', payload.new);
-          
+
           const notification = payload.new as NotificationEvent;
           emit('notification:new', notification);
-        }
+        },
       )
       .on(
         'postgres_changes',
@@ -266,7 +266,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
         },
         (payload) => {
           logger.debug('RealtimeContext', 'Notification updated:', payload.new);
-        }
+        },
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -309,7 +309,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
 
       setConnectionState('connected');
       logger.info('RealtimeContext', 'Connected to Supabase Realtime');
-
     } catch (error) {
       logger.error('RealtimeContext', 'Failed to connect:', error);
       setConnectionState('disconnected');
@@ -356,7 +355,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       const handlers = handlersRef.current.get(event);
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
+
       if (!handlers) return () => {};
       handlers.add(handler as EventHandler);
 
@@ -404,7 +403,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
           conversationId,
           isTyping: true,
           timestamp: Date.now(),
-        }
+        },
       );
 
       // Emit local event
@@ -448,7 +447,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
           conversationId,
           isTyping: false,
           timestamp: Date.now(),
-        }
+        },
       );
 
       // Emit local event

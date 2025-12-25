@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing, SPACING } from '../../constants/spacing';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import {
@@ -72,7 +72,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages([image]);
         }
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to pick image from camera', 'error');
     }
   };
@@ -104,7 +104,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages(validImages);
         }
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to pick image from gallery', 'error');
     }
   };
@@ -120,7 +120,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
       // Clear after successful upload
       setSelectedImages([]);
-    } catch (error) {
+    } catch {
       // Error handled by hook
     }
   };

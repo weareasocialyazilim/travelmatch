@@ -3,13 +3,7 @@
 // types or upstream @types packages where available.
 
 declare module '@shopify/flash-list' {
-  import {
-    Component,
-    ReactElement,
-    RefObject,
-    MutableRefObject,
-    Ref,
-  } from 'react';
+  import { Component, ReactElement } from 'react';
   import {
     ViewStyle,
     StyleProp,
@@ -30,8 +24,10 @@ declare module '@shopify/flash-list' {
     info: FlashListRenderItemInfo<T>,
   ) => ReactElement | null;
 
-  export interface FlashListProps<T>
-    extends Omit<FlatListProps<T>, 'renderItem'> {
+  export interface FlashListProps<T> extends Omit<
+    FlatListProps<T>,
+    'renderItem'
+  > {
     renderItem: ListRenderItem<T>;
     estimatedItemSize?: number;
     data: T[] | null | undefined;
@@ -76,7 +72,7 @@ declare module '@shopify/flash-list' {
     style?: StyleProp<ViewStyle>;
   }
 
-  export interface FlashListRef<T> {
+  export interface FlashListRef<_T> {
     scrollToIndex: (params: {
       index: number;
       animated?: boolean;
@@ -130,6 +126,26 @@ declare module 'posthog-react-native' {
 declare module '*-native' {
   const v: any;
   export default v;
+}
+
+// expo-tracking-transparency stub for ATT (App Tracking Transparency)
+declare module 'expo-tracking-transparency' {
+  export type PermissionStatus =
+    | 'granted'
+    | 'denied'
+    | 'undetermined'
+    | 'restricted';
+
+  export interface TrackingPermissionResponse {
+    status: PermissionStatus;
+    granted: boolean;
+    canAskAgain: boolean;
+    expires: 'never' | number;
+  }
+
+  export function getTrackingPermissionsAsync(): Promise<TrackingPermissionResponse>;
+  export function requestTrackingPermissionsAsync(): Promise<TrackingPermissionResponse>;
+  export function isAvailable(): boolean;
 }
 
 // Some small global helpers used in older codepaths — prefer importing

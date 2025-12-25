@@ -18,7 +18,7 @@ import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 
 interface Props {
   visible: boolean;

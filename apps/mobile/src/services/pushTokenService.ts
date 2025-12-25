@@ -132,7 +132,7 @@ export const updatePushTokenPreferences = async (
 /**
  * Unregister push token
  */
-export const unregisterPushToken = async (token: string): Promise<void> => {
+export const unregisterPushToken = async (_token: string): Promise<void> => {
   try {
     const {
       data: { user },

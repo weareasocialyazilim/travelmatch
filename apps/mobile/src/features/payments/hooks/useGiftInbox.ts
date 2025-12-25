@@ -127,7 +127,7 @@ export const useGiftInbox = () => {
                 acc[senderId].latestGiftAt = req.createdAt;
                 acc[senderId].latestMessage = req.message || '';
               }
-            } catch (e) {
+            } catch {
               // If parsing fails, keep existing latestGiftAt
             }
           }

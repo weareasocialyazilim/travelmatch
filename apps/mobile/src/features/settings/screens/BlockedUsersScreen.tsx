@@ -77,7 +77,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
           // First time - use mock data
           setBlockedUsers(MOCK_BLOCKED_USERS);
         }
-      } catch (error) {
+      } catch {
         logger.debug('Failed to load blocked users');
         setBlockedUsers(MOCK_BLOCKED_USERS);
       }
@@ -103,7 +103,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
                 STORAGE_KEY,
                 JSON.stringify(newBlockedUsers),
               );
-            } catch (error) {
+            } catch {
               logger.debug('Failed to save blocked users');
             }
           },

@@ -175,7 +175,11 @@ export const usersService = {
         .eq('following_id', userId);
 
       if (error) throw error;
-      return { data: (data as FollowerRecord[]) || [], count: count || 0, error: null };
+      return {
+        data: (data as FollowerRecord[]) || [],
+        count: count || 0,
+        error: null,
+      };
     } catch (error) {
       logger.error('[DB] Get followers error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -190,7 +194,11 @@ export const usersService = {
         .eq('follower_id', userId);
 
       if (error) throw error;
-      return { data: (data as FollowingRecord[]) || [], count: count || 0, error: null };
+      return {
+        data: (data as FollowingRecord[]) || [],
+        count: count || 0,
+        error: null,
+      };
     } catch (error) {
       logger.error('[DB] Get following error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -211,7 +219,8 @@ export const usersService = {
       if (error) throw error;
 
       const isFollowing = !!(
-        (Array.isArray(data) && data.length > 0) || (typeof count === 'number' && count > 0)
+        (Array.isArray(data) && data.length > 0) ||
+        (typeof count === 'number' && count > 0)
       );
 
       return { isFollowing, error: null };
@@ -474,7 +483,9 @@ export const momentsService = {
 
       // Extract moments from the join result
       const moments =
-        data?.map((item: { moments: Tables['moments']['Row'] }) => item.moments).filter(Boolean) || [];
+        data
+          ?.map((item: { moments: Tables['moments']['Row'] }) => item.moments)
+          .filter(Boolean) || [];
 
       return { data: moments, count: count || 0, error: null };
     } catch (error) {
@@ -578,7 +589,7 @@ export const momentsService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await callRpc('soft_delete', {
+      const { data: _data, error } = await callRpc('soft_delete', {
         table_name: 'moments',
         record_id: id,
         user_id: user.id,
@@ -600,7 +611,7 @@ export const momentsService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await callRpc('restore_deleted', {
+      const { data: _data, error } = await callRpc('restore_deleted', {
         table_name: 'moments',
         record_id: id,
         user_id: user.id,
@@ -1365,7 +1376,9 @@ export const notificationsService = {
  */
 export const moderationService = {
   // Reports
-  async createReport(report: Omit<ReportRecord, 'id' | 'created_at'>): Promise<DbResult<ReportRecord>> {
+  async createReport(
+    report: Omit<ReportRecord, 'id' | 'created_at'>,
+  ): Promise<DbResult<ReportRecord>> {
     try {
       const { data, error } = await supabase
         .from('reports')
@@ -1398,7 +1411,9 @@ export const moderationService = {
   },
 
   // Blocks
-  async blockUser(block: Omit<BlockRecord, 'id' | 'created_at'>): Promise<DbResult<BlockRecord>> {
+  async blockUser(
+    block: Omit<BlockRecord, 'id' | 'created_at'>,
+  ): Promise<DbResult<BlockRecord>> {
     try {
       const { data, error } = await supabase
         .from('blocks')
@@ -1514,7 +1529,7 @@ export const transactionsService = {
           const authRes = await supabase.auth.getUser();
           user = authRes?.data?.user ?? null;
         }
-      } catch (e) {
+      } catch {
         // If auth lookup fails (e.g., not mocked), proceed without user enforcement
         user = null;
       }
@@ -1568,7 +1583,9 @@ export const transactionsService = {
     }
   },
 
-  async create(transaction: TransactionInput): Promise<DbResult<Tables['transactions']['Row']>> {
+  async create(
+    transaction: TransactionInput,
+  ): Promise<DbResult<Tables['transactions']['Row']>> {
     try {
       const { data, error } = await supabase
         .from('transactions')

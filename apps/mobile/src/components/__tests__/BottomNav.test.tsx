@@ -1,5 +1,6 @@
-// Unmock BottomNav - it's mocked globally in jest setup
-jest.unmock('@/components/BottomNav');
+// Unmock BottomNav since jest.setup.afterEnv.js mocks it globally
+// Note: Using relative path since that's what Jest resolves
+jest.unmock('../BottomNav');
 
 // Mock expo-blur as it's not available in test environment
 jest.mock('expo-blur', () => ({
@@ -83,8 +84,15 @@ describe('BottomNav', () => {
     });
 
     it('has correct accessibility roles', () => {
-      const { getAllByRole } = render(<BottomNav activeTab="Discover" />);
-      const tabs = getAllByRole('tab');
+      const { UNSAFE_queryAllByType } = render(
+        <BottomNav activeTab="Discover" />,
+      );
+      const { TouchableOpacity } = require('react-native');
+      const buttons = UNSAFE_queryAllByType(TouchableOpacity);
+      // Filter by accessibilityRole='tab'
+      const tabs = buttons.filter(
+        (btn) => btn.props.accessibilityRole === 'tab',
+      );
       expect(tabs.length).toBe(5);
     });
 

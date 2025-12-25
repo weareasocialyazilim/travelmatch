@@ -97,7 +97,7 @@ const StepCircle: React.FC<{
   isCompleted: boolean;
   isCurrent: boolean;
   isPending: boolean;
-}> = ({ step, isCompleted, isCurrent, isPending }) => {
+}> = ({ step, isCompleted, isCurrent, _isPending }) => {
   const pulseScale = useSharedValue(1);
 
   useEffect(() => {
@@ -105,10 +105,10 @@ const StepCircle: React.FC<{
       pulseScale.value = withRepeat(
         withSequence(
           withTiming(1.1, { duration: 1000 }),
-          withTiming(1, { duration: 1000 })
+          withTiming(1, { duration: 1000 }),
         ),
         -1,
-        true
+        true,
       );
     } else {
       pulseScale.value = 1;
@@ -122,8 +122,8 @@ const StepCircle: React.FC<{
   const backgroundColor = isCompleted
     ? COLORS.success
     : isCurrent
-    ? COLORS.primary
-    : COLORS.gray[200];
+      ? COLORS.primary
+      : COLORS.gray[200];
 
   const iconColor = isCompleted || isCurrent ? COLORS.white : COLORS.gray[400];
 

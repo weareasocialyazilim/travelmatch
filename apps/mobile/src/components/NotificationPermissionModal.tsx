@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 
 interface NotificationPermissionModalProps {

@@ -28,7 +28,7 @@ export async function sendPhoneOtp(
   channel: 'sms' | 'whatsapp' = 'sms',
 ): Promise<SendOtpResult> {
   try {
-    const { data, error } = await supabase.functions.invoke(
+    const { data: _data, error } = await supabase.functions.invoke(
       'twilio-sms/send-otp',
       {
         body: { phone, channel },
@@ -95,7 +95,7 @@ export async function sendSms(
   message: string,
 ): Promise<SendOtpResult> {
   try {
-    const { data, error } = await supabase.functions.invoke(
+    const { data: _data, error } = await supabase.functions.invoke(
       'twilio-sms/send-sms',
       {
         body: { to, message },

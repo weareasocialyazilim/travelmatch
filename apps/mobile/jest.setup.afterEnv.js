@@ -22,9 +22,9 @@ try {
         // ignore diagnostic errors
       }
       // Log and throw to help tests show where this came from
-      // eslint-disable-next-line no-console
+
       console.error('CREATE_ELEMENT_GUARD: invalid element type ->', info);
-      // eslint-disable-next-line no-console
+
       console.error(new Error('CREATE_ELEMENT_GUARD_STACK').stack);
       throw new Error(
         'EARLY_CREATE_ELEMENT_INVALID: element type is ' + String(type),
@@ -35,7 +35,6 @@ try {
     // log its keys to help identify import mismatches.
     if (typeof type === 'object' && type !== null && !type.$$typeof) {
       try {
-        // eslint-disable-next-line no-console
         console.error(
           'CREATE_ELEMENT_GUARD: unexpected object element type keys ->',
           Object.keys(type),
@@ -45,7 +44,6 @@ try {
           (typeof type.default === 'function' ||
             typeof type.default === 'object')
         ) {
-          // eslint-disable-next-line no-console
           console.error(
             'CREATE_ELEMENT_GUARD: object.default exists, type of default ->',
             typeof type.default,
@@ -412,13 +410,13 @@ try {
               const parsedMin = min
                 ? Number(min)
                 : captured['Min price']
-                ? Number(captured['Min price'])
-                : undefined;
+                  ? Number(captured['Min price'])
+                  : undefined;
               const parsedMax = max
                 ? Number(max)
                 : captured['Max price']
-                ? Number(captured['Max price'])
-                : undefined;
+                  ? Number(captured['Max price'])
+                  : undefined;
               try {
                 const useMomentsFn = require('@/hooks/useMoments').useMoments;
                 if (typeof useMomentsFn === 'function') {
@@ -609,8 +607,8 @@ try {
         const viewId = horizontal
           ? 'stories-view'
           : numColumns && numColumns > 1
-          ? 'grid-view'
-          : 'list-view';
+            ? 'grid-view'
+            : 'list-view';
 
         // Render empty component if no data
         const isEmpty = !data || data.length === 0;
@@ -1063,6 +1061,16 @@ jest.mock('@expo/vector-icons', () => {
     AntDesign: MockIcon,
     Entypo: MockIcon,
   };
+});
+
+// Mock direct imports of @expo/vector-icons submodules
+jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  const MockIcon = (props) =>
+    React.createElement(Text, props, props.name || 'icon');
+  MockIcon.displayName = 'MaterialCommunityIcons';
+  return MockIcon;
 });
 
 // Mock expo-image to avoid native component errors

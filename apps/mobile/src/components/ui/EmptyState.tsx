@@ -3,7 +3,7 @@ import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { spacing, SPACING } from '../../constants/spacing';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { Button } from './Button';
 import { EmptyStateIllustration } from './EmptyStateIllustration';

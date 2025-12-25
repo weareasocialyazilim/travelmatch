@@ -6,8 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  TextInput,  Platform,
-  // eslint-disable-next-line react-native/split-platform-components
+  TextInput,
+  Platform,
   ActionSheetIOS,
   KeyboardAvoidingView,
   ActivityIndicator,
@@ -51,16 +51,17 @@ const EditProfileScreen = () => {
   }, [user]);
 
   // Form state with RHF + Zod
-  const { control, handleSubmit, formState, watch, reset } = useForm<EditProfileInput>({
-    resolver: zodResolver(editProfileSchema),
-    mode: 'onChange',
-    defaultValues: {
-      fullName: originalProfile.name,
-      username: originalProfile.username,
-      bio: originalProfile.bio,
-      location: originalProfile.location,
-    },
-  });
+  const { control, handleSubmit, formState, watch, reset } =
+    useForm<EditProfileInput>({
+      resolver: zodResolver(editProfileSchema),
+      mode: 'onChange',
+      defaultValues: {
+        fullName: originalProfile.name,
+        username: originalProfile.username,
+        bio: originalProfile.bio,
+        location: originalProfile.location,
+      },
+    });
 
   // Watch fields for real-time updates
   const username = watch('username');
@@ -105,11 +106,10 @@ const EditProfileScreen = () => {
     setCheckingUsername(true);
     const timer = setTimeout(async () => {
       try {
-        const isAvailable = await userService.checkUsernameAvailability(
-          username,
-        );
+        const isAvailable =
+          await userService.checkUsernameAvailability(username);
         setUsernameAvailable(isAvailable);
-      } catch (error) {
+      } catch {
         // Ignore error
       } finally {
         setCheckingUsername(false);
@@ -165,7 +165,7 @@ const EditProfileScreen = () => {
           setAvatarUri(result.assets[0].uri);
         }
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to pick image', 'error');
     }
   };
@@ -189,7 +189,9 @@ const EditProfileScreen = () => {
         fullName: data.fullName,
         username: data.username,
         bio: data.bio,
-        location: data.location ? { city: data.location, country: '' } : undefined,
+        location: data.location
+          ? { city: data.location, country: '' }
+          : undefined,
       });
 
       // Refresh user context
@@ -198,15 +200,19 @@ const EditProfileScreen = () => {
       Alert.alert('Success', 'Profile updated successfully', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
-    } catch (error) {
+    } catch {
       showToast('Failed to update profile', 'error');
     }
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState }, {
-    requireDirty: false,
-    requireValid: true,
-  }) || usernameAvailable === false;
+  const isSubmitDisabled =
+    !canSubmitForm(
+      { formState },
+      {
+        requireDirty: false,
+        requireValid: true,
+      },
+    ) || usernameAvailable === false;
 
   const handleChangeAvatar = () => {
     const options = avatarUri
@@ -338,7 +344,10 @@ const EditProfileScreen = () => {
                 <Controller
                   control={control}
                   name="fullName"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => (
                     <>
                       <TextInput
                         style={styles.textInput}
@@ -349,7 +358,9 @@ const EditProfileScreen = () => {
                         placeholderTextColor={COLORS.textSecondary}
                         maxLength={50}
                       />
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                      {error && (
+                        <Text style={styles.errorText}>{error.message}</Text>
+                      )}
                     </>
                   )}
                 />
@@ -363,7 +374,10 @@ const EditProfileScreen = () => {
                 <Controller
                   control={control}
                   name="username"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => (
                     <>
                       <View style={styles.usernameInputContainer}>
                         <Text style={styles.usernamePrefix}>@</Text>
@@ -371,7 +385,9 @@ const EditProfileScreen = () => {
                           style={[styles.textInput, styles.usernameInput]}
                           value={value}
                           onChangeText={(text) =>
-                            onChange(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))
+                            onChange(
+                              text.toLowerCase().replace(/[^a-z0-9_]/g, ''),
+                            )
                           }
                           onBlur={onBlur}
                           placeholder="username"
@@ -406,7 +422,9 @@ const EditProfileScreen = () => {
                           This username is already taken
                         </Text>
                       )}
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                      {error && (
+                        <Text style={styles.errorText}>{error.message}</Text>
+                      )}
                     </>
                   )}
                 />
@@ -423,7 +441,8 @@ const EditProfileScreen = () => {
                       styles.charCount,
                       (bio?.length ?? 0) > BIO_MAX_LENGTH * 0.9 &&
                         styles.charCountWarning,
-                      (bio?.length ?? 0) >= BIO_MAX_LENGTH && styles.charCountError,
+                      (bio?.length ?? 0) >= BIO_MAX_LENGTH &&
+                        styles.charCountError,
                     ]}
                   >
                     {bio?.length ?? 0}/{BIO_MAX_LENGTH}
@@ -432,12 +451,17 @@ const EditProfileScreen = () => {
                 <Controller
                   control={control}
                   name="bio"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => (
                     <>
                       <TextInput
                         style={[styles.textInput, styles.bioInput]}
                         value={value}
-                        onChangeText={(text) => onChange(text.slice(0, BIO_MAX_LENGTH))}
+                        onChangeText={(text) =>
+                          onChange(text.slice(0, BIO_MAX_LENGTH))
+                        }
                         onBlur={onBlur}
                         placeholder="Tell us about yourself..."
                         placeholderTextColor={COLORS.textSecondary}
@@ -445,7 +469,9 @@ const EditProfileScreen = () => {
                         numberOfLines={3}
                         maxLength={BIO_MAX_LENGTH}
                       />
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                      {error && (
+                        <Text style={styles.errorText}>{error.message}</Text>
+                      )}
                     </>
                   )}
                 />
@@ -464,7 +490,10 @@ const EditProfileScreen = () => {
                 <Controller
                   control={control}
                   name="location"
-                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => (
                     <>
                       <View style={styles.locationInputContainer}>
                         <MaterialCommunityIcons
@@ -481,7 +510,9 @@ const EditProfileScreen = () => {
                           placeholderTextColor={COLORS.textSecondary}
                         />
                       </View>
-                      {error && <Text style={styles.errorText}>{error.message}</Text>}
+                      {error && (
+                        <Text style={styles.errorText}>{error.message}</Text>
+                      )}
                     </>
                   )}
                 />

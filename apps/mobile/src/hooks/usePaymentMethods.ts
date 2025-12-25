@@ -6,7 +6,11 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { paymentsApi, type PaymentMethod } from '@/services/paymentsApi';
 import { logger } from '@/utils/logger';
-import type { SavedCard, Wallet, WalletSettings } from '@/features/payments/types/payment-methods.types';
+import type {
+  SavedCard,
+  Wallet,
+  WalletSettings,
+} from '@/features/payments/types/payment-methods.types';
 
 export interface UsePaymentMethodsReturn {
   // Core API
@@ -42,7 +46,10 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
       const methods = await paymentsApi.getPaymentMethods();
       setPaymentMethods(methods);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to load payment methods');
+      const error =
+        err instanceof Error
+          ? err
+          : new Error('Failed to load payment methods');
       setError(error);
       logger.error('Failed to load payment methods', { error: err });
     } finally {
@@ -57,7 +64,8 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
       const newMethod = await paymentsApi.addPaymentMethod(paymentMethodId);
       setPaymentMethods((prev) => [...prev, newMethod]);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to add payment method');
+      const error =
+        err instanceof Error ? err : new Error('Failed to add payment method');
       setError(error);
       logger.error('Failed to add payment method', { error: err });
       throw error;
@@ -73,7 +81,10 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
       await paymentsApi.removePaymentMethod(paymentMethodId);
       setPaymentMethods((prev) => prev.filter((m) => m.id !== paymentMethodId));
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to remove payment method');
+      const error =
+        err instanceof Error
+          ? err
+          : new Error('Failed to remove payment method');
       setError(error);
       logger.error('Failed to remove payment method', { error: err });
       throw error;
@@ -82,26 +93,32 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     }
   }, []);
 
-  const setDefaultPaymentMethod = useCallback(async (paymentMethodId: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      await paymentsApi.setDefaultPaymentMethod(paymentMethodId);
-      setPaymentMethods((prev) =>
-        prev.map((m) => ({
-          ...m,
-          isDefault: m.id === paymentMethodId,
-        }))
-      );
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to set default payment method');
-      setError(error);
-      logger.error('Failed to set default payment method', { error: err });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const setDefaultPaymentMethod = useCallback(
+    async (paymentMethodId: string) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        await paymentsApi.setDefaultPaymentMethod(paymentMethodId);
+        setPaymentMethods((prev) =>
+          prev.map((m) => ({
+            ...m,
+            isDefault: m.id === paymentMethodId,
+          })),
+        );
+      } catch (err) {
+        const error =
+          err instanceof Error
+            ? err
+            : new Error('Failed to set default payment method');
+        setError(error);
+        logger.error('Failed to set default payment method', { error: err });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
 
   // Extended API: Derive savedCards from paymentMethods
   const savedCards = useMemo<SavedCard[]>(() => {
@@ -121,13 +138,18 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
       .filter((m) => m.type === 'wallet')
       .map((m) => ({
         id: m.id,
-        name: m.walletType === 'apple_pay' ? 'Apple Pay' : m.walletType === 'google_pay' ? 'Google Pay' : 'Wallet',
+        name:
+          m.walletType === 'apple_pay'
+            ? 'Apple Pay'
+            : m.walletType === 'google_pay'
+              ? 'Google Pay'
+              : 'Wallet',
         status: 'connected',
       }));
   }, [paymentMethods]);
 
   // Extended API: Wallet settings (default values for now)
-  const [walletSettings, setWalletSettings] = useState<WalletSettings>({
+  const [walletSettings, _setWalletSettings] = useState<WalletSettings>({
     isDefaultPayment: false,
     requireAuth: true,
     enableNotifications: true,
@@ -137,27 +159,36 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
   const isWalletConnected = wallets.length > 0;
 
   // Extended API: Add a card by card details
-  const addCard = useCallback(async (cardNumber: string, expiry: string, _cvv: string) => {
-    // In a real implementation, this would tokenize the card details
-    // For now, we generate a mock payment method ID
-    const paymentMethodId = `pm_${Date.now()}`;
-    logger.info('Adding card', { lastFour: cardNumber.slice(-4), expiry });
-    await addPaymentMethod(paymentMethodId);
-  }, [addPaymentMethod]);
+  const addCard = useCallback(
+    async (cardNumber: string, expiry: string, _cvv: string) => {
+      // In a real implementation, this would tokenize the card details
+      // For now, we generate a mock payment method ID
+      const paymentMethodId = `pm_${Date.now()}`;
+      logger.info('Adding card', { lastFour: cardNumber.slice(-4), expiry });
+      await addPaymentMethod(paymentMethodId);
+    },
+    [addPaymentMethod],
+  );
 
   // Extended API: Set card as default (sync wrapper)
-  const setCardAsDefault = useCallback((cardId: string) => {
-    setDefaultPaymentMethod(cardId).catch((err) => {
-      logger.error('Failed to set card as default', { error: err });
-    });
-  }, [setDefaultPaymentMethod]);
+  const setCardAsDefault = useCallback(
+    (cardId: string) => {
+      setDefaultPaymentMethod(cardId).catch((err) => {
+        logger.error('Failed to set card as default', { error: err });
+      });
+    },
+    [setDefaultPaymentMethod],
+  );
 
   // Extended API: Remove card (sync wrapper)
-  const removeCard = useCallback((cardId: string) => {
-    removePaymentMethod(cardId).catch((err) => {
-      logger.error('Failed to remove card', { error: err });
-    });
-  }, [removePaymentMethod]);
+  const removeCard = useCallback(
+    (cardId: string) => {
+      removePaymentMethod(cardId).catch((err) => {
+        logger.error('Failed to remove card', { error: err });
+      });
+    },
+    [removePaymentMethod],
+  );
 
   // Extended API: Connect wallet
   const connectWallet = useCallback(async () => {
@@ -179,16 +210,24 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     setPaymentMethods((prev) =>
       prev.filter((m) => {
         if (m.type !== 'wallet') return true;
-        const name = m.walletType === 'apple_pay' ? 'Apple Pay' : m.walletType === 'google_pay' ? 'Google Pay' : 'Wallet';
+        const name =
+          m.walletType === 'apple_pay'
+            ? 'Apple Pay'
+            : m.walletType === 'google_pay'
+              ? 'Google Pay'
+              : 'Wallet';
         return name !== walletName;
-      })
+      }),
     );
   }, []);
 
   // Extended API: Track user interactions for analytics
-  const trackInteraction = useCallback((action: string, data?: Record<string, unknown>) => {
-    logger.info('Payment interaction', { action, ...data });
-  }, []);
+  const trackInteraction = useCallback(
+    (action: string, data?: Record<string, unknown>) => {
+      logger.info('Payment interaction', { action, ...data });
+    },
+    [],
+  );
 
   useEffect(() => {
     refresh();

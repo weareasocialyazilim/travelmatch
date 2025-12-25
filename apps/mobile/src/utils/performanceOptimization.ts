@@ -7,7 +7,7 @@
  * @module utils/performanceOptimization
  */
 
-import { useRef, useCallback, useMemo, useEffect, useState } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import type { DependencyList } from 'react';
 
 /**

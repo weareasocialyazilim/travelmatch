@@ -137,13 +137,13 @@ export const requestService = {
         type: 'gift_request',
       } as unknown as Database['public']['Tables']['requests']['Insert'];
 
-      const { data: newRequest, error } = await dbRequestsService.create(
-        requestData,
-      );
+      const { data: newRequest, error } =
+        await dbRequestsService.create(requestData);
       if (error) throw error;
 
-      const dbTotal = (newRequest as any)?.total_price;
-      const computedTotal = Number(momentRow.price || 0) * Number(data.guestCount || 0);
+      const _dbTotal = (newRequest as any)?.total_price;
+      const computedTotal =
+        Number(momentRow.price || 0) * Number(data.guestCount || 0);
 
       const request: GiftRequest = {
         id: newRequest!.id,
@@ -253,7 +253,7 @@ export const requestService = {
    * Get requests I received (as host)
    */
   getReceivedRequests: async (
-    filters?: Omit<RequestFilters, 'role'>,
+    _filters?: Omit<RequestFilters, 'role'>,
   ): Promise<{ requests: GiftRequest[]; total: number }> => {
     try {
       const {
@@ -261,7 +261,11 @@ export const requestService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, count, error } = await supabase
+      const {
+        data,
+        count: _count,
+        error,
+      } = await supabase
         .from('requests')
         .select('*, users(*), moments(*)', { count: 'exact' })
         .order('created_at', { ascending: false });

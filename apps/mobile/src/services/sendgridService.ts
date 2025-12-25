@@ -115,7 +115,7 @@ export async function sendVerificationEmail(
   name?: string,
 ): Promise<SendEmailResult> {
   try {
-    const { data, error } = await supabase.functions.invoke(
+    const { data: _data, error } = await supabase.functions.invoke(
       'sendgrid-email/verification',
       {
         body: {
@@ -155,7 +155,7 @@ export async function sendPasswordResetEmail(
   name?: string,
 ): Promise<SendEmailResult> {
   try {
-    const { data, error } = await supabase.functions.invoke(
+    const { data: _data, error } = await supabase.functions.invoke(
       'sendgrid-email/password-reset',
       {
         body: {
@@ -194,7 +194,7 @@ export async function sendWelcomeEmail(
   firstName: string,
 ): Promise<SendEmailResult> {
   try {
-    const { data, error } = await supabase.functions.invoke(
+    const { data: _data, error } = await supabase.functions.invoke(
       'sendgrid-email/welcome',
       {
         body: {

@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import {
-  Share,
   Clipboard,
-  Linking,
   Modal,
   TouchableOpacity,
   View,
+  Share,
+  Linking,
 } from 'react-native';
 import { ShareMomentBottomSheet } from '../ShareMomentBottomSheet';
 
@@ -16,19 +16,6 @@ jest.mock('../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: mockShowToast,
   }),
-}));
-
-// Clipboard is already mocked in jest.native-mocks.js
-
-// Mock Share
-jest.mock('react-native/Libraries/Share/Share', () => ({
-  share: jest.fn().mockResolvedValue({ action: 'sharedAction' }),
-}));
-
-// Mock Linking
-jest.mock('react-native/Libraries/Linking/Linking', () => ({
-  canOpenURL: jest.fn().mockResolvedValue(true),
-  openURL: jest.fn().mockResolvedValue(true),
 }));
 
 // Mock logger
@@ -49,6 +36,10 @@ describe('ShareMomentBottomSheet', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset Share and Linking mocks from jest.native-mocks.js
+    (Share.share as jest.Mock).mockResolvedValue({ action: 'sharedAction' });
+    (Linking.canOpenURL as jest.Mock).mockResolvedValue(true);
+    (Linking.openURL as jest.Mock).mockResolvedValue(undefined);
   });
 
   describe('Rendering', () => {
@@ -230,6 +221,7 @@ describe('ShareMomentBottomSheet', () => {
     });
 
     it('shows warning toast when WhatsApp is not installed', async () => {
+      // Set canOpenURL to return false for this specific test
       (Linking.canOpenURL as jest.Mock).mockResolvedValueOnce(false);
       const { getByText } = render(
         <ShareMomentBottomSheet {...defaultProps} />,
@@ -268,6 +260,7 @@ describe('ShareMomentBottomSheet', () => {
     });
 
     it('shows warning toast when Instagram is not installed', async () => {
+      // Set canOpenURL to return false for this specific test
       (Linking.canOpenURL as jest.Mock).mockResolvedValueOnce(false);
       const { getByText } = render(
         <ShareMomentBottomSheet {...defaultProps} />,

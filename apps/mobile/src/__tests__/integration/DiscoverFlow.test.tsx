@@ -11,6 +11,28 @@ import { render, mockMoment, mockFilter } from '../testUtilsRender.helper';
 jest.mock('../../hooks/useMoments');
 jest.mock('../../services/supabaseDbService');
 
+// Mock BottomNav component - use relative path for Jest module resolution
+jest.mock('../../components/BottomNav', () => {
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: () => <View testID="bottom-nav" />,
+  };
+});
+
+// Mock EmptyState component since @/components/ui/EmptyState alias may not resolve
+jest.mock('../../components/ui/EmptyState', () => ({
+  EmptyState: ({ title, message }: { title?: string; message?: string }) => {
+    const { View, Text } = require('react-native');
+    return (
+      <View testID="empty-state">
+        {title && <Text>{title}</Text>}
+        {message && <Text>{message}</Text>}
+      </View>
+    );
+  },
+}));
+
 // Mock NetworkContext to provide network status
 jest.mock('../../context/NetworkContext', () => ({
   useNetworkStatus: () => ({

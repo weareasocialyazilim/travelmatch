@@ -1,20 +1,18 @@
 import React, { memo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Share,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { OptimizedImage } from './ui/OptimizedImage';
 import { analytics } from '../services/analytics';
-import { getMomentImageProps, getAvatarImageProps, IMAGE_VARIANTS_BY_CONTEXT } from '../utils/cloudflareImageHelpers';
+import {
+  getMomentImageProps,
+  getAvatarImageProps,
+  IMAGE_VARIANTS_BY_CONTEXT,
+} from '../utils/cloudflareImageHelpers';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePressScale } from '../utils/animations';
@@ -119,7 +117,10 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         <Animated.View style={[styles.card, cardScale]}>
           <View style={styles.cardImageContainer}>
             <OptimizedImage
-              {...getMomentImageProps(moment, IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE)}
+              {...getMomentImageProps(
+                moment,
+                IMAGE_VARIANTS_BY_CONTEXT.CARD_SINGLE,
+              )}
               contentFit="cover"
               style={styles.cardImage}
               transition={200}
@@ -148,7 +149,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                 {...getAvatarImageProps(
                   moment.user || {},
                   IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                  'https://via.placeholder.com/150'
+                  'https://via.placeholder.com/150',
                 )}
                 contentFit="cover"
                 style={styles.userAvatar}

@@ -12,7 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { logger } from '../utils/logger';
 
@@ -55,7 +55,11 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
     try {
       if (Platform.OS === 'web' && typeof window !== 'undefined') {
         // Web platform only
-        await (window.navigator as Navigator & { clipboard: { writeText: (s: string) => Promise<void> } }).clipboard.writeText(proofUrl);
+        await (
+          window.navigator as Navigator & {
+            clipboard: { writeText: (s: string) => Promise<void> };
+          }
+        ).clipboard.writeText(proofUrl);
       } else {
         // For React Native, you would use @react-native-clipboard/clipboard
         // For now, just simulate the copy

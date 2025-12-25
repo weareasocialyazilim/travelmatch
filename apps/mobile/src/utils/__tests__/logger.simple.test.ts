@@ -4,7 +4,7 @@
  * Target Coverage: 80%+
  */
 
-import { Logger } from '@/utils/logger';
+import { Logger } from '../logger';
 
 // Mock console methods
 const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
@@ -21,23 +21,35 @@ describe('logger.ts - simplified', () => {
   // Helper: some environments map info -> log; accept either
   // Accept console.info, fallback to console.log/console.warn, or Logger.__testLogs when running in Jest
   const getInfoCalls = () => {
-    if (mockConsoleInfo.mock.calls.length) return mockConsoleInfo.mock.calls.slice().reverse();
-    if (mockConsoleLog.mock.calls.length) return mockConsoleLog.mock.calls.slice().reverse();
-    if (mockConsoleWarn.mock.calls.length) return mockConsoleWarn.mock.calls.slice().reverse();
+    if (mockConsoleInfo.mock.calls.length)
+      return mockConsoleInfo.mock.calls.slice().reverse();
+    if (mockConsoleLog.mock.calls.length)
+      return mockConsoleLog.mock.calls.slice().reverse();
+    if (mockConsoleWarn.mock.calls.length)
+      return mockConsoleWarn.mock.calls.slice().reverse();
     // Fallback to Logger.__testLogs (collected by Logger during Jest)
     // Represent each entry as [entry] to match console.mock.calls shape
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const LoggerClass = require('@/utils/logger').Logger;
-    if (Array.isArray(LoggerClass.__testLogs) && LoggerClass.__testLogs.length) {
-      return LoggerClass.__testLogs.slice().reverse().map((entry) => {
-        // entry can be [message, argsArray]
-        if (Array.isArray(entry)) {
-          const [message, argsArr] = entry;
-          return [message, Array.isArray(argsArr) && argsArr.length ? argsArr[0] : argsArr];
-        }
-        // fallback to string
-        return [String(entry)];
-      });
+
+    const LoggerClass = require('../logger').Logger;
+    if (
+      Array.isArray(LoggerClass.__testLogs) &&
+      LoggerClass.__testLogs.length
+    ) {
+      return LoggerClass.__testLogs
+        .slice()
+        .reverse()
+        .map((entry) => {
+          // entry can be [message, argsArray]
+          if (Array.isArray(entry)) {
+            const [message, argsArr] = entry;
+            return [
+              message,
+              Array.isArray(argsArr) && argsArr.length ? argsArr[0] : argsArr,
+            ];
+          }
+          // fallback to string
+          return [String(entry)];
+        });
     }
     return [];
   };

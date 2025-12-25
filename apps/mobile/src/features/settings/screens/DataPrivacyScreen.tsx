@@ -85,7 +85,7 @@ const DataPrivacyScreen = () => {
   ) => {
     try {
       // Record consent in history
-      const { data: rpcData, error } = await callRpc('record_consent', {
+      const { data: _rpcData, error } = await callRpc('record_consent', {
         target_user_id: user?.id,
         consent_type: consentType,
         consented: value,
@@ -216,7 +216,7 @@ const DataPrivacyScreen = () => {
           onPress: async () => {
             setDeleteLoading(true);
             try {
-              const { data: rpcData2, error } = await callRpc(
+              const { data: _rpcData2, error } = await callRpc(
                 'schedule_account_deletion',
                 {
                   target_user_id: user?.id,

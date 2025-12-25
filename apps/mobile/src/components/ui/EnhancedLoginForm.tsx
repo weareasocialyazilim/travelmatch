@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing, SPACING } from '../../constants/spacing';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
@@ -42,7 +42,10 @@ export const EnhancedLoginForm: React.FC<EnhancedLoginFormProps> = ({
 
   const onSubmit = async (data: LoginInput) => {
     try {
-      const result = await login({ email: data.email, password: data.password });
+      const result = await login({
+        email: data.email,
+        password: data.password,
+      });
       if (result.success) {
         toast.success('Login successful!');
         onSuccess?.();

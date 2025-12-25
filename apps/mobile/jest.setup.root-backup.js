@@ -22,9 +22,9 @@ try {
         // ignore diagnostic errors
       }
       // Log and throw to help tests show where this came from
-      // eslint-disable-next-line no-console
+       
       console.error('CREATE_ELEMENT_GUARD: invalid element type ->', info);
-      // eslint-disable-next-line no-console
+       
       console.error(new Error('CREATE_ELEMENT_GUARD_STACK').stack);
       throw new Error(
         'EARLY_CREATE_ELEMENT_INVALID: element type is ' + String(type),
@@ -35,7 +35,7 @@ try {
     // log its keys to help identify import mismatches.
     if (typeof type === 'object' && type !== null && !type.$$typeof) {
       try {
-        // eslint-disable-next-line no-console
+         
         console.error(
           'CREATE_ELEMENT_GUARD: unexpected object element type keys ->',
           Object.keys(type),
@@ -45,7 +45,7 @@ try {
           (typeof type.default === 'function' ||
             typeof type.default === 'object')
         ) {
-          // eslint-disable-next-line no-console
+           
           console.error(
             'CREATE_ELEMENT_GUARD: object.default exists, type of default ->',
             typeof type.default,

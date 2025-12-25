@@ -22,10 +22,8 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  withDelay,
   withSequence,
   withTiming,
-  runOnJS,
 } from 'react-native-reanimated';
 import { COLORS, GRADIENTS } from '../constants/colors';
 
@@ -81,7 +79,7 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
         withTiming(10, { duration: 100 }),
         withTiming(-5, { duration: 100 }),
         withTiming(5, { duration: 100 }),
-        withTiming(0, { duration: 100 })
+        withTiming(0, { duration: 100 }),
       );
 
       // Text fade in
@@ -140,14 +138,21 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
 
   // Simple confetti dots
   const renderConfetti = () => {
-    const confettiColors = ['#F59E0B', '#EC4899', '#8B5CF6', '#10B981', '#3B82F6'];
+    const confettiColors = [
+      '#F59E0B',
+      '#EC4899',
+      '#8B5CF6',
+      '#10B981',
+      '#3B82F6',
+    ];
     const dots = [];
 
     for (let i = 0; i < 30; i++) {
       const left = Math.random() * SCREEN_WIDTH;
-      const delay = Math.random() * 500;
+      const _delay = Math.random() * 500;
       const size = 6 + Math.random() * 8;
-      const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      const color =
+        confettiColors[Math.floor(Math.random() * confettiColors.length)];
 
       dots.push(
         <Animated.View
@@ -162,7 +167,7 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
               borderRadius: size / 2,
             },
           ]}
-        />
+        />,
       );
     }
 
@@ -206,7 +211,8 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
 
             {/* Amount */}
             <Text style={styles.amount}>
-              {currency}{giftAmount}
+              {currency}
+              {giftAmount}
             </Text>
 
             {/* Escrow Info */}

@@ -7,7 +7,7 @@ declare const __DEV__: boolean;
 
 // Extend globalThis for test environments
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __DEV__: boolean;
   
   namespace NodeJS {

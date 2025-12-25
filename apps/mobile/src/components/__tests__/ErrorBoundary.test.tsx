@@ -10,6 +10,13 @@
  * - Reset and navigation functionality
  */
 
+// Ensure __DEV__ is defined for React Native
+declare global {
+  // eslint-disable-next-line no-var
+  var __DEV__: boolean;
+}
+global.__DEV__ = true;
+
 import React from 'react';
 import { Text, View } from 'react-native';
 import {
@@ -113,7 +120,7 @@ describe('ErrorBoundary', () => {
       // Retry button should exist
       const retryButton = screen.getByText('Tekrar Dene');
       expect(retryButton).toBeTruthy();
-      
+
       // Verify button is pressable (doesn't throw)
       fireEvent.press(retryButton);
     });

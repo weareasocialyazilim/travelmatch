@@ -82,7 +82,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
           ]}
         >
           <Image
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
+             
             source={require('../../../../assets/icon.png')}
             style={styles.logo}
             resizeMode="contain"

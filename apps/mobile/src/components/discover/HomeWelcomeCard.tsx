@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -48,11 +42,10 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
               color={COLORS.white}
             />
           </View>
-          <Text style={styles.welcomeTitle}>
-            Welcome, {firstName}!
-          </Text>
+          <Text style={styles.welcomeTitle}>Welcome, {firstName}!</Text>
           <Text style={styles.welcomeSubtitle}>
-            Your journey begins here. Connect with locals and discover authentic experiences.
+            Your journey begins here. Connect with locals and discover authentic
+            experiences.
           </Text>
         </View>
 
@@ -71,7 +64,12 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           onPress={onSetupProfile}
           activeOpacity={0.7}
         >
-          <View style={[styles.actionIcon, { backgroundColor: COLORS.coralTransparent }]}>
+          <View
+            style={[
+              styles.actionIcon,
+              { backgroundColor: COLORS.coralTransparent },
+            ]}
+          >
             <MaterialCommunityIcons
               name="account-circle-outline"
               size={24}
@@ -97,7 +95,12 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           onPress={onExplore}
           activeOpacity={0.7}
         >
-          <View style={[styles.actionIcon, { backgroundColor: COLORS.mintTransparent }]}>
+          <View
+            style={[
+              styles.actionIcon,
+              { backgroundColor: COLORS.mintTransparent },
+            ]}
+          >
             <MaterialCommunityIcons
               name="compass-outline"
               size={24}
@@ -128,7 +131,9 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
               size={20}
               color={COLORS.success}
             />
-            <Text style={styles.tipText}>Verify your profile to build trust</Text>
+            <Text style={styles.tipText}>
+              Verify your profile to build trust
+            </Text>
           </View>
           <View style={styles.tipCard}>
             <MaterialCommunityIcons

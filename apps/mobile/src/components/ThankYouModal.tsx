@@ -11,7 +11,7 @@ import Animated, {
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 
 interface ThankYouModalProps {

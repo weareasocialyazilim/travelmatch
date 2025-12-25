@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
@@ -10,7 +17,6 @@ import { NotificationCard } from '@/components/NotificationCard';
 import { useRequestsScreen } from '@/hooks/useRequestsScreen';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
-import type { TabType } from '../types/requests.types';
 import type { NotificationType } from '@/components/NotificationCard';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 
@@ -44,7 +50,7 @@ const RequestsScreen = () => {
     markNotificationAsRead,
   } = useRequestsScreen(route.params?.initialTab || 'pending');
 
-  const handleNotificationPress = async (item: typeof notifications[0]) => {
+  const handleNotificationPress = async (item: (typeof notifications)[0]) => {
     if (!item.isRead) {
       await markNotificationAsRead(item.id);
     }
@@ -60,7 +66,12 @@ const RequestsScreen = () => {
             style={[styles.tab, selectedTab === 'pending' && styles.tabActive]}
             onPress={() => setSelectedTab('pending')}
           >
-            <Text style={[styles.tabText, selectedTab === 'pending' && styles.tabTextActive]}>
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === 'pending' && styles.tabTextActive,
+              ]}
+            >
               Requests
             </Text>
             {newRequestsCount > 0 && (
@@ -71,17 +82,25 @@ const RequestsScreen = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tab, selectedTab === 'notifications' && styles.tabActive]}
+            style={[
+              styles.tab,
+              selectedTab === 'notifications' && styles.tabActive,
+            ]}
             onPress={() => setSelectedTab('notifications')}
           >
             <Text
-              style={[styles.tabText, selectedTab === 'notifications' && styles.tabTextActive]}
+              style={[
+                styles.tabText,
+                selectedTab === 'notifications' && styles.tabTextActive,
+              ]}
             >
               Activity
             </Text>
             {unreadNotificationsCount > 0 && (
               <View style={styles.tabBadge}>
-                <Text style={styles.tabBadgeText}>{unreadNotificationsCount}</Text>
+                <Text style={styles.tabBadgeText}>
+                  {unreadNotificationsCount}
+                </Text>
               </View>
             )}
           </TouchableOpacity>
@@ -210,7 +229,7 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ErrorBoundary for requests/notifications screen
-export default withErrorBoundary(RequestsScreen, { 
+export default withErrorBoundary(RequestsScreen, {
   fallbackType: 'generic',
-  displayName: 'RequestsScreen' 
+  displayName: 'RequestsScreen',
 });

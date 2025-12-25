@@ -1,6 +1,6 @@
 /**
  * Supabase Realtime Subscription Tests
- * 
+ *
  * Tests for real-time features including:
  * - Channel subscriptions
  * - Message event handling
@@ -8,7 +8,7 @@
  * - Connection state management
  * - Reconnection logic
  * - Event handlers
- * 
+ *
  * Coverage:
  * - Subscribe/unsubscribe to channels
  * - Postgres changes (INSERT, UPDATE, DELETE)
@@ -45,7 +45,7 @@ describe('Supabase Realtime Subscriptions', () => {
       send: jest.fn(),
     };
 
-    (supabase.channel ).mockReturnValue(mockChannel);
+    supabase.channel.mockReturnValue(mockChannel);
   });
 
   // ===========================
@@ -64,11 +64,15 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('test-channel');
 
       channel
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        }, jest.fn())
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+          },
+          jest.fn(),
+        )
         .subscribe();
 
       expect(mockChannel.on).toHaveBeenCalledWith(
@@ -78,7 +82,7 @@ describe('Supabase Realtime Subscriptions', () => {
           schema: 'public',
           table: 'messages',
         }),
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(mockChannel.subscribe).toHaveBeenCalled();
@@ -116,7 +120,7 @@ describe('Supabase Realtime Subscriptions', () => {
       });
 
       const channel = supabase.channel('test-channel');
-      
+
       channel.subscribe((status: string) => {
         expect(status).toBe('SUBSCRIBED');
         done();
@@ -129,7 +133,7 @@ describe('Supabase Realtime Subscriptions', () => {
       });
 
       const channel = supabase.channel('test-channel');
-      
+
       channel.subscribe((status: string) => {
         expect(status).toBe('CHANNEL_ERROR');
         done();
@@ -152,19 +156,23 @@ describe('Supabase Realtime Subscriptions', () => {
       };
 
       const channel = supabase.channel('messages');
-      channel.on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-      }, insertHandler);
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        insertHandler,
+      );
 
       // Simulate INSERT event
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const handler = onCall[2];
       handler({ new: newMessage });
 
       expect(insertHandler).toHaveBeenCalledWith(
-        expect.objectContaining({ new: newMessage })
+        expect.objectContaining({ new: newMessage }),
       );
     });
 
@@ -177,13 +185,17 @@ describe('Supabase Realtime Subscriptions', () => {
       };
 
       const channel = supabase.channel('messages');
-      channel.on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'messages',
-      }, updateHandler);
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+        },
+        updateHandler,
+      );
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const handler = onCall[2];
       handler({ new: updatedMessage, old: { id: '123', content: 'Old' } });
 
@@ -194,18 +206,22 @@ describe('Supabase Realtime Subscriptions', () => {
       const deleteHandler = jest.fn();
 
       const channel = supabase.channel('messages');
-      channel.on('postgres_changes', {
-        event: 'DELETE',
-        schema: 'public',
-        table: 'messages',
-      }, deleteHandler);
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'messages',
+        },
+        deleteHandler,
+      );
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const handler = onCall[2];
       handler({ old: { id: '123' } });
 
       expect(deleteHandler).toHaveBeenCalledWith(
-        expect.objectContaining({ old: { id: '123' } })
+        expect.objectContaining({ old: { id: '123' } }),
       );
     });
 
@@ -214,19 +230,23 @@ describe('Supabase Realtime Subscriptions', () => {
       const handler = jest.fn();
 
       const channel = supabase.channel('messages');
-      channel.on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`,
-      }, handler);
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        handler,
+      );
 
       expect(mockChannel.on).toHaveBeenCalledWith(
         'postgres_changes',
         expect.objectContaining({
           filter: `conversation_id=eq.${conversationId}`,
         }),
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -235,18 +255,26 @@ describe('Supabase Realtime Subscriptions', () => {
       const conversationsHandler = jest.fn();
 
       const channel = supabase.channel('multi-table');
-      
+
       channel
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-        }, messagesHandler)
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'conversations',
-        }, conversationsHandler);
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+          },
+          messagesHandler,
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'conversations',
+          },
+          conversationsHandler,
+        );
 
       expect(mockChannel.on).toHaveBeenCalledTimes(2);
     });
@@ -255,16 +283,20 @@ describe('Supabase Realtime Subscriptions', () => {
       const handler = jest.fn();
 
       const channel = supabase.channel('all-events');
-      channel.on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'messages',
-      }, handler);
+      channel.on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+        },
+        handler,
+      );
 
       expect(mockChannel.on).toHaveBeenCalledWith(
         'postgres_changes',
         expect.objectContaining({ event: '*' }),
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -291,7 +323,7 @@ describe('Supabase Realtime Subscriptions', () => {
               key: 'user-123',
             },
           },
-        })
+        }),
       );
     });
 
@@ -306,7 +338,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('presence');
       channel.on('presence', { event: 'sync' }, syncHandler);
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const handler = onCall[2];
       handler();
 
@@ -319,12 +351,12 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('presence');
       channel.on('presence', { event: 'join' }, joinHandler);
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const handler = onCall[2];
       handler({ key: 'user-123', newPresences: [{ user_id: 'user-123' }] });
 
       expect(joinHandler).toHaveBeenCalledWith(
-        expect.objectContaining({ key: 'user-123' })
+        expect.objectContaining({ key: 'user-123' }),
       );
     });
 
@@ -334,12 +366,12 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('presence');
       channel.on('presence', { event: 'leave' }, leaveHandler);
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const handler = onCall[2];
       handler({ key: 'user-123', leftPresences: [{ user_id: 'user-123' }] });
 
       expect(leaveHandler).toHaveBeenCalledWith(
-        expect.objectContaining({ key: 'user-123' })
+        expect.objectContaining({ key: 'user-123' }),
       );
     });
 
@@ -367,7 +399,7 @@ describe('Supabase Realtime Subscriptions', () => {
   describe('Broadcast Events', () => {
     it('should send broadcast message', () => {
       const channel = supabase.channel('typing');
-      
+
       channel.send({
         type: 'broadcast',
         event: 'typing',
@@ -379,7 +411,7 @@ describe('Supabase Realtime Subscriptions', () => {
           type: 'broadcast',
           event: 'typing',
           payload: expect.objectContaining({ isTyping: true }),
-        })
+        }),
       );
     });
 
@@ -389,7 +421,7 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('typing');
       channel.on('broadcast', { event: 'typing' }, broadcastHandler);
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const handler = onCall[2];
       handler({
         payload: { userId: 'user-456', isTyping: true },
@@ -398,7 +430,7 @@ describe('Supabase Realtime Subscriptions', () => {
       expect(broadcastHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           payload: expect.objectContaining({ isTyping: true }),
-        })
+        }),
       );
     });
   });
@@ -410,7 +442,7 @@ describe('Supabase Realtime Subscriptions', () => {
   describe('Connection State Management', () => {
     it('should start in disconnected state', () => {
       const channel = supabase.channel('test');
-      
+
       // Channel created but not subscribed
       expect(mockChannel.subscribe).not.toHaveBeenCalled();
     });
@@ -421,7 +453,7 @@ describe('Supabase Realtime Subscriptions', () => {
       });
 
       const channel = supabase.channel('test');
-      
+
       channel.subscribe((status: string) => {
         expect(status).toBe('SUBSCRIBED');
         done();
@@ -434,7 +466,7 @@ describe('Supabase Realtime Subscriptions', () => {
       });
 
       const channel = supabase.channel('test');
-      
+
       channel.subscribe((status: string) => {
         expect(status).toBe('TIMED_OUT');
         done();
@@ -447,7 +479,7 @@ describe('Supabase Realtime Subscriptions', () => {
       });
 
       const channel = supabase.channel('test');
-      
+
       channel.subscribe((status: string) => {
         expect(status).toBe('CHANNEL_ERROR');
         done();
@@ -470,18 +502,26 @@ describe('Supabase Realtime Subscriptions', () => {
   describe('Reconnection Logic', () => {
     it('should resubscribe after connection loss', () => {
       const channel = supabase.channel('test');
+      const statusCallback = jest.fn();
 
       mockChannel.subscribe
-        .mockImplementationOnce((cb: Function) => cb('SUBSCRIBED'))
-        .mockImplementationOnce((cb: Function) => cb('CHANNEL_ERROR'))
-        .mockImplementationOnce((cb: Function) => cb('SUBSCRIBED'));
+        .mockImplementationOnce((cb: Function) => {
+          if (cb) cb('SUBSCRIBED');
+        })
+        .mockImplementationOnce((cb: Function) => {
+          if (cb) cb('CHANNEL_ERROR');
+        })
+        .mockImplementationOnce((cb: Function) => {
+          if (cb) cb('SUBSCRIBED');
+        });
 
       // Initial subscription
-      channel.subscribe();
+      channel.subscribe(statusCallback);
       expect(mockChannel.subscribe).toHaveBeenCalledTimes(1);
+      expect(statusCallback).toHaveBeenLastCalledWith('SUBSCRIBED');
 
-      // Simulate reconnection
-      channel.subscribe();
+      // Simulate reconnection (unsubscribe and resubscribe)
+      channel.subscribe(statusCallback);
       expect(mockChannel.subscribe).toHaveBeenCalledTimes(2);
     });
 
@@ -499,7 +539,7 @@ describe('Supabase Realtime Subscriptions', () => {
       expect(mockChannel.on).toHaveBeenCalledWith(
         'postgres_changes',
         expect.any(Object),
-        handler
+        handler,
       );
     });
   });
@@ -535,9 +575,9 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('test');
       channel.on('postgres_changes', { event: 'INSERT' }, handler);
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const eventHandler = onCall[2];
-      
+
       eventHandler({ new: null });
       eventHandler({ new: undefined });
 
@@ -550,9 +590,9 @@ describe('Supabase Realtime Subscriptions', () => {
       const channel = supabase.channel('test');
       channel.on('postgres_changes', { event: 'INSERT' }, handler);
 
-      const onCall = (mockChannel.on ).mock.calls[0];
+      const onCall = mockChannel.on.mock.calls[0];
       const eventHandler = onCall[2];
-      
+
       eventHandler({ invalid: 'data' });
       eventHandler({});
 
@@ -560,11 +600,11 @@ describe('Supabase Realtime Subscriptions', () => {
     });
 
     it('should handle concurrent channel operations', async () => {
-      const channels = Array.from({ length: 5 }, (_, i) => 
-        supabase.channel(`concurrent-${i}`)
+      const channels = Array.from({ length: 5 }, (_, i) =>
+        supabase.channel(`concurrent-${i}`),
       );
 
-      await Promise.all(channels.map(ch => Promise.resolve(ch.subscribe())));
+      await Promise.all(channels.map((ch) => Promise.resolve(ch.subscribe())));
 
       expect(mockChannel.subscribe).toHaveBeenCalledTimes(5);
     });

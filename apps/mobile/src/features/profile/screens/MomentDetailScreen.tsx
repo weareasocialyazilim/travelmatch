@@ -106,7 +106,7 @@ const MomentDetailScreen: React.FC = () => {
           text: r.comment,
         }));
         setReviews(mappedReviews);
-      } catch (error) {
+      } catch {
         // Silent fail
       }
     };
@@ -129,7 +129,7 @@ const MomentDetailScreen: React.FC = () => {
             message: r.message || '',
           }));
           setPendingRequestsList(mappedRequests);
-        } catch (error) {
+        } catch {
           // Silent fail
         }
       };
@@ -218,15 +218,21 @@ const MomentDetailScreen: React.FC = () => {
     );
   }, [deleteMoment, moment.id, navigation, showToast]);
 
-  const handleAcceptRequest = useCallback((requestId: string) => {
-    showToast('The guest has been notified!', 'info');
-    setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-  }, [showToast]);
+  const handleAcceptRequest = useCallback(
+    (requestId: string) => {
+      showToast('The guest has been notified!', 'info');
+      setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
+    },
+    [showToast],
+  );
 
-  const handleDeclineRequest = useCallback((requestId: string) => {
-    showToast('The guest has been notified.', 'info');
-    setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-  }, [showToast]);
+  const handleDeclineRequest = useCallback(
+    (requestId: string) => {
+      showToast('The guest has been notified.', 'info');
+      setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
+    },
+    [showToast],
+  );
 
   const handleGiftOption = useCallback(() => {
     trackInteraction('gift_selected');
@@ -294,10 +300,10 @@ const MomentDetailScreen: React.FC = () => {
             typeof momentUser.location === 'string'
               ? momentUser.location
               : momentUser.location
-              ? `${momentUser.location.city || ''}, ${
-                  momentUser.location.country || ''
-                }`
-              : undefined,
+                ? `${momentUser.location.city || ''}, ${
+                    momentUser.location.country || ''
+                  }`
+                : undefined,
           travelDays: momentUser.travelDays,
           isVerified: momentUser.isVerified,
         },

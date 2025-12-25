@@ -18,7 +18,7 @@ import { PLANS } from '../constants/plans';
 import { VALUES } from '@/constants/values';
 import { subscriptionsService } from '@/services/supabase';
 import { logger } from '@/utils/logger';
-import type { Plan, SubscriptionPlan } from '../constants/plans';
+import type { SubscriptionPlan } from '../constants/plans';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { ComponentProps } from 'react';
@@ -203,19 +203,27 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <View style={styles.benefitsList}>
             <View style={styles.benefitItem}>
               <Icon name="compass" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>Create more moments & share experiences</Text>
+              <Text style={styles.benefitText}>
+                Create more moments & share experiences
+              </Text>
             </View>
             <View style={styles.benefitItem}>
               <Icon name="message-text" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>Unlimited messaging with travelers</Text>
+              <Text style={styles.benefitText}>
+                Unlimited messaging with travelers
+              </Text>
             </View>
             <View style={styles.benefitItem}>
               <Icon name="gift" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>Send more gifts & show appreciation</Text>
+              <Text style={styles.benefitText}>
+                Send more gifts & show appreciation
+              </Text>
             </View>
             <View style={styles.benefitItem}>
               <Icon name="shield-check" size={20} color={COLORS.success} />
-              <Text style={styles.benefitText}>Get verified badge & build trust</Text>
+              <Text style={styles.benefitText}>
+                Get verified badge & build trust
+              </Text>
             </View>
           </View>
         </View>
@@ -230,7 +238,8 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <View style={styles.biometricContent}>
             <Text style={styles.biometricTitle}>Quick & Secure Checkout</Text>
             <Text style={styles.biometricText}>
-              Use {Platform.OS === 'ios' ? 'Face ID' : 'Fingerprint'} for fast payment verification
+              Use {Platform.OS === 'ios' ? 'Face ID' : 'Fingerprint'} for fast
+              payment verification
             </Text>
           </View>
         </View>

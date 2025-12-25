@@ -77,7 +77,7 @@ export const useOfflineSupabase = () => {
 
             // Execute original method (typed call)
             const fn = original as (...a: unknown[]) => unknown;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+             
             return fn(...args);
           };
         }

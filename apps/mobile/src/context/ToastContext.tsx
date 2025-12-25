@@ -4,7 +4,14 @@
  */
 
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useCallback, useMemo, memo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+  memo,
+} from 'react';
 import {
   Text,
   StyleSheet,
@@ -16,7 +23,7 @@ import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 

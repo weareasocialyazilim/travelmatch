@@ -129,7 +129,7 @@ class SubscriptionManager {
       const filterStr = config.filter || '';
 
       // Subscribe to postgres changes
-      const postgresChanges = (
+      const _postgresChanges = (
         channel as unknown as { on: (...args: unknown[]) => unknown }
       ).on(
         'postgres_changes',
@@ -274,7 +274,7 @@ class SubscriptionManager {
     const maxDelay = 30000; // Cap at 30 seconds
     const exponentialDelay = Math.min(
       reconnectDelay * Math.pow(2, subscription.reconnectAttempts),
-      maxDelay
+      maxDelay,
     );
     // Add jitter to prevent thundering herd
     const jitter = exponentialDelay * Math.random() * 0.25;

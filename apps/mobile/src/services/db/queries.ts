@@ -11,8 +11,6 @@ import type { Database } from '../../types/database.types';
 // Type aliases for convenience
 type Tables = Database['public']['Tables'];
 type Moment = Tables['moments']['Row'];
-type User = Tables['users']['Row'];
-type Request = Tables['requests']['Row'];
 
 /**
  * ============================================

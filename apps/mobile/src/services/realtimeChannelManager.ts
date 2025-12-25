@@ -414,7 +414,7 @@ class RealtimeChannelManager {
   async disconnectAll(): Promise<void> {
     logger.info('RealtimeChannelManager', 'Disconnecting all channels');
 
-    for (const [name, managedChannel] of this.channels) {
+    for (const [_name, managedChannel] of this.channels) {
       if (managedChannel.channel) {
         await supabase.removeChannel(managedChannel.channel);
         managedChannel.channel = null;

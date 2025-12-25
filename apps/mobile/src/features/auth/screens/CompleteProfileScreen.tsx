@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
-  // eslint-disable-next-line react-native/split-platform-components
+   
   ActionSheetIOS,
   Alert,
 } from 'react-native';

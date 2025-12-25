@@ -25,15 +25,16 @@ const ChangePasswordScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { showToast } = useToast();
 
-  const { control, handleSubmit, formState, watch } = useForm<ChangePasswordInput>({
-    resolver: zodResolver(changePasswordSchema),
-    mode: 'onChange',
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-  });
+  const { control, handleSubmit, formState, watch } =
+    useForm<ChangePasswordInput>({
+      resolver: zodResolver(changePasswordSchema),
+      mode: 'onChange',
+      defaultValues: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      },
+    });
 
   const newPassword = watch('newPassword');
   const confirmPassword = watch('confirmPassword');
@@ -45,7 +46,7 @@ const ChangePasswordScreen: React.FC = () => {
       const { error } = await supabase.auth.updateUser({
         password: data.newPassword,
       });
-      
+
       if (error) throw error;
 
       showToast('Your password has been changed successfully.', 'success');
@@ -59,10 +60,13 @@ const ChangePasswordScreen: React.FC = () => {
     }
   };
 
-  const isSubmitDisabled = !canSubmitForm({ formState }, {
-    requireDirty: false,
-    requireValid: true,
-  });
+  const isSubmitDisabled = !canSubmitForm(
+    { formState },
+    {
+      requireDirty: false,
+      requireValid: true,
+    },
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -111,7 +115,10 @@ const ChangePasswordScreen: React.FC = () => {
             <Controller
               control={control}
               name="currentPassword"
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
                 <PasswordInput
                   value={value}
                   onChangeText={onChange}
@@ -129,7 +136,10 @@ const ChangePasswordScreen: React.FC = () => {
             <Controller
               control={control}
               name="newPassword"
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
                 <PasswordInput
                   value={value}
                   onChangeText={onChange}
@@ -147,7 +157,10 @@ const ChangePasswordScreen: React.FC = () => {
             <Controller
               control={control}
               name="confirmPassword"
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }) => (
                 <PasswordInput
                   value={value}
                   onChangeText={onChange}
@@ -282,7 +295,9 @@ const ChangePasswordScreen: React.FC = () => {
             disabled={isSubmitDisabled}
           >
             <Text style={styles.changeButtonText}>
-              {formState.isSubmitting ? 'Changing Password...' : 'Change Password'}
+              {formState.isSubmitting
+                ? 'Changing Password...'
+                : 'Change Password'}
             </Text>
           </TouchableOpacity>
 
@@ -290,7 +305,10 @@ const ChangePasswordScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.forgotButton}
             onPress={() =>
-              showToast('Password reset link will be sent to your email.', 'info')
+              showToast(
+                'Password reset link will be sent to your email.',
+                'info',
+              )
             }
           >
             <Text style={styles.forgotButtonText}>
@@ -364,24 +382,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.text,
     marginBottom: 8,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  input: {
-    flex: 1,
-    height: 48,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: COLORS.text,
-  },
-  eyeButton: {
-    padding: 12,
   },
   requirementsContainer: {
     backgroundColor: COLORS.white,

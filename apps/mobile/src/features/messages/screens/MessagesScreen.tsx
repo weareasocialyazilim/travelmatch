@@ -372,38 +372,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     flex: 1,
   },
-  discoverButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    marginTop: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-  },
-  discoverButtonText: {
-    color: COLORS.white,
-    ...TYPOGRAPHY.body,
-    fontWeight: '600',
-  },
-  emptyState: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-    paddingTop: 80,
-  },
-  emptySubtitle: {
-    color: COLORS.textSecondary,
-    ...TYPOGRAPHY.body,
-    lineHeight: 22,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  emptyTitle: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.h3,
-    fontWeight: '600',
-    marginTop: 16,
-  },
   lastMessage: {
     color: COLORS.textSecondary,
     flex: 1,

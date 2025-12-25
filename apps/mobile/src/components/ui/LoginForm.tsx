@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
-import { spacing, SPACING } from '../../constants/spacing';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useToast } from '../../context/ToastContext';
 import { useFormValidation } from '../../hooks/useFormValidation';

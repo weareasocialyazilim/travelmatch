@@ -5,7 +5,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'TravelMatch',
   slug: 'travelmatch',
   owner: 'travelmatch',
-  version: '1.0.0',
+  version: '0.0.1',
   orientation: 'portrait',
   // Custom entry point to fix AppEntry.js resolution in monorepo
   entryPoint: './index.ts',
@@ -21,10 +21,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.travelmatch.mobile',
-    buildNumber: '1',
+    buildNumber: '23',
     associatedDomains: ['applinks:travelmatch.app'],
     config: {},
     infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
       NSLocationWhenInUseUsageDescription:
         'TravelMatch needs your location to verify your travel moments and show you relevant experiences nearby.',
       NSCameraUsageDescription:

@@ -212,7 +212,7 @@ export function useOfflineMutation<
         if (online) {
           // Execute registered handler immediately when online
           // `executeHandler` will throw if no handler exists.
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const result = await (offlineSyncQueue as any).executeHandler(
             offlineActionType,
             params as Record<string, unknown>,

@@ -95,7 +95,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
       showToast('Şikayetiniz başarıyla gönderildi', 'success');
       handleClose();
-    } catch (error) {
+    } catch {
       showToast('Şikayetiniz gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setLoading(false);
@@ -302,12 +302,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: colors.text.primary,
-  },
-  reasonDescription: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginLeft: 32,
-    marginTop: 4,
   },
   detailsContainer: {
     marginTop: 24,

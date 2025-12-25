@@ -8,7 +8,7 @@
 
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
-import { toJson, toRecord } from '../utils/jsonHelper';
+import { toRecord } from '../utils/jsonHelper';
 
 export interface PaymentMethod {
   id: string;

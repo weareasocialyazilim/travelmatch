@@ -23,8 +23,8 @@ interface ExpoFileSystemExtended {
 
 const FileSystemExtended = FileSystem as typeof FileSystem &
   ExpoFileSystemExtended;
-const File = FileSystemExtended.File;
-const Paths = FileSystemExtended.Paths;
+const _File = FileSystemExtended.File;
+const _Paths = FileSystemExtended.Paths;
 
 // ArrayBuffer to Base64 conversion
 const encode = (buffer: ArrayBuffer): string => {

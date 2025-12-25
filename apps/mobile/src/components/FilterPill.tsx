@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePressScale } from '../utils/animations';
 

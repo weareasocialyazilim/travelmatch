@@ -357,7 +357,7 @@ export const messageService = {
                   senderWithKey.public_key,
                 );
               }
-            } catch (e) {
+            } catch {
               logger.warn('[Message] Failed to decrypt message', msg.id);
               content = '🔒 Encrypted message';
             }
@@ -367,8 +367,8 @@ export const messageService = {
             msg.type === 'system'
               ? 'system'
               : msg.type === 'image'
-              ? 'image'
-              : 'text';
+                ? 'image'
+                : 'text';
 
           return {
             id: msg.id,

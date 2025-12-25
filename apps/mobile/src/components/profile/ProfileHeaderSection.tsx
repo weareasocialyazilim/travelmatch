@@ -44,10 +44,19 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     const resolvedLocation =
       typeof location === 'string'
         ? location
-        : (location && (location as any).city) || (user && typeof user.location === 'string' ? user.location : (user && (user.location as any)?.city)) || '';
-    const resolvedVerified = typeof isVerified === 'boolean' ? isVerified : !!user?.kyc;
-    const resolvedTrust = typeof trustScore === 'number' ? trustScore : (user?.trust_score ?? undefined);
-    const handleEditPress = onEditPress || onAvatarPress || onTrustGardenPress || (() => {});
+        : (location && (location as any).city) ||
+          (user && typeof user.location === 'string'
+            ? user.location
+            : user && (user.location as any)?.city) ||
+          '';
+    const _resolvedVerified =
+      typeof isVerified === 'boolean' ? isVerified : !!user?.kyc;
+    const resolvedTrust =
+      typeof trustScore === 'number'
+        ? trustScore
+        : (user?.trust_score ?? undefined);
+    const handleEditPress =
+      onEditPress || onAvatarPress || onTrustGardenPress || (() => {});
     return (
       <View style={styles.profileSection}>
         {/* Avatar */}
@@ -56,7 +65,11 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
           onPress={onAvatarPress}
           activeOpacity={0.9}
         >
-          <Image testID="profile-avatar" source={{ uri: resolvedAvatar }} style={styles.avatar} />
+          <Image
+            testID="profile-avatar"
+            source={{ uri: resolvedAvatar }}
+            style={styles.avatar}
+          />
           {isVerified && (
             <View style={styles.verifiedBadge}>
               <MaterialCommunityIcons
@@ -91,7 +104,9 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
             size={16}
             color={COLORS.mint}
           />
-          <Text style={styles.proofScoreText}>ProofScore {resolvedTrust ?? ''}%</Text>
+          <Text style={styles.proofScoreText}>
+            ProofScore {resolvedTrust ?? ''}%
+          </Text>
           <MaterialCommunityIcons
             name="chevron-right"
             size={16}
@@ -100,7 +115,11 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
         </TouchableOpacity>
         {/* Edit button used in tests */}
         {onEditPress && (
-          <TouchableOpacity testID="edit-button" onPress={handleEditPress} accessibilityRole="button">
+          <TouchableOpacity
+            testID="edit-button"
+            onPress={handleEditPress}
+            accessibilityRole="button"
+          >
             <Text>Edit</Text>
           </TouchableOpacity>
         )}

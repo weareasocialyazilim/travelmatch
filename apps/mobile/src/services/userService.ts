@@ -10,14 +10,8 @@ import { encryptionService } from './encryptionService';
 import { usersService as dbUsersService } from './supabaseDbService';
 import type { Database } from '../types/database.types';
 import { uploadFile } from './supabaseStorageService';
-import {
-  NotificationPreferencesSchema,
-  PrivacySettingsSchema,
-  UpdateUserProfileSchema,
-} from '../schemas/user.schema';
 import { isNotNull } from '../types/guards';
 import type {
-  FollowRow,
   UserRow,
   UpdateProfilePayload,
   NotificationPreferences,
@@ -429,7 +423,7 @@ export const userService = {
     params?: { page?: number; pageSize?: number },
   ): Promise<{ followers: FollowUser[]; total: number }> => {
     const {
-      data: { user: currentUser },
+      data: { user: _currentUser },
     } = await supabase.auth.getUser();
 
     // Get followers from DB
@@ -442,15 +436,17 @@ export const userService = {
     const myFollowingIds: Set<string> = new Set();
     const myFollowerIds: Set<string> = new Set();
 
-    const allFollowers = ((data as unknown as UserRow[]) || []).map((follower) => ({
-      id: follower.id,
-      name: follower.full_name || follower.name || 'Unknown',
-      username: follower.email ? follower.email.split('@')[0] : '',
-      avatar: follower.avatar_url || follower.avatar || '',
-      isVerified: follower.verified || false,
-      isFollowing: myFollowingIds.has(follower.id),
-      isFollowedBy: myFollowerIds.has(follower.id),
-    }));
+    const allFollowers = ((data as unknown as UserRow[]) || []).map(
+      (follower) => ({
+        id: follower.id,
+        name: follower.full_name || follower.name || 'Unknown',
+        username: follower.email ? follower.email.split('@')[0] : '',
+        avatar: follower.avatar_url || follower.avatar || '',
+        isVerified: follower.verified || false,
+        isFollowing: myFollowingIds.has(follower.id),
+        isFollowedBy: myFollowerIds.has(follower.id),
+      }),
+    );
 
     // Manual pagination since db service returns all
     const start = (params?.page || 0) * (params?.pageSize || 10);
@@ -468,7 +464,7 @@ export const userService = {
     params?: { page?: number; pageSize?: number },
   ): Promise<{ following: FollowUser[]; total: number }> => {
     const {
-      data: { user: currentUser },
+      data: { user: _currentUser },
     } = await supabase.auth.getUser();
 
     const { data, count, error } = await dbUsersService.getFollowing(userId);
@@ -480,15 +476,17 @@ export const userService = {
     const myFollowingIds: Set<string> = new Set();
     const myFollowerIds: Set<string> = new Set();
 
-    const allFollowing = ((data as unknown as UserRow[]) || []).map((followingUser) => ({
-      id: followingUser.id,
-      name: followingUser.full_name || followingUser.name || 'Unknown',
-      username: followingUser.email ? followingUser.email.split('@')[0] : '',
-      avatar: followingUser.avatar_url || followingUser.avatar || '',
-      isVerified: followingUser.verified || false,
-      isFollowing: myFollowingIds.has(followingUser.id),
-      isFollowedBy: myFollowerIds.has(followingUser.id),
-    }));
+    const allFollowing = ((data as unknown as UserRow[]) || []).map(
+      (followingUser) => ({
+        id: followingUser.id,
+        name: followingUser.full_name || followingUser.name || 'Unknown',
+        username: followingUser.email ? followingUser.email.split('@')[0] : '',
+        avatar: followingUser.avatar_url || followingUser.avatar || '',
+        isVerified: followingUser.verified || false,
+        isFollowing: myFollowingIds.has(followingUser.id),
+        isFollowedBy: myFollowerIds.has(followingUser.id),
+      }),
+    );
 
     // Manual pagination
     const start = (params?.page || 0) * (params?.pageSize || 10);

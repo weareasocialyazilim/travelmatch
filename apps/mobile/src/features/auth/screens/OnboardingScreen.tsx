@@ -10,7 +10,6 @@ import type {
   StackScreenProps,
 } from '@react-navigation/stack';
 import React, { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { ImageSourcePropType } from 'react-native';
 import {
   Animated,
@@ -25,8 +24,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
-  Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface OnboardingPage {
   id: string;
@@ -51,7 +49,6 @@ type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   navigation: navProp,
 }) => {
-  const { t } = useTranslation();
   const defaultNavigation =
     useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
@@ -64,8 +61,8 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const iconImage = require('../../../../assets/icon.png') as ImageSourcePropType;
+  const iconImage =
+    require('../../../../assets/icon.png') as ImageSourcePropType;
 
   // New 5-slide onboarding flow for gift-moment concept
   const ONBOARDING_PAGES: OnboardingPage[] = [
@@ -126,9 +123,12 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     ]).start(() => {
       if (currentIndex < ONBOARDING_PAGES.length - 1) {
         const nextIndex = currentIndex + 1;
-        flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+        flatListRef.current?.scrollToIndex({
+          index: nextIndex,
+          animated: true,
+        });
         setCurrentIndex(nextIndex);
-        
+
         // Track page view
         analytics.trackEvent('onboarding_page_view', {
           screen: 'onboarding',
@@ -140,15 +140,17 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           screen: 'onboarding',
           total_screens: ONBOARDING_PAGES.length,
         });
-        completeOnboarding().then(() => {
-          navigation.replace('Welcome');
-        }).catch((error: unknown) => {
-          logger.error('Onboarding completion error', { error });
-          // Fallback: still navigate even if storage fails
-          navigation.replace('Welcome');
-        });
+        completeOnboarding()
+          .then(() => {
+            navigation.replace('Welcome');
+          })
+          .catch((error: unknown) => {
+            logger.error('Onboarding completion error', { error });
+            // Fallback: still navigate even if storage fails
+            navigation.replace('Welcome');
+          });
       }
-      
+
       // Restore animation
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -176,7 +178,13 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     navigation.replace('Welcome');
   };
 
-  const renderPage = ({ item, index }: { item: OnboardingPage; index: number }) => (
+  const renderPage = ({
+    item,
+    index: _index,
+  }: {
+    item: OnboardingPage;
+    index: number;
+  }) => (
     <Animated.View
       style={[
         styles.pageContainer,
@@ -202,10 +210,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       {/* Icon (if present) */}
       {item.icon && (
         <View style={styles.iconContainer}>
-          <LinearGradient
-            colors={item.gradient}
-            style={styles.iconGradient}
-          >
+          <LinearGradient colors={item.gradient} style={styles.iconGradient}>
             <MaterialCommunityIcons
               name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
               size={48}
@@ -270,7 +275,10 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity onPress={handleNext} style={styles.nextButtonWrapper}>
+          <TouchableOpacity
+            onPress={handleNext}
+            style={styles.nextButtonWrapper}
+          >
             <LinearGradient
               colors={ONBOARDING_PAGES[currentIndex].gradient}
               start={{ x: 0, y: 0 }}

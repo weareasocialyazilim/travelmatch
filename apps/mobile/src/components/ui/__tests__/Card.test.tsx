@@ -103,7 +103,20 @@ describe('Card Component', () => {
         </Card>,
       );
       const card = getByTestId('custom-card');
-      expect(card.props.style).toEqual(expect.objectContaining(customStyle));
+      // Style may be an array, so we need to flatten and check
+      const styles = Array.isArray(card.props.style)
+        ? card.props.style
+            .flat()
+            .reduce(
+              (
+                acc: Record<string, unknown>,
+                s: Record<string, unknown> | null | undefined,
+              ) => ({ ...acc, ...s }),
+              {},
+            )
+        : card.props.style;
+      expect(styles.marginTop).toBe(20);
+      expect(styles.backgroundColor).toBe('red');
     });
   });
 

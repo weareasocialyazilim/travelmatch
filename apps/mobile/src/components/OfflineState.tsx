@@ -1,7 +1,7 @@
 /**
  * OfflineState Component
  * Finalized single source for offline UI
- * 
+ *
  * Shows a clean offline state with optional retry button
  */
 
@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
-import { spacing, SPACING } from '../constants/spacing';
+import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import type { ViewStyle } from 'react-native';
 
@@ -25,29 +25,29 @@ export interface OfflineStateProps {
    * @default "Bağlantı Yok"
    */
   message?: string;
-  
+
   /**
    * Callback when retry is pressed
    */
   onRetry?: () => void | Promise<void>;
-  
+
   /**
    * Custom retry button text
    * @default "Tekrar Dene"
    */
   retryText?: string;
-  
+
   /**
    * Show as banner instead of full screen
    * @default false
    */
   compact?: boolean;
-  
+
   /**
    * Custom style
    */
   style?: ViewStyle;
-  
+
   /**
    * Test ID
    */
@@ -56,11 +56,11 @@ export interface OfflineStateProps {
 
 /**
  * OfflineState - Single source for offline UI
- * 
+ *
  * @example
  * // Full screen
  * <OfflineState onRetry={handleRetry} />
- * 
+ *
  * @example
  * // Compact banner
  * <OfflineState compact onRetry={handleRetry} />
@@ -97,7 +97,7 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
           />
           <Text style={styles.compactMessage}>{message}</Text>
         </View>
-        
+
         {onRetry && (
           <TouchableOpacity
             style={styles.compactRetryButton}

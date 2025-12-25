@@ -78,7 +78,7 @@ export const LoginScreen: React.FC = () => {
           'error',
         );
       }
-    } catch (error) {
+    } catch {
       showToast(
         'Biyometrik doğrulama kullanılamıyor. Lütfen şifrenizi kullanın',
         'error',

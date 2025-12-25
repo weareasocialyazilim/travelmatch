@@ -126,7 +126,7 @@ export const NotificationSettingsScreen: React.FC<
             })),
           );
         }
-      } catch (error) {
+      } catch {
         logger.debug('Failed to load notification settings');
       }
     };
@@ -151,7 +151,7 @@ export const NotificationSettingsScreen: React.FC<
       });
       try {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allSettings));
-      } catch (error) {
+      } catch {
         logger.debug('Failed to save notification settings');
       }
     }

@@ -177,7 +177,7 @@ const customRender = (
   // If the root UI element carries a `navigation` prop, expose it on global
   // for the test navigation mock in `jest.setup` so `useNavigation` returns it.
   // Avoid try/catch for lint cleanliness — access safely via guards.
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
   // @ts-ignore
   if (ui && ui.props && ui.props.navigation) {
     // @ts-ignore
@@ -345,3 +345,13 @@ export const checkAccessibility = (component: ReactElement) => {
   // Add accessibility checks here
   return { getByLabelText, getByA11yRole, getByA11yHint };
 };
+
+// Jest requires at least one test in test files
+// This file is a helper module but is in __tests__ folder
+describe('testUtilsRender.helper', () => {
+  it('exports test utilities', () => {
+    expect(typeof checkAccessibility).toBe('function');
+    expect(typeof mockMoment).toBe('function');
+    expect(typeof mockUser).toBe('function');
+  });
+});

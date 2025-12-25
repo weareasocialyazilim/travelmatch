@@ -14,7 +14,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { radii } from '@/constants/radii';
-import { spacing, SPACING } from '@/constants/spacing';
+import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSearchStore } from '@/stores/searchStore';

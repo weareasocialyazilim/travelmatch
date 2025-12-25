@@ -10,7 +10,7 @@ declare module '@expo/vector-icons/MaterialCommunityIcons' {
 }
 
 // Prop-types declaration
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 declare module 'prop-types' {
   export const string: any;
   export const number: any;
@@ -28,4 +28,4 @@ declare module 'prop-types' {
   export const shape: (shape: any) => any;
   export const exact: (shape: any) => any;
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
+ 

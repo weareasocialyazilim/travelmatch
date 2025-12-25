@@ -1,10 +1,22 @@
 /**
  * Payment Service Complete Test Suite
- * 
+ *
  * Comprehensive tests for payment operations, wallet, and transactions
  */
 
-import { paymentService, type Transaction, type PaymentCard, type BankAccount } from '../paymentService';
+// Define __DEV__ for tests
+declare global {
+  // eslint-disable-next-line no-var
+  var __DEV__: boolean;
+}
+global.__DEV__ = true;
+
+import {
+  paymentService,
+  type Transaction,
+  type PaymentCard,
+  type BankAccount,
+} from '../paymentService';
 import { supabase } from '../../config/supabase';
 import { transactionsService } from '../supabaseDbService';
 
@@ -28,25 +40,30 @@ jest.mock('../supabaseDbService', () => ({
   },
 }));
 
-const mockSupabase = supabase ;
-const mockTransactionsService = transactionsService ;
+const mockSupabase = supabase;
+const mockTransactionsService = transactionsService;
 
 describe('PaymentService', () => {
   const mockUser = { id: 'user-123', email: 'test@example.com' };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (mockSupabase.auth.getUser ).mockResolvedValue({ data: { user: mockUser }, error: null });
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
   });
 
   describe('getBalance', () => {
     it('should fetch user wallet balance', async () => {
-      const mockBalance = { balance: 100.50, currency: 'USD' };
-      
-      (mockSupabase.from ).mockReturnValue({
+      const mockBalance = { balance: 100.5, currency: 'USD' };
+
+      mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
+            single: jest
+              .fn()
+              .mockResolvedValue({ data: mockBalance, error: null }),
           }),
         }),
       });
@@ -54,7 +71,7 @@ describe('PaymentService', () => {
       const result = await paymentService.getBalance();
 
       expect(result).toEqual({
-        available: 100.50,
+        available: 100.5,
         pending: 0,
         currency: 'USD',
       });
@@ -62,10 +79,12 @@ describe('PaymentService', () => {
     });
 
     it('should return zero balance when user not found', async () => {
-      (mockSupabase.from ).mockReturnValue({
+      mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: null, error: new Error('Not found') }),
+            single: jest
+              .fn()
+              .mockResolvedValue({ data: null, error: new Error('Not found') }),
           }),
         }),
       });
@@ -80,10 +99,13 @@ describe('PaymentService', () => {
     });
 
     it('should return zero balance when user not authenticated', async () => {
-      (mockSupabase.auth.getUser ).mockResolvedValue({ data: { user: null }, error: null });
+      mockSupabase.auth.getUser.mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
 
       const result = await paymentService.getBalance();
-      
+
       expect(result).toEqual({
         available: 0,
         pending: 0,
@@ -109,7 +131,7 @@ describe('PaymentService', () => {
         },
       ];
 
-      (mockTransactionsService.list ).mockResolvedValue({
+      mockTransactionsService.list.mockResolvedValue({
         data: mockTransactions,
         count: 1,
         error: null,
@@ -127,7 +149,7 @@ describe('PaymentService', () => {
     });
 
     it('should filter transactions by type', async () => {
-      (mockTransactionsService.list ).mockResolvedValue({
+      mockTransactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -135,13 +157,16 @@ describe('PaymentService', () => {
 
       await paymentService.getTransactions({ type: 'withdrawal' });
 
-      expect(mockTransactionsService.list).toHaveBeenCalledWith('user-123', expect.objectContaining({
-        type: 'withdrawal',
-      }));
+      expect(mockTransactionsService.list).toHaveBeenCalledWith(
+        'user-123',
+        expect.objectContaining({
+          type: 'withdrawal',
+        }),
+      );
     });
 
     it('should filter transactions by status', async () => {
-      (mockTransactionsService.list ).mockResolvedValue({
+      mockTransactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -149,13 +174,16 @@ describe('PaymentService', () => {
 
       await paymentService.getTransactions({ status: 'pending' });
 
-      expect(mockTransactionsService.list).toHaveBeenCalledWith('user-123', expect.objectContaining({
-        status: 'pending',
-      }));
+      expect(mockTransactionsService.list).toHaveBeenCalledWith(
+        'user-123',
+        expect.objectContaining({
+          status: 'pending',
+        }),
+      );
     });
 
     it('should filter transactions by date range', async () => {
-      (mockTransactionsService.list ).mockResolvedValue({
+      mockTransactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -166,14 +194,17 @@ describe('PaymentService', () => {
         endDate: '2024-12-31',
       });
 
-      expect(mockTransactionsService.list).toHaveBeenCalledWith('user-123', expect.objectContaining({
-        startDate: '2024-01-01',
-        endDate: '2024-12-31',
-      }));
+      expect(mockTransactionsService.list).toHaveBeenCalledWith(
+        'user-123',
+        expect.objectContaining({
+          startDate: '2024-01-01',
+          endDate: '2024-12-31',
+        }),
+      );
     });
 
     it('should handle pagination', async () => {
-      (mockTransactionsService.list ).mockResolvedValue({
+      mockTransactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -181,13 +212,16 @@ describe('PaymentService', () => {
 
       await paymentService.getTransactions({ page: 2, pageSize: 20 });
 
-      expect(mockTransactionsService.list).toHaveBeenCalledWith('user-123', expect.objectContaining({
-        limit: 20,
-      }));
+      expect(mockTransactionsService.list).toHaveBeenCalledWith(
+        'user-123',
+        expect.objectContaining({
+          limit: 20,
+        }),
+      );
     });
 
     it('should return empty array on error', async () => {
-      (mockTransactionsService.list ).mockResolvedValue({
+      mockTransactionsService.list.mockResolvedValue({
         data: null,
         count: 0,
         error: new Error('Database error'),
@@ -215,7 +249,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.get ).mockResolvedValue({
+      mockTransactionsService.get.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -231,12 +265,14 @@ describe('PaymentService', () => {
     });
 
     it('should throw error when transaction not found', async () => {
-      (mockTransactionsService.get ).mockResolvedValue({
+      mockTransactionsService.get.mockResolvedValue({
         data: null,
         error: new Error('Not found'),
       });
 
-      await expect(paymentService.getTransaction('invalid-id')).rejects.toThrow();
+      await expect(
+        paymentService.getTransaction('invalid-id'),
+      ).rejects.toThrow();
     });
   });
 
@@ -331,7 +367,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -351,16 +387,18 @@ describe('PaymentService', () => {
     });
 
     it('should throw error when payment fails', async () => {
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: null,
         error: new Error('Payment failed'),
       });
 
-      await expect(paymentService.processPayment({
-        amount: 25,
-        currency: 'USD',
-        paymentMethodId: 'pm_123',
-      })).rejects.toThrow();
+      await expect(
+        paymentService.processPayment({
+          amount: 25,
+          currency: 'USD',
+          paymentMethodId: 'pm_123',
+        }),
+      ).rejects.toThrow();
     });
   });
 
@@ -378,7 +416,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -395,16 +433,18 @@ describe('PaymentService', () => {
     });
 
     it('should throw error when withdrawal fails', async () => {
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: null,
         error: new Error('Withdrawal failed'),
       });
 
-      await expect(paymentService.withdrawFunds({
-        amount: 100,
-        currency: 'USD',
-        bankAccountId: 'ba_123',
-      })).rejects.toThrow();
+      await expect(
+        paymentService.withdrawFunds({
+          amount: 100,
+          currency: 'USD',
+          bankAccountId: 'ba_123',
+        }),
+      ).rejects.toThrow();
     });
   });
 
@@ -422,7 +462,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -440,11 +480,13 @@ describe('PaymentService', () => {
   describe.skip('getWalletBalance', () => {
     it('should get complete wallet balance', async () => {
       const mockBalance = { balance: 250.75, currency: 'USD' };
-      
-      (mockSupabase.from ).mockReturnValue({
+
+      mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
+            single: jest
+              .fn()
+              .mockResolvedValue({ data: mockBalance, error: null }),
           }),
         }),
       });
@@ -470,10 +512,12 @@ describe('PaymentService', () => {
         created_at: new Date().toISOString(),
       };
 
-      (mockSupabase.from ).mockReturnValue({
+      mockSupabase.from.mockReturnValue({
         insert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: mockIntent, error: null }),
+            single: jest
+              .fn()
+              .mockResolvedValue({ data: mockIntent, error: null }),
           }),
         }),
       });
@@ -499,47 +543,59 @@ describe('PaymentService', () => {
         status: 'completed',
       };
 
-      (mockSupabase.from ).mockReturnValue({
+      mockSupabase.from.mockReturnValue({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             select: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: mockIntent, error: null }),
+              single: jest
+                .fn()
+                .mockResolvedValue({ data: mockIntent, error: null }),
             }),
           }),
         }),
       });
 
-      const result = await paymentService.confirmPayment('pi_123', 'pm_card_123');
+      const result = await paymentService.confirmPayment(
+        'pi_123',
+        'pm_card_123',
+      );
 
       expect(result.success).toBe(true);
     });
 
     it('should handle payment confirmation failure', async () => {
-      (mockSupabase.from ).mockReturnValue({
+      mockSupabase.from.mockReturnValue({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             select: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: null, error: new Error('Confirmation failed') }),
+              single: jest
+                .fn()
+                .mockResolvedValue({
+                  data: null,
+                  error: new Error('Confirmation failed'),
+                }),
             }),
           }),
         }),
       });
 
-      await expect(paymentService.confirmPayment('pi_invalid', 'pm_123')).rejects.toThrow();
+      await expect(
+        paymentService.confirmPayment('pi_invalid', 'pm_123'),
+      ).rejects.toThrow();
     });
   });
 
   describe.skip('Helper Functions', () => {
     it('formatCurrency should format amount correctly', () => {
       const { formatCurrency } = require('../paymentService');
-      
+
       expect(formatCurrency(100, 'USD')).toBe('$100.00');
       expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
     });
 
     it('getTransactionTypeLabel should return correct labels', () => {
       const { getTransactionTypeLabel } = require('../paymentService');
-      
+
       expect(getTransactionTypeLabel('gift_sent')).toBe('Gift Sent');
       expect(getTransactionTypeLabel('gift_received')).toBe('Gift Received');
       expect(getTransactionTypeLabel('withdrawal')).toBe('Withdrawal');
@@ -547,7 +603,7 @@ describe('PaymentService', () => {
 
     it('getTransactionIcon should return correct icons', () => {
       const { getTransactionIcon } = require('../paymentService');
-      
+
       expect(getTransactionIcon('gift_sent')).toBe('gift');
       expect(getTransactionIcon('withdrawal')).toBe('bank-transfer-out');
       expect(getTransactionIcon('deposit')).toBe('bank-transfer-in');
@@ -555,7 +611,7 @@ describe('PaymentService', () => {
 
     it('isPositiveTransaction should identify positive transactions', () => {
       const { isPositiveTransaction } = require('../paymentService');
-      
+
       expect(isPositiveTransaction('gift_received')).toBe(true);
       expect(isPositiveTransaction('deposit')).toBe(true);
       expect(isPositiveTransaction('gift_sent')).toBe(false);
@@ -576,7 +632,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -586,7 +642,7 @@ describe('PaymentService', () => {
           amount: 10,
           currency: 'USD',
           paymentMethodId: 'pm_123',
-        })
+        }),
       );
 
       const results = await Promise.all(promises);
@@ -595,7 +651,7 @@ describe('PaymentService', () => {
 
     it('should handle very large transaction amounts', async () => {
       const largeAmount = 999999.99;
-      
+
       const mockTransaction = {
         id: 'tx-large',
         user_id: 'user-123',
@@ -607,7 +663,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -633,7 +689,7 @@ describe('PaymentService', () => {
         metadata: {},
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });

@@ -18,7 +18,7 @@ import { usePagination, type PaginatedResponse } from './usePagination';
 import type { Database } from '../types/database.types';
 
 // MomentRow type from the database - includes joined data from momentsService
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type MomentRow = any; // Using any as the service returns dynamic joins
 
 // Types
@@ -147,7 +147,7 @@ const DEFAULT_PAGE_SIZE = 20;
 const mapToMoment = (row: MomentRow): Moment => {
   // Extract user data from the optimized join
   const userData = row.users || row.user || {};
-  const categoryData = row.categories || {};
+  const _categoryData = row.categories || {};
 
   return {
     id: row.id,
@@ -296,7 +296,9 @@ export const useMoments = (): UseMomentsReturn => {
         // Upload images to Supabase Storage first
         let uploadedImageUrls: string[] = [];
         if (data.images && data.images.length > 0) {
-          logger.info('[createMoment] Uploading images...', { count: data.images.length });
+          logger.info('[createMoment] Uploading images...', {
+            count: data.images.length,
+          });
 
           const uploadResults = await uploadMomentImages(
             data.images,
@@ -310,7 +312,9 @@ export const useMoments = (): UseMomentsReturn => {
             .map((result) => result.url as string);
 
           // Check if any uploads failed
-          const failedUploads = uploadResults.filter((result) => result.error !== null);
+          const failedUploads = uploadResults.filter(
+            (result) => result.error !== null,
+          );
           if (failedUploads.length > 0) {
             logger.warn('[createMoment] Some images failed to upload:', {
               failed: failedUploads.length,
@@ -351,9 +355,8 @@ export const useMoments = (): UseMomentsReturn => {
 
         const insertPayload =
           momentData as unknown as Database['public']['Tables']['moments']['Insert'];
-        const { data: moment, error } = await momentsService.create(
-          insertPayload,
-        );
+        const { data: moment, error } =
+          await momentsService.create(insertPayload);
         if (error) throw error;
 
         const newMoment = moment ? mapToMoment(moment) : null;
@@ -414,14 +417,22 @@ export const useMoments = (): UseMomentsReturn => {
 
           // Upload new local images if any
           if (localUris.length > 0) {
-            logger.info('[updateMoment] Uploading new images...', { count: localUris.length });
+            logger.info('[updateMoment] Uploading new images...', {
+              count: localUris.length,
+            });
 
-            const uploadResults = await uploadMomentImages(localUris, user.id, id);
+            const uploadResults = await uploadMomentImages(
+              localUris,
+              user.id,
+              id,
+            );
             const uploadedUrls = uploadResults
               .filter((result) => result.url !== null)
               .map((result) => result.url as string);
 
-            logger.info('[updateMoment] New images uploaded', { count: uploadedUrls.length });
+            logger.info('[updateMoment] New images uploaded', {
+              count: uploadedUrls.length,
+            });
 
             updates.images = [...existingUrls, ...uploadedUrls];
           } else {

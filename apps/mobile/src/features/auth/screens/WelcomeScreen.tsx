@@ -39,7 +39,6 @@ export const WelcomeScreen: React.FC<{
           {/* Illustration */}
           <View style={styles.illustrationContainer}>
             <Image
-              // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
               source={require('../../../../assets/icon.png')}
               style={styles.illustration}
               resizeMode="contain"
@@ -61,10 +60,7 @@ export const WelcomeScreen: React.FC<{
           <View style={styles.buttonContainer}>
             {/* Apple Sign In (Mock) */}
             <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                styles.appleButton,
-              ]}
+              style={[styles.primaryButton, styles.appleButton]}
               onPress={() => navigation.navigate('Register')} // Mock action
               activeOpacity={0.8}
             >
@@ -209,14 +205,6 @@ const styles = StyleSheet.create({
   appleButton: {
     backgroundColor: '#000000',
     marginBottom: 12,
-  },
-  appleButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  appleIconText: {
-    marginRight: 8,
   },
   footerText: {
     fontSize: 14,

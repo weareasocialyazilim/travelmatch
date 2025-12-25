@@ -19,7 +19,6 @@ import Animated, {
   withSequence,
   withTiming,
   useSharedValue,
-  withDelay,
 } from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 
@@ -85,10 +84,10 @@ export const KYCBadge: React.FC<KYCBadgeProps> = ({
       glowOpacity.value = withRepeat(
         withSequence(
           withTiming(0.8, { duration: 1000 }),
-          withTiming(0.3, { duration: 1000 })
+          withTiming(0.3, { duration: 1000 }),
         ),
         -1,
-        true
+        true,
       );
     }
   }, [level, animated, glowOpacity]);

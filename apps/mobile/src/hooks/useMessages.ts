@@ -4,7 +4,6 @@
  * Optimized with centralized channel manager for better performance
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '../config/supabase';
 import { messageService } from '../services/messageService';
 import { logger } from '../utils/logger';
 import { ErrorHandler, retryWithErrorHandling } from '../utils/errorHandler';
@@ -15,7 +14,6 @@ import type {
   SendMessageRequest,
 } from '../services/messageService';
 import type { MessageType, MessageStatus } from '../types/message.types';
-import { isNotNull } from '../types/guards';
 
 interface UseMessagesReturn {
   // Conversations

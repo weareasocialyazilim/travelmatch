@@ -75,6 +75,12 @@ describe('DeepLinkHandler', () => {
     // Default sessionManager mock
     sessionManager.getValidToken.mockResolvedValue('mock-token');
 
+    // Default Linking mocks
+    (Linking.getInitialURL as jest.Mock).mockResolvedValue(null);
+    (Linking.addEventListener as jest.Mock).mockReturnValue({
+      remove: jest.fn(),
+    });
+
     // Default fetch mock (resource exists)
     global.fetch.mockResolvedValue({
       ok: true,
@@ -220,20 +226,20 @@ describe('DeepLinkHandler', () => {
     it('should validate all deep link types', async () => {
       const validUUID = '123e4567-e89b-12d3-a456-426614174000';
       const types = [
-        { path: 'profile', param: 'userId' },
-        { path: 'moment', param: 'momentId' },
-        { path: 'trip', param: 'tripId' },
-        { path: 'gift', param: 'giftId' },
-        { path: 'chat', param: 'conversationId' },
-        { path: 'request', param: 'requestId' },
+        { path: 'profile', resultParam: 'userId' },
+        { path: 'moment', resultParam: 'momentId' },
+        { path: 'trip', resultParam: 'bookingId' },
+        { path: 'gift', resultParam: 'giftId' },
+        { path: 'chat', resultParam: 'conversationId' },
+        { path: 'request', resultParam: 'requestId' },
       ];
 
-      for (const { path, param } of types) {
+      for (const { path, resultParam } of types) {
         const url = `https://travelmatch.app/${path}/${validUUID}`;
         const result = await deepLinkHandler.handleDeepLink(url);
 
         expect(result.success).toBe(true);
-        expect(result.params?.[param]).toBe(validUUID);
+        expect(result.params?.[resultParam]).toBe(validUUID);
       }
     });
 
@@ -720,13 +726,12 @@ describe('DeepLinkHandler', () => {
 
   describe('Error Handling', () => {
     it('should handle unknown errors gracefully', async () => {
-      // Mock parseURL to throw
       const url =
         'https://travelmatch.app/profile/123e4567-e89b-12d3-a456-426614174000';
 
-      // Force an error by setting invalid navigation
-      deepLinkHandler.setNavigation(null as any);
-      mockNavigation.isReady.mockImplementation(() => {
+      // Force an error by making navigate throw
+      mockNavigation.isReady.mockReturnValue(true);
+      mockNavigation.navigate.mockImplementation(() => {
         throw new Error('Navigation error');
       });
 

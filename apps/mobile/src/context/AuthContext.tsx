@@ -223,7 +223,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         ),
       ]);
       setTokens(newTokens);
-    } catch (error) {
+    } catch {
       // Silent fail - tokens will be re-fetched on next login
     }
   };

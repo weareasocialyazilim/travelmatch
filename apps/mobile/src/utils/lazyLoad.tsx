@@ -21,7 +21,7 @@ const DefaultLoadingFallback = () => (
  * Creates a lazy-loaded component with automatic Suspense wrapper
  * @param importFn - Dynamic import function
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export function lazyLoad<T extends ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
 ): LazyExoticComponent<T> {
@@ -51,7 +51,7 @@ export function preloadComponent<
   // @ts-expect-error Accessing internal React lazy _init property for preloading - no public API available
   if (component._init) {
     // @ts-expect-error Accessing internal React lazy _payload property for preloading
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+     
     component._init(component._payload);
   }
 }

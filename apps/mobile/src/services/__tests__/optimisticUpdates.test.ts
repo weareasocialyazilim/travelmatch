@@ -30,6 +30,50 @@ jest.mock('../../utils/logger', () => ({
 
 const mockNetInfo = NetInfo;
 
+// Global mock cache service
+const mockCache: Record<string, unknown> = {};
+const cacheService = {
+  setQueryData: (key: string, data: unknown) => {
+    mockCache[key] = data;
+  },
+  getQueryData: (key: string) => mockCache[key],
+  clearAll: () => {
+    Object.keys(mockCache).forEach((key) => delete mockCache[key]);
+  },
+  invalidate: jest.fn((key: string) => {
+    delete mockCache[key];
+  }),
+  invalidateQuery: jest.fn((key: string) => {
+    delete mockCache[key];
+  }),
+  invalidateQueries: jest.fn(
+    (filterOrPattern: string | ((key: string) => boolean)) => {
+      if (typeof filterOrPattern === 'function') {
+        Object.keys(mockCache).forEach((key) => {
+          if (filterOrPattern(key)) {
+            delete mockCache[key];
+          }
+        });
+      } else {
+        const regex = new RegExp(filterOrPattern.replace('*', '.*'));
+        Object.keys(mockCache).forEach((key) => {
+          if (regex.test(key)) {
+            delete mockCache[key];
+          }
+        });
+      }
+    },
+  ),
+  invalidatePattern: jest.fn((pattern: string) => {
+    const regex = new RegExp(pattern.replace('*', '.*'));
+    Object.keys(mockCache).forEach((key) => {
+      if (regex.test(key)) {
+        delete mockCache[key];
+      }
+    });
+  }),
+};
+
 describe('Optimistic UI Updates', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -54,16 +98,9 @@ describe('Optimistic UI Updates', () => {
 
       offlineSyncQueue.registerHandler('LIKE_MOMENT', mutationFn);
 
-      // Mock cache service inline
-      const mockCache: any = {};
-      const cacheService = {
-        setQueryData: (key: string, data: any) => {
-          mockCache[key] = data;
-        },
-        getQueryData: (key: string) => mockCache[key],
-      };
-
-      const { result } = renderHook(() => useOfflineMutation(mutationFn, { onSuccess }));
+      const { result } = renderHook(() =>
+        useOfflineMutation(mutationFn, { onSuccess }),
+      );
 
       // Cache current state
       const cacheKey = 'moment-123';

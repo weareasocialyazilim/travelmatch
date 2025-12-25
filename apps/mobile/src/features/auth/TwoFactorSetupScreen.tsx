@@ -31,11 +31,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [_secretKey, _setSecretKey] = useState<string | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    formState,
-  } = useForm<TwoFactorSetupInput>({
+  const { control, handleSubmit, formState } = useForm<TwoFactorSetupInput>({
     resolver: zodResolver(twoFactorSetupSchema),
     mode: 'onChange',
     defaultValues: {
@@ -54,7 +50,7 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setStep('verify');
       showToast('Doğrulama kodu telefonunuza gönderildi', 'success');
-    } catch (error) {
+    } catch {
       showToast('Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setIsLoading(false);
@@ -69,7 +65,10 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       if (data.verificationCode === '123456') {
         setStep('success');
       } else {
-        showToast('Doğrulama kodu hatalı. Lütfen kontrol edip tekrar deneyin', 'error');
+        showToast(
+          'Doğrulama kodu hatalı. Lütfen kontrol edip tekrar deneyin',
+          'error',
+        );
       }
     }, 1000);
   };
@@ -156,7 +155,10 @@ export const TwoFactorSetupScreen: React.FC<TwoFactorSetupScreenProps> = ({
       <Controller
         control={control}
         name="verificationCode"
-        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
           <>
             <TextInput
               style={[styles.codeInput, error && styles.codeInputError]}

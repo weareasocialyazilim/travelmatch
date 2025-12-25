@@ -7,7 +7,7 @@ import React from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { COLORS } from '../../constants/colors';
-import { spacing, SPACING } from '../../constants/spacing';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 
 interface SpinnerProps {

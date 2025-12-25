@@ -42,13 +42,16 @@ export const useNetwork = (): UseNetworkReturn => {
       if (typeof subscriber === 'function') {
         try {
           subscriber();
-        } catch (_) {
+        } catch {
           // swallow - defensive in case mock throws on double-unsubscribe
         }
-      } else if (subscriber && typeof (subscriber as any).remove === 'function') {
+      } else if (
+        subscriber &&
+        typeof (subscriber as any).remove === 'function'
+      ) {
         try {
           (subscriber as any).remove();
-        } catch (_) {
+        } catch {
           // swallow
         }
       }
