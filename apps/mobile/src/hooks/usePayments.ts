@@ -249,7 +249,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const refreshPaymentMethods = useCallback(async (): Promise<void> => {
     try {
       setPaymentMethodsLoading(true);
-      const response = paymentService.getPaymentMethods();
+      const response = await paymentService.getPaymentMethods();
       setCards(response.cards);
       setBankAccounts(response.bankAccounts);
     } catch (error) {
@@ -264,7 +264,7 @@ export const usePayments = (): UsePaymentsReturn => {
    */
   const addCard = useCallback(async (tokenId: string): Promise<PaymentCard | null> => {
     try {
-      const response = paymentService.addCard(tokenId);
+      const response = await paymentService.addCard(tokenId);
       setCards((prev) => [...prev, response.card]);
       return response.card;
     } catch (error) {
@@ -278,7 +278,7 @@ export const usePayments = (): UsePaymentsReturn => {
    */
   const removeCard = useCallback(async (cardId: string): Promise<boolean> => {
     try {
-      paymentService.removeCard(cardId);
+      await paymentService.removeCard(cardId);
       setCards((prev) => prev.filter((c) => c.id !== cardId));
       return true;
     } catch (error) {
@@ -312,7 +312,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const addBankAccount = useCallback(
     async (data: BankAccountData): Promise<BankAccount | null> => {
       try {
-        const response = paymentService.addBankAccount(data as unknown as Record<string, unknown>);
+        const response = await paymentService.addBankAccount(data as unknown as Record<string, unknown>);
         setBankAccounts((prev) => [...prev, response.bankAccount]);
         return response.bankAccount;
       } catch (error) {
@@ -328,7 +328,7 @@ export const usePayments = (): UsePaymentsReturn => {
    */
   const removeBankAccount = useCallback(async (accountId: string): Promise<boolean> => {
     try {
-      paymentService.removeBankAccount(accountId);
+      await paymentService.removeBankAccount(accountId);
       setBankAccounts((prev) => prev.filter((a) => a.id !== accountId));
       return true;
     } catch (error) {

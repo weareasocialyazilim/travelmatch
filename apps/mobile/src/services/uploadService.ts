@@ -11,6 +11,7 @@
  * - Crash recovery with pending transactions
  * - Low storage detection and warnings
  */
+import { Platform } from 'react-native';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { uploadFile as supabaseUploadFile } from './supabaseStorageService';
@@ -290,7 +291,7 @@ const trackUploadAttempt = async (
       mime_type: fileInfo.type,
       upload_status: status,
       metadata: {
-        user_agent: navigator.userAgent,
+        user_agent: `TravelMatch/${Platform.OS}/${Platform.Version}`,
         timestamp: new Date().toISOString(),
       },
     });

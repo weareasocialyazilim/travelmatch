@@ -39,7 +39,7 @@ export function useServiceHealth() {
     });
 
     // Subscribe to progress updates
-    appBootstrap.onProgress((progress) => {
+    const progressCallback = (progress: { services: Map<ServiceName, ServiceState> }) => {
       const failed = Array.from(progress.services.values())
         .filter((s) => s.status === 'failed')
         .map((s) => s.name);
@@ -49,7 +49,16 @@ export function useServiceHealth() {
         failedServices: failed,
         serviceStates: progress.services,
       });
-    });
+    };
+
+    appBootstrap.onProgress(progressCallback);
+
+    // Cleanup: Clear the progress callback when component unmounts
+    // Note: This is safe because onProgress overwrites the previous callback
+    return () => {
+      // Set to no-op to prevent state updates after unmount
+      appBootstrap.onProgress(() => {});
+    };
   }, []);
 
   const retryService = useCallback(async (serviceName: ServiceName) => {
