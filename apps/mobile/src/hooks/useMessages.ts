@@ -123,10 +123,15 @@ export const useMessages = (): UseMessagesReturn => {
       setMessages(response.messages);
       setHasMoreMessages(response.hasMore);
 
-      // Mark as read (fire and forget, but log errors)
-      messageService.markAsRead(conversationId).catch((err) => {
-        logger.warn('Failed to mark conversation as read', { conversationId, error: err });
-      });
+      // Mark as read (fire and forget - this is synchronous for now)
+      try {
+        messageService.markAsRead(conversationId);
+      } catch (err) {
+        logger.warn('Failed to mark conversation as read', {
+          conversationId,
+          error: err,
+        });
+      }
 
       if (!mountedRef.current) return;
 
