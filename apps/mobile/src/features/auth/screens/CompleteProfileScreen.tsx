@@ -33,8 +33,8 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 type IconName = React.ComponentProps<typeof Icon>['name'];
 

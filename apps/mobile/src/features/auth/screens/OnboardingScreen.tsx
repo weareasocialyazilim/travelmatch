@@ -42,7 +42,7 @@ import { COLORS, GRADIENTS } from '@/constants/colors';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { HORIZONTAL_LIST_CONFIG } from '@/utils/listOptimization';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 
