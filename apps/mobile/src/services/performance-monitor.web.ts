@@ -1,13 +1,24 @@
 /**
- * Performance Monitoring Service
- * Real-time performance tracking and alerting
+ * Performance Monitoring Service (Web)
+ * Real-time performance tracking and alerting for web platform
  * Integrates with Sentry Performance Monitoring
+ *
+ * Note: This file is web-specific and should only be bundled for web builds.
  */
 
-import React from 'react';
 import * as Sentry from '@sentry/react-native';
-import { BrowserTracing } from '@sentry/tracing';
 import { logger } from '../utils/logger';
+
+// Type declarations for Web Performance APIs
+interface LayoutShift extends PerformanceEntry {
+  hadRecentInput: boolean;
+  value: number;
+}
+
+interface LargestContentfulPaintEntry extends PerformanceEntry {
+  renderTime: number;
+  loadTime: number;
+}
 
 interface PerformanceMetrics {
   fcp?: number; // First Contentful Paint
@@ -58,12 +69,6 @@ class PerformanceMonitor {
     Sentry.init({
       dsn: process.env.SENTRY_DSN,
       environment: process.env.NODE_ENV,
-      integrations: [
-        new BrowserTracing({
-          tracingOrigins: ['localhost', /^\//],
-          routingInstrumentation: Sentry.reactRouterV6Instrumentation,
-        }),
-      ],
       tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
       beforeSend(event) {
         // Filter out non-critical events in production
@@ -84,7 +89,9 @@ class PerformanceMonitor {
       // Largest Contentful Paint (LCP)
       new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries[
+          entries.length - 1
+        ] as LargestContentfulPaintEntry;
         const lcp = lastEntry.renderTime || lastEntry.loadTime;
         this.recordMetric('lcp', lcp);
       }).observe({ type: 'largest-contentful-paint', buffered: true });

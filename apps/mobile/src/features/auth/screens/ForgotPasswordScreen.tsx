@@ -113,7 +113,6 @@ export const ForgotPasswordScreen: React.FC = () => {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
-                testID="email-input"
                 {...a11y.textInput('Email address input')}
               />
             </View>
@@ -126,7 +125,6 @@ export const ForgotPasswordScreen: React.FC = () => {
               ]}
               onPress={handleResetPassword}
               disabled={!isValidEmail(email) || isLoading}
-              testID="send-reset-link-button"
               {...a11y.button(
                 'Send reset link',
                 undefined,
