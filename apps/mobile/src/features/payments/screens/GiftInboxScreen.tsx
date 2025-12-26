@@ -16,7 +16,7 @@ import { useGiftInbox, type GiftInboxItem, type SortOption, type FilterOption } 
 import { GiftInboxCard } from '../components/GiftInboxCard';
 import { FilterSortBar, SortFilterModal } from '../components/FilterSortBar';
 import { TopPicksSection } from '../components/TopPicksSection';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';

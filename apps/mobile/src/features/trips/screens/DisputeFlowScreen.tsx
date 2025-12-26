@@ -19,7 +19,7 @@ import { logger } from '@/utils/logger';
 import { disputeSchema, type DisputeInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type _IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

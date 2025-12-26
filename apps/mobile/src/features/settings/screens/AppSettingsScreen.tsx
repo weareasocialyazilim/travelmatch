@@ -20,7 +20,7 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
 import { useAuth } from '@/context/AuthContext';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';

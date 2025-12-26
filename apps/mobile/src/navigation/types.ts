@@ -3,7 +3,7 @@
  * Type-safe navigation için tüm route tanımları
  */
 
-import type { RootStackParamList } from './AppNavigator';
+import type { RootStackParamList } from './routeParams';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { StackScreenProps } from '@react-navigation/stack';

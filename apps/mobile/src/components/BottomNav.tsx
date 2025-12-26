@@ -18,7 +18,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, GRADIENTS } from '../constants/colors';
 import { useHaptics } from '../hooks/useHaptics';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '../navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
 interface BottomNavProps {

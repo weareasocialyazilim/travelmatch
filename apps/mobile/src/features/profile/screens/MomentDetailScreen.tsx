@@ -26,7 +26,7 @@ import type {
   Review,
   ActionLoadingState,
 } from '@/components/moment-detail';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { MomentData } from '../types';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';

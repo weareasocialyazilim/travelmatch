@@ -24,7 +24,7 @@ import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { editProfileSchema, type EditProfileInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
 

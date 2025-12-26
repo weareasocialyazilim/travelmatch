@@ -4,6 +4,7 @@ export { SplashScreen } from './screens/SplashScreen';
 export { WelcomeScreen } from './screens/WelcomeScreen';
 export { OnboardingScreen } from './screens/OnboardingScreen';
 export { CompleteProfileScreen } from './screens/CompleteProfileScreen';
+export { VerifyPhoneScreen } from './screens/VerifyPhoneScreen';
 
 // Auth flow screens
 export { PhoneAuthScreen } from './screens/PhoneAuthScreen';

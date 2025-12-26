@@ -51,7 +51,7 @@ import type {
   UserStory,
   PriceRange,
 } from '@/components/discover/types';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Moment } from '@/hooks/useMoments';
 import type { Moment as DomainMoment } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';

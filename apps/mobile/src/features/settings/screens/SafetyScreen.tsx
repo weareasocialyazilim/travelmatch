@@ -13,7 +13,7 @@ import { COLORS } from '@/constants/colors';
 import { RADII as radii } from '../constants/radii';
 import { SPACING as spacing } from '../constants/spacing';
 import { TYPOGRAPHY } from '@/theme/typography';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

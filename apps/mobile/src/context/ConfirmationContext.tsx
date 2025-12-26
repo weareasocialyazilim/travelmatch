@@ -4,7 +4,7 @@
  */
 
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -159,10 +159,14 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
     }
   };
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({ showConfirmation, hideConfirmation }),
+    [showConfirmation, hideConfirmation],
+  );
+
   return (
-    <ConfirmationContext.Provider
-      value={{ showConfirmation, hideConfirmation }}
-    >
+    <ConfirmationContext.Provider value={contextValue}>
       {children}
       <Modal
         visible={visible}

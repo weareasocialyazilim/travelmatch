@@ -16,7 +16,7 @@ import { COLORS } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
 import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 interface GiverSlot {

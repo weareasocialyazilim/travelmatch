@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
 import type { RequestItem } from '../types/requests.types';
 import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 interface RequestCardProps {
   item: RequestItem;

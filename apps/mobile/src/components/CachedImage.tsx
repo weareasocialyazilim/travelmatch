@@ -23,7 +23,7 @@
  * />
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Image,
   View,
@@ -149,20 +149,29 @@ export const CachedImage: React.FC<CachedImageProps> = ({
   const [_error, setError] = useState<Error | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
-  useEffect(() => {
-    loadImage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source.uri, cloudflareId, variant]);
+  // Ref to track mounted state and cleanup timeouts
+  const isMountedRef = useRef(true);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const networkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const loadImage = async () => {
+  const loadImage = useCallback(async () => {
     setState('loading');
     setError(null);
     onLoadStart?.();
 
+    // Clear any existing network timeout
+    if (networkTimeoutRef.current) {
+      clearTimeout(networkTimeoutRef.current);
+      networkTimeoutRef.current = null;
+    }
+
     try {
       // Network timeout promise
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Network timeout')), networkTimeout);
+        networkTimeoutRef.current = setTimeout(
+          () => reject(new Error('Network timeout')),
+          networkTimeout,
+        );
       });
 
       // Image loading promise
@@ -175,22 +184,63 @@ export const CachedImage: React.FC<CachedImageProps> = ({
       // Race between timeout and image load
       const uri = await Promise.race([imagePromise, timeoutPromise]);
 
-      setCachedUri(uri);
-      setState('success');
-      setRetryCount(0); // Reset retry count on success
-      onLoadEnd?.();
-    } catch (err) {
-      const error = err as Error;
-      setError(error);
-      setState('error');
-      onError?.(error);
+      // Clear network timeout on success
+      if (networkTimeoutRef.current) {
+        clearTimeout(networkTimeoutRef.current);
+        networkTimeoutRef.current = null;
+      }
 
-      // Try fallback source if available
-      if (fallbackSource && retryCount === 0) {
-        setCachedUri(fallbackSource.uri);
+      // Only update state if still mounted
+      if (isMountedRef.current) {
+        setCachedUri(uri);
+        setState('success');
+        setRetryCount(0); // Reset retry count on success
+        onLoadEnd?.();
+      }
+    } catch (err) {
+      // Only update state if still mounted
+      if (isMountedRef.current) {
+        const error = err as Error;
+        setError(error);
+        setState('error');
+        onError?.(error);
+
+        // Try fallback source if available
+        if (fallbackSource && retryCount === 0) {
+          setCachedUri(fallbackSource.uri);
+        }
       }
     }
-  };
+  }, [
+    source.uri,
+    cloudflareId,
+    variant,
+    prefetch,
+    networkTimeout,
+    retryCount,
+    fallbackSource,
+    onLoadStart,
+    onLoadEnd,
+    onError,
+  ]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    loadImage();
+
+    return () => {
+      isMountedRef.current = false;
+      // Cleanup timeouts on unmount
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      if (networkTimeoutRef.current) {
+        clearTimeout(networkTimeoutRef.current);
+        networkTimeoutRef.current = null;
+      }
+    };
+  }, [loadImage]);
 
   const handleRetry = useCallback(() => {
     if (retryCount >= maxRetries) {
@@ -200,12 +250,19 @@ export const CachedImage: React.FC<CachedImageProps> = ({
     onRetry?.();
     setRetryCount((prev) => prev + 1);
 
+    // Clear any existing retry timeout
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+    }
+
     // Delay retry slightly to prevent rapid retries
-    setTimeout(() => {
-      loadImage();
+    retryTimeoutRef.current = setTimeout(() => {
+      if (isMountedRef.current) {
+        loadImage();
+      }
+      retryTimeoutRef.current = null;
     }, retryDelay);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retryCount, maxRetries, retryDelay]);
+  }, [retryCount, maxRetries, retryDelay, onRetry, loadImage]);
 
   const handleImageError = useCallback(() => {
     const error = new Error('Image render failed');

@@ -15,7 +15,7 @@ import { COLORS } from '@/constants/colors';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp, RouteProp } from '@react-navigation/native';
 
 type BookingDetailScreenProps = RouteProp<RootStackParamList, 'BookingDetail'>;

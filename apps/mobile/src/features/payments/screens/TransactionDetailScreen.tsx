@@ -18,7 +18,7 @@ import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
 import { paymentService } from '@/services/paymentService';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Transaction } from '@/services/paymentService';
 import type { StackScreenProps } from '@react-navigation/stack';
 

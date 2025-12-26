@@ -14,7 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { logger } from '@/utils/logger';
 import { COLORS } from '@/constants/colors';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Proof } from '../types';
 import type { StackScreenProps } from '@react-navigation/stack';
 

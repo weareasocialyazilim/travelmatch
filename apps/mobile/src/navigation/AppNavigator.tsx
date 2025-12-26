@@ -31,6 +31,7 @@ import {
   WelcomeScreen,
   OnboardingScreen,
   CompleteProfileScreen,
+  VerifyPhoneScreen,
   PhoneAuthScreen,
   EmailAuthScreen,
   RegisterScreen,
@@ -344,6 +345,10 @@ const AppNavigator = () => {
             <Stack.Screen
               name="PaymentFailed"
               component={PaymentFailedScreen}
+            />
+            <Stack.Screen
+              name="VerifyPhone"
+              component={VerifyPhoneScreen}
             />
             <Stack.Screen
               name="CompleteProfile"

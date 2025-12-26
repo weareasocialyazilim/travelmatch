@@ -135,6 +135,20 @@ export interface EscrowTransaction {
   moment_id?: string;
 }
 
+// RPC Response Types - for type-safe Supabase RPC calls
+interface AtomicTransferResponse {
+  senderTxnId: string;
+  recipientTxnId: string;
+}
+
+interface CreateEscrowResponse {
+  escrowId: string;
+}
+
+interface EscrowOperationResponse {
+  success: boolean;
+}
+
 /**
  * Titan Plan v2.0 Escrow Matrix:
  * - $0-$30: Direct payment (no escrow)
@@ -645,7 +659,7 @@ export const paymentService = {
         case 'direct':
           // < $30: Direct atomic transfer (no escrow)
           logger.info(`[Payment] Direct transfer: $${amount}`);
-          const { data: directData, error: directError } = await callRpc<any>(
+          const { data: directData, error: directError } = await callRpc<AtomicTransferResponse>(
             'atomic_transfer',
             {
               p_sender_id: user.id,
@@ -672,7 +686,7 @@ export const paymentService = {
 
           if (useEscrow) {
             // User chose escrow protection
-            const { data: escrowData, error: escrowError } = await callRpc<any>(
+            const { data: escrowData, error: escrowError } = await callRpc<CreateEscrowResponse>(
               'create_escrow_transaction',
               {
                 p_sender_id: user.id,
@@ -693,7 +707,7 @@ export const paymentService = {
           } else {
             // User chose direct payment
             const { data: directData2, error: directError2 } =
-              await callRpc<any>('atomic_transfer', {
+              await callRpc<AtomicTransferResponse>('atomic_transfer', {
                 p_sender_id: user.id,
                 p_recipient_id: recipientId,
                 p_amount: amount,
@@ -713,7 +727,7 @@ export const paymentService = {
           // >= $100: Force escrow (no choice)
           logger.info(`[Payment] Mandatory escrow: $${amount}`);
           const { data: mandatoryData, error: mandatoryError } =
-            await callRpc<any>('create_escrow_transaction', {
+            await callRpc<CreateEscrowResponse>('create_escrow_transaction', {
               p_sender_id: user.id,
               p_recipient_id: recipientId,
               p_amount: amount,
@@ -744,7 +758,7 @@ export const paymentService = {
    */
   releaseEscrow: async (escrowId: string): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await callRpc<any>('release_escrow', {
+      const { data, error } = await callRpc<EscrowOperationResponse>('release_escrow', {
         p_escrow_id: escrowId,
       });
 
@@ -766,7 +780,7 @@ export const paymentService = {
     reason: string,
   ): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await callRpc<any>('refund_escrow', {
+      const { data, error } = await callRpc<EscrowOperationResponse>('refund_escrow', {
         p_escrow_id: escrowId,
         p_reason: reason,
       });

@@ -39,13 +39,7 @@ import type {
   WithdrawalLimits,
 } from '../services/paymentService';
 
-// Bank account data for adding new accounts
-interface BankAccountData {
-  accountHolderName: string;
-  routingNumber: string;
-  accountNumber: string;
-  accountType: 'checking' | 'savings';
-}
+// Bank account data - defined below with JSDoc comments
 
 /**
  * Return type for the usePayments hook
@@ -357,8 +351,10 @@ export const usePayments = (): UsePaymentsReturn => {
           bankAccountId,
         );
 
-        // Update balance
-        void refreshBalance();
+        // Update balance (fire and forget with error logging)
+        refreshBalance().catch((err) => {
+          logger.warn('Failed to refresh balance after withdrawal', { error: err });
+        });
 
         // Add to transactions
         setTransactions((prev) => [response.transaction, ...prev]);
@@ -406,8 +402,10 @@ export const usePayments = (): UsePaymentsReturn => {
         );
 
         if (response.success) {
-          // Refresh balance after successful payment
-          void refreshBalance();
+          // Refresh balance after successful payment (fire and forget with error logging)
+          refreshBalance().catch((err) => {
+            logger.warn('Failed to refresh balance after payment', { error: err });
+          });
         }
 
         return response.success;

@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useCallback,
   useRef,
+  useMemo,
 } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -522,38 +523,57 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     };
   }, []);
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      // Connection state
+      connectionState,
+      isConnected,
+      connectionHealth,
+
+      // Online users
+      onlineUsers,
+      isUserOnline,
+
+      // Event subscription
+      subscribe,
+
+      // Typing indicators
+      sendTypingStart,
+      sendTypingStop,
+
+      // Notification subscription
+      subscribeToNotifications,
+      unsubscribeFromNotifications,
+
+      // Manual controls
+      connect,
+      disconnect,
+      reconnect,
+
+      // Performance metrics
+      getConnectionHealth,
+    }),
+    [
+      connectionState,
+      isConnected,
+      connectionHealth,
+      onlineUsers,
+      isUserOnline,
+      subscribe,
+      sendTypingStart,
+      sendTypingStop,
+      subscribeToNotifications,
+      unsubscribeFromNotifications,
+      connect,
+      disconnect,
+      reconnect,
+      getConnectionHealth,
+    ],
+  );
+
   return (
-    <RealtimeContext.Provider
-      value={{
-        // Connection state
-        connectionState,
-        isConnected,
-        connectionHealth,
-
-        // Online users
-        onlineUsers,
-        isUserOnline,
-
-        // Event subscription
-        subscribe,
-
-        // Typing indicators
-        sendTypingStart,
-        sendTypingStop,
-
-        // Notification subscription
-        subscribeToNotifications,
-        unsubscribeFromNotifications,
-
-        // Manual controls
-        connect,
-        disconnect,
-        reconnect,
-
-        // Performance metrics
-        getConnectionHealth,
-      }}
-    >
+    <RealtimeContext.Provider value={contextValue}>
       {children}
     </RealtimeContext.Provider>
   );

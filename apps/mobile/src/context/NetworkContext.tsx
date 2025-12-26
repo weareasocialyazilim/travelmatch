@@ -12,6 +12,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import type { NetInfoState } from '@react-native-community/netinfo';
@@ -90,20 +91,27 @@ export const NetworkProvider: React.FC<NetworkProviderProps> = ({
     setNetworkState(state);
   }, []);
 
-  // Build status object
-  const status: NetworkStatus = {
-    isConnected: networkState?.isConnected ?? true,
-    isInternetReachable: networkState?.isInternetReachable ?? null,
-    type: networkState?.type ?? null,
-    isWifi: networkState?.type === 'wifi',
-    isCellular: networkState?.type === 'cellular',
-  };
+  // Build status object - memoized to prevent unnecessary re-renders
+  const status = useMemo<NetworkStatus>(
+    () => ({
+      isConnected: networkState?.isConnected ?? true,
+      isInternetReachable: networkState?.isInternetReachable ?? null,
+      type: networkState?.type ?? null,
+      isWifi: networkState?.type === 'wifi',
+      isCellular: networkState?.type === 'cellular',
+    }),
+    [networkState],
+  );
 
-  const value: NetworkContextValue = {
-    isConnected: status.isConnected && status.isInternetReachable !== false,
-    status,
-    refresh,
-  };
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo<NetworkContextValue>(
+    () => ({
+      isConnected: status.isConnected && status.isInternetReachable !== false,
+      status,
+      refresh,
+    }),
+    [status, refresh],
+  );
 
   return (
     <NetworkContext.Provider value={value}>

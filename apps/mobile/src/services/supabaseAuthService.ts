@@ -5,6 +5,7 @@
 
 import { auth, supabase, isSupabaseConfigured } from '../config/supabase';
 import { logger } from '../utils/logger';
+import { VALUES } from '../constants/values';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 
 export interface AuthResult {
@@ -126,7 +127,7 @@ export const signInWithOAuth = async (
     const { data, error } = await auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: 'travelmatch://auth/callback',
+        redirectTo: VALUES.DEEP_LINKS.AUTH_CALLBACK,
         skipBrowserRedirect: true,
       },
     });
@@ -245,7 +246,7 @@ export const resetPassword = async (
 
   try {
     const { error } = await auth.resetPasswordForEmail(email, {
-      redirectTo: 'travelmatch://auth/reset-password',
+      redirectTo: VALUES.DEEP_LINKS.RESET_PASSWORD,
     });
 
     if (error) {

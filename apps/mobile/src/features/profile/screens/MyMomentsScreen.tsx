@@ -16,7 +16,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
 import { useMoments } from '@/hooks/useMoments';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Moment as MomentType } from '../types';
 import type { NavigationProp } from '@react-navigation/native';
 

@@ -17,7 +17,7 @@ import { WalletConnectButton } from '../components/WalletConnectButton';
 import { CardOptionsModal } from '../components/CardOptionsModal';
 import { WalletOptionsModal } from '../components/WalletOptionsModal';
 import { usePaymentMethods } from '@/hooks/usePaymentMethods';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import type { SavedCard, Wallet } from '../types/payment-methods.types';
 

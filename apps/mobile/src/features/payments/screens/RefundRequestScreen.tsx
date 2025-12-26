@@ -17,7 +17,7 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { refundRequestSchema, type RefundRequestInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';

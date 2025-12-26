@@ -20,7 +20,7 @@ import { LAYOUT } from '@/constants/layout';
 import { VALUES } from '@/constants/values';
 import { contactSupportSchema, type ContactSupportInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';

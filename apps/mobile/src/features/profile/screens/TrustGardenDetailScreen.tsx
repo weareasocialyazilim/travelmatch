@@ -14,7 +14,7 @@ import { TRUST_GARDEN_DEFAULTS } from '@/constants/defaultValues';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { UserProfile } from '@/services/userService';
 import type { NavigationProp } from '@react-navigation/native';
 
