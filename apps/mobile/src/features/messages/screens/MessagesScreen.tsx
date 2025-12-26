@@ -22,7 +22,7 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { useRealtime, useRealtimeEvent } from '@/context/RealtimeContext';
 import { useMessages } from '@/hooks/useMessages';
 import type { MessageEvent } from '@/context/RealtimeContext';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Conversation } from '@/services/messageService';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';

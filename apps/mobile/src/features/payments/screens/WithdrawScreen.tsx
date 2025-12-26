@@ -22,7 +22,7 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { withdrawSchema, type WithdrawInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { ControlledInput } from '@/components/ui/ControlledInput';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;

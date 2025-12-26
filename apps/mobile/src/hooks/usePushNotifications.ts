@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import { logger } from '@/utils/logger';
 import { addBreadcrumb } from '../config/sentry';
 import {

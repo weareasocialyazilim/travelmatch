@@ -15,7 +15,7 @@ import { logger } from '@/utils/logger';
 import { COLORS } from '@/constants/colors';
 import { editMomentSchema, type EditMomentInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';

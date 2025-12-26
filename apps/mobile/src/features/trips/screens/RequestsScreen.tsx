@@ -16,7 +16,7 @@ import { RequestCard } from '@/components/RequestCard';
 import { NotificationCard } from '@/components/NotificationCard';
 import { useRequestsScreen } from '@/hooks/useRequestsScreen';
 import type { RouteProp } from '@react-navigation/native';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NotificationType } from '@/components/NotificationCard';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 

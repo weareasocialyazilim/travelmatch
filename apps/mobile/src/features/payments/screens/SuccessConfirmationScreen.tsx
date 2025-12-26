@@ -10,7 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
 export const SuccessConfirmationScreen: React.FC = () => {

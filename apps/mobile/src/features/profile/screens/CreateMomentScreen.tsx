@@ -39,7 +39,7 @@ import { LAYOUT } from '@/constants/layout';
 import { STRINGS as _STRINGS } from '../constants/strings';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
 

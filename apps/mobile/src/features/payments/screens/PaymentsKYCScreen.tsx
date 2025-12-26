@@ -50,7 +50,7 @@ const INFO_ITEMS: InfoItem[] = [
   },
 ];
 
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type PaymentsKYCScreenProps = StackScreenProps<

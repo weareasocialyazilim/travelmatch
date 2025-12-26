@@ -10,7 +10,7 @@ import { RADII } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
 type MatchConfirmationScreenRouteProp = RouteProp<

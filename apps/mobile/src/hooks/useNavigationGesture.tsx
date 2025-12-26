@@ -9,7 +9,7 @@
 import { useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '../navigation/routeParams';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 

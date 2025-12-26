@@ -18,7 +18,7 @@ import { deleteAccountSchema, type DeleteAccountInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import { useConfirmation } from '../context/ConfirmationContext';
 import { useToast } from '../context/ToastContext';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

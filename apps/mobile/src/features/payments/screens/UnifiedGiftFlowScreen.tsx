@@ -29,7 +29,7 @@ import { SPACING } from '../constants/spacing';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Moment } from '../types';
 import type { StackScreenProps } from '@react-navigation/stack';
 

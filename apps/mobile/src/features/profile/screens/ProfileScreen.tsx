@@ -28,7 +28,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { UserProfile } from '@/services/userService';
 import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '@/components/withErrorBoundary';

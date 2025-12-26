@@ -12,7 +12,7 @@ import { COLORS } from '@/constants/colors';
 import { useChatScreen, type Message } from '../hooks/useChatScreen';
 import { CHAT_LIST_CONFIG } from '@/utils/listOptimization';
 import { logger } from '@/utils/logger';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
