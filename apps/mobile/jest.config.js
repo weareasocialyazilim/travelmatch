@@ -18,6 +18,8 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
     ...jestExpoPreset.moduleNameMapper,
+    // Mock BottomNav before the general @/ alias to ensure it gets mocked
+    '^@/components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^expo-image$': '<rootDir>/__mocks__/expo-image.js',
     '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',

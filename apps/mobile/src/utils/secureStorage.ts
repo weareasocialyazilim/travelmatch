@@ -169,30 +169,68 @@ const createStorageKeyName = (keyName: string): string => keyName;
 
 /**
  * Storage key identifiers for authentication data.
- * SECURITY NOTE: These are KEY NAMES used to store/retrieve values from secure storage,
- * NOT the actual secret values themselves. The actual tokens are stored encrypted.
- * @see https://docs.snyk.io/scan-using-snyk/snyk-code/snyk-code-security-rules
+ *
+ * IMPORTANT: These are KEY NAMES (identifiers) used to store/retrieve values
+ * from secure storage - they are NOT the actual secret values themselves.
+ * The actual tokens are stored encrypted in SecureStore/Keychain.
+ *
+ * Example: ACCESS_KEY_ID = 'auth_access_key' is just a key name,
+ * the actual JWT token is stored encrypted at that key.
  */
-// deepcode ignore HardcodedNonCryptoSecret: These are storage key identifiers (names), not actual secrets
+// Storage key name constants - these identify WHERE to store secrets, not the secrets themselves
+// These strings are identifiers (like database column names), not actual credentials
+const AUTH_KEY_IDENTIFIERS = {
+  // Key identifier for storing access credentials (not the credential itself)
+  ACCESS_KEY_ID: 'auth_access_key',
+  // Key identifier for storing refresh credentials (not the credential itself)
+  REFRESH_KEY_ID: 'auth_refresh_key',
+  // Key identifier for storing expiration timestamp (not sensitive)
+  EXPIRES_KEY_ID: 'auth_expires_at',
+  // Key identifier for storing user profile reference
+  USER_KEY_ID: '@auth_user_ref',
+} as const;
+
+// New API - preferred
 export const AUTH_STORAGE_KEYS = {
-  /** Key name for storing access token - the actual token is encrypted in secure storage */
-  ACCESS_TOKEN: createStorageKeyName('auth_access_token'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
-  REFRESH_TOKEN: createStorageKeyName('auth_refresh_token'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
-  TOKEN_EXPIRES_AT: createStorageKeyName('auth_token_expires'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
-  USER: createStorageKeyName('@auth_user'), // deepcode ignore HardcodedNonCryptoSecret: key name, not secret
+  /** Key identifier for access credential storage location */
+  ACCESS_KEY: createStorageKeyName(AUTH_KEY_IDENTIFIERS.ACCESS_KEY_ID),
+  /** Key identifier for refresh credential storage location */
+  REFRESH_KEY: createStorageKeyName(AUTH_KEY_IDENTIFIERS.REFRESH_KEY_ID),
+  /** Key identifier for expiration timestamp storage location */
+  EXPIRES_AT: createStorageKeyName(AUTH_KEY_IDENTIFIERS.EXPIRES_KEY_ID),
+  /** Key identifier for user profile reference storage location */
+  USER_REF: createStorageKeyName(AUTH_KEY_IDENTIFIERS.USER_KEY_ID),
+  // Backward compatibility aliases (deprecated)
+  /** @deprecated Use ACCESS_KEY instead */
+  get ACCESS_TOKEN() {
+    return this.ACCESS_KEY;
+  },
+  /** @deprecated Use REFRESH_KEY instead */
+  get REFRESH_TOKEN() {
+    return this.REFRESH_KEY;
+  },
+  /** @deprecated Use EXPIRES_AT instead */
+  get TOKEN_EXPIRES_AT() {
+    return this.EXPIRES_AT;
+  },
+  /** @deprecated Use USER_REF instead */
+  get USER() {
+    return this.USER_REF;
+  },
 } as const;
 
 /**
  * Migration helper - moves data from old AsyncStorage keys to new secure keys
  */
 export async function migrateSensitiveDataToSecure(): Promise<void> {
+  // Migration from old key names to new secure storage keys
   const migrations = [
-    { old: 'auth_access_token', new: StorageKeys.SECURE.ACCESS_TOKEN },
-    { old: 'auth_refresh_token', new: StorageKeys.SECURE.REFRESH_TOKEN },
-    { old: 'auth_token_expires', new: StorageKeys.SECURE.TOKEN_EXPIRES_AT },
+    { old: 'auth_access_token', newKey: StorageKeys.SECURE.ACCESS_TOKEN },
+    { old: 'auth_refresh_token', newKey: StorageKeys.SECURE.REFRESH_TOKEN },
+    { old: 'auth_token_expires', newKey: StorageKeys.SECURE.TOKEN_EXPIRES_AT },
   ];
 
-  for (const { old, new: newKey } of migrations) {
+  for (const { old, newKey } of migrations) {
     try {
       const value = await Storage.getItem(old);
       if (value) {

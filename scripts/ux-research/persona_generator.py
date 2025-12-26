@@ -36,16 +36,32 @@ def validate_safe_path(filepath: str, base_dir: str = None) -> str:
     Validate and sanitize file path to prevent path traversal attacks.
     Returns the resolved absolute path if safe, raises ValueError otherwise.
     """
+    from pathlib import Path
     if base_dir is None:
         base_dir = os.getcwd()
     
-    abs_path = os.path.abspath(os.path.join(base_dir, filepath))
-    abs_base = os.path.abspath(base_dir)
+    # Use pathlib for safer path resolution
+    base = Path(base_dir).resolve()
+    target = (base / filepath).resolve()
     
-    if not abs_path.startswith(abs_base + os.sep) and abs_path != abs_base:
+    # Strict check: target must be within base directory
+    try:
+        target.relative_to(base)
+    except ValueError:
         raise ValueError(f"Path '{filepath}' would escape the base directory")
     
-    return abs_path
+    return str(target)
+
+
+def read_file_safely(filepath: str, base_dir: str = None) -> str:
+    """
+    Safely read a file after validating the path.
+    This function combines path validation and file reading to ensure
+    no path traversal attacks are possible.
+    """
+    safe_path = validate_safe_path(filepath, base_dir)
+    with open(safe_path, 'r', encoding='utf-8') as f:
+        return f.read()
 
 
 class TravelStyle(Enum):
@@ -874,10 +890,8 @@ Input JSON format:
     # Load data
     if args.file:
         try:
-            safe_path = validate_safe_path(args.file)
-            # deepcode ignore PT: Path validated via validate_safe_path() above
-            with open(safe_path, 'r') as f:
-                data = json.load(f)
+            content = read_file_safely(args.file)
+            data = json.loads(content)
         except ValueError as e:
             print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)

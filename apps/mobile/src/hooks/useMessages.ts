@@ -126,7 +126,7 @@ export const useMessages = (): UseMessagesReturn => {
       // Mark as read (fire and forget - this is synchronous for now)
       try {
         messageService.markAsRead(conversationId);
-      } catch (err) {
+      } catch (err: unknown) {
         logger.warn('Failed to mark conversation as read', {
           conversationId,
           error: err,

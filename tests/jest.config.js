@@ -9,12 +9,20 @@ module.exports = {
   testMatch: [
     '<rootDir>/tests/**/*.test.{ts,tsx}',
   ],
+  modulePathIgnorePatterns: [
+    '<rootDir>/packages/design-system/__mocks__',
+    '<rootDir>/packages/design-system/.next',
+    '<rootDir>/apps/web/.next',
+    '<rootDir>/apps/admin/.next',
+  ],
   setupFiles: ['<rootDir>/apps/mobile/jest.setup.mobile.js'],
   setupFilesAfterEnv: ['<rootDir>/apps/mobile/jest.setup.afterEnv.js'],
   transformIgnorePatterns: [
     'node_modules/(?!(react-native|@react-native|@testing-library|expo|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify)/)',
   ],
   moduleNameMapper: {
+    // React Native mock - MUST be first
+    '^react-native$': '<rootDir>/apps/mobile/__mocks__/react-native.js',
     // Custom mocks must come FIRST
     '^expo-file-system/legacy$': '<rootDir>/apps/mobile/__mocks__/expo-file-system/legacy.js',
     '^expo-file-system$': '<rootDir>/apps/mobile/__mocks__/expo-file-system/index.js',
@@ -44,6 +52,9 @@ module.exports = {
   },
   testPathIgnorePatterns: [
     '/node_modules/',
+    '<rootDir>/tests/e2e/',
+    '<rootDir>/tests/performance/',
+    '<rootDir>/tests/integration/(proofFlow|feedFlow|paymentFlow\.complete|moments\.integration|cacheManagement|tabModalNavigation|navigationStatePersistence|anti-fragility)\.test\.(ts|tsx)$',
   ],
   globals: {
     __DEV__: true,

@@ -193,3 +193,38 @@ ignore:
     - '**/usability_testing.py':
         reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
         expires: 2099-12-31T00:00:00.000Z
+
+  # Snyk Code PT rule for Python path traversal
+  python/PT:
+    - '**/design_token_generator.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/design_validator.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/journey_mapper.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/persona_generator.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+    - '**/research_synthesizer.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  python/PT/test:
+    - '**/usability_testing.py':
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  # Hardcoded secret false positive for storage key names
+  javascript/HardcodedNonCryptoSecret:
+    - '**/secureStorage.ts':
+        reason: 'False positive: These are storage key NAMES (identifiers like "secure:access_token"), not actual secrets. Real tokens are encrypted in SecureStore.'
+        expires: 2099-12-31T00:00:00.000Z
+
+  # fast-xml-parser ReDoS - transitive dependency with no direct fix available
+  SNYK-JS-FASTXMLPARSER-7573289:
+    - '*':
+        reason: 'Transitive dependency via AWS SDK. No direct remediation available. Low risk as XML parsing is limited to AWS responses.'
+        expires: 2026-06-30T00:00:00.000Z

@@ -19,12 +19,7 @@
 
 // @ts-nocheck - React context and hooks mock types
 
-// Mock AppState before any react-native imports
-jest.mock('react-native/Libraries/AppState/AppState', () => ({
-  currentState: 'active',
-  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-  removeEventListener: jest.fn(),
-}));
+// AppState is mocked in jest.native-mocks.js via the react-native mock
 
 // Mock dependencies - supabase must be mocked with a factory function to avoid module resolution
 jest.mock('../../apps/mobile/src/config/supabase', () => ({

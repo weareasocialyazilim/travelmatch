@@ -11,14 +11,7 @@ import { render, mockMoment, mockFilter } from '../testUtilsRender.helper';
 jest.mock('../../hooks/useMoments');
 jest.mock('../../services/supabaseDbService');
 
-// Mock BottomNav component - use relative path for Jest module resolution
-jest.mock('../../components/BottomNav', () => {
-  const { View } = require('react-native');
-  return {
-    __esModule: true,
-    default: () => <View testID="bottom-nav" />,
-  };
-});
+// Note: BottomNav is globally mocked via jest.config.js moduleNameMapper
 
 // Mock EmptyState component since @/components/ui/EmptyState alias may not resolve
 jest.mock('../../components/ui/EmptyState', () => ({

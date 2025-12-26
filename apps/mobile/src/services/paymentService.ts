@@ -700,7 +700,7 @@ export const paymentService = {
             return {
               success: true,
               transactionId: escrowData?.transactionId ?? '',
-              escrowId: escrowData?.escrowId,
+              escrowId: escrowData?.escrowId ?? '',
             };
           } else {
             // User chose direct payment
@@ -739,7 +739,7 @@ export const paymentService = {
           return {
             success: true,
             transactionId: mandatoryData?.transactionId ?? '',
-            escrowId: mandatoryData?.escrowId,
+            escrowId: mandatoryData?.escrowId ?? '',
           };
         }
 
