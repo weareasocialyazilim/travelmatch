@@ -29,6 +29,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from 'react';
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -625,35 +626,55 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      // State
+      user,
+      authState,
+      isAuthenticated,
+      isLoading,
+
+      // Actions
+      login,
+      register,
+      socialAuth,
+      logout,
+      refreshUser,
+      updateUser,
+
+      // OAuth
+      handleOAuthCallback,
+
+      // Token
+      getAccessToken,
+
+      // Password
+      forgotPassword,
+      resetPassword,
+      changePassword,
+    }),
+    [
+      user,
+      authState,
+      isAuthenticated,
+      isLoading,
+      login,
+      register,
+      socialAuth,
+      logout,
+      refreshUser,
+      updateUser,
+      handleOAuthCallback,
+      getAccessToken,
+      forgotPassword,
+      resetPassword,
+      changePassword,
+    ],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        // State
-        user,
-        authState,
-        isAuthenticated,
-        isLoading,
-
-        // Actions
-        login,
-        register,
-        socialAuth,
-        logout,
-        refreshUser,
-        updateUser,
-
-        // OAuth
-        handleOAuthCallback,
-
-        // Token
-        getAccessToken,
-
-        // Password
-        forgotPassword,
-        resetPassword,
-        changePassword,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

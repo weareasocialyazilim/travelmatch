@@ -123,8 +123,10 @@ export const useMessages = (): UseMessagesReturn => {
       setMessages(response.messages);
       setHasMoreMessages(response.hasMore);
 
-      // Mark as read
-      messageService.markAsRead(conversationId);
+      // Mark as read (fire and forget, but log errors)
+      messageService.markAsRead(conversationId).catch((err) => {
+        logger.warn('Failed to mark conversation as read', { conversationId, error: err });
+      });
 
       if (!mountedRef.current) return;
 
@@ -233,7 +235,7 @@ export const useMessages = (): UseMessagesReturn => {
    */
   const markAsRead = useCallback(async (conversationId: string) => {
     try {
-      messageService.markAsRead(conversationId);
+      await messageService.markAsRead(conversationId);
       if (mountedRef.current) {
         setConversations((prev) =>
           prev.map((conv) =>

@@ -44,7 +44,7 @@ export type RootStackParamList = {
   DisputeFlow: {
     type: 'transaction' | 'proof';
     id: string;
-    details?: any;
+    details?: Record<string, unknown>;
   };
 
   CompleteProfile: {
