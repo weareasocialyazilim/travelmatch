@@ -7,6 +7,14 @@
  */
 
 import React from 'react';
+import * as Sentry from '@sentry/react-native';
+import { logger } from '../utils/logger';
+
+// Type declarations for Web Performance APIs
+interface LayoutShift extends PerformanceEntry {
+  hadRecentInput: boolean;
+  value: number;
+}
 
 interface LargestContentfulPaintEntry extends PerformanceEntry {
   renderTime: number;
