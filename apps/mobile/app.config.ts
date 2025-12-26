@@ -69,7 +69,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         organization: process.env.SENTRY_ORG || 'travelmatch-2p',
         project: process.env.SENTRY_PROJECT || 'react-native',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
+        // authToken is read automatically from SENTRY_AUTH_TOKEN env var
       },
     ],
     'expo-font',
@@ -99,7 +99,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         config: {
           organization: process.env.SENTRY_ORG || '',
           project: process.env.SENTRY_PROJECT || '',
-          authToken: process.env.SENTRY_AUTH_TOKEN || '',
+          // authToken is read automatically from SENTRY_AUTH_TOKEN env var
         },
       },
     ],
