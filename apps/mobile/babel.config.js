@@ -6,10 +6,7 @@ module.exports = function (api) {
   const srcPath = path.resolve(__dirname, 'src');
 
   return {
-    presets: [
-      'babel-preset-expo',
-      ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
-    ],
+    presets: ['babel-preset-expo'],
     plugins: [
       [
         'module-resolver',
