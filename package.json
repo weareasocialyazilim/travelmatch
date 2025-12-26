@@ -104,7 +104,9 @@
     "overrides": {
       "react": "19.1.0",
       "react-dom": "19.1.0",
-      "react-test-renderer": "19.1.0"
+      "react-test-renderer": "19.1.0",
+      "fast-xml-parser": "^4.5.0",
+      "glob": "^10.0.0"
     }
   }
 }
