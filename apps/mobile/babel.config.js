@@ -9,21 +9,9 @@ module.exports = function (api) {
       [
         'module-resolver',
         {
-          root: ['./src'],
+          extensions: ['.ios.ts', '.android.ts', '.ts', '.ios.tsx', '.android.tsx', '.tsx', '.jsx', '.js', '.json'],
           alias: {
             '@': './src',
-            '@/components': './src/components',
-            '@/screens': './src/screens',
-            '@/features': './src/features',
-            '@/hooks': './src/hooks',
-            '@/utils': './src/utils',
-            '@/services': './src/services',
-            '@/stores': './src/stores',
-            '@/constants': './src/constants',
-            '@/types': './src/types',
-            '@/config': './src/config',
-            '@/theme': './src/theme',
-            '@/navigation': './src/navigation',
           },
         },
       ],
