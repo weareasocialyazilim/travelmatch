@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { OptimizedImage } from '../../ui/OptimizedImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import {
   getMomentImageProps,
   getAvatarImageProps,
   IMAGE_VARIANTS_BY_CONTEXT,
-} from '../../../utils/cloudflareImageHelpers';
-import { COLORS } from '../../../constants/colors';
-import type { Moment as HookMoment } from '../../../hooks/useMoments';
+} from '@/utils/cloudflareImageHelpers';
+import { COLORS } from '@/constants/colors';
+import type { Moment as HookMoment } from '@/hooks/useMoments';
 
 interface MomentGridCardProps {
   moment: HookMoment;
