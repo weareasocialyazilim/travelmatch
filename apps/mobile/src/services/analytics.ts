@@ -1,6 +1,20 @@
 import { logger } from '../utils/logger';
 import PostHog from 'posthog-react-native';
-import * as Sentry from '@sentry/react-native';
+
+// Sentry is loaded dynamically to avoid JSI runtime errors with New Architecture
+// Do NOT import @sentry/react-native at module level
+type SentryType = typeof import('@sentry/react-native');
+let _sentry: SentryType | null = null;
+
+async function getSentry(): Promise<SentryType | null> {
+  if (_sentry) return _sentry;
+  try {
+    _sentry = await import('@sentry/react-native');
+    return _sentry;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Analytics Service
@@ -83,7 +97,7 @@ class AnalyticsService {
    * Track a custom event
    * Sends to both PostHog and Sentry breadcrumbs
    */
-  public trackEvent(eventName: string, properties?: Record<string, any>) {
+  public async trackEvent(eventName: string, properties?: Record<string, any>) {
     if (!this.initialized) {
       logger.warn('[Analytics] Not initialized, skipping event:', eventName);
       return;
@@ -93,8 +107,9 @@ class AnalyticsService {
       // Send to PostHog
       this.posthog?.capture(eventName, properties);
 
-      // Add Sentry breadcrumb for debugging
-      Sentry.addBreadcrumb({
+      // Add Sentry breadcrumb for debugging (async, non-blocking)
+      const sentry = await getSentry();
+      sentry?.addBreadcrumb({
         category: 'user-action',
         message: eventName,
         data: properties,
@@ -110,13 +125,14 @@ class AnalyticsService {
   /**
    * Track a screen view
    */
-  public trackScreen(screenName: string, properties?: Record<string, any>) {
+  public async trackScreen(screenName: string, properties?: Record<string, any>) {
     if (!this.initialized) return;
 
     try {
       this.posthog?.screen(screenName, properties);
 
-      Sentry.addBreadcrumb({
+      const sentry = await getSentry();
+      sentry?.addBreadcrumb({
         category: 'navigation',
         message: `Screen: ${screenName}`,
         data: properties,
@@ -132,15 +148,15 @@ class AnalyticsService {
   /**
    * Alias for trackScreen
    */
-  public screen(screenName: string, properties?: Record<string, any>) {
-    this.trackScreen(screenName, properties);
+  public async screen(screenName: string, properties?: Record<string, any>) {
+    await this.trackScreen(screenName, properties);
   }
 
   /**
    * Identify a user
    * Sets user context in both PostHog and Sentry
    */
-  public identify(userId: string, traits?: Record<string, any>) {
+  public async identify(userId: string, traits?: Record<string, any>) {
     if (!this.initialized) return;
 
     try {
@@ -148,7 +164,8 @@ class AnalyticsService {
       this.posthog?.identify(userId, traits);
 
       // Sentry user context
-      Sentry.setUser({
+      const sentry = await getSentry();
+      sentry?.setUser({
         id: userId,
         ...traits,
       });
@@ -163,12 +180,13 @@ class AnalyticsService {
    * Reset analytics session
    * Call on user logout
    */
-  public reset() {
+  public async reset() {
     if (!this.initialized) return;
 
     try {
       this.posthog?.reset();
-      Sentry.setUser(null);
+      const sentry = await getSentry();
+      sentry?.setUser(null);
 
       logger.info('[Analytics] Session reset');
     } catch (error) {
@@ -180,7 +198,7 @@ class AnalyticsService {
    * Track timing/performance metrics
    * Useful for measuring app performance
    */
-  public trackTiming(
+  public async trackTiming(
     metricName: string,
     duration: number,
     properties?: Record<string, any>,
@@ -188,13 +206,14 @@ class AnalyticsService {
     if (!this.initialized) return;
 
     try {
-      this.trackEvent(`timing_${metricName}`, {
+      await this.trackEvent(`timing_${metricName}`, {
         duration_ms: duration,
         ...properties,
       });
 
       // Also send to Sentry for performance monitoring
-      const sentryMetrics = Sentry as unknown as {
+      const sentry = await getSentry();
+      const sentryMetrics = sentry as unknown as {
         metrics?: {
           distribution?: (
             name: string,
@@ -203,7 +222,7 @@ class AnalyticsService {
           ) => void;
         };
       };
-      sentryMetrics.metrics?.distribution?.(metricName, duration, {
+      sentryMetrics?.metrics?.distribution?.(metricName, duration, {
         unit: 'millisecond',
         tags: properties as Record<string, string>,
       });
