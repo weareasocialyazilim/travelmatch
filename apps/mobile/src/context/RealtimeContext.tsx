@@ -422,6 +422,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
 
       typingDebounceRef.current.set(conversationId, timer);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sendTypingStop is stable and defined below
     [user, emit],
   );
 

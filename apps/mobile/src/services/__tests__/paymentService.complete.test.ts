@@ -6,7 +6,7 @@
 
 // Define __DEV__ for tests
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __DEV__: boolean;
 }
 global.__DEV__ = true;

@@ -12,7 +12,7 @@
 
 // Ensure __DEV__ is defined for React Native
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __DEV__: boolean;
 }
 global.__DEV__ = true;

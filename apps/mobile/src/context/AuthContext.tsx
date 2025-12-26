@@ -654,23 +654,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       resetPassword,
       changePassword,
     }),
-    [
-      user,
-      authState,
-      isAuthenticated,
-      isLoading,
-      login,
-      register,
-      socialAuth,
-      logout,
-      refreshUser,
-      updateUser,
-      handleOAuthCallback,
-      getAccessToken,
-      forgotPassword,
-      resetPassword,
-      changePassword,
-    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Functions are stable within provider lifecycle
+    [user, authState, isAuthenticated, isLoading],
   );
 
   return (

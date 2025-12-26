@@ -160,7 +160,9 @@ export function useOfflineMutation<
   const [error, setError] = useState<string | null>(null);
   const [isQueued, setIsQueued] = useState(false);
 
-  const { isOnline } = useNetwork();
+  // We don't use isOnline from hook - we check NetInfo.fetch() directly in mutate
+  // to avoid stale closure values
+  const { isOnline: _isOnline } = useNetwork();
 
   const mutationFn =
     typeof mutationOrOptions === 'function'
@@ -237,7 +239,7 @@ export function useOfflineMutation<
         setLoading(false);
       }
     },
-    [isOnline, mutationFn, offlineActionType, onSuccess, onError],
+    [mutationFn, offlineActionType, onSuccess, onError],
   );
 
   return {

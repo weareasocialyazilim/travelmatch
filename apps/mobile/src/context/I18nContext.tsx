@@ -165,7 +165,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       isRTL,
       supportedLanguages: SUPPORTED_LANGUAGES,
     }),
-    [language, setLanguage, t],
+    [language, setLanguage, t, isRTL],
   );
 
   if (!isInitialized) {

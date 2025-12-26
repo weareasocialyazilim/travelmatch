@@ -16,9 +16,9 @@ import { ToastProvider } from '@/context/ToastContext';
 
 // Mock react-native-safe-area-context
 jest.mock('react-native-safe-area-context', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   const ReactMock = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   const { View } = require('react-native');
   return {
     SafeAreaView: ({
@@ -45,9 +45,9 @@ jest.mock('@expo/vector-icons', () => ({
     _size: number;
     _color: string;
   }) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+     
     const ReactMock = require('react');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+     
     const { Text } = require('react-native');
     return ReactMock.createElement(Text, { testID: `icon-${name}` }, name);
   },

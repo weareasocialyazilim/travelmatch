@@ -378,19 +378,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  emptySubtitle: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    fontWeight: '400',
-    textAlign: 'center',
-  },
-  emptyTitle: {
-    color: COLORS.text,
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: LAYOUT.padding,
-    marginTop: LAYOUT.padding * 2,
-  },
   giverAvatar: {
     borderColor: COLORS.border,
     borderRadius: 30,
@@ -455,19 +442,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginLeft: LAYOUT.padding,
   },
-  messageContainer: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    marginBottom: LAYOUT.padding,
-  },
-  messageText: {
-    color: COLORS.text,
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 20,
-    marginLeft: LAYOUT.padding / 2,
-  },
   positionBadge: {
     backgroundColor: COLORS.primary,
     borderRadius: VALUES.borderRadius / 2,
@@ -481,20 +455,6 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
-  },
-  profileButton: {
-    alignItems: 'center',
-    borderColor: COLORS.border,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: LAYOUT.padding,
-  },
-  profileButtonText: {
-    color: COLORS.primary,
-    fontSize: 14,
-    fontWeight: '600',
-    marginRight: LAYOUT.padding / 2,
   },
   rejectButton: {
     alignItems: 'center',
@@ -594,12 +554,6 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: 20,
     fontWeight: '800',
-  },
-  timestamp: {
-    color: COLORS.textSecondary,
-    fontSize: 12,
-    fontWeight: '500',
-    marginBottom: LAYOUT.padding,
   },
   trustBadge: {
     alignItems: 'center',
