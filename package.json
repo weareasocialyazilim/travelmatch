@@ -78,7 +78,7 @@
     "lint-staged": "^16.2.7",
     "openai": "^6.14.0",
     "prettier": "^3.7.4",
-    "react-test-renderer": "19.2.3",
+    "react-test-renderer": "19.1.0",
     "stripe": "^20.1.0",
     "tsx": "^4.21.0",
     "turbo": "^2.6.3",
