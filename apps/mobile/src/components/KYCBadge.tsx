@@ -72,9 +72,6 @@ export const KYCBadge: React.FC<KYCBadgeProps> = ({
   offset = { bottom: -2, right: -2 },
   animated = true,
 }) => {
-  // Don't render anything for 'none' level
-  if (level === 'none') return null;
-
   const config = KYC_CONFIG[level];
   const glowOpacity = useSharedValue(0.3);
 
@@ -95,6 +92,9 @@ export const KYCBadge: React.FC<KYCBadgeProps> = ({
   const glowStyle = useAnimatedStyle(() => ({
     opacity: glowOpacity.value,
   }));
+
+  // Don't render anything for 'none' level (after all hooks)
+  if (level === 'none') return null;
 
   const showGlow = animated && (level === 'gold' || level === 'platinum');
   const containerSize = size + 8; // Padding for the badge container

@@ -98,6 +98,7 @@ export const useEnterAnimation = (
     if (autoStart) {
       enter();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- enter should not trigger re-animation
   }, [autoStart]);
 
   return {
@@ -180,6 +181,7 @@ export const useFadeAnimation = (options: {
     if (autoStart) {
       fadeIn();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fadeIn should not trigger re-animation
   }, [autoStart]);
 
   return {
@@ -247,6 +249,7 @@ export const useSlideAnimation = (options: {
     if (autoStart) {
       slideIn();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- slideIn should not trigger re-animation
   }, [autoStart]);
 
   return {

@@ -209,6 +209,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
     } finally {
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- FALLBACK_CITIES is a module-level constant
   }, []);
 
   const handleTextChange = useCallback(
