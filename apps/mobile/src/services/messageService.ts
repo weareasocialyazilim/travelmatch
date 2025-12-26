@@ -97,8 +97,15 @@ export const messageService = {
       const queueJson = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY);
       if (!queueJson) return;
 
-      const queue: SendMessageRequest[] = JSON.parse(queueJson);
-      if (queue.length === 0) return;
+      let queue: SendMessageRequest[];
+      try {
+        queue = JSON.parse(queueJson);
+      } catch (parseError) {
+        logger.warn('[Message] Corrupted offline queue, clearing', parseError);
+        await AsyncStorage.removeItem(OFFLINE_QUEUE_KEY);
+        return;
+      }
+      if (!Array.isArray(queue) || queue.length === 0) return;
 
       logger.info(`[Message] Processing ${queue.length} offline messages`);
 
@@ -263,7 +270,15 @@ export const messageService = {
 
         // Add to offline queue
         const queueJson = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY);
-        const queue = queueJson ? JSON.parse(queueJson) : [];
+        let queue: SendMessageRequest[] = [];
+        if (queueJson) {
+          try {
+            queue = JSON.parse(queueJson);
+          } catch (parseError) {
+            logger.warn('[Message] Corrupted queue data, resetting queue', parseError);
+            queue = [];
+          }
+        }
         queue.push(data);
         await AsyncStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
 

@@ -4,7 +4,7 @@
  * CRITICAL: App Store will reject apps without this implementation
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Platform, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
@@ -154,6 +154,9 @@ export const useAppTrackingTransparency = (options?: {
     }
   }, [status, onStatusChange]);
 
+  // Ref for auto-request timeout cleanup
+  const autoRequestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Initial check on mount
   useEffect(() => {
     const initialize = async () => {
@@ -162,13 +165,22 @@ export const useAppTrackingTransparency = (options?: {
       // Auto-request if enabled and status is not-determined
       if (autoRequest && currentStatus === 'not-determined') {
         // Small delay to avoid showing dialog immediately on app launch
-        setTimeout(() => {
+        autoRequestTimeoutRef.current = setTimeout(() => {
           void requestPermission();
+          autoRequestTimeoutRef.current = null;
         }, 1000);
       }
     };
 
     void initialize();
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (autoRequestTimeoutRef.current) {
+        clearTimeout(autoRequestTimeoutRef.current);
+        autoRequestTimeoutRef.current = null;
+      }
+    };
   }, [checkStatus, autoRequest, requestPermission]);
 
   return {

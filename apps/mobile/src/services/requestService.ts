@@ -11,13 +11,13 @@ import type { Database } from '../types/database.types';
 // Type aliases for joined relation data
 type UserRow = Database['public']['Tables']['users']['Row'];
 type MomentRow = Database['public']['Tables']['moments']['Row'];
+type RequestRow = Database['public']['Tables']['requests']['Row'];
 
 // Request row with joined relations
-interface RequestRowWithRelations
-  extends Database['public']['Tables']['requests']['Row'] {
+type RequestRowWithRelations = RequestRow & {
   users?: UserRow | null;
   moments?: MomentRow | null;
-}
+};
 
 // Types
 export type RequestStatus =
