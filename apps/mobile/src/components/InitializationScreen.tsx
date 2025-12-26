@@ -26,7 +26,7 @@ import type { BootstrapProgress, ServiceName } from '@/services/appBootstrap';
 
 // Asset imports - using require is necessary for local image assets
 
-const appIcon = require('../../../assets/icon.png') as number;
+const appIcon = require('../../assets/icon.png') as number;
 
 interface InitializationScreenProps {
   progress: BootstrapProgress;
