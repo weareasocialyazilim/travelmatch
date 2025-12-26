@@ -9,12 +9,12 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { StackScreenProps } from '@react-navigation/stack';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
+import type { RootStackParamList } from '@/navigation/routeParams';
+
+type SplashScreenProps = StackScreenProps<RootStackParamList, 'Splash'>;
 import { COLORS } from '@/constants/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-type SplashScreenProps = StackScreenProps<RootStackParamList, 'Splash'>;
 
 /**
  * SplashScreen - The first screen users see when launching the app

@@ -14,8 +14,8 @@ import { logger } from '@/utils/logger';
 import { LoadingState } from '@/components/LoadingState';
 import { useToast } from '@/context/ToastContext';
 import { twilioClient } from '@/services/twilioService';
-import type { RootStackParamList } from '@/navigation/AppNavigator';
 import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 type VerifyPhoneScreenProps = StackScreenProps<
   RootStackParamList,
