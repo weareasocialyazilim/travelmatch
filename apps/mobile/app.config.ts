@@ -67,8 +67,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       '@sentry/react-native/expo',
       {
-        organization: process.env.SENTRY_ORG || 'travelmatch-2p',
-        project: process.env.SENTRY_PROJECT || 'react-native',
+        organization: process.env.SENTRY_ORG || 'travelmatch-2d',
+        project: process.env.SENTRY_PROJECT || 'travelmatch-mobile',
         authToken: process.env.SENTRY_AUTH_TOKEN,
       },
     ],
