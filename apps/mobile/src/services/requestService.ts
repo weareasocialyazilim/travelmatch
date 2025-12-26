@@ -1,17 +1,4 @@
 /**
-      let query = supabase
-        .from('requests')
-        .select('*, users(*), moments(*)', { count: 'exact' });
-
-      if (filters?.status) {
-        query = query.eq('status', filters.status);
-      }
-
-      const { data, count, error } = await query.order('created_at', {
-        ascending: false,
-      });
-      if (error) throw error;
-/**
  * Request Service
  * Gift requests, bookings, and related operations
  */
@@ -20,6 +7,17 @@ import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { requestsService as dbRequestsService } from './supabaseDbService';
 import type { Database } from '../types/database.types';
+
+// Type aliases for joined relation data
+type UserRow = Database['public']['Tables']['users']['Row'];
+type MomentRow = Database['public']['Tables']['moments']['Row'];
+
+// Request row with joined relations
+interface RequestRowWithRelations
+  extends Database['public']['Tables']['requests']['Row'] {
+  users?: UserRow | null;
+  moments?: MomentRow | null;
+}
 
 // Types
 export type RequestStatus =
@@ -141,7 +139,6 @@ export const requestService = {
         await dbRequestsService.create(requestData);
       if (error) throw error;
 
-      const _dbTotal = (newRequest as any)?.total_price;
       const computedTotal =
         Number(momentRow.price || 0) * Number(data.guestCount || 0);
 
@@ -198,10 +195,7 @@ export const requestService = {
       if (error) throw error;
 
       const requests: GiftRequest[] = (data || []).map((row: unknown) => {
-        const r = row as Database['public']['Tables']['requests']['Row'] & {
-          users?: any;
-          moments?: any;
-        };
+        const r = row as RequestRowWithRelations;
         return {
           id: r.id,
           type: 'gift_request',
@@ -273,15 +267,13 @@ export const requestService = {
       if (error) throw error;
 
       // Filter by moment owner (host)
-      const filtered = (data || []).filter(
-        (row: any) => (row?.moments?.user_id ?? '') === user.id,
-      );
+      const filtered = (data || []).filter((row: unknown) => {
+        const r = row as RequestRowWithRelations;
+        return (r?.moments?.user_id ?? '') === user.id;
+      });
 
       const requests: GiftRequest[] = filtered.map((row: unknown) => {
-        const r = row as Database['public']['Tables']['requests']['Row'] & {
-          users?: any;
-          moments?: any;
-        };
+        const r = row as RequestRowWithRelations;
         return {
           id: r.id,
           type: 'gift_request',
@@ -330,11 +322,7 @@ export const requestService = {
 
       if (error) throw error;
 
-      const row =
-        data as unknown as Database['public']['Tables']['requests']['Row'] & {
-          users?: any;
-          moments?: any;
-        };
+      const row = data as unknown as RequestRowWithRelations;
 
       const request: GiftRequest = {
         id: row.id,

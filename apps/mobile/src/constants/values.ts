@@ -1,6 +1,13 @@
 import { SHADOWS } from './shadows';
 
 export const VALUES = {
+  // App deep link scheme
+  APP_SCHEME: 'travelmatch',
+  DEEP_LINKS: {
+    AUTH_CALLBACK: 'travelmatch://auth/callback',
+    RESET_PASSWORD: 'travelmatch://auth/reset-password',
+  },
+
   // Escrow thresholds
   ESCROW_DIRECT_MAX: 30,
   ESCROW_OPTIONAL_MAX: 100,
