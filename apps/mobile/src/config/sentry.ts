@@ -15,78 +15,104 @@ import { logger } from '../utils/logger';
 const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 
 // Sentry DSN from environment variables (configured in EAS)
-const SENTRY_DSN = isDev
-  ? '' // Disable in development
-  : (Constants.expoConfig?.extra?.sentryDsn as string | undefined) || '';
+const SENTRY_DSN =
+  (Constants.expoConfig?.extra?.sentryDsn as string | undefined) ||
+  process.env.EXPO_PUBLIC_SENTRY_DSN ||
+  'https://4e851e74a8a6ecab750e2f4a8933e6c8@o4510544957800448.ingest.de.sentry.io/4510550169354320';
+
+// Track if Sentry has been initialized
+let isInitialized = false;
 
 /**
- * Initialize Sentry
+ * Initialize Sentry - Call this after JSI runtime is ready (inside useEffect)
  */
 export function initSentry() {
-  if (!SENTRY_DSN) {
-    logger.debug('Sentry disabled in development');
+  if (isInitialized) {
+    logger.debug('Sentry already initialized');
     return;
   }
 
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    debug: __DEV__,
-    environment: __DEV__ ? 'development' : 'production',
+  try {
+    Sentry.init({
+      dsn: SENTRY_DSN,
+      debug: isDev,
+      environment: isDev ? 'development' : 'production',
 
-    // Performance Monitoring
-    tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+      // Adds more context data to events
+      sendDefaultPii: true,
 
-    // Enable offline caching
-    enableNativeCrashHandling: true,
-    enableAutoSessionTracking: true,
+      // Enable Logs
+      enableLogs: true,
 
-    // Filter sensitive data - PRIVACY PROTECTION
-    beforeSend(event) {
-      // Remove PII from user context
-      if (event.user) {
-        delete event.user.email;
-        delete event.user.ip_address;
-        // Keep only non-sensitive identifiers
-        event.user.username = String(
-          event.user.username || event.user.id || 'anonymous',
-        );
-      }
+      // Performance Monitoring
+      tracesSampleRate: isDev ? 1.0 : 0.2,
 
-      // Remove sensitive request data
-      if (event.request) {
-        delete event.request.cookies;
-        delete event.request.headers;
-      }
+      // Configure Session Replay - only in production
+      replaysSessionSampleRate: isDev ? 0 : 0.1,
+      replaysOnErrorSampleRate: isDev ? 0 : 1,
 
-      // Remove sensitive data from extra context
-      if (event.extra) {
-        delete event.extra.phone;
-        delete event.extra.password;
-        delete event.extra.token;
-        delete event.extra.creditCard;
-        delete event.extra.apiKey;
-      }
+      // Enable offline caching
+      enableNativeCrashHandling: true,
+      enableAutoSessionTracking: true,
 
-      // Filter breadcrumbs for sensitive data
-      if (event.breadcrumbs) {
-        event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
-          if (breadcrumb.data) {
-            delete breadcrumb.data.password;
-            delete breadcrumb.data.token;
-            delete breadcrumb.data.email;
-            delete breadcrumb.data.phone;
-            delete breadcrumb.data.creditCard;
-          }
-          return breadcrumb;
-        });
-      }
+      // Integrations - only add in production to avoid JSI issues in dev
+      integrations: isDev
+        ? []
+        : [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
 
-      return event;
-    },
+      // Filter sensitive data - PRIVACY PROTECTION
+      beforeSend(event) {
+        // Remove PII from user context
+        if (event.user) {
+          delete event.user.email;
+          delete event.user.ip_address;
+          // Keep only non-sensitive identifiers
+          event.user.username = String(
+            event.user.username || event.user.id || 'anonymous',
+          );
+        }
 
-    // Ignore specific errors
-    ignoreErrors: ['Network request failed', 'NetworkError', 'AbortError'],
-  });
+        // Remove sensitive request data
+        if (event.request) {
+          delete event.request.cookies;
+          delete event.request.headers;
+        }
+
+        // Remove sensitive data from extra context
+        if (event.extra) {
+          delete event.extra.phone;
+          delete event.extra.password;
+          delete event.extra.token;
+          delete event.extra.creditCard;
+          delete event.extra.apiKey;
+        }
+
+        // Filter breadcrumbs for sensitive data
+        if (event.breadcrumbs) {
+          event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
+            if (breadcrumb.data) {
+              delete breadcrumb.data.password;
+              delete breadcrumb.data.token;
+              delete breadcrumb.data.email;
+              delete breadcrumb.data.phone;
+              delete breadcrumb.data.creditCard;
+            }
+            return breadcrumb;
+          });
+        }
+
+        return event;
+      },
+
+      // Ignore specific errors
+      ignoreErrors: ['Network request failed', 'NetworkError', 'AbortError'],
+    });
+
+    isInitialized = true;
+    logger.info('Sentry', 'Sentry initialized successfully');
+  } catch (error) {
+    logger.error('Sentry', 'Failed to initialize Sentry', error);
+  }
 }
 
 /**
