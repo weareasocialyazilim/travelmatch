@@ -81,7 +81,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         // Build-time only token - NOT bundled in client (no EXPO_PUBLIC_ prefix)
         RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
         // Use Mapbox v11 for better New Architecture support
-        RNMapboxMapsVersion: '11.8.0',
+        RNMapboxMapsVersion: '11.17.0',
       },
     ],
   ],
