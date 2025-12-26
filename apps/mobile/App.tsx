@@ -31,11 +31,9 @@ import type {
   PendingPayment,
   PendingUpload,
 } from './src/services/pendingTransactionsService';
-import * as Sentry from '@sentry/react-native';
-import Constants from 'expo-constants';
 
-// Note: Sentry initialization moved inside component to ensure JSI runtime is ready
-// This prevents "Cannot read property 'prototype' of undefined" errors with New Architecture
+// Note: Sentry is loaded dynamically inside useEffect to avoid JSI runtime errors
+// with New Architecture. Do NOT import Sentry at module level.
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -54,7 +52,9 @@ const styles = StyleSheet.create({
 
 type AppInitState = 'initializing' | 'ready' | 'error';
 
-export default Sentry.wrap(function App() {
+// App component - Sentry.wrap removed to avoid JSI runtime errors
+// Error boundary handles crash reporting instead
+export default function App() {
   // App state
   const [appInitState, setAppInitState] =
     useState<AppInitState>('initializing');
@@ -264,4 +264,4 @@ export default Sentry.wrap(function App() {
       </ErrorBoundary>
     </GestureHandlerRootView>
   );
-});
+}
