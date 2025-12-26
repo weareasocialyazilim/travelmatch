@@ -6,14 +6,7 @@
  * Note: This file is web-specific and should only be bundled for web builds.
  */
 
-import * as Sentry from '@sentry/react-native';
-import { logger } from '../utils/logger';
-
-// Type declarations for Web Performance APIs
-interface LayoutShift extends PerformanceEntry {
-  hadRecentInput: boolean;
-  value: number;
-}
+import React from 'react';
 
 interface LargestContentfulPaintEntry extends PerformanceEntry {
   renderTime: number;
