@@ -24,7 +24,7 @@
  * ```
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { biometricAuth } from '../services/biometricAuth';
 import type { BiometricType } from '../services/biometricAuth';
 import { logger } from '../utils/logger';
@@ -198,19 +198,35 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
     await initializeBiometric();
   }, [initializeBiometric]);
 
-  const value: BiometricAuthContextValue = {
-    biometricAvailable,
-    biometricEnabled,
-    biometricType,
-    biometricTypeName,
-    isLoading,
-    enableBiometric,
-    disableBiometric,
-    authenticate,
-    authenticateForAppLaunch,
-    authenticateForAction,
-    refresh,
-  };
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo<BiometricAuthContextValue>(
+    () => ({
+      biometricAvailable,
+      biometricEnabled,
+      biometricType,
+      biometricTypeName,
+      isLoading,
+      enableBiometric,
+      disableBiometric,
+      authenticate,
+      authenticateForAppLaunch,
+      authenticateForAction,
+      refresh,
+    }),
+    [
+      biometricAvailable,
+      biometricEnabled,
+      biometricType,
+      biometricTypeName,
+      isLoading,
+      enableBiometric,
+      disableBiometric,
+      authenticate,
+      authenticateForAppLaunch,
+      authenticateForAction,
+      refresh,
+    ],
+  );
 
   return (
     <BiometricAuthContext.Provider value={value}>

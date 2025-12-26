@@ -27,6 +27,49 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+// Generic request body type - use Record for structured data
+type RequestBody = Record<string, unknown>;
+
+// API Response types for better type safety
+interface AuthLoginResponse {
+  user: {
+    id: string;
+    email: string;
+    full_name?: string;
+  };
+  session: {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+  };
+}
+
+interface UserResponse {
+  id: string;
+  email: string;
+  full_name?: string;
+  avatar_url?: string;
+  rating?: number;
+  verified?: boolean;
+}
+
+interface MomentResponse {
+  id: string;
+  title: string;
+  description?: string;
+  images?: string[];
+  price?: number;
+  user_id: string;
+}
+
+interface RequestResponse {
+  id: string;
+  status: string;
+  moment_id: string;
+  user_id: string;
+  message?: string;
+}
+
 /**
  * Network-aware API Client with automatic token refresh
  * - Checks connection before making requests
@@ -81,7 +124,7 @@ class ApiClient {
   async request<T>(
     method: string,
     path: string,
-    body?: any,
+    body?: RequestBody,
     isRetry = false,
   ): Promise<ApiResponse<T>> {
     try {
@@ -183,15 +226,15 @@ class ApiClient {
     return this.request<T>('GET', path);
   }
 
-  post<T>(path: string, body: any) {
+  post<T>(path: string, body: RequestBody) {
     return this.request<T>('POST', path, body);
   }
 
-  put<T>(path: string, body: any) {
+  put<T>(path: string, body: RequestBody) {
     return this.request<T>('PUT', path, body);
   }
 
-  patch<T>(path: string, body: any) {
+  patch<T>(path: string, body: RequestBody) {
     return this.request<T>('PATCH', path, body);
   }
 
@@ -212,10 +255,7 @@ export const apiV1Service = {
   // AUTH
   // ============================================
   async login(email: string, password: string) {
-    return apiClient.post<{
-      user: any;
-      session: any;
-    }>('/auth/login', { email, password });
+    return apiClient.post<AuthLoginResponse>('/auth/login', { email, password });
   },
 
   async logout() {
@@ -226,12 +266,12 @@ export const apiV1Service = {
   // USERS
   // ============================================
   async getUser(userId: string) {
-    return apiClient.get<any>(`/users/${userId}`);
+    return apiClient.get<UserResponse>(`/users/${userId}`);
   },
 
   async getUserMoments(userId: string) {
     return apiClient.get<{
-      moments: any[];
+      moments: MomentResponse[];
       count: number;
     }>(`/users/${userId}/moments`);
   },
@@ -251,7 +291,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      moments: any[];
+      moments: MomentResponse[];
       pagination: {
         total: number;
         limit: number;
@@ -262,7 +302,7 @@ export const apiV1Service = {
   },
 
   async getMoment(momentId: string) {
-    return apiClient.get<any>(`/moments/${momentId}`);
+    return apiClient.get<MomentResponse>(`/moments/${momentId}`);
   },
 
   // ============================================
@@ -280,7 +320,7 @@ export const apiV1Service = {
 
     const query = queryParams.toString();
     return apiClient.get<{
-      requests: any[];
+      requests: RequestResponse[];
       count: number;
     }>(`/requests${query ? `?${query}` : ''}`);
   },
