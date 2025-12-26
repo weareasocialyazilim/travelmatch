@@ -5,7 +5,7 @@
  */
 
 import type { VerificationData as KYCVerificationData } from '../features/payments/kyc/types';
-import type { SuccessType } from '../features/payments/screens/SuccessScreen';
+import type { SuccessType } from '../features/payments/types/success.types';
 import type { Moment, User, SelectedGiver } from '../types';
 
 // Success screen details interface

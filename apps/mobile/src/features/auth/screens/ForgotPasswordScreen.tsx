@@ -103,6 +103,7 @@ export const ForgotPasswordScreen: React.FC = () => {
                 style={styles.inputIcon}
               />
               <TextInput
+                testID="email-input"
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
@@ -117,6 +118,7 @@ export const ForgotPasswordScreen: React.FC = () => {
             </View>
 
             <TouchableOpacity
+              testID="send-reset-link-button"
               style={[
                 styles.button,
                 (!isValidEmail(email) || isLoading) && styles.buttonDisabled,
@@ -166,6 +168,7 @@ export const ForgotPasswordScreen: React.FC = () => {
             </Text>
 
             <TouchableOpacity
+              testID="resend-email-button"
               style={styles.resendButton}
               onPress={() => {
                 setStep('email');

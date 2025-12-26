@@ -143,6 +143,7 @@ interface AtomicTransferResponse {
 
 interface CreateEscrowResponse {
   escrowId: string;
+  transactionId?: string;
 }
 
 interface EscrowOperationResponse {
@@ -656,28 +657,27 @@ export const paymentService = {
       const escrowMode = determineEscrowMode(amount);
 
       switch (escrowMode) {
-        case 'direct':
+        case 'direct': {
           // < $30: Direct atomic transfer (no escrow)
           logger.info(`[Payment] Direct transfer: $${amount}`);
-          const { data: directData, error: directError } = await callRpc<AtomicTransferResponse>(
-            'atomic_transfer',
-            {
+          const { data: directData, error: directError } =
+            await callRpc<AtomicTransferResponse>('atomic_transfer', {
               p_sender_id: user.id,
               p_recipient_id: recipientId,
               p_amount: amount,
               p_moment_id: momentId,
               p_message: message,
-            },
-          );
+            });
 
           if (directError) throw directError;
 
           return {
             success: true,
-            transactionId: directData?.senderTxnId,
+            transactionId: directData?.senderTxnId ?? '',
           };
+        }
 
-        case 'optional':
+        case 'optional': {
           // $30-$100: Ask user preference
           logger.info(`[Payment] Optional escrow range: $${amount}`);
           const useEscrow = escrowChoiceCallback
@@ -686,23 +686,21 @@ export const paymentService = {
 
           if (useEscrow) {
             // User chose escrow protection
-            const { data: escrowData, error: escrowError } = await callRpc<CreateEscrowResponse>(
-              'create_escrow_transaction',
-              {
+            const { data: escrowData, error: escrowError } =
+              await callRpc<CreateEscrowResponse>('create_escrow_transaction', {
                 p_sender_id: user.id,
                 p_recipient_id: recipientId,
                 p_amount: amount,
                 p_moment_id: momentId,
                 p_release_condition: 'proof_verified',
-              },
-            );
+              });
 
             if (escrowError) throw escrowError;
 
             return {
               success: true,
-              transactionId: escrowData?.transaction_id,
-              escrowId: escrowData?.escrow_id,
+              transactionId: escrowData?.transactionId ?? '',
+              escrowId: escrowData?.escrowId,
             };
           } else {
             // User chose direct payment
@@ -719,11 +717,12 @@ export const paymentService = {
 
             return {
               success: true,
-              transactionId: directData2?.senderTxnId,
+              transactionId: directData2?.senderTxnId ?? '',
             };
           }
+        }
 
-        case 'mandatory':
+        case 'mandatory': {
           // >= $100: Force escrow (no choice)
           logger.info(`[Payment] Mandatory escrow: $${amount}`);
           const { data: mandatoryData, error: mandatoryError } =
@@ -739,9 +738,10 @@ export const paymentService = {
 
           return {
             success: true,
-            transactionId: mandatoryData?.transaction_id,
-            escrowId: mandatoryData?.escrow_id,
+            transactionId: mandatoryData?.transactionId ?? '',
+            escrowId: mandatoryData?.escrowId,
           };
+        }
 
         default:
           throw new Error(`Unknown escrow mode: ${escrowMode}`);
@@ -758,13 +758,16 @@ export const paymentService = {
    */
   releaseEscrow: async (escrowId: string): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await callRpc<EscrowOperationResponse>('release_escrow', {
-        p_escrow_id: escrowId,
-      });
+      const { data, error } = await callRpc<EscrowOperationResponse>(
+        'release_escrow',
+        {
+          p_escrow_id: escrowId,
+        },
+      );
 
       if (error) throw error;
 
-      return { success: data?.success };
+      return { success: data?.success ?? false };
     } catch (error) {
       logger.error('Release escrow error:', error);
       throw error;
@@ -780,14 +783,17 @@ export const paymentService = {
     reason: string,
   ): Promise<{ success: boolean }> => {
     try {
-      const { data, error } = await callRpc<EscrowOperationResponse>('refund_escrow', {
-        p_escrow_id: escrowId,
-        p_reason: reason,
-      });
+      const { data, error } = await callRpc<EscrowOperationResponse>(
+        'refund_escrow',
+        {
+          p_escrow_id: escrowId,
+          p_reason: reason,
+        },
+      );
 
       if (error) throw error;
 
-      return { success: data?.success };
+      return { success: data?.success ?? false };
     } catch (error) {
       logger.error('Refund escrow error:', error);
       throw error;

@@ -20,20 +20,12 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp, RouteProp } from '@react-navigation/native';
+import type { SuccessType } from '../types/success.types';
+
+// Re-export for backward compatibility
+export type { SuccessType } from '../types/success.types';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-
-export type SuccessType =
-  | 'card_added'
-  | 'card_removed'
-  | 'cache_cleared'
-  | 'gift_sent'
-  | 'withdraw'
-  | 'dispute'
-  | 'proof_uploaded'
-  | 'proof_approved'
-  | 'profile_complete'
-  | 'generic';
 
 interface SuccessConfig {
   icon: IconName;

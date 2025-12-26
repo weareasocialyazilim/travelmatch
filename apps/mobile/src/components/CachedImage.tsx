@@ -48,8 +48,10 @@ type ImageState = 'idle' | 'loading' | 'success' | 'error';
 
 type ImageType = 'default' | 'avatar' | 'moment' | 'trip' | 'gift' | 'profile';
 
-export interface CachedImageProps
-  extends Omit<ImageProps, 'source' | 'onError' | 'onLoadStart' | 'onLoadEnd'> {
+export interface CachedImageProps extends Omit<
+  ImageProps,
+  'source' | 'onError' | 'onLoadStart' | 'onLoadEnd'
+> {
   source: { uri: string };
   type?: ImageType;
   cloudflareId?: string;
@@ -146,13 +148,16 @@ export const CachedImage: React.FC<CachedImageProps> = ({
 }) => {
   const [state, setState] = useState<ImageState>('idle');
   const [cachedUri, setCachedUri] = useState<string | null>(null);
-  const [_error, setError] = useState<Error | null>(null);
+  // Error state is set but not read directly - we use state === 'error' instead
+  const [, setError] = useState<Error | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
   // Ref to track mounted state and cleanup timeouts
   const isMountedRef = useRef(true);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const networkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Ref to track retry count for loadImage without causing re-renders
+  const retryCountRef = useRef(0);
 
   const loadImage = useCallback(async () => {
     setState('loading');
@@ -194,7 +199,8 @@ export const CachedImage: React.FC<CachedImageProps> = ({
       if (isMountedRef.current) {
         setCachedUri(uri);
         setState('success');
-        setRetryCount(0); // Reset retry count on success
+        retryCountRef.current = 0; // Reset retry count on success
+        setRetryCount(0);
         onLoadEnd?.();
       }
     } catch (err) {
@@ -205,8 +211,8 @@ export const CachedImage: React.FC<CachedImageProps> = ({
         setState('error');
         onError?.(error);
 
-        // Try fallback source if available
-        if (fallbackSource && retryCount === 0) {
+        // Try fallback source if available (only on first failure)
+        if (fallbackSource && retryCountRef.current === 0) {
           setCachedUri(fallbackSource.uri);
         }
       }
@@ -217,7 +223,6 @@ export const CachedImage: React.FC<CachedImageProps> = ({
     variant,
     prefetch,
     networkTimeout,
-    retryCount,
     fallbackSource,
     onLoadStart,
     onLoadEnd,
@@ -248,6 +253,8 @@ export const CachedImage: React.FC<CachedImageProps> = ({
     }
 
     onRetry?.();
+    // Update both state and ref
+    retryCountRef.current = retryCount + 1;
     setRetryCount((prev) => prev + 1);
 
     // Clear any existing retry timeout
@@ -255,7 +262,7 @@ export const CachedImage: React.FC<CachedImageProps> = ({
       clearTimeout(retryTimeoutRef.current);
     }
 
-    // Delay retry slightly to prevent rapid retries
+    // Delay retry to prevent rapid retries
     retryTimeoutRef.current = setTimeout(() => {
       if (isMountedRef.current) {
         loadImage();
