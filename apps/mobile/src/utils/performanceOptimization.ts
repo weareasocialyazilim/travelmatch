@@ -7,7 +7,14 @@
  * @module utils/performanceOptimization
  */
 
-import { useRef, useCallback, useEffect, useState } from 'react';
+import {
+  useRef,
+  useCallback,
+  useEffect,
+  useState,
+  useTransition,
+  useDeferredValue,
+} from 'react';
 import type { DependencyList } from 'react';
 
 /**
@@ -435,4 +442,197 @@ export function useWhyDidUpdate(
 
     prevProps.current = props;
   });
+}
+
+// ============================================================================
+// REACT 19 CONCURRENT FEATURES
+// ============================================================================
+
+/**
+ * Hook for non-urgent state updates with transition
+ * Keeps UI responsive during expensive operations like filtering large lists
+ *
+ * @param initialValue Initial state value
+ * @returns [value, setValue, isPending] - Current value, setter wrapped in transition, pending state
+ *
+ * @example
+ * const [searchResults, setSearchResults, isSearching] = useTransitionState<Item[]>([]);
+ *
+ * const handleSearch = (query: string) => {
+ *   // This won't block user input
+ *   setSearchResults(filterItems(allItems, query));
+ * };
+ *
+ * return (
+ *   <>
+ *     <TextInput onChangeText={handleSearch} />
+ *     {isSearching && <ActivityIndicator />}
+ *     <FlatList data={searchResults} />
+ *   </>
+ * );
+ */
+export function useTransitionState<T>(
+  initialValue: T,
+): [T, (value: T | ((prev: T) => T)) => void, boolean] {
+  const [value, setValue] = useState<T>(initialValue);
+  const [isPending, startTransition] = useTransition();
+
+  const setValueWithTransition = useCallback(
+    (newValue: T | ((prev: T) => T)) => {
+      startTransition(() => {
+        setValue(newValue);
+      });
+    },
+    [],
+  );
+
+  return [value, setValueWithTransition, isPending];
+}
+
+/**
+ * Hook for deferred search/filter with automatic debouncing
+ * Combines useTransition with useDeferredValue for optimal performance
+ *
+ * @param items Array of items to filter
+ * @param filterFn Filter function that takes items and query
+ * @param debounceMs Debounce delay for query changes
+ * @returns { query, setQuery, filteredItems, isPending }
+ *
+ * @example
+ * const { query, setQuery, filteredItems, isPending } = useDeferredFilter(
+ *   allMoments,
+ *   (items, q) => items.filter(item =>
+ *     item.title.toLowerCase().includes(q.toLowerCase())
+ *   ),
+ *   300
+ * );
+ *
+ * return (
+ *   <>
+ *     <SearchInput value={query} onChangeText={setQuery} />
+ *     {isPending && <Text>Searching...</Text>}
+ *     <FlashList data={filteredItems} />
+ *   </>
+ * );
+ */
+export function useDeferredFilter<T>(
+  items: T[],
+  filterFn: (items: T[], query: string) => T[],
+  debounceMs = 300,
+): {
+  query: string;
+  setQuery: (query: string) => void;
+  filteredItems: T[];
+  isPending: boolean;
+} {
+  const [query, setQuery] = useState('');
+  const [isPending, startTransition] = useTransition();
+  const debouncedQuery = useDebounceValue(query, debounceMs);
+  const deferredQuery = useDeferredValue(debouncedQuery);
+
+  const [filteredItems, setFilteredItems] = useState<T[]>(items);
+
+  useEffect(() => {
+    startTransition(() => {
+      if (deferredQuery.trim() === '') {
+        setFilteredItems(items);
+      } else {
+        setFilteredItems(filterFn(items, deferredQuery));
+      }
+    });
+  }, [deferredQuery, items, filterFn]);
+
+  return {
+    query,
+    setQuery,
+    filteredItems,
+    isPending,
+  };
+}
+
+/**
+ * Hook for expensive computations that should not block UI
+ * Uses useDeferredValue to defer the computation result
+ *
+ * @param value The value to defer
+ * @returns The deferred value (may lag behind during transitions)
+ *
+ * @example
+ * const searchQuery = useUserInput();
+ * const deferredQuery = useDeferredComputation(searchQuery);
+ *
+ * // This expensive filter won't block typing
+ * const results = useMemo(
+ *   () => filterLargeDataset(data, deferredQuery),
+ *   [data, deferredQuery]
+ * );
+ */
+export function useDeferredComputation<T>(value: T): T {
+  return useDeferredValue(value);
+}
+
+/**
+ * Hook for list operations with transition
+ * Optimized for adding, removing, or reordering items without blocking UI
+ *
+ * @param initialItems Initial list of items
+ * @returns List operations wrapped in transitions
+ *
+ * @example
+ * const {
+ *   items,
+ *   addItem,
+ *   removeItem,
+ *   updateItem,
+ *   setItems,
+ *   isPending
+ * } = useTransitionList<Moment>(initialMoments);
+ */
+export function useTransitionList<T extends { id: string | number }>(
+  initialItems: T[],
+): {
+  items: T[];
+  addItem: (item: T) => void;
+  removeItem: (id: string | number) => void;
+  updateItem: (id: string | number, updates: Partial<T>) => void;
+  setItems: (items: T[]) => void;
+  isPending: boolean;
+} {
+  const [items, setItems] = useState<T[]>(initialItems);
+  const [isPending, startTransition] = useTransition();
+
+  const addItem = useCallback((item: T) => {
+    startTransition(() => {
+      setItems((prev) => [...prev, item]);
+    });
+  }, []);
+
+  const removeItem = useCallback((id: string | number) => {
+    startTransition(() => {
+      setItems((prev) => prev.filter((item) => item.id !== id));
+    });
+  }, []);
+
+  const updateItem = useCallback((id: string | number, updates: Partial<T>) => {
+    startTransition(() => {
+      setItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, ...updates } : item)),
+      );
+    });
+  }, []);
+
+  const setItemsWithTransition = useCallback((newItems: T[]) => {
+    startTransition(() => {
+      setItems(newItems);
+    });
+  }, []);
+
+  return {
+    items,
+    addItem,
+    removeItem,
+    updateItem,
+    setItems: setItemsWithTransition,
+    isPending,
+  };
 }
