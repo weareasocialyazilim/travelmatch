@@ -17,6 +17,8 @@ export default tseslint.config(
       '*.config.mjs',
       'metro.config.js',
       'babel.config.js',
+      'jest.setup*.js',
+      '__mocks__/**',
     ],
   },
 
@@ -121,11 +123,26 @@ export default tseslint.config(
       '**/*.spec.ts',
       '**/*.spec.tsx',
     ],
+    languageOptions: {
+      globals: {
+        jest: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        test: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+      },
+    },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       'react-native/no-inline-styles': 'off',
+      'no-console': 'off',
+      'no-empty': 'off',
     },
   },
 

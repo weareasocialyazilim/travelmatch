@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.25,
   },
   appleButton: {
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.apple,
     marginBottom: 12,
   },
   footerText: {

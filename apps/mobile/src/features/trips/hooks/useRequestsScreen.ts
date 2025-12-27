@@ -209,9 +209,11 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
     );
   };
 
-  const handleUploadProof = (item: RequestItem) => {
+  const handleUploadProof = (item: RequestItem, onNavigate?: (requestId: string) => void) => {
     logger.info('Upload proof for:', item.id);
-    // TODO: Navigate to proof upload screen
+    if (onNavigate) {
+      onNavigate(item.id);
+    }
   };
 
   const handleRefresh = async () => {

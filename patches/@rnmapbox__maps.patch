@@ -1,0 +1,22 @@
+diff --git a/src/specs/NativeRNMBXLocationModule.ts b/src/specs/NativeRNMBXLocationModule.ts
+index 9b36cebfeac7d2c91720e08a67d89e77d9988192..11d85c16b8ccba6543ee12094b3917c36d1005e2 100644
+--- a/src/specs/NativeRNMBXLocationModule.ts
++++ b/src/specs/NativeRNMBXLocationModule.ts
+@@ -1,6 +1,4 @@
+ import { type TurboModule, TurboModuleRegistry } from 'react-native';
+-// @ts-ignore - CI environment type resolution issue for CodegenTypes
+-import type { EventEmitter } from 'react-native/Libraries/Types/CodegenTypes';
+ 
+ type LocationEvent = {
+   type: string; //"userlocationdupdated"
+@@ -26,7 +24,9 @@ export interface Spec extends TurboModule {
+   simulateHeading(changesPerSecond: number, increment: number): void;
+   setLocationEventThrottle(throttle: number): void;
+ 
+-  readonly onLocationUpdate: EventEmitter<LocationEvent>;
++  // Fixed: Use standard TurboModule event pattern instead of EventEmitter type reference
++  addListener(eventName: string): void;
++  removeListeners(count: number): void;
+ }
+ 
+ export default TurboModuleRegistry.getEnforcing<Spec>('RNMBXLocationModule');

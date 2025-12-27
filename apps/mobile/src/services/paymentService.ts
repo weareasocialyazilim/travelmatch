@@ -14,16 +14,7 @@ import {
 } from '../schemas/payment.schema';
 import { VALUES } from '../constants/values';
 
-// Mock storage for payment methods (simulated for store readiness)
-// WARNING: Only used in development. Production should use real payment gateway.
-let MOCK_CARDS: PaymentCard[] = [];
-let MOCK_BANKS: BankAccount[] = [];
-
-// Handle __DEV__ being undefined in test environments
-const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
-if (!isDev) {
-  logger.warn('Mock payment methods should not be used in production!');
-}
+// Database-backed payment methods (stored in Supabase)
 
 // Types
 export type PaymentStatus =
@@ -310,92 +301,192 @@ export const paymentService = {
     }
   },
 
-  // --- Payment Methods ---
+  // --- Payment Methods (Database-backed) ---
 
   /**
-   * Get saved payment methods
+   * Get saved payment methods from database
    */
-  getPaymentMethods: (): {
+  getPaymentMethods: async (): Promise<{
     cards: PaymentCard[];
     bankAccounts: BankAccount[];
-  } => {
-    // Simulated for store readiness (would be Stripe/Supabase in production)
-    if (!__DEV__) {
-      logger.warn('Using mock payment methods in production!');
+  }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Fetch cards from payment_methods table
+      const { data: paymentMethods, error } = await supabase
+        .from('payment_methods')
+        .select('id, type, provider, last_four, brand, exp_month, exp_year, is_default, is_active, metadata')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      const cards: PaymentCard[] = (paymentMethods || [])
+        .filter((pm) => pm.type === 'card')
+        .map((pm) => ({
+          id: pm.id,
+          brand: (pm.brand as PaymentCard['brand']) || 'visa',
+          last4: pm.last_four || '****',
+          expiryMonth: pm.exp_month || 12,
+          expiryYear: pm.exp_year || 2030,
+          isDefault: pm.is_default || false,
+        }));
+
+      // Fetch bank accounts
+      const { data: bankData, error: bankError } = await supabase
+        .from('bank_accounts')
+        .select('id, bank_name, account_type, last_four, is_default, is_verified')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (bankError) {
+        logger.warn('Bank accounts table may not exist:', bankError);
+      }
+
+      const bankAccounts: BankAccount[] = (bankData || []).map((ba) => ({
+        id: ba.id,
+        bankName: ba.bank_name || 'Unknown Bank',
+        accountType: (ba.account_type as BankAccount['accountType']) || 'checking',
+        last4: ba.last_four || '****',
+        isDefault: ba.is_default || false,
+        isVerified: ba.is_verified || false,
+      }));
+
+      return { cards, bankAccounts };
+    } catch (error) {
+      logger.error('Get payment methods error:', error);
       return { cards: [], bankAccounts: [] };
     }
-    return { cards: MOCK_CARDS, bankAccounts: MOCK_BANKS };
   },
 
   /**
-   * Add a new card
+   * Add a new card via Stripe token
+   * Calls Supabase Edge Function for secure token handling
    */
-  addCard: (_tokenId: string): { card: PaymentCard } => {
-    if (!__DEV__) {
-      logger.error('addCard called in production with mock implementation!');
-      throw new Error('Payment methods not configured for production');
+  addCard: async (tokenId: string): Promise<{ card: PaymentCard }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Call edge function to securely add card via Stripe
+      const { data, error } = await supabase.functions.invoke('add-payment-method', {
+        body: { tokenId, type: 'card' },
+      });
+
+      if (error) throw error;
+
+      const card: PaymentCard = {
+        id: data.id,
+        brand: data.brand || 'visa',
+        last4: data.last4 || '****',
+        expiryMonth: data.exp_month || 12,
+        expiryYear: data.exp_year || 2030,
+        isDefault: data.is_default || false,
+      };
+
+      logger.info('Card added successfully', { cardId: card.id });
+      return { card };
+    } catch (error) {
+      logger.error('Add card error:', error);
+      throw error;
     }
-    // Simulated Stripe token exchange
-    const newCard: PaymentCard = {
-      id: `card_${Date.now()}`,
-      brand: 'visa',
-      last4: '4242',
-      expiryMonth: 12,
-      expiryYear: 2030,
-      isDefault: MOCK_CARDS.length === 0,
-    };
-    MOCK_CARDS.push(newCard);
-    return { card: newCard };
   },
 
   /**
    * Remove a card
    */
-  removeCard: (cardId: string): { success: boolean } => {
-    if (!__DEV__) {
-      logger.error('removeCard called in production with mock implementation!');
-      throw new Error('Payment methods not configured for production');
+  removeCard: async (cardId: string): Promise<{ success: boolean }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Soft delete - mark as inactive
+      const { error } = await supabase
+        .from('payment_methods')
+        .update({ is_active: false })
+        .eq('id', cardId)
+        .eq('user_id', user.id); // Ensure user owns this card
+
+      if (error) throw error;
+
+      logger.info('Card removed', { cardId });
+      return { success: true };
+    } catch (error) {
+      logger.error('Remove card error:', error);
+      throw error;
     }
-    MOCK_CARDS = MOCK_CARDS.filter((c) => c.id !== cardId);
-    return { success: true };
   },
 
   /**
    * Add a bank account
+   * Calls Supabase Edge Function for secure verification
    */
-  addBankAccount: (
-    _data: Record<string, unknown>,
-  ): { bankAccount: BankAccount } => {
-    if (!__DEV__) {
-      logger.error(
-        'addBankAccount called in production with mock implementation!',
-      );
-      throw new Error('Payment methods not configured for production');
+  addBankAccount: async (
+    data: { routingNumber: string; accountNumber: string; accountType: 'checking' | 'savings' },
+  ): Promise<{ bankAccount: BankAccount }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Call edge function to add bank account securely
+      const { data: result, error } = await supabase.functions.invoke('add-bank-account', {
+        body: data,
+      });
+
+      if (error) throw error;
+
+      const bankAccount: BankAccount = {
+        id: result.id,
+        bankName: result.bank_name || 'Bank',
+        accountType: result.account_type || 'checking',
+        last4: result.last_four || '****',
+        isDefault: result.is_default || false,
+        isVerified: result.is_verified || false,
+      };
+
+      logger.info('Bank account added', { bankAccountId: bankAccount.id });
+      return { bankAccount };
+    } catch (error) {
+      logger.error('Add bank account error:', error);
+      throw error;
     }
-    const newBank: BankAccount = {
-      id: `bank_${Date.now()}`,
-      bankName: 'Mock Bank',
-      accountType: 'checking',
-      last4: '1234',
-      isDefault: MOCK_BANKS.length === 0,
-      isVerified: true,
-    };
-    MOCK_BANKS.push(newBank);
-    return { bankAccount: newBank };
   },
 
   /**
    * Remove a bank account
    */
-  removeBankAccount: (bankAccountId: string): { success: boolean } => {
-    if (!__DEV__) {
-      logger.error(
-        'removeBankAccount called in production with mock implementation!',
-      );
-      throw new Error('Payment methods not configured for production');
+  removeBankAccount: async (bankAccountId: string): Promise<{ success: boolean }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Soft delete
+      const { error } = await supabase
+        .from('bank_accounts')
+        .update({ is_active: false })
+        .eq('id', bankAccountId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      logger.info('Bank account removed', { bankAccountId });
+      return { success: true };
+    } catch (error) {
+      logger.error('Remove bank account error:', error);
+      throw error;
     }
-    MOCK_BANKS = MOCK_BANKS.filter((b) => b.id !== bankAccountId);
-    return { success: true };
   },
 
   /**
@@ -413,14 +504,34 @@ export const paymentService = {
    * Set default card
    */
   setDefaultCard: async (cardId: string): Promise<{ success: boolean }> => {
-    if (!__DEV__) {
-      logger.error(
-        'setDefaultCard called in production with mock implementation!',
-      );
-      throw new Error('Payment methods not configured for production');
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // First, unset all cards as default
+      await supabase
+        .from('payment_methods')
+        .update({ is_default: false })
+        .eq('user_id', user.id)
+        .eq('type', 'card');
+
+      // Then set the selected card as default
+      const { error } = await supabase
+        .from('payment_methods')
+        .update({ is_default: true })
+        .eq('id', cardId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      logger.info('Default card set', { cardId });
+      return { success: true };
+    } catch (error) {
+      logger.error('Set default card error:', error);
+      throw error;
     }
-    MOCK_CARDS = MOCK_CARDS.map((c) => ({ ...c, isDefault: c.id === cardId }));
-    return { success: true };
   },
 
   /**

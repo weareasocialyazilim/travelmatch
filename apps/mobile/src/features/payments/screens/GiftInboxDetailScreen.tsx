@@ -17,6 +17,8 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
+import { profileApi } from '@/features/profile/services/profileApi';
+import { logger } from '@/utils/logger';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -46,6 +48,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
   } = route.params;
 
   const [_isHidden, setIsHidden] = useState(false);
+  const [isHiding, setIsHiding] = useState(false);
   const [showReportSheet, setShowReportSheet] = useState(false);
 
   const handleStartChat = () => {
@@ -85,10 +88,22 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
         {
           text: 'Hide',
           style: 'destructive',
-          onPress: () => {
-            setIsHidden(true);
-            // TODO: API call to hide
-            navigation.goBack();
+          onPress: async () => {
+            if (isHiding) return;
+            setIsHiding(true);
+            try {
+              // Hide each gift from this sender
+              for (const gift of gifts) {
+                await profileApi.hideItem(gift.id, 'gift');
+              }
+              setIsHidden(true);
+              navigation.goBack();
+            } catch (error) {
+              logger.error('Failed to hide gifts', error);
+              Alert.alert('Error', 'Failed to hide gifts. Please try again.');
+            } finally {
+              setIsHiding(false);
+            }
           },
         },
       ],

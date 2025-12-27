@@ -104,7 +104,7 @@ export default function PrivacyPolicyScreen({
         showsVerticalScrollIndicator={false}
       >
         {/* Last Updated */}
-        <Text style={styles.lastUpdated}>Last Updated: October 26, 2023</Text>
+        <Text style={styles.lastUpdated}>Last Updated: December 26, 2024</Text>
 
         {/* Introduction */}
         <Text style={styles.introduction}>

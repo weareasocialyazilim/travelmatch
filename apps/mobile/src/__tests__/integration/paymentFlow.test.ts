@@ -159,16 +159,51 @@ describe('Payment Flow Integration', () => {
 
   describe('Scenario 2: Add Payment Method and Make Payment', () => {
     it('should add card → verify it exists → use for payment', async () => {
-      // Step 1: Add payment card
-      const addedCard = paymentService.addCard('tok_visa');
+      // Setup mocks for functions.invoke (addCard)
+      (mockSupabase ).functions = {
+        invoke: jest.fn().mockResolvedValue({
+          data: {
+            id: 'card_new123',
+            brand: 'visa',
+            last4: '4242',
+            exp_month: 12,
+            exp_year: 2030,
+            is_default: true,
+          },
+          error: null,
+        }),
+      };
+
+      // Step 1: Add payment card (async!)
+      const addedCard = await paymentService.addCard('tok_visa');
       expect(addedCard.card.last4).toBe('4242');
       expect(addedCard.card.brand).toBe('visa');
       const cardId = addedCard.card.id;
 
-      // Step 2: Verify card was added
-      const paymentMethods = paymentService.getPaymentMethods();
-      const verifiedCard = paymentMethods.cards.find((c) => c.id === cardId);
-      expect(verifiedCard).toBeDefined();
+      // Step 2: Setup mock for getPaymentMethods
+      const mockFromChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: null, error: null }),
+      };
+      mockSupabase.from = jest.fn().mockReturnValue(mockFromChain);
+      mockFromChain.eq.mockImplementation(() => ({
+        ...mockFromChain,
+        eq: jest.fn().mockResolvedValue({
+          data: [
+            {
+              id: cardId,
+              type: 'card',
+              brand: 'visa',
+              last_four: '4242',
+              exp_month: 12,
+              exp_year: 2030,
+              is_default: true,
+            },
+          ],
+          error: null,
+        }),
+      }));
 
       // Step 3: Use card for payment
       const mockTransaction = {

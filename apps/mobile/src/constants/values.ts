@@ -8,6 +8,12 @@ export const VALUES = {
     RESET_PASSWORD: 'travelmatch://auth/reset-password',
   },
 
+  // Default images (empty string means component should show initials/placeholder)
+  IMAGES: {
+    DEFAULT_AVATAR: '', // Components should show initials when empty
+    DEFAULT_MOMENT: '', // Components should show placeholder when empty
+  },
+
   // Escrow thresholds
   ESCROW_DIRECT_MAX: 30,
   ESCROW_OPTIONAL_MAX: 100,

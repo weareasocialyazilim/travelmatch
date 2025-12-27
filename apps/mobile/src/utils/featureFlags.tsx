@@ -111,29 +111,58 @@ class FeatureFlagService {
         this.abTests = new Map(Object.entries(tests));
       }
 
-      // Fetch from remote config (Firebase, LaunchDarkly, etc.)
-      void this.fetchRemoteConfig();
+      // Fetch from remote config (Supabase app_config table)
+      await this.fetchRemoteConfig();
     } catch (error) {
       logger.error('Failed to initialize feature flags:', error);
     }
   }
 
   /**
-   * Fetch remote configuration
+   * Fetch remote configuration from Supabase app_config table
+   * Falls back gracefully if config unavailable
    */
-  private fetchRemoteConfig(): void {
-    // TODO: Replace with actual remote config service
-    // Example: Firebase Remote Config, LaunchDarkly, Split.io
-    /*
-    const response = await fetch('https://api.yourapp.com/config/features');
-    const remoteFlags = await response.json();
-    
-    this.flags = { ...this.flags, ...remoteFlags };
-    await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.flags));
-      */
+  private async fetchRemoteConfig(): Promise<void> {
+    try {
+      // Import supabase dynamically to avoid circular dependencies
+      const { supabase } = await import('../config/supabase');
 
-    // For now, use defaults
-    logger.debug('Remote config: Using default flags');
+      // Fetch feature flags from app_config table
+      const { data, error } = await supabase
+        .from('app_config')
+        .select('key, value')
+        .eq('category', 'feature_flags')
+        .eq('is_active', true);
+
+      if (error) {
+        // Table might not exist - use defaults silently
+        logger.debug('Remote config: Using defaults (table not found)');
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Parse remote flags
+        const remoteFlags: Partial<FeatureFlags> = {};
+        for (const config of data) {
+          const flagKey = config.key as keyof FeatureFlags;
+          if (flagKey in this.flags) {
+            // Parse boolean values
+            remoteFlags[flagKey] = config.value === 'true' || config.value === true;
+          }
+        }
+
+        // Merge with existing flags (remote takes precedence)
+        this.flags = { ...this.flags, ...remoteFlags };
+        await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.flags));
+
+        logger.info('Remote config: Loaded', Object.keys(remoteFlags).length, 'flags');
+      } else {
+        logger.debug('Remote config: No remote flags configured, using defaults');
+      }
+    } catch (err) {
+      // Network error or other issue - use cached/default values
+      logger.warn('Remote config: Failed to fetch, using cached values', err);
+    }
   }
 
   /**

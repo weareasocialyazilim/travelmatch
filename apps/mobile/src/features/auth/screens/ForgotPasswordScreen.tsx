@@ -132,7 +132,7 @@ export const ForgotPasswordScreen: React.FC = () => {
               )}
             >
               {isLoading ? (
-                <ActivityIndicator color="#FFF" />
+                <ActivityIndicator color={COLORS.white} />
               ) : (
                 <Text style={styles.buttonText}>Send Reset Link</Text>
               )}
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#FFF',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
   },

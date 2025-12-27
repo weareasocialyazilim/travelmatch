@@ -222,4 +222,8 @@ export type RootStackParamList = {
   LinkNotFound: { message?: string };
   SessionExpired: undefined;
   PaymentFailed: { transactionId?: string; error?: string };
+
+  // Data Privacy & Deleted Moments
+  DataPrivacy: undefined;
+  DeletedMoments: undefined;
 };

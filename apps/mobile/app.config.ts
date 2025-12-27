@@ -1,45 +1,90 @@
 import type { ExpoConfig, ConfigContext } from 'expo/config';
 
+const IS_PRODUCTION = process.env.APP_ENV === 'production';
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'TravelMatch',
   slug: 'travelmatch',
   owner: 'travelmatch',
-  version: '0.0.1',
+  version: '1.0.0',
   orientation: 'portrait',
-  // Custom entry point to fix AppEntry.js resolution in monorepo
   entryPoint: './index.ts',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'travelmatch',
   newArchEnabled: true,
+
+  // Splash screen - matches brand warm white
   splash: {
     image: './assets/splash-icon.png',
     resizeMode: 'contain',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFBF5',
   },
+
+  // ============================================
+  // iOS Configuration - App Store Ready
+  // ============================================
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.travelmatch.mobile',
-    buildNumber: '23',
+    bundleIdentifier: 'com.travelmatch.app',
+    buildNumber: '24',
     associatedDomains: ['applinks:travelmatch.app'],
-    config: {},
+    config: {
+      usesNonExemptEncryption: false,
+    },
     infoPlist: {
+      // Encryption compliance
       ITSAppUsesNonExemptEncryption: false,
+
+      // Location permissions
       NSLocationWhenInUseUsageDescription:
-        'TravelMatch needs your location to verify your travel moments and show you relevant experiences nearby.',
+        'TravelMatch uses your location to show nearby experiences and verify travel moments.',
+      NSLocationAlwaysAndWhenInUseUsageDescription:
+        'TravelMatch uses your location to show nearby experiences and verify travel moments.',
+
+      // Camera and Photos
       NSCameraUsageDescription:
-        'TravelMatch needs access to your camera to let you take photos of your travel moments for verification.',
+        'TravelMatch needs camera access to capture photos of your travel moments.',
       NSPhotoLibraryUsageDescription:
-        'TravelMatch needs access to your photo library to let you upload photos of your travel moments.',
+        'TravelMatch needs photo library access to upload travel moment photos.',
+      NSPhotoLibraryAddUsageDescription:
+        'TravelMatch needs permission to save photos to your library.',
+
+      // Face ID for biometric auth
+      NSFaceIDUsageDescription:
+        'TravelMatch uses Face ID for secure and quick account authentication.',
+
+      // Push notifications background modes
+      UIBackgroundModes: ['fetch', 'remote-notification'],
+
+      // Microphone for video recording
+      NSMicrophoneUsageDescription:
+        'TravelMatch needs microphone access to record videos of travel moments.',
+
+      // Contacts for friend invites
+      NSContactsUsageDescription:
+        'TravelMatch can access contacts to help you invite friends.',
+
+      // App Transport Security
+      NSAppTransportSecurity: {
+        NSAllowsArbitraryLoads: false,
+      },
+    },
+    entitlements: {
+      'aps-environment': IS_PRODUCTION ? 'production' : 'development',
     },
   },
+
+  // ============================================
+  // Android Configuration - Play Store Ready
+  // ============================================
   android: {
     package: 'com.travelmatch.app',
     versionCode: 1,
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: '#ffffff',
+      backgroundColor: '#FFFBF5',
     },
     intentFilters: [
       {
@@ -51,17 +96,54 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
             host: 'travelmatch.app',
             pathPrefix: '/',
           },
+          {
+            scheme: 'travelmatch',
+            host: '*',
+          },
         ],
         category: ['BROWSABLE', 'DEFAULT'],
       },
     ],
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
+    permissions: [
+      'android.permission.ACCESS_COARSE_LOCATION',
+      'android.permission.ACCESS_FINE_LOCATION',
+      'android.permission.CAMERA',
+      'android.permission.RECORD_AUDIO',
+      'android.permission.VIBRATE',
+      'android.permission.USE_BIOMETRIC',
+      'android.permission.USE_FINGERPRINT',
+      'android.permission.INTERNET',
+      'android.permission.ACCESS_NETWORK_STATE',
+      'android.permission.RECEIVE_BOOT_COMPLETED',
+    ],
+    blockedPermissions: [
+      'android.permission.READ_PHONE_STATE',
+      'android.permission.SYSTEM_ALERT_WINDOW',
+    ],
+    googleServicesFile: IS_PRODUCTION
+      ? './google-services.json'
+      : './google-services-dev.json',
     config: {},
+    splash: {
+      image: './assets/splash-icon.png',
+      resizeMode: 'contain',
+      backgroundColor: '#FFFBF5',
+    },
   },
+
+  // ============================================
+  // Web Configuration
+  // ============================================
   web: {
     favicon: './assets/favicon.png',
+    bundler: 'metro',
   },
+
+  // ============================================
+  // Expo Plugins
+  // ============================================
   plugins: [
     'expo-localization',
     [
@@ -78,18 +160,64 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       '@rnmapbox/maps',
       {
-        // Build-time only token - NOT bundled in client (no EXPO_PUBLIC_ prefix)
         RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
       },
     ],
+    [
+      'expo-notifications',
+      {
+        icon: './assets/notification-icon.png',
+        color: '#F59E0B',
+      },
+    ],
+    [
+      'expo-local-authentication',
+      {
+        faceIDPermission:
+          'TravelMatch uses Face ID for secure authentication.',
+      },
+    ],
+    [
+      'expo-location',
+      {
+        locationAlwaysAndWhenInUsePermission:
+          'TravelMatch uses your location to show nearby experiences.',
+        locationWhenInUsePermission:
+          'TravelMatch uses your location to show nearby experiences.',
+      },
+    ],
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'TravelMatch needs access to your photos to share travel moments.',
+        cameraPermission:
+          'TravelMatch needs camera access to capture travel moments.',
+      },
+    ],
   ],
+
+  // ============================================
+  // Extra Configuration
+  // ============================================
   extra: {
     eas: {
       projectId: '55ca9fff-1a53-4190-b368-f9facf1febfd',
     },
-    // Sentry configuration (from environment variables)
     sentryDsn: process.env.SENTRY_DSN || '',
+    appEnv: process.env.APP_ENV || 'development',
+    apiUrl: IS_PRODUCTION
+      ? 'https://api.travelmatch.app'
+      : 'https://staging-api.travelmatch.app',
+    supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL || '',
+    supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+    enableAnalytics: IS_PRODUCTION,
+    enableCrashReporting: true,
   },
+
+  // ============================================
+  // Post-publish hooks
+  // ============================================
   hooks: {
     postPublish: [
       {
@@ -101,5 +229,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         },
       },
     ],
+  },
+
+  // ============================================
+  // OTA Updates
+  // ============================================
+  updates: {
+    enabled: true,
+    checkAutomatically: 'ON_LOAD',
+    fallbackToCacheTimeout: 30000,
+    url: 'https://u.expo.dev/55ca9fff-1a53-4190-b368-f9facf1febfd',
+  },
+
+  runtimeVersion: {
+    policy: 'appVersion',
   },
 });

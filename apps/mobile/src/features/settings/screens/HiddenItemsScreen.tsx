@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -15,6 +17,8 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
+import { profileApi } from '@/features/profile/services/profileApi';
+import { logger } from '@/utils/logger';
 
 interface HiddenItem {
   id: string;
@@ -26,27 +30,50 @@ interface HiddenItem {
 }
 
 export const HiddenItemsScreen: React.FC = () => {
-    const { showToast } = useToast();
+  const { showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
-const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const [hiddenItems, setHiddenItems] = useState<HiddenItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // TODO: Fetch hidden items from API
-  /*
+  const fetchHiddenItems = useCallback(async () => {
+    try {
+      const items = await profileApi.getHiddenItems();
+      setHiddenItems(items);
+    } catch (error) {
+      logger.error('Failed to fetch hidden items', error);
+      showToast('Failed to load hidden items', 'error');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [showToast]);
+
   useEffect(() => {
-    // fetchHiddenItems().then(setHiddenItems);
-  }, []);
-  */
+    fetchHiddenItems();
+  }, [fetchHiddenItems]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchHiddenItems();
+  }, [fetchHiddenItems]);
 
   const handleUnhide = (id: string) => {
     Alert.alert('Unhide Item', 'This item will be restored to your inbox.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Unhide',
-        onPress: () => {
-          setHiddenItems((prev) => prev.filter((item) => item.id !== id));
-          showToast('Item has been restored to your inbox.', 'success');
+        onPress: async () => {
+          try {
+            await profileApi.unhideItem(id);
+            setHiddenItems((prev) => prev.filter((item) => item.id !== id));
+            showToast('Item has been restored to your inbox.', 'success');
+          } catch (error) {
+            logger.error('Failed to unhide item', error);
+            showToast('Failed to unhide item', 'error');
+          }
         },
       },
     ]);
@@ -58,9 +85,15 @@ const navigation = useNavigation();
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => {
-          setHiddenItems((prev) => prev.filter((item) => item.id !== id));
-          showToast('Item has been permanently deleted.', 'info');
+        onPress: async () => {
+          try {
+            await profileApi.deleteHiddenItem(id);
+            setHiddenItems((prev) => prev.filter((item) => item.id !== id));
+            showToast('Item has been permanently deleted.', 'info');
+          } catch (error) {
+            logger.error('Failed to delete hidden item', error);
+            showToast('Failed to delete item', 'error');
+          }
         },
       },
     ]);
@@ -112,10 +145,18 @@ const navigation = useNavigation();
         <View style={styles.backButton} />
       </View>
 
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      ) : (
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {hiddenItems.length > 0 ? (
           <>
@@ -139,6 +180,7 @@ const navigation = useNavigation();
           </View>
         )}
       </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
@@ -147,6 +189,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   header: {
     flexDirection: 'row',

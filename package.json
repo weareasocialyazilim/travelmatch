@@ -105,6 +105,10 @@
       "react": "19.2.0",
       "react-dom": "19.2.0",
       "react-test-renderer": "19.2.0",
+      "react-native": "0.83.0",
+      "react-native-gesture-handler": "~2.29.1",
+      "react-native-reanimated": "~4.2.0",
+      "react-native-svg": "15.15.1",
       "fast-xml-parser": "^4.5.0",
       "glob": "^9.0.0"
     }

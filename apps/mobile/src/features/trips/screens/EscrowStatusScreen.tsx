@@ -157,7 +157,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
   };
 
   const handleSendReminder = () => {
-    // TODO: Implement reminder logic
+    // Navigate to chat so user can send a reminder message
     navigation.navigate('Chat', {
       otherUser: {
         id: escrowId,
