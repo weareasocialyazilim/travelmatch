@@ -138,6 +138,11 @@ const ReportMomentScreen = lazyLoad(() =>
     default: m.ReportMomentScreen,
   })),
 );
+const DeletedMomentsScreen = lazyLoad(() =>
+  import('../features/profile').then((m) => ({
+    default: m.DeletedMomentsScreen,
+  })),
+);
 
 // ===================================
 // PAYMENTS FEATURE SCREENS
@@ -196,6 +201,7 @@ import {
   InviteFriendsScreen,
   ReportUserScreen,
   MaintenanceScreen,
+  DataPrivacyScreen,
 } from '../features/settings';
 
 // ===================================
@@ -547,6 +553,13 @@ const AppNavigator = () => {
             {/* <Stack.Screen name="Contact" component={ContactScreen} />
             <Stack.Screen name="Help" component={HelpScreen} /> */}
             <Stack.Screen name="Safety" component={SafetyScreen} />
+
+            {/* Data Privacy & Deleted Content */}
+            <Stack.Screen name="DataPrivacy" component={DataPrivacyScreen} />
+            <Stack.Screen
+              name="DeletedMoments"
+              component={DeletedMomentsScreen}
+            />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
