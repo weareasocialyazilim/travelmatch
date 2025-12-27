@@ -172,7 +172,7 @@ export const usePayments = (): UsePaymentsReturn => {
       setBalanceLoading(true);
       const response = await retryWithErrorHandling(
         () => paymentService.getWalletBalance(),
-        { context: 'refreshBalance', maxRetries: 2 }
+        { context: 'refreshBalance', maxRetries: 2 },
       );
       setBalance({
         available: response.available,
@@ -198,12 +198,13 @@ export const usePayments = (): UsePaymentsReturn => {
       setTransactionPage(1);
 
       const response = await retryWithErrorHandling(
-        () => paymentService.getTransactions({
-          ...filters,
-          page: 1,
-          pageSize: PAGE_SIZE,
-        }),
-        { context: 'loadTransactions', maxRetries: 2 }
+        () =>
+          paymentService.getTransactions({
+            ...filters,
+            page: 1,
+            pageSize: PAGE_SIZE,
+          }),
+        { context: 'loadTransactions', maxRetries: 2 },
       );
 
       setTransactions(response.transactions);
@@ -262,16 +263,19 @@ export const usePayments = (): UsePaymentsReturn => {
   /**
    * Add a card
    */
-  const addCard = useCallback(async (tokenId: string): Promise<PaymentCard | null> => {
-    try {
-      const response = await paymentService.addCard(tokenId);
-      setCards((prev) => [...prev, response.card]);
-      return response.card;
-    } catch (error) {
-      logger.error('Failed to add card:', error);
-      return null;
-    }
-  }, []);
+  const addCard = useCallback(
+    async (tokenId: string): Promise<PaymentCard | null> => {
+      try {
+        const response = await paymentService.addCard(tokenId);
+        setCards((prev) => [...prev, response.card]);
+        return response.card;
+      } catch (error) {
+        logger.error('Failed to add card:', error);
+        return null;
+      }
+    },
+    [],
+  );
 
   /**
    * Remove a card
@@ -312,7 +316,11 @@ export const usePayments = (): UsePaymentsReturn => {
   const addBankAccount = useCallback(
     async (data: BankAccountData): Promise<BankAccount | null> => {
       try {
-        const response = await paymentService.addBankAccount(data as unknown as Record<string, unknown>);
+        const response = await paymentService.addBankAccount({
+          routingNumber: data.routingNumber,
+          accountNumber: data.accountNumber,
+          accountType: data.accountType,
+        });
         setBankAccounts((prev) => [...prev, response.bankAccount]);
         return response.bankAccount;
       } catch (error) {
@@ -326,16 +334,19 @@ export const usePayments = (): UsePaymentsReturn => {
   /**
    * Remove bank account
    */
-  const removeBankAccount = useCallback(async (accountId: string): Promise<boolean> => {
-    try {
-      await paymentService.removeBankAccount(accountId);
-      setBankAccounts((prev) => prev.filter((a) => a.id !== accountId));
-      return true;
-    } catch (error) {
-      logger.error('Failed to remove bank account:', error);
-      return false;
-    }
-  }, []);
+  const removeBankAccount = useCallback(
+    async (accountId: string): Promise<boolean> => {
+      try {
+        await paymentService.removeBankAccount(accountId);
+        setBankAccounts((prev) => prev.filter((a) => a.id !== accountId));
+        return true;
+      } catch (error) {
+        logger.error('Failed to remove bank account:', error);
+        return false;
+      }
+    },
+    [],
+  );
 
   /**
    * Request withdrawal
@@ -353,7 +364,9 @@ export const usePayments = (): UsePaymentsReturn => {
 
         // Update balance (fire and forget with error logging)
         refreshBalance().catch((err) => {
-          logger.warn('Failed to refresh balance after withdrawal', { error: err });
+          logger.warn('Failed to refresh balance after withdrawal', {
+            error: err,
+          });
         });
 
         // Add to transactions
@@ -404,7 +417,9 @@ export const usePayments = (): UsePaymentsReturn => {
         if (response.success) {
           // Refresh balance after successful payment (fire and forget with error logging)
           refreshBalance().catch((err) => {
-            logger.warn('Failed to refresh balance after payment', { error: err });
+            logger.warn('Failed to refresh balance after payment', {
+              error: err,
+            });
           });
         }
 

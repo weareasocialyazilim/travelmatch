@@ -16,6 +16,17 @@ export default tseslint.config(
       'ios/**',
       'android/**',
       '**/*.d.ts',
+      // Jest setup files - use Jest globals
+      '**/jest.setup*.js',
+      '**/jest.config.js',
+      // Scripts directory
+      'scripts/**',
+      // Apps have their own ESLint config
+      'apps/**',
+      // Packages have their own ESLint config
+      'packages/**',
+      // Services have their own ESLint config
+      'services/**',
     ],
   },
 
@@ -32,7 +43,10 @@ export default tseslint.config(
   {
     files: ['**/*.{ts,tsx,js,jsx,mjs}'],
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': 'warn',
     },

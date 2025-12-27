@@ -1,13 +1,9 @@
 {
-  "!(supabase)/**/*.{ts,tsx}": [
-    "eslint --fix",
-    "prettier --write"
-  ],
-  "apps/mobile/**/*.{ts,tsx,js,jsx}": [
-    "eslint --fix",
-    "prettier --write",
-    "node scripts/jest-mobile-lint-staged.js"
-  ],
+  "packages/**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+  "services/**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+  "apps/mobile/**/*.{ts,tsx,js,jsx}": ["eslint --fix", "prettier --write", "node scripts/jest-mobile-lint-staged.js"],
+  "apps/web/**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+  "apps/admin/**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
   "*.{json,md,yml,yaml}": ["prettier --write"],
   "package.json": ["prettier --write"]
 }

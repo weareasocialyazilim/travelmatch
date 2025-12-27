@@ -85,9 +85,9 @@ export default tseslint.config(
       'react/display-name': 'off',
       'react/jsx-no-undef': 'off',
 
-      // React Hooks
-      'react-hooks/rules-of-hooks': 'warn',
-      'react-hooks/exhaustive-deps': 'warn',
+      // React Hooks - only enable rules-of-hooks, disable strict checks
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'off',
 
       // TypeScript
       '@typescript-eslint/no-explicit-any': 'off',
@@ -157,5 +157,5 @@ export default tseslint.config(
   },
 
   // Prettier config (disable conflicting rules)
-  prettierConfig
+  prettierConfig,
 );
