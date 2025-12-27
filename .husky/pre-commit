@@ -4,10 +4,11 @@ npx lint-staged
 # Run type checking with Turbo (only changed packages)
 pnpm turbo run type-check --filter="[HEAD^1]"
 
-# Check for console.log in production code (excluding tests, stories, mocks, and supabase edge functions)
+# Check for console.log in production code (excluding tests, stories, mocks, supabase edge functions, and logger utilities)
 # Note: Supabase Edge Functions use Deno, where console.log goes to Supabase Logs (acceptable)
+# Note: production-logger.ts is the logging utility that wraps console methods intentionally
 echo "🔍 Checking for console.log usage..."
-FILES_TO_CHECK=$(git diff --cached --name-only | grep -E '\.(ts|tsx)$' | grep -v -E '(\.stories\.|\.test\.|\.spec\.|__tests__|testUtils|supabase/functions)' || true)
+FILES_TO_CHECK=$(git diff --cached --name-only | grep -E '\.(ts|tsx)$' | grep -v -E '(\.stories\.|\.test\.|\.spec\.|__tests__|testUtils|supabase/functions|production-logger\.ts)' || true)
 if [ -n "$FILES_TO_CHECK" ]; then
   if echo "$FILES_TO_CHECK" | xargs grep -l 'console\.' 2>/dev/null; then
     echo "❌ ERROR: console.log found in production code!"
