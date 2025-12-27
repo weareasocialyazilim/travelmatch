@@ -319,13 +319,30 @@ export const paymentService = {
       // Fetch cards from payment_methods table
       const { data: paymentMethods, error } = await supabase
         .from('payment_methods')
-        .select('id, type, provider, last_four, brand, exp_month, exp_year, is_default, is_active, metadata')
+        .select(
+          'id, type, provider, last_four, brand, exp_month, exp_year, is_default, is_active, metadata',
+        )
         .eq('user_id', user.id)
         .eq('is_active', true);
 
       if (error) throw error;
 
-      const cards: PaymentCard[] = (paymentMethods || [])
+      type PaymentMethodRow = {
+        id: string;
+        type: string;
+        provider: string;
+        last_four: string;
+        brand: string;
+        exp_month: number;
+        exp_year: number;
+        is_default: boolean;
+        is_active: boolean;
+        metadata: unknown;
+      };
+
+      const cards: PaymentCard[] = (
+        (paymentMethods || []) as PaymentMethodRow[]
+      )
         .filter((pm) => pm.type === 'card')
         .map((pm) => ({
           id: pm.id,
@@ -339,7 +356,9 @@ export const paymentService = {
       // Fetch bank accounts
       const { data: bankData, error: bankError } = await supabase
         .from('bank_accounts')
-        .select('id, bank_name, account_type, last_four, is_default, is_verified')
+        .select(
+          'id, bank_name, account_type, last_four, is_default, is_verified',
+        )
         .eq('user_id', user.id)
         .eq('is_active', true);
 
@@ -347,10 +366,22 @@ export const paymentService = {
         logger.warn('Bank accounts table may not exist:', bankError);
       }
 
-      const bankAccounts: BankAccount[] = (bankData || []).map((ba) => ({
+      type BankAccountRow = {
+        id: string;
+        bank_name: string;
+        account_type: string;
+        last_four: string;
+        is_default: boolean;
+        is_verified: boolean;
+      };
+
+      const bankAccounts: BankAccount[] = (
+        (bankData || []) as BankAccountRow[]
+      ).map((ba) => ({
         id: ba.id,
         bankName: ba.bank_name || 'Unknown Bank',
-        accountType: (ba.account_type as BankAccount['accountType']) || 'checking',
+        accountType:
+          (ba.account_type as BankAccount['accountType']) || 'checking',
         last4: ba.last_four || '****',
         isDefault: ba.is_default || false,
         isVerified: ba.is_verified || false,
@@ -375,9 +406,12 @@ export const paymentService = {
       if (!user) throw new Error('Not authenticated');
 
       // Call edge function to securely add card via Stripe
-      const { data, error } = await supabase.functions.invoke('add-payment-method', {
-        body: { tokenId, type: 'card' },
-      });
+      const { data, error } = await supabase.functions.invoke(
+        'add-payment-method',
+        {
+          body: { tokenId, type: 'card' },
+        },
+      );
 
       if (error) throw error;
 
@@ -429,9 +463,11 @@ export const paymentService = {
    * Add a bank account
    * Calls Supabase Edge Function for secure verification
    */
-  addBankAccount: async (
-    data: { routingNumber: string; accountNumber: string; accountType: 'checking' | 'savings' },
-  ): Promise<{ bankAccount: BankAccount }> => {
+  addBankAccount: async (data: {
+    routingNumber: string;
+    accountNumber: string;
+    accountType: 'checking' | 'savings';
+  }): Promise<{ bankAccount: BankAccount }> => {
     try {
       const {
         data: { user },
@@ -439,9 +475,12 @@ export const paymentService = {
       if (!user) throw new Error('Not authenticated');
 
       // Call edge function to add bank account securely
-      const { data: result, error } = await supabase.functions.invoke('add-bank-account', {
-        body: data,
-      });
+      const { data: result, error } = await supabase.functions.invoke(
+        'add-bank-account',
+        {
+          body: data,
+        },
+      );
 
       if (error) throw error;
 
@@ -465,7 +504,9 @@ export const paymentService = {
   /**
    * Remove a bank account
    */
-  removeBankAccount: async (bankAccountId: string): Promise<{ success: boolean }> => {
+  removeBankAccount: async (
+    bankAccountId: string,
+  ): Promise<{ success: boolean }> => {
     try {
       const {
         data: { user },

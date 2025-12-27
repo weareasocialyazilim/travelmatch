@@ -140,24 +140,36 @@ class FeatureFlagService {
         return;
       }
 
+      type ConfigRow = { key: string; value: string | boolean };
+
       if (data && data.length > 0) {
         // Parse remote flags
         const remoteFlags: Partial<FeatureFlags> = {};
-        for (const config of data) {
+        for (const config of data as ConfigRow[]) {
           const flagKey = config.key as keyof FeatureFlags;
           if (flagKey in this.flags) {
             // Parse boolean values
-            remoteFlags[flagKey] = config.value === 'true' || config.value === true;
+            remoteFlags[flagKey] =
+              config.value === 'true' || config.value === true;
           }
         }
 
         // Merge with existing flags (remote takes precedence)
         this.flags = { ...this.flags, ...remoteFlags };
-        await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.flags));
+        await AsyncStorage.setItem(
+          this.STORAGE_KEY,
+          JSON.stringify(this.flags),
+        );
 
-        logger.info('Remote config: Loaded', Object.keys(remoteFlags).length, 'flags');
+        logger.info(
+          'Remote config: Loaded',
+          Object.keys(remoteFlags).length,
+          'flags',
+        );
       } else {
-        logger.debug('Remote config: No remote flags configured, using defaults');
+        logger.debug(
+          'Remote config: No remote flags configured, using defaults',
+        );
       }
     } catch (err) {
       // Network error or other issue - use cached/default values

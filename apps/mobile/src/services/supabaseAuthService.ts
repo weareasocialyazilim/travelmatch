@@ -407,6 +407,84 @@ export const verifyPhoneOtp = async (
 };
 
 /**
+ * Verify email OTP code
+ * Used for email-based verification during password reset or signup
+ */
+export const verifyOtp = async (
+  token: string,
+): Promise<{ error: AuthError | null }> => {
+  if (!isSupabaseConfigured()) {
+    logger.warn('[Auth] Supabase not configured');
+    return { error: { message: 'Supabase not configured' } as AuthError };
+  }
+
+  try {
+    // For email OTP, we need to get the email from current session or storage
+    const { data: sessionData } = await auth.getSession();
+    const email = sessionData?.session?.user?.email;
+
+    if (!email) {
+      logger.error('[Auth] No email found for OTP verification');
+      return {
+        error: { message: 'No email found for verification' } as AuthError,
+      };
+    }
+
+    const { error } = await auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    });
+
+    if (error) {
+      logger.error('[Auth] Verify email OTP error:', error);
+      return { error };
+    }
+
+    logger.info('[Auth] Email verified successfully');
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] Verify email OTP exception:', error);
+    return { error: error as AuthError };
+  }
+};
+
+/**
+ * Resend OTP code to email
+ * Used to request a new verification code
+ */
+export const resendOtp = async (): Promise<{ error: AuthError | null }> => {
+  if (!isSupabaseConfigured()) {
+    logger.warn('[Auth] Supabase not configured');
+    return { error: { message: 'Supabase not configured' } as AuthError };
+  }
+
+  try {
+    // Get email from current session
+    const { data: sessionData } = await auth.getSession();
+    const email = sessionData?.session?.user?.email;
+
+    if (!email) {
+      logger.error('[Auth] No email found for resending OTP');
+      return { error: { message: 'No email found' } as AuthError };
+    }
+
+    const { error } = await auth.signInWithOtp({ email });
+
+    if (error) {
+      logger.error('[Auth] Resend OTP error:', error);
+      return { error };
+    }
+
+    logger.info('[Auth] OTP resent successfully to', email);
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] Resend OTP exception:', error);
+    return { error: error as AuthError };
+  }
+};
+
+/**
  * Listen to auth state changes
  */
 export const onAuthStateChange = (
@@ -432,5 +510,7 @@ export default {
   deleteAccount,
   signInWithPhone,
   verifyPhoneOtp,
+  verifyOtp,
+  resendOtp,
   onAuthStateChange,
 };

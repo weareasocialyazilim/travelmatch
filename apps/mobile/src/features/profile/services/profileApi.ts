@@ -325,7 +325,8 @@ export const profileApi = {
     // Fetch hidden gifts (from hidden_items table or a flag in requests)
     const { data: hiddenGifts, error: giftsError } = await supabase
       .from('hidden_items')
-      .select(`
+      .select(
+        `
         id,
         item_type,
         item_id,
@@ -343,7 +344,8 @@ export const profileApi = {
             title
           )
         )
-      `)
+      `,
+      )
       .eq('user_id', user.id)
       .eq('item_type', 'gift')
       .order('hidden_at', { ascending: false });
@@ -356,7 +358,8 @@ export const profileApi = {
     // Fetch hidden moments
     const { data: hiddenMoments, error: momentsError } = await supabase
       .from('hidden_items')
-      .select(`
+      .select(
+        `
         id,
         item_type,
         item_id,
@@ -367,7 +370,8 @@ export const profileApi = {
           images,
           user_id
         )
-      `)
+      `,
+      )
       .eq('user_id', user.id)
       .eq('item_type', 'moment')
       .order('hidden_at', { ascending: false });
@@ -458,6 +462,9 @@ export const profileApi = {
       .single();
 
     if (fetchError) throw fetchError;
+    if (!hiddenItem) throw new Error('Hidden item not found');
+
+    const item = hiddenItem as { item_id: string; item_type: string };
 
     // Delete the hidden item record
     const { error: deleteHiddenError } = await supabase
@@ -469,11 +476,11 @@ export const profileApi = {
     if (deleteHiddenError) throw deleteHiddenError;
 
     // Soft delete the actual item if it's a moment owned by user
-    if (hiddenItem.item_type === 'moment') {
+    if (item.item_type === 'moment') {
       await supabase
         .from('moments')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', hiddenItem.item_id)
+        .update({ deleted_at: new Date().toISOString() } as never)
+        .eq('id', item.item_id)
         .eq('user_id', user.id);
     }
   },
