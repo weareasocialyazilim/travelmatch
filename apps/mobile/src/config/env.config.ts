@@ -195,8 +195,18 @@ function parseEnv() {
 /**
  * Validated environment configuration
  * Use this throughout the app instead of process.env
+ * Lazy initialization to prevent "runtime not ready" errors
  */
-export const env = parseEnv();
+let _env: z.infer<typeof envSchema> | null = null;
+
+export const env = new Proxy({} as z.infer<typeof envSchema>, {
+  get(_target, prop: string) {
+    if (!_env) {
+      _env = parseEnv();
+    }
+    return _env[prop as keyof typeof _env];
+  },
+});
 
 /**
  * Type-safe environment getter
@@ -206,17 +216,17 @@ export type Env = z.infer<typeof envSchema>;
 /**
  * Helper to check if running in development
  */
-export const isDevelopment = env.NODE_ENV === 'development';
+export const isDevelopment = (): boolean => env.NODE_ENV === 'development';
 
 /**
  * Helper to check if running in production
  */
-export const isProduction = env.NODE_ENV === 'production';
+export const isProduction = (): boolean => env.NODE_ENV === 'production';
 
 /**
  * Helper to check if running in test
  */
-export const isTest = env.NODE_ENV === 'test';
+export const isTest = (): boolean => env.NODE_ENV === 'test';
 
 /**
  * Get API base URL (with fallback)
@@ -232,7 +242,7 @@ export function getApiUrl(): string {
 export function validateEnvironment(): void {
   try {
     parseEnv();
-    if (isDevelopment && __DEV__) {
+    if (isDevelopment() && __DEV__) {
       // Development only - safe to use logger for env validation
       // Production: This code path never executes
       logger.info('Environment validation passed', { mode: env.APP_ENV });
