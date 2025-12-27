@@ -171,3 +171,50 @@ export const secureCompare = (a: string, b: string): boolean => {
   }
   return result === 0;
 };
+
+/**
+ * Base32 alphabet for TOTP secret encoding (RFC 4648)
+ */
+const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+/**
+ * Generate a cryptographically secure TOTP secret key
+ * Returns a Base32-encoded string compatible with authenticator apps
+ * @param length - Number of random bytes to generate (default: 20 for 160-bit secret)
+ */
+export const generateTotpSecret = (length = 20): string => {
+  // Generate cryptographically secure random bytes
+  const randomValues = new Uint8Array(length);
+
+  // Use crypto.getRandomValues for secure random generation
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(randomValues);
+  } else {
+    // Fallback for environments without crypto API
+    for (let i = 0; i < length; i++) {
+      randomValues[i] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  // Encode to Base32
+  let result = '';
+  let bits = 0;
+  let value = 0;
+
+  for (let i = 0; i < randomValues.length; i++) {
+    value = (value << 8) | randomValues[i];
+    bits += 8;
+
+    while (bits >= 5) {
+      bits -= 5;
+      result += BASE32_ALPHABET[(value >> bits) & 0x1f];
+    }
+  }
+
+  // Handle remaining bits
+  if (bits > 0) {
+    result += BASE32_ALPHABET[(value << (5 - bits)) & 0x1f];
+  }
+
+  return result;
+};

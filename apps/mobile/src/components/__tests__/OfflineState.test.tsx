@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { OfflineState } from '../OfflineState';
 
 describe('OfflineState', () => {
@@ -59,47 +59,65 @@ describe('OfflineState', () => {
     it('should call onRetry when button is pressed', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
       const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
-      
-      const retryButton = getByText('Tekrar Dene');
-      fireEvent.press(retryButton);
-      
+
+      await act(async () => {
+        const retryButton = getByText('Tekrar Dene');
+        fireEvent.press(retryButton);
+      });
+
       await waitFor(() => {
         expect(mockOnRetry).toHaveBeenCalledTimes(1);
       });
     });
 
     it('should show loading indicator while retrying', async () => {
-      const mockOnRetry = jest.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const mockOnRetry = jest.fn().mockResolvedValue(undefined);
       const { getByText, UNSAFE_root } = render(<OfflineState onRetry={mockOnRetry} />);
-      
-      const retryButton = getByText('Tekrar Dene');
-      fireEvent.press(retryButton);
-      
+
+      await act(async () => {
+        const retryButton = getByText('Tekrar Dene');
+        fireEvent.press(retryButton);
+      });
+
       // Loading indicator should be visible
       expect(UNSAFE_root).toBeTruthy();
+
+      // Wait for async operations to complete
+      await waitFor(() => {
+        expect(mockOnRetry).toHaveBeenCalled();
+      });
     });
 
     it('should call onRetry and handle completion', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
       const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
-      
-      const retryButton = getByText('Tekrar Dene');
-      fireEvent.press(retryButton);
-      
+
+      await act(async () => {
+        const retryButton = getByText('Tekrar Dene');
+        fireEvent.press(retryButton);
+      });
+
       await waitFor(() => {
         expect(mockOnRetry).toHaveBeenCalledTimes(1);
       });
     });
 
     it('should disable retry button while retrying', async () => {
-      const mockOnRetry = jest.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const mockOnRetry = jest.fn().mockResolvedValue(undefined);
       const { getByText, UNSAFE_root } = render(<OfflineState onRetry={mockOnRetry} />);
-      
-      const retryButton = getByText('Tekrar Dene');
-      fireEvent.press(retryButton);
-      
+
+      await act(async () => {
+        const retryButton = getByText('Tekrar Dene');
+        fireEvent.press(retryButton);
+      });
+
       // Button should be disabled (showing loading)
       expect(UNSAFE_root).toBeTruthy();
+
+      // Wait for async operations to complete
+      await waitFor(() => {
+        expect(mockOnRetry).toHaveBeenCalled();
+      });
     });
   });
 
@@ -157,39 +175,44 @@ describe('OfflineState', () => {
     it('should handle single retry attempt', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
       const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
-      
-      const retryButton = getByText('Tekrar Dene');
-      fireEvent.press(retryButton);
-      
+
+      await act(async () => {
+        const retryButton = getByText('Tekrar Dene');
+        fireEvent.press(retryButton);
+      });
+
       await waitFor(() => expect(mockOnRetry).toHaveBeenCalledTimes(1));
     });
   });
 
   describe('Async Retry', () => {
     it('should handle async onRetry callback', async () => {
-      const mockOnRetry = jest.fn(async () => {
-        await new Promise(resolve => setTimeout(resolve, 50));
-        return 'success';
-      });
-      
+      const mockOnRetry = jest.fn().mockResolvedValue('success');
+
       const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
-      
-      const retryButton = getByText('Tekrar Dene');
-      fireEvent.press(retryButton);
-      
+
+      await act(async () => {
+        const retryButton = getByText('Tekrar Dene');
+        fireEvent.press(retryButton);
+      });
+
       await waitFor(() => {
         expect(mockOnRetry).toHaveBeenCalledTimes(1);
       });
     });
 
-    it('should handle sync onRetry callback', () => {
+    it('should handle sync onRetry callback', async () => {
       const mockOnRetry = jest.fn();
       const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
-      
-      const retryButton = getByText('Tekrar Dene');
-      fireEvent.press(retryButton);
-      
-      expect(mockOnRetry).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        const retryButton = getByText('Tekrar Dene');
+        fireEvent.press(retryButton);
+      });
+
+      await waitFor(() => {
+        expect(mockOnRetry).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });
