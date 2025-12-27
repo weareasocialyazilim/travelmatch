@@ -162,18 +162,50 @@ export const reviewService = {
         const result = await dbReviewsService.listByUser(filters.userId);
         data = result.data;
         count = result.count;
+      } else if (filters.momentId) {
+        // Fetch reviews for a specific moment
+        const { data: momentReviews, count: momentCount, error } = await supabase
+          .from('reviews')
+          .select('*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)', { count: 'exact' })
+          .eq('moment_id', filters.momentId)
+          .order('created_at', { ascending: false })
+          .range(
+            ((filters.page || 1) - 1) * (filters.pageSize || 20),
+            (filters.page || 1) * (filters.pageSize || 20) - 1
+          );
+
+        if (error) throw error;
+        data = momentReviews || [];
+        count = momentCount || 0;
+      } else if (filters.reviewerId) {
+        // Fetch reviews written by a specific user
+        const { data: reviewerReviews, count: reviewerCount, error } = await supabase
+          .from('reviews')
+          .select('*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)', { count: 'exact' })
+          .eq('reviewer_id', filters.reviewerId)
+          .order('created_at', { ascending: false })
+          .range(
+            ((filters.page || 1) - 1) * (filters.pageSize || 20),
+            (filters.page || 1) * (filters.pageSize || 20) - 1
+          );
+
+        if (error) throw error;
+        data = reviewerReviews || [];
+        count = reviewerCount || 0;
       } else {
-        // TODO: Implement listByMoment or generic list in db service
-        // For now, return empty if not by user
-        return {
-          reviews: [],
-          stats: {
-            averageRating: 0,
-            totalReviews: 0,
-            ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-          },
-          total: 0,
-        };
+        // No specific filter - fetch all reviews (paginated)
+        const { data: allReviews, count: allCount, error } = await supabase
+          .from('reviews')
+          .select('*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range(
+            ((filters.page || 1) - 1) * (filters.pageSize || 20),
+            (filters.page || 1) * (filters.pageSize || 20) - 1
+          );
+
+        if (error) throw error;
+        data = allReviews || [];
+        count = allCount || 0;
       }
 
       const reviews: Review[] = data.map((row: any) => ({
@@ -299,6 +331,7 @@ export const reviewService = {
 
   /**
    * Get pending reviews (requests I need to review)
+   * Finds completed requests where the current user hasn't left a review yet
    */
   getPendingReviews: async (): Promise<{
     pendingReviews: Array<{
@@ -311,8 +344,114 @@ export const reviewService = {
       completedAt: string;
     }>;
   }> => {
-    // TODO: Implement query to find completed requests where I haven't left a review yet
-    return { pendingReviews: [] };
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Step 1: Get all completed requests where I am either the host or the requester
+      const { data: completedRequests, error: requestsError } = await supabase
+        .from('requests')
+        .select(`
+          id,
+          moment_id,
+          user_id,
+          status,
+          updated_at,
+          moments!inner (
+            id,
+            title,
+            user_id,
+            images
+          ),
+          users!requests_user_id_fkey (
+            id,
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('status', 'completed')
+        .order('updated_at', { ascending: false });
+
+      if (requestsError) throw requestsError;
+
+      // Step 2: Get all reviews I have already written
+      const { data: myReviews, error: reviewsError } = await supabase
+        .from('reviews')
+        .select('moment_id, reviewed_id')
+        .eq('reviewer_id', user.id);
+
+      if (reviewsError) throw reviewsError;
+
+      // Create a Set of reviewed combinations for fast lookup
+      const reviewedSet = new Set(
+        (myReviews || []).map(r => `${r.moment_id}-${r.reviewed_id}`)
+      );
+
+      // Step 3: Filter out requests I've already reviewed
+      const pendingReviews: Array<{
+        requestId: string;
+        momentId: string;
+        momentTitle: string;
+        userId: string;
+        userName: string;
+        userAvatar: string;
+        completedAt: string;
+      }> = [];
+
+      for (const request of (completedRequests || [])) {
+        const req = request as any;
+        const moment = req.moments;
+        const requester = req.users;
+
+        // Determine who I should review based on my role
+        let userToReview: { id: string; name: string; avatar: string } | null = null;
+
+        if (moment.user_id === user.id) {
+          // I am the host - I should review the requester
+          userToReview = {
+            id: req.user_id,
+            name: requester?.full_name || 'User',
+            avatar: requester?.avatar_url || '',
+          };
+        } else if (req.user_id === user.id) {
+          // I am the requester - I should review the host
+          // Need to fetch host info
+          const { data: hostData } = await supabase
+            .from('users')
+            .select('id, full_name, avatar_url')
+            .eq('id', moment.user_id)
+            .single();
+
+          if (hostData) {
+            userToReview = {
+              id: hostData.id,
+              name: hostData.full_name || 'Host',
+              avatar: hostData.avatar_url || '',
+            };
+          }
+        }
+
+        // Check if I've already reviewed this person for this moment
+        if (userToReview && !reviewedSet.has(`${moment.id}-${userToReview.id}`)) {
+          pendingReviews.push({
+            requestId: req.id,
+            momentId: moment.id,
+            momentTitle: moment.title || 'Untitled Moment',
+            userId: userToReview.id,
+            userName: userToReview.name,
+            userAvatar: userToReview.avatar,
+            completedAt: req.updated_at || new Date().toISOString(),
+          });
+        }
+      }
+
+      return { pendingReviews };
+    } catch (error) {
+      logger.error('Get pending reviews error:', error);
+      return { pendingReviews: [] };
+    }
   },
 
   /**

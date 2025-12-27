@@ -314,6 +314,173 @@ export const profileApi = {
   },
 
   /**
+   * Get hidden items (gifts and moments hidden from inbox)
+   */
+  getHiddenItems: async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Fetch hidden gifts (from hidden_items table or a flag in requests)
+    const { data: hiddenGifts, error: giftsError } = await supabase
+      .from('hidden_items')
+      .select(`
+        id,
+        item_type,
+        item_id,
+        hidden_at,
+        requests!hidden_items_item_id_fkey (
+          id,
+          message,
+          users!requests_user_id_fkey (
+            id,
+            full_name,
+            avatar_url
+          ),
+          moments (
+            id,
+            title
+          )
+        )
+      `)
+      .eq('user_id', user.id)
+      .eq('item_type', 'gift')
+      .order('hidden_at', { ascending: false });
+
+    if (giftsError) {
+      // Table might not exist yet - return empty
+      console.warn('hidden_items table not found:', giftsError);
+      return [];
+    }
+
+    // Fetch hidden moments
+    const { data: hiddenMoments, error: momentsError } = await supabase
+      .from('hidden_items')
+      .select(`
+        id,
+        item_type,
+        item_id,
+        hidden_at,
+        moments!hidden_items_item_id_fkey (
+          id,
+          title,
+          images,
+          user_id
+        )
+      `)
+      .eq('user_id', user.id)
+      .eq('item_type', 'moment')
+      .order('hidden_at', { ascending: false });
+
+    if (momentsError) {
+      console.warn('hidden_items moments query error:', momentsError);
+    }
+
+    // Combine and format results
+    const items = [
+      ...(hiddenGifts || []).map((h: any) => ({
+        id: h.id,
+        type: 'gift' as const,
+        title: h.requests?.users?.full_name || 'Unknown',
+        subtitle: h.requests?.moments?.title || 'Gift',
+        avatar: h.requests?.users?.avatar_url || '',
+        hiddenAt: h.hidden_at,
+      })),
+      ...(hiddenMoments || []).map((h: any) => ({
+        id: h.id,
+        type: 'moment' as const,
+        title: h.moments?.title || 'Moment',
+        subtitle: 'Hidden moment',
+        avatar: h.moments?.images?.[0] || '',
+        hiddenAt: h.hidden_at,
+      })),
+    ];
+
+    return items;
+  },
+
+  /**
+   * Hide an item (gift or moment) from inbox
+   */
+  hideItem: async (itemId: string, itemType: 'gift' | 'moment') => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('hidden_items')
+      .insert({
+        user_id: user.id,
+        item_id: itemId,
+        item_type: itemType,
+        hidden_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * Unhide an item (restore to inbox)
+   */
+  unhideItem: async (hiddenItemId: string) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { error } = await supabase
+      .from('hidden_items')
+      .delete()
+      .eq('id', hiddenItemId)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  },
+
+  /**
+   * Permanently delete a hidden item
+   */
+  deleteHiddenItem: async (hiddenItemId: string) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // First get the hidden item to know what to delete
+    const { data: hiddenItem, error: fetchError } = await supabase
+      .from('hidden_items')
+      .select('item_id, item_type')
+      .eq('id', hiddenItemId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete the hidden item record
+    const { error: deleteHiddenError } = await supabase
+      .from('hidden_items')
+      .delete()
+      .eq('id', hiddenItemId)
+      .eq('user_id', user.id);
+
+    if (deleteHiddenError) throw deleteHiddenError;
+
+    // Soft delete the actual item if it's a moment owned by user
+    if (hiddenItem.item_type === 'moment') {
+      await supabase
+        .from('moments')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', hiddenItem.item_id)
+        .eq('user_id', user.id);
+    }
+  },
+
+  /**
    * Kullanıcıyı engelle
    */
   blockUser: async (userId: string) => {
