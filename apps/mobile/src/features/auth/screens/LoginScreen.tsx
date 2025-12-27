@@ -6,6 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +21,7 @@ import { loginSchema, type LoginInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
+import { COLORS } from '@/constants/colors';
 
 export const LoginScreen: React.FC = () => {
   const { showToast } = useToast();
@@ -90,172 +94,186 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <ScreenErrorBoundary>
-      <View style={styles.container}>
-        <Text style={styles.title} {...a11y.header('Welcome Back')}>
-          Welcome Back
-        </Text>
-        <Text
-          style={styles.subtitle}
-          accessible={true}
-          accessibilityLabel="Sign in to continue"
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          Sign in to continue
-        </Text>
-
-        <Controller
-          control={control}
-          name="email"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <TextInput
-                testID="email-input"
-                style={[styles.input, error && styles.inputError]}
-                placeholder="Email"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={!isLoading}
-                accessible={true}
-                accessibilityLabel="Email address"
-                accessibilityHint="Enter your email address to sign in"
-                accessibilityValue={{ text: value }}
-              />
-              {error && (
-                <Text
-                  style={styles.errorText}
-                  {...a11y.alert(error.message || 'Validation error')}
-                >
-                  {error.message}
-                </Text>
-              )}
-            </View>
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="password"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <TextInput
-                testID="password-input"
-                style={[styles.input, error && styles.inputError]}
-                placeholder="Password"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                secureTextEntry
-                editable={!isLoading}
-                accessible={true}
-                accessibilityLabel="Password"
-                accessibilityHint="Enter your password to sign in"
-              />
-              {error && (
-                <Text
-                  style={styles.errorText}
-                  {...a11y.alert(error.message || 'Validation error')}
-                >
-                  {error.message}
-                </Text>
-              )}
-            </View>
-          )}
-        />
-
-        <TouchableOpacity
-          testID="login-button"
-          style={[
-            styles.button,
-            (isLoading ||
-              !canSubmitForm({ formState } as {
-                formState: MinimalFormState;
-              })) &&
-              styles.buttonDisabled,
-          ]}
-          onPress={handleSubmit(onSubmit)}
-          disabled={
-            isLoading ||
-            !canSubmitForm({ formState } as { formState: MinimalFormState })
-          }
-          {...a11y.button(
-            isLoading ? 'Signing in' : 'Sign In',
-            'Sign in with your email and password',
-            isLoading ||
-              !canSubmitForm({ formState } as { formState: MinimalFormState }),
-          )}
-        >
-          <Text style={styles.buttonText}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
+          <Text style={styles.title} {...a11y.header('Welcome Back')}>
+            Welcome Back
           </Text>
-        </TouchableOpacity>
+          <Text
+            style={styles.subtitle}
+            accessible={true}
+            accessibilityLabel="Sign in to continue"
+          >
+            Sign in to continue
+          </Text>
 
-        {biometricAvailable && biometricEnabled && (
-          <>
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            <TouchableOpacity
-              testID="biometric-login-button"
-              style={styles.biometricButton}
-              onPress={handleBiometricLogin}
-              disabled={isBiometricLoading || isLoading}
-              {...a11y.button(
-                `Sign in with ${biometricTypeName}`,
-                `Use ${biometricTypeName} to sign in quickly`,
-                isBiometricLoading || isLoading,
-              )}
-            >
-              {isBiometricLoading ? (
-                <ActivityIndicator size="small" color="#2563eb" />
-              ) : (
-                <>
-                  <MaterialCommunityIcons
-                    name="fingerprint"
-                    size={32}
-                    color="#2563eb"
-                    accessible={false}
-                  />
-                  <Text style={styles.biometricButtonText}>
-                    Sign in with {biometricTypeName}
+          <Controller
+            control={control}
+            name="email"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <View style={styles.inputContainer}>
+                <TextInput
+                  testID="email-input"
+                  style={[styles.input, error && styles.inputError]}
+                  placeholder="Email"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  editable={!isLoading}
+                  accessible={true}
+                  accessibilityLabel="Email address"
+                  accessibilityHint="Enter your email address to sign in"
+                  accessibilityValue={{ text: value }}
+                />
+                {error && (
+                  <Text
+                    style={styles.errorText}
+                    {...a11y.alert(error.message || 'Validation error')}
+                  >
+                    {error.message}
                   </Text>
-                </>
-              )}
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+                )}
+              </View>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="password"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <View style={styles.inputContainer}>
+                <TextInput
+                  testID="password-input"
+                  style={[styles.input, error && styles.inputError]}
+                  placeholder="Password"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  secureTextEntry
+                  editable={!isLoading}
+                  accessible={true}
+                  accessibilityLabel="Password"
+                  accessibilityHint="Enter your password to sign in"
+                />
+                {error && (
+                  <Text
+                    style={styles.errorText}
+                    {...a11y.alert(error.message || 'Validation error')}
+                  >
+                    {error.message}
+                  </Text>
+                )}
+              </View>
+            )}
+          />
+
+          <TouchableOpacity
+            testID="login-button"
+            style={[
+              styles.button,
+              (isLoading ||
+                !canSubmitForm({ formState } as {
+                  formState: MinimalFormState;
+                })) &&
+                styles.buttonDisabled,
+            ]}
+            onPress={handleSubmit(onSubmit)}
+            disabled={
+              isLoading ||
+              !canSubmitForm({ formState } as { formState: MinimalFormState })
+            }
+            {...a11y.button(
+              isLoading ? 'Signing in' : 'Sign In',
+              'Sign in with your email and password',
+              isLoading ||
+                !canSubmitForm({ formState } as { formState: MinimalFormState }),
+            )}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Text>
+          </TouchableOpacity>
+
+          {biometricAvailable && biometricEnabled && (
+            <>
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <TouchableOpacity
+                testID="biometric-login-button"
+                style={styles.biometricButton}
+                onPress={handleBiometricLogin}
+                disabled={isBiometricLoading || isLoading}
+                {...a11y.button(
+                  `Sign in with ${biometricTypeName}`,
+                  `Use ${biometricTypeName} to sign in quickly`,
+                  isBiometricLoading || isLoading,
+                )}
+              >
+                {isBiometricLoading ? (
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                ) : (
+                  <>
+                    <MaterialCommunityIcons
+                      name="fingerprint"
+                      size={32}
+                      color={COLORS.primary}
+                      accessible={false}
+                    />
+                    <Text style={styles.biometricButtonText}>
+                      Sign in with {biometricTypeName}
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ScreenErrorBoundary>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  keyboardView: {
     flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  container: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#1a1a1a',
+    color: COLORS.text,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginBottom: 30,
   },
   inputContainer: {
@@ -266,16 +284,18 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.border,
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
+    color: COLORS.text,
+    backgroundColor: COLORS.surface,
   },
   inputError: {
-    borderColor: '#ef4444',
+    borderColor: COLORS.error,
   },
   errorText: {
-    color: '#ef4444',
+    color: COLORS.error,
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
@@ -283,7 +303,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#2563eb',
+    backgroundColor: COLORS.primary,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -293,7 +313,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -306,18 +326,18 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: COLORS.border,
   },
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
   },
   biometricButton: {
     width: '100%',
     height: 60,
     borderWidth: 1.5,
-    borderColor: '#2563eb',
+    borderColor: COLORS.primary,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -325,7 +345,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   biometricButtonText: {
-    color: '#2563eb',
+    color: COLORS.primary,
     fontSize: 16,
     fontWeight: '600',
   },
