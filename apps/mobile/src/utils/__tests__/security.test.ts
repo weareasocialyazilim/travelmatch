@@ -10,6 +10,7 @@ import {
   checkRateLimit as securityCheckRateLimit,
   generateId,
   secureCompare,
+  generateTotpSecret,
 } from '../../utils/security';
 
 describe('security', () => {
@@ -317,21 +318,27 @@ describe('security', () => {
         const result = validatePassword('Short1!');
 
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('Password must be at least 8 characters');
+        expect(result.errors).toContain(
+          'Password must be at least 8 characters',
+        );
       });
 
       it('should reject password without uppercase', () => {
         const result = validatePassword('lowercase123!');
 
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('Password must contain an uppercase letter');
+        expect(result.errors).toContain(
+          'Password must contain an uppercase letter',
+        );
       });
 
       it('should reject password without lowercase', () => {
         const result = validatePassword('UPPERCASE123!');
 
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('Password must contain a lowercase letter');
+        expect(result.errors).toContain(
+          'Password must contain a lowercase letter',
+        );
       });
 
       it('should reject password without number', () => {
@@ -345,7 +352,9 @@ describe('security', () => {
         const result = validatePassword('NoSpecialChar123');
 
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('Password must contain a special character');
+        expect(result.errors).toContain(
+          'Password must contain a special character',
+        );
       });
 
       it('should return multiple errors for weak password', () => {
@@ -762,6 +771,55 @@ describe('security', () => {
       expect(result).toContain('Line1');
       expect(result).toContain('Line2');
       expect(result).toContain('Tabbed');
+    });
+  });
+
+  describe('generateTotpSecret', () => {
+    it('should generate a Base32-encoded secret', () => {
+      const secret = generateTotpSecret();
+      const base32Regex = /^[A-Z2-7]+$/;
+
+      expect(base32Regex.test(secret)).toBe(true);
+    });
+
+    it('should generate secrets of expected length', () => {
+      // 20 bytes generates 32 Base32 characters (20 * 8 / 5 = 32)
+      const secret = generateTotpSecret(20);
+
+      expect(secret.length).toBe(32);
+    });
+
+    it('should generate secrets of custom length', () => {
+      // 10 bytes generates 16 Base32 characters (10 * 8 / 5 = 16)
+      const secret = generateTotpSecret(10);
+
+      expect(secret.length).toBe(16);
+    });
+
+    it('should generate unique secrets', () => {
+      const secrets = new Set<string>();
+      for (let i = 0; i < 100; i++) {
+        secrets.add(generateTotpSecret());
+      }
+
+      expect(secrets.size).toBe(100);
+    });
+
+    it('should only contain valid Base32 characters', () => {
+      const secret = generateTotpSecret();
+      const validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+      for (const char of secret) {
+        expect(validChars).toContain(char);
+      }
+    });
+
+    it('should work with default length parameter', () => {
+      const secret = generateTotpSecret();
+
+      expect(secret).toBeDefined();
+      expect(typeof secret).toBe('string');
+      expect(secret.length).toBeGreaterThan(0);
     });
   });
 });
