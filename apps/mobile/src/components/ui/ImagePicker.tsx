@@ -2,9 +2,10 @@
  * Image Picker Component
  * Complete image selection with camera/gallery access,
  * preview, validation, and upload progress tracking.
+ * Uses centralized camera configuration for consistent high-quality captures.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -19,12 +20,8 @@ import { radii } from '../../constants/radii';
 import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useImageUpload } from '../../hooks/useImageUpload';
-import {
-  pickImageFromCamera,
-  pickImageFromGallery,
-  validateImageFile,
-  formatBytes,
-} from '../../utils/imageHandling';
+import { validateImageFile, formatBytes } from '../../utils/imageHandling';
+import { launchCamera, launchGallery, CAMERA_QUALITY } from '../../utils/cameraConfig';
 import { useToast } from '@/context/ToastContext';
 import type { ImageAsset } from '../../utils/imageHandling';
 
@@ -52,14 +49,23 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   const [selectedImages, setSelectedImages] = useState<ImageAsset[]>([]);
   const { isUploading, progress, uploadImage } = useImageUpload();
 
-  const handlePickFromCamera = async () => {
+  const handlePickFromCamera = useCallback(async () => {
     try {
-      const image = await pickImageFromCamera({
-        quality: 0.8,
+      const asset = await launchCamera({
+        quality: CAMERA_QUALITY.HIGH,
         allowsEditing: true,
       });
 
-      if (image) {
+      if (asset) {
+        const image: ImageAsset = {
+          uri: asset.uri,
+          width: asset.width,
+          height: asset.height,
+          fileSize: asset.fileSize,
+          fileName: asset.fileName ?? undefined,
+          mimeType: asset.mimeType ?? undefined,
+        };
+
         const validation = validateImageFile(image, { maxSizeMB });
         if (!validation.valid) {
           showToast(validation.error || 'Invalid image', 'error');
@@ -72,24 +78,38 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages([image]);
         }
       }
-    } catch {
-      showToast('Failed to pick image from camera', 'error');
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('permission')) {
+        showToast('Camera permission is required', 'warning');
+      } else {
+        showToast('Failed to pick image from camera', 'error');
+      }
     }
-  };
+  }, [allowMultiple, maxSizeMB, showToast]);
 
-  const handlePickFromGallery = async () => {
+  const handlePickFromGallery = useCallback(async () => {
     try {
-      const images = await pickImageFromGallery({
-        quality: 0.8,
-        allowsEditing: !allowMultiple,
-        allowsMultipleSelection: allowMultiple,
-        selectionLimit: allowMultiple ? 10 : 1,
-      });
+      const assets = await launchGallery(
+        {
+          quality: CAMERA_QUALITY.HIGH,
+          allowsEditing: !allowMultiple,
+        },
+        allowMultiple,
+        10,
+      );
 
-      if (images.length > 0) {
-        // Validate all images
+      if (assets.length > 0) {
         const validImages: ImageAsset[] = [];
-        for (const image of images) {
+        for (const asset of assets) {
+          const image: ImageAsset = {
+            uri: asset.uri,
+            width: asset.width,
+            height: asset.height,
+            fileSize: asset.fileSize,
+            fileName: asset.fileName ?? undefined,
+            mimeType: asset.mimeType ?? undefined,
+          };
+
           const validation = validateImageFile(image, { maxSizeMB });
           if (validation.valid) {
             validImages.push(image);
@@ -104,10 +124,14 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           setSelectedImages(validImages);
         }
       }
-    } catch {
-      showToast('Failed to pick image from gallery', 'error');
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('permission')) {
+        showToast('Gallery permission is required', 'warning');
+      } else {
+        showToast('Failed to pick image from gallery', 'error');
+      }
     }
-  };
+  }, [allowMultiple, maxSizeMB, showToast]);
 
   const handleUpload = async () => {
     if (selectedImages.length === 0) return;

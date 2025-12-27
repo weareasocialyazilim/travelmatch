@@ -16,6 +16,8 @@ import { PaymentPriorityNotice } from '../components/PaymentPriorityNotice';
 import { WalletConnectButton } from '../components/WalletConnectButton';
 import { CardOptionsModal } from '../components/CardOptionsModal';
 import { WalletOptionsModal } from '../components/WalletOptionsModal';
+import { EditCardModal } from '../components/EditCardModal';
+import { WalletConfigModal } from '../components/WalletConfigModal';
 import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
@@ -30,10 +32,12 @@ const PaymentMethodsScreen = () => {
     walletSettings,
     isWalletConnected,
     addCard,
+    updateCard,
     setCardAsDefault,
     removeCard,
     connectWallet,
     disconnectWallet,
+    updateWalletSettings,
     trackInteraction,
   } = usePaymentMethods();
 
@@ -41,7 +45,9 @@ const PaymentMethodsScreen = () => {
   const [selectedCard, setSelectedCard] = useState<SavedCard | null>(null);
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [isCardOptionsVisible, setIsCardOptionsVisible] = useState(false);
+  const [isEditCardVisible, setIsEditCardVisible] = useState(false);
   const [isWalletOptionsVisible, setIsWalletOptionsVisible] = useState(false);
+  const [isWalletConfigVisible, setIsWalletConfigVisible] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
   const handleAddCard = () => {
@@ -206,10 +212,19 @@ const PaymentMethodsScreen = () => {
         onSetDefault={handleSetAsDefault}
         onEdit={() => {
           setIsCardOptionsVisible(false);
-          // TODO: Implement card edit modal
-          logger.info('Edit card:', selectedCard?.lastFour);
+          setIsEditCardVisible(true);
         }}
         onRemove={handleRemoveCard}
+      />
+
+      <EditCardModal
+        visible={isEditCardVisible}
+        card={selectedCard}
+        onClose={() => {
+          setIsEditCardVisible(false);
+          setSelectedCard(null);
+        }}
+        onSave={updateCard}
       />
 
       <WalletOptionsModal
@@ -222,10 +237,20 @@ const PaymentMethodsScreen = () => {
         }}
         onConfigure={() => {
           setIsWalletOptionsVisible(false);
-          // TODO: Implement wallet configuration modal
-          logger.info('Configure wallet:', selectedWallet?.name);
+          setIsWalletConfigVisible(true);
         }}
         onDisconnect={handleDisconnectWallet}
+      />
+
+      <WalletConfigModal
+        visible={isWalletConfigVisible}
+        wallet={selectedWallet}
+        settings={walletSettings}
+        onClose={() => {
+          setIsWalletConfigVisible(false);
+          setSelectedWallet(null);
+        }}
+        onSave={updateWalletSettings}
       />
     </View>
   );

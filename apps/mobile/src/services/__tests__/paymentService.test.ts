@@ -597,128 +597,14 @@ describe('paymentService', () => {
   // ========================================
   // PAYMENT METHODS TESTS (DEV MODE)
   // ========================================
-  describe('Payment Methods (Dev Mode)', () => {
-    const originalDev = global.__DEV__;
-
-    beforeAll(() => {
-      global.__DEV__ = true;
-    });
-
-    afterAll(() => {
-      global.__DEV__ = originalDev;
-    });
-
-    describe('getPaymentMethods', () => {
-      it('should return mock payment methods in dev mode', () => {
-        const result = paymentService.getPaymentMethods();
-
-        expect(result).toHaveProperty('cards');
-        expect(result).toHaveProperty('bankAccounts');
-        expect(Array.isArray(result.cards)).toBe(true);
-        expect(Array.isArray(result.bankAccounts)).toBe(true);
-      });
-    });
-
-    describe('addCard', () => {
-      it('should add a mock card in dev mode', () => {
-        const result = paymentService.addCard('tok_visa');
-
-        expect(result.card).toHaveProperty('id');
-        expect(result.card).toHaveProperty('brand');
-        expect(result.card).toHaveProperty('last4');
-        expect(result.card.brand).toBe('visa');
-        expect(result.card.last4).toBe('4242');
-      });
-
-      it('should set first card as default', () => {
-        // Clear mock cards
-        paymentService.getPaymentMethods().cards.length = 0;
-
-        const result = paymentService.addCard('tok_visa');
-
-        expect(result.card.isDefault).toBe(true);
-      });
-    });
-
-    describe('removeCard', () => {
-      it('should remove a card in dev mode', () => {
-        const { card } = paymentService.addCard('tok_visa');
-        const result = paymentService.removeCard(card.id);
-
-        expect(result.success).toBe(true);
-      });
-    });
-
-    describe('addBankAccount', () => {
-      it('should add a mock bank account in dev mode', () => {
-        const result = paymentService.addBankAccount({
-          routingNumber: '110000000',
-          accountNumber: '000123456789',
-        });
-
-        expect(result.bankAccount).toHaveProperty('id');
-        expect(result.bankAccount).toHaveProperty('bankName');
-        expect(result.bankAccount.accountType).toBe('checking');
-        expect(result.bankAccount.isVerified).toBe(true);
-      });
-    });
-
-    describe('removeBankAccount', () => {
-      it('should remove a bank account in dev mode', () => {
-        const { bankAccount } = paymentService.addBankAccount({});
-        const result = paymentService.removeBankAccount(bankAccount.id);
-
-        expect(result.success).toBe(true);
-      });
-    });
-  });
+  // Note: Payment methods work the same in development and production
+  // All functions are async and use Supabase edge functions for secure handling
+  // Tests for these functions are in paymentService.complete.test.ts with proper async mocking
 
   // ========================================
   // PRODUCTION MODE TESTS
   // ========================================
-  describe('Payment Methods (Production Mode)', () => {
-    const originalDev = global.__DEV__;
-
-    beforeAll(() => {
-      global.__DEV__ = false;
-    });
-
-    afterAll(() => {
-      global.__DEV__ = originalDev;
-    });
-
-    it('should return empty arrays in production mode', () => {
-      const result = paymentService.getPaymentMethods();
-
-      expect(result.cards).toEqual([]);
-      expect(result.bankAccounts).toEqual([]);
-      expect(logger.warn).toHaveBeenCalledWith(
-        'Using mock payment methods in production!'
-      );
-    });
-
-    it('should throw error when adding card in production', () => {
-      expect(() => paymentService.addCard('tok_visa')).toThrow(
-        'Payment methods not configured for production'
-      );
-    });
-
-    it('should throw error when removing card in production', () => {
-      expect(() => paymentService.removeCard('card-123')).toThrow(
-        'Payment methods not configured for production'
-      );
-    });
-
-    it('should throw error when adding bank account in production', () => {
-      expect(() => paymentService.addBankAccount({})).toThrow(
-        'Payment methods not configured for production'
-      );
-    });
-
-    it('should throw error when removing bank account in production', () => {
-      expect(() => paymentService.removeBankAccount('bank-123')).toThrow(
-        'Payment methods not configured for production'
-      );
-    });
-  });
+  // Note: Payment methods work the same in development and production
+  // They use Supabase edge functions for secure token handling
+  // No __DEV__ guards needed as Supabase handles environment separation
 });

@@ -10,11 +10,12 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  FlatList,
   Keyboard,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
 
 const MAPBOX_ACCESS_TOKEN =
   process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN ||
@@ -145,9 +146,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
 
     // Use fallback search if Mapbox token is not configured
     if (!MAPBOX_ACCESS_TOKEN) {
-      console.warn(
-        '[CityAutocomplete] Mapbox token not configured, using fallback cities',
-      );
+      logger.warn('CityAutocomplete: Mapbox token not configured, using fallback cities');
       const filtered = FALLBACK_CITIES.filter(
         (city) =>
           city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -198,7 +197,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
 
       setSuggestions(cities);
     } catch (err) {
-      console.error('[CityAutocomplete] Search error:', err);
+      logger.error('CityAutocomplete: Search error', err);
       // Fallback to local search on error
       const filtered = FALLBACK_CITIES.filter(
         (city) =>
@@ -289,14 +288,16 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
 
       {showSuggestions && suggestions.length > 0 && (
         <View style={styles.suggestionsContainer}>
-          <FlatList
+          <FlashList
             data={suggestions}
             keyExtractor={(item) => item.id}
             keyboardShouldPersistTaps="handled"
+            estimatedItemSize={56}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.suggestionItem}
                 onPress={() => handleSelectCity(item)}
+                hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
               >
                 <MaterialCommunityIcons
                   name="city"

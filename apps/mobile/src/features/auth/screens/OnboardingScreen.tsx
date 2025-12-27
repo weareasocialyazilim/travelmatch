@@ -10,7 +10,6 @@ import type {
   StackScreenProps,
 } from '@react-navigation/stack';
 import React, { useRef, useState } from 'react';
-import type { ImageSourcePropType } from 'react-native';
 import {
   Animated,
   Dimensions,
@@ -22,7 +21,6 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -30,9 +28,8 @@ interface OnboardingPage {
   id: string;
   title: string;
   description: string;
-  image: ImageSourcePropType;
   gradient: readonly [string, string];
-  icon?: string;
+  icon: string;
 }
 
 import { useNavigation } from '@react-navigation/native';
@@ -61,23 +58,20 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const iconImage =
-    require('../../../../assets/icon.png') as ImageSourcePropType;
-
-  // New 5-slide onboarding flow for gift-moment concept
+  // 5-slide onboarding flow for gift-moment concept
+  // Uses gradient backgrounds with icons for a clean, app-like experience
   const ONBOARDING_PAGES: OnboardingPage[] = [
     {
       id: '1',
       title: 'Ya birisi sana bugün\nbir kahve ısmarlasa?',
       description: 'Yabancılar arasında dostluk kurmanın yeni yolu',
-      image: iconImage, // TODO: Replace with coffee.jpg
       gradient: GRADIENTS.giftButton,
+      icon: 'coffee',
     },
     {
       id: '2',
       title: 'Bir dilek tut 🌟',
       description: 'İstediğin deneyimi paylaş,\nbiri onu sana hediye etsin',
-      image: iconImage, // TODO: Replace with wish.jpg
       gradient: GRADIENTS.aurora,
       icon: 'star-shooting',
     },
@@ -85,7 +79,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       id: '3',
       title: 'Birinin gününü\ngüzelleştir 🎁',
       description: 'Küçük bir hediye, büyük bir mutluluk',
-      image: iconImage, // TODO: Replace with gift.jpg
       gradient: GRADIENTS.sunset,
       icon: 'gift',
     },
@@ -93,7 +86,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       id: '4',
       title: 'Güvenli kasada,\nmerak etme 🔒',
       description: 'Paran deneyim gerçekleşene kadar koruma altında',
-      image: iconImage, // TODO: Replace with vault.jpg
       gradient: GRADIENTS.trust,
       icon: 'lock-check',
     },
@@ -101,7 +93,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       id: '5',
       title: 'Hazır mısın?',
       description: 'Dilekler seni bekliyor',
-      image: iconImage, // TODO: Replace with world.jpg
       gradient: GRADIENTS.celebration,
       icon: 'rocket-launch',
     },
@@ -194,31 +185,26 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         },
       ]}
     >
-      {/* Full-screen background image */}
-      <Image
-        source={item.image}
-        style={styles.backgroundImage}
-        contentFit="cover"
-      />
-
-      {/* Gradient overlay */}
+      {/* Full-screen gradient background */}
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)']}
-        style={styles.gradientOverlay}
+        colors={[item.gradient[0], item.gradient[1], 'rgba(0,0,0,0.9)']}
+        locations={[0, 0.4, 1]}
+        style={styles.gradientBackground}
       />
 
-      {/* Icon (if present) */}
-      {item.icon && (
-        <View style={styles.iconContainer}>
-          <LinearGradient colors={item.gradient} style={styles.iconGradient}>
-            <MaterialCommunityIcons
-              name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-              size={48}
-              color={COLORS.white}
-            />
-          </LinearGradient>
-        </View>
-      )}
+      {/* Central icon */}
+      <View style={styles.iconContainer}>
+        <LinearGradient
+          colors={['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)']}
+          style={styles.iconGradient}
+        >
+          <MaterialCommunityIcons
+            name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+            size={56}
+            color={COLORS.white}
+          />
+        </LinearGradient>
+      </View>
 
       {/* Content */}
       <View style={styles.contentSection}>
@@ -306,7 +292,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: COLORS.black,
   },
   flatList: {
     flex: 1,
@@ -316,12 +302,7 @@ const styles = StyleSheet.create({
     height: SCREEN_HEIGHT,
     position: 'relative',
   },
-  backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  gradientOverlay: {
+  gradientBackground: {
     ...StyleSheet.absoluteFillObject,
   },
   iconContainer: {
@@ -332,16 +313,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconGradient: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   contentSection: {
     position: 'absolute',
@@ -355,13 +338,13 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     marginBottom: 16,
     lineHeight: 44,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: COLORS.overlay,
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
   description: {
     fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: COLORS.subtitle,
     lineHeight: 26,
   },
   bottomSection: {
@@ -388,7 +371,7 @@ const styles = StyleSheet.create({
   },
   inactiveDot: {
     width: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: COLORS.whiteOverlay30,
   },
   buttonsRow: {
     flexDirection: 'row',
@@ -400,7 +383,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   skipText: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: COLORS.whiteOverlay70,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -425,7 +408,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   exploreLinkText: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: COLORS.whiteOverlay70,
     fontSize: 16,
   },
 });

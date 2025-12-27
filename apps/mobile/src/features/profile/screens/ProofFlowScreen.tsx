@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { proofSchema, type ProofInput } from '../../../utils/forms/schemas';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,6 +24,7 @@ import { COLORS } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
 import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
+import { launchCamera, launchGallery } from '@/utils/cameraConfig';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
@@ -119,49 +119,39 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     setCurrentStep('upload');
   };
 
-  const handleAddPhoto = () => {
-    const showPicker = async (useCamera: boolean) => {
-      // Request permissions
-      if (useCamera) {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert(
-            'Permission Required',
-            'Camera permission is needed to take photos',
-          );
-          return;
-        }
+  const handleCameraCapture = useCallback(async () => {
+    try {
+      // Use PROOF_PHOTO config for maximum quality verification photos
+      const asset = await launchCamera('PROOF_PHOTO');
+      if (asset) {
+        setValue('photos', [...photos, asset.uri]);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('permission')) {
+        Alert.alert('Permission Required', 'Camera permission is needed to take photos');
       } else {
-        const { status } =
-          await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert(
-            'Permission Required',
-            'Gallery permission is needed to select photos',
-          );
-          return;
-        }
+        showToast('Failed to capture photo', 'error');
       }
+    }
+  }, [photos, setValue, showToast]);
 
-      const result = useCamera
-        ? await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0.8,
-          })
-        : await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0.8,
-          });
-
-      if (!result.canceled && result.assets[0]) {
-        setValue('photos', [...photos, result.assets[0].uri]);
+  const handleGallerySelect = useCallback(async () => {
+    try {
+      // Use PROOF_PHOTO config for maximum quality
+      const assets = await launchGallery('PROOF_PHOTO', false);
+      if (assets.length > 0) {
+        setValue('photos', [...photos, assets[0].uri]);
       }
-    };
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('permission')) {
+        Alert.alert('Permission Required', 'Gallery permission is needed to select photos');
+      } else {
+        showToast('Failed to select photo', 'error');
+      }
+    }
+  }, [photos, setValue, showToast]);
 
+  const handleAddPhoto = useCallback(() => {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
@@ -169,18 +159,18 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           cancelButtonIndex: 0,
         },
         (buttonIndex) => {
-          if (buttonIndex === 1) showPicker(true);
-          if (buttonIndex === 2) showPicker(false);
+          if (buttonIndex === 1) void handleCameraCapture();
+          if (buttonIndex === 2) void handleGallerySelect();
         },
       );
     } else {
       Alert.alert('Add Photo', 'Select proof photo', [
-        { text: 'Take Photo', onPress: () => showPicker(true) },
-        { text: 'Choose from Gallery', onPress: () => showPicker(false) },
+        { text: 'Take Photo', onPress: () => void handleCameraCapture() },
+        { text: 'Choose from Gallery', onPress: () => void handleGallerySelect() },
         { text: 'Cancel', style: 'cancel' },
       ]);
     }
-  };
+  }, [handleCameraCapture, handleGallerySelect]);
 
   const handleAddTicket = async () => {
     try {

@@ -61,10 +61,14 @@ const RequestsScreen = () => {
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         {/* Tabs */}
-        <View style={styles.tabs}>
+        <View style={styles.tabs} accessibilityRole="tablist">
           <TouchableOpacity
             style={[styles.tab, selectedTab === 'pending' && styles.tabActive]}
             onPress={() => setSelectedTab('pending')}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: selectedTab === 'pending' }}
+            accessibilityLabel={`Requests tab${newRequestsCount > 0 ? `, ${newRequestsCount} new` : ''}`}
+            accessibilityHint="View pending requests from travelers"
           >
             <Text
               style={[
@@ -75,7 +79,7 @@ const RequestsScreen = () => {
               Requests
             </Text>
             {newRequestsCount > 0 && (
-              <View style={styles.tabBadge}>
+              <View style={styles.tabBadge} accessibilityElementsHidden>
                 <Text style={styles.tabBadgeText}>{newRequestsCount}</Text>
               </View>
             )}
@@ -87,6 +91,10 @@ const RequestsScreen = () => {
               selectedTab === 'notifications' && styles.tabActive,
             ]}
             onPress={() => setSelectedTab('notifications')}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: selectedTab === 'notifications' }}
+            accessibilityLabel={`Activity tab${unreadNotificationsCount > 0 ? `, ${unreadNotificationsCount} unread` : ''}`}
+            accessibilityHint="View your activity and notifications"
           >
             <Text
               style={[
@@ -97,7 +105,7 @@ const RequestsScreen = () => {
               Activity
             </Text>
             {unreadNotificationsCount > 0 && (
-              <View style={styles.tabBadge}>
+              <View style={styles.tabBadge} accessibilityElementsHidden>
                 <Text style={styles.tabBadgeText}>
                   {unreadNotificationsCount}
                 </Text>
@@ -138,7 +146,7 @@ const RequestsScreen = () => {
               <EmptyState
                 icon="inbox"
                 title="No requests"
-                subtitle="You don't have any pending requests at the moment."
+                description="You don't have any pending requests at the moment."
               />
             )
           ) : notifications.length > 0 ? (
@@ -159,7 +167,7 @@ const RequestsScreen = () => {
             <EmptyState
               icon="bell-off"
               title="No notifications"
-              subtitle="You're all caught up! No new activity."
+              description="You're all caught up! No new activity."
             />
           )}
         </ScrollView>

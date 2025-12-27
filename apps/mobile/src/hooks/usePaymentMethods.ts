@@ -27,10 +27,12 @@ export interface UsePaymentMethodsReturn {
   walletSettings: WalletSettings;
   isWalletConnected: boolean;
   addCard: (cardNumber: string, expiry: string, cvv: string) => Promise<void>;
+  updateCard: (cardId: string, expiry: string) => Promise<void>;
   setCardAsDefault: (cardId: string) => void;
   removeCard: (cardId: string) => void;
   connectWallet: () => Promise<void>;
   disconnectWallet: (walletName: string) => void;
+  updateWalletSettings: (settings: Partial<WalletSettings>) => Promise<void>;
   trackInteraction: (action: string, data?: Record<string, unknown>) => void;
 }
 
@@ -148,8 +150,8 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
       }));
   }, [paymentMethods]);
 
-  // Extended API: Wallet settings (default values for now)
-  const [walletSettings, _setWalletSettings] = useState<WalletSettings>({
+  // Extended API: Wallet settings
+  const [walletSettings, setWalletSettings] = useState<WalletSettings>({
     isDefaultPayment: false,
     requireAuth: true,
     enableNotifications: true,
@@ -168,6 +170,19 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
       await addPaymentMethod(paymentMethodId);
     },
     [addPaymentMethod],
+  );
+
+  // Extended API: Update card expiry
+  const updateCard = useCallback(
+    async (cardId: string, expiry: string) => {
+      // In a real implementation, this would update the card via API
+      logger.info('Updating card', { cardId, expiry });
+      // Mock: Update the payment method's expiry (not persisted in this mock)
+      setPaymentMethods((prev) =>
+        prev.map((m) => (m.id === cardId ? { ...m, expiry } : m)),
+      );
+    },
+    [],
   );
 
   // Extended API: Set card as default (sync wrapper)
@@ -221,6 +236,15 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     );
   }, []);
 
+  // Extended API: Update wallet settings
+  const updateWalletSettings = useCallback(
+    async (settings: Partial<WalletSettings>) => {
+      logger.info('Updating wallet settings', settings);
+      setWalletSettings((prev) => ({ ...prev, ...settings }));
+    },
+    [],
+  );
+
   // Extended API: Track user interactions for analytics
   const trackInteraction = useCallback(
     (action: string, data?: Record<string, unknown>) => {
@@ -248,10 +272,12 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     walletSettings,
     isWalletConnected,
     addCard,
+    updateCard,
     setCardAsDefault,
     removeCard,
     connectWallet,
     disconnectWallet,
+    updateWalletSettings,
     trackInteraction,
   };
 }

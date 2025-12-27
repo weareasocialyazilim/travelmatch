@@ -11,12 +11,7 @@ declare global {
 }
 global.__DEV__ = true;
 
-import {
-  paymentService,
-  type Transaction,
-  type PaymentCard,
-  type BankAccount,
-} from '../paymentService';
+import { paymentService } from '../paymentService';
 import { supabase } from '../../config/supabase';
 import { transactionsService } from '../supabaseDbService';
 
@@ -289,14 +284,21 @@ describe('PaymentService', () => {
 
   describe('addCard', () => {
     beforeEach(() => {
-      // Reset MOCK_CARDS before each test
-      const { paymentService } = require('../paymentService');
-      // Get all current cards
-      const current = paymentService.getPaymentMethods();
-      // Remove all cards
-      current.cards.forEach((card: any) => {
-        paymentService.removeCard(card.id);
-      });
+      jest.clearAllMocks();
+      // Setup proper mock for functions.invoke
+      (mockSupabase ).functions = {
+        invoke: jest.fn().mockResolvedValue({
+          data: {
+            id: 'card_test123',
+            brand: 'visa',
+            last4: '4242',
+            exp_month: 12,
+            exp_year: 2030,
+            is_default: true,
+          },
+          error: null,
+        }),
+      };
     });
 
     it('should add new payment card', async () => {
@@ -318,6 +320,17 @@ describe('PaymentService', () => {
   });
 
   describe('removeCard', () => {
+    beforeEach(() => {
+      // Setup mock for from().update().eq().eq()
+      mockSupabase.from.mockReturnValue({
+        update: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            eq: jest.fn().mockResolvedValue({ data: null, error: null }),
+          }),
+        }),
+      });
+    });
+
     it('should remove payment card', async () => {
       const cardId = 'card_123';
 
@@ -328,6 +341,23 @@ describe('PaymentService', () => {
   });
 
   describe('addBankAccount', () => {
+    beforeEach(() => {
+      // Setup proper mock for functions.invoke
+      (mockSupabase ).functions = {
+        invoke: jest.fn().mockResolvedValue({
+          data: {
+            id: 'ba_test123',
+            bank_name: 'Test Bank',
+            account_type: 'checking',
+            last_four: '6789',
+            is_default: false,
+            is_verified: true,
+          },
+          error: null,
+        }),
+      };
+    });
+
     it('should add bank account', async () => {
       const accountData = {
         routingNumber: '110000000',
@@ -344,6 +374,17 @@ describe('PaymentService', () => {
   });
 
   describe('removeBankAccount', () => {
+    beforeEach(() => {
+      // Setup mock for from().update().eq().eq()
+      mockSupabase.from.mockReturnValue({
+        update: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            eq: jest.fn().mockResolvedValue({ data: null, error: null }),
+          }),
+        }),
+      });
+    });
+
     it('should remove bank account', async () => {
       const accountId = 'ba_123';
 
@@ -582,40 +623,6 @@ describe('PaymentService', () => {
       await expect(
         paymentService.confirmPayment('pi_invalid', 'pm_123'),
       ).rejects.toThrow();
-    });
-  });
-
-  describe.skip('Helper Functions', () => {
-    it('formatCurrency should format amount correctly', () => {
-      const { formatCurrency } = require('../paymentService');
-
-      expect(formatCurrency(100, 'USD')).toBe('$100.00');
-      expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
-    });
-
-    it('getTransactionTypeLabel should return correct labels', () => {
-      const { getTransactionTypeLabel } = require('../paymentService');
-
-      expect(getTransactionTypeLabel('gift_sent')).toBe('Gift Sent');
-      expect(getTransactionTypeLabel('gift_received')).toBe('Gift Received');
-      expect(getTransactionTypeLabel('withdrawal')).toBe('Withdrawal');
-    });
-
-    it('getTransactionIcon should return correct icons', () => {
-      const { getTransactionIcon } = require('../paymentService');
-
-      expect(getTransactionIcon('gift_sent')).toBe('gift');
-      expect(getTransactionIcon('withdrawal')).toBe('bank-transfer-out');
-      expect(getTransactionIcon('deposit')).toBe('bank-transfer-in');
-    });
-
-    it('isPositiveTransaction should identify positive transactions', () => {
-      const { isPositiveTransaction } = require('../paymentService');
-
-      expect(isPositiveTransaction('gift_received')).toBe(true);
-      expect(isPositiveTransaction('deposit')).toBe(true);
-      expect(isPositiveTransaction('gift_sent')).toBe(false);
-      expect(isPositiveTransaction('withdrawal')).toBe(false);
     });
   });
 

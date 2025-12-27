@@ -22,6 +22,7 @@ import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { useToast } from '@/context/ToastContext';
+import { COLORS } from '@/constants/colors';
 
 interface ConsentSettings {
   gdprConsent: boolean;
@@ -284,7 +285,7 @@ const DataPrivacyScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2563eb" />
+        <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
   }
@@ -304,7 +305,7 @@ const DataPrivacyScreen = () => {
           disabled={exportLoading}
         >
           {exportLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={COLORS.white} />
           ) : (
             <Text style={styles.actionButtonText}>Export My Data</Text>
           )}
@@ -316,7 +317,7 @@ const DataPrivacyScreen = () => {
           disabled={deleteLoading}
         >
           {deleteLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={COLORS.white} />
           ) : (
             <Text style={styles.actionButtonText}>Delete My Account</Text>
           )}
@@ -336,7 +337,7 @@ const DataPrivacyScreen = () => {
           <Switch
             value={consents.marketingConsent}
             onValueChange={(value) => updateConsent('marketing', value)}
-            trackColor={{ false: '#ccc', true: '#2563eb' }}
+            trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
           />
         </View>
 
@@ -350,7 +351,7 @@ const DataPrivacyScreen = () => {
           <Switch
             value={consents.analyticsConsent}
             onValueChange={(value) => updateConsent('analytics', value)}
-            trackColor={{ false: '#ccc', true: '#2563eb' }}
+            trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
           />
         </View>
       </View>
@@ -397,7 +398,7 @@ const DataPrivacyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
@@ -405,34 +406,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
     marginVertical: 8,
     padding: 16,
   },
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: '#111827',
+    color: COLORS.text,
     marginBottom: 8,
   },
   sectionDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
     marginBottom: 16,
     lineHeight: 20,
   },
   actionButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: COLORS.primary,
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 12,
   },
   dangerButton: {
-    backgroundColor: '#dc2626',
+    backgroundColor: COLORS.error,
   },
   actionButtonText: {
-    color: '#fff',
+    color: COLORS.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
   },
@@ -442,7 +443,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: COLORS.borderLight,
   },
   consentInfo: {
     flex: 1,
@@ -451,12 +452,12 @@ const styles = StyleSheet.create({
   consentTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: '#111827',
+    color: COLORS.text,
     marginBottom: 4,
   },
   consentDescription: {
     ...TYPOGRAPHY.caption,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
     lineHeight: 18,
   },
   linkButton: {
@@ -465,20 +466,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: COLORS.borderLight,
   },
   linkText: {
     ...TYPOGRAPHY.bodyLarge,
-    color: '#2563eb',
+    color: COLORS.primary,
     fontWeight: '500',
   },
   versionText: {
     ...TYPOGRAPHY.caption,
-    color: '#9ca3af',
+    color: COLORS.textMuted,
   },
   footerText: {
     ...TYPOGRAPHY.caption,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
     lineHeight: 20,
     textAlign: 'center',
   },

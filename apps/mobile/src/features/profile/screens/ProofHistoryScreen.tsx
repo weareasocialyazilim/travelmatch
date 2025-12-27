@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   ScrollView,
   SafeAreaView,
   Image,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -14,6 +16,8 @@ import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { profileApi } from '@/features/profile/services/profileApi';
+import { logger } from '@/utils/logger';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -33,39 +37,17 @@ interface ProofHistoryScreenProps {
 
 interface ProofItem {
   id: string;
-  submitter: string;
-  status: 'approved' | 'pending' | 'rejected';
-  timestamp: string;
-  date: string;
+  type: string;
+  status: 'approved' | 'pending' | 'rejected' | 'verified';
+  file_url: string | null;
+  created_at: string;
+  verified_at: string | null;
 }
-
-const PROOF_ITEMS: ProofItem[] = [
-  {
-    id: '1',
-    submitter: 'Lina',
-    status: 'approved',
-    timestamp: '07:42',
-    date: 'Today',
-  },
-  {
-    id: '2',
-    submitter: 'Lina',
-    status: 'pending',
-    timestamp: '15:30',
-    date: 'Yesterday',
-  },
-  {
-    id: '3',
-    submitter: 'Lina',
-    status: 'rejected',
-    timestamp: '09:15',
-    date: '2 days ago',
-  },
-];
 
 const getStatusConfig = (status: string) => {
   switch (status) {
     case 'approved':
+    case 'verified':
       return {
         icon: 'shield-check' as IconName,
         color: COLORS.emerald,
@@ -96,13 +78,94 @@ const getStatusConfig = (status: string) => {
   }
 };
 
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString();
+};
+
+const formatTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
 export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
   navigation,
   route,
 }) => {
-  // TODO: Use momentId to fetch proof history when API is ready
   const momentId = route.params?.momentId || '';
-  void momentId; // Silence unused variable warning until API integration
+  const [proofs, setProofs] = useState<ProofItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [momentDetails, setMomentDetails] = useState<{
+    title: string;
+    location: string;
+    price: number;
+    image: string;
+  } | null>(null);
+
+  const fetchProofHistory = useCallback(async () => {
+    try {
+      // Fetch proof history for the current user
+      const { data: { user } } = await (await import('@/config/supabase')).supabase.auth.getUser();
+      if (!user) return;
+
+      const data = await profileApi.getProofHistory(user.id);
+
+      // Filter by momentId if provided
+      const filteredProofs = momentId
+        ? (data || []).filter((p: any) => p.moment_id === momentId)
+        : data || [];
+
+      setProofs(filteredProofs.map((p: any) => ({
+        id: p.id,
+        type: p.type,
+        status: p.status as ProofItem['status'],
+        file_url: p.file_url,
+        created_at: p.created_at,
+        verified_at: p.verified_at,
+      })));
+
+      // Fetch moment details if momentId is provided
+      if (momentId) {
+        const { supabase } = await import('@/config/supabase');
+        const { data: moment } = await supabase
+          .from('moments')
+          .select('title, location, price, images')
+          .eq('id', momentId)
+          .single();
+
+        if (moment) {
+          setMomentDetails({
+            title: moment.title || 'Untitled Moment',
+            location: moment.location || '',
+            price: moment.price || 0,
+            image: moment.images?.[0] || '',
+          });
+        }
+      }
+    } catch (error) {
+      logger.error('Failed to fetch proof history', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [momentId]);
+
+  useEffect(() => {
+    fetchProofHistory();
+  }, [fetchProofHistory]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchProofHistory();
+  }, [fetchProofHistory]);
 
   const renderEmptyState = () => (
     <EmptyState
@@ -111,6 +174,31 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
       description="Proofs submitted by the traveler will appear here once they are uploaded for verification."
     />
   );
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name={'arrow-left' as IconName}
+              size={24}
+              color={COLORS.text}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Proof History</Text>
+          <View style={styles.headerButton} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,31 +222,36 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {/* Moment Summary Card */}
-        <View style={styles.summaryContainer}>
-          <View style={styles.summaryCard}>
-            <Image
-              source={{
-                uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=200',
-              }}
-              style={styles.summaryImage}
-            />
-            <View style={styles.summaryInfo}>
-              <Text style={styles.summaryTitle} numberOfLines={1}>
-                Hiking the Diamond Head Trail
-              </Text>
-              <Text style={styles.summaryMeta} numberOfLines={2}>
-                Honolulu, HI • $50
-              </Text>
+        {momentDetails && (
+          <View style={styles.summaryContainer}>
+            <View style={styles.summaryCard}>
+              <Image
+                source={{
+                  uri: momentDetails.image || 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=200',
+                }}
+                style={styles.summaryImage}
+              />
+              <View style={styles.summaryInfo}>
+                <Text style={styles.summaryTitle} numberOfLines={1}>
+                  {momentDetails.title}
+                </Text>
+                <Text style={styles.summaryMeta} numberOfLines={2}>
+                  {momentDetails.location} • ${momentDetails.price}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         {/* Proof List */}
-        {PROOF_ITEMS.length > 0 ? (
+        {proofs.length > 0 ? (
           <View style={styles.proofList}>
-            {PROOF_ITEMS.map((proof) => {
+            {proofs.map((proof) => {
               const config = getStatusConfig(proof.status);
               return (
                 <View key={proof.id} style={styles.proofItem}>
@@ -177,19 +270,24 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
                     </View>
                     <View style={styles.proofInfo}>
                       <Text style={styles.proofTitle} numberOfLines={1}>
-                        Proof from {proof.submitter}
+                        {proof.type || 'Proof'} Submission
                       </Text>
                       <Text style={styles.proofMeta} numberOfLines={2}>
-                        {config.label} • {proof.date} • {proof.timestamp}
+                        {config.label} • {formatDate(proof.created_at)} • {formatTime(proof.created_at)}
                       </Text>
                     </View>
                   </View>
-                  <TouchableOpacity
-                    style={styles.viewButton}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.viewButtonText}>View</Text>
-                  </TouchableOpacity>
+                  {proof.file_url && (
+                    <TouchableOpacity
+                      style={styles.viewButton}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        navigation.navigate('ProofDetail', { proofId: proof.id });
+                      }}
+                    >
+                      <Text style={styles.viewButtonText}>View</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               );
             })}
@@ -206,6 +304,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   header: {
     flexDirection: 'row',
