@@ -1,9 +1,10 @@
 /**
  * PhotoSection Component
  * Photo picker section for CreateMoment screen
+ * Uses centralized camera configuration for high-quality captures
  */
 
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,10 +16,10 @@ import {
   ActionSheetIOS,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '../../constants/colors';
 import { STRINGS } from '../../constants/strings';
 import { useToast } from '@/context/ToastContext';
+import { launchCamera, launchGallery } from '@/utils/cameraConfig';
 
 interface PhotoSectionProps {
   photo: string;
@@ -29,47 +30,37 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
   ({ photo, onPhotoSelected }) => {
     const { showToast } = useToast();
 
-    const pickImage = () => {
-      const showPicker = async (useCamera: boolean) => {
-        try {
-          if (useCamera) {
-            const { status } =
-              await ImagePicker.requestCameraPermissionsAsync();
-            if (status !== 'granted') {
-              showToast('Camera permission is required', 'warning');
-              return;
-            }
-          } else {
-            const { status } =
-              await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
-              showToast(STRINGS.ERRORS.PHOTO_PERMISSION, 'warning');
-              return;
-            }
-          }
-
-          const result = useCamera
-            ? await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                aspect: [16, 9],
-                quality: 0.8,
-              })
-            : await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                aspect: [16, 9],
-                quality: 0.8,
-              });
-
-          if (!result.canceled && result.assets[0]) {
-            onPhotoSelected(result.assets[0].uri);
-          }
-        } catch {
+    const handleCameraCapture = useCallback(async () => {
+      try {
+        const asset = await launchCamera('MOMENT_PHOTO');
+        if (asset) {
+          onPhotoSelected(asset.uri);
+        }
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('permission')) {
+          showToast('Camera permission is required', 'warning');
+        } else {
           showToast(STRINGS.ERRORS.PHOTO_SELECT, 'error');
         }
-      };
+      }
+    }, [onPhotoSelected, showToast]);
 
+    const handleGallerySelect = useCallback(async () => {
+      try {
+        const assets = await launchGallery('MOMENT_PHOTO', false);
+        if (assets.length > 0) {
+          onPhotoSelected(assets[0].uri);
+        }
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('permission')) {
+          showToast(STRINGS.ERRORS.PHOTO_PERMISSION, 'warning');
+        } else {
+          showToast(STRINGS.ERRORS.PHOTO_SELECT, 'error');
+        }
+      }
+    }, [onPhotoSelected, showToast]);
+
+    const pickImage = useCallback(() => {
       if (Platform.OS === 'ios') {
         ActionSheetIOS.showActionSheetWithOptions(
           {
@@ -77,21 +68,18 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
             cancelButtonIndex: 0,
           },
           (buttonIndex) => {
-            if (buttonIndex === 1) void showPicker(true);
-            if (buttonIndex === 2) void showPicker(false);
+            if (buttonIndex === 1) void handleCameraCapture();
+            if (buttonIndex === 2) void handleGallerySelect();
           },
         );
       } else {
         Alert.alert('Add Photo', 'Choose an option', [
-          { text: 'Take Photo', onPress: () => void showPicker(true) },
-          {
-            text: 'Choose from Gallery',
-            onPress: () => void showPicker(false),
-          },
+          { text: 'Take Photo', onPress: () => void handleCameraCapture() },
+          { text: 'Choose from Gallery', onPress: () => void handleGallerySelect() },
           { text: 'Cancel', style: 'cancel' },
         ]);
       }
-    };
+    }, [handleCameraCapture, handleGallerySelect]);
 
     return (
       <TouchableOpacity
