@@ -354,17 +354,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.background,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#1a1a1a',
+    color: COLORS.text,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginBottom: 30,
   },
   inputContainer: {
@@ -374,30 +374,31 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#374151',
+    color: COLORS.text,
     marginBottom: 6,
   },
   input: {
     width: '100%',
     height: 50,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.border,
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
+    color: COLORS.text,
   },
   inputError: {
-    borderColor: '#ef4444',
+    borderColor: COLORS.error,
   },
   errorText: {
-    color: '#ef4444',
+    color: COLORS.error,
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
   },
   hintText: {
-    color: '#6b7280',
+    color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
@@ -413,20 +414,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.border,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
   },
   genderOptionSelected: {
-    borderColor: COLORS?.mint || '#10b981',
-    backgroundColor: COLORS?.mintBackground || '#d1fae5',
+    borderColor: COLORS.mint,
+    backgroundColor: COLORS.mintBackground,
   },
   genderOptionText: {
     fontSize: 14,
-    color: '#374151',
+    color: COLORS.text,
   },
   genderOptionTextSelected: {
-    color: COLORS?.mint || '#10b981',
+    color: COLORS.mint,
     fontWeight: '600',
   },
 
@@ -436,21 +437,21 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
-    color: '#1a1a1a',
+    color: COLORS.text,
   },
   datePlaceholder: {
     fontSize: 16,
-    color: '#9ca3af',
+    color: COLORS.textSecondary,
   },
 
   // Modal styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: COLORS.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 40,
@@ -461,28 +462,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: COLORS.border,
   },
   modalTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: COLORS.text,
   },
   modalCancel: {
     fontSize: 16,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
   },
   modalDone: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS?.mint || '#10b981',
+    color: COLORS.mint,
   },
 
   // Button styles
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: COLORS?.mint || '#10b981',
+    backgroundColor: COLORS.mint,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -492,7 +493,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
   },

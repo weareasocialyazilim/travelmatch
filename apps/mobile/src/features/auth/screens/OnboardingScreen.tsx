@@ -306,7 +306,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: COLORS.black,
   },
   flatList: {
     flex: 1,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -355,13 +355,13 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     marginBottom: 16,
     lineHeight: 44,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: COLORS.overlay,
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
   description: {
     fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: COLORS.subtitle,
     lineHeight: 26,
   },
   bottomSection: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   inactiveDot: {
     width: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: COLORS.whiteOverlay30,
   },
   buttonsRow: {
     flexDirection: 'row',
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   skipText: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: COLORS.whiteOverlay70,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   exploreLinkText: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: COLORS.whiteOverlay70,
     fontSize: 16,
   },
 });
