@@ -641,17 +641,32 @@ class PaymentMigrationService {
   }
 
   /**
-   * Helper: Fetch legacy transactions (placeholder)
+   * Helper: Fetch legacy transactions
+   * @deprecated No legacy payment system exists - TravelMatch uses Supabase from the start.
+   * This method is preserved for potential future migrations from external payment providers.
+   * Returns empty array as there are no legacy transactions to fetch.
    */
   private async fetchLegacyTransactions(
     startDate: string,
     endDate: string,
   ): Promise<any[]> {
-    // TODO: Implement legacy API call
+    // No legacy payment system - TravelMatch was built with Supabase from day one.
+    // If migrating from an external provider (Stripe legacy, PayPal, etc.) in the future,
+    // implement the API call here to fetch historical transactions.
+    //
+    // Example implementation for a hypothetical legacy API:
+    // const response = await fetch(`${LEGACY_API_URL}/transactions`, {
+    //   method: 'POST',
+    //   headers: { 'Authorization': `Bearer ${LEGACY_API_KEY}` },
+    //   body: JSON.stringify({ start_date: startDate, end_date: endDate }),
+    // });
+    // return response.json();
+
     logger.debug(
       'PaymentMigration',
-      'Would fetch legacy transactions:',
+      'No legacy system configured. Date range:',
       startDate,
+      'to',
       endDate,
     );
     return [];
