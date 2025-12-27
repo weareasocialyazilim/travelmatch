@@ -6,12 +6,32 @@
 
 import { MMKV } from 'react-native-mmkv';
 
-// Create default storage instance with encryption
-export const storage = new MMKV({
-  id: 'travelmatch-storage',
-  // Note: In production, use a secure key from environment or secure keychain
-  // encryptionKey: process.env.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY,
-});
+// Lazy initialization to prevent "runtime not ready" errors with Hermes
+let _storage: MMKV | null = null;
+
+const getStorage = (): MMKV => {
+  if (!_storage) {
+    _storage = new MMKV({
+      id: 'travelmatch-storage',
+      // Note: In production, use a secure key from environment or secure keychain
+      // encryptionKey: process.env.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY,
+    });
+  }
+  return _storage;
+};
+
+// For backward compatibility - lazy getter
+export const storage = {
+  set: (key: string, value: string | number | boolean) =>
+    getStorage().set(key, value),
+  getString: (key: string) => getStorage().getString(key),
+  getNumber: (key: string) => getStorage().getNumber(key),
+  getBoolean: (key: string) => getStorage().getBoolean(key),
+  delete: (key: string) => getStorage().delete(key),
+  clearAll: () => getStorage().clearAll(),
+  getAllKeys: () => getStorage().getAllKeys(),
+  contains: (key: string) => getStorage().contains(key),
+};
 
 /**
  * Storage API - Drop-in AsyncStorage replacement
@@ -22,7 +42,7 @@ export const Storage = {
    * Set string value
    */
   setItem: (key: string, value: string): Promise<void> => {
-    storage.set(key, value);
+    getStorage().set(key, value);
     return Promise.resolve();
   },
 
@@ -30,7 +50,7 @@ export const Storage = {
    * Get string value
    */
   getItem: (key: string): Promise<string | null> => {
-    const value = storage.getString(key);
+    const value = getStorage().getString(key);
     return Promise.resolve(value ?? null);
   },
 
@@ -38,7 +58,7 @@ export const Storage = {
    * Remove item
    */
   removeItem: (key: string): Promise<void> => {
-    storage.delete(key);
+    getStorage().delete(key);
     return Promise.resolve();
   },
 
@@ -46,7 +66,7 @@ export const Storage = {
    * Clear all storage
    */
   clear: (): Promise<void> => {
-    storage.clearAll();
+    getStorage().clearAll();
     return Promise.resolve();
   },
 
@@ -54,7 +74,7 @@ export const Storage = {
    * Get all keys
    */
   getAllKeys: (): Promise<string[]> => {
-    const keys = storage.getAllKeys();
+    const keys = getStorage().getAllKeys();
     return Promise.resolve(keys);
   },
 
@@ -66,14 +86,14 @@ export const Storage = {
    * Set object value (automatically stringified)
    */
   setObject: <T>(key: string, value: T): void => {
-    storage.set(key, JSON.stringify(value));
+    getStorage().set(key, JSON.stringify(value));
   },
 
   /**
    * Get object value (automatically parsed)
    */
   getObject: <T>(key: string): T | null => {
-    const value = storage.getString(key);
+    const value = getStorage().getString(key);
     if (!value) return null;
     try {
       return JSON.parse(value) as T;
@@ -86,35 +106,35 @@ export const Storage = {
    * Set number value (stored as number, not string)
    */
   setNumber: (key: string, value: number): void => {
-    storage.set(key, value);
+    getStorage().set(key, value);
   },
 
   /**
    * Get number value
    */
   getNumber: (key: string): number | undefined => {
-    return storage.getNumber(key);
+    return getStorage().getNumber(key);
   },
 
   /**
    * Set boolean value (stored as boolean, not string)
    */
   setBoolean: (key: string, value: boolean): void => {
-    storage.set(key, value);
+    getStorage().set(key, value);
   },
 
   /**
    * Get boolean value
    */
   getBoolean: (key: string): boolean | undefined => {
-    return storage.getBoolean(key);
+    return getStorage().getBoolean(key);
   },
 
   /**
    * Check if key exists
    */
   contains: (key: string): boolean => {
-    return storage.contains(key);
+    return getStorage().contains(key);
   },
 };
 
