@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,18 +16,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
+import { generateTotpSecret } from '@/utils/security';
 
 type SetupStep = 'intro' | 'setup' | 'verify' | 'backup';
 
 const CODE_LENGTH = 6;
 
-// Mock secret key for demo - in production this would come from the API
-const MOCK_SECRET_KEY = 'JBSWY3DPEHPK3PXP';
-
 export const TwoFactorSetupScreen: React.FC = () => {
   const navigation = useNavigation();
   const { showToast } = useToast();
   const { props: a11y } = useAccessibility();
+
+  // Generate a unique TOTP secret for this setup session
+  // In production, this should be fetched from the backend API
+  const secretKey = useMemo(() => generateTotpSecret(10), []);
 
   const [step, setStep] = useState<SetupStep>('intro');
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
@@ -46,7 +48,10 @@ export const TwoFactorSetupScreen: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: { nativeEvent: { key: string } }, index: number) => {
+  const handleKeyPress = (
+    e: { nativeEvent: { key: string } },
+    index: number,
+  ) => {
     if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -54,9 +59,9 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   const handleCopySecret = async () => {
     if (Platform.OS === 'web') {
-      await navigator.clipboard.writeText(MOCK_SECRET_KEY);
+      await navigator.clipboard.writeText(secretKey);
     } else {
-      Clipboard.setString(MOCK_SECRET_KEY);
+      Clipboard.setString(secretKey);
     }
     showToast('Secret key copied to clipboard', 'success');
   };
@@ -106,25 +111,44 @@ export const TwoFactorSetupScreen: React.FC = () => {
   const renderIntro = () => (
     <View style={styles.stepContent}>
       <View style={styles.iconContainer}>
-        <MaterialCommunityIcons name="shield-lock-outline" size={64} color={COLORS.primary} />
+        <MaterialCommunityIcons
+          name="shield-lock-outline"
+          size={64}
+          color={COLORS.primary}
+        />
       </View>
 
       <Text style={styles.title}>Two-Factor Authentication</Text>
       <Text style={styles.subtitle}>
-        Add an extra layer of security to your account by enabling two-factor authentication
+        Add an extra layer of security to your account by enabling two-factor
+        authentication
       </Text>
 
       <View style={styles.benefitsContainer}>
         <View style={styles.benefitRow}>
-          <MaterialCommunityIcons name="check-circle" size={20} color={COLORS.success} />
-          <Text style={styles.benefitText}>Protect against unauthorized access</Text>
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={20}
+            color={COLORS.success}
+          />
+          <Text style={styles.benefitText}>
+            Protect against unauthorized access
+          </Text>
         </View>
         <View style={styles.benefitRow}>
-          <MaterialCommunityIcons name="check-circle" size={20} color={COLORS.success} />
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={20}
+            color={COLORS.success}
+          />
           <Text style={styles.benefitText}>Secure your personal data</Text>
         </View>
         <View style={styles.benefitRow}>
-          <MaterialCommunityIcons name="check-circle" size={20} color={COLORS.success} />
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={20}
+            color={COLORS.success}
+          />
           <Text style={styles.benefitText}>Prevent account takeover</Text>
         </View>
       </View>
@@ -150,7 +174,11 @@ export const TwoFactorSetupScreen: React.FC = () => {
   const renderSetup = () => (
     <View style={styles.stepContent}>
       <View style={styles.iconContainerSmall}>
-        <MaterialCommunityIcons name="qrcode-scan" size={40} color={COLORS.primary} />
+        <MaterialCommunityIcons
+          name="qrcode-scan"
+          size={40}
+          color={COLORS.primary}
+        />
       </View>
 
       <Text style={styles.title}>Set Up Authenticator</Text>
@@ -161,22 +189,32 @@ export const TwoFactorSetupScreen: React.FC = () => {
       {/* QR Code Placeholder */}
       <View style={styles.qrContainer}>
         <View style={styles.qrPlaceholder}>
-          <MaterialCommunityIcons name="qrcode" size={120} color={COLORS.text} />
+          <MaterialCommunityIcons
+            name="qrcode"
+            size={120}
+            color={COLORS.text}
+          />
         </View>
-        <Text style={styles.qrHint}>Scan this QR code with your authenticator app</Text>
+        <Text style={styles.qrHint}>
+          Scan this QR code with your authenticator app
+        </Text>
       </View>
 
       {/* Manual Entry */}
       <View style={styles.manualEntry}>
         <Text style={styles.manualLabel}>Or enter this key manually:</Text>
         <View style={styles.secretKeyContainer}>
-          <Text style={styles.secretKey}>{MOCK_SECRET_KEY}</Text>
+          <Text style={styles.secretKey}>{secretKey}</Text>
           <TouchableOpacity
             style={styles.copyButton}
             onPress={handleCopySecret}
             {...a11y.button('Copy secret key')}
           >
-            <MaterialCommunityIcons name="content-copy" size={20} color={COLORS.primary} />
+            <MaterialCommunityIcons
+              name="content-copy"
+              size={20}
+              color={COLORS.primary}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -197,7 +235,11 @@ export const TwoFactorSetupScreen: React.FC = () => {
   const renderVerify = () => (
     <View style={styles.stepContent}>
       <View style={styles.iconContainerSmall}>
-        <MaterialCommunityIcons name="numeric" size={40} color={COLORS.primary} />
+        <MaterialCommunityIcons
+          name="numeric"
+          size={40}
+          color={COLORS.primary}
+        />
       </View>
 
       <Text style={styles.title}>Verify Setup</Text>
@@ -226,7 +268,10 @@ export const TwoFactorSetupScreen: React.FC = () => {
       </View>
 
       <TouchableOpacity
-        style={[styles.primaryButton, (!isCodeComplete || isLoading) && styles.buttonDisabled]}
+        style={[
+          styles.primaryButton,
+          (!isCodeComplete || isLoading) && styles.buttonDisabled,
+        ]}
         onPress={handleVerify}
         disabled={!isCodeComplete || isLoading}
         {...a11y.button('Verify code', undefined, !isCodeComplete || isLoading)}
@@ -251,12 +296,17 @@ export const TwoFactorSetupScreen: React.FC = () => {
   const renderBackup = () => (
     <View style={styles.stepContent}>
       <View style={[styles.iconContainer, styles.successIcon]}>
-        <MaterialCommunityIcons name="check-circle" size={64} color={COLORS.success} />
+        <MaterialCommunityIcons
+          name="check-circle"
+          size={64}
+          color={COLORS.success}
+        />
       </View>
 
       <Text style={styles.title}>2FA Enabled!</Text>
       <Text style={styles.subtitle}>
-        Save these backup codes in a secure place. You can use them to access your account if you lose your device.
+        Save these backup codes in a secure place. You can use them to access
+        your account if you lose your device.
       </Text>
 
       {/* Backup Codes */}
@@ -268,7 +318,11 @@ export const TwoFactorSetupScreen: React.FC = () => {
             onPress={handleCopyBackupCodes}
             {...a11y.button('Copy all codes')}
           >
-            <MaterialCommunityIcons name="content-copy" size={18} color={COLORS.primary} />
+            <MaterialCommunityIcons
+              name="content-copy"
+              size={18}
+              color={COLORS.primary}
+            />
             <Text style={styles.copyButtonText}>Copy All</Text>
           </TouchableOpacity>
         </View>
@@ -283,7 +337,11 @@ export const TwoFactorSetupScreen: React.FC = () => {
       </View>
 
       <View style={styles.warningBox}>
-        <MaterialCommunityIcons name="alert-circle-outline" size={20} color={COLORS.warning} />
+        <MaterialCommunityIcons
+          name="alert-circle-outline"
+          size={20}
+          color={COLORS.warning}
+        />
         <Text style={styles.warningText}>
           Each backup code can only be used once. Store them safely!
         </Text>
@@ -327,7 +385,12 @@ export const TwoFactorSetupScreen: React.FC = () => {
         {step !== 'intro' && step !== 'backup' && (
           <View style={styles.progressIndicator}>
             <View style={[styles.progressDot, styles.progressDotActive]} />
-            <View style={[styles.progressDot, step === 'verify' && styles.progressDotActive]} />
+            <View
+              style={[
+                styles.progressDot,
+                step === 'verify' && styles.progressDotActive,
+              ]}
+            />
           </View>
         )}
       </View>
