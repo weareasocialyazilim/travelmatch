@@ -1,6 +1,7 @@
-import { renderHook, act } from '@testing-library/react-native';
+import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { usePaymentMethods } from '@/features/payments/hooks/usePaymentMethods';
 import { logger } from '@/utils/logger';
+import { Linking } from 'react-native';
 
 // Mock dependencies
 jest.mock('@/utils/logger');
@@ -16,22 +17,35 @@ jest.mock('@/context/ConfirmationContext', () => ({
   }),
 }));
 
+// Mock Linking.canOpenURL to prevent async state updates
+jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(true);
+
 describe('usePaymentMethods', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should initialize with default cards', () => {
+  it('should initialize with default cards', async () => {
     const { result } = renderHook(() => usePaymentMethods());
+
+    // Wait for all useEffect async operations to complete
+    await waitFor(() => {
+      expect(result.current.isApplePayAvailable).toBe(true);
+    });
 
     expect(result.current.savedCards).toHaveLength(4);
     expect(result.current.savedCards[0].isDefault).toBe(true);
   });
 
-  it('should add a new card', () => {
+  it('should add a new card', async () => {
     const { result } = renderHook(() => usePaymentMethods());
 
-    act(() => {
+    // Wait for all useEffect async operations to complete
+    await waitFor(() => {
+      expect(result.current.isApplePayAvailable).toBe(true);
+    });
+
+    await act(async () => {
       result.current.addCard('4111111111111111', '12/25', '123');
     });
 
@@ -40,11 +54,17 @@ describe('usePaymentMethods', () => {
     expect(result.current.savedCards[4].lastFour).toBe('1111');
   });
 
-  it('should set card as default', () => {
+  it('should set card as default', async () => {
     const { result } = renderHook(() => usePaymentMethods());
+
+    // Wait for all useEffect async operations to complete
+    await waitFor(() => {
+      expect(result.current.isApplePayAvailable).toBe(true);
+    });
+
     const secondCardId = result.current.savedCards[1].id;
 
-    act(() => {
+    await act(async () => {
       result.current.setCardAsDefault(secondCardId);
     });
 
@@ -53,11 +73,17 @@ describe('usePaymentMethods', () => {
     expect(result.current.walletSettings.isDefaultPayment).toBe(false);
   });
 
-  it('should remove a card', () => {
+  it('should remove a card', async () => {
     const { result } = renderHook(() => usePaymentMethods());
+
+    // Wait for all useEffect async operations to complete
+    await waitFor(() => {
+      expect(result.current.isApplePayAvailable).toBe(true);
+    });
+
     const cardToRemove = result.current.savedCards[0].id;
 
-    act(() => {
+    await act(async () => {
       result.current.removeCard(cardToRemove);
     });
 
@@ -65,10 +91,15 @@ describe('usePaymentMethods', () => {
     expect(logger.info).toHaveBeenCalledWith('Remove card:', cardToRemove);
   });
 
-  it('should update wallet settings', () => {
+  it('should update wallet settings', async () => {
     const { result } = renderHook(() => usePaymentMethods());
 
-    act(() => {
+    // Wait for all useEffect async operations to complete
+    await waitFor(() => {
+      expect(result.current.isApplePayAvailable).toBe(true);
+    });
+
+    await act(async () => {
       result.current.updateWalletSettings({
         isDefaultPayment: true,
         requireAuth: true,
@@ -82,8 +113,13 @@ describe('usePaymentMethods', () => {
     expect(result.current.savedCards.every((c) => !c.isDefault)).toBe(true);
   });
 
-  it('should track wallet connection', () => {
+  it('should track wallet connection', async () => {
     const { result } = renderHook(() => usePaymentMethods());
+
+    // Wait for all useEffect async operations to complete
+    await waitFor(() => {
+      expect(result.current.isApplePayAvailable).toBe(true);
+    });
 
     expect(result.current.isWalletConnected).toBe(true);
   });
