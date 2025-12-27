@@ -22,6 +22,8 @@ module.exports = {
     '^@/components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
     // Handle relative paths that babel module-resolver may produce (any number of ../)
     '^(\\.\\./)+components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
+    // Mock expo virtual env module (ES module that Jest can't handle)
+    '^expo/virtual/env$': '<rootDir>/__mocks__/expo-virtual-env.js',
     // Now spread the preset (contains generic @/ mappings)
     ...jestExpoPreset.moduleNameMapper,
     // Explicit mappings for commonly mocked modules (needed for jest.mock hoisting)
