@@ -350,7 +350,6 @@ export const profileApi = {
 
     if (giftsError) {
       // Table might not exist yet - return empty
-      console.warn('hidden_items table not found:', giftsError);
       return [];
     }
 
@@ -373,9 +372,8 @@ export const profileApi = {
       .eq('item_type', 'moment')
       .order('hidden_at', { ascending: false });
 
-    if (momentsError) {
-      console.warn('hidden_items moments query error:', momentsError);
-    }
+    // Ignore moments error - table or relation may not exist
+    void momentsError;
 
     // Combine and format results
     const items = [
