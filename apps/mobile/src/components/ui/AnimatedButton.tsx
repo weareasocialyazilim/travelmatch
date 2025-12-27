@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
+import { COLORS } from '@/constants/colors';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -128,18 +129,18 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   primary: {
-    backgroundColor: '#2563eb',
+    backgroundColor: COLORS.primary,
   },
   secondary: {
-    backgroundColor: '#10b981',
+    backgroundColor: COLORS.success,
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#2563eb',
+    borderColor: COLORS.primary,
   },
   text: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: `${COLORS.white}4D`,
     width: 50,
   },
 });

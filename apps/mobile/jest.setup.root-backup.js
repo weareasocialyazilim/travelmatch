@@ -135,15 +135,13 @@ if (typeof global.console !== 'undefined') {
   };
 })();
 
-// Suppress React act() warnings from provider initialization (Phase 1 fix)
+// Suppress react-test-renderer deprecation warning (library issue - @testing-library/react-native uses it internally)
+// Note: act() warnings should NOT be suppressed - they indicate real test issues that need fixing
 const originalError = console.error;
 console.error = (...args) => {
-  // Suppress AuthProvider initialization warnings
   if (
     typeof args[0] === 'string' &&
-    (args[0].includes('Warning: An update to AuthProvider') ||
-      (args[0].includes('Warning: An update to') &&
-        args[0].includes('was not wrapped in act')))
+    args[0].includes('react-test-renderer is deprecated')
   ) {
     return;
   }
@@ -231,16 +229,31 @@ jest.mock('./src/config/supabase', () => ({
       update: jest.fn().mockReturnThis(),
       delete: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
+      neq: jest.fn().mockReturnThis(),
       in: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
+      range: jest.fn().mockReturnThis(),
       single: jest.fn(() => Promise.resolve({ data: null, error: null })),
+      maybeSingle: jest.fn(() => Promise.resolve({ data: null, error: null })),
     })),
+    functions: {
+      invoke: jest.fn(() => Promise.resolve({ data: null, error: null })),
+    },
     channel: jest.fn(() => ({
       on: jest.fn().mockReturnThis(),
       subscribe: jest.fn(() => Promise.resolve('SUBSCRIBED')),
       unsubscribe: jest.fn(() => Promise.resolve('UNSUBSCRIBED')),
     })),
+    storage: {
+      from: jest.fn(() => ({
+        upload: jest.fn(() => Promise.resolve({ data: { path: 'test-path' }, error: null })),
+        download: jest.fn(() => Promise.resolve({ data: new Blob(), error: null })),
+        getPublicUrl: jest.fn(() => ({ data: { publicUrl: 'https://example.com/test.jpg' } })),
+        remove: jest.fn(() => Promise.resolve({ data: null, error: null })),
+        list: jest.fn(() => Promise.resolve({ data: [], error: null })),
+      })),
+    },
   },
 }));
 
@@ -970,6 +983,19 @@ try {
   }));
 } catch (_) {}
 
+// Mock useHaptics hook
+try {
+  jest.mock('@/hooks/useHaptics', () => ({
+    useHaptics: () => ({
+      impact: jest.fn(),
+      success: jest.fn(),
+      warning: jest.fn(),
+      error: jest.fn(),
+      selection: jest.fn(),
+    }),
+  }));
+} catch (_) {}
+
 // Mock Expo Vector Icons
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
@@ -1100,6 +1126,7 @@ jest.mock('react-native-reanimated', () => {
     withDelay: jest.fn((_, val) => val),
     withSequence: jest.fn((...args) => args[args.length - 1]),
     withRepeat: jest.fn((val) => val),
+    cancelAnimation: jest.fn(),
     Easing: {
       linear: jest.fn(),
       ease: jest.fn(),

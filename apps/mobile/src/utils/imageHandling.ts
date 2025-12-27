@@ -7,6 +7,8 @@ import { Platform as _Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { cacheDirectory } from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { logger } from './logger';
 
 // Image Types
 export interface ImageAsset {
@@ -128,7 +130,7 @@ export async function pickImageFromGallery(
 }
 
 /**
- * Compress image
+ * Compress image using expo-image-manipulator
  * Reduces file size while maintaining quality
  */
 export async function compressImage(
@@ -136,22 +138,64 @@ export async function compressImage(
   options: CompressionOptions = {},
 ): Promise<string> {
   const {
-    quality: _quality = 0.7,
-    maxWidth: _maxWidth,
-    maxHeight: _maxHeight,
-    format: _format = 'jpeg',
+    quality = 0.7,
+    maxWidth = 1920,
+    maxHeight = 1920,
+    format = 'jpeg',
   } = options;
 
-  // Get image info
-  const imageInfo = await FileSystem.getInfoAsync(uri);
-  if (!imageInfo.exists) {
-    throw new Error('Image file not found');
-  }
+  try {
+    // Get image info to check if exists
+    const imageInfo = await FileSystem.getInfoAsync(uri);
+    if (!imageInfo.exists) {
+      throw new Error('Image file not found');
+    }
 
-  // Manipulate image (requires expo-image-manipulator)
-  // For now, we'll use the URI as-is
-  // TODO: Add expo-image-manipulator for actual compression
-  return uri;
+    // Build manipulation actions
+    const actions: ImageManipulator.Action[] = [];
+
+    // Add resize action if dimensions specified
+    if (maxWidth || maxHeight) {
+      actions.push({
+        resize: {
+          width: maxWidth,
+          height: maxHeight,
+        },
+      });
+    }
+
+    // Determine output format
+    const saveFormat =
+      format === 'png'
+        ? ImageManipulator.SaveFormat.PNG
+        : ImageManipulator.SaveFormat.JPEG;
+
+    // Perform image manipulation
+    const result = await ImageManipulator.manipulateAsync(uri, actions, {
+      compress: quality,
+      format: saveFormat,
+    });
+
+    // Log compression result
+    const originalSize =
+      'size' in imageInfo ? (imageInfo as FileSystem.FileInfo & { size: number }).size : 0;
+    const newInfo = await FileSystem.getInfoAsync(result.uri);
+    const newSize =
+      'size' in newInfo ? (newInfo as FileSystem.FileInfo & { size: number }).size : 0;
+
+    if (originalSize > 0 && newSize > 0) {
+      const savings = ((originalSize - newSize) / originalSize) * 100;
+      logger.debug(
+        `Image compressed: ${formatBytes(originalSize)} → ${formatBytes(newSize)} (${savings.toFixed(1)}% saved)`,
+      );
+    }
+
+    return result.uri;
+  } catch (error) {
+    logger.error('Image compression failed:', error);
+    // Return original URI as fallback
+    return uri;
+  }
 }
 
 /**

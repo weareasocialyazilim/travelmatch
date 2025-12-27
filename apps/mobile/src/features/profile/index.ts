@@ -22,6 +22,7 @@ export { MomentGalleryScreen } from './screens/MomentGalleryScreen';
 export { ShareMomentScreen } from './screens/ShareMomentScreen';
 export { ReportMomentScreen } from './screens/ReportMomentScreen';
 export { SavedMomentsScreen } from './screens/SavedMomentsScreen';
+export { DeletedMomentsScreen } from './screens/DeletedMomentsScreen';
 
 // Hooks
 export { 

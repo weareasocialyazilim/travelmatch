@@ -5,7 +5,7 @@
  * For consistent form handling across the app
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Alert } from 'react-native';
 import type { UseFormReturn, FieldValues, Path } from 'react-hook-form';
 import { useToast } from '@/context/ToastContext';
@@ -173,19 +173,40 @@ export function useFormSubmitHandler() {
 
 /**
  * Wrap form submit handler with offline check
+ * Uses NetInfo to check network connectivity
  */
 export function useOfflineAwareSubmit() {
   const toast = useToast();
-  const [isOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(true);
 
-  // TODO: Hook into network state from NetworkGuard
-  // For now, assume online
+  // Subscribe to network state changes
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
+    const setupNetworkListener = async () => {
+      try {
+        const NetInfo = await import('@react-native-community/netinfo');
+        unsubscribe = NetInfo.default.addEventListener((state) => {
+          setIsOnline(state.isConnected ?? true);
+        });
+      } catch {
+        // NetInfo not available - assume online
+        logger.debug('NetInfo not available, assuming online');
+      }
+    };
+
+    setupNetworkListener();
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
 
   const wrapSubmit = useCallback(
     <T,>(submitFn: () => Promise<T>) => {
       return async (): Promise<T | null> => {
         if (!isOnline) {
-          toast.error('forms.errors.offline');
+          toast.error('You are offline. Please check your connection.');
           return null;
         }
         return submitFn();
@@ -322,22 +343,104 @@ export function getFieldA11yProps<T extends FieldValues>(
 
 /**
  * Auto-save form on change with debounce
+ * Automatically saves form data after user stops typing
  */
 export function useFormAutoSave<T extends FieldValues>(
-  _form: UseFormReturn<T>,
-  _onSave: (data: T) => Promise<void>,
-  _options: {
+  form: UseFormReturn<T>,
+  onSave: (data: T) => Promise<void>,
+  options: {
     debounceMs?: number;
     enabled?: boolean;
+    onError?: (error: Error) => void;
+    onSuccess?: () => void;
   } = {}
 ) {
-  const [isSaving] = useState(false);
-  const [lastSaved] = useState<Date | null>(null);
+  const { debounceMs = 2000, enabled = true, onError, onSuccess } = options;
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastValuesRef = useRef<string>('');
 
-  // TODO: Implement debounced auto-save
-  // Watch form values and trigger save after debounce
+  // Watch form values
+  const values = form.watch();
 
-  return { isSaving, lastSaved };
+  useEffect(() => {
+    if (!enabled) return;
+
+    // Serialize current values to compare
+    const serialized = JSON.stringify(values);
+
+    // Skip if values haven't changed
+    if (serialized === lastValuesRef.current) return;
+
+    // Skip if form is not dirty
+    if (!form.formState.isDirty) return;
+
+    // Clear previous timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Set new timeout for auto-save
+    timeoutRef.current = setTimeout(async () => {
+      // Validate before saving
+      const isValid = await form.trigger();
+      if (!isValid) return;
+
+      setIsSaving(true);
+      setSaveError(null);
+
+      try {
+        await onSave(values as T);
+        lastValuesRef.current = serialized;
+        setLastSaved(new Date());
+        onSuccess?.();
+        logger.debug('Form auto-saved successfully');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Auto-save failed';
+        setSaveError(errorMessage);
+        onError?.(error as Error);
+        logger.error('Form auto-save failed:', error);
+      } finally {
+        setIsSaving(false);
+      }
+    }, debounceMs);
+
+    // Cleanup
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [values, enabled, debounceMs, form, onSave, onError, onSuccess]);
+
+  // Force save (bypass debounce)
+  const forceSave = useCallback(async () => {
+    if (!form.formState.isDirty) return;
+
+    const isValid = await form.trigger();
+    if (!isValid) return;
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const currentValues = form.getValues();
+      await onSave(currentValues);
+      lastValuesRef.current = JSON.stringify(currentValues);
+      setLastSaved(new Date());
+      onSuccess?.();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Save failed';
+      setSaveError(errorMessage);
+      onError?.(error as Error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [form, onSave, onError, onSuccess]);
+
+  return { isSaving, lastSaved, saveError, forceSave };
 }
 
 // ============================================================================

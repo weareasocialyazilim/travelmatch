@@ -23,6 +23,7 @@ import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { NetworkGuard } from '../../../components/NetworkGuard';
 import { SkeletonList } from '../../../components/ui/SkeletonList';
+import { EmptyState } from '../../../components/ui/EmptyState';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -136,6 +137,14 @@ const GiftInboxScreen: React.FC = () => {
       >
         {loading && sortedItems.length === 0 ? (
           <SkeletonList type="gift" count={5} show={loading} minDisplayTime={500} />
+        ) : sortedItems.length === 0 && topPicks.length === 0 && newToday.length === 0 ? (
+          <EmptyState
+            icon="gift-outline"
+            title="No Gifts Yet"
+            description="When travelers send you gifts for your moments, they'll appear here. Keep creating amazing moments!"
+            actionLabel="Discover Moments"
+            onAction={() => navigation.navigate('Discover')}
+          />
         ) : (
         <ScrollView
         style={styles.scrollView}

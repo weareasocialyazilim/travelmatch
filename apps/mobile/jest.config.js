@@ -13,11 +13,13 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(.pnpm|react-native|@react-native|@testing-library|expo|@expo|@unimodules|react-navigation|@react-navigation|@supabase))',
+    '/node_modules/(?!(.pnpm|react-native|@react-native|@testing-library|expo|@expo|expo-.*|@unimodules|react-navigation|@react-navigation|@supabase))',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
     ...jestExpoPreset.moduleNameMapper,
+    // Mock expo virtual env module (ES module that Jest can't handle)
+    '^expo/virtual/env$': '<rootDir>/__mocks__/expo-virtual-env.js',
     // Mock BottomNav before the general @/ alias to ensure it gets mocked
     '^@/components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
     '^@/(.*)$': '<rootDir>/src/$1',

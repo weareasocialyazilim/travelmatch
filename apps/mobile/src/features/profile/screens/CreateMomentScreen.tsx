@@ -32,8 +32,9 @@ import {
   MomentPreview,
   CATEGORIES,
   getCategoryEmoji,
-  type Place as _Place,
+  type Place,
 } from '@/components/createMoment';
+import { PlaceSearchModal } from '@/components/PlaceSearchModal';
 import { COLORS } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
 import { STRINGS as _STRINGS } from '../constants/strings';
@@ -53,6 +54,7 @@ const CreateMomentScreen: React.FC = () => {
   // UI-specific state (not in form)
   const [photo, setPhoto] = useState<string>(''); // Managed by PhotoSection
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showPlaceSearch, setShowPlaceSearch] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -158,10 +160,14 @@ const CreateMomentScreen: React.FC = () => {
   // Handlers
   const handleDatePress = useCallback(() => setShowDatePicker(true), []);
   const handleNavigateToPlaceSearch = useCallback(() => {
-    // TODO: Implement proper place selection (Google Places or similar)
-    showToast('Place selection coming soon', 'info');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setShowPlaceSearch(true);
   }, []);
+  const handlePlaceSelect = useCallback(
+    (selectedPlace: Place) => {
+      setValue('place', selectedPlace);
+    },
+    [setValue],
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -334,6 +340,13 @@ const CreateMomentScreen: React.FC = () => {
             }}
           />
         ))}
+
+      {/* Place Search Modal (Mapbox) */}
+      <PlaceSearchModal
+        visible={showPlaceSearch}
+        onClose={() => setShowPlaceSearch(false)}
+        onSelect={handlePlaceSelect}
+      />
     </SafeAreaView>
   );
 };
