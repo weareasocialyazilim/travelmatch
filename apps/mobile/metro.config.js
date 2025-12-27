@@ -21,14 +21,50 @@ config.resolver.nodeModulesPaths = [
 // 3. Keep hierarchical lookup enabled for Expo compatibility (SDK 54+)
 config.resolver.disableHierarchicalLookup = false;
 
-// 4. Redirect expo/AppEntry to our custom index.ts (fixes monorepo entry point issue)
+// 4. Handle path alias resolution for @/ imports
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Handle expo/AppEntry - redirect to our custom index.ts
   if (moduleName === 'expo/AppEntry' || moduleName === './node_modules/expo/AppEntry') {
     return {
       filePath: path.resolve(projectRoot, 'index.ts'),
       type: 'sourceFile',
     };
   }
+
+  // Handle @/ path aliases - resolve to apps/mobile/src/
+  if (moduleName.startsWith('@/')) {
+    const aliasedPath = moduleName.replace('@/', '');
+    const possibleExtensions = ['.ts', '.tsx', '.js', '.jsx', '.json'];
+    const srcPath = path.resolve(projectRoot, 'src', aliasedPath);
+
+    // Try exact path first, then with extensions
+    const fs = require('fs');
+
+    // Check if it's a directory with index file
+    if (fs.existsSync(srcPath) && fs.statSync(srcPath).isDirectory()) {
+      for (const ext of possibleExtensions) {
+        const indexPath = path.join(srcPath, `index${ext}`);
+        if (fs.existsSync(indexPath)) {
+          return {
+            filePath: indexPath,
+            type: 'sourceFile',
+          };
+        }
+      }
+    }
+
+    // Check with extensions
+    for (const ext of possibleExtensions) {
+      const fullPath = `${srcPath}${ext}`;
+      if (fs.existsSync(fullPath)) {
+        return {
+          filePath: fullPath,
+          type: 'sourceFile',
+        };
+      }
+    }
+  }
+
   // Fallback to default resolution
   return context.resolveRequest(context, moduleName, platform);
 };
