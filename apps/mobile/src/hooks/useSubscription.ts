@@ -50,7 +50,7 @@ interface UseSubscriptionResult {
  * const { isSubscribed, status } = useSubscription({
  *   table: 'moments',
  *   filter: `user_id=eq.${userId}`,
- *   onInsert: (payload) => console.log('New moment:', payload.new),
+ *   onInsert: (payload) => logger.info('New moment:', payload.new),
  *   enabled: !!userId,
  * });
  */
@@ -98,13 +98,11 @@ export const useSubscription = <
       );
       subscriptionManager.unsubscribe(id);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, id, config.table, config.filter]);
 
   const reconnect = useCallback(() => {
     subscriptionManager.unsubscribe(subscriptionIdRef.current);
     subscriptionManager.subscribe(subscriptionIdRef.current, config);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const _unsubscribe = useCallback(() => {
@@ -125,7 +123,7 @@ export const useSubscription = <
  *
  * @example
  * const { moments } = useUserMomentsSubscription(userId, {
- *   onInsert: (moment) => console.log('New moment:', moment),
+ *   onInsert: (moment) => logger.info('New moment:', moment),
  * });
  */
 export const useUserMomentsSubscription = (

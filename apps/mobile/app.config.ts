@@ -151,7 +151,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         organization: process.env.SENTRY_ORG || 'travelmatch-2p',
         project: process.env.SENTRY_PROJECT || 'react-native',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
+        // authToken is read automatically from SENTRY_AUTH_TOKEN env var
       },
     ],
     'expo-font',
@@ -161,6 +161,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       '@rnmapbox/maps',
       {
         RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
+        // Native SDK v11 with New Architecture support
+        RNMapboxMapsVersion: '11.17.0',
       },
     ],
     [
@@ -173,8 +175,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-local-authentication',
       {
-        faceIDPermission:
-          'TravelMatch uses Face ID for secure authentication.',
+        faceIDPermission: 'TravelMatch uses Face ID for secure authentication.',
       },
     ],
     [
@@ -225,7 +226,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         config: {
           organization: process.env.SENTRY_ORG || '',
           project: process.env.SENTRY_PROJECT || '',
-          authToken: process.env.SENTRY_AUTH_TOKEN || '',
+          // authToken is read automatically from SENTRY_AUTH_TOKEN env var
         },
       },
     ],

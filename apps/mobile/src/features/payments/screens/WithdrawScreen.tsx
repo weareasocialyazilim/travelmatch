@@ -262,7 +262,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
               <ActivityIndicator
                 size="small"
                 color={COLORS.white}
-                style={{ marginRight: 8 }}
+                style={styles.loadingIndicator}
               />
               <Text style={styles.confirmButtonText}>Processing...</Text>
             </>
@@ -279,6 +279,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  loadingIndicator: {
+    marginRight: 8,
   },
   header: {
     flexDirection: 'row',

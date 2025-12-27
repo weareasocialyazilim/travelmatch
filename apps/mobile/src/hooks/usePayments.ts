@@ -450,7 +450,6 @@ export const usePayments = (): UsePaymentsReturn => {
     refreshPaymentMethods();
     loadTransactions();
     fetchWithdrawalLimits();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

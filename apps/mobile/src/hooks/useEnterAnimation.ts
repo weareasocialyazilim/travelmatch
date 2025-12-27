@@ -43,7 +43,7 @@ interface UseEnterAnimationReturn {
 }
 
 export const useEnterAnimation = (
-  options: UseEnterAnimationOptions = {}
+  options: UseEnterAnimationOptions = {},
 ): UseEnterAnimationReturn => {
   const {
     delay = 0,
@@ -61,10 +61,7 @@ export const useEnterAnimation = (
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   const enter = () => {
@@ -75,15 +72,15 @@ export const useEnterAnimation = (
     } else {
       opacity.value = withDelay(
         delay,
-        withTiming(1, { duration, easing: Easing.out(Easing.cubic) })
+        withTiming(1, { duration, easing: Easing.out(Easing.cubic) }),
       );
       scale.value = withDelay(
         delay,
-        withTiming(1, { duration, easing: Easing.out(Easing.cubic) })
+        withTiming(1, { duration, easing: Easing.out(Easing.cubic) }),
       );
       translateY.value = withDelay(
         delay,
-        withTiming(0, { duration, easing: Easing.out(Easing.cubic) })
+        withTiming(0, { duration, easing: Easing.out(Easing.cubic) }),
       );
     }
   };
@@ -98,7 +95,6 @@ export const useEnterAnimation = (
     if (autoStart) {
       enter();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- enter should not trigger re-animation
   }, [autoStart]);
 
   return {
@@ -126,7 +122,7 @@ interface UseStaggeredAnimationOptions {
 }
 
 export const useStaggeredAnimation = (
-  options: UseStaggeredAnimationOptions
+  options: UseStaggeredAnimationOptions,
 ) => {
   const {
     index,
@@ -150,11 +146,13 @@ export const useStaggeredAnimation = (
  *
  * Simple fade in/out animation.
  */
-export const useFadeAnimation = (options: {
-  delay?: number;
-  duration?: number;
-  autoStart?: boolean;
-} = {}) => {
+export const useFadeAnimation = (
+  options: {
+    delay?: number;
+    duration?: number;
+    autoStart?: boolean;
+  } = {},
+) => {
   const { delay = 0, duration = 300, autoStart = true } = options;
 
   const opacity = useSharedValue(0);
@@ -166,7 +164,7 @@ export const useFadeAnimation = (options: {
   const fadeIn = () => {
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration, easing: Easing.out(Easing.cubic) })
+      withTiming(1, { duration, easing: Easing.out(Easing.cubic) }),
     );
   };
 
@@ -181,7 +179,6 @@ export const useFadeAnimation = (options: {
     if (autoStart) {
       fadeIn();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fadeIn should not trigger re-animation
   }, [autoStart]);
 
   return {
@@ -197,13 +194,15 @@ export const useFadeAnimation = (options: {
  *
  * Slide in from direction animation.
  */
-export const useSlideAnimation = (options: {
-  direction?: 'left' | 'right' | 'up' | 'down';
-  distance?: number;
-  delay?: number;
-  duration?: number;
-  autoStart?: boolean;
-} = {}) => {
+export const useSlideAnimation = (
+  options: {
+    direction?: 'left' | 'right' | 'up' | 'down';
+    distance?: number;
+    delay?: number;
+    duration?: number;
+    autoStart?: boolean;
+  } = {},
+) => {
   const {
     direction = 'up',
     distance = 50,
@@ -214,7 +213,7 @@ export const useSlideAnimation = (options: {
 
   const opacity = useSharedValue(0);
   const translate = useSharedValue(
-    direction === 'up' || direction === 'left' ? distance : -distance
+    direction === 'up' || direction === 'left' ? distance : -distance,
   );
 
   const isHorizontal = direction === 'left' || direction === 'right';
@@ -229,11 +228,11 @@ export const useSlideAnimation = (options: {
   const slideIn = () => {
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration, easing: Easing.out(Easing.cubic) })
+      withTiming(1, { duration, easing: Easing.out(Easing.cubic) }),
     );
     translate.value = withDelay(
       delay,
-      withSpring(0, { damping: 15, stiffness: 150 })
+      withSpring(0, { damping: 15, stiffness: 150 }),
     );
   };
 
@@ -241,7 +240,7 @@ export const useSlideAnimation = (options: {
     opacity.value = withTiming(0, { duration: duration / 2 });
     translate.value = withTiming(
       direction === 'up' || direction === 'left' ? -distance : distance,
-      { duration: duration / 2 }
+      { duration: duration / 2 },
     );
   };
 
@@ -249,7 +248,6 @@ export const useSlideAnimation = (options: {
     if (autoStart) {
       slideIn();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- slideIn should not trigger re-animation
   }, [autoStart]);
 
   return {

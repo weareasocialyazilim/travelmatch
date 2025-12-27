@@ -64,15 +64,11 @@ export const WelcomeScreen: React.FC<{
               onPress={() => navigation.navigate('Register')} // Mock action
               activeOpacity={0.8}
             >
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
+              <View style={styles.appleButtonContent}>
                 {/* Use text icon for now as we don't have Apple icon asset guaranteed */}
-                <Text style={[styles.primaryButtonText, { marginRight: 8 }]}>
+                <Text
+                  style={[styles.primaryButtonText, styles.appleIconSpacing]}
+                >
                   
                 </Text>
                 <Text style={styles.primaryButtonText}>
@@ -117,6 +113,14 @@ export const WelcomeScreen: React.FC<{
 };
 
 const styles = StyleSheet.create({
+  appleButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  appleIconSpacing: {
+    marginRight: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

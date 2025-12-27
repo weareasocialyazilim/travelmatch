@@ -123,7 +123,6 @@ export const useSafeTimeout = (componentName: string) => {
       currentTimers.forEach((timer) => clearTimeout(timer));
       timers.current = [];
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return safeSetTimeout;
@@ -152,7 +151,6 @@ export const useSafeInterval = (componentName: string) => {
       currentIntervals.forEach((interval) => clearInterval(interval));
       intervals.current = [];
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return safeSetInterval;
@@ -169,7 +167,7 @@ export const useMemoryMonitor = (componentName: string) => {
     // @ts-expect-error - performance.memory is non-standard
     if (typeof performance !== 'undefined' && performance.memory) {
       // @ts-expect-error - performance.memory types
-       
+
       const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
       const usage = (
         ((usedJSHeapSize as number) / (totalJSHeapSize as number)) *

@@ -39,7 +39,6 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
   useEffect(() => {
     // Send SMS on mount
     sendSmsCode();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run on mount
   }, []);
 
   useEffect(() => {

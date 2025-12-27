@@ -9,16 +9,18 @@
  */
 
 import {
-  checkRateLimit,
+  checkRateLimitSync as checkRateLimit,
   rateLimits,
   createRateLimitHeaders,
   RateLimitConfig,
   RateLimitResult,
+  resetToInMemoryStore,
 } from '../rate-limit';
 
 describe('Rate Limit', () => {
   beforeEach(() => {
     // Clear any existing rate limit entries between tests
+    resetToInMemoryStore();
     jest.useFakeTimers();
   });
 
@@ -150,7 +152,9 @@ describe('Rate Limit', () => {
 
     it('should have strictest limits for auth', () => {
       expect(rateLimits.auth.limit).toBeLessThanOrEqual(rateLimits.api.limit);
-      expect(rateLimits.auth.windowMs).toBeGreaterThanOrEqual(rateLimits.api.windowMs);
+      expect(rateLimits.auth.windowMs).toBeGreaterThanOrEqual(
+        rateLimits.api.windowMs,
+      );
     });
   });
 

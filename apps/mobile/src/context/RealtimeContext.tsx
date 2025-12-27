@@ -422,7 +422,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
 
       typingDebounceRef.current.set(conversationId, timer);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sendTypingStop is stable and defined below
+
     [user, emit],
   );
 
@@ -473,7 +473,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     return () => {
       disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   // Handle app state changes
@@ -601,7 +600,6 @@ export const useRealtimeEvent = <T,>(
   useEffect(() => {
     const unsubscribe = subscribe<T>(event, handler);
     return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event, subscribe, ...deps]);
 };
 

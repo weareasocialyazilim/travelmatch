@@ -20,7 +20,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
+import { TYPOGRAPHY } from '../theme/typography';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
 import { SPACING } from '../constants/spacing';

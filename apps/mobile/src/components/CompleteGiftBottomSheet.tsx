@@ -47,7 +47,6 @@ export const CompleteGiftBottomSheet: React.FC<
       translateY.value = withTiming(500, { duration: 200 });
       opacity.value = withTiming(0, { duration: 200 });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({

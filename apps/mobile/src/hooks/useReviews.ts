@@ -314,7 +314,6 @@ export const useReviews = (): UseReviewsReturn => {
     void refreshReceived();
     void refreshPending();
     void fetchMyStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

@@ -146,7 +146,9 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
 
     // Use fallback search if Mapbox token is not configured
     if (!MAPBOX_ACCESS_TOKEN) {
-      logger.warn('CityAutocomplete: Mapbox token not configured, using fallback cities');
+      logger.warn(
+        'CityAutocomplete: Mapbox token not configured, using fallback cities',
+      );
       const filtered = FALLBACK_CITIES.filter(
         (city) =>
           city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -208,7 +210,6 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
     } finally {
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- FALLBACK_CITIES is a module-level constant
   }, []);
 
   const handleTextChange = useCallback(

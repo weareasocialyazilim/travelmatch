@@ -31,33 +31,8 @@ import type {
   PendingPayment,
   PendingUpload,
 } from './src/services/pendingTransactionsService';
-import * as Sentry from '@sentry/react-native';
-import Constants from 'expo-constants';
-
-Sentry.init({
-  dsn:
-    Constants.expoConfig?.extra?.sentryDsn ||
-    process.env.EXPO_PUBLIC_SENTRY_DSN ||
-    'https://4e851e74a8a6ecab750e2f4a8933e6c8@o4510544957800448.ingest.de.sentry.io/4510550169354320',
-
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
-  sendDefaultPii: true,
-
-  // Enable Logs
-  enableLogs: true,
-
-  // Configure Session Replay
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1,
-  integrations: [
-    Sentry.mobileReplayIntegration(),
-    Sentry.feedbackIntegration(),
-  ],
-
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
-});
+// Sentry is initialized lazily in useEffect to avoid JSI runtime issues with New Architecture
+// See: src/config/sentry.ts for full configuration
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -76,7 +51,8 @@ const styles = StyleSheet.create({
 
 type AppInitState = 'initializing' | 'ready' | 'error';
 
-export default Sentry.wrap(function App() {
+// App component - Sentry.wrap is applied after Sentry is initialized in useEffect
+function App() {
   // App state
   const [appInitState, setAppInitState] =
     useState<AppInitState>('initializing');
@@ -286,4 +262,6 @@ export default Sentry.wrap(function App() {
       </ErrorBoundary>
     </GestureHandlerRootView>
   );
-});
+}
+
+export default App;

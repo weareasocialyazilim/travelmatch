@@ -20,9 +20,9 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
-import type { BootstrapProgress, ServiceName } from '@/services/appBootstrap';
+import { COLORS } from '../constants/colors';
+import { TYPOGRAPHY } from '../theme/typography';
+import type { BootstrapProgress, ServiceName } from '../services/appBootstrap';
 
 // Asset imports - using require is necessary for local image assets
 

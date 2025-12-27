@@ -286,7 +286,7 @@ const WalletScreen = () => {
         <Text style={styles.sectionTitle}>Transactions</Text>
 
         {/* Transaction List */}
-        <View style={{ minHeight: 300 }}>
+        <View style={styles.transactionListContainer}>
           <FlashList
             data={filteredTransactions}
             renderItem={renderTransactionItem}
@@ -308,6 +308,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  transactionListContainer: {
+    minHeight: 300,
   },
   header: {
     flexDirection: 'row',

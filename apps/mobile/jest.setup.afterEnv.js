@@ -1,4 +1,20 @@
-require('react-native-gesture-handler/jestSetup');
+// Setup react-native-gesture-handler mocks inline to avoid babel transformation issues
+jest.mock('react-native-gesture-handler', () => ({
+  GestureHandlerRootView: ({ children }) => children,
+  ScrollView: require('react-native').ScrollView,
+  FlatList: require('react-native').FlatList,
+  Pressable: require('react-native').Pressable,
+  TouchableOpacity: require('react-native').TouchableOpacity,
+  TouchableHighlight: require('react-native').TouchableHighlight,
+  TouchableWithoutFeedback: require('react-native').TouchableWithoutFeedback,
+  TouchableNativeFeedback: require('react-native').TouchableNativeFeedback,
+  State: {},
+  PanGestureHandler: 'View',
+  BaseButton: 'View',
+  Directions: {},
+  TapGestureHandler: 'View',
+  gestureHandlerRootHOC: (component) => component,
+}));
 
 // Set global __DEV__ for React Native
 global.__DEV__ = true;
@@ -245,9 +261,15 @@ jest.mock('./src/config/supabase', () => ({
     })),
     storage: {
       from: jest.fn(() => ({
-        upload: jest.fn(() => Promise.resolve({ data: { path: 'test-path' }, error: null })),
-        download: jest.fn(() => Promise.resolve({ data: new Blob(), error: null })),
-        getPublicUrl: jest.fn(() => ({ data: { publicUrl: 'https://example.com/test.jpg' } })),
+        upload: jest.fn(() =>
+          Promise.resolve({ data: { path: 'test-path' }, error: null }),
+        ),
+        download: jest.fn(() =>
+          Promise.resolve({ data: new Blob(), error: null }),
+        ),
+        getPublicUrl: jest.fn(() => ({
+          data: { publicUrl: 'https://example.com/test.jpg' },
+        })),
         remove: jest.fn(() => Promise.resolve({ data: null, error: null })),
         list: jest.fn(() => Promise.resolve({ data: [], error: null })),
       })),

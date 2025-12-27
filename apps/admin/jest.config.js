@@ -14,6 +14,9 @@ module.exports = {
     '!src/app/**/*.tsx', // Exclude Next.js page components
   ],
   moduleNameMapper: {
+    // Explicit mappings for jest.mock hoisting (must come first)
+    '^@/lib/utils$': '<rootDir>/src/lib/utils',
+    // General path alias
     '^@/(.*)$': '<rootDir>/src/$1',
     // Handle CSS imports (for Tailwind and other styles)
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',

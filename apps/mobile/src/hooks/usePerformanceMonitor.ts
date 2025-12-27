@@ -70,7 +70,7 @@ interface UsePerformanceMonitorReturn {
  * const MyComponent = () => {
  *   const { metrics, startMeasure, endMeasure } = usePerformanceMonitor('MyComponent', {
  *     slowRenderThreshold: 16,
- *     onSlowRender: (m) => console.warn('Slow render:', m.lastRenderDuration),
+ *     onSlowRender: (m) => logger.warn('Slow render:', m.lastRenderDuration),
  *   });
  *
  *   // For custom measurements
@@ -78,7 +78,7 @@ interface UsePerformanceMonitorReturn {
  *     startMeasure('dataFetch');
  *     const data = await fetchData();
  *     const duration = endMeasure('dataFetch');
- *     console.log(`Fetch took ${duration}ms`);
+ *     logger.debug(`Fetch took ${duration}ms`);
  *   };
  *
  *   return <View>...</View>;
@@ -176,7 +176,6 @@ export function usePerformanceMonitor(
 
       onUnmount?.(finalMetrics);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startMeasure = useCallback((name: string) => {

@@ -97,12 +97,7 @@ export const TransactionDetailScreen: React.FC<
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View
-          style={[
-            styles.container,
-            { justifyContent: 'center', alignItems: 'center' },
-          ]}
-        >
+        <View style={[styles.container, styles.centerContent]}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
@@ -112,18 +107,13 @@ export const TransactionDetailScreen: React.FC<
   if (!transaction) {
     return (
       <SafeAreaView style={styles.container}>
-        <View
-          style={[
-            styles.container,
-            { justifyContent: 'center', alignItems: 'center' },
-          ]}
-        >
-          <Text style={{ color: COLORS.text }}>Transaction not found</Text>
+        <View style={[styles.container, styles.centerContent]}>
+          <Text style={styles.errorText}>Transaction not found</Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{ marginTop: 20 }}
+            style={styles.goBackButton}
           >
-            <Text style={{ color: COLORS.primary }}>Go Back</Text>
+            <Text style={styles.goBackText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -310,6 +300,19 @@ export const TransactionDetailScreen: React.FC<
 const styles = StyleSheet.create({
   actions: {
     marginTop: LAYOUT.padding * 2,
+  },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: COLORS.text,
+  },
+  goBackButton: {
+    marginTop: 20,
+  },
+  goBackText: {
+    color: COLORS.primary,
   },
   amount: {
     color: COLORS.text,

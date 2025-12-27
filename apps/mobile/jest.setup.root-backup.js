@@ -1,4 +1,20 @@
-require('react-native-gesture-handler/jestSetup');
+// Setup react-native-gesture-handler mocks inline to avoid babel transformation issues
+jest.mock('react-native-gesture-handler', () => ({
+  GestureHandlerRootView: ({ children }) => children,
+  ScrollView: require('react-native').ScrollView,
+  FlatList: require('react-native').FlatList,
+  Pressable: require('react-native').Pressable,
+  TouchableOpacity: require('react-native').TouchableOpacity,
+  TouchableHighlight: require('react-native').TouchableHighlight,
+  TouchableWithoutFeedback: require('react-native').TouchableWithoutFeedback,
+  TouchableNativeFeedback: require('react-native').TouchableNativeFeedback,
+  State: {},
+  PanGestureHandler: 'View',
+  BaseButton: 'View',
+  Directions: {},
+  TapGestureHandler: 'View',
+  gestureHandlerRootHOC: (component) => component,
+}));
 
 // Set global __DEV__ for React Native
 global.__DEV__ = true;
@@ -22,9 +38,9 @@ try {
         // ignore diagnostic errors
       }
       // Log and throw to help tests show where this came from
-       
+
       console.error('CREATE_ELEMENT_GUARD: invalid element type ->', info);
-       
+
       console.error(new Error('CREATE_ELEMENT_GUARD_STACK').stack);
       throw new Error(
         'EARLY_CREATE_ELEMENT_INVALID: element type is ' + String(type),
@@ -35,7 +51,6 @@ try {
     // log its keys to help identify import mismatches.
     if (typeof type === 'object' && type !== null && !type.$$typeof) {
       try {
-         
         console.error(
           'CREATE_ELEMENT_GUARD: unexpected object element type keys ->',
           Object.keys(type),
@@ -45,7 +60,6 @@ try {
           (typeof type.default === 'function' ||
             typeof type.default === 'object')
         ) {
-           
           console.error(
             'CREATE_ELEMENT_GUARD: object.default exists, type of default ->',
             typeof type.default,
@@ -247,9 +261,15 @@ jest.mock('./src/config/supabase', () => ({
     })),
     storage: {
       from: jest.fn(() => ({
-        upload: jest.fn(() => Promise.resolve({ data: { path: 'test-path' }, error: null })),
-        download: jest.fn(() => Promise.resolve({ data: new Blob(), error: null })),
-        getPublicUrl: jest.fn(() => ({ data: { publicUrl: 'https://example.com/test.jpg' } })),
+        upload: jest.fn(() =>
+          Promise.resolve({ data: { path: 'test-path' }, error: null }),
+        ),
+        download: jest.fn(() =>
+          Promise.resolve({ data: new Blob(), error: null }),
+        ),
+        getPublicUrl: jest.fn(() => ({
+          data: { publicUrl: 'https://example.com/test.jpg' },
+        })),
         remove: jest.fn(() => Promise.resolve({ data: null, error: null })),
         list: jest.fn(() => Promise.resolve({ data: [], error: null })),
       })),
@@ -428,13 +448,13 @@ try {
               const parsedMin = min
                 ? Number(min)
                 : captured['Min price']
-                ? Number(captured['Min price'])
-                : undefined;
+                  ? Number(captured['Min price'])
+                  : undefined;
               const parsedMax = max
                 ? Number(max)
                 : captured['Max price']
-                ? Number(captured['Max price'])
-                : undefined;
+                  ? Number(captured['Max price'])
+                  : undefined;
               try {
                 const useMomentsFn = require('@/hooks/useMoments').useMoments;
                 if (typeof useMomentsFn === 'function') {
@@ -584,12 +604,12 @@ try {
         illustration
           ? illustration
           : illustrationType
-          ? React.createElement(
-              Text,
-              { testID: `illustration-${illustrationType}` },
-              illustrationType,
-            )
-          : React.createElement(View, { testID: 'icon-container' }),
+            ? React.createElement(
+                Text,
+                { testID: `illustration-${illustrationType}` },
+                illustrationType,
+              )
+            : React.createElement(View, { testID: 'icon-container' }),
         React.createElement(Text, { testID: 'empty-state-title' }, title),
         desc
           ? React.createElement(
@@ -655,8 +675,8 @@ try {
       const viewId = horizontal
         ? 'stories-view'
         : numColumns && numColumns > 1
-        ? 'grid-view'
-        : 'list-view';
+          ? 'grid-view'
+          : 'list-view';
 
       const handleScroll = (e) => {
         try {
