@@ -31,7 +31,7 @@ interface LogContext {
 class ProductionLogger {
   private shouldLog(level: LogLevel): boolean {
     // Production: Only log warnings and errors
-    if (isProduction) {
+    if (isProduction()) {
       return level === 'warn' || level === 'error';
     }
     // Development: Log everything
@@ -45,11 +45,19 @@ class ProductionLogger {
     if (!context) return undefined;
 
     const sanitized: LogContext = {};
-    const sensitiveKeys = ['password', 'token', 'apiKey', 'secret', 'creditCard'];
+    const sensitiveKeys = [
+      'password',
+      'token',
+      'apiKey',
+      'secret',
+      'creditCard',
+    ];
 
     for (const [key, value] of Object.entries(context)) {
       // Redact sensitive fields
-      if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
+      if (
+        sensitiveKeys.some((sk) => key.toLowerCase().includes(sk.toLowerCase()))
+      ) {
         sanitized[key] = '[REDACTED]';
       } else {
         sanitized[key] = value;
@@ -65,7 +73,7 @@ class ProductionLogger {
   debug(message: string, context?: LogContext): void {
     if (!this.shouldLog('debug')) return;
 
-    if (isDevelopment && __DEV__) {
+    if (isDevelopment() && __DEV__) {
       console.log(`[DEBUG] ${message}`, this.sanitizeContext(context));
     }
   }
@@ -76,12 +84,12 @@ class ProductionLogger {
   info(message: string, context?: LogContext): void {
     if (!this.shouldLog('info')) return;
 
-    if (isDevelopment && __DEV__) {
+    if (isDevelopment() && __DEV__) {
       console.log(`[INFO] ${message}`, this.sanitizeContext(context));
     }
 
     // Production: Add breadcrumb for Sentry
-    if (isProduction) {
+    if (isProduction()) {
       Sentry.addBreadcrumb({
         message,
         level: 'info',
@@ -144,7 +152,7 @@ class ProductionLogger {
   async measure<T>(
     operationName: string,
     operation: () => Promise<T>,
-    context?: LogContext
+    context?: LogContext,
   ): Promise<T> {
     const startTime = Date.now();
 
@@ -161,14 +169,10 @@ class ProductionLogger {
     } catch (error) {
       const duration = Date.now() - startTime;
 
-      this.error(
-        `${operationName} failed`,
-        error as Error,
-        {
-          ...context,
-          duration: `${duration}ms`,
-        }
-      );
+      this.error(`${operationName} failed`, error as Error, {
+        ...context,
+        duration: `${duration}ms`,
+      });
 
       throw error;
     }
