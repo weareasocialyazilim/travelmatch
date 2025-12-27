@@ -229,16 +229,31 @@ jest.mock('./src/config/supabase', () => ({
       update: jest.fn().mockReturnThis(),
       delete: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
+      neq: jest.fn().mockReturnThis(),
       in: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
+      range: jest.fn().mockReturnThis(),
       single: jest.fn(() => Promise.resolve({ data: null, error: null })),
+      maybeSingle: jest.fn(() => Promise.resolve({ data: null, error: null })),
     })),
+    functions: {
+      invoke: jest.fn(() => Promise.resolve({ data: null, error: null })),
+    },
     channel: jest.fn(() => ({
       on: jest.fn().mockReturnThis(),
       subscribe: jest.fn(() => Promise.resolve('SUBSCRIBED')),
       unsubscribe: jest.fn(() => Promise.resolve('UNSUBSCRIBED')),
     })),
+    storage: {
+      from: jest.fn(() => ({
+        upload: jest.fn(() => Promise.resolve({ data: { path: 'test-path' }, error: null })),
+        download: jest.fn(() => Promise.resolve({ data: new Blob(), error: null })),
+        getPublicUrl: jest.fn(() => ({ data: { publicUrl: 'https://example.com/test.jpg' } })),
+        remove: jest.fn(() => Promise.resolve({ data: null, error: null })),
+        list: jest.fn(() => Promise.resolve({ data: [], error: null })),
+      })),
+    },
   },
 }));
 
