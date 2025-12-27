@@ -60,7 +60,7 @@ def read_file_safely(filepath: str, base_dir: str = None) -> str:
     no path traversal attacks are possible.
     """
     safe_path = validate_safe_path(filepath, base_dir)
-    with open(safe_path, 'r', encoding='utf-8') as f:
+    with open(safe_path, 'r', encoding='utf-8') as f:  # nosec B602 - path validated by validate_safe_path
         return f.read()
 
 
