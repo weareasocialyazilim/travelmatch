@@ -16,6 +16,7 @@ import {
   useDeferredValue,
 } from 'react';
 import type { DependencyList } from 'react';
+import { logger } from '@/utils/logger';
 
 /**
  * Creates a stable callback reference that always calls the latest version
@@ -215,7 +216,6 @@ export function useMemoizedCallback<T extends (...args: never[]) => unknown>(
   callback: T,
   deps: DependencyList,
 ): T {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(callback, deps);
 }
 
@@ -278,7 +278,7 @@ function shallowEqual(a: unknown, b: unknown): boolean {
  * @example
  * useUpdateEffect(() => {
  *   // This only runs when count changes, not on mount
- *   console.log('count updated:', count);
+ *   logger.debug('count updated:', count);
  * }, [count]);
  */
 export function useUpdateEffect(
@@ -293,7 +293,6 @@ export function useUpdateEffect(
       return;
     }
     return effect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 
@@ -307,7 +306,7 @@ export function useUpdateEffect(
  * @example
  * const latestValue = useLatest(someValue);
  * const handleClick = useCallback(() => {
- *   console.log(latestValue.current); // Always current, no stale closure
+ *   logger.debug(latestValue.current); // Always current, no stale closure
  * }, []); // No need to add someValue to deps
  */
 export function useLatest<T>(value: T): React.MutableRefObject<T> {
@@ -401,7 +400,7 @@ export function useRenderCount(componentName: string): void {
   useEffect(() => {
     renderCount.current += 1;
     if (__DEV__) {
-      console.log(`[Render] ${componentName}: ${renderCount.current}`);
+      logger.debug(`[Render] ${componentName}: ${renderCount.current}`);
     }
   });
 }
@@ -436,7 +435,7 @@ export function useWhyDidUpdate(
       });
 
       if (Object.keys(changedProps).length > 0) {
-        console.log(`[Why Update] ${componentName}:`, changedProps);
+        logger.debug(`[Why Update] ${componentName}:`, changedProps);
       }
     }
 

@@ -172,7 +172,6 @@ export function useAsync<T, Args extends unknown[] = []>(
     if (immediate) {
       void execute(...([] as unknown as Args));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -246,7 +245,7 @@ export function useAsyncCallback<T, Args extends unknown[] = []>(
         return null;
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     deps,
   );
 

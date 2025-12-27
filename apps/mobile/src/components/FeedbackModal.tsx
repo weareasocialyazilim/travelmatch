@@ -22,12 +22,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { RADII } from '@/constants/radii';
-import { SPACING } from '@/constants/spacing';
-import { useHaptics } from '@/hooks/useHaptics';
-import { analytics } from '@/services/analytics';
-import { feedbackSchema, type FeedbackInput } from '@/utils/forms';
-import { canSubmitForm } from '@/utils/forms/helpers';
+import { RADII } from '../constants/radii';
+import { SPACING } from '../constants/spacing';
+import { useHaptics } from '../hooks/useHaptics';
+import { analytics } from '../services/analytics';
+import { feedbackSchema, type FeedbackInput } from '../utils/forms';
+import { canSubmitForm } from '../utils/forms/helpers';
 import { COLORS } from '../constants/colors';
 
 interface FeedbackModalProps {
@@ -63,22 +63,16 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   const { impact } = useHaptics();
 
-  const {
-    control,
-    handleSubmit,
-    formState,
-    setValue,
-    watch,
-    reset,
-  } = useForm<FeedbackInput>({
-    resolver: zodResolver(feedbackSchema),
-    mode: 'onChange',
-    defaultValues: {
-      rating: 0,
-      category: '',
-      comment: '',
-    },
-  });
+  const { control, handleSubmit, formState, setValue, watch, reset } =
+    useForm<FeedbackInput>({
+      resolver: zodResolver(feedbackSchema),
+      mode: 'onChange',
+      defaultValues: {
+        rating: 0,
+        category: '',
+        comment: '',
+      },
+    });
 
   const rating = watch('rating');
   const category = watch('category');
@@ -95,7 +89,6 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     } else {
       opacity.value = withTiming(0, { duration: 200 });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const handleRatingPress = (value: number) => {
@@ -209,8 +202,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   <Text
                     style={[
                       styles.categoryText,
-                      category === cat &&
-                        styles.categoryTextActive,
+                      category === cat && styles.categoryTextActive,
                     ]}
                   >
                     {cat}
@@ -239,7 +231,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     onBlur={onBlur}
                     maxLength={500}
                   />
-                  <Text style={styles.charCount}>{(value?.length || 0)}/500</Text>
+                  <Text style={styles.charCount}>{value?.length || 0}/500</Text>
                 </>
               )}
             />

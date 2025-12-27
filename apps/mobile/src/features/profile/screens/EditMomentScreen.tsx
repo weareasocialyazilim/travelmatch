@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  SafeAreaView,} from 'react-native';
+  SafeAreaView,
+} from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -42,15 +43,16 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
 
   const [loading, setLoading] = useState(false);
 
-  const { control, handleSubmit, formState, setValue } = useForm<EditMomentInput>({
-    resolver: zodResolver(editMomentSchema),
-    mode: 'onChange',
-    defaultValues: {
-      title: '',
-      description: '',
-      price: 0,
-    },
-  });
+  const { control, handleSubmit, formState, setValue } =
+    useForm<EditMomentInput>({
+      resolver: zodResolver(editMomentSchema),
+      mode: 'onChange',
+      defaultValues: {
+        title: '',
+        description: '',
+        price: 0,
+      },
+    });
 
   useEffect(() => {
     const fetchMoment = async () => {
@@ -74,7 +76,6 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
       }
     };
     fetchMoment();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [momentId, setValue]);
 
   const handleSave = async (data: EditMomentInput) => {
@@ -130,7 +131,10 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
         <Controller
           control={control}
           name="title"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Title</Text>
               <TextInput
@@ -141,9 +145,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
                 onChangeText={onChange}
                 onBlur={onBlur}
               />
-              {error && (
-                <Text style={styles.errorText}>{error.message}</Text>
-              )}
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
         />
@@ -152,11 +154,18 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
         <Controller
           control={control}
           name="description"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Description</Text>
               <TextInput
-                style={[styles.input, styles.textArea, error && styles.inputError]}
+                style={[
+                  styles.input,
+                  styles.textArea,
+                  error && styles.inputError,
+                ]}
                 placeholder="Tell us about this moment"
                 placeholderTextColor={COLORS.textSecondary}
                 value={value}
@@ -166,9 +175,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
                 numberOfLines={6}
                 textAlignVertical="top"
               />
-              {error && (
-                <Text style={styles.errorText}>{error.message}</Text>
-              )}
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
         />
@@ -177,7 +184,10 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
         <Controller
           control={control}
           name="price"
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Price</Text>
               <View style={styles.priceInputWrapper}>
@@ -188,7 +198,11 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
                   style={styles.priceIcon}
                 />
                 <TextInput
-                  style={[styles.input, styles.priceInput, error && styles.inputError]}
+                  style={[
+                    styles.input,
+                    styles.priceInput,
+                    error && styles.inputError,
+                  ]}
                   placeholder="0.00"
                   placeholderTextColor={COLORS.textSecondary}
                   value={value.toString()}
@@ -200,9 +214,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
                   keyboardType="decimal-pad"
                 />
               </View>
-              {error && (
-                <Text style={styles.errorText}>{error.message}</Text>
-              )}
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
         />
@@ -213,7 +225,8 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.saveButton,
-            (loading || !canSubmitForm({ formState })) && styles.saveButtonDisabled,
+            (loading || !canSubmitForm({ formState })) &&
+              styles.saveButtonDisabled,
           ]}
           onPress={handleSubmit(handleSave)}
           disabled={loading || !canSubmitForm({ formState })}

@@ -56,7 +56,6 @@ export const useNetwork = (): UseNetworkReturn => {
         }
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleNetInfoChange = useCallback((state: NetInfoState) => {

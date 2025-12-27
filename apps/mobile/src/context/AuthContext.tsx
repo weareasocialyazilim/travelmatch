@@ -14,7 +14,7 @@
  * // Login
  * const result = await login({ email: 'user@example.com', password: 'secret' });
  * if (result.success) {
- *   console.log('Logged in as:', user?.name);
+ *   logger.info('Logged in as:', user?.name);
  * }
  *
  * // Logout
@@ -654,14 +654,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       resetPassword,
       changePassword,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Functions are stable within provider lifecycle
+
     [user, authState, isAuthenticated, isLoading],
   );
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

@@ -48,7 +48,6 @@ const DataPrivacyScreen = () => {
 
   useEffect(() => {
     loadConsentSettings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadConsentSettings = async () => {

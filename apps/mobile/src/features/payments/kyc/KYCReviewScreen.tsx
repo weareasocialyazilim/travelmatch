@@ -5,7 +5,8 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,} from 'react-native';
+  ActivityIndicator,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
@@ -55,7 +56,6 @@ const KYCReviewScreen: React.FC = () => {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmed, navigation]);
 
   const handleEditPersonal = () => {

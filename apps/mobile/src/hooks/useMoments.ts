@@ -372,7 +372,7 @@ export const useMoments = (): UseMomentsReturn => {
         return null;
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [],
   );
 
@@ -462,7 +462,7 @@ export const useMoments = (): UseMomentsReturn => {
         return null;
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [],
   );
 

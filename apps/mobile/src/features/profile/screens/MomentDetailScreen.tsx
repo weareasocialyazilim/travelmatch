@@ -184,7 +184,6 @@ const MomentDetailScreen: React.FC = () => {
     } finally {
       setActionLoading(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionLoading, saveMoment, moment.id, isSaved, trackInteraction]);
 
   const handleDelete = useCallback(() => {

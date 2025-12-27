@@ -35,7 +35,6 @@ export const DeleteMomentModal: React.FC<DeleteMomentModalProps> = ({
       translateY.value = withTiming(50, { duration: 200 });
       opacity.value = withTiming(0, { duration: 200 });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({

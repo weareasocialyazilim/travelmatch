@@ -97,17 +97,10 @@ export const Skeleton = memo<SkeletonLoaderProps>(function Skeleton({
       />
       {shimmer && (
         <Animated.View
-          style={[
-            styles.shimmerContainer,
-            { transform: [{ translateX }] },
-          ]}
+          style={[styles.shimmerContainer, { transform: [{ translateX }] }]}
         >
           <LinearGradient
-            colors={[
-              'transparent',
-              'rgba(255, 255, 255, 0.4)',
-              'transparent',
-            ]}
+            colors={['transparent', 'rgba(255, 255, 255, 0.4)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.shimmerGradient}
@@ -141,7 +134,7 @@ export const SkeletonText: React.FC<SkeletonTextProps> = ({
         width={index === lines - 1 ? lastLineWidth : '100%'}
         height={lineHeight}
         borderRadius={4}
-        style={index > 0 ? { marginTop: 8 } : undefined}
+        style={index > 0 ? styles.lineSpacing : undefined}
       />
     ))}
   </View>
@@ -159,12 +152,7 @@ export const SkeletonAvatar: React.FC<SkeletonAvatarProps> = ({
   size = 48,
   style,
 }) => (
-  <Skeleton
-    width={size}
-    height={size}
-    borderRadius={size / 2}
-    style={style}
-  />
+  <Skeleton width={size} height={size} borderRadius={size / 2} style={style} />
 );
 
 // Preset skeletons
@@ -181,7 +169,12 @@ export const SkeletonCard: React.FC<{ style?: ViewStyle }> = ({ style }) => (
       </View>
       <Skeleton width="80%" height={20} style={styles.marginTop} />
       <SkeletonText lines={2} style={styles.marginTop} />
-      <Skeleton width="100%" height={48} borderRadius={24} style={styles.marginTopLg} />
+      <Skeleton
+        width="100%"
+        height={48}
+        borderRadius={24}
+        style={styles.marginTopLg}
+      />
     </View>
   </View>
 );
@@ -201,7 +194,9 @@ export const SkeletonListItem: React.FC<{ style?: ViewStyle }> = ({
 /**
  * SkeletonWishCard - Skeleton for WishCard component
  */
-export const SkeletonWishCard: React.FC<{ style?: ViewStyle }> = ({ style }) => {
+export const SkeletonWishCard: React.FC<{ style?: ViewStyle }> = ({
+  style,
+}) => {
   const cardWidth = SCREEN_WIDTH - 32;
   const cardHeight = cardWidth * 1.25;
 
@@ -239,12 +234,19 @@ export const SkeletonMessage: React.FC<{
     {!isOwn && <SkeletonAvatar size={32} style={styles.messageAvatar} />}
     <View style={[styles.messageBubble, isOwn && styles.messageBubbleOwn]}>
       <Skeleton width={isOwn ? 120 : 180} height={14} />
-      <Skeleton width={isOwn ? 80 : 140} height={14} style={styles.marginTopSm} />
+      <Skeleton
+        width={isOwn ? 80 : 140}
+        height={14}
+        style={styles.marginTopSm}
+      />
     </View>
   </View>
 );
 
 const styles = StyleSheet.create({
+  lineSpacing: {
+    marginTop: 8,
+  },
   skeleton: {
     backgroundColor: COLORS.gray[200],
     overflow: 'hidden',

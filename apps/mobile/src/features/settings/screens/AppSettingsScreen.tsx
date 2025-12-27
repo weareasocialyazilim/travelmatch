@@ -103,28 +103,57 @@ const AppSettingsScreen: React.FC = () => {
   ].filter(Boolean).length;
 
   // Settings sections for search filtering
-  const settingsSections = useMemo(() => [
-    { id: 'notifications', label: 'Notifications', keywords: ['push', 'alert', 'sound', 'chat', 'request', 'marketing'] },
-    { id: 'privacy', label: 'Profile Visibility', keywords: ['privacy', 'visible', 'discoverable', 'hidden'] },
-    { id: 'language', label: 'Language', keywords: ['language', 'english', 'turkish', 'translate'] },
-    { id: 'invite', label: 'Invite Friends', keywords: ['invite', 'share', 'friends', 'referral'] },
-    { id: 'terms', label: 'Terms of Service', keywords: ['terms', 'legal', 'agreement'] },
-    { id: 'privacyPolicy', label: 'Privacy Policy', keywords: ['privacy', 'policy', 'data', 'gdpr'] },
-  ], []);
+  const settingsSections = useMemo(
+    () => [
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        keywords: ['push', 'alert', 'sound', 'chat', 'request', 'marketing'],
+      },
+      {
+        id: 'privacy',
+        label: 'Profile Visibility',
+        keywords: ['privacy', 'visible', 'discoverable', 'hidden'],
+      },
+      {
+        id: 'language',
+        label: 'Language',
+        keywords: ['language', 'english', 'turkish', 'translate'],
+      },
+      {
+        id: 'invite',
+        label: 'Invite Friends',
+        keywords: ['invite', 'share', 'friends', 'referral'],
+      },
+      {
+        id: 'terms',
+        label: 'Terms of Service',
+        keywords: ['terms', 'legal', 'agreement'],
+      },
+      {
+        id: 'privacyPolicy',
+        label: 'Privacy Policy',
+        keywords: ['privacy', 'policy', 'data', 'gdpr'],
+      },
+    ],
+    [],
+  );
 
   // Filter sections based on search query
   const filteredSections = useMemo(() => {
-    if (!searchQuery.trim()) return settingsSections.map(s => s.id);
+    if (!searchQuery.trim()) return settingsSections.map((s) => s.id);
     const query = searchQuery.toLowerCase();
     return settingsSections
-      .filter(section =>
-        section.label.toLowerCase().includes(query) ||
-        section.keywords.some(keyword => keyword.includes(query))
+      .filter(
+        (section) =>
+          section.label.toLowerCase().includes(query) ||
+          section.keywords.some((keyword) => keyword.includes(query)),
       )
-      .map(s => s.id);
+      .map((s) => s.id);
   }, [searchQuery, settingsSections]);
 
-  const shouldShowSection = (sectionId: string) => filteredSections.includes(sectionId);
+  const shouldShowSection = (sectionId: string) =>
+    filteredSections.includes(sectionId);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -214,226 +243,226 @@ const AppSettingsScreen: React.FC = () => {
 
         {/* Notifications - Expandable */}
         {shouldShowSection('notifications') && (
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.settingsCard}
-            onPress={toggleNotifications}
-            activeOpacity={0.7}
-          >
-            <View style={styles.settingItem}>
-              <View
-                style={[
-                  styles.settingIcon,
-                  { backgroundColor: COLORS.coralTransparent },
-                ]}
-              >
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.settingsCard}
+              onPress={toggleNotifications}
+              activeOpacity={0.7}
+            >
+              <View style={styles.settingItem}>
+                <View
+                  style={[
+                    styles.settingIcon,
+                    { backgroundColor: COLORS.coralTransparent },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="bell"
+                    size={20}
+                    color={COLORS.coral}
+                  />
+                </View>
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>Notifications</Text>
+                  <Text style={styles.settingDesc}>
+                    {pushEnabled
+                      ? `${enabledNotificationsCount} of 3 enabled`
+                      : 'All disabled'}
+                  </Text>
+                </View>
+                <Switch
+                  value={pushEnabled}
+                  onValueChange={(value) => {
+                    setPushEnabled(value);
+                    if (!value) {
+                      setChatNotifications(false);
+                      setRequestNotifications(false);
+                      setMarketingNotifications(false);
+                    }
+                  }}
+                  trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                  thumbColor={COLORS.white}
+                />
                 <MaterialCommunityIcons
-                  name="bell"
+                  name={notificationsExpanded ? 'chevron-up' : 'chevron-down'}
                   size={20}
-                  color={COLORS.coral}
+                  color={COLORS.softGray}
+                  style={styles.chevronIcon}
                 />
               </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Notifications</Text>
-                <Text style={styles.settingDesc}>
-                  {pushEnabled
-                    ? `${enabledNotificationsCount} of 3 enabled`
-                    : 'All disabled'}
-                </Text>
-              </View>
-              <Switch
-                value={pushEnabled}
-                onValueChange={(value) => {
-                  setPushEnabled(value);
-                  if (!value) {
-                    setChatNotifications(false);
-                    setRequestNotifications(false);
-                    setMarketingNotifications(false);
-                  }
-                }}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-              />
-              <MaterialCommunityIcons
-                name={notificationsExpanded ? 'chevron-up' : 'chevron-down'}
-                size={20}
-                color={COLORS.softGray}
-                style={{ marginLeft: 8 }}
-              />
-            </View>
 
-            {/* Expandable notification options */}
-            {notificationsExpanded && pushEnabled && (
-              <View style={styles.expandedContent}>
-                <View style={styles.divider} />
-                <View style={styles.subSettingItem}>
-                  <Text style={styles.subSettingLabel}>Chat Messages</Text>
-                  <Switch
-                    value={chatNotifications}
-                    onValueChange={setChatNotifications}
-                    trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                    thumbColor={COLORS.white}
-                  />
+              {/* Expandable notification options */}
+              {notificationsExpanded && pushEnabled && (
+                <View style={styles.expandedContent}>
+                  <View style={styles.divider} />
+                  <View style={styles.subSettingItem}>
+                    <Text style={styles.subSettingLabel}>Chat Messages</Text>
+                    <Switch
+                      value={chatNotifications}
+                      onValueChange={setChatNotifications}
+                      trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                      thumbColor={COLORS.white}
+                    />
+                  </View>
+                  <View style={styles.subSettingItem}>
+                    <Text style={styles.subSettingLabel}>Request Updates</Text>
+                    <Switch
+                      value={requestNotifications}
+                      onValueChange={setRequestNotifications}
+                      trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                      thumbColor={COLORS.white}
+                    />
+                  </View>
+                  <View style={styles.subSettingItem}>
+                    <Text style={styles.subSettingLabel}>Marketing</Text>
+                    <Switch
+                      value={marketingNotifications}
+                      onValueChange={setMarketingNotifications}
+                      trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                      thumbColor={COLORS.white}
+                    />
+                  </View>
                 </View>
-                <View style={styles.subSettingItem}>
-                  <Text style={styles.subSettingLabel}>Request Updates</Text>
-                  <Switch
-                    value={requestNotifications}
-                    onValueChange={setRequestNotifications}
-                    trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                    thumbColor={COLORS.white}
-                  />
-                </View>
-                <View style={styles.subSettingItem}>
-                  <Text style={styles.subSettingLabel}>Marketing</Text>
-                  <Switch
-                    value={marketingNotifications}
-                    onValueChange={setMarketingNotifications}
-                    trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                    thumbColor={COLORS.white}
-                  />
-                </View>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
+              )}
+            </TouchableOpacity>
+          </View>
         )}
 
         {/* Privacy */}
         {shouldShowSection('privacy') && (
-        <View style={styles.section}>
-          <View style={styles.settingsCard}>
-            <View style={styles.settingItem}>
-              <View
-                style={[
-                  styles.settingIcon,
-                  { backgroundColor: COLORS.mintTransparent },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="eye"
-                  size={20}
-                  color={COLORS.mint}
+          <View style={styles.section}>
+            <View style={styles.settingsCard}>
+              <View style={styles.settingItem}>
+                <View
+                  style={[
+                    styles.settingIcon,
+                    { backgroundColor: COLORS.mintTransparent },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="eye"
+                    size={20}
+                    color={COLORS.mint}
+                  />
+                </View>
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>Profile Visibility</Text>
+                  <Text style={styles.settingDesc}>
+                    {profileVisible ? 'Discoverable' : 'Hidden'}
+                  </Text>
+                </View>
+                <Switch
+                  value={profileVisible}
+                  onValueChange={setProfileVisible}
+                  trackColor={{ false: COLORS.border, true: COLORS.mint }}
+                  thumbColor={COLORS.white}
                 />
               </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Profile Visibility</Text>
-                <Text style={styles.settingDesc}>
-                  {profileVisible ? 'Discoverable' : 'Hidden'}
-                </Text>
-              </View>
-              <Switch
-                value={profileVisible}
-                onValueChange={setProfileVisible}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
-              />
             </View>
           </View>
-        </View>
         )}
 
         {/* Language */}
         {shouldShowSection('language') && (
-        <View style={styles.section}>
-          <View style={styles.settingsCard}>
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => setIsLanguageSheetVisible(true)}
-            >
-              <View
-                style={[
-                  styles.settingIcon,
-                  { backgroundColor: COLORS.softOrangeTransparent },
-                ]}
+          <View style={styles.section}>
+            <View style={styles.settingsCard}>
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={() => setIsLanguageSheetVisible(true)}
               >
+                <View
+                  style={[
+                    styles.settingIcon,
+                    { backgroundColor: COLORS.softOrangeTransparent },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="translate"
+                    size={20}
+                    color={COLORS.softOrange}
+                  />
+                </View>
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>Language</Text>
+                  <Text style={styles.settingDesc}>{selectedLanguage}</Text>
+                </View>
                 <MaterialCommunityIcons
-                  name="translate"
+                  name="chevron-right"
                   size={20}
-                  color={COLORS.softOrange}
+                  color={COLORS.softGray}
                 />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Language</Text>
-                <Text style={styles.settingDesc}>{selectedLanguage}</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         )}
 
         {/* Share */}
         {shouldShowSection('invite') && (
-        <View style={styles.section}>
-          <View style={styles.settingsCard}>
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => navigation.navigate('InviteFriends')}
-            >
-              <View
-                style={[
-                  styles.settingIcon,
-                  { backgroundColor: COLORS.mintTransparent },
-                ]}
+          <View style={styles.section}>
+            <View style={styles.settingsCard}>
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('InviteFriends')}
               >
+                <View
+                  style={[
+                    styles.settingIcon,
+                    { backgroundColor: COLORS.mintTransparent },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="account-plus"
+                    size={20}
+                    color={COLORS.mint}
+                  />
+                </View>
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>Invite Friends</Text>
+                  <Text style={styles.settingDesc}>Share TravelMatch</Text>
+                </View>
                 <MaterialCommunityIcons
-                  name="account-plus"
+                  name="chevron-right"
                   size={20}
-                  color={COLORS.mint}
+                  color={COLORS.softGray}
                 />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Invite Friends</Text>
-                <Text style={styles.settingDesc}>Share TravelMatch</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         )}
 
         {/* Legal Links */}
         {(shouldShowSection('terms') || shouldShowSection('privacyPolicy')) && (
-        <View style={styles.section}>
-          <View style={styles.settingsCard}>
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => navigation.navigate('TermsOfService')}
-            >
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Terms of Service</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
-            <View style={styles.dividerFull} />
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => navigation.navigate('PrivacyPolicy')}
-            >
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Privacy Policy</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
+          <View style={styles.section}>
+            <View style={styles.settingsCard}>
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('TermsOfService')}
+              >
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>Terms of Service</Text>
+                </View>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.softGray}
+                />
+              </TouchableOpacity>
+              <View style={styles.dividerFull} />
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('PrivacyPolicy')}
+              >
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingLabel}>Privacy Policy</Text>
+                </View>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.softGray}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         )}
 
         {/* No Results */}
@@ -499,6 +528,9 @@ const AppSettingsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  chevronIcon: {
+    marginLeft: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

@@ -17,7 +17,11 @@ interface AnimatedButtonProps {
   variant?: 'primary' | 'secondary' | 'outline';
 }
 
-export default function AnimatedButton({ children, onPress, variant = 'primary' }: AnimatedButtonProps) {
+export default function AnimatedButton({
+  children,
+  onPress,
+  variant = 'primary',
+}: AnimatedButtonProps) {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -72,12 +76,11 @@ export function PulseButton({ children, onPress }: AnimatedButtonProps) {
     scale.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -100,9 +103,8 @@ export function ShimmerButton({ children, onPress }: AnimatedButtonProps) {
     translateX.value = withRepeat(
       withTiming(100, { duration: 2000, easing: Easing.linear }),
       -1,
-      false
+      false,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const shimmerStyle = useAnimatedStyle(() => ({

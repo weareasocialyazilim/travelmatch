@@ -53,8 +53,16 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '<rootDir>/tests/e2e/',
+    '<rootDir>/tests/e2e-playwright/',
+    '<rootDir>/tests/accessibility/',
     '<rootDir>/tests/performance/',
-    '<rootDir>/tests/integration/(proofFlow|feedFlow|paymentFlow\.complete|moments\.integration|cacheManagement|tabModalNavigation|navigationStatePersistence|anti-fragility)\.test\.(ts|tsx)$',
+    '<rootDir>/supabase/tests/',
+    '<rootDir>/supabase/functions/',
+    '<rootDir>/services/',
+    '<rootDir>/apps/',
+    '<rootDir>/packages/',
+    '<rootDir>/tests/integration/',
+    '\\.spec\\.(ts|tsx)$',
   ],
   globals: {
     __DEV__: true,

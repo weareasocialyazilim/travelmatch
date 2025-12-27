@@ -1,8 +1,8 @@
 /**
  * Navigation State Persistence Tests
- * 
+ *
  * Tests for navigation state management and restoration
- * 
+ *
  * Coverage:
  * - State persistence to AsyncStorage
  * - State restoration on app restart
@@ -32,7 +32,7 @@ const mockNavigation = {
   getCurrentRoute: jest.fn(),
   getRootState: jest.fn(),
   resetRoot: jest.fn(),
-} as unknown >;
+};
 
 /**
  * Navigation state persistence utilities
@@ -71,10 +71,10 @@ async function restoreNavigationState(): Promise<NavigationState | undefined> {
     if (!serialized) return undefined;
 
     const state = JSON.parse(serialized) as NavigationState;
-    
+
     // Mark state as stale if older than 1 day
     const isStale = false; // In real implementation, check timestamp
-    
+
     return isStale ? undefined : state;
   } catch (error) {
     console.error('[Navigation] Failed to restore state:', error);
@@ -116,7 +116,7 @@ describe('Navigation State Persistence', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         PERSISTENCE_KEY,
-        JSON.stringify(state)
+        JSON.stringify(state),
       );
     });
 
@@ -142,7 +142,7 @@ describe('Navigation State Persistence', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         PERSISTENCE_KEY,
-        expect.stringContaining('MainTabs')
+        expect.stringContaining('MainTabs'),
       );
     });
 
@@ -156,7 +156,7 @@ describe('Navigation State Persistence', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         PERSISTENCE_KEY,
-        JSON.stringify(state)
+        JSON.stringify(state),
       );
     });
 
@@ -175,13 +175,17 @@ describe('Navigation State Persistence', () => {
       await persistNavigationState(state);
 
       expect(AsyncStorage.setItem).toHaveBeenCalled();
-      const savedValue = (AsyncStorage.setItem ).mock.calls[0][1];
+      const savedValue = AsyncStorage.setItem.mock.calls[0][1];
       expect(savedValue).toContain('travel & adventure');
     });
 
     it('should handle serialization errors gracefully', async () => {
       const circularState: any = { routes: [], index: 0 };
-      circularState.routes.push({ name: 'Home', key: 'home-1', self: circularState });
+      circularState.routes.push({
+        name: 'Home',
+        key: 'home-1',
+        self: circularState,
+      });
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -189,7 +193,7 @@ describe('Navigation State Persistence', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         '[Navigation] Failed to persist state:',
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();
@@ -210,9 +214,7 @@ describe('Navigation State Persistence', () => {
         index: 1,
       };
 
-      (AsyncStorage.getItem ).mockResolvedValueOnce(
-        JSON.stringify(savedState)
-      );
+      AsyncStorage.getItem.mockResolvedValueOnce(JSON.stringify(savedState));
 
       const restored = await restoreNavigationState();
 
@@ -221,7 +223,7 @@ describe('Navigation State Persistence', () => {
     });
 
     it('should return undefined when no state exists', async () => {
-      (AsyncStorage.getItem ).mockResolvedValueOnce(null);
+      AsyncStorage.getItem.mockResolvedValueOnce(null);
 
       const restored = await restoreNavigationState();
 
@@ -229,7 +231,7 @@ describe('Navigation State Persistence', () => {
     });
 
     it('should handle invalid JSON gracefully', async () => {
-      (AsyncStorage.getItem ).mockResolvedValueOnce('invalid-json');
+      AsyncStorage.getItem.mockResolvedValueOnce('invalid-json');
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -238,7 +240,7 @@ describe('Navigation State Persistence', () => {
       expect(restored).toBeUndefined();
       expect(consoleSpy).toHaveBeenCalledWith(
         '[Navigation] Failed to restore state:',
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();
@@ -259,9 +261,7 @@ describe('Navigation State Persistence', () => {
         index: 0,
       };
 
-      (AsyncStorage.getItem ).mockResolvedValueOnce(
-        JSON.stringify(savedState)
-      );
+      AsyncStorage.getItem.mockResolvedValueOnce(JSON.stringify(savedState));
 
       const restored = await restoreNavigationState();
 
@@ -270,9 +270,7 @@ describe('Navigation State Persistence', () => {
     });
 
     it('should handle AsyncStorage errors', async () => {
-      (AsyncStorage.getItem ).mockRejectedValueOnce(
-        new Error('Storage error')
-      );
+      AsyncStorage.getItem.mockRejectedValueOnce(new Error('Storage error'));
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -297,9 +295,7 @@ describe('Navigation State Persistence', () => {
     });
 
     it('should handle removal errors gracefully', async () => {
-      (AsyncStorage.removeItem ).mockRejectedValueOnce(
-        new Error('Removal error')
-      );
+      AsyncStorage.removeItem.mockRejectedValueOnce(new Error('Removal error'));
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -307,7 +303,7 @@ describe('Navigation State Persistence', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         '[Navigation] Failed to clear state:',
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();
@@ -333,10 +329,10 @@ describe('Navigation State Persistence', () => {
       await persistNavigationState(originalState);
 
       // Get what was saved
-      const savedData = (AsyncStorage.setItem ).mock.calls[0][1];
+      const savedData = AsyncStorage.setItem.mock.calls[0][1];
 
       // Mock restoration
-      (AsyncStorage.getItem ).mockResolvedValueOnce(savedData);
+      AsyncStorage.getItem.mockResolvedValueOnce(savedData);
 
       // Restore state
       const restoredState = await restoreNavigationState();
@@ -349,7 +345,11 @@ describe('Navigation State Persistence', () => {
       const currentState: NavigationState = {
         routes: [
           { name: 'Home', key: 'home-1' },
-          { name: 'MomentDetail', key: 'moment-1', params: { momentId: '789' } },
+          {
+            name: 'MomentDetail',
+            key: 'moment-1',
+            params: { momentId: '789' },
+          },
         ],
         index: 1,
       };
@@ -362,7 +362,7 @@ describe('Navigation State Persistence', () => {
 
       // Restore state on app launch
       const savedData = JSON.stringify(currentState);
-      (AsyncStorage.getItem ).mockResolvedValueOnce(savedData);
+      AsyncStorage.getItem.mockResolvedValueOnce(savedData);
 
       const restoredState = await restoreNavigationState();
 
@@ -372,7 +372,9 @@ describe('Navigation State Persistence', () => {
 
     it('should handle background/foreground transitions', async () => {
       const state: NavigationState = {
-        routes: [{ name: 'Chat', key: 'chat-1', params: { conversationId: '999' } }],
+        routes: [
+          { name: 'Chat', key: 'chat-1', params: { conversationId: '999' } },
+        ],
         index: 0,
       };
 
@@ -380,11 +382,11 @@ describe('Navigation State Persistence', () => {
       await persistNavigationState(state);
 
       // Simulate app in background
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Restore on foreground
-      const savedData = (AsyncStorage.setItem ).mock.calls[0][1];
-      (AsyncStorage.getItem ).mockResolvedValueOnce(savedData);
+      const savedData = AsyncStorage.setItem.mock.calls[0][1];
+      AsyncStorage.getItem.mockResolvedValueOnce(savedData);
 
       const restored = await restoreNavigationState();
 
@@ -405,7 +407,7 @@ describe('Navigation State Persistence', () => {
       expect(AsyncStorage.removeItem).toHaveBeenCalledWith(PERSISTENCE_KEY);
 
       // Next restore should return undefined
-      (AsyncStorage.getItem ).mockResolvedValueOnce(null);
+      AsyncStorage.getItem.mockResolvedValueOnce(null);
       const restored = await restoreNavigationState();
 
       expect(restored).toBeUndefined();
@@ -438,7 +440,7 @@ describe('Navigation State Persistence', () => {
         index: 0,
       }));
 
-      await Promise.all(states.map(state => persistNavigationState(state)));
+      await Promise.all(states.map((state) => persistNavigationState(state)));
 
       expect(AsyncStorage.setItem).toHaveBeenCalledTimes(10);
     });
@@ -453,9 +455,9 @@ describe('Navigation State Persistence', () => {
       };
 
       await persistNavigationState(state);
-      
-      const savedData = (AsyncStorage.setItem ).mock.calls[0][1];
-      (AsyncStorage.getItem ).mockResolvedValueOnce(savedData);
+
+      const savedData = AsyncStorage.setItem.mock.calls[0][1];
+      AsyncStorage.getItem.mockResolvedValueOnce(savedData);
 
       const restored = await restoreNavigationState();
 
@@ -470,8 +472,8 @@ describe('Navigation State Persistence', () => {
 
       await persistNavigationState(state);
 
-      const savedData = (AsyncStorage.setItem ).mock.calls[0][1];
-      (AsyncStorage.getItem ).mockResolvedValueOnce(savedData);
+      const savedData = AsyncStorage.setItem.mock.calls[0][1];
+      AsyncStorage.getItem.mockResolvedValueOnce(savedData);
 
       const restored = await restoreNavigationState();
 
@@ -485,10 +487,8 @@ describe('Navigation State Persistence', () => {
       };
 
       const savePromise = persistNavigationState(state);
-      
-      (AsyncStorage.getItem ).mockResolvedValueOnce(
-        JSON.stringify(state)
-      );
+
+      AsyncStorage.getItem.mockResolvedValueOnce(JSON.stringify(state));
       const restorePromise = restoreNavigationState();
 
       const [, restored] = await Promise.all([savePromise, restorePromise]);
@@ -504,7 +504,7 @@ describe('Navigation State Persistence', () => {
 
       await persistNavigationState(state);
 
-      const savedData = (AsyncStorage.setItem ).mock.calls[0][1];
+      const savedData = AsyncStorage.setItem.mock.calls[0][1];
       const parsed = JSON.parse(savedData);
 
       expect(parsed.routes[0].params.nullValue).toBeNull();
@@ -512,8 +512,8 @@ describe('Navigation State Persistence', () => {
 
     it('should handle malformed persistence key', async () => {
       // Simulate corrupted storage
-      (AsyncStorage.getItem ).mockResolvedValueOnce(
-        '{"routes": "not-an-array", "index": "not-a-number"}'
+      AsyncStorage.getItem.mockResolvedValueOnce(
+        '{"routes": "not-an-array", "index": "not-a-number"}',
       );
 
       const restored = await restoreNavigationState();
@@ -540,7 +540,7 @@ describe('Navigation State Persistence', () => {
       };
 
       // Mock old key exists
-      (AsyncStorage.getItem )
+      AsyncStorage.getItem
         .mockResolvedValueOnce(null) // New key doesn't exist
         .mockResolvedValueOnce(JSON.stringify(oldState)); // Old key exists
 
@@ -549,9 +549,7 @@ describe('Navigation State Persistence', () => {
       expect(restored).toBeUndefined();
 
       // Fallback to old key
-      (AsyncStorage.getItem ).mockResolvedValueOnce(
-        JSON.stringify(oldState)
-      );
+      AsyncStorage.getItem.mockResolvedValueOnce(JSON.stringify(oldState));
       restored = await restoreNavigationState();
 
       // Would migrate to new key in real implementation

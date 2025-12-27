@@ -136,7 +136,6 @@ const DiscoverScreen = () => {
         closeStoryViewer();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
 
   const goToPreviousStory = useCallback(() => {

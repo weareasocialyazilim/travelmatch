@@ -21,14 +21,27 @@ config.resolver.nodeModulesPaths = [
 // 3. Keep hierarchical lookup enabled for Expo compatibility (SDK 54+)
 config.resolver.disableHierarchicalLookup = false;
 
-// 4. Redirect expo/AppEntry to our custom index.ts (fixes monorepo entry point issue)
+// 3.5 Add extra node modules path for @/ alias resolution
+config.resolver.extraNodeModules = {
+  '@': path.resolve(projectRoot, 'src'),
+};
+
+// 4. Redirect expo/AppEntry and handle @/ path aliases
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Handle expo/AppEntry redirect
   if (moduleName === 'expo/AppEntry' || moduleName === './node_modules/expo/AppEntry') {
     return {
       filePath: path.resolve(projectRoot, 'index.ts'),
       type: 'sourceFile',
     };
   }
+
+  // Handle @/ path alias - resolve to src/ directory
+  if (moduleName.startsWith('@/')) {
+    const resolvedPath = moduleName.replace('@/', path.resolve(projectRoot, 'src') + '/');
+    return context.resolveRequest(context, resolvedPath, platform);
+  }
+
   // Fallback to default resolution
   return context.resolveRequest(context, moduleName, platform);
 };

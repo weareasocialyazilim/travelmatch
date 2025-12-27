@@ -141,7 +141,7 @@ describe('Discover Flow Integration', () => {
     it('filters moments by category', async () => {
       const DiscoverScreen =
         require('../../features/trips/screens/DiscoverScreen').default;
-      const { getByText, queryByText } = render(<DiscoverScreen />);
+      const { getByText } = render(<DiscoverScreen />);
 
       // Open filter
       fireEvent.press(getByText('Filter'));

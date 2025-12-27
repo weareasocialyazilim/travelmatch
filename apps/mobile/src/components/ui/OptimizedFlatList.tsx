@@ -31,8 +31,10 @@ export const getItemLayout = (itemHeight: number, separatorHeight = 0) => {
   });
 };
 
-interface OptimizedFlatListProps<T>
-  extends Omit<FlatListProps<T>, 'keyExtractor'> {
+interface OptimizedFlatListProps<T> extends Omit<
+  FlatListProps<T>,
+  'keyExtractor'
+> {
   /** Fixed item height for getItemLayout optimization */
   itemHeight?: number;
   /** Separator height if using ItemSeparatorComponent */
@@ -158,7 +160,7 @@ export function useOptimizedRenderItem<T>(
     ({ item, index }: { item: T; index: number }) => (
       <Component item={item} index={index} />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     deps,
   );
 }

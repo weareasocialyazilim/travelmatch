@@ -89,12 +89,12 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
   if (images.length === 0) {
     return (
       <View style={[styles.container, styles.center]}>
-        <Text style={{ color: COLORS.white }}>No images found</Text>
+        <Text style={styles.emptyText}>No images found</Text>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={{ marginTop: 20 }}
+          style={styles.goBackButton}
         >
-          <Text style={{ color: COLORS.primary }}>Go Back</Text>
+          <Text style={styles.goBackText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -179,6 +179,15 @@ const styles = StyleSheet.create({
   center: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyText: {
+    color: COLORS.white,
+  },
+  goBackButton: {
+    marginTop: 20,
+  },
+  goBackText: {
+    color: COLORS.primary,
   },
   backgroundImage: {
     width: SCREEN_WIDTH,

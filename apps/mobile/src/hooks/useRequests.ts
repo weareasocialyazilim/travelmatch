@@ -276,7 +276,6 @@ export const useRequests = (): UseRequestsReturn => {
   useEffect(() => {
     void fetchSentRequests();
     void fetchReceivedRequests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Refetch when filters change
