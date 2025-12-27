@@ -135,15 +135,13 @@ if (typeof global.console !== 'undefined') {
   };
 })();
 
-// Suppress React act() warnings from provider initialization and react-test-renderer deprecation
+// Suppress react-test-renderer deprecation warning (library issue - @testing-library/react-native uses it internally)
+// Note: act() warnings should NOT be suppressed - they indicate real test issues that need fixing
 const originalError = console.error;
 console.error = (...args) => {
-  // Suppress AuthProvider initialization warnings and react-test-renderer deprecation
   if (
     typeof args[0] === 'string' &&
-    (args[0].includes('Warning: An update to AuthProvider') ||
-      args[0].includes('was not wrapped in act') ||
-      args[0].includes('react-test-renderer is deprecated'))
+    args[0].includes('react-test-renderer is deprecated')
   ) {
     return;
   }

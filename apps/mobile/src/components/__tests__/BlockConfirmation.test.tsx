@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { BlockConfirmation } from '../BlockConfirmation';
 import { moderationService } from '../../services/moderationService';
 import { useToast } from '../../context/ToastContext';
@@ -142,14 +142,18 @@ describe('BlockConfirmation', () => {
       (moderationService.blockUser ).mockReturnValue(blockPromise);
 
       const { getByText, UNSAFE_getByType } = render(<BlockConfirmation {...defaultProps} />);
-      
+
       fireEvent.press(getByText('Block'));
-      
+
       await waitFor(() => {
         expect(UNSAFE_getByType(require('react-native').ActivityIndicator)).toBeTruthy();
       });
 
-      resolveBlock!();
+      // Resolve and wait for state to settle
+      await act(async () => {
+        resolveBlock!();
+        await blockPromise;
+      });
     });
 
     it('shows success toast after blocking user', async () => {
