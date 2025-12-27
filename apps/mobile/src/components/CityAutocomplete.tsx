@@ -10,9 +10,9 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  FlatList,
   Keyboard,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 
@@ -289,14 +289,16 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
 
       {showSuggestions && suggestions.length > 0 && (
         <View style={styles.suggestionsContainer}>
-          <FlatList
+          <FlashList
             data={suggestions}
             keyExtractor={(item) => item.id}
             keyboardShouldPersistTaps="handled"
+            estimatedItemSize={56}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.suggestionItem}
                 onPress={() => handleSelectCity(item)}
+                hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
               >
                 <MaterialCommunityIcons
                   name="city"

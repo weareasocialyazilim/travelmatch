@@ -1,9 +1,11 @@
 /**
  * StoryViewer Component
  * Full-screen story viewer with progress bars and navigation
+ *
+ * Updated to use Reanimated for 60 FPS animations on UI thread
  */
 
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,7 +14,6 @@ import {
   Image,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Animated,
   Dimensions,
   Platform,
   StatusBar,
@@ -21,6 +22,14 @@ import type { GestureResponderEvent } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  cancelAnimation,
+  runOnJS,
+  Easing,
+} from 'react-native-reanimated';
 import { COLORS } from '../../constants/colors';
 import { STORY_DURATION } from './constants';
 import type { UserStory, Story } from './types';
@@ -53,50 +62,63 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
   setIsPaused,
 }) => {
   const insets = useSafeAreaInsets();
-  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  // Reanimated shared value for progress (runs on UI thread)
+  const progress = useSharedValue(0);
+  const pausedProgress = useSharedValue(0);
 
   const currentStory = user?.stories[currentStoryIndex];
 
-  // Start timer animation
+  // Animated style for progress bar width
+  const progressStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
+  // Start timer animation using Reanimated (60 FPS on UI thread)
   const startStoryTimer = useCallback(() => {
     if (!user) return;
 
-    progressAnim.setValue(0);
-
-    Animated.timing(progressAnim, {
-      toValue: 1,
-      duration: STORY_DURATION,
-      useNativeDriver: false,
-    }).start(({ finished }) => {
-      if (finished && !isPaused) {
-        onNextStory();
+    progress.value = 0;
+    progress.value = withTiming(
+      1,
+      {
+        duration: STORY_DURATION,
+        easing: Easing.linear,
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(onNextStory)();
+        }
       }
-    });
-  }, [user, isPaused, onNextStory, progressAnim]);
+    );
+  }, [user, onNextStory, progress]);
 
   // Pause story
   const pauseStory = useCallback(() => {
     setIsPaused(true);
-    progressAnim.stopAnimation();
-  }, [setIsPaused, progressAnim]);
+    pausedProgress.value = progress.value;
+    cancelAnimation(progress);
+  }, [setIsPaused, progress, pausedProgress]);
 
   // Resume story
   const resumeStory = useCallback(() => {
     setIsPaused(false);
-    const currentValue =
-      (progressAnim as unknown as { _value: number })._value || 0;
-    const remainingDuration = STORY_DURATION * (1 - currentValue);
+    const remainingProgress = 1 - pausedProgress.value;
+    const remainingDuration = STORY_DURATION * remainingProgress;
 
-    Animated.timing(progressAnim, {
-      toValue: 1,
-      duration: remainingDuration,
-      useNativeDriver: false,
-    }).start(({ finished }) => {
-      if (finished && !isPaused) {
-        onNextStory();
+    progress.value = withTiming(
+      1,
+      {
+        duration: remainingDuration,
+        easing: Easing.linear,
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(onNextStory)();
+        }
       }
-    });
-  }, [isPaused, onNextStory, progressAnim, setIsPaused]);
+    );
+  }, [onNextStory, progress, pausedProgress, setIsPaused]);
 
   // Handle tap on story
   const handleStoryTap = useCallback(
@@ -120,16 +142,9 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
     }
 
     return () => {
-      progressAnim.stopAnimation();
+      cancelAnimation(progress);
     };
-  }, [
-    visible,
-    user,
-    currentStoryIndex,
-    isPaused,
-    startStoryTimer,
-    progressAnim,
-  ]);
+  }, [visible, user, currentStoryIndex, isPaused, startStoryTimer, progress]);
 
   if (!user || !currentStory) return null;
 
@@ -192,15 +207,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                     <View style={[styles.progressBarFill, styles.fullWidth]} />
                   ) : index === currentStoryIndex ? (
                     <Animated.View
-                      style={[
-                        styles.progressBarFill,
-                        {
-                          width: progressAnim.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: ['0%', '100%'],
-                          }),
-                        },
-                      ]}
+                      style={[styles.progressBarFill, progressStyle]}
                     />
                   ) : null}
                 </View>
@@ -279,6 +286,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 style={styles.viewMomentBtn}
                 onPress={() => onViewMoment(currentStory)}
                 activeOpacity={0.8}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
                 <Text style={styles.viewMomentText}>View</Text>
                 <MaterialCommunityIcons

@@ -9,10 +9,10 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
   Text,
   Keyboard,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { radii } from '../../constants/radii';
@@ -20,11 +20,7 @@ import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSearchStore } from '../../stores/searchStore';
-import {
-  VERTICAL_LIST_CONFIG,
-  ITEM_HEIGHTS,
-  createGetItemLayout,
-} from '../../utils/listOptimization';
+// FlashList doesn't need these optimizations - it handles them internally
 import { useDebounce } from '../../utils/performance';
 
 interface EnhancedSearchBarProps {
@@ -149,14 +145,16 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
             </TouchableOpacity>
           </View>
 
-          <FlatList<string>
+          <FlashList
             data={searchHistory}
             keyExtractor={(item, index) => `${item}-${index}`}
+            estimatedItemSize={48}
             renderItem={({ item }) => (
               <View style={styles.suggestionRow}>
                 <TouchableOpacity
                   style={styles.suggestionButton}
                   onPress={() => handleSuggestionPress(item)}
+                  hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
                 >
                   <MaterialCommunityIcons
                     name="history"
@@ -172,6 +170,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                 <TouchableOpacity
                   onPress={() => removeFromHistory(item)}
                   style={styles.deleteButton}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <MaterialCommunityIcons
                     name="close"
@@ -181,12 +180,8 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                 </TouchableOpacity>
               </View>
             )}
-            style={styles.suggestionsList}
+            contentContainerStyle={styles.suggestionsList}
             keyboardShouldPersistTaps="handled"
-            {...VERTICAL_LIST_CONFIG}
-            initialNumToRender={5}
-            maxToRenderPerBatch={5}
-            getItemLayout={createGetItemLayout(ITEM_HEIGHTS.SMALL)}
           />
         </View>
       )}
