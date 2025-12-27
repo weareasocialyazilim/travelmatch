@@ -1041,6 +1041,19 @@ try {
   }));
 } catch (_) {}
 
+// Mock useHaptics hook
+try {
+  jest.mock('@/hooks/useHaptics', () => ({
+    useHaptics: () => ({
+      impact: jest.fn(),
+      success: jest.fn(),
+      warning: jest.fn(),
+      error: jest.fn(),
+      selection: jest.fn(),
+    }),
+  }));
+} catch (_) {}
+
 // Mock Expo Vector Icons
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
@@ -1164,6 +1177,7 @@ jest.mock('react-native-reanimated', () => {
     withDelay: jest.fn((_, val) => val),
     withSequence: jest.fn((...args) => args[args.length - 1]),
     withRepeat: jest.fn((val) => val),
+    cancelAnimation: jest.fn(),
     Easing: {
       linear: jest.fn(),
       ease: jest.fn(),
