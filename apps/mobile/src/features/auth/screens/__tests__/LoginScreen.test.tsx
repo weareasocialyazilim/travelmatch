@@ -66,8 +66,8 @@ describe('LoginScreen', () => {
       expect(getByTestId('email-input')).toBeTruthy();
       expect(getByTestId('password-input')).toBeTruthy();
       expect(getByTestId('login-button')).toBeTruthy();
-      expect(getByText('Welcome Back')).toBeTruthy();
-      expect(getByText('Sign in to continue')).toBeTruthy();
+      expect(getByText('Tekrar Hoşgeldiniz')).toBeTruthy();
+      expect(getByText('Devam etmek için giriş yapın')).toBeTruthy();
     });
 
     it('should not render biometric button when not available', () => {
@@ -87,7 +87,7 @@ describe('LoginScreen', () => {
       const { getByTestId, getByText } = render(<LoginScreen />);
 
       expect(getByTestId('biometric-login-button')).toBeTruthy();
-      expect(getByText('Sign in with Face ID')).toBeTruthy();
+      expect(getByText('Face ID ile giriş yap')).toBeTruthy();
     });
   });
 

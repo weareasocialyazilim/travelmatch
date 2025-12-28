@@ -13,8 +13,9 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import { useAuth } from '@/context/AuthContext';
 import { useBiometric } from '@/context/BiometricAuthContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -26,7 +27,7 @@ import { useToast } from '@/context/ToastContext';
 import { COLORS } from '@/constants/colors';
 
 export const LoginScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isBiometricLoading, setIsBiometricLoading] = useState(false);
@@ -123,15 +124,15 @@ export const LoginScreen: React.FC = () => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.title} {...a11y.header('Welcome Back')}>
-              Welcome Back
+            <Text style={styles.title} {...a11y.header('Tekrar Hoşgeldiniz')}>
+              Tekrar Hoşgeldiniz
             </Text>
             <Text
               style={styles.subtitle}
               accessible={true}
-              accessibilityLabel="Sign in to continue"
+              accessibilityLabel="Devam etmek için giriş yapın"
             >
-              Sign in to continue
+              Devam etmek için giriş yapın
             </Text>
 
             <Controller
@@ -145,7 +146,7 @@ export const LoginScreen: React.FC = () => {
                   <TextInput
                     testID="email-input"
                     style={[styles.input, error && styles.inputError]}
-                    placeholder="Email"
+                    placeholder="E-posta"
                     placeholderTextColor={COLORS.textSecondary}
                     value={value}
                     onChangeText={onChange}
@@ -154,8 +155,8 @@ export const LoginScreen: React.FC = () => {
                     autoCapitalize="none"
                     editable={!isLoading}
                     accessible={true}
-                    accessibilityLabel="Email address"
-                    accessibilityHint="Enter your email address to sign in"
+                    accessibilityLabel="E-posta adresi"
+                    accessibilityHint="Giriş yapmak için e-posta adresinizi girin"
                     accessibilityValue={{ text: value }}
                   />
                   {error && (
@@ -181,7 +182,7 @@ export const LoginScreen: React.FC = () => {
                   <TextInput
                     testID="password-input"
                     style={[styles.input, error && styles.inputError]}
-                    placeholder="Password"
+                    placeholder="Şifre"
                     placeholderTextColor={COLORS.textSecondary}
                     value={value}
                     onChangeText={onChange}
@@ -189,8 +190,8 @@ export const LoginScreen: React.FC = () => {
                     secureTextEntry
                     editable={!isLoading}
                     accessible={true}
-                    accessibilityLabel="Password"
-                    accessibilityHint="Enter your password to sign in"
+                    accessibilityLabel="Şifre"
+                    accessibilityHint="Giriş yapmak için şifrenizi girin"
                   />
                   {error && (
                     <Text
@@ -203,6 +204,14 @@ export const LoginScreen: React.FC = () => {
                 </View>
               )}
             />
+
+            {/* Forgot Password Link */}
+            <TouchableOpacity
+              style={styles.forgotPasswordContainer}
+              onPress={() => navigation.navigate('ForgotPassword')}
+            >
+              <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               testID="login-button"
@@ -220,8 +229,8 @@ export const LoginScreen: React.FC = () => {
                 !canSubmitForm({ formState } as { formState: MinimalFormState })
               }
               {...a11y.button(
-                isLoading ? 'Signing in' : 'Sign In',
-                'Sign in with your email and password',
+                isLoading ? 'Giriş yapılıyor' : 'Giriş Yap',
+                'E-posta ve şifrenizle giriş yapın',
                 isLoading ||
                   !canSubmitForm({ formState } as {
                     formState: MinimalFormState;
@@ -229,7 +238,7 @@ export const LoginScreen: React.FC = () => {
               )}
             >
               <Text style={styles.buttonText}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
               </Text>
             </TouchableOpacity>
 
@@ -237,7 +246,7 @@ export const LoginScreen: React.FC = () => {
               <>
                 <View style={styles.divider}>
                   <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>or</Text>
+                  <Text style={styles.dividerText}>veya</Text>
                   <View style={styles.dividerLine} />
                 </View>
 
@@ -247,8 +256,8 @@ export const LoginScreen: React.FC = () => {
                   onPress={handleBiometricLogin}
                   disabled={isBiometricLoading || isLoading}
                   {...a11y.button(
-                    `Sign in with ${biometricTypeName}`,
-                    `Use ${biometricTypeName} to sign in quickly`,
+                    `${biometricTypeName} ile giriş yap`,
+                    `Hızlı giriş için ${biometricTypeName} kullanın`,
                     isBiometricLoading || isLoading,
                   )}
                 >
@@ -263,13 +272,21 @@ export const LoginScreen: React.FC = () => {
                         accessible={false}
                       />
                       <Text style={styles.biometricButtonText}>
-                        Sign in with {biometricTypeName}
+                        {biometricTypeName} ile giriş yap
                       </Text>
                     </>
                   )}
                 </TouchableOpacity>
               </>
             )}
+
+            {/* Sign Up Link */}
+            <View style={styles.signUpContainer}>
+              <Text style={styles.signUpText}>Hesabın yok mu? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.signUpLink}>Kayıt Ol</Text>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -394,6 +411,30 @@ const styles = StyleSheet.create({
   biometricButtonText: {
     color: COLORS.primary,
     fontSize: 16,
+    fontWeight: '600',
+  },
+  forgotPasswordContainer: {
+    alignSelf: 'flex-end',
+    marginBottom: 16,
+    marginTop: -8,
+  },
+  forgotPasswordText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 24,
+  },
+  signUpText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  signUpLink: {
+    color: COLORS.primary,
+    fontSize: 14,
     fontWeight: '600',
   },
 });
