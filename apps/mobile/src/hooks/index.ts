@@ -11,9 +11,9 @@ export { useRequests } from './useRequests';
 export { usePayments } from './usePayments';
 export { useReviews } from './useReviews';
 export { useNetwork } from './useNetwork';
-export { 
-  useOfflineSupabase, 
-  withOfflineCheck, 
+export {
+  useOfflineSupabase,
+  withOfflineCheck,
   OfflineError,
 } from './useOfflineSupabase';
 export {
@@ -23,13 +23,18 @@ export {
 } from './useOfflineData';
 
 // Pagination hooks
-export { usePagination, encodeCursor, decodeCursor, applyCursorToQuery } from './usePagination';
-export type { 
-  PaginationMeta, 
-  PaginatedResponse, 
+export {
+  usePagination,
+  encodeCursor,
+  decodeCursor,
+  applyCursorToQuery,
+} from './usePagination';
+export type {
+  PaginationMeta,
+  PaginatedResponse,
   PaginationFetcher,
   UsePaginationOptions,
-  UsePaginationReturn 
+  UsePaginationReturn,
 } from './usePagination';
 
 // Bottom Sheet hooks
@@ -75,29 +80,18 @@ export {
   // Spring & timing configurations
   SPRINGS,
   TIMINGS,
-  // Press animations
-  useScalePressAnimation,
-  usePressOpacityAnimation,
-  // Entrance animations
-  useFadeIn,
-  useFadeSlideUp,
-  useBounceIn,
-  useStaggeredItem,
-  // Continuous animations
-  usePulse,
-  useBreathing,
-  useFloating,
-  useRotation,
-  // Feedback animations
-  useShakeAnimation,
-  useSuccessBounce,
-  // Scroll-based animations
+  // Animation hooks
+  useAnimations,
+  useEntranceAnimation,
   useParallax,
-  useHeaderCollapse,
-  // Utility hooks
-  useAnimatedValue,
-  useProgress,
+  useFloatingAnimation,
+  useSkeletonAnimation,
+  // Utility functions
+  createStaggerDelays,
+  getSpringConfig,
+  getTimingConfig,
 } from './useAnimations';
+export type { SpringConfig, TimingConfig } from './useAnimations';
 
 // Existing animation hooks (for backwards compatibility)
 export { usePressAnimation, useBounceAnimation } from './usePressAnimation';

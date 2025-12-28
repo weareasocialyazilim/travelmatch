@@ -19,7 +19,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -34,8 +34,8 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -51,13 +51,13 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Enter email"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={false}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -87,7 +87,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -102,8 +102,8 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -113,7 +113,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         }
       >
         <RCTText
-          color="#9CA3AF"
+          color="#A8A29E"
           name="lock-outline"
           ref={null}
           size={20}
@@ -135,13 +135,13 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Enter password"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={true}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -184,7 +184,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           }
         >
           <RCTText
-            color="#9CA3AF"
+            color="#A8A29E"
             name="eye"
             ref={null}
             size={20}
@@ -211,7 +211,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -226,8 +226,8 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -243,13 +243,13 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Enter username"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={false}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -279,7 +279,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -294,8 +294,8 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -313,13 +313,13 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Tell us about yourself"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={false}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -356,7 +356,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -371,8 +371,8 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -388,13 +388,13 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Enter email"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={false}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -424,7 +424,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -439,8 +439,8 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -450,7 +450,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         }
       >
         <RCTText
-          color="#9CA3AF"
+          color="#A8A29E"
           name="lock-outline"
           ref={null}
           size={20}
@@ -472,13 +472,13 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Enter password"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={true}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -521,7 +521,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           }
         >
           <RCTText
-            color="#9CA3AF"
+            color="#A8A29E"
             name="eye"
             ref={null}
             size={20}
@@ -548,7 +548,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -563,8 +563,8 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -580,13 +580,13 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Enter username"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={false}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
@@ -616,7 +616,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         ref={null}
         style={
           {
-            "color": "#1F2937",
+            "color": "#1C1917",
             "fontSize": 14,
             "fontWeight": "600",
             "marginBottom": 8,
@@ -631,8 +631,8 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E5E7EB",
+            "backgroundColor": "#FAFAF9",
+            "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -650,13 +650,13 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           onChange={[Function]}
           onFocus={[Function]}
           placeholder="Tell us about yourself"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A29E"
           ref={null}
           secureTextEntry={false}
           style={
             [
               {
-                "color": "#1F2937",
+                "color": "#1C1917",
                 "flex": 1,
                 "fontSize": 16,
                 "paddingVertical": 0,
