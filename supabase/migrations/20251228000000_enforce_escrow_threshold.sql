@@ -1,0 +1,174 @@
+-- ============================================
+-- SECURITY FIX: Enforce Escrow Threshold in atomic_transfer
+-- Date: 2025-12-28
+-- Prevents client-side bypass of escrow rules
+-- ============================================
+-- Titan Plan v2.0 Escrow Matrix:
+-- - $0-$30: Direct payment allowed (no escrow)
+-- - $30-$100: Optional escrow (logged, user choice)
+-- - $100+: BLOCKED - Must use escrow (create_escrow_transaction)
+-- ============================================
+
+-- Update atomic_transfer to enforce mandatory escrow threshold
+CREATE OR REPLACE FUNCTION public.atomic_transfer(
+  p_sender_id UUID,
+  p_recipient_id UUID,
+  p_amount DECIMAL,
+  p_moment_id UUID DEFAULT NULL,
+  p_message TEXT DEFAULT NULL
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_sender_balance DECIMAL;
+  v_recipient_balance DECIMAL;
+  v_txn_sender_id UUID;
+  v_txn_recipient_id UUID;
+  v_calling_user UUID;
+  -- Escrow thresholds (matching client-side VALUES)
+  c_escrow_mandatory_threshold CONSTANT DECIMAL := 100.00;
+  c_escrow_optional_threshold CONSTANT DECIMAL := 30.00;
+BEGIN
+  -- ============================================
+  -- SECURITY: Verify caller is the sender
+  -- ============================================
+  v_calling_user := auth.uid();
+
+  -- Allow service_role to bypass for system operations
+  IF v_calling_user IS NULL THEN
+    -- Check if this is service_role context
+    IF current_setting('role', true) != 'service_role' THEN
+      RAISE EXCEPTION 'Authentication required';
+    END IF;
+  ELSE
+    -- Authenticated user must match sender_id
+    IF p_sender_id != v_calling_user THEN
+      RAISE EXCEPTION 'Cannot transfer funds on behalf of another user. Your ID: %, Requested sender: %',
+        v_calling_user, p_sender_id;
+    END IF;
+  END IF;
+
+  -- ============================================
+  -- SECURITY: Enforce escrow threshold
+  -- Amounts >= $100 MUST use escrow
+  -- ============================================
+  IF p_amount >= c_escrow_mandatory_threshold THEN
+    RAISE EXCEPTION 'Amounts of $% or more require escrow protection. Use create_escrow_transaction instead.',
+      c_escrow_mandatory_threshold;
+  END IF;
+
+  -- Log optional escrow range for audit (service can still proceed)
+  IF p_amount >= c_escrow_optional_threshold THEN
+    RAISE NOTICE 'Payment of $% is in optional escrow range ($%-$%). Consider using escrow for protection.',
+      p_amount, c_escrow_optional_threshold, c_escrow_mandatory_threshold;
+  END IF;
+  -- ============================================
+
+  -- Basic validation
+  IF p_sender_id = p_recipient_id THEN
+    RAISE EXCEPTION 'Cannot transfer to yourself';
+  END IF;
+
+  IF p_amount <= 0 THEN
+    RAISE EXCEPTION 'Amount must be positive';
+  END IF;
+
+  -- Amount limit for safety (reduced since escrow handles large amounts)
+  IF p_amount > 10000 THEN
+    RAISE EXCEPTION 'Amount exceeds maximum transfer limit of $10,000';
+  END IF;
+
+  -- Verify recipient exists
+  IF NOT EXISTS (SELECT 1 FROM public.users WHERE id = p_recipient_id) THEN
+    RAISE EXCEPTION 'Recipient not found';
+  END IF;
+
+  -- Lock sender row and check balance
+  SELECT balance INTO STRICT v_sender_balance
+  FROM public.users
+  WHERE id = p_sender_id
+  FOR UPDATE;
+
+  IF v_sender_balance < p_amount THEN
+    RAISE EXCEPTION 'Insufficient funds: available %.2f, requested %.2f', v_sender_balance, p_amount;
+  END IF;
+
+  -- Lock recipient row
+  SELECT balance INTO STRICT v_recipient_balance
+  FROM public.users
+  WHERE id = p_recipient_id
+  FOR UPDATE;
+
+  -- Debit sender
+  UPDATE public.users
+  SET
+    balance = balance - p_amount,
+    updated_at = NOW()
+  WHERE id = p_sender_id;
+
+  -- Credit recipient
+  UPDATE public.users
+  SET
+    balance = balance + p_amount,
+    updated_at = NOW()
+  WHERE id = p_recipient_id;
+
+  -- Log sender transaction
+  INSERT INTO public.transactions (
+    user_id, type, amount, status,
+    description, moment_id, metadata, created_at
+  )
+  VALUES (
+    p_sender_id, 'gift', -p_amount, 'completed',
+    'Sent gift to user ' || p_recipient_id::text,
+    p_moment_id,
+    jsonb_build_object(
+      'recipientId', p_recipient_id,
+      'message', p_message,
+      'initiatedBy', v_calling_user,
+      'escrowBypassed', FALSE
+    ),
+    NOW()
+  )
+  RETURNING id INTO v_txn_sender_id;
+
+  -- Log recipient transaction
+  INSERT INTO public.transactions (
+    user_id, type, amount, status,
+    description, moment_id, metadata, created_at
+  )
+  VALUES (
+    p_recipient_id, 'gift', p_amount, 'completed',
+    'Received gift from user ' || p_sender_id::text,
+    p_moment_id,
+    jsonb_build_object(
+      'senderId', p_sender_id,
+      'message', p_message
+    ),
+    NOW()
+  )
+  RETURNING id INTO v_txn_recipient_id;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'senderTxnId', v_txn_sender_id,
+    'recipientTxnId', v_txn_recipient_id,
+    'newSenderBalance', v_sender_balance - p_amount,
+    'newRecipientBalance', v_recipient_balance + p_amount
+  );
+
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE EXCEPTION 'Transfer failed: %', SQLERRM;
+END;
+$$;
+
+-- Add comment documenting the security feature
+COMMENT ON FUNCTION public.atomic_transfer IS
+'Atomic fund transfer with escrow threshold enforcement.
+Amounts >= $100 are BLOCKED and must use create_escrow_transaction.
+Amounts $30-$100 trigger a NOTICE log but proceed.
+Amounts < $30 proceed normally as direct transfers.';

@@ -3,10 +3,20 @@
  *
  * Enhanced shimmer loading placeholder for content loading states.
  * Part of iOS 26.3 design system for TravelMatch.
+ * Uses react-native-reanimated for native-thread animations.
  */
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect } from 'react';
 import type { ViewStyle } from 'react-native';
-import { View, Animated, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  Easing,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '../../constants/colors';
 
@@ -28,53 +38,46 @@ export const Skeleton = memo<SkeletonLoaderProps>(function Skeleton({
   style,
   shimmer = true,
 }) {
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  const shimmerPosition = useRef(new Animated.Value(-1)).current;
+  const opacity = useSharedValue(0.4);
+  const translateX = useSharedValue(-SCREEN_WIDTH);
 
   useEffect(() => {
-    // Opacity animation
-    const opacityAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(animatedValue, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(animatedValue, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]),
+    // Opacity animation - pulse between 0.4 and 0.7
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(0.7, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.4, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1, // infinite
+      false,
     );
-    opacityAnimation.start();
 
     // Shimmer animation
     if (shimmer) {
-      const shimmerAnimation = Animated.loop(
-        Animated.timing(shimmerPosition, {
-          toValue: 1,
+      translateX.value = withRepeat(
+        withTiming(SCREEN_WIDTH, {
           duration: 1500,
-          useNativeDriver: true,
+          easing: Easing.inOut(Easing.ease),
         }),
+        -1, // infinite
+        false,
       );
-      shimmerAnimation.start();
     }
 
     return () => {
-      opacityAnimation.stop();
+      cancelAnimation(opacity);
+      cancelAnimation(translateX);
     };
-  }, [animatedValue, shimmerPosition, shimmer]);
+  }, [opacity, translateX, shimmer]);
 
-  const opacity = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.4, 0.7],
-  });
+  const opacityStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    backgroundColor: COLORS.gray[200],
+  }));
 
-  const translateX = shimmerPosition.interpolate({
-    inputRange: [-1, 1],
-    outputRange: [-SCREEN_WIDTH, SCREEN_WIDTH],
-  });
+  const shimmerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   return (
     <View
@@ -88,26 +91,11 @@ export const Skeleton = memo<SkeletonLoaderProps>(function Skeleton({
         style,
       ]}
     >
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFillObject,
-          { opacity },
-          { backgroundColor: COLORS.gray[200] },
-        ]}
-      />
+      <Animated.View style={[StyleSheet.absoluteFillObject, opacityStyle]} />
       {shimmer && (
-        <Animated.View
-          style={[
-            styles.shimmerContainer,
-            { transform: [{ translateX }] },
-          ]}
-        >
+        <Animated.View style={[styles.shimmerContainer, shimmerStyle]}>
           <LinearGradient
-            colors={[
-              'transparent',
-              'rgba(255, 255, 255, 0.4)',
-              'transparent',
-            ]}
+            colors={['transparent', 'rgba(255, 255, 255, 0.4)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.shimmerGradient}
@@ -159,12 +147,7 @@ export const SkeletonAvatar: React.FC<SkeletonAvatarProps> = ({
   size = 48,
   style,
 }) => (
-  <Skeleton
-    width={size}
-    height={size}
-    borderRadius={size / 2}
-    style={style}
-  />
+  <Skeleton width={size} height={size} borderRadius={size / 2} style={style} />
 );
 
 // Preset skeletons
@@ -181,7 +164,12 @@ export const SkeletonCard: React.FC<{ style?: ViewStyle }> = ({ style }) => (
       </View>
       <Skeleton width="80%" height={20} style={styles.marginTop} />
       <SkeletonText lines={2} style={styles.marginTop} />
-      <Skeleton width="100%" height={48} borderRadius={24} style={styles.marginTopLg} />
+      <Skeleton
+        width="100%"
+        height={48}
+        borderRadius={24}
+        style={styles.marginTopLg}
+      />
     </View>
   </View>
 );
@@ -201,7 +189,9 @@ export const SkeletonListItem: React.FC<{ style?: ViewStyle }> = ({
 /**
  * SkeletonWishCard - Skeleton for WishCard component
  */
-export const SkeletonWishCard: React.FC<{ style?: ViewStyle }> = ({ style }) => {
+export const SkeletonWishCard: React.FC<{ style?: ViewStyle }> = ({
+  style,
+}) => {
   const cardWidth = SCREEN_WIDTH - 32;
   const cardHeight = cardWidth * 1.25;
 
@@ -239,7 +229,11 @@ export const SkeletonMessage: React.FC<{
     {!isOwn && <SkeletonAvatar size={32} style={styles.messageAvatar} />}
     <View style={[styles.messageBubble, isOwn && styles.messageBubbleOwn]}>
       <Skeleton width={isOwn ? 120 : 180} height={14} />
-      <Skeleton width={isOwn ? 80 : 140} height={14} style={styles.marginTopSm} />
+      <Skeleton
+        width={isOwn ? 80 : 140}
+        height={14}
+        style={styles.marginTopSm}
+      />
     </View>
   </View>
 );

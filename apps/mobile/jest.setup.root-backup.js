@@ -22,9 +22,9 @@ try {
         // ignore diagnostic errors
       }
       // Log and throw to help tests show where this came from
-       
+
       console.error('CREATE_ELEMENT_GUARD: invalid element type ->', info);
-       
+
       console.error(new Error('CREATE_ELEMENT_GUARD_STACK').stack);
       throw new Error(
         'EARLY_CREATE_ELEMENT_INVALID: element type is ' + String(type),
@@ -35,7 +35,6 @@ try {
     // log its keys to help identify import mismatches.
     if (typeof type === 'object' && type !== null && !type.$$typeof) {
       try {
-         
         console.error(
           'CREATE_ELEMENT_GUARD: unexpected object element type keys ->',
           Object.keys(type),
@@ -45,7 +44,6 @@ try {
           (typeof type.default === 'function' ||
             typeof type.default === 'object')
         ) {
-           
           console.error(
             'CREATE_ELEMENT_GUARD: object.default exists, type of default ->',
             typeof type.default,
@@ -247,9 +245,15 @@ jest.mock('./src/config/supabase', () => ({
     })),
     storage: {
       from: jest.fn(() => ({
-        upload: jest.fn(() => Promise.resolve({ data: { path: 'test-path' }, error: null })),
-        download: jest.fn(() => Promise.resolve({ data: new Blob(), error: null })),
-        getPublicUrl: jest.fn(() => ({ data: { publicUrl: 'https://example.com/test.jpg' } })),
+        upload: jest.fn(() =>
+          Promise.resolve({ data: { path: 'test-path' }, error: null }),
+        ),
+        download: jest.fn(() =>
+          Promise.resolve({ data: new Blob(), error: null }),
+        ),
+        getPublicUrl: jest.fn(() => ({
+          data: { publicUrl: 'https://example.com/test.jpg' },
+        })),
         remove: jest.fn(() => Promise.resolve({ data: null, error: null })),
         list: jest.fn(() => Promise.resolve({ data: [], error: null })),
       })),
@@ -428,13 +432,13 @@ try {
               const parsedMin = min
                 ? Number(min)
                 : captured['Min price']
-                ? Number(captured['Min price'])
-                : undefined;
+                  ? Number(captured['Min price'])
+                  : undefined;
               const parsedMax = max
                 ? Number(max)
                 : captured['Max price']
-                ? Number(captured['Max price'])
-                : undefined;
+                  ? Number(captured['Max price'])
+                  : undefined;
               try {
                 const useMomentsFn = require('@/hooks/useMoments').useMoments;
                 if (typeof useMomentsFn === 'function') {
@@ -584,12 +588,12 @@ try {
         illustration
           ? illustration
           : illustrationType
-          ? React.createElement(
-              Text,
-              { testID: `illustration-${illustrationType}` },
-              illustrationType,
-            )
-          : React.createElement(View, { testID: 'icon-container' }),
+            ? React.createElement(
+                Text,
+                { testID: `illustration-${illustrationType}` },
+                illustrationType,
+              )
+            : React.createElement(View, { testID: 'icon-container' }),
         React.createElement(Text, { testID: 'empty-state-title' }, title),
         desc
           ? React.createElement(
@@ -655,8 +659,8 @@ try {
       const viewId = horizontal
         ? 'stories-view'
         : numColumns && numColumns > 1
-        ? 'grid-view'
-        : 'list-view';
+          ? 'grid-view'
+          : 'list-view';
 
       const handleScroll = (e) => {
         try {
@@ -1110,39 +1114,80 @@ jest.mock('@sentry/react-native', () => ({
   init: jest.fn(),
 }));
 
-// Mock Reanimated
+// Mock Reanimated with comprehensive mocks for testing
 jest.mock('react-native-reanimated', () => {
   const View = require('react-native').View;
+
+  // Create a proper shared value mock
+  const useSharedValue = (initialValue) => {
+    const ref = { current: initialValue };
+    return new Proxy(
+      {},
+      {
+        get(target, prop) {
+          if (prop === 'value') return ref.current;
+          if (prop === 'get') return () => ref.current;
+          if (prop === 'set')
+            return (newValue) => {
+              ref.current =
+                typeof newValue === 'function'
+                  ? newValue(ref.current)
+                  : newValue;
+            };
+          return undefined;
+        },
+        set(target, prop, newValue) {
+          if (prop === 'value') {
+            ref.current = newValue;
+            return true;
+          }
+          return false;
+        },
+      },
+    );
+  };
+
   return {
+    __esModule: true,
     default: {
       View,
-      call: () => {},
+      createAnimatedComponent: (Component) => Component,
     },
     View,
-    useSharedValue: jest.fn((val) => ({ value: val })),
-    useAnimatedStyle: jest.fn((cb) => cb()),
-    withSpring: jest.fn((val) => val),
-    withTiming: jest.fn((val) => val),
-    withDelay: jest.fn((_, val) => val),
-    withSequence: jest.fn((...args) => args[args.length - 1]),
-    withRepeat: jest.fn((val) => val),
+    Text: require('react-native').Text,
+    Image: require('react-native').Image,
+    ScrollView: require('react-native').ScrollView,
+    useSharedValue,
+    useAnimatedStyle: (cb) => cb(),
+    useDerivedValue: (cb) => ({ value: cb() }),
+    useAnimatedProps: (cb) => cb(),
+    withSpring: (val) => val,
+    withTiming: (val) => val,
+    withDelay: (_, val) => val,
+    withSequence: (...args) => args[args.length - 1],
+    withRepeat: (val) => val,
     cancelAnimation: jest.fn(),
+    runOnJS: (fn) => fn,
+    runOnUI: (fn) => fn,
     Easing: {
-      linear: jest.fn(),
-      ease: jest.fn(),
-      quad: jest.fn(),
-      bezier: jest.fn(),
+      linear: (t) => t,
+      ease: (t) => t,
+      quad: (t) => t,
+      cubic: (t) => t,
+      bezier: () => (t) => t,
+      inOut: () => (t) => t,
+      in: () => (t) => t,
+      out: () => (t) => t,
     },
-    interpolate: jest.fn((val) => val),
+    interpolate: (val) => val,
     Extrapolation: {
       CLAMP: 'clamp',
       EXTEND: 'extend',
       IDENTITY: 'identity',
     },
-    runOnJS: jest.fn((fn) => fn),
-    useDerivedValue: jest.fn((cb) => ({ value: cb() })),
-    useAnimatedGestureHandler: jest.fn(() => ({})),
-    useAnimatedScrollHandler: jest.fn(() => ({})),
+    useAnimatedGestureHandler: () => ({}),
+    useAnimatedScrollHandler: () => ({}),
+    useAnimatedRef: () => ({ current: null }),
     createAnimatedComponent: (Component) => Component,
   };
 });
