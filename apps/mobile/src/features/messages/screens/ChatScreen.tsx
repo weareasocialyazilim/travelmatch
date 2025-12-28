@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -56,8 +56,11 @@ const ChatScreen: React.FC = () => {
     proofStatus,
   });
 
-  const renderMessage = ({ item }: { item: Message }) => (
-    <MessageBubble item={item} proofStatus={proofStatus} />
+  const renderMessage = useCallback(
+    ({ item }: { item: Message }) => (
+      <MessageBubble item={item} proofStatus={proofStatus} />
+    ),
+    [proofStatus]
   );
 
   const handleMomentPress = () => {

@@ -3,7 +3,7 @@
  * Search with autocomplete and recent searches
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   TextInput,
@@ -149,12 +149,14 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
             data={searchHistory}
             keyExtractor={(item, index) => `${item}-${index}`}
             estimatedItemSize={48}
-            renderItem={({ item }) => (
+            renderItem={useCallback(({ item }: { item: string }) => (
               <View style={styles.suggestionRow}>
                 <TouchableOpacity
                   style={styles.suggestionButton}
                   onPress={() => handleSuggestionPress(item)}
-                  hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Search for ${item}`}
                 >
                   <MaterialCommunityIcons
                     name="history"
@@ -170,7 +172,9 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                 <TouchableOpacity
                   onPress={() => removeFromHistory(item)}
                   style={styles.deleteButton}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${item} from history`}
                 >
                   <MaterialCommunityIcons
                     name="close"
@@ -179,7 +183,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                   />
                 </TouchableOpacity>
               </View>
-            )}
+            ), [handleSuggestionPress, removeFromHistory])}
             contentContainerStyle={styles.suggestionsList}
             keyboardShouldPersistTaps="handled"
           />

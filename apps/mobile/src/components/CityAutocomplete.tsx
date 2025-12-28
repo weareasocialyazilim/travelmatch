@@ -294,11 +294,13 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
             keyExtractor={(item) => item.id}
             keyboardShouldPersistTaps="handled"
             estimatedItemSize={56}
-            renderItem={({ item }) => (
+            renderItem={useCallback(({ item }: { item: City }) => (
               <TouchableOpacity
                 style={styles.suggestionItem}
                 onPress={() => handleSelectCity(item)}
-                hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel={`Select ${item.fullName}`}
               >
                 <MaterialCommunityIcons
                   name="city"
@@ -313,7 +315,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
                   )}
                 </View>
               </TouchableOpacity>
-            )}
+            ), [handleSelectCity])}
           />
         </View>
       )}

@@ -133,27 +133,31 @@ const MessagesScreen: React.FC = () => {
     refreshConversations();
   }, [refreshConversations]);
 
-  const handleChatPress = (conversation: Conversation) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('Chat', {
-      otherUser: {
-        id: conversation.participantId || '',
-        name: conversation.participantName || 'User',
-        avatar: conversation.participantAvatar,
-        isVerified: conversation.participantVerified,
-        role: 'Traveler',
-        kyc: 'Verified',
-        location: '',
-      },
-      conversationId: conversation.id,
-    });
-  };
+  const handleChatPress = useCallback(
+    (conversation: Conversation) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      navigation.navigate('Chat', {
+        otherUser: {
+          id: conversation.participantId || '',
+          name: conversation.participantName || 'User',
+          avatar: conversation.participantAvatar,
+          isVerified: conversation.participantVerified,
+          role: 'Traveler',
+          kyc: 'Verified',
+          location: '',
+        },
+        conversationId: conversation.id,
+      });
+    },
+    [navigation]
+  );
 
-  const renderChatItem = ({ item }: { item: Conversation }) => {
-    const isOnline = item.participantId
-      ? isUserOnline(item.participantId)
-      : false;
-    const isTyping = typingConversations.has(item.id);
+  const renderChatItem = useCallback(
+    ({ item }: { item: Conversation }) => {
+      const isOnline = item.participantId
+        ? isUserOnline(item.participantId)
+        : false;
+      const isTyping = typingConversations.has(item.id);
 
     return (
       <TouchableOpacity
@@ -230,17 +234,22 @@ const MessagesScreen: React.FC = () => {
         </View>
       </TouchableOpacity>
     );
-  };
+    },
+    [handleChatPress, isUserOnline, typingConversations]
+  );
 
-  const renderEmptyState = () => (
-    <EmptyState
-      icon="chat-outline"
-      title="No Messages Yet"
-      description="When you connect with travelers or hosts, your conversations will appear here."
-      actionLabel="Discover Moments"
-      onAction={() => navigation.navigate('Discover')}
-      style={styles.emptyStateContainer}
-    />
+  const renderEmptyState = useCallback(
+    () => (
+      <EmptyState
+        icon="chat-outline"
+        title="No Messages Yet"
+        description="When you connect with travelers or hosts, your conversations will appear here."
+        actionLabel="Discover Moments"
+        onAction={() => navigation.navigate('Discover')}
+        style={styles.emptyStateContainer}
+      />
+    ),
+    [navigation]
   );
 
   // Loading state - show skeleton

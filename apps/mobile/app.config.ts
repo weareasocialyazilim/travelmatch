@@ -53,6 +53,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       NSFaceIDUsageDescription:
         'TravelMatch uses Face ID for secure and quick account authentication.',
 
+      // Microphone for voice messages
+      NSMicrophoneUsageDescription:
+        'TravelMatch uses the microphone to record voice messages in chats.',
+
+      // Contacts for finding friends
+      NSContactsUsageDescription:
+        'TravelMatch can help you find friends who are also using the app.',
+
       // Push notifications background modes
       UIBackgroundModes: ['fetch', 'remote-notification'],
 
@@ -157,7 +165,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-notifications',
       {
-        icon: './assets/icon.png',
+        icon: './assets/notification-icon.png',
         color: '#F59E0B',
       },
     ],

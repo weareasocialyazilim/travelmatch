@@ -3,7 +3,7 @@
  * Uses Mapbox Geocoding API to search for places (POIs, venues, addresses)
  * Returns a Place object with name and address for CreateMoment flow
  */
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -267,11 +267,15 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
               keyExtractor={(item) => item.id}
               keyboardShouldPersistTaps="handled"
               estimatedItemSize={72}
-              renderItem={({ item }) => (
+              renderItem={useCallback(({ item }: { item: PlaceResult }) => (
                 <TouchableOpacity
                   style={styles.resultItem}
                   onPress={() => handleSelectPlace(item)}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select ${item.name}`}
+                  accessibilityHint={`Located at ${item.address}`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <View style={styles.resultIcon}>
                     <MaterialCommunityIcons
@@ -294,8 +298,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
                     color={COLORS.text.tertiary}
                   />
                 </TouchableOpacity>
-              )}
-            />
+              ), [handleSelectPlace, getCategoryIcon])}
           ) : query.length > 0 && !isLoading ? (
             <View style={styles.emptyState}>
               <MaterialCommunityIcons

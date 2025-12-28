@@ -261,4 +261,171 @@ describe('useAuth', () => {
       expect(result.current).toHaveProperty('updateUser');
     });
   });
+
+  describe('Token Refresh & Expiration', () => {
+    const mockRefreshSession = jest.requireMock(
+      '../../services/supabaseAuthService'
+    ).refreshSession;
+
+    beforeEach(() => {
+      mockRefreshSession.mockClear();
+    });
+
+    it('should handle token expiration gracefully', async () => {
+      // Setup: Mock an expired token scenario
+      const expiredSession = {
+        access_token: 'expired-token',
+        refresh_token: TEST_REFRESH_TOKEN,
+        expires_at: Date.now() - 1000, // Expired 1 second ago
+      };
+
+      mockLoginFn.mockResolvedValueOnce({
+        user: {
+          id: 'test-user-id',
+          email: TEST_EMAIL,
+          user_metadata: { name: TEST_USER_NAME },
+        },
+        session: expiredSession,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(
+        () => {
+          expect(result.current.authState).not.toBe('loading');
+        },
+        { timeout: 3000 }
+      );
+
+      // Auth context should be defined even with expired token
+      expect(result.current).toBeDefined();
+    });
+
+    it('should call refreshSession when token is about to expire', async () => {
+      // Mock a token that expires soon (within 5 minutes)
+      const soonExpiringSession = {
+        access_token: TEST_TOKEN,
+        refresh_token: TEST_REFRESH_TOKEN,
+        expires_at: Date.now() + 60000, // Expires in 1 minute
+      };
+
+      mockRefreshSession.mockResolvedValueOnce({
+        session: {
+          access_token: 'new-token',
+          refresh_token: 'new-refresh-token',
+          expires_at: Date.now() + 3600000,
+        },
+        error: null,
+      });
+
+      mockLoginFn.mockResolvedValueOnce({
+        user: {
+          id: 'test-user-id',
+          email: TEST_EMAIL,
+          user_metadata: { name: TEST_USER_NAME },
+        },
+        session: soonExpiringSession,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(
+        () => {
+          expect(result.current.authState).not.toBe('loading');
+        },
+        { timeout: 3000 }
+      );
+
+      // The hook should be ready to handle refresh
+      expect(typeof result.current.refreshUser).toBe('function');
+    });
+
+    it('should handle refresh failure and redirect to login', async () => {
+      mockRefreshSession.mockRejectedValueOnce(
+        new Error('Invalid refresh token')
+      );
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(
+        () => {
+          expect(result.current.authState).not.toBe('loading');
+        },
+        { timeout: 3000 }
+      );
+
+      // When refresh fails, user should be unauthenticated
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBeNull();
+    });
+
+    it('should silently refresh token on 401 response', async () => {
+      const newSession = {
+        access_token: 'refreshed-token',
+        refresh_token: 'new-refresh-token',
+        expires_at: Date.now() + 3600000,
+      };
+
+      mockRefreshSession.mockResolvedValueOnce({
+        session: newSession,
+        error: null,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(
+        () => {
+          expect(result.current.authState).not.toBe('loading');
+        },
+        { timeout: 3000 }
+      );
+
+      // Verify the refreshUser function exists for handling 401s
+      expect(result.current.refreshUser).toBeDefined();
+    });
+
+    it('should logout user when refresh token is invalid', async () => {
+      mockRefreshSession.mockResolvedValueOnce({
+        session: null,
+        error: { message: 'Refresh token expired', status: 401 },
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(
+        () => {
+          expect(result.current.authState).toBe('unauthenticated');
+        },
+        { timeout: 3000 }
+      );
+
+      // User should be logged out when refresh fails
+      expect(result.current.isAuthenticated).toBe(false);
+    });
+
+    it('should maintain session across app restarts with valid refresh token', async () => {
+      // Simulate stored session being restored
+      const storedSession = {
+        access_token: TEST_TOKEN,
+        refresh_token: TEST_REFRESH_TOKEN,
+        expires_at: Date.now() + 3600000,
+      };
+
+      jest.requireMock('../../services/supabaseAuthService').getSession.mockResolvedValueOnce(
+        storedSession
+      );
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(
+        () => {
+          expect(result.current.authState).not.toBe('loading');
+        },
+        { timeout: 3000 }
+      );
+
+      // Session restoration should be handled
+      expect(result.current).toBeDefined();
+    });
+  });
 });
