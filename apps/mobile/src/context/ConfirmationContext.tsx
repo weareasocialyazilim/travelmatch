@@ -4,17 +4,29 @@
  */
 
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Animated,
   Dimensions,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
@@ -65,46 +77,31 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
   const [visible, setVisible] = useState(false);
   const [config, setConfig] = useState<ConfirmationConfig | null>(null);
   const [loading, setLoading] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(0));
-  const [scaleAnim] = useState(new Animated.Value(0.9));
+
+  const fadeAnim = useSharedValue(0);
+  const scaleAnim = useSharedValue(0.9);
 
   const showConfirmation = useCallback(
     (newConfig: ConfirmationConfig) => {
       setConfig(newConfig);
       setVisible(true);
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      fadeAnim.value = withTiming(1, { duration: 200 });
+      scaleAnim.value = withSpring(1, {
+        damping: 15,
+        stiffness: 120,
+      });
     },
     [fadeAnim, scaleAnim],
   );
 
   const hideConfirmation = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 0.9,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setVisible(false);
-      setConfig(null);
-      setLoading(false);
+    fadeAnim.value = withTiming(0, { duration: 150 });
+    scaleAnim.value = withTiming(0.9, { duration: 150 }, (finished) => {
+      if (finished) {
+        runOnJS(setVisible)(false);
+        runOnJS(setConfig)(null);
+        runOnJS(setLoading)(false);
+      }
     });
   }, [fadeAnim, scaleAnim]);
 
@@ -159,6 +156,15 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
     }
   };
 
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: fadeAnim.value,
+  }));
+
+  const containerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAnim.value }],
+    opacity: fadeAnim.value,
+  }));
+
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({ showConfirmation, hideConfirmation }),
@@ -175,19 +181,14 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
         onRequestClose={handleCancel}
         statusBarTranslucent
       >
-        <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
+        <Animated.View style={[styles.backdrop, backdropStyle]}>
           <TouchableOpacity
             style={styles.backdropTouchable}
             activeOpacity={1}
             onPress={handleCancel}
           />
           {config && (
-            <Animated.View
-              style={[
-                styles.container,
-                { transform: [{ scale: scaleAnim }], opacity: fadeAnim },
-              ]}
-            >
+            <Animated.View style={[styles.container, containerStyle]}>
               {/* Icon */}
               <View
                 style={[
