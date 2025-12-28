@@ -1,9 +1,2 @@
-try {
-  module.exports =
-    require('@/features/moments/screens/MomentDetailScreen').default;
-} catch {
-  const React = require('react');
-  module.exports = function MomentDetailScreen() {
-    return React.createElement('RCTView', null, null);
-  };
-}
+// Re-export from the correct feature location
+export { default } from '@/features/profile/screens/MomentDetailScreen';
