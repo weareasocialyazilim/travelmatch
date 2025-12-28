@@ -4,56 +4,99 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* ═══════════════════════════════════════════
+       LIGHT MODE - Sunset Proof Palette
+       ═══════════════════════════════════════════ */
+
+    /* Background */
+    --background: 40 33% 99%; /* #FFFCF8 warm cream */
+    --foreground: 20 14% 10%; /* #1C1917 */
+
+    /* Card */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 20 14% 10%;
+
+    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 6 78% 57%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+    --popover-foreground: 20 14% 10%;
+
+    /* Primary - Amber */
+    --primary: 38 92% 50%; /* #F59E0B */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Magenta */
+    --secondary: 330 81% 60%; /* #EC4899 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Accent - Seafoam */
+    --accent: 173 58% 39%; /* #14B8A6 */
+    --accent-foreground: 0 0% 100%;
+
+    /* Trust - Emerald */
+    --trust: 160 84% 39%; /* #10B981 */
+
+    /* Muted */
+    --muted: 30 6% 96%; /* #F5F5F4 */
+    --muted-foreground: 25 5% 45%; /* #78716C */
+
+    /* Border */
+    --border: 30 6% 90%; /* #E7E5E4 */
+    --input: 30 6% 90%;
+    --ring: 38 92% 50%; /* Primary amber */
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success/Warning */
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
-    --warning-foreground: 222.2 84% 4.9%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 6 78% 57%;
-    --radius: 0.5rem;
+    --warning-foreground: 0 0% 100%;
+
+    /* Radius */
+    --radius: 16px;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 6 78% 57%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+    /* ═══════════════════════════════════════════
+       DARK MODE - Midnight Travel
+       ═══════════════════════════════════════════ */
+
+    --background: 20 14% 4%; /* #0C0A09 */
+    --foreground: 0 0% 100%;
+
+    --card: 20 14% 10%; /* #1C1917 */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 20 14% 10%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 38 92% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 330 81% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 173 58% 39%;
+    --accent-foreground: 0 0% 100%;
+
+    --trust: 160 84% 39%;
+
+    --muted: 20 14% 14%;
+    --muted-foreground: 30 6% 63%;
+
+    --border: 20 14% 18%;
+    --input: 20 14% 18%;
+    --ring: 38 92% 50%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
-    --warning-foreground: 222.2 84% 4.9%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 6 78% 57%;
+    --warning-foreground: 0 0% 100%;
   }
 }
 
@@ -61,8 +104,130 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  /* Tabular numbers for prices/scores */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  /* Glass effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-stone-900/80 backdrop-blur-xl border border-white/10;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-hero;
+  }
+
+  .gradient-text-sunset {
+    @apply bg-clip-text text-transparent bg-gradient-sunset;
+  }
+
+  /* Trust ring glow */
+  .trust-glow {
+    @apply shadow-trust-glow;
+  }
+
+  /* Hairline border */
+  .border-hairline {
+    @apply border border-black/10;
+  }
+
+  .border-hairline-light {
+    @apply border border-white/10;
+  }
+
+  /* Smooth scroll */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-transform duration-300 ease-out hover:-translate-y-1;
+  }
+
+  /* Press effect */
+  .press-effect {
+    @apply transition-transform duration-150 active:scale-[0.98];
+  }
+}
+
+@layer components {
+  /* Primary Button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-xl font-semibold text-white
+           bg-gradient-hero shadow-button
+           hover:shadow-lg hover:scale-[1.02]
+           active:scale-[0.98]
+           transition-all duration-200 ease-out;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-xl font-semibold
+           bg-secondary/10 text-secondary
+           hover:bg-secondary/20
+           active:scale-[0.98]
+           transition-all duration-200 ease-out;
+  }
+
+  /* Ghost Button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-xl font-semibold
+           hover:bg-stone-100 dark:hover:bg-stone-800
+           active:scale-[0.98]
+           transition-all duration-200 ease-out;
+  }
+
+  /* Card */
+  .card-base {
+    @apply bg-card rounded-2xl border border-stone-200/50 dark:border-stone-800
+           shadow-card hover:shadow-card-hover transition-shadow duration-300;
+  }
+
+  /* Trust Badge */
+  .trust-badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5
+           rounded-full text-xs font-semibold
+           bg-trust/10 text-trust;
+  }
+
+  /* Section Container */
+  .section-container {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Stat Card */
+  .stat-card {
+    @apply bg-card rounded-2xl border border-stone-200/50 dark:border-stone-800
+           p-6 shadow-card hover:shadow-card-hover transition-all duration-300;
   }
 }
 
@@ -117,24 +282,24 @@
 }
 
 .priority-high {
-  @apply border-l-4 border-l-orange-500;
+  @apply border-l-4 border-l-primary-500;
 }
 
 .priority-medium {
-  @apply border-l-4 border-l-yellow-500;
+  @apply border-l-4 border-l-secondary-400;
 }
 
 .priority-low {
-  @apply border-l-4 border-l-green-500;
+  @apply border-l-4 border-l-trust;
 }
 
 /* Status colors */
 .status-active {
-  @apply bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
+  @apply bg-trust/10 text-trust dark:bg-trust/20;
 }
 
 .status-pending {
-  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400;
+  @apply bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400;
 }
 
 .status-suspended {
@@ -142,5 +307,22 @@
 }
 
 .status-completed {
-  @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+  @apply bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-400;
+}
+
+/* Trust level badges */
+.trust-platinum {
+  @apply bg-gradient-to-r from-stone-300 to-stone-400 text-stone-900;
+}
+
+.trust-gold {
+  @apply bg-gradient-to-r from-primary-400 to-primary-500 text-white;
+}
+
+.trust-silver {
+  @apply bg-gradient-to-r from-stone-400 to-stone-500 text-white;
+}
+
+.trust-bronze {
+  @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white;
 }
