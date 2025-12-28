@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Animated, StyleSheet, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { GiftMomentBottomSheet } from '@/components/GiftMomentBottomSheet';
 import { GiftSuccessModal } from '@/components/GiftSuccessModal';
 import {
@@ -322,109 +323,115 @@ const MomentDetailScreen: React.FC = () => {
   const isCompleted = moment.status === 'completed';
 
   return (
-    <View style={styles.container}>
-      <MomentHeader
-        navigation={navigation}
-        isOwner={isOwner}
-        isSaved={isSaved}
-        actionLoading={actionLoading}
-        momentId={moment.id}
-        momentStatus={moment.status}
-        onSave={handleSave}
-        onDelete={handleDelete}
-        onShare={handleShare}
-        onEdit={handleEdit}
-        onReport={handleReport}
-      />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
+        <MomentHeader
+          navigation={navigation}
+          isOwner={isOwner}
+          isSaved={isSaved}
+          actionLoading={actionLoading}
+          momentId={moment.id}
+          momentStatus={moment.status}
+          onSave={handleSave}
+          onDelete={handleDelete}
+          onShare={handleShare}
+          onEdit={handleEdit}
+          onReport={handleReport}
+        />
 
-      {/* Scrollable Content */}
-      <Animated.ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        onScroll={handleScroll}
-        contentContainerStyle={styles.scrollViewContent}
-      >
-        <View style={styles.content}>
-          {/* Host Info */}
-          <HostSection user={momentUser} navigation={navigation} />
+        {/* Scrollable Content */}
+        <Animated.ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onScroll={handleScroll}
+          contentContainerStyle={styles.scrollViewContent}
+        >
+          <View style={styles.content}>
+            {/* Host Info */}
+            <HostSection user={momentUser} navigation={navigation} />
 
-          {/* Moment Info */}
-          <MomentInfo
-            title={moment.title}
-            category={moment.category}
-            location={moment.location}
-            availability={moment.availability}
-            date={moment.date}
-            story={moment.story}
-          />
-
-          {/* Owner Active: Pending Requests */}
-          {isOwner && !isCompleted && (
-            <RequestsSection
-              requests={pendingRequestsList}
-              onAccept={handleAcceptRequest}
-              onDecline={handleDeclineRequest}
+            {/* Moment Info */}
+            <MomentInfo
+              title={moment.title}
+              category={moment.category}
+              location={moment.location}
+              availability={moment.availability}
+              date={moment.date}
+              story={moment.story}
             />
-          )}
 
-          {/* Owner Completed: Summary */}
-          {isOwner && isCompleted && (
-            <SummarySection
-              totalEarned={moment.price * 3}
-              guestCount={3}
-              rating={4.8}
-            />
-          )}
+            {/* Owner Active: Pending Requests */}
+            {isOwner && !isCompleted && (
+              <RequestsSection
+                requests={pendingRequestsList}
+                onAccept={handleAcceptRequest}
+                onDecline={handleDeclineRequest}
+              />
+            )}
 
-          {/* Owner Completed: Reviews */}
-          {isOwner && isCompleted && <ReviewsSection reviews={reviews} />}
+            {/* Owner Completed: Summary */}
+            {isOwner && isCompleted && (
+              <SummarySection
+                totalEarned={moment.price * 3}
+                guestCount={3}
+                rating={4.8}
+              />
+            )}
 
-          <View style={styles.bottomSpacer} />
-        </View>
-      </Animated.ScrollView>
+            {/* Owner Completed: Reviews */}
+            {isOwner && isCompleted && <ReviewsSection reviews={reviews} />}
 
-      {/* Bottom Action Bar */}
-      <ActionBar
-        isOwner={isOwner}
-        isCompleted={isCompleted}
-        price={moment.price}
-        onGift={() => setShowGiftSheet(true)}
-        onCreateSimilar={handleCreateSimilar}
-      />
+            <View style={styles.bottomSpacer} />
+          </View>
+        </Animated.ScrollView>
 
-      {/* Gift Bottom Sheet */}
-      <GiftMomentBottomSheet
-        visible={showGiftSheet}
-        moment={giftSheetMoment}
-        onClose={() => setShowGiftSheet(false)}
-        onGift={handleGiftOption}
-      />
+        {/* Bottom Action Bar */}
+        <ActionBar
+          isOwner={isOwner}
+          isCompleted={isCompleted}
+          price={moment.price}
+          onGift={() => setShowGiftSheet(true)}
+          onCreateSimilar={handleCreateSimilar}
+        />
 
-      {/* Success Modal */}
-      <GiftSuccessModal
-        visible={showSuccessModal}
-        amount={giftAmount}
-        momentTitle={moment.title}
-        onViewApprovals={handleViewApprovals}
-        onClose={() => {
-          setShowSuccessModal(false);
-          navigation.goBack();
-        }}
-      />
+        {/* Gift Bottom Sheet */}
+        <GiftMomentBottomSheet
+          visible={showGiftSheet}
+          moment={giftSheetMoment}
+          onClose={() => setShowGiftSheet(false)}
+          onGift={handleGiftOption}
+        />
 
-      {/* Report/Block Sheet */}
-      <ReportBlockBottomSheet
-        visible={showReportSheet}
-        onClose={() => setShowReportSheet(false)}
-        onSubmit={handleReportSubmit}
-        targetType="moment"
-      />
-    </View>
+        {/* Success Modal */}
+        <GiftSuccessModal
+          visible={showSuccessModal}
+          amount={giftAmount}
+          momentTitle={moment.title}
+          onViewApprovals={handleViewApprovals}
+          onClose={() => {
+            setShowSuccessModal(false);
+            navigation.goBack();
+          }}
+        />
+
+        {/* Report/Block Sheet */}
+        <ReportBlockBottomSheet
+          visible={showReportSheet}
+          onClose={() => setShowReportSheet(false)}
+          onSubmit={handleReportSubmit}
+          targetType="moment"
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+  },
   container: {
     backgroundColor: COLORS.white,
     flex: 1,
