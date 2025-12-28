@@ -2,37 +2,34 @@
 
 import {
   Users,
-  Heart,
+  Activity,
   Camera,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Activity,
   ArrowRight,
   BarChart3,
+  Heart,
+  AlertTriangle,
+  Shield,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { StatCard } from '@/components/common/stat-card';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-} from 'recharts';
-import { formatCurrency, formatDate } from '@/lib/utils';
+  AdminAreaChart,
+  AdminLineChart,
+  CHART_COLORS,
+  ChartLegend,
+} from '@/components/common/admin-chart';
+import { formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
-// Mock data
+// Mock data - Enhanced with sparklines
 const overviewStats = {
   totalUsers: 125000,
   userGrowth: 8.5,
@@ -55,267 +52,230 @@ const userActivityData = [
 ];
 
 const revenueData = [
-  { date: '12 Ara', revenue: 42000 },
-  { date: '13 Ara', revenue: 45000 },
-  { date: '14 Ara', revenue: 38000 },
-  { date: '15 Ara', revenue: 52000 },
-  { date: '16 Ara', revenue: 58000 },
-  { date: '17 Ara', revenue: 65000 },
-  { date: '18 Ara', revenue: 48000 },
+  { date: '12 Ara', revenue: 42000, subscriptions: 28000, gifts: 14000 },
+  { date: '13 Ara', revenue: 45000, subscriptions: 30000, gifts: 15000 },
+  { date: '14 Ara', revenue: 38000, subscriptions: 25000, gifts: 13000 },
+  { date: '15 Ara', revenue: 52000, subscriptions: 35000, gifts: 17000 },
+  { date: '16 Ara', revenue: 58000, subscriptions: 38000, gifts: 20000 },
+  { date: '17 Ara', revenue: 65000, subscriptions: 42000, gifts: 23000 },
+  { date: '18 Ara', revenue: 48000, subscriptions: 32000, gifts: 16000 },
 ];
 
 const pendingTasks = [
-  { id: '1', type: 'kyc', title: 'KYC Onayı Bekliyor', count: 24, priority: 'high' },
-  { id: '2', type: 'payout', title: 'Ödeme Onayı Bekliyor', count: 12, priority: 'high' },
-  { id: '3', type: 'report', title: 'Şikayet İncelemesi', count: 45, priority: 'medium' },
-  { id: '4', type: 'moment', title: 'Moment Moderasyonu', count: 156, priority: 'medium' },
+  { id: '1', type: 'kyc', title: 'KYC Onayı Bekliyor', count: 24, priority: 'high', icon: Shield },
+  { id: '2', type: 'payout', title: 'Ödeme Onayı Bekliyor', count: 12, priority: 'high', icon: DollarSign },
+  { id: '3', type: 'report', title: 'Şikayet İncelemesi', count: 45, priority: 'medium', icon: AlertTriangle },
+  { id: '4', type: 'moment', title: 'Moment Moderasyonu', count: 156, priority: 'medium', icon: Camera },
 ];
 
 const systemHealth = {
-  api: { status: 'healthy', uptime: 99.98 },
-  database: { status: 'healthy', uptime: 99.99 },
-  storage: { status: 'healthy', uptime: 99.95 },
-  notifications: { status: 'degraded', uptime: 98.5 },
+  api: { status: 'healthy' as const, uptime: 99.98, label: 'API Gateway' },
+  database: { status: 'healthy' as const, uptime: 99.99, label: 'Database' },
+  storage: { status: 'healthy' as const, uptime: 99.95, label: 'Storage' },
+  notifications: { status: 'degraded' as const, uptime: 98.5, label: 'Notifications' },
 };
 
-const recentActivity = [
-  { id: '1', type: 'user', message: 'Yeni kullanıcı kaydı: Ahmet Y.', time: '2 dk önce' },
-  { id: '2', type: 'payment', message: 'Premium abonelik: ₺149.99', time: '5 dk önce' },
-  { id: '3', type: 'report', message: 'Yeni şikayet alındı', time: '8 dk önce' },
-  { id: '4', type: 'moment', message: 'Moment onaylandı: #12345', time: '12 dk önce' },
-  { id: '5', type: 'payout', message: 'Ödeme onaylandı: ₺540.00', time: '15 dk önce' },
+const quickLinks = [
+  {
+    title: 'Analitik',
+    description: 'Detaylı metrikler',
+    href: '/analytics',
+    icon: BarChart3,
+    color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+  },
+  {
+    title: 'Gelir',
+    description: 'Finansal raporlar',
+    href: '/revenue',
+    icon: DollarSign,
+    color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+  },
+  {
+    title: 'Coğrafya',
+    description: 'Bölgesel analiz',
+    href: '/geographic',
+    icon: Heart,
+    color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+  },
+  {
+    title: 'Olaylar',
+    description: 'Sistem durumu',
+    href: '/incidents',
+    icon: AlertTriangle,
+    color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+  },
 ];
 
+// Sparkline data generators
+const generateSparkline = (trend: 'up' | 'down' | 'stable') => {
+  const base = [20, 25, 22, 28, 32, 30, 35, 40];
+  if (trend === 'up') return base;
+  if (trend === 'down') return base.reverse();
+  return base.map((v) => v + Math.random() * 5 - 2.5);
+};
+
 export default function DashboardPage() {
-  const getStatusColor = (status: string) => {
+  const getStatusIcon = (status: 'healthy' | 'degraded' | 'down' | 'maintenance') => {
     switch (status) {
       case 'healthy':
-        return 'bg-green-500';
+        return <CheckCircle2 className="h-4 w-4 text-status-healthy" />;
       case 'degraded':
-        return 'bg-yellow-500';
+        return <AlertCircle className="h-4 w-4 text-status-degraded" />;
       case 'down':
-        return 'bg-red-500';
+        return <XCircle className="h-4 w-4 text-status-down" />;
+      case 'maintenance':
+        return <Clock className="h-4 w-4 text-status-maintenance" />;
       default:
-        return 'bg-gray-500';
+        return null;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-800';
+        return (
+          <Badge className="badge-gradient-amber text-[10px] font-semibold">
+            Acil
+          </Badge>
+        );
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'low':
-        return 'bg-green-100 text-green-800';
+        return (
+          <Badge variant="secondary" className="text-[10px] font-semibold">
+            Normal
+          </Badge>
+        );
       default:
-        return 'bg-gray-100 text-gray-800';
+        return null;
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="admin-content space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">Platform genel bakış ve özet metrikleri</p>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Toplam Kullanıcı</p>
-                <p className="text-2xl font-bold">
-                  {overviewStats.totalUsers.toLocaleString('tr-TR')}
-                </p>
-              </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm">
-              {overviewStats.userGrowth > 0 ? (
-                <>
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="text-green-600">+{overviewStats.userGrowth}%</span>
-                </>
-              ) : (
-                <>
-                  <TrendingDown className="h-4 w-4 text-red-500" />
-                  <span className="text-red-600">{overviewStats.userGrowth}%</span>
-                </>
-              )}
-              <span className="text-muted-foreground">son 30 gün</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Aktif Kullanıcı</p>
-                <p className="text-2xl font-bold">
-                  {overviewStats.activeUsers.toLocaleString('tr-TR')}
-                </p>
-              </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <Activity className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">+{overviewStats.activeGrowth}%</span>
-              <span className="text-muted-foreground">son 7 gün</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Toplam Gelir</p>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(overviewStats.totalRevenue, 'TRY')}
-                </p>
-              </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
-                <DollarSign className="h-6 w-6 text-emerald-600" />
-              </div>
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">+{overviewStats.revenueGrowth}%</span>
-              <span className="text-muted-foreground">son 30 gün</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Toplam Moment</p>
-                <p className="text-2xl font-bold">
-                  {overviewStats.totalMoments.toLocaleString('tr-TR')}
-                </p>
-              </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                <Camera className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">+{overviewStats.momentGrowth}%</span>
-              <span className="text-muted-foreground">son 30 gün</span>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Key Metrics - Using new StatCard */}
+      <div className="dashboard-grid">
+        <StatCard
+          title="Toplam Kullanıcı"
+          value={overviewStats.totalUsers.toLocaleString('tr-TR')}
+          icon={Users}
+          change={overviewStats.userGrowth}
+          changeLabel="son 30 gün"
+          href="/users"
+          sparkline={generateSparkline('up')}
+        />
+        <StatCard
+          title="Aktif Kullanıcı"
+          value={overviewStats.activeUsers.toLocaleString('tr-TR')}
+          icon={Activity}
+          change={overviewStats.activeGrowth}
+          changeLabel="son 7 gün"
+          variant="success"
+          href="/analytics"
+          sparkline={generateSparkline('up')}
+        />
+        <StatCard
+          title="Toplam Gelir"
+          value={formatCurrency(overviewStats.totalRevenue, 'TRY')}
+          icon={DollarSign}
+          change={overviewStats.revenueGrowth}
+          changeLabel="son 30 gün"
+          variant="success"
+          href="/revenue"
+          sparkline={generateSparkline('up')}
+        />
+        <StatCard
+          title="Toplam Moment"
+          value={overviewStats.totalMoments.toLocaleString('tr-TR')}
+          icon={Camera}
+          change={overviewStats.momentGrowth}
+          changeLabel="son 30 gün"
+          href="/moments"
+          sparkline={generateSparkline('up')}
+        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Charts */}
+        {/* Charts - 2/3 width */}
         <div className="lg:col-span-2 space-y-6">
           {/* User Activity Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Kullanıcı Aktivitesi</CardTitle>
-              <CardDescription>Son 7 günlük DAU ve yeni kayıtlar</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={userActivityData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area
-                      type="monotone"
-                      dataKey="users"
-                      stackId="1"
-                      stroke="#3b82f6"
-                      fill="#93c5fd"
-                      name="Aktif Kullanıcı"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="newUsers"
-                      stackId="2"
-                      stroke="#22c55e"
-                      fill="#86efac"
-                      name="Yeni Kayıt"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <AdminAreaChart
+            title="Kullanıcı Aktivitesi"
+            description="Son 7 günlük DAU ve yeni kayıtlar"
+            data={userActivityData}
+            xAxisKey="date"
+            height={280}
+            areas={[
+              { dataKey: 'users', name: 'Aktif Kullanıcı', color: CHART_COLORS.primary },
+              { dataKey: 'newUsers', name: 'Yeni Kayıt', color: CHART_COLORS.trust },
+            ]}
+            formatter={(value, name) => [
+              value.toLocaleString('tr-TR'),
+              name,
+            ]}
+          />
 
           {/* Revenue Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Günlük Gelir</CardTitle>
-              <CardDescription>Son 7 günlük gelir trendi</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`} />
-                    <Tooltip formatter={(value: number) => [formatCurrency(value, 'TRY'), 'Gelir']} />
-                    <Line
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      dot={{ fill: '#22c55e' }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <AdminLineChart
+            title="Günlük Gelir"
+            description="Son 7 günlük gelir trendi"
+            data={revenueData}
+            xAxisKey="date"
+            height={250}
+            lines={[
+              { dataKey: 'subscriptions', name: 'Abonelik', color: CHART_COLORS.primary },
+              { dataKey: 'gifts', name: 'Hediye', color: CHART_COLORS.secondary },
+            ]}
+            yAxisFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
+            formatter={(value, name) => [formatCurrency(value, 'TRY'), name]}
+          />
         </div>
 
-        {/* Right Sidebar */}
+        {/* Right Sidebar - 1/3 width */}
         <div className="space-y-6">
           {/* Pending Tasks */}
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Bekleyen Görevler</CardTitle>
+                <CardTitle className="text-base font-semibold">Bekleyen Görevler</CardTitle>
                 <Link href="/queue">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
                     Tümü
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="h-3 w-3" />
                   </Button>
                 </Link>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2">
               {pendingTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center justify-between rounded-lg border p-3"
+                  className={cn(
+                    'flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50',
+                    task.priority === 'high' && 'border-l-4 border-l-amber-500'
+                  )}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${getPriorityColor(task.priority)}`}
+                      className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-lg',
+                        task.priority === 'high'
+                          ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                          : 'bg-muted text-muted-foreground'
+                      )}
                     >
-                      {task.count}
+                      <task.icon className="h-4 w-4" />
                     </div>
-                    <span className="text-sm font-medium">{task.title}</span>
+                    <div>
+                      <p className="text-sm font-medium">{task.title}</p>
+                      <p className="text-xs text-muted-foreground">{task.count} adet bekliyor</p>
+                    </div>
                   </div>
-                  <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
-                    {task.priority === 'high' ? 'Acil' : 'Normal'}
-                  </Badge>
+                  {getPriorityBadge(task.priority)}
                 </div>
               ))}
             </CardContent>
@@ -325,11 +285,11 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Sistem Durumu</CardTitle>
+                <CardTitle className="text-base font-semibold">Sistem Durumu</CardTitle>
                 <Link href="/ops-center">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
                     Detay
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="h-3 w-3" />
                   </Button>
                 </Link>
               </div>
@@ -337,31 +297,51 @@ export default function DashboardPage() {
             <CardContent className="space-y-3">
               {Object.entries(systemHealth).map(([key, data]) => (
                 <div key={key} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`h-2 w-2 rounded-full ${getStatusColor(data.status)}`} />
-                    <span className="text-sm font-medium capitalize">{key}</span>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        'health-indicator',
+                        data.status === 'healthy' && 'health-indicator-healthy',
+                        data.status === 'degraded' && 'health-indicator-degraded',
+                        data.status === 'down' && 'health-indicator-down',
+                        data.status === 'maintenance' && 'health-indicator-maintenance'
+                      )}
+                    />
+                    <span className="text-sm font-medium">{data.label}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">{data.uptime}%</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{data.uptime}%</span>
+                    {getStatusIcon(data.status)}
+                  </div>
                 </div>
               ))}
             </CardContent>
           </Card>
 
-          {/* Recent Activity */}
+          {/* Revenue Summary Mini Card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Son Aktivite</CardTitle>
+              <CardTitle className="text-base font-semibold">Bugünkü Özet</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-3">
-                  <div className="mt-1 h-2 w-2 rounded-full bg-blue-500" />
-                  <div className="flex-1">
-                    <p className="text-sm">{activity.message}</p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
-                  </div>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Yeni Kayıt</span>
+                  <span className="text-sm font-semibold">+248</span>
                 </div>
-              ))}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Aktif Oturum</span>
+                  <span className="text-sm font-semibold">3,892</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Günlük Gelir</span>
+                  <span className="text-sm font-semibold text-emerald-600">₺48,750</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Yeni Moment</span>
+                  <span className="text-sm font-semibold">1,234</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -369,66 +349,20 @@ export default function DashboardPage() {
 
       {/* Quick Links */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Link href="/analytics">
-          <Card className="hover:bg-accent/50 cursor-pointer transition-colors">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Analitik</p>
-                  <p className="text-sm text-muted-foreground">Detaylı metrikler</p>
-                </div>
+        {quickLinks.map((link) => (
+          <Link key={link.href} href={link.href}>
+            <Card className="quick-action-card">
+              <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', link.color)}>
+                <link.icon className="h-5 w-5" />
               </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/revenue">
-          <Card className="hover:bg-accent/50 cursor-pointer transition-colors">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Gelir</p>
-                  <p className="text-sm text-muted-foreground">Finansal raporlar</p>
-                </div>
+              <div className="flex-1">
+                <p className="font-medium">{link.title}</p>
+                <p className="text-xs text-muted-foreground">{link.description}</p>
               </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/geographic">
-          <Card className="hover:bg-accent/50 cursor-pointer transition-colors">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-                  <Heart className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Coğrafya</p>
-                  <p className="text-sm text-muted-foreground">Bölgesel analiz</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/incidents">
-          <Card className="hover:bg-accent/50 cursor-pointer transition-colors">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Olaylar</p>
-                  <p className="text-sm text-muted-foreground">Sistem durumu</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+              <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+            </Card>
+          </Link>
+        ))}
       </div>
     </div>
   );
