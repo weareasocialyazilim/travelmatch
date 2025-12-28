@@ -11,8 +11,16 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { Animated, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+  withSequence,
+  runOnJS,
+} from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -31,7 +39,11 @@ const ToastContext = createContext<ToastContextType | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<ToastOptions | null>(null);
-  const [opacity] = useState(new Animated.Value(0));
+  const opacity = useSharedValue(0);
+
+  const clearToast = useCallback(() => {
+    setToast(null);
+  }, []);
 
   const showToast = useCallback((options: ToastOptions) => {
     setToast(options);
@@ -39,23 +51,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (toast) {
-      Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.delay(toast.duration || 3000),
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setToast(null);
-      });
+      const duration = toast.duration || 3000;
+      opacity.value = withSequence(
+        withTiming(1, { duration: 200 }),
+        withDelay(
+          duration,
+          withTiming(0, { duration: 200 }, (finished) => {
+            if (finished) {
+              runOnJS(clearToast)();
+            }
+          }),
+        ),
+      );
     }
-  }, [toast, opacity]);
+  }, [toast, opacity, clearToast]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   const getToastConfig = (type: ToastType = 'info') => {
     const configs = {
@@ -90,7 +103,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <Animated.View
           style={[
             styles.toast,
-            { opacity, backgroundColor: getToastConfig(toast.type).bgColor },
+            { backgroundColor: getToastConfig(toast.type).bgColor },
+            animatedStyle,
           ]}
         >
           <MaterialCommunityIcons
