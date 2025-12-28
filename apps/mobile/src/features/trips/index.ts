@@ -20,3 +20,14 @@ export { useTrips, useTrip, useCreateTrip, useUpdateTrip, useDeleteTrip, useMyTr
 // Services
 export { tripsApi } from './services/tripsApi';
 export type { TripFilters, CreateTripDto, UpdateTripDto } from './services/tripsApi';
+
+// Types
+export type {
+  Moment,
+  MomentData,
+  MomentUser,
+  MomentLocation,
+  User,
+  Trip,
+  UserProfile,
+} from './types';
