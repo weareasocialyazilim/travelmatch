@@ -99,7 +99,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
                 <MaterialCommunityIcons
                   name="map-marker"
                   size={10}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
                 <Text style={styles.gridDistance}>{locationCity}</Text>
               </View>
@@ -130,10 +130,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   gridCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 4,
@@ -161,19 +161,19 @@ const styles = StyleSheet.create({
   },
   gridCreatorName: {
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
   },
   gridTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 17,
     marginBottom: 4,
   },
   gridStory: {
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 6,
   },
   gridFooter: {
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   gridDistance: {
     fontSize: 10,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 2,
   },
   gridPrice: {

@@ -15,7 +15,7 @@ import Animated, {
   withTiming,
   withSequence,
 } from 'react-native-reanimated';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 
 export type GiftStatus =
   | 'sent'
@@ -120,12 +120,13 @@ const StepCircle: React.FC<{
   }));
 
   const backgroundColor = isCompleted
-    ? COLORS.success
+    ? COLORS.feedback.success
     : isCurrent
-      ? COLORS.primary
-      : COLORS.gray[200];
+      ? COLORS.brand.primary
+      : primitives.stone[200];
 
-  const iconColor = isCompleted || isCurrent ? COLORS.white : COLORS.gray[400];
+  const iconColor =
+    isCompleted || isCurrent ? COLORS.utility.white : primitives.stone[400];
 
   return (
     <Animated.View
@@ -159,7 +160,7 @@ export const GiftJourneyTimeline: React.FC<GiftJourneyTimelineProps> = ({
           <MaterialCommunityIcons
             name={currentStatus === 'rejected' ? 'close-circle' : 'cash-refund'}
             size={24}
-            color={COLORS.white}
+            color={COLORS.utility.white}
           />
         </View>
         <Text style={styles.specialLabel}>
@@ -266,10 +267,10 @@ const styles = StyleSheet.create({
     top: -24,
     width: 2,
     height: 24,
-    backgroundColor: COLORS.gray[200],
+    backgroundColor: primitives.stone[200],
   },
   connectorCompleted: {
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success,
   },
   circle: {
     width: 40,
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   circleCurrent: {
-    shadowColor: COLORS.primary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
@@ -293,14 +294,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.gray[400],
+    color: primitives.stone[400],
   },
   labelActive: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   description: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   // Compact styles
@@ -313,19 +314,19 @@ const styles = StyleSheet.create({
   compactConnector: {
     width: 24,
     height: 2,
-    backgroundColor: COLORS.gray[200],
+    backgroundColor: primitives.stone[200],
   },
   compactDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.gray[200],
+    backgroundColor: primitives.stone[200],
   },
   compactDotCompleted: {
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success,
   },
   compactDotCurrent: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     width: 14,
     height: 14,
     borderRadius: 7,
@@ -344,17 +345,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   errorCircle: {
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
   },
   specialLabel: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   specialDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });
 

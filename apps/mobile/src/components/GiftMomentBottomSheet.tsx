@@ -13,7 +13,7 @@ import {
   PanResponder,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { ConfirmGiftModal } from './ConfirmGiftModal';
 import { useScreenSecurity } from '../hooks/useScreenSecurity';
@@ -222,7 +222,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                 <MaterialCommunityIcons
                   name="map-marker"
                   size={14}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
                 <Text style={styles.previewMetaText}>
                   {moment.location?.name || 'Unknown Location'}
@@ -232,7 +232,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                 <MaterialCommunityIcons
                   name="calendar"
                   size={14}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
                 <Text style={styles.previewMetaText}>
                   {moment.dateRange
@@ -253,7 +253,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                 <MaterialCommunityIcons
                   name="flash"
                   size={20}
-                  color={COLORS.success}
+                  color={COLORS.feedback.success}
                 />
                 <Text style={styles.protectionTitle}>Direct Payment</Text>
               </View>
@@ -267,7 +267,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                 <MaterialCommunityIcons
                   name="shield-check"
                   size={20}
-                  color={COLORS.success}
+                  color={COLORS.feedback.success}
                 />
                 <Text style={styles.protectionTitle}>
                   Protected by ProofLoop™
@@ -320,7 +320,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                   color={
                     paymentMethod === 'apple-pay'
                       ? COLORS.buttonDark
-                      : COLORS.textSecondary
+                      : COLORS.text.secondary
                   }
                 />
                 <Text
@@ -350,7 +350,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                     color={
                       paymentMethod === 'google-pay'
                         ? COLORS.buttonDark
-                        : COLORS.textSecondary
+                        : COLORS.text.secondary
                     }
                   />
                   <Text
@@ -379,7 +379,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                   color={
                     paymentMethod === 'card'
                       ? COLORS.buttonDark
-                      : COLORS.textSecondary
+                      : COLORS.text.secondary
                   }
                 />
                 <Text
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: SHEET_HEIGHT,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
   },
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   previewBadgeText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   previewTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 6,
   },
   previewMeta: {
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   },
   previewMetaText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 4,
   },
   directPayNotice: {
@@ -525,16 +525,16 @@ const styles = StyleSheet.create({
   protectionTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: 8,
   },
   protectionText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
   paymentInfo: {
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -547,22 +547,22 @@ const styles = StyleSheet.create({
   },
   paymentLabel: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   paymentValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   paymentDivider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginVertical: 8,
   },
   paymentTotal: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   paymentMethodSection: {
     marginBottom: 20,
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   paymentMethods: {
@@ -579,24 +579,24 @@ const styles = StyleSheet.create({
   paymentMethodButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: 12,
     padding: 16,
     borderWidth: 2,
-    borderColor: COLORS.transparent,
+    borderColor: COLORS.utility.transparent,
   },
   paymentMethodSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     backgroundColor: COLORS.mintTransparentLight,
   },
   paymentMethodText: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: 12,
   },
   paymentMethodTextSelected: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   ctaSection: {
     paddingVertical: 20,
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
   ctaButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 17,
     fontWeight: '700',
   },

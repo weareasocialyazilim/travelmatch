@@ -31,7 +31,7 @@ MomentGallery.displayName = 'MomentGallery';
 
 const styles = StyleSheet.create({
   heroImageContainer: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     left: 0,
     overflow: 'hidden',
     position: 'absolute',

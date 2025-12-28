@@ -43,7 +43,7 @@ interface SuccessConfig {
 const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   card_added: {
     icon: 'credit-card-check',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Card Added Successfully',
     subtitle: "You can now use this card to support travelers' moments.",
     primaryButton: 'Done',
@@ -51,7 +51,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   card_removed: {
     icon: 'credit-card-remove',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Card Removed',
     subtitle: 'Your card has been removed from your account.',
     primaryButton: 'Done',
@@ -59,7 +59,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   cache_cleared: {
     icon: 'cached',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Cache Cleared',
     subtitle: 'App cache has been cleared successfully.',
     primaryButton: 'Done',
@@ -67,7 +67,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   gift_sent: {
     icon: 'gift',
-    iconColor: COLORS.primary,
+    iconColor: COLORS.brand.primary,
     emoji: '🎉',
     title: 'Gift Sent!',
     subtitle:
@@ -77,7 +77,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   withdraw: {
     icon: 'check-circle',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Withdrawal Requested',
     subtitle: "You'll receive the money soon.",
     primaryButton: 'Done',
@@ -86,7 +86,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   dispute: {
     icon: 'check-circle',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Dispute Submitted Successfully',
     subtitle:
       'Your dispute has been received and a confirmation email has been sent. Our support team will review your case within 3-5 business days.',
@@ -97,7 +97,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   proof_uploaded: {
     icon: 'check-circle',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Proof Uploaded!',
     subtitle:
       "Your proof has been submitted for verification. You'll be notified once it's approved.",
@@ -106,7 +106,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   proof_approved: {
     icon: 'check-decagram',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Proof Approved!',
     subtitle:
       'Congratulations! Your proof has been verified and funds have been released.',
@@ -115,7 +115,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   profile_complete: {
     icon: 'account-check',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: "You're in!",
     subtitle: "Let's personalize your TravelMatch journey.",
     primaryButton: 'Start exploring',
@@ -123,7 +123,7 @@ const SUCCESS_CONFIGS: Record<SuccessType, SuccessConfig> = {
   },
   generic: {
     icon: 'check-circle',
-    iconColor: COLORS.success,
+    iconColor: COLORS.feedback.success,
     title: 'Success!',
     subtitle: 'Operation completed successfully.',
     primaryButton: 'Done',
@@ -170,7 +170,7 @@ export const SuccessScreen: React.FC = () => {
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-          <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
       </View>
 
@@ -266,7 +266,7 @@ export const SuccessScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -316,25 +316,25 @@ const styles = StyleSheet.create({
   headline: {
     ...TYPOGRAPHY.h1,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     letterSpacing: -0.5,
   },
   body: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: 16,
   },
   detailsCard: {
     width: '100%',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 20,
     gap: 16,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -347,12 +347,12 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   detailValue: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   footer: {
     paddingHorizontal: 24,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   primaryButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -370,21 +370,21 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   secondaryButton: {
-    backgroundColor: COLORS.transparent,
+    backgroundColor: COLORS.utility.transparent,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });
 

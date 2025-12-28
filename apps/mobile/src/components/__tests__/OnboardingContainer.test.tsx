@@ -74,7 +74,7 @@ describe('OnboardingContainer', () => {
       const { ActivityIndicator } = require('react-native');
       const { COLORS } = require('../../constants/colors');
       const indicator = UNSAFE_getByType(ActivityIndicator);
-      expect(indicator.props.color).toBe(COLORS.primary);
+      expect(indicator.props.color).toBe(COLORS.brand.primary);
     });
 
     it('loading indicator is large size', () => {

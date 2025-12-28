@@ -30,7 +30,7 @@ const KYCPendingScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="clock-outline"
                 size={48}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <Text style={kycStyles.title}>Verification in Progress</Text>
@@ -60,7 +60,7 @@ const KYCPendingScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name={step.icon}
                   size={20}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
                 <View style={kycStyles.nextStepContent}>
                   <Text style={kycStyles.nextStepTitle}>{step.title}</Text>

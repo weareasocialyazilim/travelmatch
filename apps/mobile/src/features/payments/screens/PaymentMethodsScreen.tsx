@@ -104,7 +104,7 @@ const PaymentMethodsScreen = () => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Payment methods</Text>
           <View style={styles.backButton} />
@@ -161,7 +161,7 @@ const PaymentMethodsScreen = () => {
             <MaterialCommunityIcons
               name="shield-check"
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.securityText}>
               All payment data is encrypted and{'\n'}securely stored. We never store full card
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '700',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 12,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   securityNotice: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     padding: 14,
     borderRadius: 12,
     marginBottom: 24,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   securityText: {
     flex: 1,
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
   addCardButton: {
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   addCardButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

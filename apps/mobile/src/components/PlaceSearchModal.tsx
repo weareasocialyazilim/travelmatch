@@ -216,7 +216,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
             style={styles.closeButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
           <Text style={styles.title}>Search Place</Text>
           <View style={styles.closeButton} />
@@ -228,19 +228,19 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
             <MaterialCommunityIcons
               name="magnify"
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <TextInput
               style={styles.input}
               value={query}
               onChangeText={handleTextChange}
               placeholder="Search for a place, venue, or address"
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               autoCapitalize="words"
               autoCorrect={false}
               autoFocus
             />
-            {isLoading && <ActivityIndicator size="small" color={COLORS.primary} />}
+            {isLoading && <ActivityIndicator size="small" color={COLORS.brand.primary} />}
             {query.length > 0 && !isLoading && (
               <TouchableOpacity
                 onPress={() => {
@@ -252,7 +252,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
                 <MaterialCommunityIcons
                   name="close-circle"
                   size={18}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
               </TouchableOpacity>
             )}
@@ -277,7 +277,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
                     <MaterialCommunityIcons
                       name={getCategoryIcon(item.category)}
                       size={20}
-                      color={COLORS.primary}
+                      color={COLORS.brand.primary}
                     />
                   </View>
                   <View style={styles.resultContent}>
@@ -291,7 +291,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
                   <MaterialCommunityIcons
                     name="chevron-right"
                     size={20}
-                    color={COLORS.textTertiary}
+                    color={COLORS.text.tertiary}
                   />
                 </TouchableOpacity>
               )}
@@ -301,7 +301,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
               <MaterialCommunityIcons
                 name="map-search"
                 size={48}
-                color={COLORS.textTertiary}
+                color={COLORS.text.tertiary}
               />
               <Text style={styles.emptyStateText}>No places found</Text>
               <Text style={styles.emptyStateSubtext}>
@@ -313,7 +313,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
               <MaterialCommunityIcons
                 name="map-marker-radius"
                 size={48}
-                color={COLORS.textTertiary}
+                color={COLORS.text.tertiary}
               />
               <Text style={styles.emptyStateText}>Find a place</Text>
               <Text style={styles.emptyStateSubtext}>
@@ -330,7 +330,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -339,8 +339,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    borderBottomColor: COLORS.border.default,
+    backgroundColor: COLORS.utility.white,
   },
   closeButton: {
     width: 40,
@@ -351,13 +351,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   searchContainer: {
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   resultsContainer: {
     flex: 1,
@@ -380,9 +380,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     gap: 12,
   },
   resultIcon: {
@@ -399,11 +399,11 @@ const styles = StyleSheet.create({
   resultName: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   resultAddress: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   emptyState: {
@@ -415,12 +415,12 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: 8,
   },

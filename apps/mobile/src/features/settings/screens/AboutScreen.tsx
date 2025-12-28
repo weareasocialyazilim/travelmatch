@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '@/constants/colors';
+import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
@@ -45,7 +45,7 @@ export const AboutScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>About TravelMatch</Text>
@@ -59,7 +59,7 @@ export const AboutScreen: React.FC = () => {
             <MaterialCommunityIcons
               name={'airplane' as IconName}
               size={40}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           </View>
           <Text style={styles.appName}>TravelMatch</Text>
@@ -82,7 +82,7 @@ export const AboutScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name={item.icon}
                     size={24}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                 </View>
                 <Text style={styles.infoLabel}>{item.label}</Text>
@@ -113,7 +113,7 @@ export const AboutScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: -0.24,
   },
   content: {
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   appName: {
     ...TYPOGRAPHY.display2,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: -0.5,
     lineHeight: 38,
     marginBottom: 8,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   tagline: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
     maxWidth: 336,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 448,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   infoList: {
     paddingVertical: 24,
@@ -205,19 +205,19 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     alignItems: 'center',
     justifyContent: 'center',
   },
   infoLabel: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   infoValue: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   legalSection: {
     flexDirection: 'row',
@@ -229,6 +229,6 @@ const styles = StyleSheet.create({
   legalLink: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });

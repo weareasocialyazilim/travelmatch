@@ -97,7 +97,7 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
               <MaterialCommunityIcons
                 name="camera"
                 size={32}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
               <Text style={styles.photoOverlayText}>Change Photo</Text>
             </View>
@@ -107,7 +107,7 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
             <MaterialCommunityIcons
               name="camera-plus"
               size={64}
-              color={COLORS.textTertiary}
+              color={COLORS.text.tertiary}
             />
             <Text style={styles.photoPlaceholderText}>
               Add a photo that tells your story
@@ -127,7 +127,7 @@ PhotoSection.displayName = 'PhotoSection';
 const styles = StyleSheet.create({
   photoSection: {
     aspectRatio: 16 / 9,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     width: '100%',
   },
   heroImage: {
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoOverlayText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 15,
     fontWeight: '600',
   },
@@ -154,13 +154,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   photoPlaceholderText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '600',
     textAlign: 'center',
   },
   photoPlaceholderSubtext: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
     textAlign: 'center',
   },

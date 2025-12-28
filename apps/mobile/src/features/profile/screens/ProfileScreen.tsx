@@ -178,7 +178,7 @@ const ProfileScreen: React.FC = () => {
       },
       {
         icon: 'bookmark-outline',
-        color: COLORS.coral,
+        color: COLORS.brand.secondary,
         label: 'Saved Moments',
         count: userData.savedCount,
         onPress: handleSavedMoments,
@@ -272,7 +272,7 @@ const ProfileScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="pencil-outline"
                 size={22}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -285,7 +285,7 @@ const ProfileScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="cog-outline"
                 size={22}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -298,7 +298,7 @@ const ProfileScreen: React.FC = () => {
             <RefreshControl
               refreshing={myMomentsLoading}
               onRefresh={loadMyMoments}
-              tintColor={COLORS.coral}
+              tintColor={COLORS.brand.secondary}
             />
           }
         >
@@ -391,7 +391,7 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   container: {
     flex: 1,
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   headerSpacer: {
     width: 80,
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   headerActions: {
     flexDirection: 'row',
@@ -429,10 +429,10 @@ const styles = StyleSheet.create({
 
   // Profile Section - Reused for stats row wrapper
   profileSection: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginHorizontal: 16,
     borderRadius: 20,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 12,

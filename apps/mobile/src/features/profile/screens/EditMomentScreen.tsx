@@ -115,7 +115,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
           <MaterialCommunityIcons
             name={'close' as IconName}
             size={28}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Moment</Text>
@@ -140,7 +140,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
               <TextInput
                 style={[styles.input, error && styles.inputError]}
                 placeholder="Enter moment title"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -167,7 +167,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
                   error && styles.inputError,
                 ]}
                 placeholder="Tell us about this moment"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -194,7 +194,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
                 <MaterialCommunityIcons
                   name={'currency-usd' as IconName}
                   size={20}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                   style={styles.priceIcon}
                 />
                 <TextInput
@@ -204,7 +204,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
                     error && styles.inputError,
                   ]}
                   placeholder="0.00"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   value={value.toString()}
                   onChangeText={(text) => {
                     const num = parseFloat(text);
@@ -244,7 +244,7 @@ export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   header: {
     flexDirection: 'row',
@@ -253,8 +253,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    borderBottomColor: COLORS.border.default,
+    backgroundColor: COLORS.utility.white,
   },
   headerButton: {
     minWidth: 40,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -277,24 +277,24 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   input: {
     height: 56,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   inputError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
@@ -321,13 +321,13 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    borderTopColor: COLORS.border.default,
+    backgroundColor: COLORS.utility.white,
   },
   saveButton: {
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -337,6 +337,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

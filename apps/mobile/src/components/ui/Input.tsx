@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 
 interface InputProps extends TextInputProps {
   /** Input label text */
@@ -89,9 +89,9 @@ export const Input: React.FC<InputProps> = memo(
 
     // Memoize border color calculation
     const borderColor = useMemo((): string => {
-      if (error) return COLORS.error;
-      if (isFocused) return COLORS.primary;
-      return COLORS.gray[200];
+      if (error) return COLORS.feedback.error;
+      if (isFocused) return COLORS.brand.primary;
+      return primitives.stone[200];
     }, [error, isFocused]);
 
     // Memoize callbacks
@@ -135,7 +135,7 @@ export const Input: React.FC<InputProps> = memo(
             <MaterialCommunityIcons
               name={leftIcon}
               size={20}
-              color={isFocused ? COLORS.primary : COLORS.gray[400]}
+              color={isFocused ? COLORS.brand.primary : primitives.stone[400]}
               style={styles.leftIcon}
             />
           )}
@@ -147,7 +147,7 @@ export const Input: React.FC<InputProps> = memo(
               leftIcon && styles.inputWithLeftIcon,
               (rightIcon || isPassword) && styles.inputWithRightIcon,
             ]}
-            placeholderTextColor={COLORS.gray[400]}
+            placeholderTextColor={primitives.stone[400]}
             onFocus={handleFocus}
             onBlur={handleBlur}
             secureTextEntry={isPassword && !showPassword}
@@ -168,7 +168,7 @@ export const Input: React.FC<InputProps> = memo(
               <MaterialCommunityIcons
                 name={showPassword ? 'eye-off' : 'eye'}
                 size={20}
-                color={COLORS.gray[400]}
+                color={primitives.stone[400]}
               />
             </TouchableOpacity>
           )}
@@ -184,7 +184,7 @@ export const Input: React.FC<InputProps> = memo(
               <MaterialCommunityIcons
                 name={rightIcon}
                 size={20}
-                color={COLORS.gray[400]}
+                color={primitives.stone[400]}
               />
             </TouchableOpacity>
           )}
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputContainer: {
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderRadius: 12,
-    backgroundColor: COLORS.surfaceLight,
+    backgroundColor: COLORS.surface.baseLight,
     paddingHorizontal: 16,
     height: 52,
   },
@@ -222,12 +222,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   inputError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingVertical: 0,
   },
   inputWithLeftIcon: {
@@ -245,16 +245,16 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 12,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     marginTop: 4,
   },
   hint: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 4,
   },
   required: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontWeight: '600',
   },
 });

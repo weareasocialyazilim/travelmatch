@@ -127,7 +127,7 @@ export const WishCard: React.FC<WishCardProps> = memo(
                 <MaterialCommunityIcons
                   name={isSaved ? 'bookmark' : 'bookmark-outline'}
                   size={24}
-                  color={isSaved ? COLORS.primary : COLORS.white}
+                  color={isSaved ? COLORS.brand.primary : COLORS.utility.white}
                 />
               </BlurView>
             </TouchableOpacity>
@@ -165,7 +165,7 @@ export const WishCard: React.FC<WishCardProps> = memo(
                     <MaterialCommunityIcons
                       name="shield-check"
                       size={12}
-                      color={COLORS.success}
+                      color={COLORS.feedback.success}
                     />
                     <Text style={styles.trustText}>{wish.user.trustScore}</Text>
                   </View>
@@ -220,7 +220,7 @@ WishCard.displayName = 'WishCard';
 const styles = StyleSheet.create({
   container: {
     width: CARD_WIDTH,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 24,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   userName: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   trustText: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     right: 16,
   },
   wishTitle: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 22,
     fontWeight: '700',
     marginBottom: 8,
@@ -342,12 +342,12 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: COLORS.text.primaryMuted,
   },
   priceValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   giftButtonContainer: {
     flex: 1,

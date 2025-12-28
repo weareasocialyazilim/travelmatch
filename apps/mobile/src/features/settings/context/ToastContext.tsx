@@ -74,23 +74,23 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     const configs = {
       success: {
         icon: 'check-circle' as const,
-        color: COLORS.success,
-        bgColor: COLORS.success + '15',
+        color: COLORS.feedback.success,
+        bgColor: COLORS.feedback.success + '15',
       },
       error: {
         icon: 'alert-circle' as const,
-        color: COLORS.error,
-        bgColor: COLORS.error + '15',
+        color: COLORS.feedback.error,
+        bgColor: COLORS.feedback.error + '15',
       },
       warning: {
         icon: 'alert' as const,
-        color: COLORS.warning,
-        bgColor: COLORS.warning + '15',
+        color: COLORS.feedback.warning,
+        bgColor: COLORS.feedback.warning + '15',
       },
       info: {
         icon: 'information' as const,
-        color: COLORS.info,
-        bgColor: COLORS.info + '15',
+        color: COLORS.feedback.info,
+        bgColor: COLORS.feedback.info + '15',
       },
     };
     return configs[type];

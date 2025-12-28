@@ -193,7 +193,7 @@ const CreateMomentScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="close"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Share a Moment</Text>
@@ -290,13 +290,13 @@ const CreateMomentScreen: React.FC = () => {
             accessibilityState={{ disabled: !isValid || isSubmitting }}
           >
             {isSubmitting ? (
-              <ActivityIndicator size="small" color={COLORS.text} />
+              <ActivityIndicator size="small" color={COLORS.text.primary} />
             ) : (
               <>
                 <MaterialCommunityIcons
                   name="check"
                   size={20}
-                  color={COLORS.text}
+                  color={COLORS.text.primary}
                 />
                 <Text style={styles.publishButtonText}>Publish Moment</Text>
               </>
@@ -335,7 +335,7 @@ const CreateMomentScreen: React.FC = () => {
                   onChange={(_event, date) => {
                     if (date) setValue('date', date);
                   }}
-                  textColor={COLORS.text}
+                  textColor={COLORS.text.primary}
                 />
               </View>
             </View>
@@ -366,13 +366,13 @@ const CreateMomentScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   header: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderBottomColor: COLORS.border.default,
     borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '600',
   },
@@ -397,20 +397,20 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   publishSection: {
-    backgroundColor: COLORS.white,
-    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderTopColor: COLORS.border.default,
     borderTopWidth: 1,
     gap: 12,
     padding: 20,
   },
   publishHint: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
     textAlign: 'center',
   },
   publishButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: LAYOUT.borderRadius.full,
     flexDirection: 'row',
     gap: 8,
@@ -418,10 +418,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   publishButtonDisabled: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   publishButtonText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '600',
   },
@@ -437,24 +437,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   datePickerContent: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 20,
   },
   datePickerHeader: {
     alignItems: 'flex-end',
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     borderBottomWidth: 1,
     padding: 16,
   },
   datePickerDoneText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 17,
     fontWeight: '600',
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 12,
     marginTop: 4,
     marginHorizontal: LAYOUT.padding,

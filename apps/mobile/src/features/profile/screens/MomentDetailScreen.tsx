@@ -429,10 +429,10 @@ const MomentDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     flex: 1,
   },
   scrollView: {
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     paddingTop: 400,
   },
   content: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -24,

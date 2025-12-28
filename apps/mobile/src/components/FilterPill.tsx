@@ -53,7 +53,7 @@ export const FilterPill: React.FC<FilterPillProps> = React.memo(
             <MaterialCommunityIcons
               name={filter.icon as IconName}
               size={16}
-              color={isSelected ? COLORS.text : COLORS.textSecondary}
+              color={isSelected ? COLORS.text.primary : COLORS.text.secondary}
             />
           )}
           <Text
@@ -72,8 +72,8 @@ FilterPill.displayName = 'FilterPill';
 const styles = StyleSheet.create({
   filterPill: {
     alignItems: 'center',
-    backgroundColor: COLORS.glassBackground,
-    borderColor: COLORS.glassBorder,
+    backgroundColor: COLORS.surface.glassBackground,
+    borderColor: COLORS.surface.glassBorder,
     borderRadius: radii.full,
     borderWidth: 1,
     flexDirection: 'row',
@@ -87,12 +87,12 @@ const styles = StyleSheet.create({
     borderColor: COLORS.filterPillActiveBorder,
   },
   filterText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     fontWeight: '500',
   },
   filterTextActive: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
 });

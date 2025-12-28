@@ -34,6 +34,7 @@ import Reanimated, {
   Extrapolation,
   runOnJS,
   Easing,
+  SharedValue,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -81,9 +82,24 @@ const SLIDES: OnboardingSlide[] = [
     subheadline: 'Yabancılar arasında dostluk kurmanın yeni yolu',
     gradientColors: ['#F97316', '#FB923C', '#0C0A09'] as const,
     floatingElements: [
-      { emoji: '\u2728', position: { top: 15, left: 10 }, scale: 1.2, rotation: -15 },
-      { emoji: '\u{1F9E1}', position: { top: 25, left: 80 }, scale: 0.8, rotation: 10 },
-      { emoji: '\u2615', position: { top: 60, left: 85 }, scale: 0.6, rotation: -5 },
+      {
+        emoji: '\u2728',
+        position: { top: 15, left: 10 },
+        scale: 1.2,
+        rotation: -15,
+      },
+      {
+        emoji: '\u{1F9E1}',
+        position: { top: 25, left: 80 },
+        scale: 0.8,
+        rotation: 10,
+      },
+      {
+        emoji: '\u2615',
+        position: { top: 60, left: 85 },
+        scale: 0.6,
+        rotation: -5,
+      },
     ],
   },
   {
@@ -94,9 +110,24 @@ const SLIDES: OnboardingSlide[] = [
     subheadline: 'İstediğin deneyimi paylaş,\nbiri onu sana hediye etsin',
     gradientColors: ['#A855F7', '#C084FC', '#0C0A09'] as const,
     floatingElements: [
-      { emoji: '\u{1F4AB}', position: { top: 20, left: 15 }, scale: 1, rotation: 20 },
-      { emoji: '\u2B50', position: { top: 35, left: 75 }, scale: 1.1, rotation: -10 },
-      { emoji: '\u{1F319}', position: { top: 55, left: 10 }, scale: 0.7, rotation: 5 },
+      {
+        emoji: '\u{1F4AB}',
+        position: { top: 20, left: 15 },
+        scale: 1,
+        rotation: 20,
+      },
+      {
+        emoji: '\u2B50',
+        position: { top: 35, left: 75 },
+        scale: 1.1,
+        rotation: -10,
+      },
+      {
+        emoji: '\u{1F319}',
+        position: { top: 55, left: 10 },
+        scale: 0.7,
+        rotation: 5,
+      },
     ],
   },
   {
@@ -107,9 +138,24 @@ const SLIDES: OnboardingSlide[] = [
     subheadline: 'Küçük bir hediye, büyük bir mutluluk',
     gradientColors: ['#F43F5E', '#FB7185', '#0C0A09'] as const,
     floatingElements: [
-      { emoji: '\u{1F49D}', position: { top: 18, left: 20 }, scale: 0.9, rotation: -12 },
-      { emoji: '\u{1F389}', position: { top: 40, left: 78 }, scale: 1, rotation: 15 },
-      { emoji: '\u2728', position: { top: 58, left: 25 }, scale: 0.8, rotation: -8 },
+      {
+        emoji: '\u{1F49D}',
+        position: { top: 18, left: 20 },
+        scale: 0.9,
+        rotation: -12,
+      },
+      {
+        emoji: '\u{1F389}',
+        position: { top: 40, left: 78 },
+        scale: 1,
+        rotation: 15,
+      },
+      {
+        emoji: '\u2728',
+        position: { top: 58, left: 25 },
+        scale: 0.8,
+        rotation: -8,
+      },
     ],
   },
   {
@@ -120,9 +166,24 @@ const SLIDES: OnboardingSlide[] = [
     subheadline: 'Paran deneyim gerçekleşene kadar koruma altında',
     gradientColors: ['#10B981', '#34D399', '#0C0A09'] as const,
     floatingElements: [
-      { emoji: '\u{1F6E1}', position: { top: 22, left: 12 }, scale: 1.1, rotation: 8 },
-      { emoji: '\u2713', position: { top: 38, left: 82 }, scale: 0.9, rotation: -5 },
-      { emoji: '\u{1F48E}', position: { top: 55, left: 70 }, scale: 0.7, rotation: 12 },
+      {
+        emoji: '\u{1F6E1}',
+        position: { top: 22, left: 12 },
+        scale: 1.1,
+        rotation: 8,
+      },
+      {
+        emoji: '\u2713',
+        position: { top: 38, left: 82 },
+        scale: 0.9,
+        rotation: -5,
+      },
+      {
+        emoji: '\u{1F48E}',
+        position: { top: 55, left: 70 },
+        scale: 0.7,
+        rotation: 12,
+      },
     ],
   },
   {
@@ -133,9 +194,24 @@ const SLIDES: OnboardingSlide[] = [
     subheadline: 'Dilekler seni bekliyor',
     gradientColors: ['#3B82F6', '#60A5FA', '#0C0A09'] as const,
     floatingElements: [
-      { emoji: '\u{1F30D}', position: { top: 20, left: 15 }, scale: 1.2, rotation: -10 },
-      { emoji: '\u2764', position: { top: 45, left: 80 }, scale: 1, rotation: 15 },
-      { emoji: '\u{1F3AF}', position: { top: 60, left: 20 }, scale: 0.8, rotation: 5 },
+      {
+        emoji: '\u{1F30D}',
+        position: { top: 20, left: 15 },
+        scale: 1.2,
+        rotation: -10,
+      },
+      {
+        emoji: '\u2764',
+        position: { top: 45, left: 80 },
+        scale: 1,
+        rotation: 15,
+      },
+      {
+        emoji: '\u{1F3AF}',
+        position: { top: 60, left: 20 },
+        scale: 0.8,
+        rotation: 5,
+      },
     ],
   },
 ];
@@ -148,7 +224,7 @@ interface FloatingElementProps {
   position: { top: number; left: number };
   scale: number;
   rotation: number;
-  slideProgress: Reanimated.SharedValue<number>;
+  slideProgress: SharedValue<number>;
   index: number;
 }
 
@@ -166,11 +242,17 @@ const FloatingElement: React.FC<FloatingElementProps> = ({
     // Floating animation
     floatY.value = withRepeat(
       withSequence(
-        withTiming(-8, { duration: 2000 + index * 200, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2000 + index * 200, easing: Easing.inOut(Easing.ease) })
+        withTiming(-8, {
+          duration: 2000 + index * 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(0, {
+          duration: 2000 + index * 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
       ),
       -1,
-      false
+      false,
     );
   }, [index]);
 
@@ -179,7 +261,7 @@ const FloatingElement: React.FC<FloatingElementProps> = ({
       slideProgress.value,
       [0, 1],
       [0, -30 * (index + 1)],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     return {
@@ -192,7 +274,7 @@ const FloatingElement: React.FC<FloatingElementProps> = ({
         slideProgress.value,
         [0, 0.3, 0.7, 1],
         [0, 1, 1, 0],
-        Extrapolation.CLAMP
+        Extrapolation.CLAMP,
       ),
     };
   });
@@ -217,7 +299,9 @@ const FloatingElement: React.FC<FloatingElementProps> = ({
 // ============================================
 // MAIN COMPONENT
 // ============================================
-export const OnboardingScreenV2: React.FC<OnboardingScreenV2Props> = ({ navigation }) => {
+export const OnboardingScreenV2: React.FC<OnboardingScreenV2Props> = ({
+  navigation,
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const insets = useSafeAreaInsets();
 
@@ -245,12 +329,12 @@ export const OnboardingScreenV2: React.FC<OnboardingScreenV2Props> = ({ navigati
     emojiScale.value = withSequence(
       withSpring(0.8, { damping: 10 }),
       withSpring(1.1, { damping: 8 }),
-      withSpring(1, { damping: 12 })
+      withSpring(1, { damping: 12 }),
     );
     emojiRotation.value = withSequence(
       withSpring(-10, { damping: 10 }),
       withSpring(10, { damping: 8 }),
-      withSpring(0, { damping: 12 })
+      withSpring(0, { damping: 12 }),
     );
 
     // Content fade out and slide
@@ -260,7 +344,9 @@ export const OnboardingScreenV2: React.FC<OnboardingScreenV2Props> = ({ navigati
     if (currentIndex < SLIDES.length - 1) {
       setTimeout(() => {
         setCurrentIndex((prev) => prev + 1);
-        slideProgress.value = withSpring((currentIndex + 1) / (SLIDES.length - 1));
+        slideProgress.value = withSpring(
+          (currentIndex + 1) / (SLIDES.length - 1),
+        );
       }, 150);
     } else {
       // Navigate to Welcome
@@ -325,10 +411,7 @@ export const OnboardingScreenV2: React.FC<OnboardingScreenV2Props> = ({ navigati
 
       {/* Bottom Controls */}
       <View
-        style={[
-          styles.bottomContainer,
-          { paddingBottom: insets.bottom + 20 },
-        ]}
+        style={[styles.bottomContainer, { paddingBottom: insets.bottom + 20 }]}
       >
         {/* Progress Dots */}
         <View style={styles.dotsContainer}>

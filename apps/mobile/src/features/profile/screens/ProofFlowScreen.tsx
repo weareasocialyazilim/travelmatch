@@ -56,7 +56,7 @@ const PROOF_TYPES: {
     id: 'micro-kindness',
     name: 'Micro Kindness',
     icon: 'hand-heart',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     description:
       'Small acts of kindness like buying coffee or giving directions',
   },
@@ -64,14 +64,14 @@ const PROOF_TYPES: {
     id: 'verified-experience',
     name: 'Verified Experience',
     icon: 'check-decagram',
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     description: 'Share your authentic experiences at places you visited',
   },
   {
     id: 'community-proof',
     name: 'Community Proof',
     icon: 'account-group',
-    color: COLORS.accent,
+    color: COLORS.brand.accent,
     description: 'Group activities, volunteering, or community events',
   },
 ];
@@ -301,7 +301,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name={type.icon} size={48} color={COLORS.white} />
+              <Icon name={type.icon} size={48} color={COLORS.utility.white} />
               <Text style={styles.typeName}>{type.name}</Text>
               <Text style={styles.typeDescription}>{type.description}</Text>
             </LinearGradient>
@@ -326,7 +326,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
             style={styles.addPhotoButton}
             onPress={handleAddPhoto}
           >
-            <Icon name="camera-plus" size={32} color={COLORS.primary} />
+            <Icon name="camera-plus" size={32} color={COLORS.brand.primary} />
             <Text style={styles.addPhotoText}>Add Photo</Text>
           </TouchableOpacity>
           {photos?.map((photo) => (
@@ -336,7 +336,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
                 style={styles.removePhoto}
                 onPress={() => handleRemovePhoto(photo)}
               >
-                <Icon name="close-circle" size={24} color={COLORS.error} />
+                <Icon name="close-circle" size={24} color={COLORS.feedback.error} />
               </TouchableOpacity>
             </View>
           ))}
@@ -350,7 +350,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       <View style={styles.uploadSection}>
         <Text style={styles.sectionLabel}>Ticket/Receipt (Optional)</Text>
         <TouchableOpacity style={styles.uploadButton} onPress={handleAddTicket}>
-          <Icon name="receipt" size={24} color={COLORS.primary} />
+          <Icon name="receipt" size={24} color={COLORS.brand.primary} />
           <Text style={styles.uploadButtonText}>Upload Ticket</Text>
         </TouchableOpacity>
       </View>
@@ -362,7 +362,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           style={styles.uploadButton}
           onPress={handleSelectLocation}
         >
-          <Icon name="map-marker" size={24} color={COLORS.primary} />
+          <Icon name="map-marker" size={24} color={COLORS.brand.primary} />
           <Text style={styles.uploadButtonText}>
             {location ? location.name : 'Add Location'}
           </Text>
@@ -371,7 +371,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
       <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
         <LinearGradient
-          colors={[COLORS.primary, COLORS.accent]}
+          colors={[COLORS.brand.primary, COLORS.brand.accent]}
           style={styles.buttonGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
@@ -399,7 +399,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
             <TextInput
               style={styles.input}
               placeholder="e.g., Coffee for a stranger"
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -421,7 +421,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Share the story behind your gesture..."
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -448,7 +448,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
                 <TextInput
                   style={[styles.input, styles.amountValue]}
                   placeholder="0.00"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   keyboardType="decimal-pad"
                   value={value?.toString() || ''}
                   onChangeText={(text) =>
@@ -471,7 +471,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
             <TextInput
               style={styles.input}
               placeholder="Name or username of the receiver"
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -482,7 +482,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
       <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
         <LinearGradient
-          colors={[COLORS.primary, COLORS.accent]}
+          colors={[COLORS.brand.primary, COLORS.brand.accent]}
           style={styles.buttonGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
@@ -539,7 +539,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       </View>
 
       <View style={styles.verificationNote}>
-        <Icon name="information" size={20} color={COLORS.info} />
+        <Icon name="information" size={20} color={COLORS.feedback.info} />
         <Text style={styles.verificationText}>
           Your proof will be verified using AI and blockchain technology. This
           process usually takes 2-5 minutes.
@@ -555,7 +555,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         disabled={loading || !isValid}
       >
         <LinearGradient
-          colors={[COLORS.primary, COLORS.accent]}
+          colors={[COLORS.brand.primary, COLORS.brand.accent]}
           style={styles.buttonGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
@@ -606,7 +606,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           }}
           activeOpacity={0.7}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
+          <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Proof</Text>
         <TouchableOpacity
@@ -614,7 +614,7 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Icon name="close" size={24} color={COLORS.textSecondary} />
+          <Icon name="close" size={24} color={COLORS.text.secondary} />
         </TouchableOpacity>
       </View>
 
@@ -648,12 +648,12 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
 const styles = StyleSheet.create({
   activeProgressStep: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   addPhotoButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: VALUES.borderRadius,
     borderStyle: 'dashed',
     borderWidth: 2,
@@ -663,7 +663,7 @@ const styles = StyleSheet.create({
     width: 120,
   },
   addPhotoText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 12,
     fontWeight: '600',
     marginTop: LAYOUT.padding / 2,
@@ -683,16 +683,16 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 2,
   },
   buttonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 18,
     fontWeight: '700',
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   currency: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 20,
     fontWeight: '700',
     marginRight: LAYOUT.padding,
@@ -705,22 +705,22 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 1.5,
   },
   headerTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 20,
     fontWeight: '700',
   },
   input: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: VALUES.borderRadius,
     borderWidth: 2,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '500',
     padding: LAYOUT.padding * 1.5,
   },
   inputLabel: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: LAYOUT.padding,
@@ -750,27 +750,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: LAYOUT.padding * 2,
   },
   progressStep: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 2,
     flex: 1,
     height: 4,
     marginHorizontal: LAYOUT.padding / 4,
   },
   removePhoto: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     position: 'absolute',
     right: -8,
     top: -8,
   },
   reviewCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: VALUES.borderRadius,
     padding: LAYOUT.padding * 2,
     ...VALUES.shadow,
   },
   reviewLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
     fontWeight: '600',
     marginBottom: LAYOUT.padding / 2,
@@ -779,7 +779,7 @@ const styles = StyleSheet.create({
     marginBottom: LAYOUT.padding * 1.5,
   },
   reviewValue: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionLabel: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: LAYOUT.padding,
@@ -800,14 +800,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 24,
     marginBottom: LAYOUT.padding * 3,
   },
   stepTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 28,
     fontWeight: '800',
     marginBottom: LAYOUT.padding,
@@ -827,7 +827,7 @@ const styles = StyleSheet.create({
     ...VALUES.shadow,
   },
   typeDescription: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 14,
     fontWeight: '400',
     opacity: 0.9,
@@ -838,7 +838,7 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding * 2,
   },
   typeName: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 20,
     fontWeight: '700',
     marginBottom: LAYOUT.padding / 2,
@@ -849,15 +849,15 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: VALUES.borderRadius,
     borderWidth: 2,
     flexDirection: 'row',
     padding: LAYOUT.padding * 1.5,
   },
   uploadButtonText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: LAYOUT.padding,
@@ -866,14 +866,14 @@ const styles = StyleSheet.create({
     marginBottom: LAYOUT.padding * 2,
   },
   verificationNote: {
-    backgroundColor: COLORS.info + '20',
+    backgroundColor: COLORS.feedback.info + '20',
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     marginTop: LAYOUT.padding * 2,
     padding: LAYOUT.padding * 1.5,
   },
   verificationText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     fontSize: 14,
     fontWeight: '400',
@@ -884,7 +884,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 12,
     marginTop: 4,
   },
@@ -893,7 +893,7 @@ const styles = StyleSheet.create({
   },
   uploadHint: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: LAYOUT.padding,
     paddingHorizontal: LAYOUT.padding * 2,
@@ -903,16 +903,16 @@ const styles = StyleSheet.create({
     bottom: 40,
     left: LAYOUT.padding * 2,
     right: LAYOUT.padding * 2,
-    backgroundColor: COLORS.warning + '20',
+    backgroundColor: COLORS.feedback.warning + '20',
     borderRadius: VALUES.borderRadius,
     padding: LAYOUT.padding * 1.5,
     borderWidth: 1,
-    borderColor: COLORS.warning,
+    borderColor: COLORS.feedback.warning,
     zIndex: 1000,
   },
   loadingWarningText: {
     fontSize: 13,
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
     textAlign: 'center',
     fontWeight: '600',
   },

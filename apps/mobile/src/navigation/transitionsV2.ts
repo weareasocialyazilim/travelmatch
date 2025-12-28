@@ -341,7 +341,6 @@ export const DEFAULT_NAVIGATOR_OPTIONS = {
 export const MODAL_NAVIGATOR_OPTIONS = {
   screenOptions: {
     headerShown: false,
-    presentation: 'modal' as const,
     ...TRANSITIONS_V2.modalSlideFromBottom,
   },
 };

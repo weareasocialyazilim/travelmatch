@@ -140,7 +140,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
               <MaterialCommunityIcons
                 name="share-variant"
                 size={20}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
             </TouchableOpacity>
 
@@ -182,7 +182,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                 <MaterialCommunityIcons
                   name="map-marker"
                   size={16}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
                 <Text style={styles.detailText} numberOfLines={1}>
                   {moment.location.name}
@@ -192,7 +192,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                 <MaterialCommunityIcons
                   name="clock-outline"
                   size={16}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
                 <Text style={styles.detailText} numberOfLines={1}>
                   {moment.availability}
@@ -228,7 +228,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: radii.xl,
     marginBottom: SPACING.md,
     overflow: 'hidden',
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
   },
   cardDetails: {
-    borderTopColor: COLORS.glassBorder,
+    borderTopColor: COLORS.surface.glassBorder,
     borderTopWidth: 1,
     gap: SPACING.sm,
     paddingTop: SPACING.md,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   cardLocation: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: SPACING.md,
   },
   cardTitle: {
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
@@ -285,23 +285,23 @@ const styles = StyleSheet.create({
   },
   detailText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
   },
   priceText: {
     ...TYPOGRAPHY.h3,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   primaryButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: radii.full,
     flex: 1,
     height: 44,
     justifyContent: 'center',
   },
   primaryButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -314,12 +314,12 @@ const styles = StyleSheet.create({
     width: 120,
   },
   secondaryButtonText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
   },
   userAvatar: {
-    borderColor: COLORS.white,
+    borderColor: COLORS.utility.white,
     borderRadius: radii.full,
     borderWidth: 2,
     height: 36,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     ...TYPOGRAPHY.body,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   userRole: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textWhite80,
+    color: COLORS.text.primaryWhite80,
     fontSize: 11,
     marginTop: 1,
   },

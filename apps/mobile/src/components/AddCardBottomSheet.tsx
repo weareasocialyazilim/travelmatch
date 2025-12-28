@@ -73,7 +73,7 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = ({
               <MaterialCommunityIcons
                 name={'close' as IconName}
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -85,13 +85,13 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = ({
               <MaterialCommunityIcons
                 name={'credit-card' as IconName}
                 size={20}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
                 style={styles.inputIcon}
               />
               <TextInput
                 style={styles.input}
                 placeholder="0000 0000 0000 0000"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 value={cardNumber}
                 onChangeText={setCardNumber}
                 keyboardType="number-pad"
@@ -107,7 +107,7 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = ({
               <TextInput
                 style={styles.input}
                 placeholder="MM/YY"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 value={expiry}
                 onChangeText={setExpiry}
                 keyboardType="number-pad"
@@ -121,13 +121,13 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = ({
                 <MaterialCommunityIcons
                   name={'help-circle-outline' as IconName}
                   size={16}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
               </View>
               <TextInput
                 style={styles.input}
                 placeholder="123"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 value={cvv}
                 onChangeText={setCvv}
                 keyboardType="number-pad"
@@ -143,7 +143,7 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = ({
               <MaterialCommunityIcons
                 name={'lock' as IconName}
                 size={20}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </View>
             <Text style={styles.securityText}>
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     maxHeight: '90%',
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   header: {
     flexDirection: 'row',
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     textAlign: 'center',
   },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputWrapper: {
@@ -253,11 +253,11 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 15,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   rowFields: {
@@ -287,13 +287,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: `${COLORS.primary}20`,
+    backgroundColor: `${COLORS.brand.primary}20`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   securityText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   footer: {
@@ -304,16 +304,16 @@ const styles = StyleSheet.create({
   addButton: {
     height: 56,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   addButtonDisabled: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   addButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.background,
+    color: COLORS.bg.primary,
   },
 });

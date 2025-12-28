@@ -164,7 +164,7 @@ export const PhoneAuthScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
 
@@ -172,7 +172,7 @@ export const PhoneAuthScreen: React.FC = () => {
             <MaterialCommunityIcons
               name={step === 'phone' ? 'phone' : 'message-text'}
               size={64}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.title}>
               {step === 'phone'
@@ -198,7 +198,7 @@ export const PhoneAuthScreen: React.FC = () => {
                     setPhoneNumber(formatPhoneNumber(text))
                   }
                   placeholder="(555) 123-4567"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   keyboardType="phone-pad"
                   maxLength={14}
                   editable={!isLoading}
@@ -303,11 +303,11 @@ export const PhoneAuthScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -325,13 +325,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 8,
     textAlign: 'center',
   },
@@ -341,29 +341,29 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   phoneInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     marginBottom: 24,
   },
   countryCode: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 16,
     borderRightWidth: 1,
-    borderRightColor: COLORS.border,
+    borderRightColor: COLORS.border.default,
   },
   phoneInput: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     padding: 16,
   },
   otpContainer: {
@@ -376,19 +376,19 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.surface,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.surface.base,
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   otpInputFilled: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primaryLight,
+    borderColor: COLORS.brand.primary,
+    backgroundColor: COLORS.brand.primaryLight,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -407,19 +407,19 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   resendText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 14,
     fontWeight: '500',
   },
   resendTextDisabled: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   changePhoneButton: {
     alignItems: 'center',
     padding: 12,
   },
   changePhoneText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
   },
 });

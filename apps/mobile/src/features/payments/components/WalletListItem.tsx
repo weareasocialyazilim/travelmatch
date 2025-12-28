@@ -22,7 +22,7 @@ export const WalletListItem = ({ wallet, isDefault, onPress }: WalletListItemPro
         <MaterialCommunityIcons
           name={Platform.OS === 'ios' ? 'apple' : 'google'}
           size={24}
-          color={COLORS.text}
+          color={COLORS.text.primary}
         />
       </View>
       <View style={styles.walletInfo}>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   walletItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 12,
@@ -72,11 +72,11 @@ const styles = StyleSheet.create({
   walletName: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   walletStatus: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   defaultBadgeSmall: {
     backgroundColor: COLORS.mint,
@@ -87,6 +87,6 @@ const styles = StyleSheet.create({
   defaultBadgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

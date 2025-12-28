@@ -90,7 +90,7 @@ export default function TermsOfServiceScreen({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Terms of Service</Text>
@@ -117,16 +117,16 @@ export default function TermsOfServiceScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     width: 48,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     flex: 1,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
   },
   content: {
@@ -154,13 +154,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
     lineHeight: 32,
   },
   sectionContent: {
     ...TYPOGRAPHY.bodyLarge,
     lineHeight: 26,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

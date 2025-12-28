@@ -241,7 +241,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 <MaterialCommunityIcons
                   name="close"
                   size={28}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
               </TouchableOpacity>
             </View>
@@ -262,7 +262,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                     <MaterialCommunityIcons
                       name="map-marker"
                       size={14}
-                      color={COLORS.white}
+                      color={COLORS.utility.white}
                     />
                     <Text style={styles.infoMetaText}>
                       {currentStory?.distance}
@@ -272,7 +272,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                     <MaterialCommunityIcons
                       name="currency-usd"
                       size={14}
-                      color={COLORS.white}
+                      color={COLORS.utility.white}
                     />
                     <Text style={styles.infoMetaText}>
                       {currentStory?.price === 0
@@ -292,7 +292,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 <MaterialCommunityIcons
                   name="arrow-right"
                   size={18}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
               </TouchableOpacity>
             </View>
@@ -306,7 +306,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.black,
+    backgroundColor: COLORS.utility.black,
   },
   backgroundContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 1.5,
   },
   fullWidth: {
@@ -382,13 +382,13 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1.5,
-    borderColor: COLORS.white,
+    borderColor: COLORS.utility.white,
   },
   userInfo: {
     marginLeft: 10,
   },
   userName: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '700',
     fontSize: 14,
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   infoTitle: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '700',
     fontSize: 18,
     marginBottom: 4,
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   infoMetaText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 13,
     fontWeight: '500',
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   viewMomentText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '700',
     fontSize: 14,
   },

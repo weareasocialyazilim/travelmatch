@@ -64,10 +64,10 @@ export const SortSelector: React.FC<SortSelectorProps> = ({
         <View
           style={[
             styles.container,
-            { backgroundColor: COLORS.white, borderColor: COLORS.border },
+            { backgroundColor: COLORS.utility.white, borderColor: COLORS.border.default },
           ]}
         >
-          <Text style={[styles.title, { color: COLORS.text }]}>Sort By</Text>
+          <Text style={[styles.title, { color: COLORS.text.primary }]}>Sort By</Text>
 
           {SORT_OPTIONS.map((option) => {
             const isSelected = sortBy === option.value;
@@ -80,14 +80,14 @@ export const SortSelector: React.FC<SortSelectorProps> = ({
                 <MaterialCommunityIcons
                   name={option.icon}
                   size={22}
-                  color={isSelected ? COLORS.primary : COLORS.textSecondary}
+                  color={isSelected ? COLORS.brand.primary : COLORS.text.secondary}
                   style={styles.icon}
                 />
                 <Text
                   style={[
                     styles.optionText,
                     {
-                      color: isSelected ? COLORS.primary : COLORS.text,
+                      color: isSelected ? COLORS.brand.primary : COLORS.text.primary,
                     },
                     isSelected ? styles.selectedText : styles.normalText,
                   ]}
@@ -98,7 +98,7 @@ export const SortSelector: React.FC<SortSelectorProps> = ({
                   <MaterialCommunityIcons
                     name="check"
                     size={20}
-                    color={COLORS.primary}
+                    color={COLORS.brand.primary}
                   />
                 )}
               </TouchableOpacity>
@@ -113,7 +113,7 @@ export const SortSelector: React.FC<SortSelectorProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'center',
     alignItems: 'center',
   },

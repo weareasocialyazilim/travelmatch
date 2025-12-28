@@ -24,7 +24,7 @@ const MomentsTabs: React.FC<MomentsTabsProps> = memo(
           <MaterialCommunityIcons
             name="map-marker-star"
             size={18}
-            color={activeTab === 'active' ? COLORS.mint : COLORS.textSecondary}
+            color={activeTab === 'active' ? COLORS.mint : COLORS.text.secondary}
           />
           <Text
             style={[
@@ -45,7 +45,7 @@ const MomentsTabs: React.FC<MomentsTabsProps> = memo(
           <MaterialCommunityIcons
             name="history"
             size={18}
-            color={activeTab === 'past' ? COLORS.mint : COLORS.textSecondary}
+            color={activeTab === 'past' ? COLORS.mint : COLORS.text.secondary}
           />
           <Text
             style={[styles.tabText, activeTab === 'past' && styles.tabTextActive]}
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 16,
     marginTop: 20,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 4,
   },
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   tabActive: {
-    backgroundColor: COLORS.white,
-    shadowColor: COLORS.black,
+    backgroundColor: COLORS.utility.white,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   tabTextActive: {
     color: COLORS.mint,

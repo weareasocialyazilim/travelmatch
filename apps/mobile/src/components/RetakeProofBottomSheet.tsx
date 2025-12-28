@@ -53,7 +53,7 @@ export const RetakeProofBottomSheet: React.FC<RetakeProofBottomSheetProps> = ({
             <MaterialCommunityIcons
               name={'camera' as IconName}
               size={24}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </View>
           <Text style={styles.listItemText}>Take new photo</Text>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
@@ -106,12 +106,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   headline: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 24,
     paddingTop: 20,
     paddingBottom: 8,
@@ -128,14 +128,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: `${COLORS.primary}33`,
+    backgroundColor: `${COLORS.brand.primary}33`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   listItemText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     flex: 1,
   },
   dividerContainer: {
@@ -144,12 +144,12 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   cancelButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 24,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   bottomSafeArea: {
     height: 20,

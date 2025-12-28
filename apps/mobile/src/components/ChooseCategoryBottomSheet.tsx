@@ -84,7 +84,7 @@ export const ChooseCategoryBottomSheet: React.FC<ChooseCategoryBottomSheetProps>
                     <MaterialCommunityIcons
                       name={category.icon}
                       size={24}
-                      color={COLORS.primary}
+                      color={COLORS.brand.primary}
                     />
                   </View>
                   <Text style={styles.categoryLabel}>{category.label}</Text>
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     maxHeight: '70%',
@@ -130,12 +130,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   header: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     paddingVertical: 12,
   },
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   categoryItemSelected: {
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${COLORS.brand.primary}10`,
   },
   categoryContent: {
     flexDirection: 'row',
@@ -158,14 +158,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: `${COLORS.primary}20`,
+    backgroundColor: `${COLORS.brand.primary}20`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   categoryLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   bottomPadding: {

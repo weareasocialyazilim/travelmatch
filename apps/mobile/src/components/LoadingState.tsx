@@ -60,10 +60,19 @@ SkeletonItem.displayName = 'SkeletonItem';
  * <LoadingState type="overlay" message="Loading your trips..." />
  */
 export const LoadingState: React.FC<LoadingStateProps> = memo(
-  ({ type, count = 3, message, color = COLORS.primary, size = 'large' }) => {
+  ({
+    type,
+    count = 3,
+    message,
+    color = COLORS.brand.primary,
+    size = 'large',
+  }) => {
     // Memoize skeleton items array to prevent recreation
     const skeletonItems = useMemo(
-      () => Array.from({ length: count }, (_, index) => <SkeletonItem key={index} />),
+      () =>
+        Array.from({ length: count }, (_, index) => (
+          <SkeletonItem key={index} />
+        )),
       [count],
     );
 
@@ -84,7 +93,9 @@ export const LoadingState: React.FC<LoadingStateProps> = memo(
             <View style={styles.overlayContainer}>
               <View style={styles.overlayContent}>
                 <ActivityIndicator size="large" color={color} />
-                {message && <Text style={styles.overlayMessage}>{message}</Text>}
+                {message && (
+                  <Text style={styles.overlayMessage}>{message}</Text>
+                )}
               </View>
             </View>
           </Modal>
@@ -111,14 +122,14 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   skeletonItem: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 8,
     padding: SPACING.md,
     gap: SPACING.sm,
   },
   skeletonLine: {
     height: 16,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 4,
   },
   skeletonLineShort: {
@@ -136,19 +147,19 @@ const styles = StyleSheet.create({
   // Overlay Styles
   overlayContainer: {
     flex: 1,
-    backgroundColor: COLORS.overlay,
+    backgroundColor: COLORS.overlay.medium,
     justifyContent: 'center',
     alignItems: 'center',
   },
   overlayContent: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: SPACING.xl,
     alignItems: 'center',
     minWidth: 200,
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.text,
+        shadowColor: COLORS.text.primary,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 4,
@@ -160,7 +171,7 @@ const styles = StyleSheet.create({
   },
   overlayMessage: {
     ...TYPOGRAPHY.body,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: SPACING.md,
     textAlign: 'center',
   },

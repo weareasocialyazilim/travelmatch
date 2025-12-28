@@ -99,11 +99,11 @@ export const GiftSuccessModal: React.FC<Props> = ({
 
   const confettiColors = useMemo(
     () => [
-      COLORS.coral,
+      COLORS.brand.secondary,
       COLORS.mint,
-      COLORS.success,
+      COLORS.feedback.success,
       COLORS.softOrange,
-      COLORS.white,
+      COLORS.utility.white,
     ],
     [],
   );
@@ -171,7 +171,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
             <MaterialCommunityIcons
               name="check-circle"
               size={80}
-              color={COLORS.success}
+              color={COLORS.feedback.success}
             />
           </Animated.View>
 
@@ -186,7 +186,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
               <MaterialCommunityIcons
                 name="shield-check"
                 size={20}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
               <Text style={styles.infoText}>
                 You&apos;ll be notified when proof is uploaded.
@@ -199,7 +199,7 @@ export const GiftSuccessModal: React.FC<Props> = ({
               <MaterialCommunityIcons
                 name="flash"
                 size={20}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
               <Text style={styles.infoText}>
                 Payment sent instantly to recipient.
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -257,14 +257,14 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 28,
     maxWidth: LAYOUT.size.modalMax,
     padding: 40,
     width: '100%',
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.black,
+        shadowColor: COLORS.utility.black,
         shadowOffset: LAYOUT.shadowOffset.xxl,
         shadowOpacity: 0.2,
         shadowRadius: 20,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   infoBox: {
     alignItems: 'center',
     backgroundColor: COLORS.successLight,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     borderRadius: 12,
     borderWidth: 1,
     flexDirection: 'row',
@@ -289,19 +289,19 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   infoText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
   },
   subtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 17,
     marginBottom: 32,
     textAlign: 'center',
   },
   title: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 28,
     fontWeight: '700',
     marginBottom: 8,

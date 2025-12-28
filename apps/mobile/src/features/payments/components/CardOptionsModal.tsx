@@ -49,7 +49,7 @@ export const CardOptionsModal = ({
           <ScrollView style={styles.optionsScroll}>
             {!card.isDefault && (
               <TouchableOpacity style={styles.optionItem} onPress={onSetDefault}>
-                <MaterialCommunityIcons name="star-outline" size={24} color={COLORS.text} />
+                <MaterialCommunityIcons name="star-outline" size={24} color={COLORS.text.primary} />
                 <View style={styles.optionText}>
                   <Text style={styles.optionTitle}>Set as default</Text>
                   <Text style={styles.optionDescription}>
@@ -61,7 +61,7 @@ export const CardOptionsModal = ({
             )}
 
             <TouchableOpacity style={styles.optionItem} onPress={onEdit}>
-              <MaterialCommunityIcons name="pencil-outline" size={24} color={COLORS.text} />
+              <MaterialCommunityIcons name="pencil-outline" size={24} color={COLORS.text.primary} />
               <View style={styles.optionText}>
                 <Text style={styles.optionTitle}>Update card details</Text>
                 <Text style={styles.optionDescription}>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   optionsContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 12,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   optionsTitle: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 20,
     marginBottom: 16,
   },
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   optionTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   optionTitleDanger: {
@@ -151,6 +151,6 @@ const styles = StyleSheet.create({
   },
   optionDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

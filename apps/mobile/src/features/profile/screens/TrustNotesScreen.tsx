@@ -69,7 +69,7 @@ export const TrustNotesScreen: React.FC<TrustNotesScreenProps> = ({
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Trust notes</Text>
@@ -111,7 +111,7 @@ export const TrustNotesScreen: React.FC<TrustNotesScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 40,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
   notesList: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   noteCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     shadowColor: COLORS.shadow,
@@ -163,11 +163,11 @@ const styles = StyleSheet.create({
   noteText: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 24,
   },
   noteMeta: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

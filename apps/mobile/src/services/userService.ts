@@ -887,19 +887,19 @@ export const getVerificationBadge = (
     case 'verified':
       return {
         icon: 'shield-checkmark',
-        color: COLORS.emerald,
+        color: COLORS.trust.primary,
         label: 'Verified',
       };
     case 'pending':
       return {
         icon: 'time',
-        color: COLORS.warning,
+        color: COLORS.feedback.warning,
         label: 'Verification Pending',
       };
     case 'rejected':
       return {
         icon: 'close-circle',
-        color: COLORS.error,
+        color: COLORS.feedback.error,
         label: 'Verification Failed',
       };
     default:

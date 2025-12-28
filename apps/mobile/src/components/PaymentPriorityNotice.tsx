@@ -20,18 +20,18 @@ export const PaymentPriorityNotice: React.FC<PaymentPriorityNoticeProps> = ({
   const typeConfig = {
     info: {
       icon: 'information' as const,
-      color: COLORS.info,
-      bgColor: COLORS.info + '15',
+      color: COLORS.feedback.info,
+      bgColor: COLORS.feedback.info + '15',
     },
     warning: {
       icon: 'alert' as const,
-      color: COLORS.warning,
-      bgColor: COLORS.warning + '15',
+      color: COLORS.feedback.warning,
+      bgColor: COLORS.feedback.warning + '15',
     },
     success: {
       icon: 'check-circle' as const,
-      color: COLORS.success,
-      bgColor: COLORS.success + '15',
+      color: COLORS.feedback.success,
+      bgColor: COLORS.feedback.success + '15',
     },
   };
 

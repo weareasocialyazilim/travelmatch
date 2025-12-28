@@ -38,13 +38,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               <MaterialCommunityIcons
                 name="file-document-outline"
                 size={18}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
               <Text style={styles.proofHeaderText}>Proof of Moment</Text>
               <MaterialCommunityIcons
                 name="check-decagram"
                 size={18}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
             </View>
             <Text style={styles.proofFilename}>{item.text}</Text>
@@ -55,7 +55,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               <MaterialCommunityIcons
                 name="clock-outline"
                 size={16}
-                color={COLORS.warning}
+                color={COLORS.feedback.warning}
               />
               <Text style={styles.proofStatusText}>Verifying proof...</Text>
             </View>
@@ -65,7 +65,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               <MaterialCommunityIcons
                 name="check-circle"
                 size={16}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
               <Text style={styles.proofStatusVerified}>
                 Verified - Funds released
@@ -77,7 +77,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               <MaterialCommunityIcons
                 name="close-circle"
                 size={16}
-                color={COLORS.error}
+                color={COLORS.feedback.error}
               />
               <Text style={styles.proofStatusRejected}>
                 Verification failed
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   },
   systemMessageText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
   },
   messageRow: {
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   otherMessageBubble: {
     maxWidth: '80%',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderBottomLeftRadius: 0,
     paddingHorizontal: 16,
@@ -175,12 +175,12 @@ const styles = StyleSheet.create({
   },
   otherMessageText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 24,
   },
   myMessageBubble: {
     maxWidth: '80%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     borderBottomRightRadius: 0,
     paddingHorizontal: 16,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   myMessageText: {
     fontSize: 16,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     lineHeight: 24,
   },
   imageMessageContainer: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 0,
     padding: 12,
     borderWidth: 1,
-    borderColor: COLORS.success + '30',
+    borderColor: COLORS.feedback.success + '30',
   },
   proofHeaderRow: {
     flexDirection: 'row',
@@ -221,12 +221,12 @@ const styles = StyleSheet.create({
   proofHeaderText: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     flex: 1,
   },
   proofFilename: {
     fontSize: 12,
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontWeight: '500',
   },
   proofStatusContainer: {
@@ -236,21 +236,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: COLORS.success + '20',
+    borderTopColor: COLORS.feedback.success + '20',
   },
   proofStatusText: {
     fontSize: 13,
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
     fontWeight: '500',
   },
   proofStatusVerified: {
     fontSize: 13,
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontWeight: '600',
   },
   proofStatusRejected: {
     fontSize: 13,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontWeight: '600',
   },
 });

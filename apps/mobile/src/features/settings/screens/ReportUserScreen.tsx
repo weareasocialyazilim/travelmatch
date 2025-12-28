@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   userInfo: {
     flex: 1,
@@ -98,11 +98,11 @@ const styles = StyleSheet.create({
   userName: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   userRole: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

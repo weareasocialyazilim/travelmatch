@@ -77,8 +77,8 @@ const KYCDocumentTypeScreen: React.FC = () => {
                     size={24}
                     color={
                       selectedType === option.id
-                        ? COLORS.primary
-                        : COLORS.textSecondary
+                        ? COLORS.brand.primary
+                        : COLORS.text.secondary
                     }
                   />
                 </View>
@@ -94,7 +94,7 @@ const KYCDocumentTypeScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="check-circle"
                     size={24}
-                    color={COLORS.primary}
+                    color={COLORS.brand.primary}
                   />
                 )}
               </TouchableOpacity>

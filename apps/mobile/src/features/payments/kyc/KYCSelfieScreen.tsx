@@ -75,13 +75,13 @@ const KYCSelfieScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="check-circle"
                     size={64}
-                    color={COLORS.success}
+                    color={COLORS.feedback.success}
                   />
                 ) : (
                   <MaterialCommunityIcons
                     name="account"
                     size={64}
-                    color={COLORS.textTertiary}
+                    color={COLORS.text.tertiary}
                   />
                 )}
               </View>
@@ -91,7 +91,7 @@ const KYCSelfieScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="check"
                   size={16}
-                  color={COLORS.success}
+                  color={COLORS.feedback.success}
                 />
                 <Text style={kycStyles.feedbackText}>Face Captured</Text>
               </View>
@@ -112,7 +112,7 @@ const KYCSelfieScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="lock-outline"
                 size={14}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={kycStyles.securityNoteText}>
                 Your photo is securely encrypted

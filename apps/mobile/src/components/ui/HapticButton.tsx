@@ -204,28 +204,28 @@ const getVariantStyles = (
     case 'primary':
       return {
         container: {
-          backgroundColor: COLORS.primary,
+          backgroundColor: COLORS.brand.primary,
           opacity,
         } as ViewStyle,
-        textColor: COLORS.white,
+        textColor: COLORS.utility.white,
       };
     case 'secondary':
       return {
         container: {
-          backgroundColor: COLORS.secondary || '#6B7280',
+          backgroundColor: COLORS.brand.secondary || '#6B7280',
           opacity,
         } as ViewStyle,
-        textColor: COLORS.white,
+        textColor: COLORS.utility.white,
       };
     case 'outline':
       return {
         container: {
           backgroundColor: 'transparent',
           borderWidth: 1,
-          borderColor: COLORS.primary,
+          borderColor: COLORS.brand.primary,
           opacity,
         } as ViewStyle,
-        textColor: COLORS.primary,
+        textColor: COLORS.brand.primary,
       };
     case 'ghost':
       return {
@@ -233,23 +233,23 @@ const getVariantStyles = (
           backgroundColor: 'transparent',
           opacity,
         } as ViewStyle,
-        textColor: COLORS.primary,
+        textColor: COLORS.brand.primary,
       };
     case 'danger':
       return {
         container: {
-          backgroundColor: COLORS.error || '#EF4444',
+          backgroundColor: COLORS.feedback.error || '#EF4444',
           opacity,
         } as ViewStyle,
-        textColor: COLORS.white,
+        textColor: COLORS.utility.white,
       };
     default:
       return {
         container: {
-          backgroundColor: COLORS.primary,
+          backgroundColor: COLORS.brand.primary,
           opacity,
         } as ViewStyle,
-        textColor: COLORS.white,
+        textColor: COLORS.utility.white,
       };
   }
 };

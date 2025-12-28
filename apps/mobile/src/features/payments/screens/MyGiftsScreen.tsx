@@ -74,7 +74,7 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Gifts</Text>
@@ -117,7 +117,7 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
                     <MaterialCommunityIcons
                       name={gift.icon}
                       size={24}
-                      color={COLORS.textSecondary}
+                      color={COLORS.text.secondary}
                     />
                   </View>
                   <View style={styles.giftInfo}>
@@ -148,7 +148,7 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
                     <MaterialCommunityIcons
                       name={'clock-outline' as IconName}
                       size={16}
-                      color={COLORS.warning}
+                      color={COLORS.feedback.warning}
                     />
                     <Text style={styles.statusBadgeTextPending}>
                       Awaiting Proof
@@ -174,7 +174,7 @@ export const MyGiftsScreen: React.FC<MyGiftsScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 40,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -206,22 +206,22 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     padding: 16,
     gap: 6,
   },
   statLabel: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   statValue: {
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   giftList: {
     paddingHorizontal: 16,
@@ -229,10 +229,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   giftCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     padding: 16,
     gap: 16,
   },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -259,12 +259,12 @@ const styles = StyleSheet.create({
   giftTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   giftMeta: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
   statusBadgeVerified: {
@@ -295,6 +295,6 @@ const styles = StyleSheet.create({
   statusBadgeTextPending: {
     ...TYPOGRAPHY.caption,
     fontWeight: '600',
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
   },
 });

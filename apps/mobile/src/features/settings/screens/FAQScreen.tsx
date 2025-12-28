@@ -202,7 +202,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <LinearGradient
-        colors={[COLORS.background, COLORS.backgroundLight]}
+        colors={[COLORS.bg.primary, COLORS.bg.primaryLight]}
         style={styles.gradient}
       >
         {/* Header */}
@@ -215,7 +215,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>FAQ</Text>
@@ -227,7 +227,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="face-agent"
               size={24}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </TouchableOpacity>
         </View>
@@ -237,13 +237,13 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
           <MaterialCommunityIcons
             name="magnify"
             size={20}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
             placeholder="Search questions..."
-            placeholderTextColor={COLORS.textSecondary}
+            placeholderTextColor={COLORS.text.secondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -252,7 +252,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
               <MaterialCommunityIcons
                 name="close-circle"
                 size={20}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
             </TouchableOpacity>
           )}
@@ -339,7 +339,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
                       expandedItems.has(item.id) ? 'chevron-up' : 'chevron-down'
                     }
                     size={24}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                 </View>
                 {expandedItems.has(item.id) && (
@@ -356,7 +356,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="lifebuoy"
               size={32}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.helpTitle}>Still need help?</Text>
             <Text style={styles.helpSubtitle}>
@@ -368,7 +368,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
               activeOpacity={0.8}
             >
               <LinearGradient
-                colors={[COLORS.primary, COLORS.secondary]}
+                colors={[COLORS.brand.primary, COLORS.brand.secondary]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.contactGradient}
@@ -377,7 +377,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
                 <MaterialCommunityIcons
                   name="arrow-right"
                   size={20}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
               </LinearGradient>
             </TouchableOpacity>
@@ -393,7 +393,7 @@ export const FAQScreen: React.FC<FAQScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   backButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 20,
     height: 40,
     justifyContent: 'center',
@@ -413,34 +413,34 @@ const styles = StyleSheet.create({
   },
   categoryBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     borderRadius: 8,
     marginBottom: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   categoryBadgeText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 11,
     fontWeight: '600',
   },
   categoryChip: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 20,
     marginRight: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   categoryChipActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   categoryChipText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.caption,
     fontWeight: '600',
   },
   categoryChipTextActive: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   contactButton: {
     borderRadius: VALUES.borderRadius,
@@ -455,22 +455,22 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   contactText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   faqAnswer: {
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
     borderTopWidth: 1,
     marginTop: 12,
     paddingTop: 12,
   },
   faqAnswerText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodySmall,
     lineHeight: 20,
   },
@@ -484,14 +484,14 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   faqItem: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     marginBottom: 12,
     padding: 16,
     ...VALUES.shadow,
   },
   faqQuestion: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.body,
     fontWeight: '600',
     lineHeight: 20,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -509,13 +509,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
   },
   helpCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     marginBottom: 16,
     marginTop: 24,
@@ -523,13 +523,13 @@ const styles = StyleSheet.create({
     ...VALUES.shadow,
   },
   helpSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodySmall,
     marginBottom: 16,
     marginTop: 4,
   },
   helpTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
     marginTop: 12,
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     height: 48,
@@ -557,13 +557,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   searchInput: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
   },
   supportButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 20,
     height: 40,
     justifyContent: 'center',

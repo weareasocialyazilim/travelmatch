@@ -33,7 +33,7 @@ const WalletCard: React.FC<WalletCardProps> = memo(
         <MaterialCommunityIcons
           name="chevron-right"
           size={24}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
         />
       </TouchableOpacity>
     );
@@ -48,12 +48,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginHorizontal: 16,
     marginTop: 16,
     padding: 16,
     borderRadius: 16,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -74,13 +74,13 @@ const styles = StyleSheet.create({
   },
   walletLabel: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 2,
   },
   walletBalance: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });
 

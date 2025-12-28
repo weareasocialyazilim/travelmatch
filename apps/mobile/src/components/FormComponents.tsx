@@ -13,7 +13,7 @@ import {
   Text,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 
 interface DismissKeyboardViewProps {
   children: React.ReactNode;
@@ -172,7 +172,7 @@ export const FormInput: React.FC<FormInputProps> = ({
           <MaterialCommunityIcons
             name={leftIcon}
             size={20}
-            color={isFocused ? COLORS.primary : COLORS.textSecondary}
+            color={isFocused ? COLORS.brand.primary : COLORS.text.secondary}
             style={styles.leftIcon}
           />
         )}
@@ -181,7 +181,7 @@ export const FormInput: React.FC<FormInputProps> = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={COLORS.gray[400]}
+          placeholderTextColor={primitives.stone[400]}
           secureTextEntry={actualSecureEntry}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
@@ -217,7 +217,7 @@ export const FormInput: React.FC<FormInputProps> = ({
             <MaterialCommunityIcons
               name={isSecureVisible ? 'eye-off-outline' : 'eye-outline'}
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
         )}
@@ -232,7 +232,7 @@ export const FormInput: React.FC<FormInputProps> = ({
             <MaterialCommunityIcons
               name={rightIcon}
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
         )}
@@ -243,7 +243,7 @@ export const FormInput: React.FC<FormInputProps> = ({
           <MaterialCommunityIcons
             name="alert-circle"
             size={14}
-            color={COLORS.error}
+            color={COLORS.feedback.error}
           />
           <Text style={styles.errorText}>{error}</Text>
         </View>
@@ -271,29 +271,29 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     paddingHorizontal: 14,
     minHeight: 52,
   },
   inputWrapperFocused: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
+    borderColor: COLORS.brand.primary,
+    backgroundColor: COLORS.utility.white,
   },
   inputWrapperError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
     backgroundColor: COLORS.errorBackground,
   },
   inputWrapperDisabled: {
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     opacity: 0.7,
   },
   inputWrapperMultiline: {
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingVertical: 0,
   },
   inputMultiline: {
@@ -331,11 +331,11 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
   },
   charCount: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'right',
     marginTop: 4,
   },

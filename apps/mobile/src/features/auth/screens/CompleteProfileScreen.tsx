@@ -187,7 +187,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
+          <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
@@ -226,7 +226,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                 <Icon
                   name="camera-plus"
                   size={32}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
               </View>
             )}
@@ -247,11 +247,11 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
               <View
                 style={[styles.inputWrapper, error && styles.inputWrapperError]}
               >
-                <Icon name="account" size={20} color={COLORS.textSecondary} />
+                <Icon name="account" size={20} color={COLORS.text.secondary} />
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your name"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -276,11 +276,11 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
               <View
                 style={[styles.inputWrapper, error && styles.inputWrapperError]}
               >
-                <Icon name="at" size={20} color={COLORS.textSecondary} />
+                <Icon name="at" size={20} color={COLORS.text.secondary} />
                 <TextInput
                   style={styles.input}
                   placeholder="Choose a username"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -312,7 +312,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                 <TextInput
                   style={[styles.input, styles.bioInput]}
                   placeholder="Tell us about yourself..."
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -348,7 +348,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                   <Icon
                     name={interest.icon}
                     size={18}
-                    color={isSelected ? COLORS.white : COLORS.mint}
+                    color={isSelected ? COLORS.utility.white : COLORS.mint}
                   />
                   <Text
                     style={[
@@ -398,7 +398,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   topHeader: {
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   backButton: {
     width: 40,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   progressBar: {
     width: 120,
     height: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 4,
   },
   scrollContent: {
@@ -448,13 +448,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 28,
     fontWeight: '700',
     marginBottom: 8,
   },
   subtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 15,
     lineHeight: 22,
   },
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   },
   avatarPlaceholder: {
     alignItems: 'center',
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     height: '100%',
     justifyContent: 'center',
     width: '100%',
@@ -491,15 +491,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   inputLabel: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
   },
   inputWrapper: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     borderWidth: 1.5,
     flexDirection: 'row',
@@ -507,10 +507,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   inputWrapperError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   input: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     fontSize: 16,
     paddingVertical: 14,
@@ -524,13 +524,13 @@ const styles = StyleSheet.create({
     paddingTop: 14,
   },
   charCount: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
     marginTop: 4,
     textAlign: 'right',
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 12,
     marginTop: 4,
   },
@@ -538,13 +538,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
   sectionSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     marginBottom: 16,
   },
@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
   },
   interestChip: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderColor: COLORS.mint,
     borderRadius: 20,
     borderWidth: 1.5,
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   interestTextSelected: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   completeButton: {
     backgroundColor: COLORS.mint,
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     backgroundColor: `${COLORS.mint}50`,
   },
   buttonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   skipText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     fontWeight: '600',
   },

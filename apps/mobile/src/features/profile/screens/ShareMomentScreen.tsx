@@ -213,7 +213,7 @@ export const ShareMomentScreen: React.FC = () => {
       id: 'more',
       label: 'More',
       icon: 'dots-horizontal',
-      color: COLORS.textSecondary,
+      color: COLORS.text.secondary,
       action: handleNativeShare,
     },
   ];
@@ -226,7 +226,7 @@ export const ShareMomentScreen: React.FC = () => {
           style={styles.closeButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Share Moment</Text>
         <View style={styles.headerSpacer} />
@@ -259,7 +259,7 @@ export const ShareMomentScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="link-variant"
             size={20}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
           <Text style={styles.linkText} numberOfLines={1}>
             {shareUrl}
@@ -272,7 +272,7 @@ export const ShareMomentScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={linkCopied ? 'check' : 'content-copy'}
             size={18}
-            color={linkCopied ? COLORS.mint : COLORS.primary}
+            color={linkCopied ? COLORS.mint : COLORS.brand.primary}
           />
           <Text
             style={[
@@ -327,7 +327,7 @@ export const ShareMomentScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="qrcode"
             size={24}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <Text style={styles.qrButtonText}>Show QR Code</Text>
         </TouchableOpacity>
@@ -341,7 +341,7 @@ export const ShareMomentScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="account-plus"
           size={20}
-          color={COLORS.white}
+          color={COLORS.utility.white}
         />
         <Text style={styles.inviteButtonText}>
           Invite Friends to TravelMatch
@@ -354,7 +354,7 @@ export const ShareMomentScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   closeButton: {
     width: 40,
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   headerSpacer: {
     width: 40,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
   previewCard: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -400,13 +400,13 @@ const styles = StyleSheet.create({
   previewTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   previewPrice: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   copyLinkSection: {
     flexDirection: 'row',
@@ -419,23 +419,23 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   linkText: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 8,
   },
   copyButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: COLORS.brand.primary + '15',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 10,
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   copyButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   copyButtonTextSuccess: {
     color: COLORS.mint,
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 16,
   },
   shareOptionsGrid: {
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   },
   shareOptionLabel: {
     fontSize: 12,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
   },
   qrSection: {
@@ -495,19 +495,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     gap: 8,
   },
   qrButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   inviteButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     marginHorizontal: 16,
     paddingVertical: 16,
     borderRadius: 12,
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
   inviteButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

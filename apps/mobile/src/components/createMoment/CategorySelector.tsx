@@ -77,8 +77,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = memo(
                 size={20}
                 color={
                   selectedCategory === category.id
-                    ? COLORS.text
-                    : COLORS.textSecondary
+                    ? COLORS.text.primary
+                    : COLORS.text.secondary
                 }
               />
               <Text
@@ -102,11 +102,11 @@ CategorySelector.displayName = 'CategorySelector';
 
 const styles = StyleSheet.create({
   categorySection: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     paddingVertical: 16,
   },
   sectionLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
     fontWeight: '600',
     letterSpacing: 0.5,
@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
   },
   categoryChip: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: LAYOUT.borderRadius.full,
     borderWidth: 1.5,
     flexDirection: 'row',
@@ -131,15 +131,15 @@ const styles = StyleSheet.create({
   },
   categoryChipSelected: {
     backgroundColor: COLORS.filterPillActive,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   categoryChipText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 15,
     fontWeight: '500',
   },
   categoryChipTextSelected: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
 });

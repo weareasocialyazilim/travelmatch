@@ -120,11 +120,11 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
       case 'completed':
         return COLORS.mint;
       case 'current':
-        return COLORS.primary;
+        return COLORS.brand.primary;
       case 'pending':
-        return COLORS.border;
+        return COLORS.border.default;
       default:
-        return COLORS.border;
+        return COLORS.border.default;
     }
   };
 
@@ -152,7 +152,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
       case 'refunded':
         return COLORS.softRed;
       default:
-        return COLORS.primary;
+        return COLORS.brand.primary;
     }
   };
 
@@ -198,7 +198,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Escrow Status</Text>
@@ -271,7 +271,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
                     <MaterialCommunityIcons
                       name="check"
                       size={12}
-                      color={COLORS.white}
+                      color={COLORS.utility.white}
                     />
                   )}
                   {step.status === 'current' && (
@@ -286,7 +286,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
                         backgroundColor:
                           step.status === 'completed'
                             ? COLORS.mint
-                            : COLORS.border,
+                            : COLORS.border.default,
                       },
                     ]}
                   />
@@ -329,7 +329,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
           <MaterialCommunityIcons
             name="information-outline"
             size={20}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <Text style={styles.infoText}>
             Your funds are securely held until the proof is verified by our
@@ -349,7 +349,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
                 <MaterialCommunityIcons
                   name="bell-outline"
                   size={20}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
                 <Text style={styles.secondaryButtonText}>Send Reminder</Text>
               </TouchableOpacity>
@@ -362,7 +362,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
               <MaterialCommunityIcons
                 name="message-outline"
                 size={20}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
               <Text style={styles.primaryButtonText}>
                 Message {receiverName}
@@ -380,7 +380,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
               <MaterialCommunityIcons
                 name="message-outline"
                 size={20}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
               <Text style={styles.primaryButtonText}>Say Thanks</Text>
             </TouchableOpacity>
@@ -396,7 +396,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
               <MaterialCommunityIcons
                 name="wallet-outline"
                 size={20}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
               <Text style={styles.primaryButtonText}>View Balance</Text>
             </TouchableOpacity>
@@ -410,7 +410,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     padding: 8,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   placeholder: {
     width: 40,
@@ -440,11 +440,11 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   statusCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -467,31 +467,31 @@ const styles = StyleSheet.create({
   receiverName: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   momentTitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   amountContainer: {
     alignItems: 'center',
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     marginBottom: 16,
   },
   amountLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 4,
   },
   amountValue: {
     fontSize: 32,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   statusBadge: {
     flexDirection: 'row',
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   timelineContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 20,
   },
   timelineItem: {
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   timelineLine: {
     width: 2,
@@ -559,29 +559,29 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   stepTitlePending: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   stepSubtitle: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
     marginLeft: 28,
   },
   stepSubtitlePending: {
-    color: COLORS.border,
+    color: COLORS.border.default,
   },
   stepTime: {
     fontSize: 12,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     marginTop: 4,
     marginLeft: 28,
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.brand.primary + '10',
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 18,
   },
   actionsContainer: {
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     paddingVertical: 14,
     gap: 8,
@@ -608,15 +608,15 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   secondaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     borderRadius: 12,
     paddingVertical: 14,
     gap: 8,
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });
 

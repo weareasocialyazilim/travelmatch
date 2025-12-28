@@ -31,27 +31,27 @@ export interface RequestCardProps {
 
 const statusConfig = {
   pending: {
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
     label: 'Pending',
     icon: 'clock-outline' as const,
   },
   accepted: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     label: 'Accepted',
     icon: 'check-circle' as const,
   },
   rejected: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     label: 'Rejected',
     icon: 'close-circle' as const,
   },
   completed: {
-    color: COLORS.info,
+    color: COLORS.feedback.info,
     label: 'Completed',
     icon: 'check-all' as const,
   },
   cancelled: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     label: 'Cancelled',
     icon: 'cancel' as const,
   },
@@ -134,7 +134,7 @@ export const RequestCard: React.FC<RequestCardProps> = memo(
                 <MaterialCommunityIcons
                   name="close"
                   size={18}
-                  color={COLORS.error}
+                  color={COLORS.feedback.error}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -144,7 +144,7 @@ export const RequestCard: React.FC<RequestCardProps> = memo(
                 <MaterialCommunityIcons
                   name="check"
                   size={18}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
               </TouchableOpacity>
             </View>
@@ -167,7 +167,7 @@ RequestCard.displayName = 'RequestCard';
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -193,11 +193,11 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   momentTitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   statusBadge: {
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 14,
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     marginTop: 12,
     lineHeight: 20,
   },
@@ -225,11 +225,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   date: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   actions: {
     flexDirection: 'row',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: COLORS.error + '15',
+    backgroundColor: COLORS.feedback.error + '15',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success,
     justifyContent: 'center',
     alignItems: 'center',
   },

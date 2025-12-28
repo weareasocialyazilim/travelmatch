@@ -64,7 +64,7 @@ const SocialButton: React.FC<SocialButtonProps> = memo(
           <MaterialCommunityIcons
             name={config.icon}
             size={24}
-            color={COLORS.white}
+            color={COLORS.utility.white}
           />
         </TouchableOpacity>
       );
@@ -81,7 +81,7 @@ const SocialButton: React.FC<SocialButtonProps> = memo(
         <MaterialCommunityIcons
           name={config.icon}
           size={24}
-          color={COLORS.white}
+          color={COLORS.utility.white}
         />
         <Text style={styles.largeButtonText}>{displayText}</Text>
       </TouchableOpacity>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   largeButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

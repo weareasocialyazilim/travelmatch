@@ -299,9 +299,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     gap: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   chatContent: {
     flex: 1,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
 
   // Moment Card
   momentCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     overflow: 'hidden',
     marginHorizontal: 16,
@@ -330,9 +330,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     padding: 16,
     gap: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   giftContent: {
     flex: 1,
@@ -350,9 +350,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     gap: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   transactionContent: {
     flex: 1,
@@ -367,9 +367,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     padding: 16,
     gap: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   notificationContent: {
     flex: 1,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
 
   // Request Card
   requestCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 16,
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
 
   // Trip Card
   tripCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     overflow: 'hidden',
     marginHorizontal: 16,

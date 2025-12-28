@@ -84,7 +84,7 @@ export const WelcomeScreen: React.FC<{
                 <MaterialCommunityIcons
                   name="apple"
                   size={24}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
                 <Text style={styles.socialButtonText}>Apple ile devam et</Text>
               </View>
@@ -102,7 +102,7 @@ export const WelcomeScreen: React.FC<{
                 <MaterialCommunityIcons
                   name="google"
                   size={24}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
                 <Text style={styles.socialButtonText}>Google ile devam et</Text>
               </View>
@@ -157,7 +157,7 @@ export const WelcomeScreen: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   main: {
     flex: 1,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 32,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     letterSpacing: -0.5,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: 16,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   socialButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -243,12 +243,12 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   primaryButton: {
     backgroundColor: COLORS.mint,
@@ -259,13 +259,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   primaryButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.25,
   },
   secondaryButton: {
-    backgroundColor: COLORS.transparent,
+    backgroundColor: COLORS.utility.transparent,
     borderRadius: 28,
     height: 56,
     alignItems: 'center',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 14,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
     paddingTop: 16,

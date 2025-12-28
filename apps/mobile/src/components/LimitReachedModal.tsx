@@ -34,7 +34,7 @@ export const LimitReachedModal: React.FC<LimitReachedModalProps> = ({
             <MaterialCommunityIcons
               name={'alert-circle' as IconName}
               size={40}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </View>
 
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '100%',
     maxWidth: 384,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 24,
     alignItems: 'center',
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: `${COLORS.primary}33`,
+    backgroundColor: `${COLORS.brand.primary}33`,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     paddingTop: 4,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: 16,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 24,
     paddingTop: 4,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
@@ -125,6 +125,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.background,
+    color: COLORS.bg.primary,
   },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -30,7 +30,7 @@ export const ClearCacheDialog: React.FC<ClearCacheDialogProps> = ({
             <MaterialCommunityIcons
               name={'broom' as IconName}
               size={40}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </View>
 
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   dialog: {
     width: '100%',
     maxWidth: 384,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 24,
     padding: 24,
     paddingBottom: 20,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: `${COLORS.primary}1A`, // 10% opacity
+    backgroundColor: `${COLORS.brand.primary}1A`, // 10% opacity
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -103,14 +103,14 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: -0.5,
     lineHeight: 30,
   },
   body: {
     fontSize: 16,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
     paddingTop: 8,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
@@ -133,14 +133,14 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: 0.24,
   },
   confirmButton: {
     flex: 1,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     letterSpacing: 0.24,
   },
 });

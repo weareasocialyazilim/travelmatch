@@ -87,23 +87,23 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
         style={[
           styles.searchBar,
           {
-            backgroundColor: COLORS.white,
-            borderColor: isFocused ? COLORS.primary : COLORS.border,
+            backgroundColor: COLORS.utility.white,
+            borderColor: isFocused ? COLORS.brand.primary : COLORS.border.default,
           },
         ]}
       >
         <MaterialCommunityIcons
           name="magnify"
           size={24}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
           style={styles.icon}
         />
 
         <TextInput
           ref={inputRef}
-          style={[styles.input, { color: COLORS.text }]}
+          style={[styles.input, { color: COLORS.text.primary }]}
           placeholder={placeholder || t('common.search')}
-          placeholderTextColor={COLORS.textSecondary}
+          placeholderTextColor={COLORS.text.secondary}
           value={localQuery}
           onChangeText={setLocalQuery}
           onFocus={() => setIsFocused(true)}
@@ -120,7 +120,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
             <MaterialCommunityIcons
               name="close-circle"
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
         )}
@@ -131,15 +131,15 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
         <View
           style={[
             styles.suggestions,
-            { backgroundColor: COLORS.white, borderColor: COLORS.border },
+            { backgroundColor: COLORS.utility.white, borderColor: COLORS.border.default },
           ]}
         >
           <View style={styles.suggestionsHeader}>
-            <Text style={[styles.suggestionsTitle, { color: COLORS.text }]}>
+            <Text style={[styles.suggestionsTitle, { color: COLORS.text.primary }]}>
               {t('common.search')} History
             </Text>
             <TouchableOpacity onPress={clearHistory}>
-              <Text style={[styles.clearText, { color: COLORS.primary }]}>
+              <Text style={[styles.clearText, { color: COLORS.brand.primary }]}>
                 Clear All
               </Text>
             </TouchableOpacity>
@@ -159,10 +159,10 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                   <MaterialCommunityIcons
                     name="history"
                     size={20}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                     style={styles.suggestionIcon}
                   />
-                  <Text style={[styles.suggestionText, { color: COLORS.text }]}>
+                  <Text style={[styles.suggestionText, { color: COLORS.text.primary }]}>
                     {item}
                   </Text>
                 </TouchableOpacity>
@@ -175,7 +175,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                   <MaterialCommunityIcons
                     name="close"
                     size={18}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                 </TouchableOpacity>
               </View>

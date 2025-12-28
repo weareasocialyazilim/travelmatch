@@ -38,7 +38,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import imageCacheManager, {
   type ImageVariant,
 } from '../services/imageCacheManager';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 
 // ============================================================================
 // TYPES
@@ -83,37 +83,37 @@ const FALLBACK_CONFIG: Record<
 > = {
   default: {
     icon: 'image-off-outline',
-    color: COLORS.gray[400],
-    bg: COLORS.gray[100],
+    color: primitives.stone[400],
+    bg: primitives.stone[100],
     label: 'Görsel yüklenemedi',
   },
   avatar: {
     icon: 'account-circle-outline',
-    color: COLORS.gray[500],
+    color: primitives.stone[500],
     bg: COLORS.primaryMuted,
     label: 'Profil fotoğrafı yüklenemedi',
   },
   moment: {
     icon: 'camera-off-outline',
-    color: COLORS.gray[500],
-    bg: COLORS.gray[50],
+    color: primitives.stone[500],
+    bg: primitives.stone[50],
     label: 'Moment görseli yüklenemedi',
   },
   trip: {
     icon: 'map-marker-off-outline',
-    color: COLORS.gray[500],
-    bg: COLORS.gray[50],
+    color: primitives.stone[500],
+    bg: primitives.stone[50],
     label: 'Seyahat görseli yüklenemedi',
   },
   gift: {
     icon: 'gift-off-outline',
-    color: COLORS.gray[500],
+    color: primitives.stone[500],
     bg: COLORS.softOrangeTransparent,
     label: 'Hediye görseli yüklenemedi',
   },
   profile: {
     icon: 'account-outline',
-    color: COLORS.gray[500],
+    color: primitives.stone[500],
     bg: COLORS.primaryMuted,
     label: 'Profil görseli yüklenemedi',
   },
@@ -296,7 +296,7 @@ export const CachedImage: React.FC<CachedImageProps> = ({
           style as ViewStyle,
         ]}
       >
-        <ActivityIndicator size="small" color={COLORS.primary} />
+        <ActivityIndicator size="small" color={COLORS.brand.primary} />
         <Text style={styles.loadingText}>Yükleniyor...</Text>
       </View>
     );
@@ -338,7 +338,7 @@ export const CachedImage: React.FC<CachedImageProps> = ({
             <MaterialCommunityIcons
               name="refresh"
               size={16}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.retryText}>
               Tekrar Dene {retryCount > 0 && `(${retryCount}/${maxRetries})`}
@@ -444,14 +444,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   loadingContainer: {
-    backgroundColor: COLORS.gray[50],
+    backgroundColor: primitives.stone[50],
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
   },
   loadingText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 4,
   },
   errorContainer: {
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: 8,
   },
@@ -472,20 +472,20 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     marginTop: 8,
   },
   retryText: {
     fontSize: 13,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
   maxRetriesText: {
     fontSize: 11,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     marginTop: 4,
   },
 });

@@ -63,12 +63,12 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
 
   return (
     <LinearGradient
-      colors={[COLORS.background, COLORS.surface]}
+      colors={[COLORS.bg.primary, COLORS.surface.base]}
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg.primary} />
 
       <View style={styles.content}>
         {/* Logo */}
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   slogan: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     letterSpacing: 0.5,
   },
@@ -179,6 +179,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
 });

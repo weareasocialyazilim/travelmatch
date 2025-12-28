@@ -130,18 +130,18 @@ export function validateThemeContrast(theme: {
       isLarge: false,
     },
     {
-      fg: COLORS.white,
+      fg: COLORS.utility.white,
       bg: theme.primary,
       name: 'white/primary',
       isLarge: false,
     },
     {
-      fg: COLORS.white,
+      fg: COLORS.utility.white,
       bg: theme.success,
       name: 'white/success',
       isLarge: false,
     },
-    { fg: COLORS.white, bg: theme.error, name: 'white/error', isLarge: false },
+    { fg: COLORS.utility.white, bg: theme.error, name: 'white/error', isLarge: false },
   ];
 
   checks.forEach(({ fg, bg, name, isLarge }) => {
@@ -183,5 +183,5 @@ export function suggestBetterContrast(
   const shouldDarken = bgLuminance > 0.5;
 
   // Simple suggestion: make it black or white based on background
-  return shouldDarken ? COLORS.black : COLORS.white;
+  return shouldDarken ? COLORS.utility.black : COLORS.utility.white;
 }

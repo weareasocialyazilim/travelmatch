@@ -97,7 +97,7 @@ const KYCReviewScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="account"
                     size={24}
-                    color={COLORS.text}
+                    color={COLORS.text.primary}
                   />
                 </View>
                 <View style={kycStyles.reviewInfo}>
@@ -143,7 +143,7 @@ const KYCReviewScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="account"
                     size={24}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                 </View>
                 <View style={kycStyles.reviewInfo}>
@@ -176,7 +176,7 @@ const KYCReviewScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="check"
                   size={16}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
               )}
             </View>
@@ -195,7 +195,7 @@ const KYCReviewScreen: React.FC = () => {
             activeOpacity={0.8}
           >
             {loading ? (
-              <ActivityIndicator color={COLORS.text} />
+              <ActivityIndicator color={COLORS.text.primary} />
             ) : (
               <Text style={kycStyles.primaryButtonText}>
                 Submit for Verification

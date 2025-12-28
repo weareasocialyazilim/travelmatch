@@ -47,7 +47,7 @@ const MapLoadingFallback: React.FC<{ visible: boolean }> = ({ visible }) => {
       transparent={false}
     >
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.brand.primary} />
         <Text style={styles.loadingText}>Loading map...</Text>
         <Text style={styles.loadingHint}>
           This only happens once!
@@ -99,7 +99,7 @@ export const LazyLocationPicker: React.FC<LazyLocationPickerProps> = (props) => 
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
@@ -107,12 +107,12 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
   },
   loadingHint: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });
 

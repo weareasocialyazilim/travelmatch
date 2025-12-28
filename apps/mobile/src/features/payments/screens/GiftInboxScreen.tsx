@@ -102,7 +102,7 @@ const GiftInboxScreen: React.FC = () => {
     if (pendingGift) {
       return {
         icon: 'camera-outline',
-        color: COLORS.coral,
+        color: COLORS.brand.secondary,
         text: 'Upload proof',
       };
     }
@@ -114,7 +114,7 @@ const GiftInboxScreen: React.FC = () => {
         text: 'Verifying...',
       };
     }
-    return { icon: 'gift-outline', color: COLORS.primary, text: 'Pending' };
+    return { icon: 'gift-outline', color: COLORS.brand.primary, text: 'Pending' };
   };
 
   return (
@@ -137,7 +137,7 @@ const GiftInboxScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>🎁 Gift Inbox</Text>
@@ -145,7 +145,7 @@ const GiftInboxScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="cog-outline"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
       </View>
@@ -216,7 +216,7 @@ const GiftInboxScreen: React.FC = () => {
                       <MaterialCommunityIcons
                         name="chevron-right"
                         size={16}
-                        color={COLORS.primary}
+                        color={COLORS.brand.primary}
                       />
                     </TouchableOpacity>
                   )}
@@ -284,7 +284,7 @@ const GiftInboxScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     padding: 8,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     textAlign: 'center',
   },
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   inboxList: {
     paddingHorizontal: 20,
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   seeAllText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });
 

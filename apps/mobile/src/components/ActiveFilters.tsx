@@ -51,7 +51,7 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = memo(
                 <MaterialCommunityIcons
                   name="close-circle"
                   size={16}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
               </TouchableOpacity>
             </View>
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   filterTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.brand.primaryLight,
     borderRadius: 16,
     paddingVertical: SPACING.xs,
     paddingHorizontal: SPACING.sm,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
   clearAllButton: {
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   clearAllText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontWeight: '600',
   },
 });

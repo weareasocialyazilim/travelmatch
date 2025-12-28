@@ -40,7 +40,7 @@ const MatchConfirmationScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Confirm Matches</Text>
@@ -79,32 +79,32 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: RADII.md,
     padding: SPACING.md,
   },
   confirmButtonText: {
     fontSize: TYPOGRAPHY.fontSizes['2xl'],
     fontWeight: TYPOGRAPHY.fontWeights.semibold,
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   footer: {
-    backgroundColor: COLORS.white,
-    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderTopColor: COLORS.border.default,
     borderTopWidth: 1,
     padding: SPACING.md,
   },
   giverAmount: {
     fontSize: TYPOGRAPHY.fontSizes.sm,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   giverCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: RADII.md,
     flexDirection: 'row',
     marginBottom: SPACING.md,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: SPACING.md,

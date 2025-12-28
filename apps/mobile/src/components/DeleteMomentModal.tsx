@@ -110,12 +110,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   modalContent: {
     width: '100%',
     maxWidth: 384,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 24,
     alignItems: 'center',
@@ -137,14 +137,14 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 8,
   },
   bodyText: {
     fontSize: 16,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 24,
     paddingTop: 4,
@@ -163,18 +163,18 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   cancelButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

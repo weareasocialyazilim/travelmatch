@@ -76,7 +76,7 @@ export const LeaveTrustNoteBottomSheet: React.FC<
             <TextInput
               style={styles.textArea}
               placeholder="Share what you loved about this moment..."
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={note}
               onChangeText={setNote}
               multiline
@@ -127,14 +127,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   keyboardView: {
     flex: 1,
     justifyContent: 'flex-end',
   },
   bottomSheet: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     paddingBottom: 32,
@@ -147,19 +147,19 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   headline: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 24,
     paddingTop: 16,
     lineHeight: 34,
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     paddingHorizontal: 24,
     paddingTop: 4,
     paddingBottom: 16,
@@ -172,11 +172,11 @@ const styles = StyleSheet.create({
     minHeight: 144,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.primary,
     padding: 16,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   metaContainer: {
     paddingHorizontal: 24,
@@ -186,13 +186,13 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   actionsContainer: {
     paddingHorizontal: 24,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
     gap: 8,
   },
   submitButton: {
@@ -208,18 +208,18 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   cancelButton: {
     height: 48,
     borderRadius: 8,
-    backgroundColor: COLORS.transparent,
+    backgroundColor: COLORS.utility.transparent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

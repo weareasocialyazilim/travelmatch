@@ -7,7 +7,7 @@
 import React, { memo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 
 interface DividerProps {
   /** Optional centered text (creates OR-style divider) */
@@ -82,12 +82,12 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.gray[200],
+    backgroundColor: primitives.stone[200],
   },
   text: {
     paddingHorizontal: 16,
     fontSize: 12,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     fontWeight: '500',
   },
 });

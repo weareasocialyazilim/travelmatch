@@ -44,7 +44,7 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
                 <MaterialCommunityIcons
                   name="plus"
                   size={24}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
               </View>
             </View>
@@ -89,7 +89,7 @@ StoriesRow.displayName = 'StoriesRow';
 
 const styles = StyleSheet.create({
   storiesSection: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     paddingBottom: 16,
     paddingTop: 8,
   },
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
   },
   createStoryRing: {
     alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.bg.primary,
+    borderColor: COLORS.border.default,
     borderRadius: 36,
     borderStyle: 'dashed',
     borderWidth: 2,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   createStoryInner: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 30,
     height: 60,
     justifyContent: 'center',
@@ -130,10 +130,10 @@ const styles = StyleSheet.create({
     width: 72,
   },
   storyRingNew: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   storyRingViewed: {
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   storyAvatar: {
     borderRadius: 30,
@@ -141,14 +141,14 @@ const styles = StyleSheet.create({
     width: 60,
   },
   storyName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 12,
     marginTop: 6,
     textAlign: 'center',
   },
   newIndicator: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.white,
+    backgroundColor: COLORS.brand.primary,
+    borderColor: COLORS.utility.white,
     borderRadius: 6,
     borderWidth: 2,
     height: 12,

@@ -55,14 +55,14 @@ export const ThankYouModal: React.FC<ThankYouModalProps> = ({
       <View style={styles.overlay}>
         <Animated.View style={[styles.modal, animatedStyle]}>
           <LinearGradient
-            colors={[COLORS.primary, COLORS.accent]}
+            colors={[COLORS.brand.primary, COLORS.brand.accent]}
             style={styles.gradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
             {/* Success Icon */}
             <View style={styles.iconContainer}>
-              <Icon name="check-circle" size={80} color={COLORS.white} />
+              <Icon name="check-circle" size={80} color={COLORS.utility.white} />
             </View>
 
             {/* Title */}
@@ -76,7 +76,7 @@ export const ThankYouModal: React.FC<ThankYouModalProps> = ({
 
             {/* Appreciation Note */}
             <View style={styles.noteCard}>
-              <Icon name="heart" size={24} color={COLORS.error} />
+              <Icon name="heart" size={24} color={COLORS.feedback.error} />
               <Text style={styles.noteText}>
                 Gratitude strengthens the bond of kindness
               </Text>
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   closeButtonText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     lineHeight: 24,
     marginBottom: SPACING.lg,
     opacity: 0.95,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   noteText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     flex: 1,
     fontWeight: '600',
     lineHeight: 20,
@@ -150,13 +150,13 @@ const styles = StyleSheet.create({
   },
   title: {
     ...TYPOGRAPHY.h1,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     marginBottom: SPACING.md,
     textAlign: 'center',
   },
   whiteButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: radii.md,
     paddingVertical: SPACING.md,
   },

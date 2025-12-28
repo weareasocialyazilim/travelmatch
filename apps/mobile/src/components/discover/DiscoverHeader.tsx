@@ -96,7 +96,7 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
   const HeaderBackground = Platform.OS === 'ios' ? BlurView : View;
   const headerBgProps = Platform.OS === 'ios'
     ? { intensity: 90, tint: 'light' as const }
-    : { style: { backgroundColor: COLORS.glassBackground } };
+    : { style: { backgroundColor: COLORS.surface.glassBackground } };
 
   return (
     <Animated.View style={[styles.animatedHeader, headerStyle]}>
@@ -124,7 +124,7 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
               <MaterialCommunityIcons
                 name="map-marker"
                 size={18}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
               <Text style={styles.locationButtonText} numberOfLines={1}>
                 {location}
@@ -132,7 +132,7 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
               <MaterialCommunityIcons
                 name="chevron-down"
                 size={18}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
             </TouchableOpacity>
 
@@ -145,7 +145,7 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
               <MaterialCommunityIcons
                 name="magnify"
                 size={22}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
             </TouchableOpacity>
           </View>
@@ -173,14 +173,14 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
       onPress={onLocationPress}
       activeOpacity={0.7}
     >
-      <MaterialCommunityIcons name="map-marker" size={18} color={COLORS.primary} />
+      <MaterialCommunityIcons name="map-marker" size={18} color={COLORS.brand.primary} />
       <Text style={styles.locationText} numberOfLines={1}>
         {location}
       </Text>
       <MaterialCommunityIcons
         name="chevron-down"
         size={18}
-        color={COLORS.textSecondary}
+        color={COLORS.text.secondary}
       />
     </TouchableOpacity>
 
@@ -195,7 +195,7 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
         <MaterialCommunityIcons
           name="filter-variant"
           size={22}
-          color={COLORS.text}
+          color={COLORS.text.primary}
         />
         {activeFiltersCount > 0 && (
           <View style={styles.filterBadge}>
@@ -213,7 +213,7 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
         <MaterialCommunityIcons
           name={viewMode === 'single' ? 'view-grid' : 'view-agenda'}
           size={22}
-          color={COLORS.text}
+          color={COLORS.text.primary}
         />
       </TouchableOpacity>
     </View>
@@ -228,9 +228,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   locationSelector: {
     flexDirection: 'row',
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: 6,
     flex: 1,
   },
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -265,14 +265,14 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   filterBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   // Animated header styles
   animatedHeader: {
@@ -300,12 +300,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 4,
   },
   compactTitle: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   compactTitleText: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   searchRow: {
     flexDirection: 'row',
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: 12,
@@ -344,13 +344,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 8,
     fontSize: 15,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '500',
   },
   searchButton: {
     width: 48,
     height: 48,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

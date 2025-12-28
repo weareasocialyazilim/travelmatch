@@ -68,7 +68,7 @@ export const Avatar = memo<AvatarProps>(function Avatar({
   name,
   size = 'md',
   showBadge = false,
-  badgeColor = COLORS.success,
+  badgeColor = COLORS.feedback.success,
   showVerified = false,
   style,
 }) {
@@ -117,7 +117,7 @@ export const Avatar = memo<AvatarProps>(function Avatar({
           <Text
             style={[
               styles.initials,
-              { fontSize: sizeValue * 0.4, color: COLORS.primary },
+              { fontSize: sizeValue * 0.4, color: COLORS.brand.primary },
             ]}
           >
             {name ? getInitials(name) : '?'}
@@ -154,7 +154,7 @@ export const Avatar = memo<AvatarProps>(function Avatar({
           <MaterialCommunityIcons
             name="check-decagram"
             size={verifiedSize}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
         </View>
       )}
@@ -180,13 +180,13 @@ const styles = StyleSheet.create({
   },
   badgeBorder: {
     borderWidth: 2,
-    borderColor: COLORS.surfaceLight,
+    borderColor: COLORS.surface.baseLight,
   },
   verified: {
     position: 'absolute',
     bottom: -2,
     right: -2,
-    backgroundColor: COLORS.surfaceLight,
+    backgroundColor: COLORS.surface.baseLight,
     borderRadius: 999,
   },
 });

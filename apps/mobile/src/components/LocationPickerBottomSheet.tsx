@@ -74,7 +74,7 @@ export const LocationPickerBottomSheet: React.FC<
             <MaterialCommunityIcons
               name={'close' as IconName}
               size={28}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Choose a location</Text>
@@ -93,13 +93,13 @@ export const LocationPickerBottomSheet: React.FC<
             <MaterialCommunityIcons
               name={'magnify' as IconName}
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
               style={styles.searchIcon}
             />
             <TextInput
               style={styles.searchInput}
               placeholder="Search for a place"
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -111,7 +111,7 @@ export const LocationPickerBottomSheet: React.FC<
                 <MaterialCommunityIcons
                   name={'close-circle' as IconName}
                   size={18}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
               </TouchableOpacity>
             )}
@@ -134,7 +134,7 @@ export const LocationPickerBottomSheet: React.FC<
                 <MaterialCommunityIcons
                   name="map-marker"
                   size={32}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
               </View>
             </PointAnnotation>
@@ -162,7 +162,7 @@ export const LocationPickerBottomSheet: React.FC<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -171,8 +171,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    borderBottomColor: COLORS.border.default,
+    backgroundColor: COLORS.utility.white,
   },
   headerButton: {
     minWidth: 60,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   doneText: {
     fontSize: 16,
@@ -191,17 +191,17 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     paddingHorizontal: 12,
     height: 48,
   },
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   clearButton: {
     padding: 4,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -242,18 +242,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     alignSelf: 'center',
     marginBottom: 8,
   },
   locationName: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   locationAddress: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   selectButton: {
     height: 48,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   selectButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   markerContainer: {
     alignItems: 'center',

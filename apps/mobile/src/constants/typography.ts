@@ -64,6 +64,21 @@ export const TYPOGRAPHY = {
     letterSpacing: -1,
   } as TextStyle,
 
+  // Display aliases for backward compatibility
+  display1: {
+    fontSize: 40,
+    lineHeight: 46,
+    fontWeight: '800' as const,
+    letterSpacing: -1.2,
+  } as TextStyle,
+
+  display2: {
+    fontSize: 34,
+    lineHeight: 40,
+    fontWeight: '700' as const,
+    letterSpacing: -1,
+  } as TextStyle,
+
   // ─────────────────────────────────────────────
   // DISPLAY - Screen titles, section headers
   // 20-28px, semibold/bold
@@ -288,6 +303,30 @@ export const TYPOGRAPHY = {
     fontWeight: '500' as const,
     letterSpacing: 0.1,
     textDecorationLine: 'underline' as const,
+  } as TextStyle,
+
+  // ─────────────────────────────────────────────
+  // BUTTON - Button text styles
+  // ─────────────────────────────────────────────
+  button: {
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '600' as const,
+    letterSpacing: 0.2,
+  } as TextStyle,
+
+  buttonSmall: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '600' as const,
+    letterSpacing: 0.2,
+  } as TextStyle,
+
+  buttonLarge: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '600' as const,
+    letterSpacing: 0.1,
   } as TextStyle,
 } as const;
 

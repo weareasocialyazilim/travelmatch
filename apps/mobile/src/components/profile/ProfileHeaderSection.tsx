@@ -87,7 +87,7 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
           <MaterialCommunityIcons
             name="map-marker"
             size={16}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
           <Text style={styles.locationText}>{resolvedLocation}</Text>
         </View>
@@ -156,12 +156,12 @@ const AVATAR_SIZE = 90;
 
 const styles = StyleSheet.create({
   profileSection: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginHorizontal: 16,
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -176,20 +176,20 @@ const styles = StyleSheet.create({
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
     borderWidth: 3,
-    borderColor: COLORS.white,
+    borderColor: COLORS.utility.white,
   },
   verifiedBadge: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 2,
   },
   userName: {
     fontSize: 22,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   locationRow: {
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   proofScoreBadge: {
     flexDirection: 'row',

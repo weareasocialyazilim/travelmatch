@@ -112,7 +112,7 @@ export const HiddenItemsScreen: React.FC = () => {
           style={styles.unhideButton}
           onPress={() => handleUnhide(item.id)}
         >
-          <MaterialCommunityIcons name="eye" size={20} color={COLORS.primary} />
+          <MaterialCommunityIcons name="eye" size={20} color={COLORS.brand.primary} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
@@ -121,7 +121,7 @@ export const HiddenItemsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="delete"
             size={20}
-            color={COLORS.error}
+            color={COLORS.feedback.error}
           />
         </TouchableOpacity>
       </View>
@@ -138,7 +138,7 @@ export const HiddenItemsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Hidden Items</Text>
@@ -147,7 +147,7 @@ export const HiddenItemsScreen: React.FC = () => {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+          <ActivityIndicator size="large" color={COLORS.brand.primary} />
         </View>
       ) : (
       <ScrollView
@@ -171,7 +171,7 @@ export const HiddenItemsScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="eye-off-outline"
               size={64}
-              color={COLORS.textTertiary}
+              color={COLORS.text.tertiary}
             />
             <Text style={styles.emptyTitle}>No hidden items</Text>
             <Text style={styles.emptySubtitle}>
@@ -188,7 +188,7 @@ export const HiddenItemsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -221,14 +221,14 @@ const styles = StyleSheet.create({
   },
   sectionInfo: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 20,
     lineHeight: 20,
   },
   itemCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -245,17 +245,17 @@ const styles = StyleSheet.create({
   itemTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   itemSubtitle: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 2,
   },
   itemDate: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.brand.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -286,13 +286,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     ...TYPOGRAPHY.h3,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     paddingHorizontal: 40,
   },

@@ -19,7 +19,7 @@ export const RequestsSection: React.FC<RequestsSectionProps> = React.memo(
             <MaterialCommunityIcons
               name="account-clock-outline"
               size={40}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.emptyRequestsText}>
               No pending requests yet
@@ -59,7 +59,7 @@ export const RequestsSection: React.FC<RequestsSectionProps> = React.memo(
                 <MaterialCommunityIcons
                   name="check"
                   size={20}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -71,7 +71,7 @@ export const RequestsSection: React.FC<RequestsSectionProps> = React.memo(
                 <MaterialCommunityIcons
                   name="close"
                   size={20}
-                  color={COLORS.error}
+                  color={COLORS.feedback.error}
                 />
               </TouchableOpacity>
             </View>
@@ -89,15 +89,15 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionHeader: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '700',
     marginBottom: 12,
   },
   requestCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     borderWidth: 1,
     flexDirection: 'row',
@@ -114,13 +114,13 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   requestName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     fontWeight: '600',
     marginBottom: 2,
   },
   requestMessage: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
   },
   requestActions: {
@@ -138,8 +138,8 @@ const styles = StyleSheet.create({
   },
   declineButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.error,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.feedback.error,
     borderRadius: 18,
     borderWidth: 1.5,
     height: 36,
@@ -148,21 +148,21 @@ const styles = StyleSheet.create({
   },
   emptyRequestsCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     borderWidth: 1,
     paddingHorizontal: 20,
     paddingVertical: 30,
   },
   emptyRequestsText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
     marginTop: 12,
   },
   emptyRequestsSubtext: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     marginTop: 4,
   },

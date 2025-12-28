@@ -253,7 +253,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
         <MaterialCommunityIcons
           name="map-marker"
           size={18}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
         />
         <TextInput
           style={styles.input}
@@ -262,11 +262,11 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
           onFocus={() => setShowSuggestions(true)}
           onBlur={handleBlur}
           placeholder={placeholder}
-          placeholderTextColor={COLORS.textSecondary}
+          placeholderTextColor={COLORS.text.secondary}
           autoCapitalize="words"
           autoCorrect={false}
         />
-        {isLoading && <ActivityIndicator size="small" color={COLORS.primary} />}
+        {isLoading && <ActivityIndicator size="small" color={COLORS.brand.primary} />}
         {query.length > 0 && !isLoading && (
           <TouchableOpacity
             onPress={() => {
@@ -279,7 +279,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
             <MaterialCommunityIcons
               name="close-circle"
               size={18}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
         )}
@@ -303,7 +303,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
                 <MaterialCommunityIcons
                   name="city"
                   size={20}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                   style={styles.suggestionIcon}
                 />
                 <View style={styles.suggestionText}>
@@ -337,15 +337,15 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderWidth: 1,
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 12,
     marginTop: 4,
   },
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     marginTop: 4,
     maxHeight: 200,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   suggestionIcon: {
     marginRight: 12,
@@ -381,11 +381,11 @@ const styles = StyleSheet.create({
   cityName: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   countryName: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
 });

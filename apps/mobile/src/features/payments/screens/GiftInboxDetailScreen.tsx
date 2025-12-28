@@ -145,7 +145,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       case 'pending_proof':
         return {
           icon: 'camera-outline',
-          color: COLORS.coral,
+          color: COLORS.brand.secondary,
           text: 'Upload Proof',
         };
       case 'verifying':
@@ -157,9 +157,9 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       case 'verified':
         return { icon: 'check-decagram', color: COLORS.mint, text: 'Verified' };
       case 'failed':
-        return { icon: 'close-circle', color: COLORS.error, text: 'Failed' };
+        return { icon: 'close-circle', color: COLORS.feedback.error, text: 'Failed' };
       default:
-        return { icon: 'gift-outline', color: COLORS.primary, text: 'Pending' };
+        return { icon: 'gift-outline', color: COLORS.brand.primary, text: 'Pending' };
     }
   };
 
@@ -187,7 +187,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{senderName}&apos;s Gifts</Text>
@@ -214,7 +214,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
                 <MaterialCommunityIcons
                   name="check-decagram"
                   size={18}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
               )}
             </View>
@@ -234,7 +234,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
                 <MaterialCommunityIcons
                   name="airplane"
                   size={16}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
                 <Text style={styles.statText}>{senderTripCount} trips</Text>
               </View>
@@ -249,7 +249,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
             <MaterialCommunityIcons
               name="chevron-right"
               size={16}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </TouchableOpacity>
         </View>
@@ -310,7 +310,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
                       <MaterialCommunityIcons
                         name="camera"
                         size={16}
-                        color={COLORS.white}
+                        color={COLORS.utility.white}
                       />
                       <Text style={styles.uploadButtonText}>Upload</Text>
                     </TouchableOpacity>
@@ -333,7 +333,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
             <MaterialCommunityIcons
               name="message-outline"
               size={20}
-              color={canStartChat ? COLORS.white : COLORS.textSecondary}
+              color={canStartChat ? COLORS.utility.white : COLORS.text.secondary}
             />
             <Text
               style={[
@@ -355,7 +355,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
               <MaterialCommunityIcons
                 name="eye-off-outline"
                 size={20}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.secondaryButtonText}>Hide</Text>
             </TouchableOpacity>
@@ -367,10 +367,10 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
               <MaterialCommunityIcons
                 name="flag-outline"
                 size={20}
-                color={COLORS.error}
+                color={COLORS.feedback.error}
               />
               <Text
-                style={[styles.secondaryButtonText, { color: COLORS.error }]}
+                style={[styles.secondaryButtonText, { color: COLORS.feedback.error }]}
               >
                 Report
               </Text>
@@ -383,7 +383,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
           <MaterialCommunityIcons
             name="information-outline"
             size={20}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <Text style={styles.infoText}>
             Starting a chat won&apos;t affect your received gifts. You can chat
@@ -406,7 +406,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     padding: 8,
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   placeholder: {
     width: 40,
@@ -436,13 +436,13 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   profileCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 20,
     padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -466,11 +466,11 @@ const styles = StyleSheet.create({
   name: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   city: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
   },
   statsRow: {
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   },
   statText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   viewProfileButton: {
     flexDirection: 'row',
@@ -495,11 +495,11 @@ const styles = StyleSheet.create({
   },
   viewProfileText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '500',
   },
   totalCard: {
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: COLORS.brand.primary + '15',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
@@ -507,18 +507,18 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 4,
   },
   totalAmount: {
     ...TYPOGRAPHY.display1,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginBottom: 4,
   },
   giftCount: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   section: {
     marginBottom: 20,
@@ -526,15 +526,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   giftItem: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -555,16 +555,16 @@ const styles = StyleSheet.create({
   giftTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   giftAmount: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   giftMessage: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontStyle: 'italic',
     marginBottom: 12,
     paddingLeft: 44,
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   uploadButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.coral,
+    backgroundColor: COLORS.brand.secondary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
   uploadButtonText: {
     ...TYPOGRAPHY.caption,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   actionsSection: {
     marginBottom: 20,
@@ -605,22 +605,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 16,
     paddingVertical: 16,
     gap: 8,
     marginBottom: 12,
   },
   startChatButtonDisabled: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   startChatText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   startChatTextDisabled: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   secondaryActions: {
     flexDirection: 'row',
@@ -635,11 +635,11 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.brand.primary + '10',
     borderRadius: 12,
     padding: 16,
     gap: 12,
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     ...TYPOGRAPHY.caption,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 18,
   },
 });

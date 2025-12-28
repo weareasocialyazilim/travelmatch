@@ -74,7 +74,6 @@ export const FONTS = {
   },
 } as const;
 
-
 // ============================================
 // 2. TYPE SCALE (8pt grid based)
 // ============================================
@@ -279,7 +278,6 @@ export const TYPE_SCALE = {
   },
 } as const;
 
-
 // ============================================
 // 3. SEMANTIC TEXT STYLES
 // ============================================
@@ -320,6 +318,12 @@ export const TEXT_STYLES = {
   } as TextStyle,
 
   // Button text
+  button: {
+    ...TYPE_SCALE.label.large,
+    color: COLORS.utility.white,
+    fontWeight: '600' as const,
+  } as TextStyle,
+
   buttonPrimary: {
     ...TYPE_SCALE.label.large,
     color: COLORS.utility.white,
@@ -389,14 +393,14 @@ export const TEXT_STYLES = {
   } as TextStyle,
 } as const;
 
-
 // ============================================
 // 4. TYPOGRAPHY UTILITIES
 // ============================================
-export const truncateText = (lines: number = 1): TextStyle => ({
-  numberOfLines: lines,
-  overflow: 'hidden',
-} as unknown as TextStyle);
+export const truncateText = (lines: number = 1): TextStyle =>
+  ({
+    numberOfLines: lines,
+    overflow: 'hidden',
+  }) as unknown as TextStyle;
 
 export const textAlign = {
   left: { textAlign: 'left' } as TextStyle,
@@ -420,7 +424,6 @@ export const fontWeight = {
   black: { fontWeight: '800' } as TextStyle,
 };
 
-
 // ============================================
 // 5. TYPE EXPORTS
 // ============================================
@@ -430,3 +433,8 @@ export type BodyVariant = keyof typeof TYPE_SCALE.body;
 export type LabelVariant = keyof typeof TYPE_SCALE.label;
 export type MonoVariant = keyof typeof TYPE_SCALE.mono;
 export type TextStyleName = keyof typeof TEXT_STYLES;
+
+// ============================================
+// 6. RE-EXPORTS FOR BACKWARD COMPATIBILITY
+// ============================================
+export { TYPOGRAPHY } from '../constants/typography';

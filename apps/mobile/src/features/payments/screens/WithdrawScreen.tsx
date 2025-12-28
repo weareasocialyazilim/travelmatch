@@ -101,7 +101,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
             accessible={false}
           />
         </TouchableOpacity>
@@ -159,7 +159,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
               <MaterialCommunityIcons
                 name="bank"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </View>
             <View style={styles.accountDetails}>
@@ -261,7 +261,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             <>
               <ActivityIndicator
                 size="small"
-                color={COLORS.white}
+                color={COLORS.utility.white}
                 style={styles.loadingIndicator}
               />
               <Text style={styles.confirmButtonText}>Processing...</Text>
@@ -278,7 +278,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   loadingIndicator: {
     marginRight: 8,
@@ -288,9 +288,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     width: 48,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
   },
   content: {
@@ -328,13 +328,13 @@ const styles = StyleSheet.create({
   balanceLabel: {
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     marginBottom: 4,
   },
   balanceAmount: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   infoRow: {
     flexDirection: 'row',
@@ -344,12 +344,12 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   infoValue: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   inputWrapper: {
     marginHorizontal: 16,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
@@ -367,14 +367,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     paddingHorizontal: 16,
     paddingVertical: 16,
     marginHorizontal: 16,
     marginBottom: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   accountInfo: {
     flexDirection: 'row',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -396,15 +396,15 @@ const styles = StyleSheet.create({
   accountNumber: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   accountBank: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   changeButton: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 16,
@@ -412,25 +412,25 @@ const styles = StyleSheet.create({
   changeButtonText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   bottomSpacer: {
     height: 24,
   },
   footer: {
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   footerText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 12,
   },
   confirmButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     paddingVertical: 16,
     borderRadius: 28,
     alignItems: 'center',
@@ -438,17 +438,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   confirmButtonDisabled: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     opacity: 0.6,
   },
   confirmButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   processingWarning: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
     textAlign: 'center',
     marginBottom: 8,
     fontWeight: '600',

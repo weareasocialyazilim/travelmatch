@@ -69,7 +69,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const renderPlanCard = (plan: SubscriptionPlan) => {
     const isSelected = selectedPlan === plan.id;
-    const planColor = plan.color || COLORS.primary;
+    const planColor = plan.color || COLORS.brand.primary;
     const isFree = plan.price === 0;
 
     return (
@@ -90,7 +90,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         )}
 
         <View style={[styles.planIcon, { backgroundColor: planColor }]}>
-          <Icon name={plan.icon as IconName} size={32} color={COLORS.white} />
+          <Icon name={plan.icon as IconName} size={32} color={COLORS.utility.white} />
         </View>
 
         <Text style={styles.planName}>{plan.name}</Text>
@@ -108,7 +108,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               <Icon
                 name={feature.included ? 'check-circle' : 'close-circle'}
                 size={16}
-                color={feature.included ? planColor : COLORS.textSecondary}
+                color={feature.included ? planColor : COLORS.text.secondary}
               />
               <Text
                 style={[
@@ -157,7 +157,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.accent]}
+        colors={[COLORS.brand.primary, COLORS.brand.accent]}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -166,7 +166,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.white} />
+          <Icon name="arrow-left" size={24} color={COLORS.utility.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Membership Plans</Text>
         <View style={styles.headerSpacer} />
@@ -188,7 +188,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         {/* Info Card */}
         <View style={styles.infoCard}>
-          <Icon name="information" size={24} color={COLORS.info} />
+          <Icon name="information" size={24} color={COLORS.feedback.info} />
           <View style={styles.infoContent}>
             <Text style={styles.infoTitle}>Flexible Billing</Text>
             <Text style={styles.infoText}>
@@ -202,25 +202,25 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <Text style={styles.benefitsTitle}>Why Upgrade?</Text>
           <View style={styles.benefitsList}>
             <View style={styles.benefitItem}>
-              <Icon name="compass" size={20} color={COLORS.success} />
+              <Icon name="compass" size={20} color={COLORS.feedback.success} />
               <Text style={styles.benefitText}>
                 Create more moments & share experiences
               </Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="message-text" size={20} color={COLORS.success} />
+              <Icon name="message-text" size={20} color={COLORS.feedback.success} />
               <Text style={styles.benefitText}>
                 Unlimited messaging with travelers
               </Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="gift" size={20} color={COLORS.success} />
+              <Icon name="gift" size={20} color={COLORS.feedback.success} />
               <Text style={styles.benefitText}>
                 Send more gifts & show appreciation
               </Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="shield-check" size={20} color={COLORS.success} />
+              <Icon name="shield-check" size={20} color={COLORS.feedback.success} />
               <Text style={styles.benefitText}>
                 Get verified badge & build trust
               </Text>
@@ -233,7 +233,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <Icon
             name={Platform.OS === 'ios' ? 'face-recognition' : 'fingerprint'}
             size={24}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <View style={styles.biometricContent}>
             <Text style={styles.biometricTitle}>Quick & Secure Checkout</Text>
@@ -249,7 +249,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style={styles.faqButton}
           onPress={() => navigation.navigate('FAQ')}
         >
-          <Icon name="help-circle" size={20} color={COLORS.primary} />
+          <Icon name="help-circle" size={20} color={COLORS.brand.primary} />
           <Text style={styles.faqText}>View Frequently Asked Questions</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -262,11 +262,11 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding / 2,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   currency: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
     marginRight: LAYOUT.padding / 4,
@@ -277,12 +277,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
   },
   planTagline: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: LAYOUT.padding,
   },
   moreFeatures: {
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   benefitsTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: LAYOUT.padding,
   },
   benefitsList: {
@@ -312,19 +312,19 @@ const styles = StyleSheet.create({
   },
   benefitText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   biometricHint: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: VALUES.borderRadius,
     padding: LAYOUT.padding * 1.5,
     marginBottom: LAYOUT.padding * 2,
     gap: LAYOUT.padding,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   biometricContent: {
     flex: 1,
@@ -332,12 +332,12 @@ const styles = StyleSheet.create({
   biometricTitle: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: LAYOUT.padding / 4,
   },
   biometricText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   faqButton: {
     alignItems: 'center',
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 1.5,
   },
   faqText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     marginLeft: LAYOUT.padding / 2,
@@ -357,28 +357,28 @@ const styles = StyleSheet.create({
     marginBottom: LAYOUT.padding,
   },
   featureText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     marginLeft: LAYOUT.padding,
   },
   featureDisabled: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textDecorationLine: 'line-through',
   },
   featuresContainer: {
     marginBottom: LAYOUT.padding * 2,
   },
   freeButton: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   freeButtonInner: {
     alignItems: 'center',
     paddingVertical: LAYOUT.padding * 1.5,
   },
   freeButtonText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
   },
@@ -393,12 +393,12 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerTitle: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.h3,
     fontWeight: '800',
   },
   infoCard: {
-    backgroundColor: COLORS.info + '20',
+    backgroundColor: COLORS.feedback.info + '20',
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     marginBottom: LAYOUT.padding * 2,
@@ -409,27 +409,27 @@ const styles = StyleSheet.create({
     marginLeft: LAYOUT.padding,
   },
   infoText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
     fontWeight: '400',
     lineHeight: 18,
   },
   infoTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '700',
     marginBottom: LAYOUT.padding / 4,
   },
   interval: {
     alignSelf: 'flex-end',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
     marginBottom: LAYOUT.padding / 2,
   },
   planCard: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: VALUES.borderRadius,
     borderWidth: 2,
     marginBottom: LAYOUT.padding * 2,
@@ -446,13 +446,13 @@ const styles = StyleSheet.create({
     width: 64,
   },
   planName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h2,
     fontWeight: '800',
     marginBottom: LAYOUT.padding,
   },
   popularBadge: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.brand.accent,
     borderRadius: VALUES.borderRadius / 2,
     paddingHorizontal: LAYOUT.padding,
     paddingVertical: LAYOUT.padding / 2,
@@ -461,12 +461,12 @@ const styles = StyleSheet.create({
     top: -10,
   },
   popularText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 10,
     fontWeight: '800',
   },
   price: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 48,
     fontWeight: '800',
   },
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   selectedPlan: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   subscribeButton: {
     borderRadius: VALUES.borderRadius,
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 1.5,
   },
   subscribeText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
   },

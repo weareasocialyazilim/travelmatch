@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '@/constants/colors';
+import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -29,7 +29,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
+          <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Refund Policy</Text>
         <View style={styles.headerSpacer} />
@@ -61,7 +61,11 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Icon name="check-circle" size={24} color={COLORS.coral} />
+            <Icon
+              name="check-circle"
+              size={24}
+              color={COLORS.brand.secondary}
+            />
             <Text style={styles.sectionTitle}>Eligible for Refund</Text>
           </View>
           <View style={styles.bulletList}>
@@ -69,7 +73,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Gesture not delivered within agreed timeframe
@@ -79,7 +83,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Proof of gesture not provided within 14 days
@@ -89,7 +93,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Gesture significantly differs from description
@@ -99,7 +103,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Verified issues with gesture quality or authenticity
@@ -109,7 +113,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Technical payment errors or duplicates
@@ -120,7 +124,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Icon name="close-circle" size={24} color={COLORS.gray[400]} />
+            <Icon name="close-circle" size={24} color={primitives.stone[400]} />
             <Text style={styles.sectionTitle}>Not Eligible for Refund</Text>
           </View>
           <View style={styles.bulletList}>
@@ -128,7 +132,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Change of mind after gesture is delivered
@@ -138,7 +142,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Refund requests made after 14-day window
@@ -148,7 +152,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 Verified gestures with valid proof submitted
@@ -158,7 +162,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <Icon
                 name="circle-small"
                 size={24}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
                 User violations of TravelMatch terms of service
@@ -169,7 +173,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Icon name="clock-outline" size={24} color={COLORS.primary} />
+            <Icon name="clock-outline" size={24} color={COLORS.brand.primary} />
             <Text style={styles.sectionTitle}>Refund Process</Text>
           </View>
           <View style={styles.steps}>
@@ -225,7 +229,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Icon name="information" size={24} color={COLORS.coral} />
+            <Icon name="information" size={24} color={COLORS.brand.secondary} />
             <Text style={styles.sectionTitle}>Important Notes</Text>
           </View>
           <Text style={styles.paragraph}>
@@ -249,7 +253,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
             style={styles.contactButton}
             onPress={() => navigation.navigate('Support')}
           >
-            <Icon name="message-text" size={20} color={COLORS.white} />
+            <Icon name="message-text" size={20} color={COLORS.utility.white} />
             <Text style={styles.contactButtonText}>Contact Support</Text>
           </TouchableOpacity>
         </View>
@@ -278,7 +282,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   bulletText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.body,
     lineHeight: 22,
@@ -293,32 +297,32 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   contactButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
   },
   contactSection: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: 16,
     marginHorizontal: 16,
     padding: 32,
   },
   contactText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.body,
     marginBottom: 20,
     textAlign: 'center',
   },
   contactTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
     marginBottom: 8,
     marginTop: 16,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   content: {
@@ -337,24 +341,24 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
   },
   hero: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginBottom: 16,
     padding: 32,
   },
   heroSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.body,
     lineHeight: 22,
     textAlign: 'center',
   },
   heroTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
     marginBottom: 8,
@@ -362,12 +366,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   paragraph: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.body,
     lineHeight: 22,
   },
   section: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginBottom: 16,
     padding: 20,
   },
@@ -378,7 +382,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
   },
@@ -386,7 +390,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepDescription: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodySmall,
     lineHeight: 20,
   },
@@ -403,12 +407,12 @@ const styles = StyleSheet.create({
     width: 32,
   },
   stepNumberText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
   },
   stepTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
     marginBottom: 4,

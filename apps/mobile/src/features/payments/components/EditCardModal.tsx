@@ -122,7 +122,7 @@ export const EditCardModal = ({
           <View style={styles.header}>
             <Text style={styles.title}>Update Card</Text>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+              <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
           </View>
 
@@ -131,7 +131,7 @@ export const EditCardModal = ({
             <MaterialCommunityIcons
               name={card.brand.toLowerCase() === 'visa' ? 'credit-card' : 'credit-card-outline'}
               size={32}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <View style={styles.cardDetails}>
               <Text style={styles.cardBrand}>{card.brand}</Text>
@@ -146,14 +146,14 @@ export const EditCardModal = ({
               <MaterialCommunityIcons
                 name="calendar-month"
                 size={20}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <TextInput
                 style={styles.input}
                 value={expiry}
                 onChangeText={handleExpiryChange}
                 placeholder="MM/YY"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 keyboardType="number-pad"
                 maxLength={5}
                 autoFocus
@@ -167,7 +167,7 @@ export const EditCardModal = ({
             <MaterialCommunityIcons
               name="information-outline"
               size={18}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.infoText}>
               For security, you cannot change the card number. Add a new card if you have a different card.
@@ -185,7 +185,7 @@ export const EditCardModal = ({
               disabled={!expiry || isLoading}
             >
               {isLoading ? (
-                <ActivityIndicator size="small" color={COLORS.white} />
+                <ActivityIndicator size="small" color={COLORS.utility.white} />
               ) : (
                 <Text style={styles.saveButtonText}>Update Card</Text>
               )}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 12,
@@ -231,12 +231,12 @@ const styles = StyleSheet.create({
   title: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   cardInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
@@ -248,11 +248,11 @@ const styles = StyleSheet.create({
   cardBrand: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   cardNumber: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   inputSection: {
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
   },
   inputContainer: {
@@ -276,16 +276,16 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   inputError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   input: {
     flex: 1,
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   errorText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     marginTop: 8,
   },
   infoNotice: {
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     lineHeight: 18,
   },
   actions: {
@@ -312,19 +312,19 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   cancelButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   saveButton: {
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   saveButtonDisabled: {
     backgroundColor: COLORS.softGray,
@@ -332,6 +332,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

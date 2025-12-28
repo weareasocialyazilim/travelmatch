@@ -38,7 +38,7 @@ export const KYCHeader: React.FC<KYCHeaderProps> = ({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
       ) : (

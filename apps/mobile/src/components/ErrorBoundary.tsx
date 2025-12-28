@@ -247,7 +247,7 @@ export class ErrorBoundary extends Component<
                 <MaterialCommunityIcons
                   name={content.icon}
                   size={80}
-                  color={COLORS.error}
+                  color={COLORS.feedback.error}
                 />
               </View>
 
@@ -276,7 +276,7 @@ export class ErrorBoundary extends Component<
                     <MaterialCommunityIcons
                       name="refresh"
                       size={20}
-                      color={COLORS.background}
+                      color={COLORS.bg.primary}
                     />
                     <Text style={styles.buttonTextPrimary}>Tekrar Dene</Text>
                   </TouchableOpacity>
@@ -291,7 +291,7 @@ export class ErrorBoundary extends Component<
                     <MaterialCommunityIcons
                       name="home-outline"
                       size={20}
-                      color={COLORS.primary}
+                      color={COLORS.brand.primary}
                     />
                     <Text style={styles.buttonTextSecondary}>
                       Ana Sayfaya Dön
@@ -312,7 +312,7 @@ export class ErrorBoundary extends Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -334,12 +334,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: SPACING.md,
     textAlign: 'center',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   message: {
     ...TYPOGRAPHY.body,
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: SPACING.xl,
     textAlign: 'center',
     lineHeight: 24,
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   debugTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     marginBottom: SPACING.xs,
   },
   errorDetails: {
@@ -382,21 +382,21 @@ const styles = StyleSheet.create({
     gap: SPACING.xs,
   },
   buttonPrimary: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   buttonSecondary: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   buttonTextPrimary: {
-    color: COLORS.background,
+    color: COLORS.bg.primary,
     fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',
   },
   buttonTextSecondary: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',

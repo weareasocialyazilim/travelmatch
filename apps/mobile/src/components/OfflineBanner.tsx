@@ -44,7 +44,7 @@ const OfflineBanner: React.FC<OfflineBannerProps> = ({
         <MaterialCommunityIcons
           name="wifi-off"
           size={18}
-          color={COLORS.white}
+          color={COLORS.utility.white}
         />
         <Text style={styles.message}>{message}</Text>
       </View>
@@ -64,7 +64,7 @@ const OfflineBanner: React.FC<OfflineBannerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     paddingVertical: 10,
     paddingHorizontal: 16,
     flexDirection: 'row',
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.black,
+        shadowColor: COLORS.utility.black,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   message: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 14,
     fontWeight: '500',
   },
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   retryText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 13,
     fontWeight: '600',
   },

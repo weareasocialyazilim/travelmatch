@@ -114,7 +114,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="shield-lock-outline"
           size={64}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
       </View>
 
@@ -129,7 +129,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="check-circle"
             size={20}
-            color={COLORS.success}
+            color={COLORS.feedback.success}
           />
           <Text style={styles.benefitText}>
             Protect against unauthorized access
@@ -139,7 +139,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="check-circle"
             size={20}
-            color={COLORS.success}
+            color={COLORS.feedback.success}
           />
           <Text style={styles.benefitText}>Secure your personal data</Text>
         </View>
@@ -147,7 +147,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="check-circle"
             size={20}
-            color={COLORS.success}
+            color={COLORS.feedback.success}
           />
           <Text style={styles.benefitText}>Prevent account takeover</Text>
         </View>
@@ -177,7 +177,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="qrcode-scan"
           size={40}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
       </View>
 
@@ -192,7 +192,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="qrcode"
             size={120}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </View>
         <Text style={styles.qrHint}>
@@ -213,7 +213,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="content-copy"
               size={20}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </TouchableOpacity>
         </View>
@@ -238,7 +238,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="numeric"
           size={40}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
       </View>
 
@@ -277,7 +277,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
         {...a11y.button('Verify code', undefined, !isCodeComplete || isLoading)}
       >
         {isLoading ? (
-          <ActivityIndicator color={COLORS.white} />
+          <ActivityIndicator color={COLORS.utility.white} />
         ) : (
           <Text style={styles.primaryButtonText}>Verify & Enable</Text>
         )}
@@ -299,7 +299,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="check-circle"
           size={64}
-          color={COLORS.success}
+          color={COLORS.feedback.success}
         />
       </View>
 
@@ -321,7 +321,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="content-copy"
               size={18}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.copyButtonText}>Copy All</Text>
           </TouchableOpacity>
@@ -340,7 +340,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="alert-circle-outline"
           size={20}
-          color={COLORS.warning}
+          color={COLORS.feedback.warning}
         />
         <Text style={styles.warningText}>
           Each backup code can only be used once. Store them safely!
@@ -377,7 +377,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={step === 'backup' ? 'close' : 'arrow-left'}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
 
@@ -411,7 +411,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -435,10 +435,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   progressDotActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 24,
@@ -463,25 +463,25 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 24,
     marginBottom: 24,
   },
   successIcon: {
-    backgroundColor: `${COLORS.success}15`,
+    backgroundColor: `${COLORS.feedback.success}15`,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 32,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   },
   benefitsContainer: {
     width: '100%',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 20,
     marginBottom: 32,
@@ -502,12 +502,12 @@ const styles = StyleSheet.create({
   },
   benefitText: {
     fontSize: 15,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   primaryButton: {
     width: '100%',
     height: 52,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   primaryButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   secondaryButtonText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     fontWeight: '500',
   },
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   qrPlaceholder: {
     width: 160,
     height: 160,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
   },
   qrHint: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
   },
   manualEntry: {
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
   },
   manualLabel: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -561,14 +561,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 16,
   },
   secretKey: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: 2,
     marginRight: 12,
   },
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
   },
   copyButtonText: {
     fontSize: 13,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '500',
   },
   codeContainer: {
@@ -593,21 +593,21 @@ const styles = StyleSheet.create({
     width: 46,
     height: 54,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     fontSize: 22,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
   },
   codeInputFilled: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}10`,
+    borderColor: COLORS.brand.primary,
+    backgroundColor: `${COLORS.brand.primary}10`,
   },
   backupCodesContainer: {
     width: '100%',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
   backupCodesTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   codesGrid: {
     flexDirection: 'row',
@@ -635,13 +635,13 @@ const styles = StyleSheet.create({
   },
   codeNumber: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     width: 24,
   },
   backupCode: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   warningBox: {
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
-    backgroundColor: `${COLORS.warning}15`,
+    backgroundColor: `${COLORS.feedback.warning}15`,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   warningText: {
     flex: 1,
     fontSize: 13,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 20,
   },
 });

@@ -72,7 +72,7 @@ export const ForgotPasswordScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
 
@@ -80,7 +80,7 @@ export const ForgotPasswordScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={step === 'email' ? 'lock-reset' : 'email-check-outline'}
             size={64}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <Text style={styles.title}>
             {step === 'email' ? 'Forgot Password?' : 'Check Your Email'}
@@ -99,7 +99,7 @@ export const ForgotPasswordScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="email-outline"
                 size={20}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
                 style={styles.inputIcon}
               />
               <TextInput
@@ -108,7 +108,7 @@ export const ForgotPasswordScreen: React.FC = () => {
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -132,7 +132,7 @@ export const ForgotPasswordScreen: React.FC = () => {
               )}
             >
               {isLoading ? (
-                <ActivityIndicator color={COLORS.white} />
+                <ActivityIndicator color={COLORS.utility.white} />
               ) : (
                 <Text style={styles.buttonText}>Send Reset Link</Text>
               )}
@@ -146,7 +146,7 @@ export const ForgotPasswordScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="arrow-left"
                 size={16}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
               <Text style={styles.backToLoginText}>Back to Login</Text>
             </TouchableOpacity>
@@ -157,7 +157,7 @@ export const ForgotPasswordScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="check"
                 size={48}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
             </View>
 
@@ -190,7 +190,7 @@ export const ForgotPasswordScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="arrow-left"
                 size={16}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
               <Text style={styles.backToLoginText}>Back to Login</Text>
             </TouchableOpacity>
@@ -204,7 +204,7 @@ export const ForgotPasswordScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -222,13 +222,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 8,
     textAlign: 'center',
     paddingHorizontal: 20,
@@ -239,16 +239,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     marginBottom: 24,
   },
   inputIcon: {
@@ -257,12 +257,12 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     padding: 16,
     paddingLeft: 12,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   backToLoginText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 14,
     fontWeight: '500',
   },
@@ -303,12 +303,12 @@ const styles = StyleSheet.create({
   sentTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   sentDescription: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 32,
     paddingHorizontal: 20,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   resendText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 14,
     fontWeight: '500',
   },

@@ -28,7 +28,7 @@ import { useHaptics } from '../hooks/useHaptics';
 import { analytics } from '../services/analytics';
 import { feedbackSchema, type FeedbackInput } from '../utils/forms';
 import { canSubmitForm } from '../utils/forms/helpers';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 
 interface FeedbackModalProps {
   visible: boolean;
@@ -159,7 +159,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+              <Ionicons name="close" size={24} color={COLORS.text.secondary} />
             </TouchableOpacity>
           </View>
 
@@ -179,7 +179,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   <Ionicons
                     name={value <= rating ? 'star' : 'star-outline'}
                     size={36}
-                    color={value <= rating ? COLORS.gold : COLORS.gray[300]}
+                    color={
+                      value <= rating ? COLORS.gold : primitives.stone[300]
+                    }
                   />
                 </TouchableOpacity>
               ))}
@@ -225,7 +227,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     multiline
                     numberOfLines={4}
                     placeholder="Tell us more about your experience..."
-                    placeholderTextColor={COLORS.textTertiary}
+                    placeholderTextColor={COLORS.text.tertiary}
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
@@ -269,7 +271,7 @@ const styles = StyleSheet.create({
   modal: {
     width: '90%',
     maxWidth: 500,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: RADII.xl,
     padding: SPACING.lg,
     ...Platform.select({
@@ -291,12 +293,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.xs,
   },
   subtitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   closeButton: {
     position: 'absolute',
@@ -309,7 +311,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.sm,
   },
   ratingContainer: {
@@ -329,42 +331,42 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderRadius: RADII.full,
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderWidth: 1,
-    borderColor: COLORS.gray[200],
+    borderColor: primitives.stone[200],
   },
   categoryPillActive: {
     backgroundColor: COLORS.primaryMuted,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   categoryText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontWeight: '500',
   },
   categoryTextActive: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
   textInput: {
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: RADII.md,
     padding: SPACING.md,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     minHeight: 100,
     textAlignVertical: 'top',
-    backgroundColor: COLORS.gray[50],
+    backgroundColor: primitives.stone[50],
   },
   charCount: {
     fontSize: 12,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     textAlign: 'right',
     marginTop: SPACING.xs,
   },
   submitButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: RADII.md,
     padding: SPACING.md,
     alignItems: 'center',
@@ -375,6 +377,6 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

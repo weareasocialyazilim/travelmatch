@@ -68,7 +68,7 @@ export const WalletSettingsModal: React.FC<WalletSettingsModalProps> = ({
               <MaterialCommunityIcons
                 name="close"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -84,8 +84,8 @@ export const WalletSettingsModal: React.FC<WalletSettingsModalProps> = ({
               <Switch
                 value={settings.isDefaultPayment}
                 onValueChange={() => handleToggle('isDefaultPayment')}
-                trackColor={{ false: COLORS.lightGray, true: COLORS.primary }}
-                thumbColor={COLORS.white}
+                trackColor={{ false: COLORS.lightGray, true: COLORS.brand.primary }}
+                thumbColor={COLORS.utility.white}
               />
             </View>
 
@@ -99,8 +99,8 @@ export const WalletSettingsModal: React.FC<WalletSettingsModalProps> = ({
               <Switch
                 value={settings.requireAuth}
                 onValueChange={() => handleToggle('requireAuth')}
-                trackColor={{ false: COLORS.lightGray, true: COLORS.primary }}
-                thumbColor={COLORS.white}
+                trackColor={{ false: COLORS.lightGray, true: COLORS.brand.primary }}
+                thumbColor={COLORS.utility.white}
               />
             </View>
 
@@ -114,8 +114,8 @@ export const WalletSettingsModal: React.FC<WalletSettingsModalProps> = ({
               <Switch
                 value={settings.enableNotifications}
                 onValueChange={() => handleToggle('enableNotifications')}
-                trackColor={{ false: COLORS.lightGray, true: COLORS.primary }}
-                thumbColor={COLORS.white}
+                trackColor={{ false: COLORS.lightGray, true: COLORS.brand.primary }}
+                thumbColor={COLORS.utility.white}
               />
             </View>
           </View>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   settingsList: {
     gap: 16,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   settingDescription: {
     fontSize: 13,
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   saveButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

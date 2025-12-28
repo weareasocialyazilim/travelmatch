@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 import { a11yProps } from '../../utils/accessibility';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -50,7 +50,7 @@ export const Button: React.FC<ButtonProps> = memo(
     const variantStyles = useMemo((): ViewStyle => {
       if (disabled) {
         return {
-          backgroundColor: COLORS.gray[300],
+          backgroundColor: primitives.stone[300],
           borderWidth: 0,
         };
       }
@@ -58,7 +58,7 @@ export const Button: React.FC<ButtonProps> = memo(
       switch (variant) {
         case 'primary':
           return {
-            backgroundColor: COLORS.primary,
+            backgroundColor: COLORS.brand.primary,
             borderWidth: 0,
           };
         case 'secondary':
@@ -68,18 +68,18 @@ export const Button: React.FC<ButtonProps> = memo(
           };
         case 'outline':
           return {
-            backgroundColor: COLORS.transparent,
+            backgroundColor: COLORS.utility.transparent,
             borderWidth: 2,
-            borderColor: COLORS.primary,
+            borderColor: COLORS.brand.primary,
           };
         case 'ghost':
           return {
-            backgroundColor: COLORS.transparent,
+            backgroundColor: COLORS.utility.transparent,
             borderWidth: 0,
           };
         case 'danger':
           return {
-            backgroundColor: COLORS.error,
+            backgroundColor: COLORS.feedback.error,
             borderWidth: 0,
           };
         default:
@@ -103,19 +103,19 @@ export const Button: React.FC<ButtonProps> = memo(
 
     // Memoize text color
     const textColor = useMemo((): string => {
-      if (disabled) return COLORS.gray[400];
+      if (disabled) return primitives.stone[400];
 
       switch (variant) {
         case 'primary':
-          return COLORS.text;
+          return COLORS.text.primary;
         case 'danger':
-          return COLORS.white;
+          return COLORS.utility.white;
         case 'secondary':
         case 'outline':
         case 'ghost':
-          return COLORS.text;
+          return COLORS.text.primary;
         default:
-          return COLORS.text;
+          return COLORS.text.primary;
       }
     }, [variant, disabled]);
 

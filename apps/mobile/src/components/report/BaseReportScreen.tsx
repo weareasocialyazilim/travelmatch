@@ -128,7 +128,7 @@ export function BaseReportScreen<T extends string = string>({
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>
@@ -185,7 +185,7 @@ export function BaseReportScreen<T extends string = string>({
               <TextInput
                 style={[styles.textArea, error && styles.textAreaError]}
                 placeholder={detailsPlaceholder}
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 multiline
                 numberOfLines={6}
                 textAlignVertical="top"
@@ -245,7 +245,7 @@ export function ReportSummaryCard({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 48,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -279,15 +279,15 @@ const styles = StyleSheet.create({
     gap: 16,
     margin: 16,
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 16,
     marginBottom: 12,
   },
@@ -303,37 +303,37 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   optionItemSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}10`,
+    borderColor: COLORS.brand.primary,
+    backgroundColor: `${COLORS.brand.primary}10`,
   },
   optionLabel: {
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   radio: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: `${COLORS.border}CC`,
+    borderColor: `${COLORS.border.default}CC`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   radioSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   radioDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   textFieldContainer: {
     paddingHorizontal: 16,
@@ -342,24 +342,24 @@ const styles = StyleSheet.create({
   textFieldLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   textArea: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     padding: 15,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     minHeight: 144,
   },
   textAreaError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
@@ -373,9 +373,9 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: `${COLORS.background}F5`,
+    backgroundColor: `${COLORS.bg.primary}F5`,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   cancelButton: {
     flex: 1,
@@ -387,24 +387,24 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   submitButton: {
     flex: 2,
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 8,
   },
   submitButtonDisabled: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     opacity: 0.5,
   },
   submitButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

@@ -159,7 +159,7 @@ export const OptimizedImage = memo<OptimizedImageProps>(
         />
         {isLoading && showLoading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="small" color={COLORS.primary} />
+            <ActivityIndicator size="small" color={COLORS.brand.primary} />
           </View>
         )}
       </View>

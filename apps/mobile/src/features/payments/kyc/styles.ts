@@ -6,7 +6,7 @@ import { TYPOGRAPHY } from '@/theme/typography';
 export const kycStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   content: {
     flex: 1,
@@ -27,7 +27,7 @@ export const kycStyles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   progressContainer: {
     paddingHorizontal: 24,
@@ -35,17 +35,17 @@ export const kycStyles = StyleSheet.create({
   },
   progressText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
   },
   progressBarTrack: {
     height: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 2,
   },
   progressBarFill: {
     height: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 2,
   },
   scrollView: {
@@ -58,19 +58,19 @@ export const kycStyles = StyleSheet.create({
   title: {
     ...TYPOGRAPHY.h1,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
     letterSpacing: -0.5,
   },
   description: {
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 24,
     marginBottom: 24,
   },
   reviewDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     paddingHorizontal: 24,
     marginBottom: 16,
   },
@@ -81,7 +81,7 @@ export const kycStyles = StyleSheet.create({
     gap: 12,
   },
   primaryButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -90,7 +90,7 @@ export const kycStyles = StyleSheet.create({
   primaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -108,14 +108,14 @@ export const kycStyles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   requirementLabel: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   securityNote: {
     flexDirection: 'row',
@@ -125,7 +125,7 @@ export const kycStyles = StyleSheet.create({
   },
   securityNoteText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   optionsList: {
     gap: 12,
@@ -133,22 +133,22 @@ export const kycStyles = StyleSheet.create({
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     gap: 12,
   },
   optionCardSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}08`,
+    borderColor: COLORS.brand.primary,
+    backgroundColor: `${COLORS.brand.primary}08`,
   },
   optionIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -156,10 +156,10 @@ export const kycStyles = StyleSheet.create({
     flex: 1,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   optionLabelSelected: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   guidelinesList: {
     gap: 12,
@@ -172,7 +172,7 @@ export const kycStyles = StyleSheet.create({
   },
   guidelineText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   uploadSection: {
@@ -181,21 +181,21 @@ export const kycStyles = StyleSheet.create({
   uploadLabel: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 8,
   },
   uploadCard: {
     height: 160,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
   },
   uploadCardDone: {
-    borderColor: COLORS.success,
+    borderColor: COLORS.feedback.success,
     borderStyle: 'solid',
   },
   uploadPlaceholder: {
@@ -204,7 +204,7 @@ export const kycStyles = StyleSheet.create({
   },
   uploadPlaceholderText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   uploadedContent: {
     alignItems: 'center',
@@ -213,7 +213,7 @@ export const kycStyles = StyleSheet.create({
   uploadedText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.success,
+    color: COLORS.feedback.success,
   },
   selfieContent: {
     flex: 1,
@@ -232,7 +232,7 @@ export const kycStyles = StyleSheet.create({
   cameraPlaceholder: {
     width: 250,
     height: 320,
-    backgroundColor: COLORS.backgroundDark,
+    backgroundColor: COLORS.bg.primaryDark,
     borderRadius: 125,
     alignItems: 'center',
     justifyContent: 'center',
@@ -242,7 +242,7 @@ export const kycStyles = StyleSheet.create({
     height: 260,
     borderRadius: 100,
     borderWidth: 3,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -250,7 +250,7 @@ export const kycStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -259,7 +259,7 @@ export const kycStyles = StyleSheet.create({
   feedbackText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.success,
+    color: COLORS.feedback.success,
   },
   reviewSection: {
     marginBottom: 24,
@@ -267,18 +267,18 @@ export const kycStyles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   reviewCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   reviewCardContent: {
     flexDirection: 'row',
@@ -290,7 +290,7 @@ export const kycStyles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -299,30 +299,30 @@ export const kycStyles = StyleSheet.create({
   },
   reviewLabel: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   reviewValue: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   editButton: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   docThumbnail: {
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   selfieThumbnail: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -336,18 +336,18 @@ export const kycStyles = StyleSheet.create({
     height: 24,
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
+    borderColor: COLORS.brand.primary,
   },
   checkboxLabel: {
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 20,
   },
   pendingContent: {
@@ -363,27 +363,27 @@ export const kycStyles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
   },
   pendingCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     gap: 12,
   },
   pendingCardTitle: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   pendingCardSubtitle: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   nextStepsSection: {
     gap: 16,
@@ -398,12 +398,12 @@ export const kycStyles = StyleSheet.create({
   nextStepTitle: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   nextStepDescription: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
 });

@@ -50,29 +50,29 @@ const getStatusConfig = (status: string) => {
     case 'verified':
       return {
         icon: 'shield-check' as IconName,
-        color: COLORS.emerald,
-        bgColor: COLORS.emeraldTransparent20,
+        color: COLORS.trust.primary,
+        bgColor: COLORS.trustTransparent20,
         label: 'Approved',
       };
     case 'pending':
       return {
         icon: 'clock-outline' as IconName,
-        color: COLORS.warning,
+        color: COLORS.feedback.warning,
         bgColor: COLORS.warningTransparent20,
         label: 'Pending',
       };
     case 'rejected':
       return {
         icon: 'close-circle' as IconName,
-        color: COLORS.error,
+        color: COLORS.feedback.error,
         bgColor: COLORS.errorTransparent20,
         label: 'Rejected',
       };
     default:
       return {
         icon: 'help-circle' as IconName,
-        color: COLORS.textSecondary,
-        bgColor: `${COLORS.textSecondary}20`,
+        color: COLORS.text.secondary,
+        bgColor: `${COLORS.text.secondary}20`,
         label: 'Unknown',
       };
   }
@@ -113,7 +113,9 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
   const fetchProofHistory = useCallback(async () => {
     try {
       // Fetch proof history for the current user
-      const { data: { user } } = await (await import('@/config/supabase')).supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await (await import('@/config/supabase')).supabase.auth.getUser();
       if (!user) return;
 
       const data = await profileApi.getProofHistory(user.id);
@@ -123,14 +125,16 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
         ? (data || []).filter((p: any) => p.moment_id === momentId)
         : data || [];
 
-      setProofs(filteredProofs.map((p: any) => ({
-        id: p.id,
-        type: p.type,
-        status: p.status as ProofItem['status'],
-        file_url: p.file_url,
-        created_at: p.created_at,
-        verified_at: p.verified_at,
-      })));
+      setProofs(
+        filteredProofs.map((p: any) => ({
+          id: p.id,
+          type: p.type,
+          status: p.status as ProofItem['status'],
+          file_url: p.file_url,
+          created_at: p.created_at,
+          verified_at: p.verified_at,
+        })),
+      );
 
       // Fetch moment details if momentId is provided
       if (momentId) {
@@ -187,14 +191,14 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
             <MaterialCommunityIcons
               name={'arrow-left' as IconName}
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Proof History</Text>
           <View style={styles.headerButton} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+          <ActivityIndicator size="large" color={COLORS.brand.primary} />
         </View>
       </SafeAreaView>
     );
@@ -212,7 +216,7 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Proof History</Text>
@@ -232,7 +236,9 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
             <View style={styles.summaryCard}>
               <Image
                 source={{
-                  uri: momentDetails.image || 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=200',
+                  uri:
+                    momentDetails.image ||
+                    'https://images.unsplash.com/photo-1551632811-561732d1e306?w=200',
                 }}
                 style={styles.summaryImage}
               />
@@ -273,7 +279,8 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
                         {proof.type || 'Proof'} Submission
                       </Text>
                       <Text style={styles.proofMeta} numberOfLines={2}>
-                        {config.label} • {formatDate(proof.created_at)} • {formatTime(proof.created_at)}
+                        {config.label} • {formatDate(proof.created_at)} •{' '}
+                        {formatTime(proof.created_at)}
                       </Text>
                     </View>
                   </View>
@@ -282,7 +289,9 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
                       style={styles.viewButton}
                       activeOpacity={0.7}
                       onPress={() => {
-                        navigation.navigate('ProofDetail', { proofId: proof.id });
+                        navigation.navigate('ProofDetail', {
+                          proofId: proof.id,
+                        });
                       }}
                     >
                       <Text style={styles.viewButtonText}>View</Text>
@@ -303,7 +312,7 @@ export const ProofHistoryScreen: React.FC<ProofHistoryScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -317,7 +326,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 40,
@@ -328,7 +337,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -339,7 +348,7 @@ const styles = StyleSheet.create({
   summaryCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     gap: 16,
@@ -353,7 +362,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   summaryInfo: {
     flex: 1,
@@ -361,12 +370,12 @@ const styles = StyleSheet.create({
   summaryTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   summaryMeta: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
   proofList: {
@@ -378,7 +387,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     minHeight: 72,
@@ -407,12 +416,12 @@ const styles = StyleSheet.create({
   proofTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   proofMeta: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
   viewButton: {
@@ -423,6 +432,6 @@ const styles = StyleSheet.create({
   viewButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });

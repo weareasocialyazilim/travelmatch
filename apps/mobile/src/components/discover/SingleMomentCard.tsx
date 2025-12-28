@@ -60,7 +60,7 @@ export const SingleMomentCard: React.FC<MomentCardProps> = ({
         <MaterialCommunityIcons
           name="map-marker-outline"
           size={14}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
         />
         <Text style={styles.locationText}>
           {item.location?.city || 'Unknown'}
@@ -77,12 +77,12 @@ export const SingleMomentCard: React.FC<MomentCardProps> = ({
 
 const styles = StyleSheet.create({
   singleCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     marginHorizontal: 16,
     marginBottom: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   singleImage: {
     width: '100%',
     height: 220,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   singleContent: {
     padding: 16,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     marginRight: 10,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   creatorInfo: {
     flex: 1,
@@ -119,18 +119,18 @@ const styles = StyleSheet.create({
   creatorName: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   singleTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 6,
     letterSpacing: -0.3,
   },
   storyDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 10,
     lineHeight: 20,
   },
@@ -141,16 +141,16 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 4,
   },
   dotSeparator: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginHorizontal: 6,
   },
   distanceText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   priceValue: {
     fontSize: 20,

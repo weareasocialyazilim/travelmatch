@@ -137,7 +137,7 @@ export const GiftButton: React.FC<GiftButtonProps> = ({
             <MaterialCommunityIcons
               name="gift"
               size={config.iconSize}
-              color={COLORS.white}
+              color={COLORS.utility.white}
               style={styles.icon}
             />
           )}
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.primary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mainText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '700',
     letterSpacing: 0.3,
   },

@@ -18,11 +18,14 @@ import {
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { sendGiftSchema, type SendGiftInput } from '../../../utils/forms/schemas';
+import {
+  sendGiftSchema,
+  type SendGiftInput,
+} from '../../../utils/forms/schemas';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
-import { COLORS } from '@/constants/colors';
+import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADII } from '../constants/radii';
 import { SPACING } from '../constants/spacing';
@@ -97,7 +100,9 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   );
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [submittedData, setSubmittedData] = useState<SendGiftInput | null>(null);
+  const [submittedData, setSubmittedData] = useState<SendGiftInput | null>(
+    null,
+  );
 
   const {
     control,
@@ -137,42 +142,39 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   );
 
   // Handle gift purchase
-  const onPurchase = useCallback((data: SendGiftInput) => {
-    setLoading(true);
-    setSubmittedData(data);
-    void impact('medium');
+  const onPurchase = useCallback(
+    (data: SendGiftInput) => {
+      setLoading(true);
+      setSubmittedData(data);
+      void impact('medium');
 
-    trackEvent('gift_purchase_started', {
-      momentId: moment.id,
-      price: moment.price,
-      paymentMethod: selectedPayment,
-      hasMessage: !!data.message,
-    });
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-      impact('success');
-
-      trackInteraction('gift_completed', {
+      trackEvent('gift_purchase_started', {
         momentId: moment.id,
         price: moment.price,
         paymentMethod: selectedPayment,
+        hasMessage: !!data.message,
       });
 
-      trackEvent('gift_purchase_completed', {
-        momentId: moment.id,
-        price: moment.price,
-      });
-    }, 2000);
-  }, [
-    moment,
-    selectedPayment,
-    impact,
-    trackEvent,
-    trackInteraction,
-  ]);
+      // Simulate API call
+      setTimeout(() => {
+        setLoading(false);
+        setSuccess(true);
+        impact('success');
+
+        trackInteraction('gift_completed', {
+          momentId: moment.id,
+          price: moment.price,
+          paymentMethod: selectedPayment,
+        });
+
+        trackEvent('gift_purchase_completed', {
+          momentId: moment.id,
+          price: moment.price,
+        });
+      }, 2000);
+    },
+    [moment, selectedPayment, impact, trackEvent, trackInteraction],
+  );
 
   // Handle share
   const handleShare = useCallback(() => {
@@ -208,7 +210,11 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.successContainer}>
           <View style={styles.successIcon}>
-            <Icon name="check-circle" size={80} color={COLORS.success} />
+            <Icon
+              name="check-circle"
+              size={80}
+              color={COLORS.feedback.success}
+            />
           </View>
 
           <Text style={styles.successTitle}>Gift Sent! 🎁</Text>
@@ -231,7 +237,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
               <Icon
                 name="message-text"
                 size={20}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
               <Text style={styles.messageText}>{submittedData.message}</Text>
             </View>
@@ -240,7 +246,11 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
           {/* Actions */}
           <View style={styles.successActions}>
             <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-              <Icon name="share-variant" size={20} color={COLORS.white} />
+              <Icon
+                name="share-variant"
+                size={20}
+                color={COLORS.utility.white}
+              />
               <Text style={styles.shareButtonText}>Share</Text>
             </TouchableOpacity>
 
@@ -266,7 +276,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Icon name="arrow-left" size={24} color={COLORS.text} />
+            <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Gift this Moment</Text>
         </View>
@@ -303,7 +313,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
                 <TextInput
                   style={styles.input}
                   placeholder="Recipient's email"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={COLORS.text.tertiary}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -313,7 +323,9 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
               )}
             />
             {errors.recipientEmail && (
-              <Text style={styles.errorText}>{errors.recipientEmail.message}</Text>
+              <Text style={styles.errorText}>
+                {errors.recipientEmail.message}
+              </Text>
             )}
           </View>
 
@@ -327,7 +339,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   placeholder="Add a personal message..."
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={COLORS.text.tertiary}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -363,8 +375,8 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
                   size={24}
                   color={
                     selectedPayment === method.id
-                      ? COLORS.primary
-                      : COLORS.textSecondary
+                      ? COLORS.brand.primary
+                      : COLORS.text.secondary
                   }
                 />
                 <View style={styles.paymentInfo}>
@@ -376,7 +388,11 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
                   )}
                 </View>
                 {selectedPayment === method.id && (
-                  <Icon name="check-circle" size={24} color={COLORS.primary} />
+                  <Icon
+                    name="check-circle"
+                    size={24}
+                    color={COLORS.brand.primary}
+                  />
                 )}
               </TouchableOpacity>
             ))}
@@ -425,7 +441,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   container: {
     flex: 1,
@@ -435,7 +451,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     marginRight: SPACING.md,
@@ -443,7 +459,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -454,7 +470,7 @@ const styles = StyleSheet.create({
   momentPreview: {
     flexDirection: 'row',
     padding: SPACING.md,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: RADII.lg,
     marginBottom: SPACING.lg,
     ...Platform.select({
@@ -482,18 +498,18 @@ const styles = StyleSheet.create({
   momentTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.xs,
   },
   momentLocation: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: SPACING.xs,
   },
   momentPrice: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   section: {
     marginBottom: SPACING.xl,
@@ -501,24 +517,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.md,
   },
   input: {
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: RADII.md,
     padding: SPACING.md,
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text,
-    backgroundColor: COLORS.white,
+    color: COLORS.text.primary,
+    backgroundColor: COLORS.utility.white,
   },
   textArea: {
     minHeight: 80,
   },
   charCount: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     textAlign: 'right',
     marginTop: SPACING.xs,
   },
@@ -527,13 +543,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: RADII.md,
     marginBottom: SPACING.sm,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   paymentMethodSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     borderWidth: 2,
   },
   paymentInfo: {
@@ -543,16 +559,16 @@ const styles = StyleSheet.create({
   paymentName: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   paymentDetails: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   summary: {
     padding: SPACING.md,
-    backgroundColor: COLORS.gray[50],
+    backgroundColor: primitives.stone[50],
     borderRadius: RADII.md,
     marginBottom: SPACING.lg,
   },
@@ -563,31 +579,31 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   summaryValue: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   summaryTotal: {
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
     marginBottom: 0,
   },
   totalLabel: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   totalValue: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   purchaseButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: RADII.md,
     padding: SPACING.md,
     alignItems: 'center',
@@ -599,7 +615,7 @@ const styles = StyleSheet.create({
   purchaseButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   successContainer: {
     flex: 1,
@@ -613,12 +629,12 @@ const styles = StyleSheet.create({
   successTitle: {
     ...TYPOGRAPHY.h1,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.sm,
   },
   successSubtitle: {
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: SPACING.xl,
   },
@@ -626,7 +642,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     padding: SPACING.md,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: RADII.lg,
     marginBottom: SPACING.lg,
   },
@@ -643,26 +659,26 @@ const styles = StyleSheet.create({
   giftTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.xs,
   },
   giftPrice: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   messagePreview: {
     width: '100%',
     flexDirection: 'row',
     padding: SPACING.md,
-    backgroundColor: COLORS.gray[50],
+    backgroundColor: primitives.stone[50],
     borderRadius: RADII.md,
     marginBottom: SPACING.xl,
   },
   messageText: {
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: SPACING.sm,
     fontStyle: 'italic',
   },
@@ -674,7 +690,7 @@ const styles = StyleSheet.create({
   shareButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: RADII.md,
     padding: SPACING.md,
     alignItems: 'center',
@@ -684,13 +700,13 @@ const styles = StyleSheet.create({
   shareButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   doneButton: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: RADII.md,
     padding: SPACING.md,
     alignItems: 'center',
@@ -699,10 +715,10 @@ const styles = StyleSheet.create({
   doneButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 12,
     marginTop: 4,
   },
@@ -711,21 +727,21 @@ const styles = StyleSheet.create({
     bottom: 40,
     left: SPACING.lg,
     right: SPACING.lg,
-    backgroundColor: COLORS.warning + '20',
+    backgroundColor: COLORS.feedback.warning + '20',
     borderRadius: RADII.md,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.warning,
+    borderColor: COLORS.feedback.warning,
   },
   loadingWarningText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
     textAlign: 'center',
     fontWeight: '600',
   },
   paymentHint: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
   },

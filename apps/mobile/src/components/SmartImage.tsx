@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import type { ImageProps, ViewStyle, ImageStyle } from 'react-native';
 import { Image, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 
 interface SmartImageProps extends Omit<ImageProps, 'source'> {
   uri: string;
@@ -33,7 +33,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
   showLoader = true,
   containerStyle,
   imageStyle,
-  loaderColor = COLORS.primary,
+  loaderColor = COLORS.brand.primary,
   onLoadStart,
   onLoadEnd,
   onError,
@@ -94,7 +94,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
         <MaterialCommunityIcons
           name={fallbackIcon}
           size={fallbackIconSize}
-          color={COLORS.gray[400]}
+          color={primitives.stone[400]}
         />
       </View>
     );
@@ -154,11 +154,11 @@ export const AvatarImage: React.FC<AvatarImageProps> = ({
   if (showFallback || !uri) {
     // Generate consistent color from name
     const colors = [
-      COLORS.primary,
+      COLORS.brand.primary,
       COLORS.mint,
       COLORS.softOrange,
-      COLORS.info,
-      COLORS.success,
+      COLORS.feedback.info,
+      COLORS.feedback.success,
     ];
     const colorIndex = name.length % colors.length;
     const bgColor = colors[colorIndex];
@@ -174,7 +174,7 @@ export const AvatarImage: React.FC<AvatarImageProps> = ({
         <MaterialCommunityIcons
           name="account"
           size={size * 0.5}
-          color={COLORS.white}
+          color={COLORS.utility.white}
         />
       </View>
     );
@@ -238,7 +238,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
   },
   image: {
     resizeMode: 'cover',
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   fallbackContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
   },
   avatarFallback: {
     alignItems: 'center',

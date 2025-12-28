@@ -107,7 +107,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Saved Moments</Text>
@@ -130,7 +130,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Saved</Text>
@@ -179,13 +179,13 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
           <RefreshControl
             refreshing={savedMomentsLoading}
             onRefresh={loadSavedMoments}
-            tintColor={COLORS.coral}
+            tintColor={COLORS.brand.secondary}
           />
         }
       >
         {savedMomentsLoading && savedMoments.length === 0 ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.coral} />
+            <ActivityIndicator size="large" color={COLORS.brand.secondary} />
           </View>
         ) : filteredMoments.length === 0 ? (
           // Empty State
@@ -235,7 +235,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
                   <MaterialCommunityIcons
                     name="bookmark"
                     size={24}
-                    color={COLORS.primary}
+                    color={COLORS.brand.primary}
                   />
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -250,7 +250,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 48,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   segmentedContainer: {
     paddingVertical: 12,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   segmentedControl: {
     flexDirection: 'row',
-    backgroundColor: `${COLORS.border}80`,
+    backgroundColor: `${COLORS.border.default}80`,
     borderRadius: 8,
     padding: 4,
     height: 40,
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   segmentButtonActive: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -304,10 +304,10 @@ const styles = StyleSheet.create({
   segmentText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   segmentTextActive: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
   scrollView: {
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 8,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   momentInfo: {
     flex: 1,
@@ -352,11 +352,11 @@ const styles = StyleSheet.create({
   momentTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   momentDetails: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

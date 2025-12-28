@@ -70,7 +70,7 @@ export const HowEscrowWorksScreen: React.FC<HowEscrowWorksScreenProps> = ({
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>How escrow works</Text>
@@ -94,7 +94,7 @@ export const HowEscrowWorksScreen: React.FC<HowEscrowWorksScreenProps> = ({
               <MaterialCommunityIcons
                 name={'shield-check' as IconName}
                 size={80}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
           </View>
@@ -111,7 +111,7 @@ export const HowEscrowWorksScreen: React.FC<HowEscrowWorksScreenProps> = ({
                   <MaterialCommunityIcons
                     name={step.icon}
                     size={24}
-                    color={COLORS.primary}
+                    color={COLORS.brand.primary}
                   />
                 </View>
                 <View style={styles.stepContent}>
@@ -142,7 +142,7 @@ export const HowEscrowWorksScreen: React.FC<HowEscrowWorksScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 48,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -175,14 +175,14 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     lineHeight: 38,
   },
   heroDescription: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 12,
     maxWidth: 320,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     height: 120,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${COLORS.brand.primary}10`,
     borderRadius: 12,
   },
   stepsSection: {
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   stepsTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 16,
   },
   stepsList: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: `${COLORS.primary}20`,
+    backgroundColor: `${COLORS.brand.primary}20`,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -230,12 +230,12 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   stepDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
   faqSection: {
@@ -244,19 +244,19 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
   },
   faqCard: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 12,
     padding: 24,
   },
   faqTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   faqDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
 });

@@ -14,7 +14,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
@@ -64,7 +64,7 @@ export const ConfirmGiftModal: React.FC<Props> = memo(
               <MaterialCommunityIcons
                 name="gift-outline"
                 size={48}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
             </View>
 
@@ -107,7 +107,7 @@ ConfirmGiftModal.displayName = 'ConfirmGiftModal';
 
 const styles = StyleSheet.create({
   amount: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontSize: 17,
     fontWeight: '700',
   },
@@ -125,13 +125,13 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: radii.full,
     flex: 1,
     paddingVertical: SPACING.md,
   },
   cancelButtonText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
   },
   confirmButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },
   container: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: radii.xl,
     maxWidth: LAYOUT.size.modalMax,
     padding: SPACING.xl,
@@ -171,18 +171,18 @@ const styles = StyleSheet.create({
     width: LAYOUT.size.iconSm,
   },
   message: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 16,
     lineHeight: 24,
     marginBottom: SPACING.xl,
     textAlign: 'center',
   },
   recipient: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
   title: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 22,
     fontWeight: '700',
     marginBottom: SPACING.md,

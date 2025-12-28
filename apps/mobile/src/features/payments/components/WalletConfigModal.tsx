@@ -91,7 +91,7 @@ export const WalletConfigModal = ({
           <View style={styles.header}>
             <Text style={styles.title}>Wallet Settings</Text>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+              <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
           </View>
 
@@ -101,13 +101,13 @@ export const WalletConfigModal = ({
               <MaterialCommunityIcons
                 name="wallet"
                 size={28}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
             </View>
             <View style={styles.walletDetails}>
               <Text style={styles.walletName}>{wallet.name}</Text>
               <View style={styles.statusBadge}>
-                <View style={[styles.statusDot, { backgroundColor: COLORS.success }]} />
+                <View style={[styles.statusDot, { backgroundColor: COLORS.feedback.success }]} />
                 <Text style={styles.statusText}>{wallet.status}</Text>
               </View>
             </View>
@@ -121,7 +121,7 @@ export const WalletConfigModal = ({
                 <MaterialCommunityIcons
                   name="star-outline"
                   size={22}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>Default Payment</Text>
@@ -133,8 +133,8 @@ export const WalletConfigModal = ({
               <Switch
                 value={isDefaultPayment}
                 onValueChange={setIsDefaultPayment}
-                trackColor={{ false: COLORS.softGray, true: COLORS.primaryLight }}
-                thumbColor={isDefaultPayment ? COLORS.primary : COLORS.white}
+                trackColor={{ false: COLORS.softGray, true: COLORS.brand.primaryLight }}
+                thumbColor={isDefaultPayment ? COLORS.brand.primary : COLORS.utility.white}
               />
             </View>
 
@@ -144,7 +144,7 @@ export const WalletConfigModal = ({
                 <MaterialCommunityIcons
                   name="fingerprint"
                   size={22}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>Require Authentication</Text>
@@ -156,8 +156,8 @@ export const WalletConfigModal = ({
               <Switch
                 value={requireAuth}
                 onValueChange={setRequireAuth}
-                trackColor={{ false: COLORS.softGray, true: COLORS.primaryLight }}
-                thumbColor={requireAuth ? COLORS.primary : COLORS.white}
+                trackColor={{ false: COLORS.softGray, true: COLORS.brand.primaryLight }}
+                thumbColor={requireAuth ? COLORS.brand.primary : COLORS.utility.white}
               />
             </View>
 
@@ -167,7 +167,7 @@ export const WalletConfigModal = ({
                 <MaterialCommunityIcons
                   name="bell-outline"
                   size={22}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>Payment Notifications</Text>
@@ -179,8 +179,8 @@ export const WalletConfigModal = ({
               <Switch
                 value={enableNotifications}
                 onValueChange={setEnableNotifications}
-                trackColor={{ false: COLORS.softGray, true: COLORS.primaryLight }}
-                thumbColor={enableNotifications ? COLORS.primary : COLORS.white}
+                trackColor={{ false: COLORS.softGray, true: COLORS.brand.primaryLight }}
+                thumbColor={enableNotifications ? COLORS.brand.primary : COLORS.utility.white}
               />
             </View>
           </View>
@@ -196,7 +196,7 @@ export const WalletConfigModal = ({
               disabled={!hasChanges || isLoading}
             >
               {isLoading ? (
-                <ActivityIndicator size="small" color={COLORS.white} />
+                <ActivityIndicator size="small" color={COLORS.utility.white} />
               ) : (
                 <Text style={styles.saveButtonText}>Save Changes</Text>
               )}
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 12,
@@ -239,12 +239,12 @@ const styles = StyleSheet.create({
   title: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   walletInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   walletName: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   statusBadge: {
     flexDirection: 'row',
@@ -279,11 +279,11 @@ const styles = StyleSheet.create({
   },
   statusText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontWeight: '500',
   },
   settingsSection: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 12,
     marginBottom: 24,
   },
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   settingItemLast: {
     borderBottomWidth: 0,
@@ -311,11 +311,11 @@ const styles = StyleSheet.create({
   settingTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   settingDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   actions: {
@@ -327,19 +327,19 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   cancelButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   saveButton: {
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   saveButtonDisabled: {
     backgroundColor: COLORS.softGray,
@@ -347,6 +347,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

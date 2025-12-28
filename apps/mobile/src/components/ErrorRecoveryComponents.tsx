@@ -61,7 +61,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
         <MaterialCommunityIcons
           name="alert-circle-outline"
           size={64}
-          color={COLORS.error}
+          color={COLORS.feedback.error}
         />
       </View>
 
@@ -110,7 +110,7 @@ export const NetworkErrorView: React.FC<NetworkErrorViewProps> = ({
         <MaterialCommunityIcons
           name="wifi-off"
           size={64}
-          color={COLORS.error}
+          color={COLORS.feedback.error}
         />
       </View>
 
@@ -176,7 +176,7 @@ export const OfflineBanner: React.FC<OfflineBannerProps> = ({
 
   return (
     <Animated.View style={[styles.offlineBanner, animatedStyle]}>
-      <MaterialCommunityIcons name="wifi-off" size={20} color={COLORS.white} />
+      <MaterialCommunityIcons name="wifi-off" size={20} color={COLORS.utility.white} />
       <Text style={styles.offlineBannerText}>No Internet Connection</Text>
       {onRetry && (
         <TouchableOpacity onPress={onRetry} style={styles.offlineBannerButton}>
@@ -248,20 +248,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.xl,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   errorIcon: {
     marginBottom: SPACING.lg,
   },
   errorTitle: {
     ...TYPOGRAPHY.h2,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.sm,
     textAlign: 'center',
   },
   errorMessage: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: SPACING.xl,
     maxWidth: 300,
@@ -278,26 +278,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     gap: SPACING.sm,
   },
   offlineBannerText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     flex: 1,
   },
   offlineBannerButton: {
     paddingVertical: SPACING.xs,
     paddingHorizontal: SPACING.md,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     opacity: 0.2,
     borderRadius: 4,
   },
   offlineBannerButtonText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '600',
   },
   networkStatus: {
@@ -313,11 +313,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
   },
   networkStatusText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontWeight: '600',
   },
   loadingContainer: {
@@ -328,12 +328,12 @@ const styles = StyleSheet.create({
   },
   loadingMessage: {
     ...TYPOGRAPHY.body,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.md,
   },
   retryText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: SPACING.lg,
   },
   cancelButton: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
 });

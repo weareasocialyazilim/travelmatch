@@ -68,7 +68,7 @@ export const AddBankAccountBottomSheet: React.FC<
               <TextInput
                 style={styles.input}
                 placeholder="DE89 3704 0044 0532 0130 00"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 value={iban}
                 onChangeText={setIban}
                 autoCapitalize="characters"
@@ -81,7 +81,7 @@ export const AddBankAccountBottomSheet: React.FC<
               <TextInput
                 style={styles.input}
                 placeholder="Jane Doe"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 value={accountHolder}
                 onChangeText={setAccountHolder}
                 autoCapitalize="words"
@@ -94,7 +94,7 @@ export const AddBankAccountBottomSheet: React.FC<
             <MaterialCommunityIcons
               name={'lock' as IconName}
               size={16}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.securityText}>
               Your information is securely encrypted.
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.overlay40,
   },
   bottomSheet: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingBottom: 24,
@@ -148,12 +148,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   headline: {
     fontSize: 32,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 12,
@@ -169,17 +169,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   input: {
     height: 56,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 15,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   securityInfo: {
     flexDirection: 'row',
@@ -192,23 +192,23 @@ const styles = StyleSheet.create({
   },
   securityText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   saveButton: {
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 16,
     marginTop: 16,
   },
   saveButtonDisabled: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   saveButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

@@ -42,7 +42,7 @@ export const HostSection: React.FC<HostSectionProps> = React.memo(
         <MaterialCommunityIcons
           name="chevron-right"
           size={20}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
         />
       </TouchableOpacity>
     );
@@ -73,12 +73,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   userName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '600',
   },
   viewProfileHint: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
   },
 });

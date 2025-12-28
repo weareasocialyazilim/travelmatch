@@ -36,7 +36,7 @@ export const RemoveCardModal: React.FC<RemoveCardModalProps> = ({
             <MaterialCommunityIcons
               name={'delete' as IconName}
               size={32}
-              color={COLORS.error}
+              color={COLORS.feedback.error}
             />
           </View>
 
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '100%',
     maxWidth: 384,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 12,
     padding: 24,
     alignItems: 'center',
@@ -110,13 +110,13 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 32,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
   },
   bodyText: {
     fontSize: 16,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     maxWidth: 280,
   },
@@ -128,25 +128,25 @@ const styles = StyleSheet.create({
   removeButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     alignItems: 'center',
     justifyContent: 'center',
   },
   removeButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   cancelButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.transparent,
+    backgroundColor: COLORS.utility.transparent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

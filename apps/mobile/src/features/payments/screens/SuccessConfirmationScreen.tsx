@@ -63,7 +63,7 @@ export const SuccessConfirmationScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   main: {
     flex: 1,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 30,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     letterSpacing: -0.5,
     lineHeight: 36,
@@ -99,18 +99,18 @@ const styles = StyleSheet.create({
   body: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
   footer: {
     padding: 16,
-    backgroundColor: `${COLORS.background}CC`, // 80% opacity
+    backgroundColor: `${COLORS.bg.primary}CC`, // 80% opacity
   },
   ctaButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
     maxWidth: 512,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   ctaButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.background,
+    color: COLORS.bg.primary,
     letterSpacing: 0.24,
   },
 });

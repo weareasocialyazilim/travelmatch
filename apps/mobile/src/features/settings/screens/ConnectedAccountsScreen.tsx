@@ -45,7 +45,7 @@ const ConnectedAccountsScreen: React.FC = () => {
       platform: 'twitter',
       name: 'X (Twitter)',
       icon: 'twitter',
-      color: COLORS.black,
+      color: COLORS.utility.black,
       connected: true,
       username: '@sophia_carter',
       followers: 3400,
@@ -140,7 +140,7 @@ const ConnectedAccountsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Connected Accounts</Text>
@@ -300,7 +300,7 @@ const ConnectedAccountsScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="share-variant"
                   size={18}
-                  color={COLORS.coral}
+                  color={COLORS.brand.secondary}
                 />
               </View>
               <View style={styles.benefitContent}>
@@ -322,7 +322,7 @@ const ConnectedAccountsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   placeholder: {
     width: 40,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -375,23 +375,23 @@ const styles = StyleSheet.create({
   infoTitle: {
     ...TYPOGRAPHY.body,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   infoText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
 
   // Stats
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -409,11 +409,11 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   statDivider: {
     width: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
 
   // Sections
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     marginBottom: 12,
@@ -431,10 +431,10 @@ const styles = StyleSheet.create({
 
   // Accounts Card
   accountsCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   accountName: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   accountMeta: {
@@ -472,16 +472,16 @@ const styles = StyleSheet.create({
   },
   accountUsername: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   accountDot: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginHorizontal: 4,
   },
   accountFollowers: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   accountNotConnected: {
     ...TYPOGRAPHY.caption,
@@ -498,20 +498,20 @@ const styles = StyleSheet.create({
   connectText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginLeft: 66,
   },
 
   // Benefits Card
   benefitsCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -536,12 +536,12 @@ const styles = StyleSheet.create({
   benefitTitle: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   benefitDesc: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
 

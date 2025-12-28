@@ -97,36 +97,36 @@ export const TMPill: React.FC<TMPillProps> = ({
   const iconSize = size === 'lg' ? 18 : size === 'md' ? 16 : 14;
 
   const getBackgroundColor = (): string => {
-    if (disabled) return COLORS.surfaceMuted;
+    if (disabled) return COLORS.surface.baseMuted;
     switch (effectiveVariant) {
       case 'selected':
-        return COLORS.primary;
+        return COLORS.brand.primary;
       case 'outlined':
         return 'transparent';
       case 'muted':
-        return COLORS.surfaceMuted;
+        return COLORS.surface.baseMuted;
       default:
-        return COLORS.surfaceSubtle;
+        return COLORS.surface.baseSubtle;
     }
   };
 
   const getTextColor = (): string => {
-    if (disabled) return COLORS.textDisabled;
+    if (disabled) return COLORS.text.primaryDisabled;
     switch (effectiveVariant) {
       case 'selected':
-        return COLORS.white;
+        return COLORS.utility.white;
       case 'outlined':
-        return COLORS.text;
+        return COLORS.text.primary;
       case 'muted':
-        return COLORS.textSecondary;
+        return COLORS.text.secondary;
       default:
-        return COLORS.text;
+        return COLORS.text.primary;
     }
   };
 
   const getBorderColor = (): string => {
     if (effectiveVariant === 'outlined') {
-      return disabled ? COLORS.borderLight : COLORS.border;
+      return disabled ? COLORS.border.light : COLORS.border.default;
     }
     return 'transparent';
   };

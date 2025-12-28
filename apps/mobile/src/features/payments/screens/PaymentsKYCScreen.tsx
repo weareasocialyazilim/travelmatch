@@ -72,7 +72,7 @@ export default function PaymentsKYCScreen({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.white}
+            color={COLORS.utility.white}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payments & KYC</Text>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     flex: 1,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     textAlign: 'center',
     paddingRight: 48,
   },
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   mainTitle: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     marginBottom: 16,
   },
   disclaimer: {
@@ -185,13 +185,13 @@ const styles = StyleSheet.create({
   itemTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     lineHeight: 24,
   },
   itemDescription: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     lineHeight: 24,
   },
 });

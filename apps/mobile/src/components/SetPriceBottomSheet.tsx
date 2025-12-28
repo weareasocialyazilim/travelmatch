@@ -113,13 +113,13 @@ export const SetPriceBottomSheet: React.FC<SetPriceBottomSheetProps> = ({
             <MaterialCommunityIcons
               name={'currency-usd' as IconName}
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
               style={styles.inputIcon}
             />
             <TextInput
               style={styles.input}
               placeholder="0.00"
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={customAmount}
               onChangeText={(text) => {
                 setCustomAmount(text);
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingBottom: 32,
@@ -170,12 +170,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   headline: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 8,
@@ -192,23 +192,23 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 20,
     borderRadius: 20,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
   },
   chipSelected: {
-    backgroundColor: `${COLORS.primary}33`,
-    borderColor: COLORS.primary,
+    backgroundColor: `${COLORS.brand.primary}33`,
+    borderColor: COLORS.brand.primary,
   },
   chipText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   chipTextSelected: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   inputContainer: {
     paddingHorizontal: 24,
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputWrapper: {
@@ -235,17 +235,17 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.primary,
     paddingLeft: 44,
     paddingRight: 16,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   setButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 24,
@@ -254,6 +254,6 @@ const styles = StyleSheet.create({
   setButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

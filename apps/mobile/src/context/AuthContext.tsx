@@ -205,15 +205,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const isLoading = authState === 'loading';
 
   /**
-   * Save tokens to secure storage
+   * Save tokens - refresh token to SecureStore, access token to memory only
+   *
+   * Security: Access tokens are kept in memory only (OAuth 2.0 best practice)
+   * - Refresh token (~200 bytes) → SecureStore (hardware-backed, persistent)
+   * - Access token (large) → Memory only (volatile, more secure)
+   * - On app restart, access token is refreshed from refresh token
    */
   const saveTokens = async (newTokens: AuthTokens) => {
     try {
+      // Only save refresh token and expiry to SecureStore (small, fits in 2KB limit)
+      // Access token stays in memory only - more secure, no SecureStore size issues
       await Promise.all([
-        secureStorage.setItem(
-          AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-          newTokens.accessToken,
-        ),
         secureStorage.setItem(
           AUTH_STORAGE_KEYS.REFRESH_TOKEN,
           newTokens.refreshToken,
@@ -223,6 +226,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           newTokens.expiresAt.toString(),
         ),
       ]);
+      // Access token is kept in memory only (not persisted)
       setTokens(newTokens);
     } catch {
       // Silent fail - tokens will be re-fetched on next login
@@ -248,8 +252,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       await Promise.all([
         AsyncStorage.removeItem(STORAGE_KEYS.USER),
+        // Only refresh token and expires_at are in SecureStore now
         secureStorage.deleteItems([
-          AUTH_STORAGE_KEYS.ACCESS_TOKEN,
           AUTH_STORAGE_KEYS.REFRESH_TOKEN,
           AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
         ]),
@@ -303,37 +307,69 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /**
    * Load auth state from storage on mount
+   *
+   * Refresh Token-Only Strategy:
+   * 1. Load refresh token from SecureStore (small, hardware-backed)
+   * 2. Use refresh token to get new access token from Supabase
+   * 3. Keep access token in memory only (more secure)
    */
   useEffect(() => {
     const loadAuthState = async () => {
       try {
-        // Load user from AsyncStorage and tokens from SecureStore
-        const [storedUser, accessToken, refreshToken, expiresAtStr] =
-          await Promise.all([
-            AsyncStorage.getItem(STORAGE_KEYS.USER),
-            secureStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN),
-            secureStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN),
-            secureStorage.getItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT),
-          ]);
+        // Load user and refresh token only (access token is not persisted)
+        const [storedUser, refreshToken, expiresAtStr] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEYS.USER),
+          secureStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN),
+          secureStorage.getItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT),
+        ]);
 
-        if (storedUser && accessToken && refreshToken && expiresAtStr) {
+        if (storedUser && refreshToken) {
           const parsedUser = JSON.parse(storedUser) as User;
-          const expiresAt = parseInt(expiresAtStr, 10);
+          const expiresAt = expiresAtStr ? parseInt(expiresAtStr, 10) : 0;
 
-          // Check if tokens are still valid
-          if (expiresAt > Date.now()) {
-            const parsedTokens: AuthTokens = {
-              accessToken,
-              refreshToken,
-              expiresAt,
-            };
+          // Always refresh access token on app start (OAuth 2.0 best practice)
+          // This ensures we have a fresh token and validates the session
+          try {
+            logger.info('[Auth] Refreshing session on app start...');
+            const { session } = await authService.getSession();
 
-            setUser(parsedUser);
-            setTokens(parsedTokens);
-            setAuthState('authenticated');
-          } else {
-            // Tokens expired, clear data
-            await clearAuthData();
+            if (session) {
+              const newTokens: AuthTokens = {
+                accessToken: session.access_token,
+                refreshToken: session.refresh_token,
+                expiresAt: (session.expires_at || 0) * 1000,
+              };
+
+              // Save updated refresh token (if changed) and keep access token in memory
+              await saveTokens(newTokens);
+              setUser(parsedUser);
+              setAuthState('authenticated');
+              logger.info('[Auth] Session refreshed successfully');
+            } else {
+              // Session invalid, clear data
+              logger.info('[Auth] Session invalid, clearing auth data');
+              await clearAuthData();
+            }
+          } catch (refreshError) {
+            // If refresh fails but we have a valid expiry, try to continue
+            // This handles offline scenarios
+            if (expiresAt > Date.now()) {
+              logger.warn('[Auth] Token refresh failed, using cached session');
+              // Create minimal tokens for offline use
+              const offlineTokens: AuthTokens = {
+                accessToken: '', // Will be refreshed when online
+                refreshToken,
+                expiresAt,
+              };
+              setTokens(offlineTokens);
+              setUser(parsedUser);
+              setAuthState('authenticated');
+            } else {
+              logger.info(
+                '[Auth] Session expired and refresh failed, clearing',
+              );
+              await clearAuthData();
+            }
           }
         } else {
           setAuthState('unauthenticated');

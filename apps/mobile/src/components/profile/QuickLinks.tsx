@@ -40,7 +40,7 @@ const QuickLinks: React.FC<QuickLinksProps> = memo(
                 <MaterialCommunityIcons
                   name="chevron-right"
                   size={20}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
               </View>
             </TouchableOpacity>
@@ -59,12 +59,12 @@ QuickLinks.displayName = 'QuickLinks';
 
 const styles = StyleSheet.create({
   quickLinks: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginHorizontal: 16,
     marginTop: 12,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   quickLinkText: {
     fontSize: 15,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   quickLinkRight: {
     flexDirection: 'row',
@@ -95,11 +95,11 @@ const styles = StyleSheet.create({
   quickLinkCount: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   quickLinkDivider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginLeft: 50,
   },
 });

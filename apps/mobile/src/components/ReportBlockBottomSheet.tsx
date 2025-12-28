@@ -129,7 +129,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                         <MaterialCommunityIcons
                           name="flag"
                           size={20}
-                          color={COLORS.text}
+                          color={COLORS.text.primary}
                         />
                       </View>
                       <Text style={styles.actionText}>Report {targetType}</Text>
@@ -137,7 +137,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                     <MaterialCommunityIcons
                       name="chevron-right"
                       size={24}
-                      color={COLORS.textSecondary}
+                      color={COLORS.text.secondary}
                     />
                   </TouchableOpacity>
 
@@ -150,7 +150,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                         <MaterialCommunityIcons
                           name="account-cancel"
                           size={24}
-                          color={COLORS.text}
+                          color={COLORS.text.primary}
                         />
                       </View>
                       <View style={styles.actionTextContainer}>
@@ -166,7 +166,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                     <MaterialCommunityIcons
                       name="chevron-right"
                       size={24}
-                      color={COLORS.textSecondary}
+                      color={COLORS.text.secondary}
                     />
                   </TouchableOpacity>
 
@@ -180,7 +180,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                           <MaterialCommunityIcons
                             name="eye-off"
                             size={20}
-                            color={COLORS.text}
+                            color={COLORS.text.primary}
                           />
                         </View>
                         <Text style={styles.actionText}>Hide this moment</Text>
@@ -188,7 +188,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                       <MaterialCommunityIcons
                         name="chevron-right"
                         size={24}
-                        color={COLORS.textSecondary}
+                        color={COLORS.text.secondary}
                       />
                     </TouchableOpacity>
                   )}
@@ -208,7 +208,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                     <MaterialCommunityIcons
                       name="chevron-up"
                       size={20}
-                      color={COLORS.text}
+                      color={COLORS.text.primary}
                     />
                   </TouchableOpacity>
 
@@ -278,7 +278,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
                   <TextInput
                     style={styles.textarea}
                     placeholder="Please describe the issue"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={COLORS.text.secondary}
                     value={details}
                     onChangeText={setDetails}
                     multiline
@@ -328,13 +328,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   modalContent: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   handle: {
     width: 40,
     height: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 2,
   },
   header: {
@@ -359,12 +359,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 15,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   scrollView: {
     maxHeight: SCREEN_HEIGHT * 0.5,
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   actionTextContainer: {
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   actionTextBold: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   actionTextSubtitle: {
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
   expandableTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   radioOption: {
     flexDirection: 'row',
@@ -451,19 +451,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     marginTop: 12,
   },
   radioOptionSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     borderWidth: 2,
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.brand.primary + '10',
   },
   radioLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   radioCircle: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -479,22 +479,22 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   textarea: {
     minHeight: 144,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 15,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
   },
   footerContainer: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   footer: {
     flexDirection: 'row',
@@ -503,12 +503,12 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   submitButton: {
     flex: 1,
     height: 48,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
@@ -516,21 +516,21 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   cancelButton: {
     flex: 1,
     height: 48,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

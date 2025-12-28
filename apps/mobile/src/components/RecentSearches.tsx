@@ -34,7 +34,7 @@ export const RecentSearches: React.FC<RecentSearchesProps> = ({
         <MaterialCommunityIcons
           name="history"
           size={20}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
           style={styles.icon}
         />
         <Text style={styles.itemText} numberOfLines={1}>
@@ -47,7 +47,7 @@ export const RecentSearches: React.FC<RecentSearchesProps> = ({
           <MaterialCommunityIcons
             name="close"
             size={18}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -91,11 +91,11 @@ const styles = StyleSheet.create({
   },
   title: {
     ...TYPOGRAPHY.h4,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   clearButton: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
   listContainer: {
@@ -106,14 +106,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.lg,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   icon: {
     marginRight: SPACING.sm,
   },
   itemText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
 });

@@ -129,7 +129,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Trust & Safety</Text>
@@ -147,7 +147,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="shield-account"
               size={48}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           </View>
           <Text style={styles.heroTitle}>Your Safety Matters</Text>
@@ -169,7 +169,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="phone-alert"
               size={28}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           </View>
           <View style={styles.emergencyContent}>
@@ -181,7 +181,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
           <MaterialCommunityIcons
             name="chevron-right"
             size={24}
-            color={COLORS.white}
+            color={COLORS.utility.white}
           />
         </TouchableOpacity>
 
@@ -194,7 +194,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
                 <MaterialCommunityIcons
                   name={tip.icon}
                   size={24}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
               </View>
               <View style={styles.tipContent}>
@@ -211,7 +211,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="shield-lock"
               size={32}
-              color={COLORS.success}
+              color={COLORS.feedback.success}
             />
             <Text style={styles.escrowTitle}>Escrow Protection</Text>
           </View>
@@ -230,7 +230,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="arrow-right"
               size={18}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </TouchableOpacity>
         </View>
@@ -251,7 +251,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
                 <MaterialCommunityIcons
                   name={resource.icon}
                   size={24}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
               </View>
               <View style={styles.resourceContent}>
@@ -261,7 +261,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
               <MaterialCommunityIcons
                 name="chevron-right"
                 size={24}
-                color={COLORS.textTertiary}
+                color={COLORS.text.tertiary}
               />
             </TouchableOpacity>
           ))}
@@ -284,7 +284,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="flag-outline"
               size={20}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
             <Text style={styles.reportButtonText}>Report an Issue</Text>
           </TouchableOpacity>
@@ -295,7 +295,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
           <MaterialCommunityIcons
             name="information-outline"
             size={24}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <View style={styles.infoContent}>
             <Text style={styles.infoTitle}>Trust Score System</Text>
@@ -314,7 +314,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     width: 40,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...TYPOGRAPHY.h3,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -350,26 +350,26 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
   heroTitle: {
     ...TYPOGRAPHY.h2,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: spacing.xs,
   },
   heroSubtitle: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     maxWidth: 300,
   },
   emergencyCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.xl,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   emergencyTitle: {
     ...TYPOGRAPHY.label,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     marginBottom: spacing.xs / 2,
   },
   emergencyText: {
@@ -400,12 +400,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...TYPOGRAPHY.h4,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: spacing.md,
   },
   tipCard: {
     flexDirection: 'row',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: radii.md,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.brand.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -424,12 +424,12 @@ const styles = StyleSheet.create({
   },
   tipTitle: {
     ...TYPOGRAPHY.label,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: spacing.xs / 2,
   },
   tipDescription: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
   escrowCard: {
@@ -445,12 +445,12 @@ const styles = StyleSheet.create({
   },
   escrowTitle: {
     ...TYPOGRAPHY.h4,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: spacing.sm,
   },
   escrowText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: spacing.md,
     lineHeight: 22,
   },
@@ -460,13 +460,13 @@ const styles = StyleSheet.create({
   },
   learnMoreText: {
     ...TYPOGRAPHY.label,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginRight: spacing.xs,
   },
   resourceCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: radii.md,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.brand.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -485,12 +485,12 @@ const styles = StyleSheet.create({
   },
   resourceTitle: {
     ...TYPOGRAPHY.label,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: spacing.xs / 2,
   },
   resourceSubtitle: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   reportSection: {
     backgroundColor: COLORS.warningLight,
@@ -501,17 +501,17 @@ const styles = StyleSheet.create({
   },
   reportTitle: {
     ...TYPOGRAPHY.h4,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: spacing.xs,
   },
   reportText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
   reportButton: {
-    backgroundColor: COLORS.warning,
+    backgroundColor: COLORS.feedback.warning,
     borderRadius: radii.lg,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
@@ -521,11 +521,11 @@ const styles = StyleSheet.create({
   },
   reportButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   infoCard: {
     flexDirection: 'row',
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.brand.primaryLight,
     borderRadius: radii.lg,
     padding: spacing.md,
   },
@@ -535,12 +535,12 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     ...TYPOGRAPHY.label,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: spacing.xs / 2,
   },
   infoText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
 });

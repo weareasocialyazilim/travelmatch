@@ -66,7 +66,7 @@ export const RequestAdditionalProofBottomSheet: React.FC<
               <MaterialCommunityIcons
                 name={'close' as IconName}
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Request additional proof</Text>
@@ -81,7 +81,7 @@ export const RequestAdditionalProofBottomSheet: React.FC<
                 <TextInput
                   style={styles.textArea}
                   placeholder="Tell them what you need to confirm the moment. e.g., 'Could you please upload a photo of the ticket stub?'"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   value={message}
                   onChangeText={setMessage}
                   multiline
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     maxHeight: '90%',
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   header: {
     flexDirection: 'row',
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     textAlign: 'center',
     paddingRight: 40,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   textAreaContainer: {
     position: 'relative',
@@ -191,41 +191,41 @@ const styles = StyleSheet.create({
     height: 156,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 32,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   charCounter: {
     position: 'absolute',
     bottom: 8,
     right: 12,
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   footer: {
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 32,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   sendButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: `${COLORS.primary}66`,
+    backgroundColor: `${COLORS.brand.primary}66`,
   },
   sendButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

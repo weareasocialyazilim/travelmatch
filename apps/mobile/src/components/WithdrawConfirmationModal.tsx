@@ -33,7 +33,7 @@ export const WithdrawConfirmationModal: React.FC<
             <MaterialCommunityIcons
               name={'wallet' as IconName}
               size={40}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </View>
 
@@ -85,12 +85,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   modalContent: {
     width: '100%',
     maxWidth: 384,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 12,
     padding: 24,
     alignItems: 'center',
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: `${COLORS.primary}1A`,
+    backgroundColor: `${COLORS.brand.primary}1A`,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -112,21 +112,21 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 8,
   },
   bodyText: {
     fontSize: 16,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 16,
   },
   amount: {
     fontSize: 32,
     fontWeight: '800',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginBottom: 24,
   },
   buttonGroup: {
@@ -138,26 +138,26 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   confirmButton: {
     flex: 1,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   confirmButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

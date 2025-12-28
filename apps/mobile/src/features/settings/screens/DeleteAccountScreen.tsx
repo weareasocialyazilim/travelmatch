@@ -139,7 +139,7 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Delete account</Text>
@@ -156,7 +156,7 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
           <MaterialCommunityIcons
             name={'alert' as IconName}
             size={24}
-            color={COLORS.error}
+            color={COLORS.feedback.error}
             style={styles.warningIcon}
           />
           <View style={styles.warningContent}>
@@ -179,7 +179,7 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
                 <MaterialCommunityIcons
                   name={item.icon}
                   size={24}
-                  color={COLORS.text}
+                  color={COLORS.text.primary}
                 />
               </View>
               <View style={styles.infoTextContainer}>
@@ -204,7 +204,7 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
                     error && styles.confirmationInputError,
                   ]}
                   placeholder="DELETE"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -247,7 +247,7 @@ export const DeleteAccountScreen: React.FC<DeleteAccountScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 48,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -296,17 +296,17 @@ const styles = StyleSheet.create({
   warningTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   warningDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 32,
     marginBottom: 8,
   },
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -335,12 +335,12 @@ const styles = StyleSheet.create({
   infoTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   infoDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
   },
   confirmationContainer: {
@@ -350,24 +350,24 @@ const styles = StyleSheet.create({
   confirmationLabel: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   confirmationInput: {
     height: 48,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    borderColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 12,
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   confirmationInputError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   errorText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     marginTop: 4,
   },
   footer: {
@@ -376,15 +376,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 16,
-    backgroundColor: `${COLORS.background}F0`,
+    backgroundColor: `${COLORS.bg.primary}F0`,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
     gap: 12,
   },
   deleteButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -394,19 +394,19 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   keepButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   keepButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });
 

@@ -173,14 +173,14 @@ const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
   const getToastStyle = () => {
     switch (toast.type) {
       case 'success':
-        return { backgroundColor: COLORS.success };
+        return { backgroundColor: COLORS.feedback.success };
       case 'error':
-        return { backgroundColor: COLORS.error };
+        return { backgroundColor: COLORS.feedback.error };
       case 'warning':
-        return { backgroundColor: COLORS.warning };
+        return { backgroundColor: COLORS.feedback.warning };
       case 'info':
       default:
-        return { backgroundColor: COLORS.primary };
+        return { backgroundColor: COLORS.brand.primary };
     }
   };
 
@@ -235,14 +235,14 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   icon: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.h3,
     fontWeight: 'bold',
     marginRight: SPACING.sm,
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     flex: 1,
     fontWeight: '500',
   },

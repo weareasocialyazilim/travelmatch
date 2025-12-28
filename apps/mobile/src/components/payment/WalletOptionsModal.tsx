@@ -54,7 +54,7 @@ export const WalletOptionsModal: React.FC<WalletOptionsModalProps> = ({
               <MaterialCommunityIcons
                 name={Platform.OS === 'ios' ? 'apple' : 'google'}
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </View>
             <Text style={styles.modalTitle}>{walletName}</Text>
@@ -62,7 +62,7 @@ export const WalletOptionsModal: React.FC<WalletOptionsModalProps> = ({
               <MaterialCommunityIcons
                 name="close"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -72,7 +72,7 @@ export const WalletOptionsModal: React.FC<WalletOptionsModalProps> = ({
               <MaterialCommunityIcons
                 name="cog-outline"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
               <Text style={styles.optionText}>Configure {walletName}</Text>
             </TouchableOpacity>
@@ -84,7 +84,7 @@ export const WalletOptionsModal: React.FC<WalletOptionsModalProps> = ({
               <MaterialCommunityIcons
                 name="link-variant-off"
                 size={24}
-                color={COLORS.error}
+                color={COLORS.feedback.error}
               />
               <Text style={[styles.optionText, styles.destructiveText]}>
                 Disconnect {walletName}
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   optionsList: {
     gap: 8,
@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   destructiveOption: {
     backgroundColor: '#FEE2E2',
   },
   destructiveText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
   },
 });
 

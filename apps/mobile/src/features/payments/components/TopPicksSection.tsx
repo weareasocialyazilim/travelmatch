@@ -18,7 +18,7 @@ const TopPickCard: React.FC<TopPickCardProps> = ({ item, onPress }) => (
         <MaterialCommunityIcons
           name="check-decagram"
           size={14}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
       </View>
     )}
@@ -84,11 +84,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   sectionSubtitle: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   topPicksContainer: {
@@ -97,11 +97,11 @@ const styles = StyleSheet.create({
   },
   topPickCard: {
     width: 100,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 12,
     alignItems: 'center',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -117,20 +117,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 54,
     right: 22,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 10,
     padding: 2,
   },
   topPickName: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   topPickAmount: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginBottom: 4,
   },
   topPickRating: {
@@ -140,6 +140,6 @@ const styles = StyleSheet.create({
   },
   topPickRatingText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

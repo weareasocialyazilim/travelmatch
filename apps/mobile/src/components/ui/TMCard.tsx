@@ -131,7 +131,7 @@ export const TMCard: React.FC<TMCardProps> = ({
             <MaterialCommunityIcons
               name="map-marker"
               size={14}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
             <Text style={styles.locationText}>
               {moment.location.city}
@@ -164,7 +164,7 @@ export const TMCard: React.FC<TMCardProps> = ({
               <MaterialCommunityIcons
                 name="check-decagram"
                 size={14}
-                color={COLORS.trust}
+                color={COLORS.trust.primary}
               />
             )}
           </View>
@@ -201,7 +201,7 @@ export const TMCard: React.FC<TMCardProps> = ({
                       <MaterialCommunityIcons
                         name="gift"
                         size={16}
-                        color={COLORS.white}
+                        color={COLORS.utility.white}
                       />
                       <Text style={styles.primaryButtonText}>Send gift</Text>
                     </LinearGradient>
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.base,
   },
   card: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: RADIUS.card,
     overflow: 'hidden',
     borderWidth: 1,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     ...TYPOGRAPHY.captionSmall,
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   categoryBadge: {
     position: 'absolute',
@@ -275,14 +275,14 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     ...TYPOGRAPHY.labelXSmall,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   content: {
     padding: SPACING.cardPadding,
   },
   title: {
     ...TYPOGRAPHY.h4,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.xs,
   },
   titleCompact: {
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   actionRow: {
     flexDirection: 'row',
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: COLORS.borderLight,
+    borderTopColor: COLORS.border.light,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -313,11 +313,11 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     ...TYPOGRAPHY.captionSmall,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
   },
   price: {
     ...TYPOGRAPHY.price,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   buttons: {
     flexDirection: 'row',
@@ -327,11 +327,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderRadius: RADIUS.button,
-    backgroundColor: COLORS.surfaceMuted,
+    backgroundColor: COLORS.surface.baseMuted,
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.labelSmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   primaryButton: {
     borderRadius: RADIUS.button,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     ...TYPOGRAPHY.labelSmall,
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

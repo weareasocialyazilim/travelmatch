@@ -18,7 +18,7 @@ import Animated, {
   cancelAnimation,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -72,7 +72,7 @@ export const Skeleton = memo<SkeletonLoaderProps>(function Skeleton({
 
   const opacityStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    backgroundColor: COLORS.gray[200],
+    backgroundColor: primitives.stone[200],
   }));
 
   const shimmerStyle = useAnimatedStyle(() => ({
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   skeleton: {
-    backgroundColor: COLORS.gray[200],
+    backgroundColor: primitives.stone[200],
     overflow: 'hidden',
   },
   shimmerContainer: {
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   card: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 16,
@@ -288,14 +288,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   listItemContent: {
     flex: 1,
     marginLeft: 12,
   },
   wishCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 24,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   messageBubble: {
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: 16,
     padding: 12,
     maxWidth: '70%',

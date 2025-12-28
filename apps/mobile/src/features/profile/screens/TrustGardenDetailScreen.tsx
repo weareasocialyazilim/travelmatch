@@ -156,7 +156,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       case 'Growing':
         return COLORS.softOrange;
       default:
-        return COLORS.coral;
+        return COLORS.brand.secondary;
     }
   };
 
@@ -182,7 +182,7 @@ const TrustGardenDetailScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Trust Garden</Text>
@@ -305,7 +305,7 @@ const TrustGardenDetailScreen: React.FC = () => {
                       <MaterialCommunityIcons
                         name="chevron-right"
                         size={18}
-                        color={COLORS.textSecondary}
+                        color={COLORS.text.secondary}
                       />
                     )}
                   </View>
@@ -328,7 +328,7 @@ const TrustGardenDetailScreen: React.FC = () => {
                         <MaterialCommunityIcons
                           name="arrow-right"
                           size={14}
-                          color={COLORS.textSecondary}
+                          color={COLORS.text.secondary}
                         />
                         <Text style={styles.tipText}>{tip}</Text>
                       </View>
@@ -347,7 +347,7 @@ const TrustGardenDetailScreen: React.FC = () => {
           <View style={styles.levelsCard}>
             <View style={styles.levelRow}>
               <View
-                style={[styles.levelDot, { backgroundColor: COLORS.coral }]}
+                style={[styles.levelDot, { backgroundColor: COLORS.brand.secondary }]}
               />
               <View style={styles.levelInfo}>
                 <Text style={styles.levelTitle}>Sprout</Text>
@@ -399,7 +399,7 @@ const TrustGardenDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   placeholder: {
     width: 40,
@@ -431,13 +431,13 @@ const styles = StyleSheet.create({
 
   // Overview Card
   overviewCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
     marginBottom: 24,
     borderWidth: 2,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   },
   levelRank: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 20,
   },
   scoreContainer: {
@@ -471,16 +471,16 @@ const styles = StyleSheet.create({
   scoreValue: {
     fontSize: 48,
     fontWeight: '800',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scoreMax: {
     fontSize: 20,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   levelDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 20,
@@ -497,15 +497,15 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   progressPoints: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   progressBar: {
     height: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     marginBottom: 12,
@@ -529,11 +529,11 @@ const styles = StyleSheet.create({
 
   // Factor Card
   factorCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -558,12 +558,12 @@ const styles = StyleSheet.create({
   factorName: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   factorDesc: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   factorValueContainer: {
     flexDirection: 'row',
@@ -581,11 +581,11 @@ const styles = StyleSheet.create({
   },
   factorMaxText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   factorProgressBar: {
     height: 6,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 12,
@@ -596,14 +596,14 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   tipsContainer: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 10,
     padding: 12,
   },
   tipsTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
   },
   tipItem: {
@@ -614,15 +614,15 @@ const styles = StyleSheet.create({
   },
   tipText: {
     fontSize: 13,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 
   // Levels Card
   levelsCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -648,11 +648,11 @@ const styles = StyleSheet.create({
   levelTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   levelRange: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 
   bottomSpacer: {

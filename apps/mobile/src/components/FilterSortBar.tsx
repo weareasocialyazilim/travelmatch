@@ -66,7 +66,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
         <MaterialCommunityIcons
           name={sortOrder === 'asc' ? 'sort-ascending' : 'sort-descending'}
           size={20}
-          color={COLORS.textPrimary}
+          color={COLORS.text.primary}
         />
         <Text style={styles.sortText}>{sortField}</Text>
       </TouchableOpacity>
@@ -80,9 +80,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   filtersContainer: {
     flexDirection: 'row',
@@ -93,20 +93,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   filterChipActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
+    borderColor: COLORS.brand.primary,
   },
   filterText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   filterTextActive: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '600',
   },
   sortButton: {
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   sortText: {
     fontSize: 14,
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     textTransform: 'capitalize',
   },
 });

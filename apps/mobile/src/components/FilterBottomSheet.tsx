@@ -250,14 +250,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   bottomSheet: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     maxHeight: '85%',
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 6,
     borderRadius: 3,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   scrollView: {
     maxHeight: '70%',
@@ -283,12 +283,12 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   section: {
     paddingHorizontal: 16,
@@ -303,13 +303,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   priceRange: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   chipsContainer: {
     gap: 8,
@@ -319,20 +319,20 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   chipSelected: {
-    backgroundColor: `${COLORS.primary}20`,
+    backgroundColor: `${COLORS.brand.primary}20`,
   },
   chipText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   chipTextSelected: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
   rangeContainer: {
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 4,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 2,
     transform: [{ translateY: -2 }],
   },
@@ -353,13 +353,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     height: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 2,
     transform: [{ translateY: -2 }],
   },
   segmentedControl: {
     flexDirection: 'row',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 8,
     padding: 4,
     gap: 8,
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   segmentButtonSelected: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -382,17 +382,17 @@ const styles = StyleSheet.create({
   segmentButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   segmentButtonTextSelected: {
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   footer: {
     flexDirection: 'row',
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
     gap: 12,
   },
   clearButton: {
@@ -405,19 +405,19 @@ const styles = StyleSheet.create({
   clearButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   applyButton: {
     flex: 1,
     height: 48,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   applyButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
