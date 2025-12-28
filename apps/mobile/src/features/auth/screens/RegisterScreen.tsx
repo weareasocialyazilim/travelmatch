@@ -19,6 +19,8 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import { COLORS } from '@/constants/colors';
+import SocialButton from '@/components/SocialButton';
+import { logger } from '@/utils/logger';
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: 'male', label: 'Erkek' },
@@ -49,7 +51,7 @@ const calculateAge = (birthDate: Date): number => {
 };
 
 export const RegisterScreen: React.FC = () => {
-  const { showToast: _showToast } = useToast();
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const { register } = useAuth();
@@ -105,10 +107,61 @@ export const RegisterScreen: React.FC = () => {
     }
   };
 
+  const handleSocialSignup = async (provider: 'apple' | 'google' | 'facebook') => {
+    try {
+      setIsLoading(true);
+      logger.debug('[Auth] Social signup initiated:', provider);
+      // TODO: Implement actual social signup with Supabase
+      const providerNames = {
+        apple: 'Apple',
+        google: 'Google',
+        facebook: 'Facebook',
+      };
+      showToast(
+        `${providerNames[provider]} ile kayıt yakında aktif olacak`,
+        'info',
+      );
+    } catch (error) {
+      logger.error('[Auth] Social signup error:', error);
+      showToast('Sosyal kayıt başarısız oldu. Lütfen tekrar deneyin.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Hesap Oluştur</Text>
       <Text style={styles.subtitle}>Başlamak için kayıt olun</Text>
+
+      {/* Social Signup Buttons */}
+      <View style={styles.socialButtonsContainer}>
+        <SocialButton
+          provider="apple"
+          label="Apple ile kayıt ol"
+          onPress={() => handleSocialSignup('apple')}
+          style={styles.socialButton}
+        />
+        <SocialButton
+          provider="google"
+          label="Google ile kayıt ol"
+          onPress={() => handleSocialSignup('google')}
+          style={styles.socialButton}
+        />
+        <SocialButton
+          provider="facebook"
+          label="Facebook ile kayıt ol"
+          onPress={() => handleSocialSignup('facebook')}
+          style={styles.socialButton}
+        />
+      </View>
+
+      {/* Divider */}
+      <View style={styles.divider}>
+        <View style={styles.dividerLine} />
+        <Text style={styles.dividerText}>veya email ile kayıt ol</Text>
+        <View style={styles.dividerLine} />
+      </View>
 
       {/* Full Name */}
       <Controller
@@ -365,7 +418,31 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: COLORS.textSecondary,
-    marginBottom: 30,
+    marginBottom: 24,
+  },
+  socialButtonsContainer: {
+    width: '100%',
+    gap: 12,
+    marginBottom: 8,
+  },
+  socialButton: {
+    width: '100%',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+    width: '100%',
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   inputContainer: {
     width: '100%',

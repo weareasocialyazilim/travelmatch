@@ -17,11 +17,13 @@ import { useAuth } from '@/context/AuthContext';
 import { useBiometric } from '@/context/BiometricAuthContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import SocialButton from '@/components/SocialButton';
 import { loginSchema, type LoginInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
 
 export const LoginScreen: React.FC = () => {
   const { showToast } = useToast();
@@ -57,6 +59,24 @@ export const LoginScreen: React.FC = () => {
           : 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin',
         'error',
       );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'apple' | 'google') => {
+    try {
+      setIsLoading(true);
+      logger.debug('[Auth] Social login initiated:', provider);
+      // TODO: Implement actual social login with Supabase
+      // For now, show a message that it's coming soon
+      showToast(
+        `${provider === 'apple' ? 'Apple' : 'Google'} ile giriş yakında aktif olacak`,
+        'info',
+      );
+    } catch (error) {
+      logger.error('[Auth] Social login error:', error);
+      showToast('Sosyal giriş başarısız oldu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +133,29 @@ export const LoginScreen: React.FC = () => {
           >
             Sign in to continue
           </Text>
+
+          {/* Social Login Buttons */}
+          <View style={styles.socialButtonsContainer}>
+            <SocialButton
+              provider="apple"
+              label="Apple ile devam et"
+              onPress={() => handleSocialLogin('apple')}
+              style={styles.socialButton}
+            />
+            <SocialButton
+              provider="google"
+              label="Google ile devam et"
+              onPress={() => handleSocialLogin('google')}
+              style={styles.socialButton}
+            />
+          </View>
+
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>veya email ile giriş yap</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
           <Controller
             control={control}
@@ -213,9 +256,9 @@ export const LoginScreen: React.FC = () => {
 
           {biometricAvailable && biometricEnabled && (
             <>
-              <View style={styles.divider}>
+              <View style={styles.biometricDivider}>
                 <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>or</Text>
+                <Text style={styles.dividerText}>veya</Text>
                 <View style={styles.dividerLine} />
               </View>
 
@@ -274,7 +317,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: COLORS.textSecondary,
-    marginBottom: 30,
+    marginBottom: 24,
+  },
+  socialButtonsContainer: {
+    width: '100%',
+    gap: 12,
+    marginBottom: 8,
+  },
+  socialButton: {
+    width: '100%',
   },
   inputContainer: {
     width: '100%',
@@ -318,6 +369,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+    width: '100%',
+  },
+  biometricDivider: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 24,
