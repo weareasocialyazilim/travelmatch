@@ -1,6 +1,6 @@
 /**
  * Centralized Form Utilities
- * 
+ *
  * Common form helpers, hooks, and utilities
  * For consistent form handling across the app
  */
@@ -8,7 +8,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Alert } from 'react-native';
 import type { UseFormReturn, FieldValues, Path } from 'react-hook-form';
-import { useToast } from '@/context/ToastContext';
+import { useToast } from '../../context/ToastContext';
 import { logger } from '../logger';
 
 // ============================================================================
@@ -19,9 +19,7 @@ import { logger } from '../logger';
  * Get form state summary
  * Useful for debugging and conditional rendering
  */
-export function getFormState<T extends FieldValues>(
-  form: UseFormReturn<T>
-) {
+export function getFormState<T extends FieldValues>(form: UseFormReturn<T>) {
   return {
     isValid: form.formState.isValid,
     isDirty: form.formState.isDirty,
@@ -46,7 +44,7 @@ export interface MinimalFormState {
 /**
  * Check if form can be submitted
  * Common validation for submit button state
- * 
+ *
  * @param form - Either a full UseFormReturn object or an object with just { formState }
  * @param options - Options for validation
  */
@@ -55,7 +53,7 @@ export function canSubmitForm<T extends FieldValues>(
   options: {
     requireDirty?: boolean;
     requireValid?: boolean;
-  } = {}
+  } = {},
 ): boolean {
   const { requireDirty = true, requireValid = true } = options;
   const formState = 'formState' in form ? form.formState : form;
@@ -75,7 +73,7 @@ export function canSubmitForm<T extends FieldValues>(
  * Get first error message from form
  */
 export function getFirstErrorMessage<T extends FieldValues>(
-  form: UseFormReturn<T>
+  form: UseFormReturn<T>,
 ): string | null {
   const errors = form.formState.errors;
   const firstError = Object.values(errors)[0];
@@ -86,7 +84,7 @@ export function getFirstErrorMessage<T extends FieldValues>(
  * Get all error messages from form
  */
 export function getAllErrorMessages<T extends FieldValues>(
-  form: UseFormReturn<T>
+  form: UseFormReturn<T>,
 ): Record<string, string> {
   const errors = form.formState.errors;
   const messages: Record<string, string> = {};
@@ -106,7 +104,7 @@ export function getAllErrorMessages<T extends FieldValues>(
  */
 export function hasFieldError<T extends FieldValues>(
   form: UseFormReturn<T>,
-  fieldName: Path<T>
+  fieldName: Path<T>,
 ): boolean {
   return !!form.formState.errors[fieldName];
 }
@@ -116,7 +114,7 @@ export function hasFieldError<T extends FieldValues>(
  */
 export function getFieldError<T extends FieldValues>(
   form: UseFormReturn<T>,
-  fieldName: Path<T>
+  fieldName: Path<T>,
 ): string | undefined {
   return form.formState.errors[fieldName]?.message as string | undefined;
 }
@@ -134,30 +132,30 @@ export function useFormSubmitHandler() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = useCallback(
-    async <T,>(
+    async <T>(
       submitFn: () => Promise<T>,
       options: {
         successMessage?: string;
         errorMessage?: string;
         onSuccess?: (data: T) => void;
         onError?: (error: Error) => void;
-      } = {}
+      } = {},
     ): Promise<T | null> => {
       setIsSubmitting(true);
       try {
         const result = await submitFn();
-        
+
         if (options.successMessage) {
           toast.success(options.successMessage);
         }
-        
+
         options.onSuccess?.(result);
         return result;
       } catch (error) {
-        const errorMessage = 
-          options.errorMessage || 
+        const errorMessage =
+          options.errorMessage ||
           (error instanceof Error ? error.message : 'forms.errors.generic');
-        
+
         toast.error(errorMessage);
         options.onError?.(error as Error);
         return null;
@@ -165,7 +163,7 @@ export function useFormSubmitHandler() {
         setIsSubmitting(false);
       }
     },
-    [toast]
+    [toast],
   );
 
   return { handleSubmit, isSubmitting };
@@ -203,7 +201,7 @@ export function useOfflineAwareSubmit() {
   }, []);
 
   const wrapSubmit = useCallback(
-    <T,>(submitFn: () => Promise<T>) => {
+    <T>(submitFn: () => Promise<T>) => {
       return async (): Promise<T | null> => {
         if (!isOnline) {
           toast.error('You are offline. Please check your connection.');
@@ -212,7 +210,7 @@ export function useOfflineAwareSubmit() {
         return submitFn();
       };
     },
-    [isOnline, toast]
+    [isOnline, toast],
   );
 
   return { wrapSubmit, isOnline };
@@ -226,13 +224,13 @@ export function useOfflineAwareSubmit() {
  * Trigger field validation on blur
  */
 export function useFieldValidation<T extends FieldValues>(
-  form: UseFormReturn<T>
+  form: UseFormReturn<T>,
 ) {
   const validateField = useCallback(
     (fieldName: Path<T>) => {
       form.trigger(fieldName);
     },
-    [form]
+    [form],
   );
 
   const validateAllFields = useCallback(() => {
@@ -247,7 +245,7 @@ export function useFieldValidation<T extends FieldValues>(
  */
 export function useWatchAndValidate<T extends FieldValues>(
   form: UseFormReturn<T>,
-  fieldName: Path<T>
+  fieldName: Path<T>,
 ) {
   const value = form.watch(fieldName);
   const error = getFieldError(form, fieldName);
@@ -267,21 +265,19 @@ export function useWatchAndValidate<T extends FieldValues>(
 /**
  * Reset form with confirmation
  */
-export function useFormReset<T extends FieldValues>(
-  form: UseFormReturn<T>
-) {
+export function useFormReset<T extends FieldValues>(form: UseFormReturn<T>) {
   const resetForm = useCallback(
     (values?: Partial<T>) => {
       form.reset(values as T);
     },
-    [form]
+    [form],
   );
 
   const resetField = useCallback(
     (fieldName: Path<T>) => {
       form.resetField(fieldName);
     },
-    [form]
+    [form],
   );
 
   return { resetForm, resetField };
@@ -295,9 +291,10 @@ export function useFormReset<T extends FieldValues>(
  * Check if form has unsaved changes
  */
 export function useUnsavedChanges<T extends FieldValues>(
-  form: UseFormReturn<T>
+  form: UseFormReturn<T>,
 ) {
-  const hasUnsavedChanges = form.formState.isDirty && !form.formState.isSubmitSuccessful;
+  const hasUnsavedChanges =
+    form.formState.isDirty && !form.formState.isSubmitSuccessful;
 
   const confirmLeave = useCallback(
     (message = 'You have unsaved changes. Are you sure you want to leave?') => {
@@ -308,7 +305,7 @@ export function useUnsavedChanges<T extends FieldValues>(
       }
       return true;
     },
-    [hasUnsavedChanges]
+    [hasUnsavedChanges],
   );
 
   return { hasUnsavedChanges, confirmLeave };
@@ -324,7 +321,7 @@ export function useUnsavedChanges<T extends FieldValues>(
 export function getFieldA11yProps<T extends FieldValues>(
   form: UseFormReturn<T>,
   fieldName: Path<T>,
-  label: string
+  label: string,
 ) {
   const error = getFieldError(form, fieldName);
   const hasError = hasFieldError(form, fieldName);
@@ -353,7 +350,7 @@ export function useFormAutoSave<T extends FieldValues>(
     enabled?: boolean;
     onError?: (error: Error) => void;
     onSuccess?: () => void;
-  } = {}
+  } = {},
 ) {
   const { debounceMs = 2000, enabled = true, onError, onSuccess } = options;
   const [isSaving, setIsSaving] = useState(false);
@@ -398,7 +395,8 @@ export function useFormAutoSave<T extends FieldValues>(
         onSuccess?.();
         logger.debug('Form auto-saved successfully');
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Auto-save failed';
+        const errorMessage =
+          error instanceof Error ? error.message : 'Auto-save failed';
         setSaveError(errorMessage);
         onError?.(error as Error);
         logger.error('Form auto-save failed:', error);
@@ -432,7 +430,8 @@ export function useFormAutoSave<T extends FieldValues>(
       setLastSaved(new Date());
       onSuccess?.();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Save failed';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Save failed';
       setSaveError(errorMessage);
       onError?.(error as Error);
     } finally {
@@ -451,11 +450,11 @@ export function useFormAutoSave<T extends FieldValues>(
  * Focus first error field
  */
 export function focusFirstErrorField<T extends FieldValues>(
-  form: UseFormReturn<T>
+  form: UseFormReturn<T>,
 ) {
   const errors = form.formState.errors;
   const firstErrorField = Object.keys(errors)[0] as Path<T>;
-  
+
   if (firstErrorField) {
     form.setFocus(firstErrorField);
   }
@@ -466,7 +465,7 @@ export function focusFirstErrorField<T extends FieldValues>(
  */
 export function focusField<T extends FieldValues>(
   form: UseFormReturn<T>,
-  fieldName: Path<T>
+  fieldName: Path<T>,
 ) {
   form.setFocus(fieldName);
 }
@@ -480,7 +479,7 @@ export function focusField<T extends FieldValues>(
  */
 export function debugFormState<T extends FieldValues>(
   form: UseFormReturn<T>,
-  label = 'Form State'
+  label = 'Form State',
 ) {
   if (__DEV__) {
     logger.debug(`[${label}]`, {
@@ -500,13 +499,13 @@ export function debugFormState<T extends FieldValues>(
  */
 export function useFormDebug<T extends FieldValues>(
   form: UseFormReturn<T>,
-  enabled = __DEV__
+  enabled = __DEV__,
 ) {
   if (!enabled) return;
 
   // Watch all values
   const values = form.watch();
-  
+
   if (__DEV__) {
     logger.debug('[Form Watch]', values);
   }

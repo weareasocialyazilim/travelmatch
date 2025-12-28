@@ -26,11 +26,16 @@ async function getSentry(): Promise<SentryType | null> {
  * - Screen tracking (PostHog)
  * - Performance metrics (Sentry)
  * - Privacy-compliant (EU hosting)
+ *
+ * PostHog v4 Migration:
+ * - Uses `new PostHog()` constructor instead of deprecated `PostHog.initAsync()`
+ * - captureApplicationLifecycleEvents -> captureAppLifecycleEvents
+ * - Synchronous initialization with async flush
  */
 class AnalyticsService {
   private static instance: AnalyticsService;
   private initialized = false;
-  private posthog: typeof PostHog | null = null;
+  private posthog: PostHog | null = null;
 
   private constructor() {}
 
@@ -44,17 +49,15 @@ class AnalyticsService {
   /**
    * Initialize PostHog analytics
    * Must be called before any tracking
-   * Uses timeout to prevent blocking app startup on network issues
+   * PostHog v4 uses synchronous constructor - no more initAsync
    */
   public async init() {
     if (this.initialized) return;
 
-    const INIT_TIMEOUT_MS = 5000; // 5 second timeout for initialization
-
     try {
       const apiKey = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
       const host =
-        process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://us.posthog.com';
+        process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com';
 
       if (!apiKey) {
         logger.warn(
@@ -63,32 +66,25 @@ class AnalyticsService {
         return;
       }
 
-      // Wrap PostHog initialization with timeout to prevent blocking app startup
-      const initPromise = PostHog.initAsync(apiKey, {
+      // PostHog v4: Use constructor instead of deprecated initAsync
+      this.posthog = new PostHog(apiKey, {
         host,
-        // Automatic event tracking
-        captureApplicationLifecycleEvents: true,
-        captureDeepLinks: true,
+        // Automatic event tracking (v4 renamed option)
+        captureAppLifecycleEvents: true,
         // Privacy settings
         enableSessionReplay: false, // Disable for privacy
         // Performance
         flushAt: 20, // Send events in batches
         flushInterval: 30000, // Every 30 seconds
+        // Disable in development to reduce noise
+        disabled: __DEV__ && !apiKey.startsWith('phc_'),
       });
-
-      const timeoutPromise = new Promise<null>((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('PostHog initialization timed out'));
-        }, INIT_TIMEOUT_MS);
-      });
-
-      this.posthog = await Promise.race([initPromise, timeoutPromise]);
 
       this.initialized = true;
       logger.info('[Analytics] PostHog initialized successfully');
     } catch (error) {
       logger.warn(
-        '[Analytics] PostHog initialization failed or timed out, analytics disabled:',
+        '[Analytics] PostHog initialization failed, analytics disabled:',
         error,
       );
       // Don't throw - analytics failure shouldn't block app startup

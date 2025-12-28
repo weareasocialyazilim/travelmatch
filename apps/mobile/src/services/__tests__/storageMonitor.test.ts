@@ -1,6 +1,6 @@
 /**
  * Storage Monitor Service Tests
- * 
+ *
  * Tests device storage monitoring with:
  * - Storage level detection (normal, low, critical)
  * - Upload permission checks based on available space
@@ -10,28 +10,30 @@
  * - Periodic monitoring lifecycle
  */
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { storageMonitor, StorageLevel } from '../storageMonitor';
 import { logger } from '../../utils/logger';
 
 // Mock dependencies
-jest.mock('expo-file-system');
+jest.mock('expo-file-system/legacy');
 jest.mock('@react-native-async-storage/async-storage');
 jest.mock('../../utils/logger');
 
-const mockFileSystem = FileSystem ;
-const mockAsyncStorage = AsyncStorage ;
-const mockLogger = logger ;
+const mockFileSystem = FileSystem;
+const mockAsyncStorage = AsyncStorage;
+const mockLogger = logger;
 
 describe('StorageMonitorService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    
+
     // Default mock implementations
     mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(500 * 1024 * 1024); // 500MB
-    mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024); // 1GB
+    mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+      1000 * 1024 * 1024,
+    ); // 1GB
     mockAsyncStorage.getItem.mockResolvedValue(null);
     mockAsyncStorage.setItem.mockResolvedValue(undefined);
     mockAsyncStorage.removeItem.mockResolvedValue(undefined);
@@ -44,8 +46,12 @@ describe('StorageMonitorService', () => {
 
   describe('Storage Info Detection', () => {
     it('should detect NORMAL storage level (> 100MB free)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024); // 200MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024); // 1GB
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      ); // 200MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      ); // 1GB
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -58,8 +64,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should detect LOW storage level (50MB - 100MB free)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(75 * 1024 * 1024); // 75MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024); // 1GB
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        75 * 1024 * 1024,
+      ); // 75MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      ); // 1GB
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -68,8 +78,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should detect CRITICAL storage level (< 50MB free)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(30 * 1024 * 1024); // 30MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024); // 1GB
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        30 * 1024 * 1024,
+      ); // 30MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      ); // 1GB
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -78,8 +92,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should calculate free percentage correctly', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(250 * 1024 * 1024); // 250MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024); // 1GB
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        250 * 1024 * 1024,
+      ); // 250MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      ); // 1GB
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -87,7 +105,9 @@ describe('StorageMonitorService', () => {
     });
 
     it('should estimate uploads remaining based on 5MB average', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(100 * 1024 * 1024); // 100MB
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        100 * 1024 * 1024,
+      ); // 100MB
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -96,7 +116,9 @@ describe('StorageMonitorService', () => {
     });
 
     it('should handle storage info errors gracefully', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('FileSystem error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('FileSystem error'),
+      );
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -104,15 +126,19 @@ describe('StorageMonitorService', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'StorageMonitor',
         'Failed to get storage info',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
 
   describe('Upload Permission Checks', () => {
     it('should allow upload when sufficient storage (normal)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024); // 200MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      ); // 200MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const fileSize = 10 * 1024 * 1024; // 10MB file
       const result = await storageMonitor.canUpload(fileSize);
@@ -122,8 +148,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should block upload on CRITICAL storage (< 50MB)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(40 * 1024 * 1024); // 40MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        40 * 1024 * 1024,
+      ); // 40MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const fileSize = 10 * 1024 * 1024; // 10MB file
       const result = await storageMonitor.canUpload(fileSize);
@@ -133,8 +163,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should block upload when file size exceeds available space', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(20 * 1024 * 1024); // 20MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        20 * 1024 * 1024,
+      ); // 20MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const fileSize = 50 * 1024 * 1024; // 50MB file (requires 75MB with buffer)
       const result = await storageMonitor.canUpload(fileSize);
@@ -149,13 +183,17 @@ describe('StorageMonitorService', () => {
           fileSize: expect.any(String),
           freeSpace: expect.any(String),
           required: expect.any(String),
-        })
+        }),
       );
     });
 
     it('should apply 1.5x buffer for processing space', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(100 * 1024 * 1024); // 100MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        100 * 1024 * 1024,
+      ); // 100MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const fileSize = 80 * 1024 * 1024; // 80MB (requires 120MB with 1.5x buffer)
       const result = await storageMonitor.canUpload(fileSize);
@@ -164,8 +202,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should warn but allow upload on LOW storage', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(75 * 1024 * 1024); // 75MB (LOW)
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        75 * 1024 * 1024,
+      ); // 75MB (LOW)
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const fileSize = 10 * 1024 * 1024; // 10MB file
       const result = await storageMonitor.canUpload(fileSize);
@@ -177,24 +219,28 @@ describe('StorageMonitorService', () => {
         'Upload allowed but storage is low',
         expect.objectContaining({
           level: StorageLevel.LOW,
-        })
+        }),
       );
     });
 
     it('should allow upload when storage info unavailable (fail-open)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('Error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('Error'),
+      );
 
       const result = await storageMonitor.canUpload(10 * 1024 * 1024);
 
       expect(result.allowed).toBe(true);
       expect(mockLogger.warn).toHaveBeenCalledWith(
         'StorageMonitor',
-        'Cannot verify storage, allowing upload'
+        'Cannot verify storage, allowing upload',
       );
     });
 
     it('should handle canUpload check errors gracefully', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('FileSystem error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('FileSystem error'),
+      );
 
       const result = await storageMonitor.canUpload(10 * 1024 * 1024);
 
@@ -205,8 +251,12 @@ describe('StorageMonitorService', () => {
 
   describe('Storage Check Logging', () => {
     it('should log CRITICAL storage level', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(30 * 1024 * 1024); // 30MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        30 * 1024 * 1024,
+      ); // 30MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       await storageMonitor.checkStorage();
 
@@ -217,13 +267,17 @@ describe('StorageMonitorService', () => {
           freeSpace: expect.any(String),
           freePercentage: expect.any(String),
           estimatedUploads: expect.any(Number),
-        })
+        }),
       );
     });
 
     it('should log LOW storage level as warning', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(75 * 1024 * 1024); // 75MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        75 * 1024 * 1024,
+      ); // 75MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       await storageMonitor.checkStorage();
 
@@ -234,13 +288,17 @@ describe('StorageMonitorService', () => {
           freeSpace: expect.any(String),
           freePercentage: expect.any(String),
           estimatedUploads: expect.any(Number),
-        })
+        }),
       );
     });
 
     it('should log NORMAL storage level as info', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024); // 200MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      ); // 200MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       await storageMonitor.checkStorage();
 
@@ -250,24 +308,30 @@ describe('StorageMonitorService', () => {
         expect.objectContaining({
           freeSpace: expect.any(String),
           freePercentage: expect.any(String),
-        })
+        }),
       );
     });
 
     it('should save last storage check timestamp', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      );
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       await storageMonitor.checkStorage();
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         '@travelmatch/last_storage_check',
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     it('should handle check storage errors gracefully', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('Error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('Error'),
+      );
 
       const info = await storageMonitor.checkStorage();
 
@@ -275,15 +339,19 @@ describe('StorageMonitorService', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'StorageMonitor',
         'Storage check failed',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
 
   describe('Periodic Monitoring', () => {
     it('should start monitoring with interval', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      );
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       storageMonitor.startMonitoring();
 
@@ -294,15 +362,15 @@ describe('StorageMonitorService', () => {
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'StorageMonitor',
-        'Monitoring started'
+        'Monitoring started',
       );
     });
 
     it('should not start monitoring if already monitoring', () => {
       storageMonitor.startMonitoring();
-      
+
       const firstCall = mockLogger.info.mock.calls.length;
-      
+
       storageMonitor.startMonitoring(); // Try to start again
 
       expect(mockLogger.info).toHaveBeenCalledTimes(firstCall); // No additional call
@@ -314,7 +382,7 @@ describe('StorageMonitorService', () => {
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'StorageMonitor',
-        'Monitoring stopped'
+        'Monitoring stopped',
       );
     });
 
@@ -324,13 +392,17 @@ describe('StorageMonitorService', () => {
       // Should not crash or log anything
       expect(mockLogger.info).not.toHaveBeenCalledWith(
         'StorageMonitor',
-        'Monitoring stopped'
+        'Monitoring stopped',
       );
     });
 
     it('should run periodic checks every 5 minutes', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      );
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       storageMonitor.startMonitoring();
 
@@ -350,48 +422,58 @@ describe('StorageMonitorService', () => {
 
   describe('Initialization', () => {
     it('should initialize and start monitoring', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      );
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       await storageMonitor.initialize();
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'StorageMonitor',
-        'Initialized'
+        'Initialized',
       );
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'StorageMonitor',
-        'Monitoring started'
+        'Monitoring started',
       );
 
       storageMonitor.stopMonitoring();
     });
 
     it('should check storage on initialization', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      );
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       await storageMonitor.initialize();
 
       expect(mockFileSystem.getFreeDiskStorageAsync).toHaveBeenCalled();
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         '@travelmatch/last_storage_check',
-        expect.any(String)
+        expect.any(String),
       );
 
       storageMonitor.stopMonitoring();
     });
 
     it('should handle initialization errors gracefully', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('Init error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('Init error'),
+      );
 
       await storageMonitor.initialize();
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'StorageMonitor',
         'Failed to initialize',
-        expect.any(Error)
+        expect.any(Error),
       );
 
       storageMonitor.stopMonitoring();
@@ -400,8 +482,12 @@ describe('StorageMonitorService', () => {
 
   describe('Warning System', () => {
     it('should warn user when storage is LOW and not warned recently', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(75 * 1024 * 1024); // LOW
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        75 * 1024 * 1024,
+      ); // LOW
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
       mockAsyncStorage.getItem.mockResolvedValue(null); // Not shown yet
 
       const shouldWarn = await storageMonitor.shouldWarnUser();
@@ -410,8 +496,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should warn user when storage is CRITICAL', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(30 * 1024 * 1024); // CRITICAL
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        30 * 1024 * 1024,
+      ); // CRITICAL
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
       mockAsyncStorage.getItem.mockResolvedValue(null);
 
       const shouldWarn = await storageMonitor.shouldWarnUser();
@@ -420,8 +510,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should not warn when storage is NORMAL', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024); // NORMAL
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      ); // NORMAL
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const shouldWarn = await storageMonitor.shouldWarnUser();
 
@@ -429,8 +523,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should not warn if already shown this session', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(75 * 1024 * 1024); // LOW
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        75 * 1024 * 1024,
+      ); // LOW
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
       mockAsyncStorage.getItem.mockResolvedValue('true'); // Already shown
 
       const shouldWarn = await storageMonitor.shouldWarnUser();
@@ -439,8 +537,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should respect 30 minute cooldown between warnings', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(75 * 1024 * 1024); // LOW
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        75 * 1024 * 1024,
+      ); // LOW
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       // Mark warning shown
       await storageMonitor.markWarningShown();
@@ -456,7 +558,7 @@ describe('StorageMonitorService', () => {
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         '@travelmatch/storage_warning_shown',
-        'true'
+        'true',
       );
     });
 
@@ -464,12 +566,14 @@ describe('StorageMonitorService', () => {
       await storageMonitor.resetWarningFlag();
 
       expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith(
-        '@travelmatch/storage_warning_shown'
+        '@travelmatch/storage_warning_shown',
       );
     });
 
     it('should handle shouldWarnUser errors gracefully', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('Error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('Error'),
+      );
 
       const shouldWarn = await storageMonitor.shouldWarnUser();
 
@@ -485,7 +589,7 @@ describe('StorageMonitorService', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'StorageMonitor',
         'Failed to mark warning shown',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -497,7 +601,7 @@ describe('StorageMonitorService', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'StorageMonitor',
         'Failed to reset warning flag',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -512,8 +616,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should get storage stats string', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(250 * 1024 * 1024); // 250MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024); // 1GB
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        250 * 1024 * 1024,
+      ); // 250MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      ); // 1GB
 
       const stats = await storageMonitor.getStorageStats();
 
@@ -525,7 +633,9 @@ describe('StorageMonitorService', () => {
     });
 
     it('should handle getStorageStats errors', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('Error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('Error'),
+      );
 
       const stats = await storageMonitor.getStorageStats();
 
@@ -533,7 +643,9 @@ describe('StorageMonitorService', () => {
     });
 
     it('should return unavailable message when no info', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(new Error('Error'));
+      mockFileSystem.getFreeDiskStorageAsync.mockRejectedValue(
+        new Error('Error'),
+      );
 
       const stats = await storageMonitor.getStorageStats();
 
@@ -548,7 +660,7 @@ describe('StorageMonitorService', () => {
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'StorageMonitor',
-        'Monitoring stopped'
+        'Monitoring stopped',
       );
     });
 
@@ -558,15 +670,19 @@ describe('StorageMonitorService', () => {
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'StorageMonitor',
-        'Monitoring stopped'
+        'Monitoring stopped',
       );
     });
   });
 
   describe('Edge Cases', () => {
     it('should handle exact threshold values (100MB - LOW)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(100 * 1024 * 1024); // Exactly 100MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        100 * 1024 * 1024,
+      ); // Exactly 100MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -574,8 +690,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should handle exact threshold values (50MB - CRITICAL)', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(50 * 1024 * 1024); // Exactly 50MB
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        50 * 1024 * 1024,
+      ); // Exactly 50MB
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -584,7 +704,9 @@ describe('StorageMonitorService', () => {
 
     it('should handle 0 bytes free', async () => {
       mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(0);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const info = await storageMonitor.getStorageInfo();
 
@@ -605,8 +727,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should handle concurrent getStorageInfo calls', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      );
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const [info1, info2, info3] = await Promise.all([
         storageMonitor.getStorageInfo(),
@@ -620,8 +746,12 @@ describe('StorageMonitorService', () => {
     });
 
     it('should handle concurrent canUpload calls', async () => {
-      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(200 * 1024 * 1024);
-      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(1000 * 1024 * 1024);
+      mockFileSystem.getFreeDiskStorageAsync.mockResolvedValue(
+        200 * 1024 * 1024,
+      );
+      mockFileSystem.getTotalDiskCapacityAsync.mockResolvedValue(
+        1000 * 1024 * 1024,
+      );
 
       const [result1, result2] = await Promise.all([
         storageMonitor.canUpload(10 * 1024 * 1024),

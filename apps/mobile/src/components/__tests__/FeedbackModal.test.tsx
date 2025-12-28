@@ -3,7 +3,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { FeedbackModal } from '../FeedbackModal';
 
 // Mock dependencies
-jest.mock('@/hooks/useHaptics', () => ({
+jest.mock('../../hooks/useHaptics', () => ({
   useHaptics: () => ({
     impact: jest.fn(),
     success: jest.fn(),
@@ -12,7 +12,7 @@ jest.mock('@/hooks/useHaptics', () => ({
   }),
 }));
 
-jest.mock('@/services/analytics', () => ({
+jest.mock('../../services/analytics', () => ({
   analytics: {
     trackEvent: jest.fn(),
   },
@@ -22,11 +22,11 @@ jest.mock('@hookform/resolvers/zod', () => ({
   zodResolver: () => () => ({}),
 }));
 
-jest.mock('@/utils/forms/helpers', () => ({
+jest.mock('../../utils/forms/helpers', () => ({
   canSubmitForm: ({ formState }: any) => formState.isValid !== false,
 }));
 
-jest.mock('@/utils/forms', () => ({
+jest.mock('../../utils/forms', () => ({
   feedbackSchema: {},
 }));
 
@@ -52,7 +52,7 @@ describe('FeedbackModal', () => {
 
     it('should not render when visible is false', () => {
       const { UNSAFE_getByType } = render(
-        <FeedbackModal {...defaultProps} visible={false} />
+        <FeedbackModal {...defaultProps} visible={false} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.visible).toBe(false);
@@ -64,7 +64,7 @@ describe('FeedbackModal', () => {
           {...defaultProps}
           title="How was it?"
           subtitle="Let us know"
-        />
+        />,
       );
       expect(getByText('How was it?')).toBeTruthy();
       expect(getByText('Let us know')).toBeTruthy();
@@ -72,17 +72,15 @@ describe('FeedbackModal', () => {
 
     it('should render rating question', () => {
       const { getByText } = render(<FeedbackModal {...defaultProps} />);
-      expect(
-        getByText('How would you rate your experience?')
-      ).toBeTruthy();
+      expect(getByText('How would you rate your experience?')).toBeTruthy();
     });
 
     it('should render all 5 star buttons', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
       const ionicons = UNSAFE_getAllByType(
-        require('@expo/vector-icons').Ionicons
+        require('@expo/vector-icons').Ionicons,
       );
       // Filter for star icons (should have at least 5)
       expect(ionicons.length).toBeGreaterThanOrEqual(5);
@@ -105,7 +103,7 @@ describe('FeedbackModal', () => {
         <FeedbackModal
           {...defaultProps}
           categories={['Custom 1', 'Custom 2']}
-        />
+        />,
       );
       expect(getByText('Custom 1')).toBeTruthy();
       expect(getByText('Custom 2')).toBeTruthy();
@@ -124,10 +122,10 @@ describe('FeedbackModal', () => {
 
     it('should render close button', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       expect(touchables.length).toBeGreaterThan(0);
     });
@@ -136,10 +134,10 @@ describe('FeedbackModal', () => {
   describe('User Interactions', () => {
     it('should call onClose when backdrop is pressed', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       // First touchable is the backdrop
       fireEvent.press(touchables[0]);
@@ -148,10 +146,10 @@ describe('FeedbackModal', () => {
 
     it('should call onClose when close button is pressed', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       // Find close button (second touchable)
       fireEvent.press(touchables[1]);
@@ -160,10 +158,10 @@ describe('FeedbackModal', () => {
 
     it('should allow selecting a rating', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       // Rating buttons are after backdrop and close button
       const firstStarButton = touchables[2];
@@ -180,11 +178,9 @@ describe('FeedbackModal', () => {
 
     it('should allow typing in comment field', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
-      const textInputs = UNSAFE_getAllByType(
-        require('react-native').TextInput
-      );
+      const textInputs = UNSAFE_getAllByType(require('react-native').TextInput);
       const commentInput = textInputs[0];
       fireEvent.changeText(commentInput, 'Great app!');
       // Should not crash
@@ -219,21 +215,17 @@ describe('FeedbackModal', () => {
   describe('Form Validation', () => {
     it('should limit comment to 500 characters', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
-      const textInputs = UNSAFE_getAllByType(
-        require('react-native').TextInput
-      );
+      const textInputs = UNSAFE_getAllByType(require('react-native').TextInput);
       expect(textInputs[0].props.maxLength).toBe(500);
     });
 
     it('should have multiline text input', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
-      const textInputs = UNSAFE_getAllByType(
-        require('react-native').TextInput
-      );
+      const textInputs = UNSAFE_getAllByType(require('react-native').TextInput);
       expect(textInputs[0].props.multiline).toBe(true);
     });
   });
@@ -241,12 +233,12 @@ describe('FeedbackModal', () => {
   describe('Submission', () => {
     it('should handle submit button press', () => {
       const { getByText, UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
 
       // Select rating
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       const firstStarButton = touchables[2];
       fireEvent.press(firstStarButton);
@@ -265,7 +257,7 @@ describe('FeedbackModal', () => {
 
   describe('Analytics', () => {
     it('should have analytics service available', () => {
-      const { analytics } = require('@/services/analytics');
+      const { analytics } = require('../../services/analytics');
       expect(analytics.trackEvent).toBeDefined();
     });
   });
@@ -273,14 +265,11 @@ describe('FeedbackModal', () => {
   describe('Edge Cases', () => {
     it('should handle missing onSubmit gracefully', async () => {
       const { getByText, UNSAFE_getAllByType } = render(
-        <FeedbackModal
-          visible={true}
-          onClose={mockOnClose}
-        />
+        <FeedbackModal visible={true} onClose={mockOnClose} />,
       );
 
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       fireEvent.press(touchables[2]);
 
@@ -290,20 +279,20 @@ describe('FeedbackModal', () => {
 
     it('should handle empty categories array', () => {
       const { queryByText } = render(
-        <FeedbackModal {...defaultProps} categories={[]} />
+        <FeedbackModal {...defaultProps} categories={[]} />,
       );
       expect(queryByText('Bug Report')).toBeNull();
     });
 
     it('should handle rapid star presses', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       const firstStarButton = touchables[2];
-      
+
       fireEvent.press(firstStarButton);
       fireEvent.press(firstStarButton);
       fireEvent.press(firstStarButton);
@@ -312,11 +301,9 @@ describe('FeedbackModal', () => {
 
     it('should handle long comments', () => {
       const { UNSAFE_getAllByType } = render(
-        <FeedbackModal {...defaultProps} />
+        <FeedbackModal {...defaultProps} />,
       );
-      const textInputs = UNSAFE_getAllByType(
-        require('react-native').TextInput
-      );
+      const textInputs = UNSAFE_getAllByType(require('react-native').TextInput);
       const longComment = 'a'.repeat(600);
       fireEvent.changeText(textInputs[0], longComment);
       // Should be truncated by maxLength

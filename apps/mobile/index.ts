@@ -1,3 +1,7 @@
+// CRITICAL: gesture-handler MUST be imported FIRST before any other imports
+// This ensures the native module is registered before any navigation or gesture code runs
+import 'react-native-gesture-handler';
+
 import { registerRootComponent } from 'expo';
 import App from './App';
 

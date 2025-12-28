@@ -1,7 +1,6 @@
 /**
  * Toast Context
  * Global toast notification system
- * Uses react-native-reanimated for native-thread animations.
  */
 
 import type { ReactNode } from 'react';
@@ -12,16 +11,9 @@ import React, {
   useCallback,
   useMemo,
   memo,
-  useEffect,
 } from 'react';
-import { Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
+import { Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '../theme/typography';
 import { radii } from '../constants/radii';
@@ -144,29 +136,39 @@ interface ToastItemProps {
 
 // Memoized ToastItem to prevent re-renders when other toasts change
 const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(-100);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(-100));
 
-  useEffect(() => {
-    // Animate in
-    opacity.value = withTiming(1, { duration: 300 });
-    translateY.value = withSpring(0, { damping: 15, stiffness: 120 });
-  }, [opacity, translateY]);
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
-  const handleDismiss = useCallback(() => {
-    // Animate out then call onDismiss
-    opacity.value = withTiming(0, { duration: 200 });
-    translateY.value = withTiming(-100, { duration: 200 }, (finished) => {
-      if (finished) {
-        runOnJS(onDismiss)(toast.id);
-      }
-    });
-  }, [opacity, translateY, onDismiss, toast.id]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
+  const handleDismiss = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -100,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => onDismiss(toast.id));
+  };
 
   const getToastStyle = () => {
     switch (toast.type) {
@@ -197,7 +199,16 @@ const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
   };
 
   return (
-    <Animated.View style={[styles.toast, getToastStyle(), animatedStyle]}>
+    <Animated.View
+      style={[
+        styles.toast,
+        getToastStyle(),
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
+    >
       <TouchableOpacity
         style={styles.toastContent}
         onPress={handleDismiss}
