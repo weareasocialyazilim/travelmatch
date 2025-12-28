@@ -365,7 +365,7 @@ importers:
         specifier: ~15.0.8
         version: 15.0.8(expo@54.0.29(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@13.6.9)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))
       expo-sharing:
-        specifier: ^14.0.8
+        specifier: ~14.0.7
         version: 14.0.8(expo@54.0.29(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@react-native-community/cli@13.6.9)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))
       expo-splash-screen:
         specifier: ~31.0.12
