@@ -20,7 +20,7 @@ interface SpinnerProps {
 
 export const Spinner: React.FC<SpinnerProps> = ({
   size = 'large',
-  color = COLORS.primary,
+  color = COLORS.brand.primary,
   message,
   fullScreen = false,
   style,
@@ -45,13 +45,13 @@ const styles = StyleSheet.create({
   },
   fullScreenContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
     justifyContent: 'center',
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: SPACING.md,
     textAlign: 'center',
   },

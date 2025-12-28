@@ -56,15 +56,15 @@ export const TransactionDetailScreen: React.FC<
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return COLORS.success;
+        return COLORS.feedback.success;
       case 'pending':
-        return COLORS.warning;
+        return COLORS.feedback.warning;
       case 'failed':
-        return COLORS.error;
+        return COLORS.feedback.error;
       case 'refunded':
-        return COLORS.info;
+        return COLORS.feedback.info;
       default:
-        return COLORS.textSecondary;
+        return COLORS.text.secondary;
     }
   };
 
@@ -102,7 +102,7 @@ export const TransactionDetailScreen: React.FC<
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Icon name="arrow-left" size={24} color={COLORS.text} />
+            <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Transaction Details</Text>
           <View style={styles.placeholder} />
@@ -169,7 +169,7 @@ export const TransactionDetailScreen: React.FC<
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.accent]}
+        colors={[COLORS.brand.primary, COLORS.brand.accent]}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -270,7 +270,7 @@ export const TransactionDetailScreen: React.FC<
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment Method</Text>
           <View style={styles.paymentMethodContainer}>
-            <Icon name="credit-card" size={24} color={COLORS.text} />
+            <Icon name="credit-card" size={24} color={COLORS.text.primary} />
             <Text style={styles.paymentMethodText}>
               {tx.paymentMethod.type.toUpperCase()} ••••{' '}
               {tx.paymentMethod.last4}
@@ -314,7 +314,7 @@ export const TransactionDetailScreen: React.FC<
         {/* Actions */}
         <View style={styles.actions}>
           <TouchableOpacity style={styles.helpButton}>
-            <Icon name="help-circle-outline" size={20} color={COLORS.primary} />
+            <Icon name="help-circle-outline" size={20} color={COLORS.brand.primary} />
             <Text style={styles.helpButtonText}>Report an Issue</Text>
           </TouchableOpacity>
         </View>
@@ -332,16 +332,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   goBackButton: {
     marginTop: 20,
   },
   goBackText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   amount: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 36,
     fontWeight: '800',
     marginBottom: LAYOUT.padding / 2,
@@ -355,19 +355,19 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding / 2,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   content: {
     flex: 1,
   },
   date: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodySmall,
     marginTop: LAYOUT.padding / 2,
   },
   divider: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     height: 1,
     marginVertical: LAYOUT.padding,
   },
@@ -379,13 +379,13 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 2,
   },
   headerTitle: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.h3,
     fontWeight: '800',
   },
   helpButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -393,38 +393,38 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding,
   },
   helpButtonText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     marginLeft: LAYOUT.padding / 2,
   },
   label: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodySmall,
     flex: 1,
   },
   paymentMethodContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     padding: LAYOUT.padding,
   },
   paymentMethodText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     marginLeft: LAYOUT.padding,
   },
   recipientContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     padding: LAYOUT.padding,
   },
   recipientId: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
     marginTop: 2,
   },
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     marginLeft: LAYOUT.padding,
   },
   recipientName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
   },
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     marginBottom: LAYOUT.padding * 2,
   },
   sectionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
     marginBottom: LAYOUT.padding * 1.5,
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   },
   statusCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: VALUES.borderRadius,
     marginBottom: LAYOUT.padding * 2,
     padding: LAYOUT.padding * 2,
@@ -481,17 +481,17 @@ const styles = StyleSheet.create({
     marginTop: LAYOUT.padding / 2,
   },
   totalLabel: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
   },
   totalValue: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '800',
   },
   value: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     textAlign: 'right',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     gap: LAYOUT.padding / 2,
   },
   skeletonCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: VALUES.borderRadius,
     marginHorizontal: LAYOUT.padding * 2,
     marginBottom: LAYOUT.padding,

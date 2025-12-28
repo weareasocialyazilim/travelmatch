@@ -49,7 +49,7 @@ export const CardOptionsModal: React.FC<CardOptionsModalProps> = ({
               <MaterialCommunityIcons
                 name="close"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -63,7 +63,7 @@ export const CardOptionsModal: React.FC<CardOptionsModalProps> = ({
                 <MaterialCommunityIcons
                   name="check-circle-outline"
                   size={24}
-                  color={COLORS.text}
+                  color={COLORS.text.primary}
                 />
                 <Text style={styles.optionText}>Set as default</Text>
               </TouchableOpacity>
@@ -73,7 +73,7 @@ export const CardOptionsModal: React.FC<CardOptionsModalProps> = ({
               <MaterialCommunityIcons
                 name="pencil-outline"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
               <Text style={styles.optionText}>Edit card</Text>
             </TouchableOpacity>
@@ -85,7 +85,7 @@ export const CardOptionsModal: React.FC<CardOptionsModalProps> = ({
               <MaterialCommunityIcons
                 name="trash-can-outline"
                 size={24}
-                color={COLORS.error}
+                color={COLORS.feedback.error}
               />
               <Text style={[styles.optionText, styles.destructiveText]}>
                 Remove card
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   optionsList: {
     gap: 8,
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   destructiveOption: {
     backgroundColor: '#FEE2E2',
   },
   destructiveText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
   },
 });
 

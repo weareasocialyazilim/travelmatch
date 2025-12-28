@@ -33,7 +33,7 @@ export const SummarySection: React.FC<SummarySectionProps> = React.memo(
             <MaterialCommunityIcons
               name="star"
               size={24}
-              color={COLORS.warning}
+              color={COLORS.feedback.warning}
             />
             <Text style={styles.summaryValue}>{rating.toFixed(1)}</Text>
             <Text style={styles.summaryLabel}>Rating</Text>
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionHeader: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '700',
     marginBottom: 12,
@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     borderWidth: 1,
     flex: 1,
@@ -71,13 +71,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   summaryValue: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 20,
     fontWeight: '700',
     marginTop: 8,
   },
   summaryLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
     marginTop: 4,
   },

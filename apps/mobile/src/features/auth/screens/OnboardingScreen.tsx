@@ -28,7 +28,7 @@ interface OnboardingPage {
   id: string;
   title: string;
   description: string;
-  gradient: readonly [string, string];
+  gradient: readonly string[];
   icon: string;
 }
 
@@ -186,7 +186,13 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     >
       {/* Full-screen gradient background */}
       <LinearGradient
-        colors={[item.gradient[0], item.gradient[1], 'rgba(0,0,0,0.9)']}
+        colors={
+          [
+            item.gradient[0] || '#000',
+            item.gradient[1] || '#000',
+            'rgba(0,0,0,0.9)',
+          ] as [string, string, string]
+        }
         locations={[0, 0.4, 1]}
         style={styles.gradientBackground}
       />
@@ -200,7 +206,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           <MaterialCommunityIcons
             name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
             size={56}
-            color={COLORS.white}
+            color={COLORS.utility.white}
           />
         </LinearGradient>
       </View>
@@ -264,7 +270,10 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
             style={styles.nextButtonWrapper}
           >
             <LinearGradient
-              colors={ONBOARDING_PAGES[currentIndex].gradient}
+              colors={[
+                ONBOARDING_PAGES[currentIndex].gradient[0] || '#F97316',
+                ONBOARDING_PAGES[currentIndex].gradient[1] || '#FB923C',
+              ]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.nextButton}
@@ -290,7 +299,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.black,
+    backgroundColor: COLORS.utility.black,
   },
   pageContainer: {
     width: SCREEN_WIDTH,
@@ -313,7 +322,7 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 16,
@@ -330,10 +339,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: '800',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     marginBottom: 16,
     lineHeight: 44,
-    textShadowColor: COLORS.overlay,
+    textShadowColor: COLORS.overlay.dark,
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
@@ -362,7 +371,7 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     width: 24,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   inactiveDot: {
     width: 8,
@@ -394,7 +403,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   nextText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 18,
     fontWeight: '700',
   },

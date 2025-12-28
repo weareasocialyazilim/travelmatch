@@ -153,7 +153,7 @@ export const TMTrustRing: React.FC<TMTrustRingProps> = ({
             cx={config.container / 2}
             cy={config.container / 2}
             r={radius}
-            stroke={COLORS.border}
+            stroke={COLORS.border.default}
             strokeWidth={config.stroke}
             fill="transparent"
           />
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   avatarContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -4,
     right: -4,
-    backgroundColor: COLORS.trust,
+    backgroundColor: COLORS.trust.primary,
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     ...TYPOGRAPHY.score,
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   scoreTextSmall: {
     fontSize: 10,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...TYPOGRAPHY.captionMedium,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: SPACING.xs,
   },
   labelSmall: {

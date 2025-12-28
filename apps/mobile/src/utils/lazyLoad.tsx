@@ -13,7 +13,7 @@ import { COLORS } from '../constants/colors';
  */
 const DefaultLoadingFallback = () => (
   <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+    <ActivityIndicator size="large" color={COLORS.brand.primary} />
   </View>
 );
 

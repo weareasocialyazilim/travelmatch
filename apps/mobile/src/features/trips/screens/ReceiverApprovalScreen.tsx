@@ -138,7 +138,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
       {loading && <LoadingState type="overlay" message="Processing..." />}
       {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.accent]}
+        colors={[COLORS.brand.primary, COLORS.brand.accent]}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -148,7 +148,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Icon name="arrow-left" size={24} color={COLORS.white} />
+            <Icon name="arrow-left" size={24} color={COLORS.utility.white} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Approve Givers</Text>
           <View style={styles.headerSpacer} />
@@ -181,7 +181,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
 
         {selectedTotalAmount >= totalAmount && (
           <View style={styles.successBanner}>
-            <Icon name="check-circle" size={20} color={COLORS.success} />
+            <Icon name="check-circle" size={20} color={COLORS.feedback.success} />
             <Text style={styles.successText}>Amount fulfilled!</Text>
           </View>
         )}
@@ -189,7 +189,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
 
       {/* Info Card */}
       <View style={styles.infoCard}>
-        <Icon name="information" size={20} color={COLORS.info} />
+        <Icon name="information" size={20} color={COLORS.feedback.info} />
         <Text style={styles.infoText}>
           Select one or more givers to approve. You can choose multiple givers
           to split the cost or select the one that best fits your needs.
@@ -231,7 +231,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
                     <Icon
                       name="check-circle"
                       size={24}
-                      color={COLORS.success}
+                      color={COLORS.feedback.success}
                     />
                   </View>
                 )}
@@ -253,7 +253,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
                         <Icon
                           name="shield-check"
                           size={14}
-                          color={COLORS.success}
+                          color={COLORS.feedback.success}
                         />
                         <Text style={styles.trustScore}>100% Trust</Text>
                       </View>
@@ -292,13 +292,13 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={[COLORS.primary, COLORS.accent]}
+            colors={[COLORS.brand.primary, COLORS.brand.accent]}
             style={styles.approveButtonGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
             <>
-              <Icon name="check" size={20} color={COLORS.white} />
+              <Icon name="check" size={20} color={COLORS.utility.white} />
               <Text style={styles.approveButtonText}>
                 Approve{' '}
                 {selectedSlots.length > 0 && `(${selectedSlots.length})`}
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   amountContainer: {
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderTopWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -323,12 +323,12 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding,
   },
   amountLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     fontWeight: '500',
   },
   amountValue: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 24,
     fontWeight: '800',
   },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 1.5,
   },
   approveButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
     marginLeft: LAYOUT.padding / 2,
@@ -356,15 +356,15 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding / 2,
   },
   bottomActions: {
-    backgroundColor: COLORS.white,
-    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderTopColor: COLORS.border.default,
     borderTopWidth: 1,
     flexDirection: 'row',
     paddingHorizontal: LAYOUT.padding * 2,
     paddingVertical: LAYOUT.padding * 1.5,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   emptyState: {
@@ -372,14 +372,14 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 6,
   },
   emptyStateText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     fontWeight: '400',
     textAlign: 'center',
     marginTop: 8,
   },
   giverAvatar: {
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 30,
     borderWidth: 2,
     height: 60,
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     marginBottom: LAYOUT.padding * 1.5,
   },
   giverName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 18,
     fontWeight: '700',
     marginBottom: LAYOUT.padding / 2,
@@ -409,14 +409,14 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerSubtitle: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
     opacity: 0.9,
     textAlign: 'center',
   },
   headerTitle: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 20,
     fontWeight: '800',
   },
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     marginBottom: LAYOUT.padding,
   },
   infoCard: {
-    backgroundColor: COLORS.info + '20',
+    backgroundColor: COLORS.feedback.info + '20',
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     marginHorizontal: LAYOUT.padding * 2,
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     padding: LAYOUT.padding * 1.5,
   },
   infoText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     fontSize: 14,
     fontWeight: '400',
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     marginLeft: LAYOUT.padding,
   },
   positionBadge: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: VALUES.borderRadius / 2,
     paddingHorizontal: LAYOUT.padding,
     paddingVertical: LAYOUT.padding / 2,
@@ -452,13 +452,13 @@ const styles = StyleSheet.create({
     top: LAYOUT.padding,
   },
   positionText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 12,
     fontWeight: '700',
   },
   rejectButton: {
     alignItems: 'center',
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
     borderRadius: VALUES.borderRadius,
     borderWidth: 2,
     flex: 1,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding * 1.5,
   },
   rejectButtonText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 18,
     fontWeight: '700',
     marginBottom: LAYOUT.padding * 1.5,
@@ -491,11 +491,11 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   selectedValue: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   slotCard: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: VALUES.borderRadius,
     borderWidth: 2,
     marginBottom: LAYOUT.padding * 1.5,
@@ -503,15 +503,15 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   slotCardSelected: {
-    backgroundColor: COLORS.success + '10',
-    borderColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success + '10',
+    borderColor: COLORS.feedback.success,
   },
   slotContent: {
     marginTop: LAYOUT.padding / 2,
   },
   successBanner: {
     alignItems: 'center',
-    backgroundColor: COLORS.success + '20',
+    backgroundColor: COLORS.feedback.success + '20',
     borderRadius: VALUES.borderRadius / 2,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -519,20 +519,20 @@ const styles = StyleSheet.create({
     paddingVertical: LAYOUT.padding,
   },
   successText: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontSize: 14,
     fontWeight: '600',
     marginLeft: LAYOUT.padding / 2,
   },
   summaryCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: VALUES.borderRadius,
     marginHorizontal: LAYOUT.padding * 2,
     marginTop: -LAYOUT.padding * 2,
     padding: LAYOUT.padding * 1.5,
   },
   summaryDivider: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginHorizontal: LAYOUT.padding,
     width: 1,
   },
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summaryLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
     fontWeight: '500',
     marginBottom: LAYOUT.padding / 2,
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   summaryValue: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 20,
     fontWeight: '800',
   },
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   trustScore: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontSize: 14,
     fontWeight: '600',
     marginLeft: LAYOUT.padding / 2,

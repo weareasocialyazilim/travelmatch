@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 import { CATEGORIES, SORT_OPTIONS } from './constants';
 import type { PriceRange } from './types';
 
@@ -74,7 +74,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               <MaterialCommunityIcons
                 name="close"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -127,7 +127,11 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     <MaterialCommunityIcons
                       name={option.icon}
                       size={16}
-                      color={sortBy === option.id ? COLORS.white : COLORS.text}
+                      color={
+                        sortBy === option.id
+                          ? COLORS.utility.white
+                          : COLORS.text.primary
+                      }
                     />
                     <Text
                       style={[
@@ -221,11 +225,11 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'flex-end',
   },
   modal: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '85%',
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   section: {
     padding: 20,
@@ -251,7 +255,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   categoryGrid: {
@@ -276,11 +280,11 @@ const styles = StyleSheet.create({
   },
   categoryChipText: {
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '500',
   },
   categoryChipTextActive: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   sortOptions: {
     flexDirection: 'row',
@@ -301,11 +305,11 @@ const styles = StyleSheet.create({
   },
   sortOptionText: {
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '500',
   },
   sortOptionTextActive: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   distanceOptions: {
     flexDirection: 'row',
@@ -323,11 +327,11 @@ const styles = StyleSheet.create({
   },
   distanceChipText: {
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '500',
   },
   distanceChipTextActive: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   priceOptions: {
     flexDirection: 'row',
@@ -345,11 +349,11 @@ const styles = StyleSheet.create({
   },
   priceChipText: {
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '500',
   },
   priceChipTextActive: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   actions: {
     flexDirection: 'row',
@@ -362,13 +366,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.gray[300],
+    borderColor: primitives.stone[300],
     alignItems: 'center',
   },
   resetButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   applyButton: {
     flex: 2,
@@ -380,7 +384,7 @@ const styles = StyleSheet.create({
   applyButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

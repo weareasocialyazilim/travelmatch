@@ -315,7 +315,7 @@ export const ChatSkeleton: React.FC = () => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   content: {
     flex: 1,
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : 16,
     paddingBottom: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   headerRight: {
     flexDirection: 'row',
@@ -340,9 +340,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     paddingBottom: Platform.OS === 'ios' ? 28 : 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   tabItem: {
     alignItems: 'center',
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   profileHeader: {
     alignItems: 'center',
     paddingVertical: 24,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   statsRow: {
     flexDirection: 'row',
@@ -411,17 +411,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   chatHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   chatMessages: {
     flex: 1,
@@ -441,9 +441,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 8,
     paddingBottom: Platform.OS === 'ios' ? 28 : 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   mt4: { marginTop: 4 },
   mt8: { marginTop: 8 },

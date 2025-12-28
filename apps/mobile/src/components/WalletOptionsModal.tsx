@@ -47,7 +47,7 @@ export const WalletOptionsModal: React.FC<WalletOptionsModalProps> = ({
                   <MaterialCommunityIcons
                     name="star-outline"
                     size={24}
-                    color={COLORS.textPrimary}
+                    color={COLORS.text.primary}
                   />
                   <Text style={styles.optionText}>Set as Default</Text>
                 </TouchableOpacity>
@@ -60,7 +60,7 @@ export const WalletOptionsModal: React.FC<WalletOptionsModalProps> = ({
                 <MaterialCommunityIcons
                   name="link-variant-off"
                   size={24}
-                  color={COLORS.error}
+                  color={COLORS.feedback.error}
                 />
                 <Text style={[styles.optionText, styles.dangerText]}>Disconnect</Text>
               </TouchableOpacity>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   content: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -101,19 +101,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 12,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     marginBottom: 8,
     gap: 12,
   },
   optionText: {
     fontSize: 16,
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   dangerOption: {
-    backgroundColor: COLORS.error + '10',
+    backgroundColor: COLORS.feedback.error + '10',
   },
   dangerText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
   },
   cancelButton: {
     padding: 16,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });
 

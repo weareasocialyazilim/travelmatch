@@ -93,13 +93,13 @@ export const ReportMomentScreen: React.FC<ReportMomentScreenProps> = ({
 
 const styles = StyleSheet.create({
   summaryCard: {
-    backgroundColor: `${COLORS.border}40`,
+    backgroundColor: `${COLORS.border.default}40`,
   },
   momentImage: {
     width: 56,
     height: 56,
     borderRadius: 8,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   momentInfo: {
     flex: 1,
@@ -107,11 +107,11 @@ const styles = StyleSheet.create({
   momentTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   momentDetails: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

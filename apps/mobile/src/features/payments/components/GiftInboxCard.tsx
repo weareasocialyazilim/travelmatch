@@ -31,7 +31,7 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
             <MaterialCommunityIcons
               name="check-decagram"
               size={12}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </View>
         )}
@@ -78,7 +78,7 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
         <MaterialCommunityIcons
           name="chevron-right"
           size={20}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
         />
       </View>
     </TouchableOpacity>
@@ -88,11 +88,11 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
 const styles = StyleSheet.create({
   inboxItem: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -2,
     right: -2,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 10,
     padding: 2,
   },
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   inboxName: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   inboxRating: {
     flexDirection: 'row',
@@ -135,16 +135,16 @@ const styles = StyleSheet.create({
   },
   inboxRatingText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   inboxGiftCount: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 4,
   },
   inboxMessage: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontStyle: 'italic',
     marginBottom: 6,
   },
@@ -163,6 +163,6 @@ const styles = StyleSheet.create({
   },
   inboxTime: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

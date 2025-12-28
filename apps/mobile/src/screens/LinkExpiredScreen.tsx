@@ -47,7 +47,7 @@ const LinkExpiredScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="timer-off-outline"
             size={80}
-            color={COLORS.warning}
+            color={COLORS.feedback.warning}
           />
         </View>
 
@@ -71,7 +71,7 @@ const LinkExpiredScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="compass"
               size={20}
-              color={COLORS.white}
+              color={COLORS.utility.white}
               style={styles.buttonIcon}
             />
             <Text style={styles.primaryButtonText}>Keşfet</Text>
@@ -85,7 +85,7 @@ const LinkExpiredScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="home"
               size={20}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
               style={styles.buttonIcon}
             />
             <Text style={styles.secondaryButtonText}>Ana Sayfaya Dön</Text>
@@ -97,7 +97,7 @@ const LinkExpiredScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="lightbulb-on-outline"
             size={16}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
           <Text style={styles.infoText}>
             Linkler belirli bir süre sonra geçerliliğini yitirebilir veya içerik sahibi tarafından kaldırılmış olabilir.
@@ -111,7 +111,7 @@ const LinkExpiredScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   content: {
     flex: 1,
@@ -123,24 +123,24 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     padding: 20,
     borderRadius: 60,
-    backgroundColor: COLORS.warningLight || `${COLORS.warning}15`,
+    backgroundColor: COLORS.warningLight || `${COLORS.feedback.warning}15`,
   },
   title: {
     ...TYPOGRAPHY.h2,
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 12,
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 8,
     fontSize: 16,
   },
   submessage: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 22,
@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   primaryButton: {
-    backgroundColor: COLORS.primary,
-    shadowColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -170,19 +170,19 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   buttonIcon: {
     marginRight: 8,
   },
   primaryButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 16,
   },
   infoContainer: {
@@ -190,13 +190,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: COLORS.backgroundSecondary || `${COLORS.textSecondary}08`,
+    backgroundColor: COLORS.bg.secondary || `${COLORS.text.secondary}08`,
     borderRadius: 8,
     maxWidth: 320,
   },
   infoText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 8,
     flex: 1,
     lineHeight: 18,

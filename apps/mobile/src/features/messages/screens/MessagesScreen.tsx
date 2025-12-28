@@ -189,7 +189,7 @@ const MessagesScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="check-decagram"
                   size={14}
-                  color={COLORS.primary}
+                  color={COLORS.brand.primary}
                 />
               )}
             </View>
@@ -252,12 +252,12 @@ const MessagesScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="magnify"
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <TextInput
               style={styles.searchInput}
               placeholder="Search conversations..."
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               editable={false}
             />
           </View>
@@ -303,12 +303,12 @@ const MessagesScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="magnify"
               size={20}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <TextInput
               style={styles.searchInput}
               placeholder="Search conversations..."
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -317,7 +317,7 @@ const MessagesScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="close-circle"
                   size={18}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
               </TouchableOpacity>
             )}
@@ -362,23 +362,23 @@ const styles = StyleSheet.create({
   },
   chatItem: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   lastMessage: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
   },
   lastMessageUnread: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '500',
   },
   listContent: {
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   momentBadge: {
     alignItems: 'center',
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: COLORS.bg.secondary,
     borderRadius: 6,
     flexDirection: 'row',
     gap: 4,
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.caption,
   },
   momentTitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
     fontWeight: '500',
   },
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   },
   onlineIndicator: {
     backgroundColor: COLORS.greenBright,
-    borderColor: COLORS.white,
+    borderColor: COLORS.utility.white,
     borderRadius: 6,
     borderWidth: 2,
     bottom: 2,
@@ -426,13 +426,13 @@ const styles = StyleSheet.create({
     width: 12,
   },
   personName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
   },
   searchBar: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     flexDirection: 'row',
     gap: 8,
@@ -445,34 +445,34 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   searchInput: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.body,
   },
   separator: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     height: 1,
     marginLeft: 80,
   },
   timeText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
   },
   typingText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
     fontStyle: 'italic',
   },
   unreadBadge: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 10,
     minWidth: 20,
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
   unreadText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 11,
     fontWeight: '700',
     textAlign: 'center',

@@ -26,7 +26,7 @@ export const NotificationDetailScreen: React.FC<
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notification</Text>
@@ -37,7 +37,7 @@ export const NotificationDetailScreen: React.FC<
         <MaterialCommunityIcons
           name="bell-outline"
           size={64}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
         />
         <Text style={styles.title}>Notification Details</Text>
         <Text style={styles.description}>
@@ -54,7 +54,7 @@ export const NotificationDetailScreen: React.FC<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     padding: 8,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   placeholder: {
     width: 40,
@@ -85,18 +85,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
   },
   comingSoon: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontStyle: 'italic',
   },
 });

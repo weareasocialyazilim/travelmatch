@@ -192,7 +192,7 @@ describe('FilterPill', () => {
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icon = UNSAFE_getByType(MaterialCommunityIcons);
       const { COLORS } = require('../../constants/colors');
-      expect(icon.props.color).toBe(COLORS.textSecondary);
+      expect(icon.props.color).toBe(COLORS.text.secondary);
     });
 
     it('renders icon with text color when selected', () => {
@@ -202,7 +202,7 @@ describe('FilterPill', () => {
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icon = UNSAFE_getByType(MaterialCommunityIcons);
       const { COLORS } = require('../../constants/colors');
-      expect(icon.props.color).toBe(COLORS.text);
+      expect(icon.props.color).toBe(COLORS.text.primary);
     });
   });
 

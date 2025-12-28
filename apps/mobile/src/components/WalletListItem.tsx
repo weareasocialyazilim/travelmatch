@@ -35,14 +35,14 @@ export const WalletListItem: React.FC<WalletListItemProps> = memo(
     return (
       <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name={config.icon} size={24} color={COLORS.textPrimary} />
+          <MaterialCommunityIcons name={config.icon} size={24} color={COLORS.text.primary} />
         </View>
         <View style={styles.info}>
           <Text style={styles.label}>{config.label}</Text>
           {isDefault && <Text style={styles.defaultBadge}>Default</Text>}
         </View>
         <TouchableOpacity style={styles.optionsButton} onPress={onOptionsPress}>
-          <MaterialCommunityIcons name="dots-vertical" size={20} color={COLORS.textSecondary} />
+          <MaterialCommunityIcons name="dots-vertical" size={20} color={COLORS.text.secondary} />
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     marginBottom: 8,
   },
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -79,11 +79,11 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   defaultBadge: {
     fontSize: 12,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginTop: 2,
   },
   optionsButton: {

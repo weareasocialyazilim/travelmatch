@@ -30,7 +30,7 @@ export const ChatAttachmentBottomSheet: React.FC<
       label: 'Photo or Video',
       description: 'Share a photo or video',
       onPress: onPhotoVideo,
-      color: COLORS.primary,
+      color: COLORS.brand.primary,
     },
     {
       id: 'gift',
@@ -38,7 +38,7 @@ export const ChatAttachmentBottomSheet: React.FC<
       label: 'Send a Gift',
       description: 'Gift this moment to someone',
       onPress: onGift,
-      color: COLORS.coral,
+      color: COLORS.brand.secondary,
     },
   ];
 
@@ -96,7 +96,7 @@ export const ChatAttachmentBottomSheet: React.FC<
                   <MaterialCommunityIcons
                     name={'chevron-right' as IconName}
                     size={24}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                 </TouchableOpacity>
                 {index < options.length - 1 && (
@@ -119,7 +119,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'flex-end',
   },
   sheetContainer: {
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     maxHeight: SCREEN_HEIGHT * 0.9,
     elevation: 5,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     letterSpacing: 0.24,
   },
   optionsList: {
@@ -179,16 +179,16 @@ const styles = StyleSheet.create({
   optionLabel: {
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   optionDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   separator: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginLeft: 72, // Align with text
   },
   bottomSpacer: {

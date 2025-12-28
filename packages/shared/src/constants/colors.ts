@@ -81,7 +81,13 @@ export const COLORS = {
   white: '#FFFFFF',
   black: '#000000',
   background: '#FFFCF7', // Warm cream
-  border: primitives.stone[200],
+
+  // Border (for compatibility with both flat and nested access)
+  border: {
+    default: primitives.stone[200],
+    light: primitives.stone[100],
+    strong: primitives.stone[300],
+  },
 
   // Grayscale
   gray50: primitives.stone[50],
@@ -106,6 +112,27 @@ export const COLORS = {
   trust: primitives.emerald[500],
   trustLight: primitives.emerald[400],
   trustDark: primitives.emerald[600],
+
+  // Utility (for compatibility)
+  utility: {
+    white: '#FFFFFF',
+    black: '#000000',
+    transparent: 'transparent',
+  },
+
+  // BG (for compatibility)
+  bg: {
+    primary: '#FFFCF7',
+    secondary: '#FFF9F0',
+    tertiary: '#FFF5E6',
+  },
+
+  // Surface (for compatibility)
+  surface: {
+    base: '#FFFFFF',
+    muted: primitives.stone[50],
+    subtle: primitives.stone[100],
+  },
 } as const;
 
 export type ColorKey = keyof typeof COLORS;

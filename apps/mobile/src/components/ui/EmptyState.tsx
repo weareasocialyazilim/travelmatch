@@ -2,7 +2,7 @@ import React from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { Button } from './Button';
@@ -49,7 +49,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <MaterialCommunityIcons
             name={icon}
             size={48}
-            color={COLORS.gray[400]}
+            color={primitives.stone[400]}
           />
         </View>
       )}
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: 50,
     height: 100,
     justifyContent: 'center',
@@ -98,13 +98,13 @@ const styles = StyleSheet.create({
   },
   title: {
     ...TYPOGRAPHY.h3,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.xs,
     textAlign: 'center',
   },
   description: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: SPACING.lg,
     textAlign: 'center',
     maxWidth: '80%',

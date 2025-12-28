@@ -48,7 +48,7 @@ export const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({
       <MaterialCommunityIcons
         name={config.icon}
         size={20}
-        color={disabled ? COLORS.textSecondary : COLORS.textPrimary}
+        color={disabled ? COLORS.text.secondary : COLORS.text.primary}
       />
       <Text style={[styles.label, disabled && styles.labelDisabled]}>
         {config.label}
@@ -63,23 +63,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     gap: 8,
   },
   buttonDisabled: {
-    backgroundColor: COLORS.surface,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface.base,
+    borderColor: COLORS.border.default,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   labelDisabled: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });
 

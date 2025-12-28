@@ -43,7 +43,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
           styles.container,
           {
             borderRadius,
-            backgroundColor: COLORS.glassBackground,
+            backgroundColor: COLORS.surface.glassBackground,
           },
           showBorder && styles.border,
           style,
@@ -97,7 +97,7 @@ export const GlassView: React.FC<GlassViewProps> = ({
     return (
       <View
         style={[
-          { backgroundColor: COLORS.glassBackground },
+          { backgroundColor: COLORS.surface.glassBackground },
           style,
         ]}
       >
@@ -141,7 +141,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       <View
         style={[
           styles.glassButton,
-          { borderRadius, backgroundColor: COLORS.glassBackground },
+          { borderRadius, backgroundColor: COLORS.surface.glassBackground },
           style,
         ]}
       >
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
   border: {
     borderWidth: 1,
-    borderColor: COLORS.glassBorder,
+    borderColor: COLORS.surface.glassBorder,
   },
   blur: {
     ...StyleSheet.absoluteFillObject,

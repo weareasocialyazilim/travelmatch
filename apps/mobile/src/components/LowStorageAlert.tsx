@@ -70,7 +70,7 @@ export const LowStorageAlert: React.FC<LowStorageAlertProps> = ({
             <MaterialCommunityIcons
               name={isCritical ? 'alert-octagon' : 'alert'}
               size={48}
-              color={isCritical ? COLORS.error : COLORS.softOrange}
+              color={isCritical ? COLORS.feedback.error : COLORS.softOrange}
             />
           </View>
 
@@ -133,7 +133,7 @@ export const LowStorageAlert: React.FC<LowStorageAlertProps> = ({
               style={[styles.button, styles.primaryButton]}
               onPress={handleOpenSettings}
             >
-              <MaterialCommunityIcons name="cog" size={18} color={COLORS.white} />
+              <MaterialCommunityIcons name="cog" size={18} color={COLORS.utility.white} />
               <Text style={styles.primaryButtonText}>Open Settings</Text>
             </TouchableOpacity>
           </View>
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 20,
     padding: 24,
     width: '100%',
@@ -177,29 +177,29 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.softOrange + '20',
   },
   iconContainerCritical: {
-    backgroundColor: COLORS.error + '20',
+    backgroundColor: COLORS.feedback.error + '20',
   },
   title: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
     textAlign: 'center',
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 20,
   },
   bold: {
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   tipsContainer: {
     width: '100%',
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: COLORS.bg.secondary,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   tipsTitle: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   tip: {
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   tipText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
   },
   actions: {
@@ -242,17 +242,17 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   secondaryButton: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   dismissButton: {
     marginTop: 12,
@@ -260,6 +260,6 @@ const styles = StyleSheet.create({
   },
   dismissText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

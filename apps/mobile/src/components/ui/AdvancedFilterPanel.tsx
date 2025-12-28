@@ -101,21 +101,21 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
   const activeCount = Object.keys(localFilters).length;
 
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.background }]}>
+    <View style={[styles.container, { backgroundColor: COLORS.bg.primary }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: COLORS.border }]}>
-        <Text style={[styles.title, { color: COLORS.text }]}>
+      <View style={[styles.header, { borderBottomColor: COLORS.border.default }]}>
+        <Text style={[styles.title, { color: COLORS.text.primary }]}>
           {t('common.filter')} ({activeCount})
         </Text>
         <TouchableOpacity onPress={onClose}>
-          <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Categories */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>
+          <Text style={[styles.sectionTitle, { color: COLORS.text.primary }]}>
             Category
           </Text>
           <View style={styles.chipGrid}>
@@ -128,9 +128,9 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
                     styles.chip,
                     {
                       backgroundColor: isSelected
-                        ? COLORS.primary
-                        : COLORS.white,
-                      borderColor: isSelected ? COLORS.primary : COLORS.border,
+                        ? COLORS.brand.primary
+                        : COLORS.utility.white,
+                      borderColor: isSelected ? COLORS.brand.primary : COLORS.border.default,
                     },
                   ]}
                   onPress={() => toggleCategory(category.id)}
@@ -140,13 +140,13 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
                       category.icon as keyof typeof MaterialCommunityIcons.glyphMap
                     }
                     size={20}
-                    color={isSelected ? COLORS.white : COLORS.text}
+                    color={isSelected ? COLORS.utility.white : COLORS.text.primary}
                     style={styles.chipIcon}
                   />
                   <Text
                     style={[
                       styles.chipText,
-                      { color: isSelected ? COLORS.white : COLORS.text },
+                      { color: isSelected ? COLORS.utility.white : COLORS.text.primary },
                     ]}
                   >
                     {category.label}
@@ -159,7 +159,7 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
 
         {/* Price Range */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>
+          <Text style={[styles.sectionTitle, { color: COLORS.text.primary }]}>
             Price Range
           </Text>
           <View style={styles.priceGrid}>
@@ -174,9 +174,9 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
                     styles.priceChip,
                     {
                       backgroundColor: isSelected
-                        ? COLORS.primary
-                        : COLORS.white,
-                      borderColor: isSelected ? COLORS.primary : COLORS.border,
+                        ? COLORS.brand.primary
+                        : COLORS.utility.white,
+                      borderColor: isSelected ? COLORS.brand.primary : COLORS.border.default,
                     },
                   ]}
                   onPress={() => selectPriceRange(range.min, range.max)}
@@ -184,7 +184,7 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
                   <Text
                     style={[
                       styles.priceText,
-                      { color: isSelected ? COLORS.white : COLORS.text },
+                      { color: isSelected ? COLORS.utility.white : COLORS.text.primary },
                     ]}
                   >
                     {range.label}
@@ -197,7 +197,7 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
 
         {/* Difficulty Level */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>
+          <Text style={[styles.sectionTitle, { color: COLORS.text.primary }]}>
             Difficulty Level
           </Text>
           <View style={styles.difficultyGrid}>
@@ -210,9 +210,9 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
                     styles.difficultyChip,
                     {
                       backgroundColor: isSelected
-                        ? COLORS.primary
-                        : COLORS.white,
-                      borderColor: isSelected ? COLORS.primary : COLORS.border,
+                        ? COLORS.brand.primary
+                        : COLORS.utility.white,
+                      borderColor: isSelected ? COLORS.brand.primary : COLORS.border.default,
                     },
                   ]}
                   onPress={() => toggleDifficulty(level.id)}
@@ -220,7 +220,7 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
                   <Text
                     style={[
                       styles.difficultyText,
-                      { color: isSelected ? COLORS.white : COLORS.text },
+                      { color: isSelected ? COLORS.utility.white : COLORS.text.primary },
                     ]}
                   >
                     {level.label}
@@ -233,7 +233,7 @@ export const AdvancedFilterPanel: React.FC<FilterPanelProps> = ({
       </ScrollView>
 
       {/* Footer Actions */}
-      <View style={[styles.footer, { borderTopColor: COLORS.border }]}>
+      <View style={[styles.footer, { borderTopColor: COLORS.border.default }]}>
         <Button
           title="Reset"
           onPress={handleReset}

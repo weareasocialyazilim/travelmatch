@@ -52,7 +52,7 @@ export const WalletItem: React.FC<WalletItemProps> = memo(
         accessibilityRole="button"
       >
         <View style={styles.walletIcon}>
-          <MaterialCommunityIcons name={iconName} size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name={iconName} size={24} color={COLORS.text.primary} />
         </View>
         <View style={styles.walletInfo}>
           <View style={styles.walletNameRow}>
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   walletName: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   walletStatus: {
     fontSize: 14,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   defaultBadge: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   defaultBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

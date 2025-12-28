@@ -169,7 +169,7 @@ export const NotificationSettingsScreen: React.FC<
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
@@ -198,7 +198,7 @@ export const NotificationSettingsScreen: React.FC<
                       <MaterialCommunityIcons
                         name={setting.icon}
                         size={20}
-                        color={COLORS.primary}
+                        color={COLORS.brand.primary}
                       />
                     </View>
                     <Text style={styles.settingLabel}>{setting.label}</Text>
@@ -209,10 +209,10 @@ export const NotificationSettingsScreen: React.FC<
                       toggleSetting(sectionIndex, setting.id)
                     }
                     trackColor={{
-                      false: COLORS.border,
-                      true: COLORS.primary,
+                      false: COLORS.border.default,
+                      true: COLORS.brand.primary,
                     }}
-                    thumbColor={COLORS.white}
+                    thumbColor={COLORS.utility.white}
                   />
                 </View>
               ))}
@@ -227,7 +227,7 @@ export const NotificationSettingsScreen: React.FC<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 48,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -259,13 +259,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.caption,
     fontWeight: '700',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     paddingHorizontal: 16,
     paddingBottom: 8,
     letterSpacing: 0.5,
   },
   settingsContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginHorizontal: 16,
     borderRadius: 8,
     overflow: 'hidden',
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   settingRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: `${COLORS.border}40`,
+    borderBottomColor: `${COLORS.border.default}40`,
   },
   settingContent: {
     flex: 1,
@@ -292,14 +292,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: `${COLORS.primary}20`,
+    backgroundColor: `${COLORS.brand.primary}20`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   settingLabel: {
     flex: 1,
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 20,
   },
 });

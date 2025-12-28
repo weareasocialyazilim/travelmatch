@@ -28,7 +28,7 @@ const brandConfig: Record<
   mastercard: { icon: 'credit-card', color: '#EB001B' },
   amex: { icon: 'credit-card', color: '#006FCF' },
   discover: { icon: 'credit-card', color: '#FF6000' },
-  unknown: { icon: 'credit-card-outline', color: COLORS.textSecondary },
+  unknown: { icon: 'credit-card-outline', color: COLORS.text.secondary },
 };
 
 export const CardListItem: React.FC<CardListItemProps> = memo(
@@ -81,7 +81,7 @@ export const CardListItem: React.FC<CardListItemProps> = memo(
           <MaterialCommunityIcons
             name="dots-vertical"
             size={20}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     marginBottom: 8,
   },
@@ -121,16 +121,16 @@ const styles = StyleSheet.create({
   cardNumber: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   expiry: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   defaultBadge: {
     fontSize: 12,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginTop: 2,
   },
   optionsButton: {

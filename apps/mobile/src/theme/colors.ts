@@ -88,7 +88,18 @@ export const COLORS = {
   },
 
   // ============================================
-  // 8. GRADIENT COLORS
+  // 8. BG COLORS (alias for background)
+  // ============================================
+  bg: {
+    primary: '#FFFFFF',
+    secondary: '#F8F9FA',
+    tertiary: '#E9ECEF',
+    elevated: '#FFFFFF',
+    primaryLight: '#FAFAFA',
+  },
+
+  // ============================================
+  // 9. GRADIENT COLORS
   // ============================================
   gradient: {
     primary: ['#FF6B6B', '#FF8E8E'],

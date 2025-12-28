@@ -13,7 +13,7 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { logger } from '@/utils/logger';
-import { COLORS } from '@/constants/colors';
+import { COLORS, primitives } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Proof } from '../types';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -68,13 +68,13 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'micro-kindness':
-        return COLORS.coral;
+        return COLORS.brand.secondary;
       case 'verified-experience':
         return COLORS.mint;
       case 'community-proof':
         return COLORS.purple;
       default:
-        return COLORS.primary;
+        return COLORS.brand.primary;
     }
   };
 
@@ -99,11 +99,11 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
+          <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Proof Detail</Text>
         <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
-          <Icon name="share-variant" size={24} color={COLORS.text} />
+          <Icon name="share-variant" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
       </View>
 
@@ -153,8 +153,8 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
                 proof.status === 'verified'
                   ? [COLORS.mint, COLORS.successDark]
                   : proof.status === 'pending'
-                  ? [COLORS.orange, COLORS.orangeDark]
-                  : [COLORS.softRed, COLORS.error]
+                    ? [COLORS.orange, COLORS.orangeDark]
+                    : [COLORS.softRed, COLORS.feedback.error]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -165,18 +165,18 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
                   proof.status === 'verified'
                     ? 'check-decagram'
                     : proof.status === 'pending'
-                    ? 'clock-outline'
-                    : 'close-circle'
+                      ? 'clock-outline'
+                      : 'close-circle'
                 }
                 size={16}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
               <Text style={styles.statusText}>
                 {proof.status === 'verified'
                   ? 'Verified'
                   : proof.status === 'pending'
-                  ? 'Pending'
-                  : 'Rejected'}
+                    ? 'Pending'
+                    : 'Rejected'}
               </Text>
             </LinearGradient>
           </View>
@@ -196,7 +196,10 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
             >
               {proof.type
                 .split('-')
-                .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                .map(
+                  (word: string) =>
+                    word.charAt(0).toUpperCase() + word.slice(1),
+                )
                 .join(' ')}
             </Text>
           </View>
@@ -207,11 +210,11 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
           {/* Info Row */}
           <View style={styles.infoRow}>
             <View style={styles.infoItem}>
-              <Icon name="calendar" size={16} color={COLORS.textSecondary} />
+              <Icon name="calendar" size={16} color={COLORS.text.secondary} />
               <Text style={styles.infoText}>{proof.date}</Text>
             </View>
             <View style={styles.infoItem}>
-              <Icon name="map-marker" size={16} color={COLORS.textSecondary} />
+              <Icon name="map-marker" size={16} color={COLORS.text.secondary} />
               <Text style={styles.infoText} numberOfLines={1}>
                 {typeof proof.location === 'string'
                   ? proof.location
@@ -241,7 +244,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
 
             {proof.receiver && (
               <View style={styles.detailCard}>
-                <Icon name="account" size={24} color={COLORS.coral} />
+                <Icon name="account" size={24} color={COLORS.brand.secondary} />
                 <Text style={styles.detailLabel}>Receiver</Text>
                 <Text style={styles.detailValue}>
                   {typeof proof.receiver === 'string'
@@ -311,7 +314,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
 
 const styles = StyleSheet.create({
   activeIndicator: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     width: 20,
   },
   backButton: {
@@ -321,31 +324,31 @@ const styles = StyleSheet.create({
     width: 40,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   content: {
     padding: 20,
   },
   description: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     lineHeight: 22,
   },
   detailCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     flex: 1,
     padding: 16,
   },
   detailLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
     marginTop: 8,
   },
   detailValue: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '700',
     marginTop: 4,
@@ -365,7 +368,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   headerTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 18,
     fontWeight: '700',
   },
@@ -399,7 +402,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   infoText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
     fontSize: 14,
   },
@@ -411,7 +414,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '700',
     marginBottom: 12,
@@ -434,7 +437,7 @@ const styles = StyleSheet.create({
     top: 16,
   },
   statusText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -446,7 +449,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   timelineDate: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
   },
   timelineDot: {
@@ -470,13 +473,13 @@ const styles = StyleSheet.create({
     width: 2,
   },
   timelineTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     fontWeight: '600',
     marginBottom: 4,
   },
   title: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 24,
     fontWeight: '700',
     marginBottom: 16,
@@ -484,7 +487,7 @@ const styles = StyleSheet.create({
   typeBadge: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: 16,
     flexDirection: 'row',
     gap: 6,

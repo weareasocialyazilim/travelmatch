@@ -22,13 +22,13 @@ import { COLORS } from '../constants/colors';
 
 // Color aliases for easier use
 const colors = {
-  primary: { main: COLORS.primary, light: COLORS.primaryLight },
-  text: { primary: COLORS.text, secondary: COLORS.textSecondary },
+  primary: { main: COLORS.brand.primary, light: COLORS.brand.primaryLight },
+  text: { primary: COLORS.text.primary, secondary: COLORS.text.secondary },
   background: {
-    primary: COLORS.background,
-    secondary: COLORS.backgroundSecondary,
+    primary: COLORS.bg.primary,
+    secondary: COLORS.bg.secondary,
   },
-  border: { light: COLORS.border, medium: COLORS.border },
+  border: { light: COLORS.border.default, medium: COLORS.border.default },
   status: { error: COLORS.danger },
 };
 import { useToast } from '../context/ToastContext';
@@ -213,7 +213,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             activeOpacity={0.8}
           >
             {loading ? (
-              <ActivityIndicator color={COLORS.white} size="small" />
+              <ActivityIndicator color={COLORS.utility.white} size="small" />
             ) : (
               <Text style={styles.submitButtonText}>Submit Report</Text>
             )}
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

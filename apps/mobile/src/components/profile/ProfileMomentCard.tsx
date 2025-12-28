@@ -58,10 +58,10 @@ const MOMENT_CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
 const styles = StyleSheet.create({
   momentCard: {
     width: MOMENT_CARD_WIDTH,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   momentTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   momentPrice: {

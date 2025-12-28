@@ -209,7 +209,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
       {/* Upload Progress */}
       {isUploading && (
         <View style={styles.progressContainer}>
-          <ActivityIndicator size="small" color={COLORS.primary} />
+          <ActivityIndicator size="small" color={COLORS.brand.primary} />
           <Text style={styles.progressText}>
             Uploading... {progress.percentage}%
           </Text>
@@ -248,16 +248,16 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: radii.lg,
     paddingVertical: SPACING.md,
     alignItems: 'center',
   },
   actionButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   preview: {
     marginBottom: SPACING.md,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   removeButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   imageInfoText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
   },
   progressContainer: {
@@ -301,28 +301,28 @@ const styles = StyleSheet.create({
   },
   progressText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginVertical: SPACING.xs,
   },
   progressBar: {
     width: '100%',
     height: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: radii.sm,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   uploadButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: radii.lg,
     paddingVertical: SPACING.md,
     alignItems: 'center',
   },
   uploadButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });

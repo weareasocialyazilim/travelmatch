@@ -96,7 +96,7 @@ const MomentSingleCard: React.FC<MomentSingleCardProps> = memo(
             <MaterialCommunityIcons
               name="map-marker-outline"
               size={14}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.locationText}>{locationCity}</Text>
           </View>
@@ -114,10 +114,10 @@ MomentSingleCard.displayName = 'MomentSingleCard';
 
 const styles = StyleSheet.create({
   singleCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -155,18 +155,18 @@ const styles = StyleSheet.create({
   creatorName: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   singleTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 22,
     marginBottom: 6,
   },
   storyDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
     marginBottom: 8,
   },
@@ -177,16 +177,16 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 4,
   },
   dotSeparator: {
     marginHorizontal: 6,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   distanceText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   priceValue: {
     fontSize: 18,

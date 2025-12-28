@@ -24,7 +24,7 @@ const StorySection: React.FC<StorySectionProps> = memo(
         <TextInput
           style={styles.storyInput}
           placeholder="Share the story behind this moment..."
-          placeholderTextColor={COLORS.textTertiary}
+          placeholderTextColor={COLORS.text.tertiary}
           value={story}
           onChangeText={onStoryChange}
           multiline
@@ -50,20 +50,20 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   sectionLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
     fontWeight: '600',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   optionalLabel: {
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     fontWeight: '400',
   },
   storyInput: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: LAYOUT.borderRadius.md,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     marginTop: 12,
     minHeight: 100,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     ...CARD_SHADOW,
   },
   storyCounter: {
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     fontSize: 12,
     marginTop: 8,
     textAlign: 'right',

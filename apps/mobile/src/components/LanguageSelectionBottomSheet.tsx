@@ -46,10 +46,10 @@ const styles = StyleSheet.create({
   option: {
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   optionText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

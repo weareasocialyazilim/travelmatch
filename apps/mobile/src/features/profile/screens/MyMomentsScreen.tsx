@@ -145,7 +145,7 @@ const MyMomentsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
             accessible={false}
           />
         </TouchableOpacity>
@@ -160,7 +160,7 @@ const MyMomentsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="plus"
             size={24}
-            color={COLORS.coral}
+            color={COLORS.brand.secondary}
             accessible={false}
           />
         </TouchableOpacity>
@@ -212,7 +212,7 @@ const MyMomentsScreen: React.FC = () => {
           <RefreshControl
             refreshing={myMomentsLoading}
             onRefresh={loadMyMoments}
-            tintColor={COLORS.coral}
+            tintColor={COLORS.brand.secondary}
           />
         }
       >
@@ -260,7 +260,7 @@ const MyMomentsScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="map-marker"
                     size={14}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                   <Text style={styles.momentLocationText}>
                     {typeof moment.location === 'string'
@@ -330,7 +330,7 @@ const MyMomentsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   addButton: {
     width: 40,
@@ -368,19 +368,19 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 12,
   },
   activeTab: {
-    backgroundColor: COLORS.coral,
+    backgroundColor: COLORS.brand.secondary,
   },
   tabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   activeTabText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 
   // Scroll
@@ -395,11 +395,11 @@ const styles = StyleSheet.create({
   momentCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 12,
     marginBottom: 12,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 12,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   momentContent: {
     flex: 1,
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   momentTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     marginRight: 8,
   },
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   },
   momentLocationText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   momentFooter: {
     flexDirection: 'row',
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
   momentPrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -456,11 +456,11 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   completedDate: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 
   // Status Badges
@@ -473,12 +473,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activeBadge: {
-    backgroundColor: COLORS.coralTransparent,
+    backgroundColor: COLORS.brand.secondaryTransparent,
   },
   activeBadgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
   },
   pendingBadge: {
     backgroundColor: COLORS.softOrangeTransparent,
@@ -499,11 +499,11 @@ const styles = StyleSheet.create({
 
   // Summary Card
   summaryCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginTop: 8,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
   summaryTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   summaryRow: {
@@ -523,12 +523,12 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   summaryValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   summaryValueHighlight: {
     fontSize: 16,

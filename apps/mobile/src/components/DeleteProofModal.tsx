@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '100%',
     maxWidth: 384,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 8,
     overflow: 'hidden',
     shadowColor: COLORS.shadow,
@@ -97,21 +97,21 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 8,
   },
   bodyText: {
     fontSize: 16,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: 8,
   },
   buttonGroup: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   cancelButton: {
     flex: 1,
@@ -122,11 +122,11 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   buttonDivider: {
     width: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   deleteButton: {
     flex: 1,
@@ -137,6 +137,6 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });

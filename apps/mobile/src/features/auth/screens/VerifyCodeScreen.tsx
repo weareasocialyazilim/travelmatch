@@ -126,14 +126,14 @@ export const VerifyCodeScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           {...a11y.button('Go back')}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
       </View>
 
       {/* Content */}
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="shield-check-outline" size={48} color={COLORS.primary} />
+          <MaterialCommunityIcons name="shield-check-outline" size={48} color={COLORS.brand.primary} />
         </View>
 
         <Text style={styles.title}>Verify Code</Text>
@@ -186,7 +186,7 @@ export const VerifyCodeScreen: React.FC = () => {
 
         {/* Help Text */}
         <View style={styles.helpContainer}>
-          <MaterialCommunityIcons name="information-outline" size={18} color={COLORS.textSecondary} />
+          <MaterialCommunityIcons name="information-outline" size={18} color={COLORS.text.secondary} />
           <Text style={styles.helpText}>
             If you're having trouble receiving the code, check your spam folder or try requesting a new code.
           </Text>
@@ -199,7 +199,7 @@ export const VerifyCodeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 24,
@@ -232,13 +232,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 32,
@@ -254,17 +254,17 @@ const styles = StyleSheet.create({
     width: 48,
     height: 56,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
   },
   codeInputFilled: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}10`,
+    borderColor: COLORS.brand.primary,
+    backgroundColor: `${COLORS.brand.primary}10`,
   },
   resendContainer: {
     flexDirection: 'row',
@@ -273,22 +273,22 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   resendLink: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   cooldownText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontWeight: '500',
   },
   verifyButton: {
     width: '100%',
     height: 52,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   verifyButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -308,13 +308,13 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     marginTop: 8,
   },
   helpText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
     lineHeight: 20,
   },

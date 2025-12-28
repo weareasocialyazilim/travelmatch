@@ -45,7 +45,7 @@ export const PaymentFailedScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={'close' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
       </View>
@@ -56,7 +56,7 @@ export const PaymentFailedScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={'shield-remove' as IconName}
             size={120}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
         </View>
 
@@ -92,7 +92,7 @@ export const PaymentFailedScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     paddingHorizontal: 16,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 30,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     paddingTop: 24,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   bodyText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     lineHeight: 24,
     maxWidth: 320,
@@ -145,25 +145,25 @@ const styles = StyleSheet.create({
   primaryButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.background,
+    color: COLORS.bg.primary,
   },
   secondaryButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

@@ -24,10 +24,10 @@ export interface GiftInboxCardProps {
 
 // Status colors defined outside component to avoid recreation
 const statusColors = {
-  pending: COLORS.warning,
-  accepted: COLORS.success,
-  rejected: COLORS.error,
-  expired: COLORS.textSecondary,
+  pending: COLORS.feedback.warning,
+  accepted: COLORS.feedback.success,
+  rejected: COLORS.feedback.error,
+  expired: COLORS.text.secondary,
 };
 
 export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
@@ -110,7 +110,7 @@ GiftInboxCard.displayName = 'GiftInboxCard';
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -136,11 +136,11 @@ const styles = StyleSheet.create({
   senderName: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   date: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   statusBadge: {
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 10,
     fontWeight: '600',
   },
@@ -157,21 +157,21 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   momentTitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   amount: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginTop: 4,
   },
   message: {
     fontSize: 14,
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     marginTop: 8,
     fontStyle: 'italic',
   },
@@ -185,22 +185,22 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
     alignItems: 'center',
   },
   rejectText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontWeight: '600',
   },
   acceptButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
   },
   acceptText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '600',
   },
 });

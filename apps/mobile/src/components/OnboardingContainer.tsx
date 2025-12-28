@@ -29,8 +29,8 @@ export const OnboardingContainer: React.FC<OnboardingContainerProps> = ({
 
   if (isLoading) {
     return (
-      <View style={[styles.loading, { backgroundColor: COLORS.background }]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+      <View style={[styles.loading, { backgroundColor: COLORS.bg.primary }]}>
+        <ActivityIndicator size="large" color={COLORS.brand.primary} />
       </View>
     );
   }

@@ -14,7 +14,7 @@ export const MaintenanceScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="hammer-wrench"
             size={120}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
         </View>
 
@@ -34,7 +34,7 @@ export const MaintenanceScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   content: {
     flex: 1,
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   headline: {
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     letterSpacing: -0.5,
     lineHeight: 30,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   body: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },

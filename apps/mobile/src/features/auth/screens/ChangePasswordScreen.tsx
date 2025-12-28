@@ -90,7 +90,7 @@ export const ChangePasswordScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="lock-outline"
           size={20}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
           style={styles.inputIcon}
         />
         <TextInput
@@ -98,7 +98,7 @@ export const ChangePasswordScreen: React.FC = () => {
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={COLORS.textSecondary}
+          placeholderTextColor={COLORS.text.secondary}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           editable={!isLoading}
@@ -112,7 +112,7 @@ export const ChangePasswordScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={showPassword ? 'eye-off-outline' : 'eye-outline'}
             size={20}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
         </TouchableOpacity>
       </View>
@@ -137,7 +137,7 @@ export const ChangePasswordScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
 
@@ -145,7 +145,7 @@ export const ChangePasswordScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="shield-lock-outline"
               size={64}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.title}>Change Password</Text>
             <Text style={styles.subtitle}>
@@ -244,7 +244,7 @@ const RequirementItem: React.FC<{ met: boolean; text: string }> = ({
     <MaterialCommunityIcons
       name={met ? 'check-circle' : 'circle-outline'}
       size={16}
-      color={met ? COLORS.success : COLORS.textSecondary}
+      color={met ? COLORS.feedback.success : COLORS.text.secondary}
     />
     <Text style={[styles.requirementText, met && styles.requirementMet]}>
       {text}
@@ -255,11 +255,11 @@ const RequirementItem: React.FC<{ met: boolean; text: string }> = ({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -277,13 +277,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 8,
     textAlign: 'center',
     paddingHorizontal: 20,
@@ -297,16 +297,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   inputIcon: {
     paddingLeft: 16,
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     padding: 16,
     paddingLeft: 12,
   },
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   requirements: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -335,19 +335,19 @@ const styles = StyleSheet.create({
   },
   requirementText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   requirementMet: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
   },
   mismatchError: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 14,
     marginTop: -12,
     marginBottom: 16,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

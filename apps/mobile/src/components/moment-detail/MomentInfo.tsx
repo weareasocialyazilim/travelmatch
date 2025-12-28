@@ -33,7 +33,7 @@ export const MomentInfo: React.FC<MomentInfoProps> = React.memo(
             <MaterialCommunityIcons
               name="map-marker"
               size={14}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.infoText}>
               {location?.city || location?.name || 'Location'}
@@ -44,7 +44,7 @@ export const MomentInfo: React.FC<MomentInfoProps> = React.memo(
             <MaterialCommunityIcons
               name="clock-outline"
               size={14}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.infoText}>
               {availability || date || 'Flexible'}
@@ -91,7 +91,7 @@ MomentInfo.displayName = 'MomentInfo';
 
 const styles = StyleSheet.create({
   title: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 28,
     fontWeight: 'bold',
     lineHeight: 34,
@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
   },
   categoryPill: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: 999,
     borderWidth: 1,
     flexDirection: 'row',
@@ -119,12 +119,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   categoryName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 13,
     fontWeight: '600',
   },
   separator: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     opacity: 0.5,
   },
@@ -134,27 +134,27 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   infoText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
   },
   section: {
     marginBottom: 24,
   },
   sectionHeader: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '700',
     marginBottom: 12,
   },
   sectionBody: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 15,
     lineHeight: 22,
   },
   placeCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     borderWidth: 1,
     flexDirection: 'row',
@@ -173,13 +173,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   placeName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     fontWeight: '600',
     marginBottom: 2,
   },
   placeAddress: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
   },
 });

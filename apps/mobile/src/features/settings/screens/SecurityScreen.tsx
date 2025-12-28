@@ -209,7 +209,7 @@ const SecurityScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Security</Text>
@@ -312,8 +312,8 @@ const SecurityScreen: React.FC = () => {
               <Switch
                 value={twoFactorEnabled}
                 onValueChange={handleTwoFactorSetup}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
+                trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                thumbColor={COLORS.utility.white}
               />
             </TouchableOpacity>
 
@@ -352,8 +352,8 @@ const SecurityScreen: React.FC = () => {
                   value={biometricEnabled}
                   onValueChange={handleBiometricToggle}
                   disabled={!biometricAvailable}
-                  trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                  thumbColor={COLORS.white}
+                  trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                  thumbColor={COLORS.utility.white}
                 />
               )}
             </TouchableOpacity>
@@ -367,13 +367,13 @@ const SecurityScreen: React.FC = () => {
               <View
                 style={[
                   styles.menuIcon,
-                  { backgroundColor: COLORS.background },
+                  { backgroundColor: COLORS.bg.primary },
                 ]}
               >
                 <MaterialCommunityIcons
                   name="lock-reset"
                   size={20}
-                  color={COLORS.text}
+                  color={COLORS.text.primary}
                 />
               </View>
               <View style={styles.menuContent}>
@@ -403,13 +403,13 @@ const SecurityScreen: React.FC = () => {
               <View
                 style={[
                   styles.menuIcon,
-                  { backgroundColor: COLORS.coralTransparent },
+                  { backgroundColor: COLORS.brand.secondaryTransparent },
                 ]}
               >
                 <MaterialCommunityIcons
                   name="bell-alert"
                   size={20}
-                  color={COLORS.coral}
+                  color={COLORS.brand.secondary}
                 />
               </View>
               <View style={styles.menuContent}>
@@ -421,8 +421,8 @@ const SecurityScreen: React.FC = () => {
               <Switch
                 value={loginAlertsEnabled}
                 onValueChange={setLoginAlertsEnabled}
-                trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                thumbColor={COLORS.white}
+                trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                thumbColor={COLORS.utility.white}
               />
             </TouchableOpacity>
           </View>
@@ -453,7 +453,7 @@ const SecurityScreen: React.FC = () => {
                         >['name']
                       }
                       size={20}
-                      color={session.isCurrent ? COLORS.mint : COLORS.text}
+                      color={session.isCurrent ? COLORS.mint : COLORS.text.primary}
                     />
                   </View>
                   <View style={styles.sessionInfo}>
@@ -494,7 +494,7 @@ const SecurityScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   spacer: {
     width: 40,
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     marginBottom: 12,
@@ -545,16 +545,16 @@ const styles = StyleSheet.create({
   revokeAllText: {
     ...TYPOGRAPHY.caption,
     fontWeight: '600',
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
     marginBottom: 12,
   },
 
   // KYC Card
   kycCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -582,12 +582,12 @@ const styles = StyleSheet.create({
   kycTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   kycSubtitle: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   verifiedBadge: {
     backgroundColor: COLORS.mintTransparent,
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   kycDetailRow: {
     flexDirection: 'row',
@@ -613,15 +613,15 @@ const styles = StyleSheet.create({
   },
   kycDetailLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   kycDetailValue: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   verifyButton: {
-    backgroundColor: COLORS.coral,
+    backgroundColor: COLORS.brand.secondary,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
@@ -630,15 +630,15 @@ const styles = StyleSheet.create({
   verifyButtonText: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 
   // Menu Card
   menuCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -663,25 +663,25 @@ const styles = StyleSheet.create({
   menuLabel: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   menuDesc: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   menuDivider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginLeft: 62,
   },
 
   // Sessions
   sessionsCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
   sessionDevice: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   currentBadge: {
     backgroundColor: COLORS.mintTransparent,
@@ -728,11 +728,11 @@ const styles = StyleSheet.create({
   },
   sessionDetails: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   sessionDivider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginLeft: 62,
   },
 

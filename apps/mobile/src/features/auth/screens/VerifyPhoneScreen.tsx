@@ -168,7 +168,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
+          <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
       </View>
 
@@ -247,7 +247,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -280,20 +280,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
   phoneText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 4,
     marginBottom: 32,
   },
@@ -307,13 +307,13 @@ const styles = StyleSheet.create({
     width: 48,
     height: 56,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   codeInputFilled: {
     borderColor: COLORS.mint,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   resendLink: {
     fontSize: 14,
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
   cooldownText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontWeight: '500',
   },
   verifyButton: {
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     backgroundColor: `${COLORS.mint}50`,
   },
   verifyButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   },
   emailInfoText: {
     fontSize: 13,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     lineHeight: 20,
   },

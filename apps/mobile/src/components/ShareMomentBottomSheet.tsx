@@ -12,7 +12,7 @@ import {
   Linking,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 import { logger } from '../utils/logger';
 import { useToast } from '../context/ToastContext';
 
@@ -123,16 +123,16 @@ export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
       icon: 'link' as IconName,
       label: 'Copy link',
       onPress: handleCopyLink,
-      backgroundColor: COLORS.gray[100],
-      iconColor: COLORS.textSecondary,
+      backgroundColor: primitives.stone[100],
+      iconColor: COLORS.text.secondary,
     },
     {
       id: 'share',
       icon: 'share-variant' as IconName,
       label: 'Share via...',
       onPress: handleShareVia,
-      backgroundColor: COLORS.gray[100],
-      iconColor: COLORS.textSecondary,
+      backgroundColor: primitives.stone[100],
+      iconColor: COLORS.text.secondary,
     },
   ];
 
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: -0.3,
   },
   optionsList: {
@@ -296,11 +296,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginVertical: 8,
     marginHorizontal: 16,
   },

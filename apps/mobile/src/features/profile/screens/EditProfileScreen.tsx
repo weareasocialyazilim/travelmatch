@@ -326,7 +326,7 @@ const EditProfileScreen = () => {
                 <MaterialCommunityIcons
                   name="camera"
                   size={20}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
               </View>
             </View>
@@ -355,7 +355,7 @@ const EditProfileScreen = () => {
                         onChangeText={onChange}
                         onBlur={onBlur}
                         placeholder="Enter your name"
-                        placeholderTextColor={COLORS.textSecondary}
+                        placeholderTextColor={COLORS.text.secondary}
                         maxLength={50}
                       />
                       {error && (
@@ -391,7 +391,7 @@ const EditProfileScreen = () => {
                           }
                           onBlur={onBlur}
                           placeholder="username"
-                          placeholderTextColor={COLORS.textSecondary}
+                          placeholderTextColor={COLORS.text.secondary}
                           autoCapitalize="none"
                           autoCorrect={false}
                           maxLength={30}
@@ -399,7 +399,7 @@ const EditProfileScreen = () => {
                         {checkingUsername && (
                           <ActivityIndicator
                             size="small"
-                            color={COLORS.textSecondary}
+                            color={COLORS.text.secondary}
                           />
                         )}
                         {!checkingUsername && usernameAvailable === true && (
@@ -413,7 +413,7 @@ const EditProfileScreen = () => {
                           <MaterialCommunityIcons
                             name="close-circle"
                             size={20}
-                            color={COLORS.coral}
+                            color={COLORS.brand.secondary}
                           />
                         )}
                       </View>
@@ -464,7 +464,7 @@ const EditProfileScreen = () => {
                         }
                         onBlur={onBlur}
                         placeholder="Tell us about yourself..."
-                        placeholderTextColor={COLORS.textSecondary}
+                        placeholderTextColor={COLORS.text.secondary}
                         multiline
                         numberOfLines={3}
                         maxLength={BIO_MAX_LENGTH}
@@ -499,7 +499,7 @@ const EditProfileScreen = () => {
                         <MaterialCommunityIcons
                           name="map-marker"
                           size={18}
-                          color={COLORS.textSecondary}
+                          color={COLORS.text.secondary}
                         />
                         <TextInput
                           style={[styles.textInput, styles.locationInput]}
@@ -507,7 +507,7 @@ const EditProfileScreen = () => {
                           onChangeText={onChange}
                           onBlur={onBlur}
                           placeholder="City, Country"
-                          placeholderTextColor={COLORS.textSecondary}
+                          placeholderTextColor={COLORS.text.secondary}
                         />
                       </View>
                       {error && (
@@ -530,7 +530,7 @@ const EditProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     minWidth: 60,
@@ -550,11 +550,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   cancelText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   saveText: {
     fontSize: 16,
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
     color: COLORS.mint,
   },
   saveTextDisabled: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     opacity: 0.5,
   },
   keyboardView: {
@@ -596,11 +596,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.text,
+    backgroundColor: COLORS.text.primary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: COLORS.background,
+    borderColor: COLORS.bg.primary,
   },
   changePhotoText: {
     fontSize: 15,
@@ -616,12 +616,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     letterSpacing: 0.5,
     marginBottom: 10,
   },
   inputCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -630,18 +630,18 @@ const styles = StyleSheet.create({
   },
   inputDivider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginLeft: 14,
   },
   inputLabel: {
     fontSize: 13,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
   },
   textInput: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     padding: 0,
   },
 
@@ -653,19 +653,19 @@ const styles = StyleSheet.create({
   },
   usernamePrefix: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   usernameInput: {
     flex: 1,
   },
   usernameError: {
     fontSize: 12,
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
     marginTop: 4,
   },
   errorText: {
     fontSize: 12,
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
     marginTop: 4,
   },
 
@@ -682,13 +682,13 @@ const styles = StyleSheet.create({
   },
   charCount: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   charCountWarning: {
     color: COLORS.softOrange,
   },
   charCountError: {
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
   },
 
   // Location

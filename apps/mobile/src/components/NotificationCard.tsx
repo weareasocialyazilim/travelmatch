@@ -36,12 +36,12 @@ const typeConfig: Record<
     color: string;
   }
 > = {
-  gift_received: { icon: 'gift', color: COLORS.primary },
-  request_accepted: { icon: 'check', color: COLORS.success },
-  request_rejected: { icon: 'close', color: COLORS.error },
-  new_message: { icon: 'message', color: COLORS.info },
-  new_review: { icon: 'star', color: COLORS.warning },
-  system: { icon: 'bell', color: COLORS.textSecondary },
+  gift_received: { icon: 'gift', color: COLORS.brand.primary },
+  request_accepted: { icon: 'check', color: COLORS.feedback.success },
+  request_rejected: { icon: 'close', color: COLORS.feedback.error },
+  new_message: { icon: 'message', color: COLORS.feedback.info },
+  new_review: { icon: 'star', color: COLORS.feedback.warning },
+  system: { icon: 'bell', color: COLORS.text.secondary },
 };
 
 export const NotificationCard: React.FC<NotificationCardProps> = memo(
@@ -127,13 +127,13 @@ NotificationCard.displayName = 'NotificationCard';
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
   },
   unread: {
-    backgroundColor: COLORS.primary + '08',
+    backgroundColor: COLORS.brand.primary + '08',
   },
   iconContainer: {
     marginRight: 12,
@@ -156,18 +156,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   message: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
     marginBottom: 4,
   },
   timestamp: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   markReadButton: {
     padding: 4,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
 });
 

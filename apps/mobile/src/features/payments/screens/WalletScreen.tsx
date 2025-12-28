@@ -120,7 +120,7 @@ const WalletScreen = () => {
             <MaterialCommunityIcons
               name={getTransactionIcon(transaction.type)}
               size={20}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </View>
           <View style={styles.transactionInfo}>
@@ -157,7 +157,7 @@ const WalletScreen = () => {
         <MaterialCommunityIcons
           name="receipt"
           size={48}
-          color={COLORS.textSecondary}
+          color={COLORS.text.secondary}
         />
         <Text style={styles.emptyText}>No transactions yet</Text>
       </View>
@@ -177,7 +177,7 @@ const WalletScreen = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Wallet</Text>
@@ -188,7 +188,7 @@ const WalletScreen = () => {
           <MaterialCommunityIcons
             name="shield-check"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
       </View>
@@ -310,7 +310,7 @@ const WalletScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   transactionListContainer: {
     minHeight: 300,
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     textAlign: 'center',
   },
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 16,
     marginBottom: 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     padding: 24,
     shadowColor: COLORS.shadow,
@@ -359,18 +359,18 @@ const styles = StyleSheet.create({
   },
   balanceLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 8,
   },
   balanceAmount: {
     ...TYPOGRAPHY.display1,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   escrowText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   balanceActions: {
     flexDirection: 'row',
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     flex: 1,
     height: 48,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   secondaryButton: {
     flex: 1,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   filterContainer: {
     paddingHorizontal: 16,
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   filterButtonActive: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -431,16 +431,16 @@ const styles = StyleSheet.create({
   filterButtonText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   filterButtonTextActive: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
@@ -473,12 +473,12 @@ const styles = StyleSheet.create({
   transactionTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   transactionSubtitle: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   transactionRight: {
     alignItems: 'flex-end',
@@ -487,10 +487,10 @@ const styles = StyleSheet.create({
   transactionAmount: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   transactionAmountPositive: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
   },
   proofLoopBadge: {
     paddingHorizontal: 8,
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   emptyText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.body,
     marginTop: 12,
   },

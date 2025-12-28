@@ -91,17 +91,17 @@ const styles = StyleSheet.create({
   },
   storyCircleSeen: {
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   storyAvatar: {
     width: '100%',
     height: '100%',
     borderRadius: 30,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   storyName: {
     fontSize: 11,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
   },
 });

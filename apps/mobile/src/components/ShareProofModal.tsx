@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS, primitives } from '../constants/colors';
 import { radii } from '../constants/radii';
 import { SHADOWS } from '../constants/shadows';
 import { SPACING } from '../constants/spacing';
@@ -27,10 +27,10 @@ interface ShareProofModalProps {
 
 const socialPlatforms: { name: string; icon: IconName; color: string }[] = [
   { name: 'Instagram', icon: 'instagram', color: COLORS.instagram },
-  { name: 'Facebook', icon: 'facebook', color: COLORS.info },
+  { name: 'Facebook', icon: 'facebook', color: COLORS.feedback.info },
   { name: 'Twitter', icon: 'twitter', color: COLORS.twitter },
   { name: 'WhatsApp', icon: 'whatsapp', color: COLORS.whatsapp },
-  { name: 'More', icon: 'dots-horizontal', color: COLORS.textSecondary },
+  { name: 'More', icon: 'dots-horizontal', color: COLORS.text.secondary },
 ];
 
 export const ShareProofModal: React.FC<ShareProofModalProps> = ({
@@ -89,7 +89,7 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
             <MaterialCommunityIcons
               name="close"
               size={24}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
 
@@ -108,7 +108,7 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
               <MaterialCommunityIcons
                 name={copied ? 'check' : 'content-copy'}
                 size={20}
-                color={copied ? COLORS.success : COLORS.primary}
+                color={copied ? COLORS.feedback.success : COLORS.brand.primary}
               />
             </TouchableOpacity>
           </View>
@@ -129,7 +129,7 @@ export const ShareProofModal: React.FC<ShareProofModalProps> = ({
                   <MaterialCommunityIcons
                     name={platform.icon}
                     size={32}
-                    color={COLORS.white}
+                    color={COLORS.utility.white}
                   />
                 </View>
                 <Text style={styles.socialLabel}>{platform.name}</Text>
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     top: SPACING.md,
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: radii.xl,
     padding: SPACING.xl,
     width: '100%',
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   linkContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
     borderRadius: radii.md,
     flexDirection: 'row',
     marginBottom: SPACING.xl,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
   linkInput: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
   },
   overlay: {
@@ -202,11 +202,11 @@ const styles = StyleSheet.create({
   },
   socialLabel: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   subtitle: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: SPACING.lg,
     textAlign: 'center',
   },

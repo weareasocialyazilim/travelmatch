@@ -20,7 +20,7 @@ export const PLANS: Plan[] = [
     name: 'Free',
     price: 0,
     interval: 'month',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     icon: 'gift',
     features: [
       '3 gestures per month',
@@ -34,7 +34,7 @@ export const PLANS: Plan[] = [
     name: 'Starter',
     price: 10,
     interval: 'month',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     icon: 'rocket',
     features: [
       '10 gestures per month',
@@ -50,7 +50,7 @@ export const PLANS: Plan[] = [
     price: 25,
     interval: 'month',
     popular: true,
-    color: COLORS.accent,
+    color: COLORS.brand.accent,
     icon: 'star',
     features: [
       'Unlimited gestures',
@@ -67,7 +67,7 @@ export const PLANS: Plan[] = [
     name: 'VIP',
     price: 50,
     interval: 'month',
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
     icon: 'crown',
     features: [
       'All Pro features',

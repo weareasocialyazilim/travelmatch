@@ -124,7 +124,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Blocked users</Text>
@@ -138,7 +138,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
             <MaterialCommunityIcons
               name={'shield-check' as IconName}
               size={48}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </View>
           <Text style={styles.emptyTitle}>No one blocked</Text>
@@ -186,7 +186,7 @@ export const BlockedUsersScreen: React.FC<BlockedUsersScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 48,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   emptyState: {
     flex: 1,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${COLORS.brand.primary}10`,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -226,12 +226,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   emptyDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
   },
   scrollView: {
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   userInfo: {
     flex: 1,
@@ -269,18 +269,18 @@ const styles = StyleSheet.create({
   userName: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   userRole: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   unblockButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     borderRadius: 12,
     minWidth: 84,
     alignItems: 'center',
@@ -288,6 +288,6 @@ const styles = StyleSheet.create({
   unblockButtonText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });

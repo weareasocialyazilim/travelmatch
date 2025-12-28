@@ -36,7 +36,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -59,7 +59,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               <MaterialCommunityIcons
                 name="check"
                 size={10}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
             </View>
           </View>
@@ -69,7 +69,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               <MaterialCommunityIcons
                 name="check-decagram"
                 size={18}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <Text style={styles.headerRole}>Traveler</Text>
@@ -87,7 +87,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           <MaterialCommunityIcons
             name="dots-vertical"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
       </View>
@@ -121,7 +121,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   headerTop: {
     flexDirection: 'row',
@@ -156,9 +156,9 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success,
     borderWidth: 2,
-    borderColor: COLORS.background,
+    borderColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -173,13 +173,13 @@ const styles = StyleSheet.create({
   headerName: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginRight: 4,
   },
   headerRole: {
     fontSize: 12,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   moreButton: {
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
     padding: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
@@ -215,12 +215,12 @@ const styles = StyleSheet.create({
   momentTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   momentSubtitle: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   viewButton: {
     paddingHorizontal: 12,
@@ -231,6 +231,6 @@ const styles = StyleSheet.create({
   viewButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });

@@ -19,16 +19,16 @@ import { COLORS } from '../constants/colors';
 
 // Color aliases for easier use
 const colors = {
-  primary: { main: COLORS.primary },
-  text: { primary: COLORS.text, secondary: COLORS.textSecondary },
+  primary: { main: COLORS.brand.primary },
+  text: { primary: COLORS.text.primary, secondary: COLORS.text.secondary },
   background: {
-    primary: COLORS.background,
-    secondary: COLORS.backgroundSecondary,
+    primary: COLORS.bg.primary,
+    secondary: COLORS.bg.secondary,
   },
-  border: { medium: COLORS.border },
+  border: { medium: COLORS.border.default },
   status: {
-    success: COLORS.success,
-    warning: COLORS.warning,
+    success: COLORS.feedback.success,
+    warning: COLORS.feedback.warning,
     error: COLORS.danger,
   },
 };
@@ -154,10 +154,10 @@ export const BlockConfirmation: React.FC<BlockConfirmationProps> = ({
               activeOpacity={0.8}
             >
               {loading ? (
-                <ActivityIndicator color={COLORS.white} size="small" />
+                <ActivityIndicator color={COLORS.utility.white} size="small" />
               ) : (
                 <>
-                  <Ionicons name="ban" size={18} color={COLORS.white} />
+                  <Ionicons name="ban" size={18} color={COLORS.utility.white} />
                   <Text style={styles.blockButtonText}>Block</Text>
                 </>
               )}
@@ -172,7 +172,7 @@ export const BlockConfirmation: React.FC<BlockConfirmationProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   blockButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

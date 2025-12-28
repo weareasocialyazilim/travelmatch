@@ -28,12 +28,12 @@ export const ErrorState: React.FC<ErrorStateProps> = memo(
 
     return (
       <View style={containerStyle}>
-        <MaterialCommunityIcons name={icon} size={64} color={COLORS.error} />
+        <MaterialCommunityIcons name={icon} size={64} color={COLORS.feedback.error} />
         <Text style={styles.errorTitle}>Oops!</Text>
         <Text style={styles.errorMessage}>{message}</Text>
         {onRetry && (
           <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-            <MaterialCommunityIcons name="refresh" size={18} color={COLORS.white} />
+            <MaterialCommunityIcons name="refresh" size={18} color={COLORS.utility.white} />
             <Text style={styles.retryButtonText}>{retryText}</Text>
           </TouchableOpacity>
         )}
@@ -56,13 +56,13 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   errorTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 20,
     fontWeight: '600',
     marginTop: 16,
   },
   errorMessage: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 15,
     textAlign: 'center',
     marginTop: 8,
@@ -72,14 +72,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
     marginTop: 24,
   },
   retryButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 15,
     fontWeight: '600',
   },

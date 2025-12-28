@@ -56,7 +56,7 @@ const SessionExpiredScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="clock-alert-outline"
             size={80}
-            color={COLORS.warning}
+            color={COLORS.feedback.warning}
           />
         </View>
 
@@ -77,7 +77,7 @@ const SessionExpiredScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="login"
             size={20}
-            color={COLORS.white}
+            color={COLORS.utility.white}
             style={styles.buttonIcon}
           />
           <Text style={styles.loginButtonText}>Tekrar Giriş Yap</Text>
@@ -88,7 +88,7 @@ const SessionExpiredScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="information-outline"
             size={16}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
           <Text style={styles.infoText}>
             Verileriniz güvende. Giriş yaptıktan sonra kaldığınız yerden devam edebilirsiniz.
@@ -102,7 +102,7 @@ const SessionExpiredScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   content: {
     flex: 1,
@@ -114,17 +114,17 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     padding: 20,
     borderRadius: 60,
-    backgroundColor: COLORS.warningLight || `${COLORS.warning}15`,
+    backgroundColor: COLORS.warningLight || `${COLORS.feedback.warning}15`,
   },
   title: {
     ...TYPOGRAPHY.h2,
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 12,
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 22,
@@ -134,12 +134,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 12,
     minWidth: 200,
-    shadowColor: COLORS.primary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
   },
   infoContainer: {
@@ -159,13 +159,13 @@ const styles = StyleSheet.create({
     marginTop: 32,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: COLORS.backgroundSecondary || `${COLORS.textSecondary}08`,
+    backgroundColor: COLORS.bg.secondary || `${COLORS.text.secondary}08`,
     borderRadius: 8,
     maxWidth: 320,
   },
   infoText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 8,
     flex: 1,
     lineHeight: 18,

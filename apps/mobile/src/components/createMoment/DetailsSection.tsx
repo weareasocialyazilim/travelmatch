@@ -61,7 +61,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
       if (amountNum <= VALUES.ESCROW_DIRECT_MAX) {
         return {
           icon: 'flash',
-          color: COLORS.primary,
+          color: COLORS.brand.primary,
           title: 'Direct Payment',
           description: '$0-$30: Instant transfer to you when someone gifts.',
         };
@@ -75,7 +75,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
       } else {
         return {
           icon: 'shield-check',
-          color: COLORS.success,
+          color: COLORS.feedback.success,
           title: 'Proof Required',
           description:
             '$100+: Escrow protected. Upload proof to receive funds.',
@@ -162,7 +162,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
               <MaterialCommunityIcons
                 name="map-marker"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.detailCardContent}>
@@ -181,7 +181,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
             <MaterialCommunityIcons
               name="chevron-right"
               size={20}
-              color={COLORS.textTertiary}
+              color={COLORS.text.tertiary}
             />
           </View>
         </TouchableOpacity>
@@ -199,7 +199,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
               <MaterialCommunityIcons
                 name="calendar"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.detailCardContent}>
@@ -215,7 +215,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
             <MaterialCommunityIcons
               name="chevron-right"
               size={20}
-              color={COLORS.textTertiary}
+              color={COLORS.text.tertiary}
             />
           </View>
         </TouchableOpacity>
@@ -227,7 +227,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
               <MaterialCommunityIcons
                 name="currency-usd"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.detailCardContent}>
@@ -237,7 +237,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
                 <TextInput
                   style={styles.amountInput}
                   placeholder="0"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={COLORS.text.tertiary}
                   value={amount}
                   onChangeText={onAmountChange}
                   keyboardType="decimal-pad"
@@ -276,7 +276,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
               <MaterialCommunityIcons
                 name="information-outline"
                 size={16}
-                color={COLORS.textTertiary}
+                color={COLORS.text.tertiary}
               />
             </TouchableOpacity>
           )}
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   detailCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: LAYOUT.borderRadius.md,
     padding: 16,
     ...CARD_SHADOW,
@@ -317,22 +317,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   detailCardLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
     marginBottom: 4,
   },
   detailCardValue: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '600',
   },
   detailCardSubvalue: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
     marginTop: 2,
   },
   detailCardPlaceholder: {
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     fontSize: 15,
   },
   amountInputContainer: {
@@ -340,13 +340,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   currencySymbol: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 24,
     fontWeight: '600',
     marginRight: 4,
   },
   amountInput: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     fontSize: 24,
     fontWeight: '600',
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   },
   escrowInfo: {
     alignItems: 'flex-start',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: LAYOUT.borderRadius.sm,
     borderWidth: 1,
     flexDirection: 'row',
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   escrowDescription: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
     lineHeight: 16,
   },

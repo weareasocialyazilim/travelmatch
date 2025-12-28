@@ -87,7 +87,7 @@ export const EmailAuthScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
 
@@ -95,7 +95,7 @@ export const EmailAuthScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={step === 'email' ? 'email-outline' : 'email-check-outline'}
             size={64}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <Text style={styles.title}>
             {step === 'email' ? 'Sign in with Email' : 'Check Your Email'}
@@ -114,7 +114,7 @@ export const EmailAuthScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="email-outline"
                 size={20}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
                 style={styles.inputIcon}
               />
               <TextInput
@@ -122,7 +122,7 @@ export const EmailAuthScreen: React.FC = () => {
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={COLORS.text.secondary}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -158,7 +158,7 @@ export const EmailAuthScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="information-outline"
                 size={20}
-                color={COLORS.info}
+                color={COLORS.feedback.info}
               />
               <Text style={styles.infoText}>
                 Click the link in your email to sign in instantly. The link
@@ -172,7 +172,7 @@ export const EmailAuthScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="check"
                 size={48}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
             </View>
 
@@ -189,7 +189,7 @@ export const EmailAuthScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="email-open-outline"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
               <Text style={styles.openEmailText}>Open Email App</Text>
             </TouchableOpacity>
@@ -222,7 +222,7 @@ export const EmailAuthScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -240,13 +240,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 8,
     textAlign: 'center',
     paddingHorizontal: 20,
@@ -257,16 +257,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     marginBottom: 24,
   },
   inputIcon: {
@@ -275,12 +275,12 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     padding: 16,
     paddingLeft: 12,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.info,
+    color: COLORS.feedback.info,
     lineHeight: 20,
   },
   sentContainer: {
@@ -326,12 +326,12 @@ const styles = StyleSheet.create({
   sentTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   sentDescription: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 32,
     paddingHorizontal: 20,
@@ -340,14 +340,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.brand.primaryLight,
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 24,
     marginBottom: 16,
   },
   openEmailText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   resendText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 14,
     fontWeight: '500',
   },
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   changeEmailText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
   },
 });

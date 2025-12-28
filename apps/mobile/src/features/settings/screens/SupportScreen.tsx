@@ -113,7 +113,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <LinearGradient
-        colors={[COLORS.background, COLORS.backgroundLight]}
+        colors={[COLORS.bg.primary, COLORS.bg.primaryLight]}
         style={styles.gradient}
       >
         {/* Header */}
@@ -126,7 +126,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Support & Help</Text>
@@ -144,7 +144,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
               <MaterialCommunityIcons
                 name="face-agent"
                 size={64}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <Text style={styles.heroTitle}>How can we help you?</Text>
@@ -170,7 +170,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                         option.icon as keyof typeof MaterialCommunityIcons.glyphMap
                       }
                       size={28}
-                      color={COLORS.primary}
+                      color={COLORS.brand.primary}
                     />
                   </View>
                   <Text style={styles.optionTitle}>{option.title}</Text>
@@ -199,7 +199,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                       <TextInput
                         style={styles.input}
                         placeholder="What do you need help with?"
-                        placeholderTextColor={COLORS.textSecondary}
+                        placeholderTextColor={COLORS.text.secondary}
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
@@ -225,7 +225,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                       <TextInput
                         style={[styles.input, styles.textArea]}
                         placeholder="Describe your issue in detail..."
-                        placeholderTextColor={COLORS.textSecondary}
+                        placeholderTextColor={COLORS.text.secondary}
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
@@ -252,7 +252,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                 activeOpacity={0.8}
               >
                 <LinearGradient
-                  colors={[COLORS.primary, COLORS.secondary]}
+                  colors={[COLORS.brand.primary, COLORS.brand.secondary]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.submitGradient}
@@ -265,7 +265,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
                       <MaterialCommunityIcons
                         name="send"
                         size={20}
-                        color={COLORS.white}
+                        color={COLORS.utility.white}
                       />
                     </>
                   )}
@@ -284,7 +284,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
               <MaterialCommunityIcons
                 name="frequently-asked-questions"
                 size={24}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.faqContent}>
@@ -296,7 +296,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="chevron-right"
               size={24}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
 
@@ -305,7 +305,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="clock-outline"
               size={20}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.infoText}>
               Average response time:{' '}
@@ -323,7 +323,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   backButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 20,
     height: 40,
     justifyContent: 'center',
@@ -334,18 +334,18 @@ const styles = StyleSheet.create({
     height: 32,
   },
   charCount: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
     marginTop: 4,
     textAlign: 'right',
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   faqCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     marginBottom: 16,
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   },
   faqIcon: {
     alignItems: 'center',
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     borderRadius: 24,
     height: 48,
     justifyContent: 'center',
@@ -365,17 +365,17 @@ const styles = StyleSheet.create({
     width: 48,
   },
   faqSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
   },
   faqTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
     marginBottom: 4,
   },
   formCard: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     padding: 20,
     ...VALUES.shadow,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
   },
@@ -402,18 +402,18 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
   },
   heroSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodySmall,
   },
   heroTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h2,
     fontWeight: '700',
     marginBottom: 8,
   },
   iconContainer: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 60,
     height: 120,
     justifyContent: 'center',
@@ -422,28 +422,28 @@ const styles = StyleSheet.create({
     ...VALUES.shadow,
   },
   infoBold: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '700',
   },
   infoCard: {
     alignItems: 'center',
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${COLORS.brand.primary}10`,
     borderRadius: VALUES.borderRadius,
     flexDirection: 'row',
     marginBottom: 16,
     padding: 16,
   },
   infoText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     marginLeft: 12,
   },
   input: {
-    backgroundColor: COLORS.background,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.bg.primary,
+    borderColor: COLORS.border.default,
     borderRadius: VALUES.borderRadius,
     borderWidth: 1,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     padding: 12,
   },
@@ -451,14 +451,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputLabel: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     marginBottom: 8,
   },
   optionCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: VALUES.borderRadius,
     marginBottom: 16,
     padding: 16,
@@ -466,13 +466,13 @@ const styles = StyleSheet.create({
     ...VALUES.shadow,
   },
   optionDescription: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 11,
     textAlign: 'center',
   },
   optionIcon: {
     alignItems: 'center',
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     borderRadius: 28,
     height: 56,
     justifyContent: 'center',
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     width: 56,
   },
   optionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     marginBottom: 4,
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
     marginBottom: 16,
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   submitText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
   },
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
     marginTop: 4,
   },
 });

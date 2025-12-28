@@ -122,7 +122,7 @@ const RequestsScreen = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              tintColor={COLORS.primary}
+              tintColor={COLORS.brand.primary}
             />
           }
         >
@@ -180,14 +180,14 @@ const RequestsScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   safeArea: {
     flex: 1,
   },
   tabs: {
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     borderBottomWidth: 1,
     flexDirection: 'row',
     gap: 24,
@@ -202,27 +202,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   tabActive: {
-    borderBottomColor: COLORS.primary,
+    borderBottomColor: COLORS.brand.primary,
     borderBottomWidth: 2,
   },
   tabText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 15,
     fontWeight: '500',
   },
   tabTextActive: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
   tabBadge: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 10,
     minWidth: 20,
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
   tabBadgeText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 11,
     fontWeight: '700',
     textAlign: 'center',

@@ -81,11 +81,11 @@ export const BookingDetailScreen: React.FC = () => {
       case 'confirmed':
         return COLORS.mint;
       case 'completed':
-        return COLORS.primary;
+        return COLORS.brand.primary;
       case 'cancelled':
-        return COLORS.coral;
+        return COLORS.brand.secondary;
       default:
-        return COLORS.textSecondary;
+        return COLORS.text.secondary;
     }
   };
 
@@ -154,7 +154,7 @@ export const BookingDetailScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Booking Details</Text>
@@ -190,7 +190,7 @@ export const BookingDetailScreen: React.FC = () => {
         <MaterialCommunityIcons
           name="alert-circle"
           size={64}
-          color={COLORS.coral}
+          color={COLORS.brand.secondary}
         />
         <Text style={styles.errorText}>Booking not found</Text>
         <TouchableOpacity
@@ -214,7 +214,7 @@ export const BookingDetailScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Booking Details</Text>
@@ -281,7 +281,7 @@ export const BookingDetailScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="calendar"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.detailContent}>
@@ -295,7 +295,7 @@ export const BookingDetailScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="clock-outline"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.detailContent}>
@@ -309,7 +309,7 @@ export const BookingDetailScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="map-marker"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.detailContent}>
@@ -320,7 +320,7 @@ export const BookingDetailScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="directions"
                 size={24}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </TouchableOpacity>
           </View>
@@ -330,7 +330,7 @@ export const BookingDetailScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="account-group"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <View style={styles.detailContent}>
@@ -351,7 +351,7 @@ export const BookingDetailScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="information"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
               <Text style={styles.notesText}>{booking.notes}</Text>
             </View>
@@ -391,7 +391,7 @@ export const BookingDetailScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="calendar-plus"
               size={20}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.actionButtonText}>Add to Calendar</Text>
           </TouchableOpacity>
@@ -403,7 +403,7 @@ export const BookingDetailScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="message-text"
               size={20}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.actionButtonText}>Contact Host</Text>
           </TouchableOpacity>
@@ -416,7 +416,7 @@ export const BookingDetailScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="close-circle"
                 size={20}
-                color={COLORS.coral}
+                color={COLORS.brand.secondary}
               />
               <Text style={[styles.actionButtonText, styles.cancelButtonText]}>
                 Cancel Booking
@@ -433,7 +433,7 @@ export const BookingDetailScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="help-circle"
             size={18}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
           <Text style={styles.supportText}>Need help? Contact Support</Text>
         </TouchableOpacity>
@@ -447,32 +447,32 @@ export const BookingDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     padding: 24,
   },
   errorText: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 16,
   },
   errorButton: {
     marginTop: 24,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 8,
   },
   errorButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   header: {
     flexDirection: 'row',
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     width: 40,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   headerSpacer: {
     width: 40,
@@ -516,19 +516,19 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginHorizontal: 16,
     marginTop: 16,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
   },
   confirmationLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   confirmationCode: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 4,
     letterSpacing: 2,
   },
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 16,
     marginTop: 16,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
   momentTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   hostInfo: {
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
   },
   hostName: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   detailsSection: {
     marginTop: 24,
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 16,
   },
   detailRow: {
@@ -584,13 +584,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   detailIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: COLORS.brand.primary + '15',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -600,12 +600,12 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   detailValue: {
     fontSize: 15,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 2,
   },
   notesSection: {
@@ -615,15 +615,15 @@ const styles = StyleSheet.create({
   notesCard: {
     flexDirection: 'row',
     padding: 16,
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.brand.primary + '10',
     borderRadius: 12,
     borderLeftWidth: 3,
-    borderLeftColor: COLORS.primary,
+    borderLeftColor: COLORS.brand.primary,
   },
   notesText: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: 12,
     lineHeight: 20,
   },
@@ -632,7 +632,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   paymentCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 16,
   },
@@ -644,27 +644,27 @@ const styles = StyleSheet.create({
   },
   paymentLabel: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   paymentValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   paymentDivider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginVertical: 8,
   },
   paymentTotalLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   paymentTotalValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   actionsSection: {
     marginTop: 24,
@@ -677,22 +677,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   actionButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginLeft: 8,
   },
   cancelButton: {
-    borderColor: COLORS.coral + '30',
-    backgroundColor: COLORS.coral + '10',
+    borderColor: COLORS.brand.secondary + '30',
+    backgroundColor: COLORS.brand.secondary + '10',
   },
   cancelButtonText: {
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
   },
   supportLink: {
     flexDirection: 'row',
@@ -703,7 +703,7 @@ const styles = StyleSheet.create({
   },
   supportText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 6,
   },
   bottomSpacer: {
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   skeletonCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     marginHorizontal: 16,
     marginTop: 16,

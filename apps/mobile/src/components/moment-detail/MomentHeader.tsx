@@ -51,7 +51,7 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
               <MaterialCommunityIcons
                 name="arrow-left"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
             <View style={styles.headerRight}>
@@ -66,12 +66,12 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
                   accessibilityRole="button"
                 >
                   {actionLoading === 'save' ? (
-                    <ActivityIndicator size="small" color={COLORS.primary} />
+                    <ActivityIndicator size="small" color={COLORS.brand.primary} />
                   ) : (
                     <MaterialCommunityIcons
                       name={isSaved ? 'bookmark' : 'bookmark-outline'}
                       size={22}
-                      color={isSaved ? COLORS.primary : COLORS.text}
+                      color={isSaved ? COLORS.brand.primary : COLORS.text.primary}
                     />
                   )}
                 </TouchableOpacity>
@@ -89,7 +89,7 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
                   <MaterialCommunityIcons
                     name="pencil-outline"
                     size={22}
-                    color={COLORS.text}
+                    color={COLORS.text.primary}
                   />
                 </TouchableOpacity>
               )}
@@ -105,12 +105,12 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
                   accessibilityRole="button"
                 >
                   {actionLoading === 'delete' ? (
-                    <ActivityIndicator size="small" color={COLORS.error} />
+                    <ActivityIndicator size="small" color={COLORS.feedback.error} />
                   ) : (
                     <MaterialCommunityIcons
                       name="trash-can-outline"
                       size={22}
-                      color={COLORS.error}
+                      color={COLORS.feedback.error}
                     />
                   )}
                 </TouchableOpacity>
@@ -127,7 +127,7 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
                 <MaterialCommunityIcons
                   name="share-variant-outline"
                   size={22}
-                  color={COLORS.text}
+                  color={COLORS.text.primary}
                 />
               </TouchableOpacity>
 
@@ -143,7 +143,7 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
                   <MaterialCommunityIcons
                     name="flag-outline"
                     size={22}
-                    color={COLORS.text}
+                    color={COLORS.text.primary}
                   />
                 </TouchableOpacity>
               )}

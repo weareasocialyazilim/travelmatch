@@ -32,7 +32,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = React.memo(
                       key={i}
                       name="star"
                       size={14}
-                      color={i < review.rating ? COLORS.warning : COLORS.border}
+                      color={i < review.rating ? COLORS.feedback.warning : COLORS.border.default}
                     />
                   ))}
                 </View>
@@ -53,14 +53,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionHeader: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 17,
     fontWeight: '700',
     marginBottom: 12,
   },
   reviewCard: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     borderWidth: 1,
     marginBottom: 10,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   reviewName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   reviewText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     lineHeight: 20,
   },

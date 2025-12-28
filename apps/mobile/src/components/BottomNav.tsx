@@ -78,7 +78,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
             name={activeTab === 'Discover' ? 'gift' : 'gift-outline'}
             size={24}
             color={
-              activeTab === 'Discover' ? COLORS.primary : COLORS.textSecondary
+              activeTab === 'Discover' ? COLORS.brand.primary : COLORS.text.secondary
             }
           />
           <Text
@@ -105,7 +105,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
               name={activeTab === 'Requests' ? 'heart' : 'heart-outline'}
               size={24}
               color={
-                activeTab === 'Requests' ? COLORS.primary : COLORS.textSecondary
+                activeTab === 'Requests' ? COLORS.brand.primary : COLORS.text.secondary
               }
             />
             {requestsBadge > 0 && (
@@ -137,7 +137,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
             colors={GRADIENTS.giftButton}
             style={styles.createButton}
           >
-            <MaterialCommunityIcons name="plus" size={28} color={COLORS.white} />
+            <MaterialCommunityIcons name="plus" size={28} color={COLORS.utility.white} />
           </LinearGradient>
         </TouchableOpacity>
 
@@ -156,7 +156,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
               name={activeTab === 'Messages' ? 'chat' : 'chat-outline'}
               size={24}
               color={
-                activeTab === 'Messages' ? COLORS.primary : COLORS.textSecondary
+                activeTab === 'Messages' ? COLORS.brand.primary : COLORS.text.secondary
               }
             />
             {messagesBadge > 0 && (
@@ -188,7 +188,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
             name={activeTab === 'Profile' ? 'account' : 'account-outline'}
             size={24}
             color={
-              activeTab === 'Profile' ? COLORS.primary : COLORS.textSecondary
+              activeTab === 'Profile' ? COLORS.brand.primary : COLORS.text.secondary
             }
           />
           <Text
@@ -207,7 +207,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
 const styles = StyleSheet.create({
   badge: {
     alignItems: 'center',
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     borderRadius: 9,
     height: 18,
     justifyContent: 'center',
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     top: -4,
   },
   badgeText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 10,
     fontWeight: '700',
   },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 28 : 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.2)',
-    backgroundColor: Platform.OS === 'android' ? COLORS.glassBackground : 'transparent',
+    backgroundColor: Platform.OS === 'android' ? COLORS.surface.glassBackground : 'transparent',
   },
   createButton: {
     alignItems: 'center',
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     height: 48,
     justifyContent: 'center',
     marginTop: -16,
-    shadowColor: COLORS.primary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -264,13 +264,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   navText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 10,
     fontWeight: '600',
     marginTop: 2,
   },
   navTextActive: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 10,
     fontWeight: '700',
     marginTop: 2,

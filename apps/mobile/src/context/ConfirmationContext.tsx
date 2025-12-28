@@ -131,27 +131,27 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
       case 'danger':
         return {
           icon: 'alert-circle' as IconName,
-          color: COLORS.error,
+          color: COLORS.feedback.error,
           backgroundColor: COLORS.errorLight,
         };
       case 'warning':
         return {
           icon: 'alert' as IconName,
-          color: COLORS.warning,
+          color: COLORS.feedback.warning,
           backgroundColor: COLORS.warningLight,
         };
       case 'success':
         return {
           icon: 'check-circle' as IconName,
-          color: COLORS.success,
+          color: COLORS.feedback.success,
           backgroundColor: COLORS.successLight,
         };
       case 'info':
       default:
         return {
           icon: 'information' as IconName,
-          color: COLORS.primary,
-          backgroundColor: COLORS.primaryLight,
+          color: COLORS.brand.primary,
+          backgroundColor: COLORS.brand.primaryLight,
         };
     }
   };
@@ -267,7 +267,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.lg,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: Math.min(SCREEN_WIDTH - SPACING.lg * 2, 340),
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface.base,
     borderRadius: radii.xl,
     padding: SPACING.xl,
     alignItems: 'center',
@@ -297,13 +297,13 @@ const styles = StyleSheet.create({
   },
   title: {
     ...TYPOGRAPHY.h3,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: SPACING.sm,
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: SPACING.xl,
     lineHeight: 22,
@@ -315,14 +315,14 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: COLORS.bg.primaryLight,
     borderRadius: radii.lg,
     paddingVertical: SPACING.md,
     alignItems: 'center',
   },
   cancelButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   confirmButton: {
     flex: 1,
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonText: {
     ...TYPOGRAPHY.button,
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   buttonDisabled: {
     opacity: 0.6,

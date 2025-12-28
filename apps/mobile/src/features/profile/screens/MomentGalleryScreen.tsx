@@ -81,7 +81,7 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
   if (loading) {
     return (
       <View style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color={COLORS.white} />
+        <ActivityIndicator size="large" color={COLORS.utility.white} />
       </View>
     );
   }
@@ -121,14 +121,14 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
             <MaterialCommunityIcons
               name={'arrow-left' as IconName}
               size={24}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton} activeOpacity={0.7}>
             <MaterialCommunityIcons
               name={'dots-horizontal' as IconName}
               size={24}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           </TouchableOpacity>
         </SafeAreaView>
@@ -174,20 +174,20 @@ export const MomentGalleryScreen: React.FC<MomentGalleryScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.black,
+    backgroundColor: COLORS.utility.black,
   },
   center: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   goBackButton: {
     marginTop: 20,
   },
   goBackText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   backgroundImage: {
     width: SCREEN_WIDTH,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: SCREEN_HEIGHT * 0.6,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   topBar: {
     flexDirection: 'row',
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   pageIndicatorActive: {
     width: 24,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   pageIndicatorInactive: {
     width: 6,
@@ -244,13 +244,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     textAlign: 'center',
     marginBottom: 8,
   },
   description: {
     fontSize: 16,
-    color: COLORS.textWhite80,
+    color: COLORS.text.primaryWhite80,
     textAlign: 'center',
   },
   touchArea: {

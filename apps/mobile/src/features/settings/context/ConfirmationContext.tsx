@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 24,
     width: '100%',
@@ -123,13 +123,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 12,
   },
   message: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -141,31 +141,31 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 14,
     borderRadius: 8,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     alignItems: 'center',
   },
   cancelText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   confirmButton: {
     flex: 1,
     padding: 14,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
   },
   confirmText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   destructiveButton: {
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
   },
   destructiveText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

@@ -116,7 +116,7 @@ export const ArchivedChatsScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="check-decagram"
               size={14}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </View>
         )}
@@ -136,7 +136,7 @@ export const ArchivedChatsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="archive-arrow-up"
             size={20}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -146,7 +146,7 @@ export const ArchivedChatsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="delete"
             size={20}
-            color={COLORS.error}
+            color={COLORS.feedback.error}
           />
         </TouchableOpacity>
       </View>
@@ -163,7 +163,7 @@ export const ArchivedChatsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Archived Chats</Text>
@@ -200,7 +200,7 @@ export const ArchivedChatsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   scrollView: {
     flex: 1,
@@ -228,14 +228,14 @@ const styles = StyleSheet.create({
   },
   sectionInfo: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 20,
     lineHeight: 20,
   },
   chatCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -2,
     right: -2,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 10,
     padding: 2,
   },
@@ -263,17 +263,17 @@ const styles = StyleSheet.create({
   chatName: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   chatMessage: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 2,
   },
   chatDate: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.brand.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },

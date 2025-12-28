@@ -35,11 +35,11 @@ const STATS: Stat[] = [
 ];
 
 const TAGS: Tag[] = [
-  { id: '1', text: 'Always sends proof', color: COLORS.success },
-  { id: '2', text: 'Great storyteller', color: COLORS.coral },
-  { id: '3', text: 'Creative updates', color: COLORS.success },
-  { id: '4', text: 'Trustworthy', color: COLORS.coral },
-  { id: '5', text: 'Adventurous', color: COLORS.success },
+  { id: '1', text: 'Always sends proof', color: COLORS.feedback.success },
+  { id: '2', text: 'Great storyteller', color: COLORS.brand.secondary },
+  { id: '3', text: 'Creative updates', color: COLORS.feedback.success },
+  { id: '4', text: 'Trustworthy', color: COLORS.brand.secondary },
+  { id: '5', text: 'Adventurous', color: COLORS.feedback.success },
 ];
 
 const TESTIMONIALS: Testimonial[] = [
@@ -87,7 +87,7 @@ export default function ReputationScreen({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reputation</Text>
@@ -148,7 +148,7 @@ export default function ReputationScreen({
               <MaterialCommunityIcons
                 name="star-circle"
                 size={64}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             </View>
             <Text style={styles.emptyTitle}>Your Reputation is Growing</Text>
@@ -168,16 +168,16 @@ export default function ReputationScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     width: 48,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
   },
   content: {
@@ -200,9 +200,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   statItem: {
     flex: 1,
@@ -212,23 +212,23 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 30,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   statLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
   },
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 16,
     paddingTop: 24,
     paddingBottom: 12,
@@ -255,22 +255,22 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   testimonialCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     gap: 8,
   },
   testimonialQuote: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 24,
   },
   testimonialAuthor: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   emptyState: {
     alignItems: 'center',
@@ -291,14 +291,14 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyDescription: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     maxWidth: 280,
     lineHeight: 20,

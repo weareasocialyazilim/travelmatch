@@ -7,7 +7,7 @@
 import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, StyleSheet, Pressable } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 
 /** Card visual style variant */
 type CardVariant = 'elevated' | 'outlined' | 'filled';
@@ -71,7 +71,7 @@ export const Card: React.FC<CardProps> = memo(
       switch (variant) {
         case 'elevated':
           return {
-            backgroundColor: COLORS.surfaceLight,
+            backgroundColor: COLORS.surface.baseLight,
             shadowColor: COLORS.shadow,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -80,13 +80,13 @@ export const Card: React.FC<CardProps> = memo(
           };
         case 'outlined':
           return {
-            backgroundColor: COLORS.surfaceLight,
+            backgroundColor: COLORS.surface.baseLight,
             borderWidth: 1,
-            borderColor: COLORS.gray[200],
+            borderColor: primitives.stone[200],
           };
         case 'filled':
           return {
-            backgroundColor: COLORS.gray[50],
+            backgroundColor: primitives.stone[50],
           };
         default:
           return {};

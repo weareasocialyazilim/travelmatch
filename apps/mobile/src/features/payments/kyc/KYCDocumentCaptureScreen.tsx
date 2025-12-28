@@ -77,7 +77,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="check-circle"
                   size={20}
-                  color={COLORS.success}
+                  color={COLORS.feedback.success}
                 />
                 <Text style={kycStyles.guidelineText}>{guideline.text}</Text>
               </View>
@@ -100,7 +100,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="check-circle"
                     size={32}
-                    color={COLORS.success}
+                    color={COLORS.feedback.success}
                   />
                   <Text style={kycStyles.uploadedText}>Document captured</Text>
                 </View>
@@ -109,7 +109,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name="camera"
                     size={32}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                   <Text style={kycStyles.uploadPlaceholderText}>
                     Tap to capture
@@ -134,7 +134,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
                       <MaterialCommunityIcons
                         name="check-circle"
                         size={32}
-                        color={COLORS.success}
+                        color={COLORS.feedback.success}
                       />
                       <Text style={kycStyles.uploadedText}>
                         Document captured
@@ -145,7 +145,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
                       <MaterialCommunityIcons
                         name="camera"
                         size={32}
-                        color={COLORS.textSecondary}
+                        color={COLORS.text.secondary}
                       />
                       <Text style={kycStyles.uploadPlaceholderText}>
                         Tap to capture

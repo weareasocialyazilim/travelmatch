@@ -288,7 +288,7 @@ const DataPrivacyScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.brand.primary} />
       </View>
     );
   }
@@ -304,7 +304,7 @@ const DataPrivacyScreen = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Data Privacy</Text>
@@ -325,7 +325,7 @@ const DataPrivacyScreen = () => {
             disabled={exportLoading}
           >
             {exportLoading ? (
-              <ActivityIndicator size="small" color={COLORS.white} />
+              <ActivityIndicator size="small" color={COLORS.utility.white} />
             ) : (
               <Text style={styles.actionButtonText}>Export My Data</Text>
             )}
@@ -337,7 +337,7 @@ const DataPrivacyScreen = () => {
             disabled={deleteLoading}
           >
             {deleteLoading ? (
-              <ActivityIndicator size="small" color={COLORS.white} />
+              <ActivityIndicator size="small" color={COLORS.utility.white} />
             ) : (
               <Text style={styles.actionButtonText}>Delete My Account</Text>
             )}
@@ -357,7 +357,7 @@ const DataPrivacyScreen = () => {
             <Switch
               value={consents.marketingConsent}
               onValueChange={(value) => updateConsent('marketing', value)}
-              trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
+              trackColor={{ false: COLORS.disabled, true: COLORS.brand.primary }}
             />
           </View>
 
@@ -371,7 +371,7 @@ const DataPrivacyScreen = () => {
             <Switch
               value={consents.analyticsConsent}
               onValueChange={(value) => updateConsent('analytics', value)}
-              trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
+              trackColor={{ false: COLORS.disabled, true: COLORS.brand.primary }}
             />
           </View>
         </View>
@@ -420,7 +420,7 @@ const DataPrivacyScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     padding: 8,
@@ -437,14 +437,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   placeholder: {
     width: 40,
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -452,34 +452,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   section: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     marginVertical: 8,
     padding: 16,
   },
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   sectionDescription: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 16,
     lineHeight: 20,
   },
   actionButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 12,
   },
   dangerButton: {
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
   },
   actionButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
   },
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
+    borderBottomColor: COLORS.border.light,
   },
   consentInfo: {
     flex: 1,
@@ -498,12 +498,12 @@ const styles = StyleSheet.create({
   consentTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   consentDescription: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 18,
   },
   linkButton: {
@@ -512,20 +512,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
+    borderBottomColor: COLORS.border.light,
   },
   linkText: {
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '500',
   },
   versionText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textMuted,
+    color: COLORS.text.primaryMuted,
   },
   footerText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 20,
     textAlign: 'center',
   },

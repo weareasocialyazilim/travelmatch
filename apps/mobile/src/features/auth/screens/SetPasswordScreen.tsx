@@ -84,12 +84,12 @@ export const SetPasswordScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             {...a11y.button('Back button')}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
 
           <View style={styles.header}>
             <View style={styles.iconContainer}>
-              <MaterialCommunityIcons name="lock-plus-outline" size={48} color={COLORS.primary} />
+              <MaterialCommunityIcons name="lock-plus-outline" size={48} color={COLORS.brand.primary} />
             </View>
             <Text style={styles.title}>Create Password</Text>
             <Text style={styles.subtitle}>
@@ -105,7 +105,7 @@ export const SetPasswordScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="lock-outline"
                   size={20}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                   style={styles.inputIcon}
                 />
                 <TextInput
@@ -113,7 +113,7 @@ export const SetPasswordScreen: React.FC = () => {
                   value={password}
                   onChangeText={setPassword}
                   placeholder="Enter password"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -128,7 +128,7 @@ export const SetPasswordScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={20}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -143,7 +143,7 @@ export const SetPasswordScreen: React.FC = () => {
                     <MaterialCommunityIcons
                       name={passed ? 'check-circle' : 'circle-outline'}
                       size={16}
-                      color={passed ? COLORS.success : COLORS.textSecondary}
+                      color={passed ? COLORS.feedback.success : COLORS.text.secondary}
                     />
                     <Text style={[styles.requirementText, passed && styles.requirementPassed]}>
                       {req.label}
@@ -160,7 +160,7 @@ export const SetPasswordScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="lock-check-outline"
                   size={20}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                   style={styles.inputIcon}
                 />
                 <TextInput
@@ -168,7 +168,7 @@ export const SetPasswordScreen: React.FC = () => {
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   placeholder="Confirm password"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   secureTextEntry={!showConfirmPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -183,7 +183,7 @@ export const SetPasswordScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={20}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -192,7 +192,7 @@ export const SetPasswordScreen: React.FC = () => {
               )}
               {passwordsMatch && (
                 <View style={styles.matchIndicator}>
-                  <MaterialCommunityIcons name="check-circle" size={16} color={COLORS.success} />
+                  <MaterialCommunityIcons name="check-circle" size={16} color={COLORS.feedback.success} />
                   <Text style={styles.matchText}>Passwords match</Text>
                 </View>
               )}
@@ -206,7 +206,7 @@ export const SetPasswordScreen: React.FC = () => {
               {...a11y.button('Set password', undefined, !isFormValid || isLoading)}
             >
               {isLoading ? (
-                <ActivityIndicator color={COLORS.white} />
+                <ActivityIndicator color={COLORS.utility.white} />
               ) : (
                 <Text style={styles.buttonText}>Set Password</Text>
               )}
@@ -221,7 +221,7 @@ export const SetPasswordScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   keyboardView: {
     flex: 1,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -251,13 +251,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     paddingHorizontal: 20,
   },
@@ -270,16 +270,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   inputIcon: {
     paddingLeft: 16,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     padding: 16,
     paddingLeft: 12,
   },
@@ -306,14 +306,14 @@ const styles = StyleSheet.create({
   },
   requirementText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   requirementPassed: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
   },
   errorText: {
     fontSize: 12,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     marginTop: 8,
     paddingLeft: 4,
   },
@@ -326,10 +326,10 @@ const styles = StyleSheet.create({
   },
   matchText: {
     fontSize: 12,
-    color: COLORS.success,
+    color: COLORS.feedback.success,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
   },

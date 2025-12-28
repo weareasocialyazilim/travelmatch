@@ -44,7 +44,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             <MaterialCommunityIcons
               name="plus-circle"
               size={24}
-              color={isConnected ? COLORS.textSecondary : COLORS.softGray}
+              color={isConnected ? COLORS.text.secondary : COLORS.softGray}
             />
           </TouchableOpacity>
           <TextInput
@@ -54,7 +54,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
                 ? "Thank them or ask a question..." 
                 : "Offline - Cannot send"
             }
-            placeholderTextColor={COLORS.textSecondary}
+            placeholderTextColor={COLORS.text.secondary}
             value={messageText}
             onChangeText={onTextChange}
             multiline={false}
@@ -85,13 +85,13 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             <MaterialCommunityIcons
               name="loading"
               size={24}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           ) : (
             <MaterialCommunityIcons
               name="send"
               size={24}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           )}
         </TouchableOpacity>
@@ -102,11 +102,11 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
 
 const styles = StyleSheet.create({
   inputBar: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 9999,
     paddingLeft: 4,
     marginRight: 8,
@@ -131,21 +131,21 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingRight: 16,
   },
   typingIndicator: {
     position: 'absolute',
     right: 16,
     fontSize: 12,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontStyle: 'italic',
   },
   sendButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

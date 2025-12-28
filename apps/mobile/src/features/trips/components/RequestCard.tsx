@@ -27,7 +27,7 @@ export const RequestCard = ({ item, onAccept, onDecline }: RequestCardProps) => 
           <Image source={{ uri: item.person.avatar }} style={styles.avatar} />
           {item.person.isVerified && (
             <View style={styles.verifiedBadge}>
-              <MaterialCommunityIcons name="check-decagram" size={12} color={COLORS.primary} />
+              <MaterialCommunityIcons name="check-decagram" size={12} color={COLORS.brand.primary} />
             </View>
           )}
         </TouchableOpacity>
@@ -74,7 +74,7 @@ export const RequestCard = ({ item, onAccept, onDecline }: RequestCardProps) => 
             <MaterialCommunityIcons
               name={item.proofUploaded ? 'check-circle' : 'alert-circle-outline'}
               size={14}
-              color={item.proofUploaded ? COLORS.success : COLORS.warning}
+              color={item.proofUploaded ? COLORS.feedback.success : COLORS.feedback.warning}
             />
             <Text
               style={[
@@ -111,11 +111,11 @@ export const RequestCard = ({ item, onAccept, onDecline }: RequestCardProps) => 
 
 const styles = StyleSheet.create({
   requestCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     marginBottom: 8,
     padding: 12,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 4,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   verifiedBadge: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 10,
     bottom: -2,
     position: 'absolute',
@@ -153,18 +153,18 @@ const styles = StyleSheet.create({
   personName: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   categoryInline: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 8,
   },
   newDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   metaRow: {
     flexDirection: 'row',
@@ -172,34 +172,34 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   rating: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
   },
   separator: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
   },
   city: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
   },
   timeAgo: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
   },
   amountBadge: {
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   amountText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontSize: 15,
     fontWeight: '700',
   },
   message: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
     lineHeight: 18,
     marginTop: 8,
@@ -216,19 +216,19 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: `${COLORS.warning}15`,
+    backgroundColor: `${COLORS.feedback.warning}15`,
     borderRadius: 6,
   },
   proofUploadedCompact: {
-    backgroundColor: `${COLORS.success}15`,
+    backgroundColor: `${COLORS.feedback.success}15`,
   },
   proofTextCompact: {
     fontSize: 11,
     fontWeight: '500',
-    color: COLORS.warning,
+    color: COLORS.feedback.warning,
   },
   proofTextUploadedCompact: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
   },
   actions: {
     flexDirection: 'row',
@@ -237,28 +237,28 @@ const styles = StyleSheet.create({
   },
   declineButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: COLORS.bg.secondary,
     borderRadius: 8,
     flex: 1,
     paddingVertical: 10,
   },
   declineButtonText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     fontWeight: '600',
   },
   acceptButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 8,
     flex: 1,
     paddingVertical: 10,
   },
   acceptButtonDisabled: {
-    backgroundColor: COLORS.warning,
+    backgroundColor: COLORS.feedback.warning,
   },
   acceptButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 14,
     fontWeight: '600',
   },

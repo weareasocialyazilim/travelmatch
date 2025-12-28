@@ -131,18 +131,18 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   primary: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   secondary: {
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success,
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   text: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: `${COLORS.white}4D`,
+    backgroundColor: `${COLORS.utility.white}4D`,
     width: 50,
   },
 });

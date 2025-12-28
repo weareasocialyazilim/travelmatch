@@ -25,10 +25,10 @@ export const WalletConnectButton = ({ onPress }: WalletConnectButtonProps) => {
         <MaterialCommunityIcons
           name={Platform.OS === 'ios' ? 'apple' : 'google'}
           size={24}
-          color={COLORS.text}
+          color={COLORS.text.primary}
         />
         <Text style={styles.connectWalletText}>Connect {walletName}</Text>
-        <MaterialCommunityIcons name="plus-circle-outline" size={20} color={COLORS.text} />
+        <MaterialCommunityIcons name="plus-circle-outline" size={20} color={COLORS.text.primary} />
       </TouchableOpacity>
       <Text style={styles.walletHelpText}>{helpText}</Text>
     </View>
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
@@ -52,12 +52,12 @@ const styles = StyleSheet.create({
     flex: 1,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: 12,
   },
   walletHelpText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 24,
     marginTop: 4,
     paddingHorizontal: 4,

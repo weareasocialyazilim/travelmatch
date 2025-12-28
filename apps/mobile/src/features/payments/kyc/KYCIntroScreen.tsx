@@ -44,7 +44,7 @@ const KYCIntroScreen: React.FC = () => {
                   <MaterialCommunityIcons
                     name={req.icon}
                     size={24}
-                    color={COLORS.primary}
+                    color={COLORS.brand.primary}
                   />
                 </View>
                 <Text style={kycStyles.requirementLabel}>{req.label}</Text>
@@ -65,7 +65,7 @@ const KYCIntroScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="lock-outline"
               size={14}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={kycStyles.securityNoteText}>
               Your data is encrypted and secure

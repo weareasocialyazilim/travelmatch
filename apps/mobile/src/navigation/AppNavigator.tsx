@@ -19,7 +19,7 @@ const loadingStyle = {
 };
 const LoadingFallback = () => (
   <View style={loadingStyle}>
-    <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+    <ActivityIndicator size="large" color={COLORS.brand.primary} />
   </View>
 );
 

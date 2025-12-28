@@ -184,7 +184,7 @@ export const CompleteGiftBottomSheet: React.FC<
                     <MaterialCommunityIcons
                       name="check"
                       size={16}
-                      color={COLORS.text}
+                      color={COLORS.text.primary}
                     />
                   )}
                 </View>
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   bottomSheet: {
     maxHeight: SCREEN_HEIGHT * 0.9,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   subtitle: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   },
   amountText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   statusDot: {
@@ -295,12 +295,12 @@ const styles = StyleSheet.create({
   walletButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginTop: 8,
     marginBottom: 12,
   },
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   row: {
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
   savedCardText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   checkboxContainer: {
     width: 28,
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     borderColor: COLORS.beige,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   secondaryButton: {
     flex: 1,
@@ -398,6 +398,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

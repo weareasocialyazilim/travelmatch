@@ -103,7 +103,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text} />
+          <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Request Refund</Text>
         <View style={styles.headerSpacer} />
@@ -112,7 +112,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Info Card */}
         <View style={styles.infoCard}>
-          <Icon name="information" size={24} color={COLORS.coral} />
+          <Icon name="information" size={24} color={COLORS.brand.secondary} />
           <Text style={styles.infoText}>
             Please provide detailed information about your refund request. Our
             team will review it within 2-3 business days.
@@ -170,7 +170,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
                         color={
                           value === reasonOption.id
                             ? COLORS.mint
-                            : COLORS.textSecondary
+                            : COLORS.text.secondary
                         }
                       />
                       <Text
@@ -216,7 +216,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
                   <TextInput
                     style={styles.textArea}
                     placeholder="Describe your issue here..."
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={COLORS.text.secondary}
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
@@ -238,14 +238,14 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
           style={styles.policyLink}
           onPress={() => navigation.navigate('RefundPolicy')}
         >
-          <Icon name="file-document-outline" size={20} color={COLORS.coral} />
+          <Icon name="file-document-outline" size={20} color={COLORS.brand.secondary} />
           <Text style={styles.policyLinkText}>View Refund Policy</Text>
-          <Icon name="chevron-right" size={20} color={COLORS.coral} />
+          <Icon name="chevron-right" size={20} color={COLORS.brand.secondary} />
         </TouchableOpacity>
 
         {/* Warning */}
         <View style={styles.warningCard}>
-          <Icon name="alert" size={20} color={COLORS.warning} />
+          <Icon name="alert" size={20} color={COLORS.feedback.warning} />
           <Text style={styles.warningText}>
             Fraudulent refund requests may result in account suspension. Please
             ensure your request is legitimate.
@@ -268,7 +268,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
             <Text style={styles.submitButtonText}>Submitting...</Text>
           ) : (
             <>
-              <Icon name="send" size={20} color={COLORS.white} />
+              <Icon name="send" size={20} color={COLORS.utility.white} />
               <Text style={styles.submitButtonText}>Submit Refund Request</Text>
             </>
           )}
@@ -286,20 +286,20 @@ const styles = StyleSheet.create({
     width: 40,
   },
   bottomAction: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopColor: COLORS.lightGray,
     borderTopWidth: 1,
     padding: 16,
     paddingBottom: 32,
   },
   charCount: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.caption,
     marginTop: 8,
     textAlign: 'right',
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   content: {
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomColor: COLORS.lightGray,
     borderBottomWidth: 1,
     flexDirection: 'row',
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
   },
@@ -338,14 +338,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   infoText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.bodySmall,
     lineHeight: 20,
   },
   policyLink: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     flexDirection: 'row',
     gap: 8,
@@ -355,14 +355,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   policyLinkText: {
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
     flex: 1,
     ...TYPOGRAPHY.body,
     fontWeight: '600',
   },
   reasonCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderColor: COLORS.lightGray,
     borderRadius: 12,
     borderWidth: 2,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.mint,
   },
   reasonLabel: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.body,
     fontWeight: '500',
@@ -393,13 +393,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.bodySmall,
     marginBottom: 12,
     paddingHorizontal: 16,
   },
   sectionTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
     marginBottom: 4,
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     alignItems: 'center',
-    backgroundColor: COLORS.coral,
+    backgroundColor: COLORS.brand.secondary,
     borderRadius: 12,
     flexDirection: 'row',
     gap: 8,
@@ -418,16 +418,16 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
   },
   textArea: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderColor: COLORS.lightGray,
     borderRadius: 12,
     borderWidth: 1,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.body,
     minHeight: 120,
     padding: 16,
@@ -437,12 +437,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   transactionCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     marginTop: 12,
     padding: 16,
   },
   transactionLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     ...TYPOGRAPHY.body,
   },
   transactionRow: {
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   transactionValue: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     ...TYPOGRAPHY.body,
     fontWeight: '600',
   },
@@ -468,14 +468,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   warningText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     ...TYPOGRAPHY.caption,
     lineHeight: 19,
   },
   errorText: {
     fontSize: 12,
-    color: COLORS.coral,
+    color: COLORS.brand.secondary,
     marginTop: 8,
   },
 });

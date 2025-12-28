@@ -58,7 +58,7 @@ export const GridMomentCard: React.FC<GridCardProps> = ({
             <MaterialCommunityIcons
               name="map-marker"
               size={10}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.gridDistance}>{item.distance || '?'} km</Text>
           </View>
@@ -83,10 +83,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   gridCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   gridImage: {
     width: '100%',
     height: 120,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   gridContent: {
     padding: 10,
@@ -110,23 +110,23 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   gridCreatorName: {
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     flex: 1,
   },
   gridTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
     lineHeight: 17,
   },
   gridStory: {
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 6,
   },
   gridFooter: {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   gridDistance: {
     fontSize: 10,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   gridPrice: {
     fontSize: 14,

@@ -175,7 +175,7 @@ const AppSettingsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
@@ -188,12 +188,12 @@ const AppSettingsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="magnify"
             size={20}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
           <TextInput
             style={styles.searchInput}
             placeholder="Search settings..."
-            placeholderTextColor={COLORS.textSecondary}
+            placeholderTextColor={COLORS.text.secondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
@@ -204,7 +204,7 @@ const AppSettingsScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="close-circle"
                 size={18}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
             </TouchableOpacity>
           )}
@@ -226,7 +226,7 @@ const AppSettingsScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="shield-account"
                 size={24}
-                color={COLORS.warning}
+                color={COLORS.feedback.warning}
               />
             </View>
             <View style={styles.verificationContent}>
@@ -253,13 +253,13 @@ const AppSettingsScreen: React.FC = () => {
                 <View
                   style={[
                     styles.settingIcon,
-                    { backgroundColor: COLORS.coralTransparent },
+                    { backgroundColor: COLORS.brand.secondaryTransparent },
                   ]}
                 >
                   <MaterialCommunityIcons
                     name="bell"
                     size={20}
-                    color={COLORS.coral}
+                    color={COLORS.brand.secondary}
                   />
                 </View>
                 <View style={styles.settingContent}>
@@ -280,8 +280,8 @@ const AppSettingsScreen: React.FC = () => {
                       setMarketingNotifications(false);
                     }
                   }}
-                  trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                  thumbColor={COLORS.white}
+                  trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                  thumbColor={COLORS.utility.white}
                 />
                 <MaterialCommunityIcons
                   name={notificationsExpanded ? 'chevron-up' : 'chevron-down'}
@@ -300,8 +300,8 @@ const AppSettingsScreen: React.FC = () => {
                     <Switch
                       value={chatNotifications}
                       onValueChange={setChatNotifications}
-                      trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                      thumbColor={COLORS.white}
+                      trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                      thumbColor={COLORS.utility.white}
                     />
                   </View>
                   <View style={styles.subSettingItem}>
@@ -309,8 +309,8 @@ const AppSettingsScreen: React.FC = () => {
                     <Switch
                       value={requestNotifications}
                       onValueChange={setRequestNotifications}
-                      trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                      thumbColor={COLORS.white}
+                      trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                      thumbColor={COLORS.utility.white}
                     />
                   </View>
                   <View style={styles.subSettingItem}>
@@ -318,8 +318,8 @@ const AppSettingsScreen: React.FC = () => {
                     <Switch
                       value={marketingNotifications}
                       onValueChange={setMarketingNotifications}
-                      trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                      thumbColor={COLORS.white}
+                      trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                      thumbColor={COLORS.utility.white}
                     />
                   </View>
                 </View>
@@ -354,8 +354,8 @@ const AppSettingsScreen: React.FC = () => {
                 <Switch
                   value={profileVisible}
                   onValueChange={setProfileVisible}
-                  trackColor={{ false: COLORS.border, true: COLORS.mint }}
-                  thumbColor={COLORS.white}
+                  trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                  thumbColor={COLORS.utility.white}
                 />
               </View>
             </View>
@@ -471,7 +471,7 @@ const AppSettingsScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="magnify-close"
               size={48}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
             <Text style={styles.noResultsText}>
               No settings found for "{searchQuery}"
@@ -488,7 +488,7 @@ const AppSettingsScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="logout"
               size={20}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
             <Text style={styles.signOutText}>Sign Out</Text>
           </TouchableOpacity>
@@ -500,7 +500,7 @@ const AppSettingsScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="delete-outline"
               size={20}
-              color={COLORS.error}
+              color={COLORS.feedback.error}
             />
             <Text style={styles.deleteText}>Delete</Text>
           </TouchableOpacity>
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   placeholder: {
     width: 40,
@@ -563,12 +563,12 @@ const styles = StyleSheet.create({
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     paddingHorizontal: 14,
     height: 44,
     gap: 10,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   noResults: {
     alignItems: 'center',
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   },
   noResultsText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
   },
   scrollView: {
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -622,15 +622,15 @@ const styles = StyleSheet.create({
   verificationTitle: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   verificationDesc: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   verifyButton: {
-    backgroundColor: COLORS.warning,
+    backgroundColor: COLORS.feedback.warning,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
   verifyButtonText: {
     ...TYPOGRAPHY.caption,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 
   // Sections
@@ -648,10 +648,10 @@ const styles = StyleSheet.create({
 
   // Settings Card
   settingsCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -676,21 +676,21 @@ const styles = StyleSheet.create({
   settingLabel: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   settingDesc: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     marginHorizontal: 14,
   },
   dividerFull: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
 
   // Expanded notifications
@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
   },
   subSettingLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 
   // Action Buttons
@@ -722,17 +722,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 14,
     paddingVertical: 14,
     gap: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   signOutText: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   deleteButton: {
     flex: 1,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
   deleteText: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.error,
+    color: COLORS.feedback.error,
   },
 
   // Footer
@@ -758,7 +758,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     fontWeight: '500',
   },
 });

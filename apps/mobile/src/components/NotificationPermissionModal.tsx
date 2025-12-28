@@ -49,12 +49,12 @@ export const NotificationPermissionModal: React.FC<
           {/* Icon */}
           <View style={styles.iconContainer}>
             <LinearGradient
-              colors={[COLORS.primary, COLORS.accent]}
+              colors={[COLORS.brand.primary, COLORS.brand.accent]}
               style={styles.iconGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="bell-ring" size={48} color={COLORS.white} />
+              <Icon name="bell-ring" size={48} color={COLORS.utility.white} />
             </LinearGradient>
           </View>
 
@@ -70,15 +70,15 @@ export const NotificationPermissionModal: React.FC<
           {/* Benefits */}
           <View style={styles.benefitsContainer}>
             <View style={styles.benefit}>
-              <Icon name="hand-heart" size={20} color={COLORS.primary} />
+              <Icon name="hand-heart" size={20} color={COLORS.brand.primary} />
               <Text style={styles.benefitText}>New gesture matches</Text>
             </View>
             <View style={styles.benefit}>
-              <Icon name="message-text" size={20} color={COLORS.primary} />
+              <Icon name="message-text" size={20} color={COLORS.brand.primary} />
               <Text style={styles.benefitText}>Chat messages</Text>
             </View>
             <View style={styles.benefit}>
-              <Icon name="check-decagram" size={20} color={COLORS.primary} />
+              <Icon name="check-decagram" size={20} color={COLORS.brand.primary} />
               <Text style={styles.benefitText}>Proof verification updates</Text>
             </View>
           </View>
@@ -90,7 +90,7 @@ export const NotificationPermissionModal: React.FC<
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={[COLORS.primary, COLORS.accent]}
+              colors={[COLORS.brand.primary, COLORS.brand.accent]}
               style={styles.allowGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   allowButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   benefit: {
     alignItems: 'center',
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     borderBottomWidth: 1,
     flexDirection: 'row',
     paddingVertical: SPACING.md,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   description: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     lineHeight: 24,
     marginBottom: SPACING.lg,
     textAlign: 'center',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   modal: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: radii.xl,
     padding: SPACING.xl,
     width: '100%',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontWeight: '600',
   },
   title: {

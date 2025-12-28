@@ -81,12 +81,12 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
 
   return (
     <LinearGradient
-      colors={[COLORS.background, COLORS.surface]}
+      colors={[COLORS.bg.primary, COLORS.surface.base]}
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
     >
-      <StatusBar style="dark" backgroundColor={COLORS.background} />
+      <StatusBar style="dark" backgroundColor={COLORS.bg.primary} />
 
       <View style={styles.content}>
         {/* Logo */}
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   tagline: {
     ...TYPOGRAPHY.bodySmall,
     textAlign: 'center',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   progressSection: {
     paddingHorizontal: 40,
@@ -275,13 +275,13 @@ const styles = StyleSheet.create({
   },
   progressBarBackground: {
     height: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 2,
   },
   statusContainer: {
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginLeft: 8,
   },
   dotsContainer: {
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     marginHorizontal: 2,
   },
   errorContainer: {
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontWeight: '600',
     marginBottom: 8,
     textAlign: 'center',
@@ -326,19 +326,19 @@ const styles = StyleSheet.create({
   },
   errorText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     flex: 1,
   },
   retryButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     borderRadius: 6,
     marginLeft: 8,
   },
   retryText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '600',
   },
   warningContainer: {
@@ -349,18 +349,18 @@ const styles = StyleSheet.create({
   },
   warningText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.warning || '#D97706',
+    color: COLORS.feedback.warning || '#D97706',
     textAlign: 'center',
   },
   detailsContainer: {
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: COLORS.warning || '#D97706',
+    borderTopColor: COLORS.feedback.warning || '#D97706',
   },
   detailText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.warning || '#D97706',
+    color: COLORS.feedback.warning || '#D97706',
     marginTop: 4,
   },
   footer: {
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   },
   version: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
   },
 });
 

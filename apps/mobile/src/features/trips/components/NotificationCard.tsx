@@ -28,15 +28,15 @@ export const NotificationCard = ({ item, onPress }: NotificationCardProps) => {
   const getIconColor = () => {
     switch (item.type) {
       case 'completed':
-        return COLORS.success;
+        return COLORS.feedback.success;
       case 'review':
         return COLORS.gold;
       case 'payment':
-        return COLORS.primary;
+        return COLORS.brand.primary;
       case 'new_request':
-        return COLORS.info;
+        return COLORS.feedback.info;
       default:
-        return COLORS.textSecondary;
+        return COLORS.text.secondary;
     }
   };
 
@@ -70,20 +70,20 @@ export const NotificationCard = ({ item, onPress }: NotificationCardProps) => {
 
 const styles = StyleSheet.create({
   notificationItem: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     flexDirection: 'row',
     gap: 12,
     marginBottom: 8,
     padding: 12,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 4,
     elevation: 2,
   },
   notificationUnread: {
-    backgroundColor: `${COLORS.primary}05`,
+    backgroundColor: `${COLORS.brand.primary}05`,
   },
   notificationAvatar: {
     borderRadius: 20,
@@ -101,23 +101,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   notificationTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     fontWeight: '600',
     marginBottom: 4,
   },
   notificationBody: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     lineHeight: 18,
     marginBottom: 4,
   },
   notificationTime: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 12,
   },
   unreadIndicator: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 4,
     height: 8,
     width: 8,

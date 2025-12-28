@@ -2,7 +2,7 @@ import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 
 type BadgeVariant =
   | 'default'
@@ -34,41 +34,41 @@ export const Badge = memo<BadgeProps>(function Badge({
   const variantStyles = useMemo((): { bg: string; text: string } => {
     switch (variant) {
       case 'success':
-        return { bg: COLORS.mintTransparent, text: COLORS.success };
+        return { bg: COLORS.mintTransparent, text: COLORS.feedback.success };
       case 'warning':
         return { bg: COLORS.softOrangeTransparent, text: COLORS.orange };
       case 'error':
-        return { bg: COLORS.coralTransparent, text: COLORS.error };
+        return {
+          bg: COLORS.brand.secondaryTransparent,
+          text: COLORS.feedback.error,
+        };
       case 'info':
-        return { bg: 'rgba(59, 130, 246, 0.1)', text: COLORS.info };
+        return { bg: 'rgba(59, 130, 246, 0.1)', text: COLORS.feedback.info };
       case 'primary':
-        return { bg: COLORS.primaryMuted, text: COLORS.primary };
+        return { bg: COLORS.primaryMuted, text: COLORS.brand.primary };
       default:
-        return { bg: COLORS.gray[100], text: COLORS.gray[600] };
+        return { bg: primitives.stone[100], text: primitives.stone[600] };
     }
   }, [variant]);
 
   // Memoize size styles
-  const sizeStyles = useMemo(
-    (): {
-      paddingH: number;
-      paddingV: number;
-      fontSize: number;
-      iconSize: number;
-    } => {
-      switch (size) {
-        case 'sm':
-          return { paddingH: 8, paddingV: 2, fontSize: 10, iconSize: 12 };
-        case 'md':
-          return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
-        case 'lg':
-          return { paddingH: 12, paddingV: 6, fontSize: 14, iconSize: 16 };
-        default:
-          return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
-      }
-    },
-    [size],
-  );
+  const sizeStyles = useMemo((): {
+    paddingH: number;
+    paddingV: number;
+    fontSize: number;
+    iconSize: number;
+  } => {
+    switch (size) {
+      case 'sm':
+        return { paddingH: 8, paddingV: 2, fontSize: 10, iconSize: 12 };
+      case 'md':
+        return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
+      case 'lg':
+        return { paddingH: 12, paddingV: 6, fontSize: 14, iconSize: 16 };
+      default:
+        return { paddingH: 10, paddingV: 4, fontSize: 12, iconSize: 14 };
+    }
+  }, [size]);
 
   // Memoize dot style
   const dotStyle = useMemo(
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     minWidth: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 5,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   notificationText: {
     fontSize: 10,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 

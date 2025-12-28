@@ -49,7 +49,7 @@ export function DeleteMomentDialog({
             <MaterialCommunityIcons
               name="close"
               size={24}
-              color={COLORS.textSecondary}
+              color={COLORS.text.secondary}
             />
           </TouchableOpacity>
 
@@ -59,7 +59,7 @@ export function DeleteMomentDialog({
               <MaterialCommunityIcons
                 name="alert"
                 size={32}
-                color={COLORS.warning}
+                color={COLORS.feedback.warning}
               />
             </View>
           </View>
@@ -96,13 +96,13 @@ export function DeleteMomentDialog({
               style={[styles.deleteButton, isDeleting && styles.disabledButton]}
             >
               {isDeleting ? (
-                <ActivityIndicator size="small" color={COLORS.white} />
+                <ActivityIndicator size="small" color={COLORS.utility.white} />
               ) : (
                 <>
                   <MaterialCommunityIcons
                     name="trash-can-outline"
                     size={18}
-                    color={COLORS.white}
+                    color={COLORS.utility.white}
                   />
                   <Text style={styles.deleteButtonText}>Delete</Text>
                 </>
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 24,
     width: '100%',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: COLORS.warning + '20',
+    backgroundColor: COLORS.feedback.warning + '20',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -159,11 +159,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   momentTitleContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
@@ -172,18 +172,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     textAlign: 'center',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   description: {
     textAlign: 'center',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 14,
     marginBottom: 24,
     lineHeight: 20,
   },
   highlight: {
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -194,21 +194,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   cancelButtonText: {
     textAlign: 'center',
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.text.primary,
   },
   deleteButton: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   disabledButton: {
     opacity: 0.6,

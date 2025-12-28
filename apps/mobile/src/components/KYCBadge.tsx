@@ -135,7 +135,7 @@ export const KYCBadge: React.FC<KYCBadgeProps> = ({
       <MaterialCommunityIcons
         name={config.icon}
         size={iconSize}
-        color={COLORS.white}
+        color={COLORS.utility.white}
       />
     </View>
   );
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: COLORS.white,
+    borderColor: COLORS.utility.white,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,

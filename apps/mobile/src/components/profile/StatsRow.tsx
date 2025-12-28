@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   statItem: {
     flex: 1,
@@ -71,17 +71,17 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 2,
   },
   statLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   statDivider: {
     width: 1,
     height: 32,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
 });
 

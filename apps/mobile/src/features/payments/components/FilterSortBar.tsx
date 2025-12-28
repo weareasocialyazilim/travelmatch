@@ -28,7 +28,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
         <MaterialCommunityIcons
           name="filter-variant"
           size={16}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
         <Text style={styles.filterButtonText}>
           {getFilterLabel(filterBy)}
@@ -36,7 +36,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
         <MaterialCommunityIcons
           name="chevron-down"
           size={16}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
       </TouchableOpacity>
 
@@ -44,7 +44,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
         <MaterialCommunityIcons
           name="sort"
           size={16}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
         <Text style={styles.filterButtonText}>
           {getSortLabel(sortBy)}
@@ -52,7 +52,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
         <MaterialCommunityIcons
           name="chevron-down"
           size={16}
-          color={COLORS.primary}
+          color={COLORS.brand.primary}
         />
       </TouchableOpacity>
     </View>
@@ -109,7 +109,7 @@ export function SortFilterModal<T extends string>({
               <MaterialCommunityIcons
                 name="check"
                 size={20}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             )}
           </TouchableOpacity>
@@ -129,17 +129,17 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
     gap: 6,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   filterButtonText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '500',
   },
   modalOverlay: {
@@ -148,11 +148,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -171,14 +171,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   modalOptionText: {
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   modalOptionSelected: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '600',
   },
 });

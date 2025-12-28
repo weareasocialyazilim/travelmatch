@@ -64,7 +64,7 @@ const MomentPreview: React.FC<MomentPreviewProps> = memo(
                   <MaterialCommunityIcons
                     name="map-marker"
                     size={16}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                   <Text style={styles.previewDetailText}>{place.name}</Text>
                 </View>
@@ -73,7 +73,7 @@ const MomentPreview: React.FC<MomentPreviewProps> = memo(
                 <MaterialCommunityIcons
                   name="clock-outline"
                   size={16}
-                  color={COLORS.textSecondary}
+                  color={COLORS.text.secondary}
                 />
                 <Text style={styles.previewDetailText}>
                   {selectedDate.toLocaleDateString('en-US', {
@@ -87,7 +87,7 @@ const MomentPreview: React.FC<MomentPreviewProps> = memo(
                   <MaterialCommunityIcons
                     name="currency-usd"
                     size={16}
-                    color={COLORS.textSecondary}
+                    color={COLORS.text.secondary}
                   />
                   <Text style={[styles.previewDetailText, styles.previewPrice]}>
                     {amount}
@@ -101,7 +101,7 @@ const MomentPreview: React.FC<MomentPreviewProps> = memo(
                 <MaterialCommunityIcons
                   name="shield-check"
                   size={14}
-                  color={COLORS.success}
+                  color={COLORS.feedback.success}
                 />
                 <Text style={styles.previewProofText}>ProofLoop Protected</Text>
               </View>
@@ -121,14 +121,14 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   previewLabel: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.2,
     marginBottom: 12,
   },
   previewCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: LAYOUT.borderRadius.lg,
     overflow: 'hidden',
     ...CARD_SHADOW,
@@ -158,14 +158,14 @@ const styles = StyleSheet.create({
   },
   userAvatar: {
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 16,
     height: 32,
     justifyContent: 'center',
     width: 32,
   },
   userAvatarText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -173,26 +173,26 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   userName: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 13,
     fontWeight: '600',
   },
   userRole: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 11,
   },
   previewContent: {
     padding: 16,
   },
   previewTitle: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 20,
     fontWeight: '600',
     lineHeight: 26,
     marginBottom: 8,
   },
   previewStory: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     lineHeight: 22,
     marginBottom: 12,
@@ -208,11 +208,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   previewDetailText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 13,
   },
   previewPrice: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
   previewProofBadge: {
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   previewProofText: {
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     fontSize: 12,
     fontWeight: '600',
   },

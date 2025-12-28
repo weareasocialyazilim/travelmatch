@@ -226,3 +226,19 @@ export const HIT_SLOP = {
 export type SpacingKey = keyof typeof SPACING;
 export type RadiusKey = keyof typeof RADIUS;
 export type SizeKey = keyof typeof SIZES;
+
+// ═══════════════════════════════════════════════════════════════════
+// BACKWARD COMPATIBILITY ALIASES
+// ═══════════════════════════════════════════════════════════════════
+export const spacing = SPACING;
+export const radii = RADIUS;
+
+export const BORDER = {
+  none: 0,
+  thin: 1,
+  medium: 2,
+  thick: 3,
+  hairline: 0.5,
+} as const;
+
+export type BorderKey = keyof typeof BORDER;

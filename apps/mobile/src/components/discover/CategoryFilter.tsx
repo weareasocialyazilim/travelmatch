@@ -49,7 +49,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 const styles = StyleSheet.create({
   categorySection: {
     paddingVertical: 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
   },
   categoryScroll: {
     paddingHorizontal: 16,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   categoryPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontSize: 13,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   categoryLabelActive: {
     color: COLORS.mint,

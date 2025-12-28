@@ -14,32 +14,32 @@ export const AllColors: StoryObj = {
     <ScrollView style={styles.container}>
       <Text style={styles.sectionTitle}>Primary Colors</Text>
       <View style={styles.row}>
-        <ColorSwatch name="Primary" color={COLORS.primary} />
-        <ColorSwatch name="Secondary" color={COLORS.secondary} />
-        <ColorSwatch name="Accent" color={COLORS.accent} />
+        <ColorSwatch name="Primary" color={COLORS.brand.primary} />
+        <ColorSwatch name="Secondary" color={COLORS.brand.secondary} />
+        <ColorSwatch name="Accent" color={COLORS.brand.accent} />
       </View>
 
       <Text style={styles.sectionTitle}>Semantic Colors</Text>
       <View style={styles.row}>
-        <ColorSwatch name="Success" color={COLORS.success} />
-        <ColorSwatch name="Error" color={COLORS.error} />
-        <ColorSwatch name="Warning" color={COLORS.warning} />
-        <ColorSwatch name="Info" color={COLORS.info} />
+        <ColorSwatch name="Success" color={COLORS.feedback.success} />
+        <ColorSwatch name="Error" color={COLORS.feedback.error} />
+        <ColorSwatch name="Warning" color={COLORS.feedback.warning} />
+        <ColorSwatch name="Info" color={COLORS.feedback.info} />
       </View>
 
       <Text style={styles.sectionTitle}>Text Colors</Text>
       <View style={styles.row}>
-        <ColorSwatch name="Text Primary" color={COLORS.text} />
-        <ColorSwatch name="Text Secondary" color={COLORS.textSecondary} />
-        <ColorSwatch name="Text Disabled" color={COLORS.textDisabled || '#999'} />
+        <ColorSwatch name="Text Primary" color={COLORS.text.primary} />
+        <ColorSwatch name="Text Secondary" color={COLORS.text.secondary} />
+        <ColorSwatch name="Text Disabled" color={COLORS.text.primaryDisabled || '#999'} />
       </View>
 
       <Text style={styles.sectionTitle}>Neutral Colors</Text>
       <View style={styles.row}>
-        <ColorSwatch name="White" color={COLORS.white} />
-        <ColorSwatch name="Black" color={COLORS.black} />
-        <ColorSwatch name="Background" color={COLORS.background} />
-        <ColorSwatch name="Surface" color={COLORS.surface || '#f9f9f9'} />
+        <ColorSwatch name="White" color={COLORS.utility.white} />
+        <ColorSwatch name="Black" color={COLORS.utility.black} />
+        <ColorSwatch name="Background" color={COLORS.bg.primary} />
+        <ColorSwatch name="Surface" color={COLORS.surface.base || '#f9f9f9'} />
       </View>
 
       <Text style={styles.sectionTitle}>Gray Scale</Text>
@@ -55,7 +55,7 @@ export const AllColors: StoryObj = {
 export const PrimaryPalette: StoryObj = {
   render: () => (
     <View style={styles.container}>
-      <ColorSwatch name="Primary" color={COLORS.primary} large />
+      <ColorSwatch name="Primary" color={COLORS.brand.primary} large />
       <View style={styles.description}>
         <Text style={styles.descText}>Main brand color used for primary actions, links, and key UI elements</Text>
       </View>
@@ -66,10 +66,10 @@ export const PrimaryPalette: StoryObj = {
 export const SemanticColors: StoryObj = {
   render: () => (
     <View style={styles.container}>
-      <ColorSwatch name="Success" color={COLORS.success} />
-      <ColorSwatch name="Error" color={COLORS.error} />
-      <ColorSwatch name="Warning" color={COLORS.warning} />
-      <ColorSwatch name="Info" color={COLORS.info} />
+      <ColorSwatch name="Success" color={COLORS.feedback.success} />
+      <ColorSwatch name="Error" color={COLORS.feedback.error} />
+      <ColorSwatch name="Warning" color={COLORS.feedback.warning} />
+      <ColorSwatch name="Info" color={COLORS.feedback.info} />
     </View>
   ),
 };

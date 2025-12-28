@@ -93,7 +93,7 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
           <MaterialCommunityIcons
             name="wifi-off"
             size={18}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
           <Text style={styles.compactMessage}>{message}</Text>
         </View>
@@ -107,7 +107,7 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
             testID={`${testID}-retry`}
           >
             {isRetrying ? (
-              <ActivityIndicator size="small" color={COLORS.primary} />
+              <ActivityIndicator size="small" color={COLORS.brand.primary} />
             ) : (
               <Text style={styles.compactRetryText}>{retryText}</Text>
             )}
@@ -124,7 +124,7 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
           <MaterialCommunityIcons
             name="wifi-off"
             size={64}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
         </View>
 
@@ -140,13 +140,13 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
             testID={`${testID}-retry`}
           >
             {isRetrying ? (
-              <ActivityIndicator size="small" color={COLORS.white} />
+              <ActivityIndicator size="small" color={COLORS.utility.white} />
             ) : (
               <>
                 <MaterialCommunityIcons
                   name="refresh"
                   size={20}
-                  color={COLORS.white}
+                  color={COLORS.utility.white}
                 />
                 <Text style={styles.retryButtonText}>{retryText}</Text>
               </>
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   // Full screen styles
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.lg,
@@ -178,13 +178,13 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.h2,
     fontSize: 20,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.sm,
     textAlign: 'center',
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: SPACING.xl,
     lineHeight: 22,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.md,
     borderRadius: 12,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     gap: SPACING.xs,
   },
   retryButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   compactContent: {
     flex: 1,
@@ -225,20 +225,20 @@ const styles = StyleSheet.create({
   },
   compactMessage: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   compactRetryButton: {
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs,
     borderRadius: 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     minWidth: 80,
     alignItems: 'center',
   },
   compactRetryText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
 });

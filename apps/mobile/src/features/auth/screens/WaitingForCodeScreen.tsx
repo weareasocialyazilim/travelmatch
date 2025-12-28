@@ -106,7 +106,7 @@ export const WaitingForCodeScreen: React.FC = () => {
           onPress={handleCancel}
           {...a11y.button('Cancel and go back')}
         >
-          <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
       </View>
 
@@ -123,7 +123,7 @@ export const WaitingForCodeScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="cellphone-message"
               size={64}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
           </Animated.View>
         </Animated.View>
@@ -151,15 +151,15 @@ export const WaitingForCodeScreen: React.FC = () => {
         {/* Tips */}
         <View style={styles.tipsContainer}>
           <View style={styles.tipRow}>
-            <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.success} />
+            <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.feedback.success} />
             <Text style={styles.tipText}>Make sure your phone has signal</Text>
           </View>
           <View style={styles.tipRow}>
-            <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.success} />
+            <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.feedback.success} />
             <Text style={styles.tipText}>Check your SMS inbox</Text>
           </View>
           <View style={styles.tipRow}>
-            <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.success} />
+            <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.feedback.success} />
             <Text style={styles.tipText}>Code will arrive within 30 seconds</Text>
           </View>
         </View>
@@ -172,7 +172,7 @@ export const WaitingForCodeScreen: React.FC = () => {
               onPress={handleRetry}
               {...a11y.button('Request new code')}
             >
-              <MaterialCommunityIcons name="refresh" size={20} color={COLORS.white} />
+              <MaterialCommunityIcons name="refresh" size={20} color={COLORS.utility.white} />
               <Text style={styles.retryButtonText}>Request New Code</Text>
             </TouchableOpacity>
           </View>
@@ -184,7 +184,7 @@ export const WaitingForCodeScreen: React.FC = () => {
           onPress={handleManualEntry}
           {...a11y.button('Enter code manually')}
         >
-          <MaterialCommunityIcons name="keyboard-outline" size={18} color={COLORS.primary} />
+          <MaterialCommunityIcons name="keyboard-outline" size={18} color={COLORS.brand.primary} />
           <Text style={styles.manualEntryText}>Already have a code? Enter manually</Text>
         </TouchableOpacity>
 
@@ -204,7 +204,7 @@ export const WaitingForCodeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${COLORS.brand.primary}15`,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 32,
@@ -237,13 +237,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 32,
@@ -257,23 +257,23 @@ const styles = StyleSheet.create({
   progressBar: {
     width: '80%',
     height: 6,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 8,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 3,
   },
   progressText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   tipsContainer: {
     width: '100%',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   },
   tipText: {
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   retryContainer: {
     width: '100%',
@@ -297,12 +297,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 26,
     height: 52,
   },
   retryButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
   manualEntryText: {
     fontSize: 14,
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     fontWeight: '500',
   },
   cancelButton: {
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });
 

@@ -196,7 +196,7 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
               <MaterialCommunityIcons
                 name="gift"
                 size={48}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
             </LinearGradient>
           </Animated.View>
@@ -221,7 +221,7 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
               <MaterialCommunityIcons
                 name="lock"
                 size={20}
-                color={COLORS.success}
+                color={COLORS.feedback.success}
               />
               <Text style={styles.escrowText}>
                 Para güvenli kasada, deneyim tamamlanınca transfer edilecek
@@ -237,7 +237,7 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
               <MaterialCommunityIcons
                 name="share-variant"
                 size={20}
-                color={COLORS.white}
+                color={COLORS.utility.white}
               />
               <Text style={styles.shareText}>Bu Anı Paylaş</Text>
             </TouchableOpacity>
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     top: -20,
   },
   content: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 24,
     padding: 32,
     alignItems: 'center',
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.primary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
@@ -308,13 +308,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 24,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 36,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginBottom: 24,
   },
   escrowInfo: {
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     fontSize: 14,
-    color: COLORS.success,
+    color: COLORS.feedback.success,
     lineHeight: 20,
   },
   shareButton: {
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   shareText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   closeText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontSize: 16,
     fontWeight: '500',
   },

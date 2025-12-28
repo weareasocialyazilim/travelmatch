@@ -60,7 +60,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
               <MaterialCommunityIcons
                 name="close"
                 size={24}
-                color={COLORS.text}
+                color={COLORS.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -109,7 +109,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                       <MaterialCommunityIcons
                         name="history"
                         size={20}
-                        color={COLORS.textSecondary}
+                        color={COLORS.text.secondary}
                       />
                     </View>
                     <Text style={styles.locationOptionText}>{loc}</Text>
@@ -162,11 +162,11 @@ export const LocationModal: React.FC<LocationModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'flex-end',
   },
   locationModal: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '80%',
@@ -178,12 +178,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   locationModalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   locationOptionCurrent: {
     flexDirection: 'row',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -211,11 +211,11 @@ const styles = StyleSheet.create({
   locationOptionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   locationOptionSubtitle: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   locationSection: {
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   locationSectionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 12,
@@ -235,12 +235,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   locationOptionText: {
     flex: 1,
     fontSize: 15,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   locationEmoji: {
     fontSize: 20,

@@ -337,7 +337,7 @@ const DiscoverScreen = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg.primary} />
 
       {/* Offline Banner at top */}
       {!isConnected && (
@@ -415,7 +415,7 @@ const DiscoverScreen = () => {
                   name="square-outline"
                   size={18}
                   color={
-                    viewMode === 'single' ? COLORS.white : COLORS.textSecondary
+                    viewMode === 'single' ? COLORS.utility.white : COLORS.text.secondary
                   }
                   accessible={false}
                 />
@@ -438,7 +438,7 @@ const DiscoverScreen = () => {
                   name="view-grid-outline"
                   size={18}
                   color={
-                    viewMode === 'grid' ? COLORS.white : COLORS.textSecondary
+                    viewMode === 'grid' ? COLORS.utility.white : COLORS.text.secondary
                   }
                   accessible={false}
                 />
@@ -452,7 +452,7 @@ const DiscoverScreen = () => {
               <MaterialCommunityIcons
                 name="alert-circle-outline"
                 size={48}
-                color={COLORS.error}
+                color={COLORS.feedback.error}
                 accessible={false}
               />
               <Text style={styles.errorText} {...a11y.alert(error)}>
@@ -513,7 +513,7 @@ const DiscoverScreen = () => {
           {/* Load More Indicator */}
           {loading && filteredMoments.length > 0 && (
             <View style={styles.loadMoreContainer}>
-              <ActivityIndicator size="small" color={COLORS.primary} />
+              <ActivityIndicator size="small" color={COLORS.brand.primary} />
               <Text style={styles.loadMoreText}>Loading more...</Text>
             </View>
           )}
@@ -609,7 +609,7 @@ const DiscoverScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollView: {
     flex: 1,
@@ -625,11 +625,11 @@ const styles = StyleSheet.create({
   },
   resultsText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   viewToggle: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 8,
     padding: 4,
   },
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   viewToggleButtonActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
 
   // Single List Container
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: 16,
   },
@@ -673,11 +673,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '600',
   },
 
@@ -691,7 +691,7 @@ const styles = StyleSheet.create({
   loadMoreText: {
     marginLeft: 8,
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 
   // Stories Container

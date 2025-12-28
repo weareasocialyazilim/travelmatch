@@ -52,7 +52,7 @@ export const TransactionHistoryScreen: React.FC = () => {
       amount: -25.0,
       status: 'Verified',
       icon: 'inbox-arrow-up',
-      iconBgColor: `${COLORS.primary}33`,
+      iconBgColor: `${COLORS.brand.primary}33`,
     },
     {
       id: '3',
@@ -62,7 +62,7 @@ export const TransactionHistoryScreen: React.FC = () => {
       amount: -150.0,
       status: 'Pending',
       icon: 'bank',
-      iconBgColor: `${COLORS.border}80`,
+      iconBgColor: `${COLORS.border.default}80`,
     },
     {
       id: '4',
@@ -72,7 +72,7 @@ export const TransactionHistoryScreen: React.FC = () => {
       amount: 75.0,
       status: 'Failed',
       icon: 'inbox-arrow-down',
-      iconBgColor: `${COLORS.border}80`,
+      iconBgColor: `${COLORS.border.default}80`,
     },
   ];
 
@@ -87,15 +87,15 @@ export const TransactionHistoryScreen: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Completed':
-        return { bg: COLORS.successTransparent33, text: COLORS.success };
+        return { bg: COLORS.successTransparent33, text: COLORS.feedback.success };
       case 'Verified':
-        return { bg: COLORS.infoTransparent33, text: COLORS.buttonPrimary };
+        return { bg: COLORS.infoTransparent33, text: COLORS.brand.primary };
       case 'Pending':
-        return { bg: COLORS.warningTransparent33, text: COLORS.warning };
+        return { bg: COLORS.warningTransparent33, text: COLORS.feedback.warning };
       case 'Failed':
-        return { bg: `${COLORS.primary}33`, text: COLORS.primary };
+        return { bg: `${COLORS.brand.primary}33`, text: COLORS.brand.primary };
       default:
-        return { bg: COLORS.border, text: COLORS.textSecondary };
+        return { bg: COLORS.border.default, text: COLORS.text.secondary };
     }
   };
 
@@ -115,7 +115,7 @@ export const TransactionHistoryScreen: React.FC = () => {
           <MaterialCommunityIcons
             name={'arrow-left' as IconName}
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Transaction History</Text>
@@ -179,10 +179,10 @@ export const TransactionHistoryScreen: React.FC = () => {
                       size={24}
                       color={
                         transaction.type === 'received'
-                          ? COLORS.success
+                          ? COLORS.feedback.success
                           : transaction.type === 'sent'
-                          ? COLORS.primary
-                          : COLORS.textSecondary
+                          ? COLORS.brand.primary
+                          : COLORS.text.secondary
                       }
                     />
                   </View>
@@ -205,8 +205,8 @@ export const TransactionHistoryScreen: React.FC = () => {
                         {
                           color:
                             transaction.amount > 0
-                              ? COLORS.success
-                              : COLORS.text,
+                              ? COLORS.feedback.success
+                              : COLORS.text.primary,
                         },
                       ]}
                     >
@@ -240,7 +240,7 @@ export const TransactionHistoryScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name={'history' as IconName}
                 size={48}
-                color={COLORS.textSecondary}
+                color={COLORS.text.secondary}
               />
             </View>
             <Text style={styles.emptyStateTitle}>Your History Awaits</Text>
@@ -258,7 +258,7 @@ export const TransactionHistoryScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
@@ -266,9 +266,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: `${COLORS.background}CC`,
+    backgroundColor: `${COLORS.bg.primary}CC`,
     borderBottomWidth: 1,
-    borderBottomColor: `${COLORS.border}20`,
+    borderBottomColor: `${COLORS.border.default}20`,
   },
   backButton: {
     width: 40,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
     textAlign: 'center',
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   filterButtonGroup: {
     flexDirection: 'row',
-    backgroundColor: `${COLORS.border}40`,
+    backgroundColor: `${COLORS.border.default}40`,
     borderRadius: 24,
     padding: 4,
     gap: 4,
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   filterButtonActive: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -318,10 +318,10 @@ const styles = StyleSheet.create({
   filterButtonText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   filterButtonTextActive: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
   transactionList: {
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
   transactionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 8,
     padding: 12,
     gap: 12,
@@ -351,12 +351,12 @@ const styles = StyleSheet.create({
   transactionTitle: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   transactionDate: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   transactionRight: {
     alignItems: 'flex-end',
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -392,14 +392,14 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyStateText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },

@@ -80,7 +80,7 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
             />
             <Text style={styles.title}>Incomplete Actions</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <MaterialCommunityIcons name="close" size={24} color={COLORS.textSecondary} />
+              <MaterialCommunityIcons name="close" size={24} color={COLORS.text.secondary} />
             </TouchableOpacity>
           </View>
 
@@ -93,7 +93,7 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
             {hasPayments && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <MaterialCommunityIcons name="credit-card-outline" size={20} color={COLORS.text} />
+                  <MaterialCommunityIcons name="credit-card-outline" size={20} color={COLORS.text.primary} />
                   <Text style={styles.sectionTitle}>Pending Payments ({payments.length})</Text>
                 </View>
 
@@ -140,7 +140,7 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
             {hasUploads && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <MaterialCommunityIcons name="cloud-upload-outline" size={20} color={COLORS.text} />
+                  <MaterialCommunityIcons name="cloud-upload-outline" size={20} color={COLORS.text.primary} />
                   <Text style={styles.sectionTitle}>Pending Uploads ({uploads.length})</Text>
                 </View>
 
@@ -186,7 +186,7 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
                         style={[styles.actionButton, styles.resumeButton]}
                         onPress={() => onResumeUpload(upload)}
                       >
-                        <MaterialCommunityIcons name="refresh" size={16} color={COLORS.white} />
+                        <MaterialCommunityIcons name="refresh" size={16} color={COLORS.utility.white} />
                         <Text style={styles.resumeButtonText}>Retry</Text>
                       </TouchableOpacity>
                     </View>
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '85%',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   title: {
     ...TYPOGRAPHY.h3,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     flex: 1,
   },
   closeButton: {
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     paddingHorizontal: 20,
     marginBottom: 20,
   },
@@ -259,16 +259,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   card: {
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: COLORS.bg.secondary,
     marginHorizontal: 20,
     marginBottom: 12,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   cardAmount: {
@@ -288,15 +288,15 @@ const styles = StyleSheet.create({
   },
   cardSubtitle: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   cardTime: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   cardNote: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 12,
     fontStyle: 'italic',
   },
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -319,13 +319,13 @@ const styles = StyleSheet.create({
   },
   progressText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     minWidth: 40,
     textAlign: 'right',
   },
   retryText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     marginBottom: 8,
   },
   cardActions: {
@@ -343,13 +343,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   dismissButton: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   dismissButtonText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontWeight: '500',
   },
   resumeButton: {
@@ -357,13 +357,13 @@ const styles = StyleSheet.create({
   },
   resumeButtonText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontWeight: '600',
   },
   footer: {
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   dismissAllButton: {
     paddingVertical: 14,
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
   dismissAllText: {
     ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontWeight: '500',
   },
 });

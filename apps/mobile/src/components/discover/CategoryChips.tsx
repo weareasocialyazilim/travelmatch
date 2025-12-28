@@ -176,12 +176,12 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 20,
-    shadowColor: COLORS.primary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -207,21 +207,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   labelSelected: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   // Tab styles
   tabContainer: {
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   tab: {
     flex: 1,
@@ -231,20 +231,20 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabSelected: {
-    borderBottomColor: COLORS.primary,
+    borderBottomColor: COLORS.brand.primary,
   },
   tabLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   tabLabelSelected: {
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   tabDescription: {
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: COLORS.text.primaryMuted,
     marginTop: 2,
   },
 });

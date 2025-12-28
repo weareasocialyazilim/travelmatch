@@ -120,7 +120,7 @@ export default function RequestMoreProofBottomSheet({
                 <TextInput
                   style={styles.otherInput}
                   placeholder="Specify the issue..."
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.text.secondary}
                   value={otherReason}
                   onChangeText={setOtherReason}
                   multiline
@@ -136,7 +136,7 @@ export default function RequestMoreProofBottomSheet({
             <TextInput
               style={styles.noteInput}
               placeholder="e.g., 'Hey! Could you take a clearer picture in front of the sign?'"
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={COLORS.text.secondary}
               value={note}
               onChangeText={setNote}
               multiline
@@ -169,10 +169,10 @@ const styles = StyleSheet.create({
   },
   modalBackdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   bottomSheet: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   header: {
     paddingHorizontal: 16,
@@ -196,18 +196,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
     lineHeight: 24,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     gap: 16,
   },
   radioOptionSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     backgroundColor: COLORS.mintTransparentLight,
   },
   radio: {
@@ -234,49 +234,49 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
   },
   radioSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   radioText: {
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     lineHeight: 20,
   },
   otherInput: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 12,
     padding: 12,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginLeft: 36,
     marginTop: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     minHeight: 72,
     textAlignVertical: 'top',
   },
   noteInput: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderRadius: 12,
     padding: 12,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginHorizontal: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     minHeight: 96,
     textAlignVertical: 'top',
   },
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sendButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     paddingVertical: 16,
     borderRadius: 28,
     alignItems: 'center',
@@ -294,10 +294,10 @@ const styles = StyleSheet.create({
   sendButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   cancelButton: {
-    backgroundColor: COLORS.transparent,
+    backgroundColor: COLORS.utility.transparent,
     paddingVertical: 16,
     borderRadius: 28,
     alignItems: 'center',
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   bottomSpacer: {
     height: 20,

@@ -80,13 +80,13 @@ export const CurrencySelectionBottomSheet: React.FC<
           <MaterialCommunityIcons
             name={'magnify' as IconName}
             size={24}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
             placeholder="Search for a currency"
-            placeholderTextColor={COLORS.textSecondary}
+            placeholderTextColor={COLORS.text.secondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             accessibilityLabel="Search currencies"
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   currencyList: {
     flex: 1,
@@ -162,12 +162,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     marginBottom: 12,
   },
   currencyItemSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}1A`, // 10% opacity
+    borderColor: COLORS.brand.primary,
+    backgroundColor: `${COLORS.brand.primary}1A`, // 10% opacity
   },
   currencyInfo: {
     flex: 1,
@@ -176,30 +176,30 @@ const styles = StyleSheet.create({
   currencyCode: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   currencyName: {
     fontSize: 14,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   radio: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
   },
   radioSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   radioDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   footer: {
     paddingHorizontal: 16,
@@ -209,14 +209,14 @@ const styles = StyleSheet.create({
   confirmButton: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   confirmButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     letterSpacing: 0.24,
   },
 });

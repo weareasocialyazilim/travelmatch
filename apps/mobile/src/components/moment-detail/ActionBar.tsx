@@ -31,7 +31,7 @@ export const ActionBar: React.FC<ActionBarProps> = React.memo(
             <MaterialCommunityIcons
               name="plus"
               size={20}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
             <Text style={styles.createSimilarText}>Create Similar Moment</Text>
           </TouchableOpacity>
@@ -58,8 +58,8 @@ ActionBar.displayName = 'ActionBar';
 
 const styles = StyleSheet.create({
   bottomBar: {
-    backgroundColor: COLORS.white,
-    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderTopColor: COLORS.border.default,
     borderTopWidth: 1,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -76,18 +76,18 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   buttonText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 16,
     fontWeight: '700',
   },
   buttonBadge: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   badgeText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   createSimilarText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
     fontSize: 16,
     fontWeight: '700',
   },

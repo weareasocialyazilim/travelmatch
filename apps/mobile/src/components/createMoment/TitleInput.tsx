@@ -20,7 +20,7 @@ const TitleInput: React.FC<TitleInputProps> = memo(
         <TextInput
           style={styles.titleInput}
           placeholder="Give your moment a title..."
-          placeholderTextColor={COLORS.textTertiary}
+          placeholderTextColor={COLORS.text.tertiary}
           value={title}
           onChangeText={onTitleChange}
           maxLength={VALUES.TITLE_MAX_LENGTH}
@@ -40,19 +40,19 @@ TitleInput.displayName = 'TitleInput';
 
 const styles = StyleSheet.create({
   titleSection: {
-    backgroundColor: COLORS.white,
-    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.utility.white,
+    borderBottomColor: COLORS.border.default,
     borderBottomWidth: 1,
     padding: 20,
   },
   titleInput: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontSize: 20,
     fontWeight: '600',
     minHeight: 60,
   },
   titleCounter: {
-    color: COLORS.textTertiary,
+    color: COLORS.text.tertiary,
     fontSize: 12,
     marginTop: 8,
     textAlign: 'right',

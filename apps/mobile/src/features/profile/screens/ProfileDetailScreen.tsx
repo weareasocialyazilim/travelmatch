@@ -208,7 +208,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
@@ -219,7 +219,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
           <MaterialCommunityIcons
             name="dots-vertical"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
       </View>
@@ -261,7 +261,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
             <MaterialCommunityIcons
               name="handshake"
               size={16}
-              color={COLORS.primary}
+              color={COLORS.brand.primary}
             />
             <Text style={styles.badgeText}>
               {user.successfulExchanges} successful exchanges
@@ -272,7 +272,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
               <MaterialCommunityIcons
                 name="lightning-bolt"
                 size={16}
-                color={COLORS.warning}
+                color={COLORS.feedback.warning}
               />
               <Text style={styles.badgeText}>Fast responder</Text>
             </View>
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   container: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     flex: 1,
   },
   header: {
@@ -430,13 +430,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   headerTitle: {
     flex: 1,
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     letterSpacing: -0.15,
   },
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     height: 128,
     borderRadius: 64,
     borderWidth: 4,
-    borderColor: COLORS.background,
+    borderColor: COLORS.bg.primary,
   },
   profileInfo: {
     alignItems: 'center',
@@ -480,13 +480,13 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 22,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
     letterSpacing: -0.15,
   },
   role: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   proofScoreBadge: {
     marginTop: 8,
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   proofScoreText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     letterSpacing: 0.15,
   },
   segmentedControl: {
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 12,
     padding: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
     borderRadius: 9999,
     height: 40,
   },
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   segmentButtonActive: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -528,10 +528,10 @@ const styles = StyleSheet.create({
   segmentButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   segmentButtonTextActive: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   momentsGrid: {
     flexDirection: 'row',
@@ -556,26 +556,26 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 12,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.heavy,
   },
   momentTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     marginBottom: 2,
   },
   momentLocation: {
     fontSize: 12,
-    color: COLORS.textWhite80,
+    color: COLORS.text.primaryWhite80,
     marginBottom: 4,
   },
   momentPrice: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   completedBadge: {
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.feedback.success,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
   completedText: {
     fontSize: 10,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   bottomPadding: {
     height: 20,
@@ -597,23 +597,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
     gap: 12,
   },
   giftButton: {
     flex: 1,
     height: 48,
     borderRadius: 9999,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   giftButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   badgesContainer: {
     flexDirection: 'row',
@@ -627,9 +627,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 9999,
@@ -637,6 +637,6 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 13,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });

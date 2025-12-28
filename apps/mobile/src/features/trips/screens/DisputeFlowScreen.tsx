@@ -179,14 +179,14 @@ export const DisputeFlowScreen: React.FC = () => {
             <MaterialCommunityIcons
               name="file-document-outline"
               size={24}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
             <Text style={styles.fileName}>{file}</Text>
             <TouchableOpacity onPress={() => handleRemoveFile(index)}>
               <MaterialCommunityIcons
                 name="close"
                 size={20}
-                color={COLORS.error}
+                color={COLORS.feedback.error}
               />
             </TouchableOpacity>
           </View>
@@ -199,7 +199,7 @@ export const DisputeFlowScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="cloud-upload"
             size={32}
-            color={COLORS.primary}
+            color={COLORS.brand.primary}
           />
           <Text style={styles.uploadButtonText}>Tap to Upload</Text>
         </TouchableOpacity>
@@ -270,7 +270,7 @@ export const DisputeFlowScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dispute Center</Text>
@@ -295,14 +295,14 @@ export const DisputeFlowScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     padding: 8,
@@ -312,19 +312,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   headerSpacer: {
     width: 40,
   },
   progressBar: {
     height: 4,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     width: '100%',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   content: {
     flex: 1,
@@ -333,53 +333,53 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 16,
   },
   detailsCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     padding: 16,
     borderRadius: 12,
     marginBottom: 20,
   },
   detailLabel: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   textArea: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 16,
     height: 150,
     textAlignVertical: 'top',
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
   },
   inputError: {
-    borderColor: COLORS.error,
+    borderColor: COLORS.feedback.error,
   },
   errorText: {
-    color: COLORS.error,
+    color: COLORS.feedback.error,
     fontSize: 14,
     marginTop: 4,
   },
   charCount: {
     textAlign: 'right',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 8,
     marginBottom: 24,
   },
   helperText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 20,
   },
   uploadArea: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   fileItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
@@ -396,11 +396,11 @@ const styles = StyleSheet.create({
   fileName: {
     flex: 1,
     marginLeft: 12,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   uploadButton: {
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
     borderStyle: 'dashed',
     borderRadius: 12,
     padding: 24,
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   uploadButtonText: {
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
     marginTop: 8,
     fontWeight: '600',
   },
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -436,30 +436,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: COLORS.text,
+    color: COLORS.text.primary,
     fontWeight: '600',
     fontSize: 16,
   },
   reviewCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     padding: 20,
     borderRadius: 12,
     marginBottom: 24,
   },
   reviewLabel: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 4,
   },
   reviewValue: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 16,
   },
   errorContainer: {

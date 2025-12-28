@@ -99,31 +99,31 @@ export const TMButton: React.FC<TMButtonProps> = ({
   const iconSize = size === 'xl' ? 24 : size === 'lg' ? 22 : size === 'md' ? 20 : size === 'sm' ? 18 : 16;
 
   const getTextColor = (): string => {
-    if (disabled) return COLORS.textDisabled;
+    if (disabled) return COLORS.text.primaryDisabled;
     switch (variant) {
       case 'primary':
-        return COLORS.white;
+        return COLORS.utility.white;
       case 'secondary':
-        return COLORS.primary;
+        return COLORS.brand.primary;
       case 'outline':
-        return COLORS.primary;
+        return COLORS.brand.primary;
       case 'ghost':
-        return COLORS.primary;
+        return COLORS.brand.primary;
       case 'danger':
-        return COLORS.white;
+        return COLORS.utility.white;
       default:
-        return COLORS.white;
+        return COLORS.utility.white;
     }
   };
 
   const getIconColor = (): string => {
-    if (disabled) return COLORS.textDisabled;
+    if (disabled) return COLORS.text.primaryDisabled;
     switch (variant) {
       case 'primary':
       case 'danger':
-        return COLORS.white;
+        return COLORS.utility.white;
       default:
-        return COLORS.primary;
+        return COLORS.brand.primary;
     }
   };
 
@@ -131,7 +131,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
     <>
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' || variant === 'danger' ? '#FFF' : COLORS.primary}
+          color={variant === 'primary' || variant === 'danger' ? '#FFF' : COLORS.brand.primary}
           size="small"
         />
       ) : (
@@ -289,13 +289,13 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.brand.primary,
   },
   ghost: {
     backgroundColor: 'transparent',
   },
   danger: {
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
   },
   disabled: {
     opacity: 0.5,

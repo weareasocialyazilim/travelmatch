@@ -61,7 +61,7 @@ export function DeletedMomentsScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.brand.primary} />
       </View>
     );
   }
@@ -77,7 +77,7 @@ export function DeletedMomentsScreen() {
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -140,18 +140,18 @@ export function DeletedMomentsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   listContent: {
     paddingBottom: 16,
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.card,
+    borderBottomColor: COLORS.border.default,
+    backgroundColor: COLORS.surface.base,
   },
   backButton: {
     padding: 8,
@@ -175,11 +175,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   headerSubtitle: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
   placeholder: {
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   momentItem: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
     backgroundColor: COLORS.cardBackground,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -201,11 +201,11 @@ const styles = StyleSheet.create({
   momentTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   momentDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 4,
   },
   deletedInfo: {
@@ -215,12 +215,12 @@ const styles = StyleSheet.create({
   },
   deletedText: {
     fontSize: 12,
-    color: COLORS.error,
+    color: COLORS.feedback.error,
   },
   restoreButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',

@@ -29,7 +29,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
     <View style={styles.container}>
       {/* Welcome Card */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.mint]}
+        colors={[COLORS.brand.primary, COLORS.mint]}
         style={styles.welcomeCard}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -39,7 +39,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
             <MaterialCommunityIcons
               name="airplane-takeoff"
               size={32}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
           </View>
           <Text style={styles.welcomeTitle}>Welcome, {firstName}!</Text>
@@ -67,13 +67,13 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           <View
             style={[
               styles.actionIcon,
-              { backgroundColor: COLORS.coralTransparent },
+              { backgroundColor: COLORS.brand.secondaryTransparent },
             ]}
           >
             <MaterialCommunityIcons
               name="account-circle-outline"
               size={24}
-              color={COLORS.coral}
+              color={COLORS.brand.secondary}
             />
           </View>
           <View style={styles.actionContent}>
@@ -85,7 +85,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           <MaterialCommunityIcons
             name="chevron-right"
             size={24}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
         </TouchableOpacity>
 
@@ -116,7 +116,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           <MaterialCommunityIcons
             name="chevron-right"
             size={24}
-            color={COLORS.textSecondary}
+            color={COLORS.text.secondary}
           />
         </TouchableOpacity>
       </View>
@@ -129,7 +129,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
             <MaterialCommunityIcons
               name="shield-check"
               size={20}
-              color={COLORS.success}
+              color={COLORS.feedback.success}
             />
             <Text style={styles.tipText}>
               Verify your profile to build trust
@@ -139,7 +139,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
             <MaterialCommunityIcons
               name="message-text-outline"
               size={20}
-              color={COLORS.info}
+              color={COLORS.feedback.info}
             />
             <Text style={styles.tipText}>Message hosts before booking</Text>
           </View>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
     marginBottom: 8,
   },
   welcomeSubtitle: {
@@ -209,17 +209,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: COLORS.black,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -239,13 +239,13 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   actionDescription: {
     fontSize: 13,
     fontWeight: '400',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   tipsContainer: {
     marginBottom: 16,
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   tipCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 12,
     padding: 14,
     gap: 12,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
 });
 

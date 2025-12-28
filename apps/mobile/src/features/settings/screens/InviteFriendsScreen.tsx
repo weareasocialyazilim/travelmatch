@@ -63,7 +63,7 @@ export default function InviteFriendsScreen({
           <MaterialCommunityIcons
             name="arrow-left"
             size={24}
-            color={COLORS.text}
+            color={COLORS.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Invite friends</Text>
@@ -100,7 +100,7 @@ export default function InviteFriendsScreen({
               <MaterialCommunityIcons
                 name="content-copy"
                 size={16}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
               <Text style={styles.copyButtonText}>Copy</Text>
             </TouchableOpacity>
@@ -116,7 +116,7 @@ export default function InviteFriendsScreen({
             <MaterialCommunityIcons
               name="link"
               size={20}
-              color={COLORS.white}
+              color={COLORS.utility.white}
             />
             <Text style={styles.primaryButtonText}>Share Invite Link</Text>
           </TouchableOpacity>
@@ -128,7 +128,7 @@ export default function InviteFriendsScreen({
             <MaterialCommunityIcons
               name="message-text"
               size={20}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
             <Text style={styles.secondaryButtonText}>Share via Messages</Text>
           </TouchableOpacity>
@@ -140,7 +140,7 @@ export default function InviteFriendsScreen({
             <MaterialCommunityIcons
               name="share"
               size={20}
-              color={COLORS.text}
+              color={COLORS.text.primary}
             />
             <Text style={styles.secondaryButtonText}>Share on Instagram</Text>
           </TouchableOpacity>
@@ -171,16 +171,16 @@ export default function InviteFriendsScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     width: 48,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     flex: 1,
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
   },
   content: {
@@ -209,14 +209,14 @@ const styles = StyleSheet.create({
   mainTitle: {
     ...TYPOGRAPHY.display2,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     textAlign: 'center',
     paddingTop: 24,
     paddingBottom: 12,
   },
   description: {
     ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
@@ -224,11 +224,11 @@ const styles = StyleSheet.create({
   inviteCodeCard: {
     margin: 16,
     padding: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: COLORS.black,
+    borderColor: COLORS.border.default,
+    shadowColor: COLORS.utility.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   codeLabel: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginBottom: 4,
   },
   codeRow: {
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   codeText: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   copyButton: {
     flexDirection: 'row',
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   copyButtonText: {
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.brand.primary,
   },
   buttonsContainer: {
     paddingHorizontal: 16,
@@ -273,30 +273,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 48,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     borderRadius: 12,
     gap: 8,
   },
   primaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   secondaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     height: 48,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     gap: 8,
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   impactSection: {
     padding: 16,
@@ -304,14 +304,14 @@ const styles = StyleSheet.create({
   impactTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 12,
   },
   statsContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     overflow: 'hidden',
   },
   statRow: {
@@ -324,16 +324,16 @@ const styles = StyleSheet.create({
   statLabel: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   statValue: {
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   statDivider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.border.default,
   },
   bottomSpacer: {
     height: 96,

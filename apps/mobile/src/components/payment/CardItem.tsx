@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   cardBrand: {
     fontSize: 14,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   defaultBadge: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   defaultBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 
