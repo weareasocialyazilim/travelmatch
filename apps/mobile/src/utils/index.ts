@@ -9,6 +9,7 @@ export * from './secureStorage';
 export * from './validation';
 export * from './accessibility';
 export * from './animations';
+export * from './motion';
 
 // Error Handling (excluding duplicates from appErrors)
 export {
