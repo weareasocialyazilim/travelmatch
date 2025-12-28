@@ -198,8 +198,21 @@ function App() {
 
   // Hide splash screen when ready
   const onLayoutRootView = useCallback(async () => {
+    logger.info('App', `onLayoutRootView called, state: ${appInitState}`);
     if (appInitState === 'ready' || appInitState === 'error') {
+      logger.info('App', 'Hiding splash screen...');
       await SplashScreen.hideAsync();
+      logger.info('App', 'Splash screen hidden');
+    }
+  }, [appInitState]);
+
+  // Force hide splash when ready (backup)
+  useEffect(() => {
+    if (appInitState === 'ready') {
+      logger.info('App', 'App is ready, forcing splash hide');
+      SplashScreen.hideAsync().catch((e) =>
+        logger.warn('App', 'Failed to hide splash', e),
+      );
     }
   }, [appInitState]);
 
@@ -211,12 +224,18 @@ function App() {
         onLayout={onLayoutRootView}
       >
         <ErrorBoundary level="app">
-          {bootstrapProgress && (
-            <InitializationScreen
-              progress={bootstrapProgress}
-              onRetry={handleRetryService}
-            />
-          )}
+          <InitializationScreen
+            progress={
+              bootstrapProgress ?? {
+                currentStep: 0,
+                totalSteps: 9,
+                currentService: null,
+                services: new Map(),
+                canContinue: true,
+              }
+            }
+            onRetry={handleRetryService}
+          />
         </ErrorBoundary>
       </GestureHandlerRootView>
     );

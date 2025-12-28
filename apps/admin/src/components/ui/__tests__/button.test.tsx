@@ -1,8 +1,11 @@
+/**
+ * @jest-environment jsdom
+ */
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-// Mock the utils module with cn function - use @/ alias to match the import in button.tsx
-jest.mock('@/lib/utils', () => ({
+// Mock the utils module with cn function - use relative path for Jest compatibility
+jest.mock('../../../lib/utils', () => ({
   cn: (...inputs: (string | undefined | null | false)[]) =>
     inputs.filter(Boolean).join(' '),
 }));

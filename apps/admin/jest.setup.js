@@ -1,6 +1,21 @@
 // Jest setup file for admin app
 require('@testing-library/jest-dom');
 
+// Ensure jsdom environment globals are available
+if (typeof window === 'undefined') {
+  global.window = {};
+}
+if (typeof document === 'undefined') {
+  const { JSDOM } = require('jsdom');
+  const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
+    url: 'http://localhost',
+    pretendToBeVisual: true,
+  });
+  global.document = dom.window.document;
+  global.window = dom.window;
+  global.navigator = dom.window.navigator;
+}
+
 // Mock date-fns/locale with proper formatDistance function
 jest.mock('date-fns/locale', () => ({
   tr: {
