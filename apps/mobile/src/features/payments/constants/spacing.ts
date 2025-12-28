@@ -1,20 +1,17 @@
 /**
- * Spacing Constants
+ * Payments Feature - Spacing Constants
+ * Re-exports from main app constants for consistency
  */
 
-export const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  '2xl': 24,
-  '3xl': 32,
-  '4xl': 40,
-  '5xl': 48,
-} as const;
-
-export type SpacingKey = keyof typeof SPACING;
-export type SpacingValue = (typeof SPACING)[SpacingKey];
-
-export default SPACING;
+export {
+  SPACING,
+  RADIUS,
+  SIZES,
+  BORDER,
+  spacing,
+  radii,
+  type SpacingKey,
+  type RadiusKey,
+  type SizeKey,
+  type BorderKey,
+} from '../../../constants/spacing';

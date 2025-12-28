@@ -1,40 +1,139 @@
 /**
- * Design Tokens - Spacing
- * Manually managed spacing scale for TravelMatch
- * Base unit: 4px
+ * TravelMatch Ultimate Design System - Spacing & Sizes
+ *
+ * 8pt Grid System with Premium spacing rules
+ *
+ * Awwwards Standards:
+ * - Screen padding: 20-24px
+ * - Card padding: 14-16px
+ * - Button heights: 44/48px (min tap target)
+ * - Radius: 16 base, 24 hero, 12 chip
  */
 
-export const spacing = {
-  // Base spacing scale (4px grid)
-  none: 0,
-  xs: 4, // 4px
-  sm: 8, // 8px
-  md: 12, // 12px
-  lg: 16, // 16px
-  xl: 20, // 20px
-  '2xl': 24, // 24px
-  '3xl': 32, // 32px
-  '4xl': 40, // 40px
-  '5xl': 48, // 48px
-  '6xl': 64, // 64px
+// ═══════════════════════════════════════════════════
+// SPACING - 8pt grid
+// ═══════════════════════════════════════════════════
+export const SPACING = {
+  // Base scale
+  xxs: 2,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  base: 16,
+  lg: 20,
+  xl: 24,
+  '2xl': 32,
+  '3xl': 40,
+  '4xl': 48,
+  '5xl': 64,
 
-  // Semantic spacing
-  gutter: 16, // Default horizontal spacing
-  sectionGap: 32, // Gap between major sections
-  componentGap: 12, // Gap between related components
-  elementGap: 8, // Gap between small elements
+  // Semantic (Awwwards standard)
+  screenPadding: 20,
+  cardPadding: 16,
+  sectionGap: 24,
+  itemGap: 12,
+  inlineGap: 8,
 } as const;
 
-export const radius = {
+// Legacy alias for backwards compatibility
+export const spacing = SPACING;
+
+
+// ═══════════════════════════════════════════════════
+// RADIUS - Premium corners
+// ═══════════════════════════════════════════════════
+export const RADIUS = {
   none: 0,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  '2xl': 24,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  base: 16,
+  lg: 20,
+  xl: 24,
+  '2xl': 28,
   full: 9999,
+
+  // Semantic
+  chip: 12,
+  button: 14,
+  card: 16,
+  cardHero: 24,
+  sheet: 28,
+  avatar: 9999,
 } as const;
 
+// Legacy alias
+export const radii = RADIUS;
+export const radius = RADIUS;
+
+
+// ═══════════════════════════════════════════════════
+// SIZES - Component dimensions
+// ═══════════════════════════════════════════════════
+export const SIZES = {
+  // Buttons
+  buttonSmall: 36,
+  button: 44,
+  buttonLarge: 52,
+  buttonXL: 56,
+
+  // Chips/Pills
+  chip: 32,
+  chipSmall: 28,
+
+  // Inputs
+  input: 48,
+  inputLarge: 56,
+
+  // Avatars
+  avatarXS: 28,
+  avatarSM: 36,
+  avatarMD: 48,
+  avatarLG: 64,
+  avatarXL: 80,
+  avatarHero: 100,
+
+  // Trust Ring
+  trustRingSM: 44,
+  trustRingMD: 64,
+  trustRingLG: 88,
+  trustRingHero: 120,
+
+  // Icons
+  iconSM: 16,
+  iconMD: 20,
+  iconLG: 24,
+  iconXL: 28,
+
+  // Navigation
+  bottomNav: 84,
+  header: 56,
+  tabBar: 48,
+
+  // Cards
+  cardImageHeight: 200,
+  cardImageHeightLarge: 280,
+
+  // FAB
+  fab: 56,
+  fabSmall: 44,
+} as const;
+
+
+// ═══════════════════════════════════════════════════
+// BORDER
+// ═══════════════════════════════════════════════════
+export const BORDER = {
+  thin: 1,
+  hairline: 0.5,
+  medium: 1.5,
+  thick: 2,
+} as const;
+
+
+// ═══════════════════════════════════════════════════
+// SHADOWS - Elevation system
+// ═══════════════════════════════════════════════════
 export const shadows = {
   none: 'none',
   sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
@@ -45,6 +144,16 @@ export const shadows = {
   inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
 } as const;
 
-export type Spacing = typeof spacing;
-export type Radius = typeof radius;
+
+// ═══════════════════════════════════════════════════
+// Type exports
+// ═══════════════════════════════════════════════════
+export type SpacingKey = keyof typeof SPACING;
+export type RadiusKey = keyof typeof RADIUS;
+export type SizeKey = keyof typeof SIZES;
+export type BorderKey = keyof typeof BORDER;
+export type Spacing = typeof SPACING;
+export type Radius = typeof RADIUS;
+export type Sizes = typeof SIZES;
+export type Border = typeof BORDER;
 export type Shadows = typeof shadows;
