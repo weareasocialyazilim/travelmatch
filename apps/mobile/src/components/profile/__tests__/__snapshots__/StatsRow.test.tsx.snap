@@ -6,7 +6,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
   style={
     {
       "alignItems": "center",
-      "borderTopColor": "#E5E7EB",
+      "borderTopColor": "#E7E5E4",
       "borderTopWidth": 1,
       "flexDirection": "row",
       "paddingVertical": 16,
@@ -38,7 +38,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       ref={null}
       style={
         {
-          "color": "#1F2937",
+          "color": "#1C1917",
           "fontSize": 20,
           "fontWeight": "700",
           "marginBottom": 2,
@@ -52,7 +52,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 12,
         }
       }
@@ -65,7 +65,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     ref={null}
     style={
       {
-        "backgroundColor": "#E5E7EB",
+        "backgroundColor": "#E7E5E4",
         "height": 32,
         "width": 1,
       }
@@ -95,7 +95,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       ref={null}
       style={
         {
-          "color": "#1F2937",
+          "color": "#1C1917",
           "fontSize": 20,
           "fontWeight": "700",
           "marginBottom": 2,
@@ -109,7 +109,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 12,
         }
       }
@@ -122,7 +122,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     ref={null}
     style={
       {
-        "backgroundColor": "#E5E7EB",
+        "backgroundColor": "#E7E5E4",
         "height": 32,
         "width": 1,
       }
@@ -141,7 +141,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       ref={null}
       style={
         {
-          "color": "#1F2937",
+          "color": "#1C1917",
           "fontSize": 20,
           "fontWeight": "700",
           "marginBottom": 2,
@@ -156,7 +156,7 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 12,
         }
       }
@@ -174,7 +174,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
   style={
     {
       "alignItems": "center",
-      "borderTopColor": "#E5E7EB",
+      "borderTopColor": "#E7E5E4",
       "borderTopWidth": 1,
       "flexDirection": "row",
       "paddingVertical": 16,
@@ -206,7 +206,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       ref={null}
       style={
         {
-          "color": "#1F2937",
+          "color": "#1C1917",
           "fontSize": 20,
           "fontWeight": "700",
           "marginBottom": 2,
@@ -220,7 +220,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 12,
         }
       }
@@ -233,7 +233,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     ref={null}
     style={
       {
-        "backgroundColor": "#E5E7EB",
+        "backgroundColor": "#E7E5E4",
         "height": 32,
         "width": 1,
       }
@@ -263,7 +263,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       ref={null}
       style={
         {
-          "color": "#1F2937",
+          "color": "#1C1917",
           "fontSize": 20,
           "fontWeight": "700",
           "marginBottom": 2,
@@ -277,7 +277,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 12,
         }
       }
@@ -290,7 +290,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     ref={null}
     style={
       {
-        "backgroundColor": "#E5E7EB",
+        "backgroundColor": "#E7E5E4",
         "height": 32,
         "width": 1,
       }
@@ -309,7 +309,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       ref={null}
       style={
         {
-          "color": "#1F2937",
+          "color": "#1C1917",
           "fontSize": 20,
           "fontWeight": "700",
           "marginBottom": 2,
@@ -324,7 +324,7 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 12,
         }
       }

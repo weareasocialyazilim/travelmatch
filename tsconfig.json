@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": [
-      "ES2020",
-      "DOM"
-    ],
+    "lib": ["ES2020", "DOM"],
     "jsx": "react",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -24,9 +21,7 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "exclude": [
@@ -37,7 +32,16 @@
     ".next",
     ".expo",
     "android",
-    "ios"
+    "ios",
+    "tests/**",
+    "apps/**",
+    "packages/**",
+    "services/**",
+    "scripts/**",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.stories.tsx"
   ],
   "extends": "expo/tsconfig.base"
 }
