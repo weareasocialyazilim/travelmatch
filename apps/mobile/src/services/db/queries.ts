@@ -425,8 +425,8 @@ export const batchFetchUsers = async (
 ): Promise<{
   data: Array<{
     id: string;
-    name: string;
-    avatar: string;
+    full_name: string;
+    avatar_url: string;
     verified: boolean;
     rating: number;
   }> | null;
@@ -435,14 +435,14 @@ export const batchFetchUsers = async (
   if (userIds.length === 0) return { data: [], error: null };
   const { data, error } = await supabase
     .from('users')
-    .select('id, name, avatar, verified, rating')
+    .select('id, full_name, avatar_url, verified, rating')
     .in('id', userIds);
 
   return {
     data: data as Array<{
       id: string;
-      name: string;
-      avatar: string;
+      full_name: string;
+      avatar_url: string;
       verified: boolean;
       rating: number;
     }> | null,
@@ -472,8 +472,8 @@ export const batchFetchMoments = async (
       image_blur_hash,
       user:users!user_id(
         id,
-        name,
-        avatar
+        full_name,
+        avatar_url
       ),
       uploaded_images!moments_image_id_fkey(
         id,

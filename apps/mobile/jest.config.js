@@ -13,7 +13,7 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo|expo-blur|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid)/)',
+    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo|expo-blur|expo/virtual|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid)/)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
@@ -55,6 +55,8 @@ module.exports = {
     '^@/screens/TransactionHistoryScreen$': '<rootDir>/src/screens/TransactionHistoryScreen',
     // General path alias (must be last)
     '^@/(.*)$': '<rootDir>/src/$1',
+    // Expo and React Native mocks
+    '^expo-blur$': '<rootDir>/__mocks__/expo-blur.js',
     '^expo-image$': '<rootDir>/__mocks__/expo-image.js',
     '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',
     '^@travelmatch/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',

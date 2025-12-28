@@ -83,14 +83,22 @@ export const RegisterScreen: React.FC = () => {
   const onSubmit = async (data: RegisterInput) => {
     try {
       setIsLoading(true);
-      await register({
+      const result = await register({
         email: data.email,
         password: data.password,
         name: data.fullName,
         gender: data.gender,
         dateOfBirth: data.dateOfBirth,
       });
-      // Navigation handled by auth state change
+      if (result.success) {
+        // Navigate to Discover on successful registration
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Discover' }],
+        });
+      } else {
+        Alert.alert('Kayıt Başarısız', result.error || 'Lütfen tekrar deneyin');
+      }
     } catch (error) {
       Alert.alert(
         'Kayıt Başarısız',
