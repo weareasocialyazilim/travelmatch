@@ -38,12 +38,14 @@ module.exports = {
   ],
   
   // Module name mapping
+  // Shared mocks are in tests/__mocks__/ to avoid duplication across packages
   moduleNameMapper: {
-    '^react-native$': '<rootDir>/__mocks__/react-native.js',
+    '^react-native$': '<rootDir>/../../tests/__mocks__/react-native.js',
+    '^react-native-reanimated$': '<rootDir>/../../tests/__mocks__/react-native-reanimated.js',
+    '^react-native-svg$': '<rootDir>/../../tests/__mocks__/react-native-svg.js',
+    // Package-specific mocks
     '^@testing-library/react-native$': '<rootDir>/__mocks__/testing-library.js',
-    '^react-native-reanimated$': '<rootDir>/__mocks__/react-native-reanimated.js',
     '^react-native-gesture-handler$': '<rootDir>/__mocks__/react-native-gesture-handler.js',
-    '^react-native-svg$': '<rootDir>/__mocks__/react-native-svg.js',
     '^@expo/vector-icons$': '<rootDir>/__mocks__/expo-vector-icons.js',
     '^@/(.*)$': '<rootDir>/src/$1',
   },

@@ -1,8 +1,9 @@
 /**
- * Mock for react-native-reanimated
+ * Shared react-native-reanimated mock for Jest tests
+ * This comprehensive mock is used by all packages in the monorepo
  */
 const React = require('react');
-const { View, Text } = require('react-native');
+const { View, Text } = require('./react-native');
 
 const Animated = {
   View: (props) => React.createElement(View, props),

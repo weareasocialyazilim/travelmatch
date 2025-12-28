@@ -1,6 +1,6 @@
 /**
- * React Native mock for Jest tests
- * This provides a comprehensive mock that matches jest.native-mocks.js
+ * Shared React Native mock for Jest tests
+ * This comprehensive mock is used by all packages in the monorepo
  */
 const React = require('react');
 
@@ -206,7 +206,7 @@ module.exports = {
     scheduleLayoutAnimation: jest.fn(),
   },
 
-  // AppState - CRITICAL FOR TESTS
+  // AppState
   AppState: {
     currentState: 'active',
     addEventListener: jest.fn(() => ({ remove: jest.fn() })),
