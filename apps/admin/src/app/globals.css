@@ -223,24 +223,24 @@
   background: hsl(var(--stat-critical-bg));
 }
 
-/* Sidebar V2 Styles */
-.sidebar-v2 {
+/* Sidebar Styles */
+.sidebar {
   @apply flex h-screen flex-col border-r transition-all duration-300;
   background: hsl(var(--sidebar));
   border-color: hsl(var(--sidebar-border));
 }
 
-.sidebar-v2-nav-item {
+.sidebar-nav-item {
   @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200;
   color: hsl(var(--sidebar-foreground-muted));
 }
 
-.sidebar-v2-nav-item:hover {
+.sidebar-nav-item:hover {
   @apply bg-accent/50;
   color: hsl(var(--sidebar-foreground));
 }
 
-.sidebar-v2-nav-item-active {
+.sidebar-nav-item-active {
   @apply font-medium;
   background: hsl(var(--sidebar-active));
   color: hsl(var(--sidebar-foreground));
@@ -268,32 +268,32 @@
   --tw-ring-color: hsl(160 84% 39%);
 }
 
-/* Data Table V2 Enhancements */
-.data-table-v2 {
+/* Data Table Enhancements */
+.data-table {
   @apply rounded-lg border overflow-hidden;
 }
 
-.data-table-v2 thead {
+.data-table thead {
   @apply bg-muted/50;
 }
 
-.data-table-v2 th {
+.data-table th {
   @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground;
 }
 
-.data-table-v2 td {
+.data-table td {
   @apply px-4 py-3 text-sm;
 }
 
-.data-table-v2 tbody tr {
+.data-table tbody tr {
   @apply border-t transition-colors duration-150;
 }
 
-.data-table-v2 tbody tr:hover {
+.data-table tbody tr:hover {
   @apply bg-muted/30;
 }
 
-.data-table-v2 tbody tr[data-state="selected"] {
+.data-table tbody tr[data-state="selected"] {
   @apply bg-primary/5;
 }
 
