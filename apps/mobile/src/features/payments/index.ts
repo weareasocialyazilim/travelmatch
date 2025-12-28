@@ -55,3 +55,16 @@ export {
 // Services
 export { paymentsApi } from './services/paymentsApi';
 export type { CreatePaymentIntentDto } from './services/paymentsApi';
+
+// Types
+export type {
+  Moment,
+  MomentData,
+  MomentUser,
+  MomentLocation,
+  User,
+  Transaction,
+  TransactionType,
+  TransactionStatus,
+  UserProfile,
+} from './types';

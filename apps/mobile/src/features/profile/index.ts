@@ -40,3 +40,16 @@ export {
 // Services
 export { profileApi } from './services/profileApi';
 export type { UpdateProfileDto } from './services/profileApi';
+
+// Types
+export type {
+  Moment,
+  MomentData,
+  MomentUser,
+  MomentLocation,
+  User,
+  Proof,
+  ProofType,
+  ProofStatus,
+  UserProfile,
+} from './types';
