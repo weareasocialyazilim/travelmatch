@@ -8,7 +8,9 @@ import { fireEvent, waitFor } from '@testing-library/react-native';
 import { render, mockMoment, mockFilter } from '../testUtilsRender.helper';
 
 // Mock dependencies
-jest.mock('../../hooks/useMoments');
+jest.mock('../../hooks/useMoments', () => ({
+  useMoments: jest.fn(),
+}));
 jest.mock('../../services/supabaseDbService');
 
 // Note: BottomNav is globally mocked via jest.config.js moduleNameMapper

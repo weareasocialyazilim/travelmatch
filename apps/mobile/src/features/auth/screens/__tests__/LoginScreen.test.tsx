@@ -103,13 +103,30 @@ jest.mock('../../../../components/ErrorBoundary', () => ({
 
 jest.mock('../../../../constants/colors', () => ({
   COLORS: {
-    primary: '#007AFF',
-    background: '#FFFFFF',
-    text: '#000000',
-    textSecondary: '#666666',
-    border: '#E0E0E0',
-    error: '#FF3B30',
-    success: '#34C759',
+    bg: {
+      primary: '#FFFCF7',
+      secondary: '#FFF9F0',
+    },
+    surface: {
+      base: '#FFFFFF',
+    },
+    text: {
+      primary: '#1C1917',
+      secondary: '#78716C',
+    },
+    brand: {
+      primary: '#F97316',
+    },
+    border: {
+      default: '#E7E5E4',
+    },
+    feedback: {
+      error: '#EF4444',
+      success: '#22C55E',
+    },
+    utility: {
+      white: '#FFFFFF',
+    },
   },
 }));
 

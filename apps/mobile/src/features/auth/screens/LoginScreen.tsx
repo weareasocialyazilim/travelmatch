@@ -52,8 +52,22 @@ export const LoginScreen: React.FC = () => {
   const onSubmit = async (data: LoginInput) => {
     try {
       setIsLoading(true);
-      await login({ email: data.email, password: data.password });
-      // Navigation handled by auth state change
+      const result = await login({
+        email: data.email,
+        password: data.password,
+      });
+      if (result.success) {
+        // Navigate to Discover on successful login
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Discover' }],
+        });
+      } else {
+        showToast(
+          result.error || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin',
+          'error',
+        );
+      }
     } catch (error) {
       showToast(
         error instanceof Error
@@ -262,7 +276,10 @@ export const LoginScreen: React.FC = () => {
                   )}
                 >
                   {isBiometricLoading ? (
-                    <ActivityIndicator size="small" color={COLORS.brand.primary} />
+                    <ActivityIndicator
+                      size="small"
+                      color={COLORS.brand.primary}
+                    />
                   ) : (
                     <>
                       <MaterialCommunityIcons

@@ -57,21 +57,21 @@ describe('Supabase Query Performance Optimization', () => {
       // Verify optimized select was called with joins
       expect(mockQuery.select).toHaveBeenCalledWith(
         expect.stringContaining('users:user_id'),
-        expect.objectContaining({ count: 'exact' })
+        expect.objectContaining({ count: 'exact' }),
       );
 
       // Verify join includes only necessary fields (not *)
       expect(mockQuery.select).toHaveBeenCalledWith(
         expect.stringContaining('id,'),
-        expect.anything()
+        expect.anything(),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('name,'),
-        expect.anything()
+        expect.stringContaining('full_name,'),
+        expect.anything(),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('avatar,'),
-        expect.anything()
+        expect.stringContaining('avatar_url,'),
+        expect.anything(),
       );
     });
 
@@ -84,8 +84,11 @@ describe('Supabase Query Performance Optimization', () => {
             {
               id: '1',
               title: 'Test Moment',
-              users: { id: 'user-1', name: 'John', avatar: 'avatar.jpg' },
-              categories: { id: 'cat-1', name: 'Adventure', emoji: '🏔️' },
+              users: {
+                id: 'user-1',
+                full_name: 'John',
+                avatar_url: 'avatar.jpg',
+              },
             },
           ],
           count: 1,
@@ -110,8 +113,7 @@ describe('Supabase Query Performance Optimization', () => {
       const mockData = Array.from({ length: 10 }, (_, i) => ({
         id: `moment-${i}`,
         title: `Moment ${i}`,
-        users: { id: `user-${i}`, name: `User ${i}` },
-        categories: { id: `cat-${i}`, name: `Category ${i}` },
+        users: { id: `user-${i}`, full_name: `User ${i}` },
       }));
 
       const mockQuery = {
@@ -135,7 +137,7 @@ describe('Supabase Query Performance Optimization', () => {
   });
 
   describe('momentsService.getById', () => {
-    it('should fetch moment with user, category, and request data in single query', async () => {
+    it('should fetch moment with user and request data in single query', async () => {
       const mockQuery = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
@@ -143,8 +145,7 @@ describe('Supabase Query Performance Optimization', () => {
           data: {
             id: '1',
             title: 'Test',
-            users: { id: 'user-1', name: 'John' },
-            categories: { id: 'cat-1', name: 'Adventure' },
+            users: { id: 'user-1', full_name: 'John' },
             moment_requests: [{ id: 'req-1', status: 'pending' }],
           },
           error: null,
@@ -157,13 +158,10 @@ describe('Supabase Query Performance Optimization', () => {
 
       // Verify join syntax includes all relationships
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('users:user_id')
+        expect.stringContaining('users:user_id'),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('categories:category')
-      );
-      expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('moment_requests')
+        expect.stringContaining('moment_requests'),
       );
 
       // Should only make 1 query
@@ -182,8 +180,7 @@ describe('Supabase Query Performance Optimization', () => {
               moments: {
                 id: '1',
                 title: 'Saved Moment',
-                users: { id: 'host-1', name: 'Host' },
-                categories: { id: 'cat-1', name: 'Food' },
+                users: { id: 'host-1', full_name: 'Host' },
               },
             },
           ],
@@ -199,11 +196,11 @@ describe('Supabase Query Performance Optimization', () => {
       // Verify nested join syntax
       expect(mockQuery.select).toHaveBeenCalledWith(
         expect.stringContaining('moments:moment_id'),
-        expect.objectContaining({ count: 'exact' })
+        expect.objectContaining({ count: 'exact' }),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
         expect.stringContaining('users:user_id'),
-        expect.anything()
+        expect.anything(),
       );
 
       // Should only make 1 query for favorites with nested moments
@@ -255,13 +252,13 @@ describe('Supabase Query Performance Optimization', () => {
 
       // Verify aggregated counts are fetched
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('moments_count:moments!user_id(count)')
+        expect.stringContaining('moments_count:moments!user_id(count)'),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('followers_count:follows!following_id(count)')
+        expect.stringContaining('followers_count:follows!following_id(count)'),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('following_count:follows!follower_id(count)')
+        expect.stringContaining('following_count:follows!follower_id(count)'),
       );
 
       // Should only make 1 query instead of 1 + 4 count queries

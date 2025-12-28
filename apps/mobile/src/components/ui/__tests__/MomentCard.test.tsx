@@ -109,16 +109,45 @@ jest.mock('../../../utils/logger', () => ({
 // Mock constants
 jest.mock('../../../constants/colors', () => ({
   COLORS: {
-    primary: '#007AFF',
-    background: '#FFFFFF',
-    text: '#000000',
-    textSecondary: '#666666',
-    border: '#E0E0E0',
-    error: '#FF3B30',
-    success: '#34C759',
-    card: '#FFFFFF',
-    shadow: '#000000',
-    white: '#FFFFFF',
+    bg: {
+      primary: '#FFFCF7',
+      secondary: '#FFF9F0',
+    },
+    surface: {
+      base: '#FFFFFF',
+      elevated: 'rgba(255, 252, 247, 0.95)',
+    },
+    text: {
+      primary: '#1C1917',
+      secondary: '#78716C',
+      muted: '#A8A29E',
+      inverse: '#FFFFFF',
+    },
+    brand: {
+      primary: '#F97316',
+      secondary: '#F43F5E',
+    },
+    border: {
+      default: '#E7E5E4',
+    },
+    feedback: {
+      error: '#EF4444',
+      success: '#22C55E',
+    },
+    utility: {
+      white: '#FFFFFF',
+      transparent: 'transparent',
+    },
+    trust: {
+      verified: '#22C55E',
+    },
+    overlay: {
+      default: 'rgba(0, 0, 0, 0.5)',
+      light: 'rgba(0, 0, 0, 0.3)',
+      medium: 'rgba(0, 0, 0, 0.5)',
+      heavy: 'rgba(0, 0, 0, 0.7)',
+      dark: 'rgba(0, 0, 0, 0.8)',
+    },
   },
 }));
 

@@ -261,7 +261,9 @@ export const requestService = {
         error,
       } = await supabase
         .from('requests')
-        .select('*, users(*), moments(*)', { count: 'exact' })
+        .select('*, users:users!requests_user_id_fkey(*), moments(*)', {
+          count: 'exact',
+        })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -316,7 +318,7 @@ export const requestService = {
     try {
       const { data, error } = await supabase
         .from('requests')
-        .select('*, users(*), moments(*)')
+        .select('*, users:users!requests_user_id_fkey(*), moments(*)')
         .eq('id', requestId)
         .single();
 

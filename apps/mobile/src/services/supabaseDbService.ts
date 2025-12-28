@@ -296,22 +296,18 @@ export const momentsService = {
 
     try {
       // Optimized query with explicit joins to prevent N+1 queries
+      // Note: category is a TEXT column, not a foreign key to a categories table
       let query = supabase.from('moments').select(
         `
           *,
           users:user_id (
             id,
-            name,
-            avatar,
+            full_name,
+            avatar_url,
             location,
-            kyc,
-            trust_score,
+            kyc_status,
+            rating,
             created_at
-          ),
-          categories:category (
-            id,
-            name,
-            emoji
           )
         `,
         { count: 'exact' },
@@ -389,21 +385,15 @@ export const momentsService = {
           *,
           users:user_id (
             id,
-            name,
-            avatar,
+            full_name,
+            avatar_url,
             location,
-            kyc,
-            trust_score,
-            review_count,
+            kyc_status,
             rating,
+            review_count,
             created_at
           ),
-          categories:category (
-            id,
-            name,
-            emoji
-          ),
-          moment_requests!moment_id (
+          moment_requests:requests!moment_id (
             id,
             status,
             created_at
@@ -453,6 +443,7 @@ export const momentsService = {
 
     try {
       // Optimized query with nested joins for saved moments
+      // Note: category is a TEXT column, not a foreign key to a categories table
       const { data, count, error } = await supabase
         .from('favorites')
         .select(
@@ -461,16 +452,11 @@ export const momentsService = {
             *,
             users:user_id (
               id,
-              name,
-              avatar,
+              full_name,
+              avatar_url,
               location,
-              kyc,
-              trust_score
-            ),
-            categories:category (
-              id,
-              name,
-              emoji
+              kyc_status,
+              rating
             )
           )
         `,
@@ -776,21 +762,17 @@ export const momentsService = {
       const limit = options?.limit || 20;
 
       // Optimized query with explicit joins
+      // Note: category is a TEXT column, not a foreign key to a categories table
       let query = supabase.from('moments').select(`
           *,
           users:user_id (
             id,
-            name,
-            avatar,
+            full_name,
+            avatar_url,
             location,
-            kyc,
-            trust_score,
+            kyc_status,
+            rating,
             created_at
-          ),
-          categories:category (
-            id,
-            name,
-            emoji
           )
         `);
 
@@ -905,6 +887,7 @@ export const requestsService = {
 
     try {
       // ✅ OPTIMIZED: Single query with specific field selection to avoid N+1
+      // Note: Using explicit FK hints to disambiguate relationships
       let query = supabase.from('requests').select(
         `
           id,
@@ -919,12 +902,12 @@ export const requestsService = {
             verified,
             location
           ),
-          moment:moments(
+          moment:moments!requests_moment_id_fkey(
             id,
             title,
             price,
             category,
-            user:users(
+            user:users!moments_user_id_fkey(
               id,
               full_name,
               avatar_url
@@ -1117,7 +1100,8 @@ export const conversationsService = {
 
     try {
       // Optimized query with specific fields to prevent N+1 queries
-      // Fetch conversation with last message and participant details in single query
+      // Fetch conversation with participant details in single query
+      // Note: last_message is fetched separately due to potential missing FK constraint
       const { data, count, error } = await supabase
         .from('conversations')
         .select(
@@ -1127,18 +1111,7 @@ export const conversationsService = {
           updated_at,
           created_at,
           last_message_id,
-          last_message:messages!conversations_last_message_id_fkey (
-            id,
-            content,
-            sender_id,
-            created_at,
-            read_at,
-            sender:users!messages_sender_id_fkey (
-              id,
-              full_name,
-              avatar_url
-            )
-          )
+          moment_id
         `,
           { count: 'exact' },
         )

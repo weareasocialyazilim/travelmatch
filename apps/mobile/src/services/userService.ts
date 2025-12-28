@@ -180,7 +180,6 @@ export const userService = {
         `
         id,
         username,
-        name,
         full_name,
         email,
         avatar_url,
@@ -223,7 +222,6 @@ export const userService = {
         `
         id,
         username,
-        name,
         full_name,
         avatar_url,
         bio,
@@ -263,7 +261,6 @@ export const userService = {
         `
         id,
         username,
-        name,
         full_name,
         avatar_url,
         bio,
