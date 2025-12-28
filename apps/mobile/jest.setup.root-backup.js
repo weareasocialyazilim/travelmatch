@@ -1,20 +1,73 @@
-// Setup react-native-gesture-handler mocks inline to avoid babel transformation issues
-jest.mock('react-native-gesture-handler', () => ({
-  GestureHandlerRootView: ({ children }) => children,
-  ScrollView: require('react-native').ScrollView,
-  FlatList: require('react-native').FlatList,
-  Pressable: require('react-native').Pressable,
-  TouchableOpacity: require('react-native').TouchableOpacity,
-  TouchableHighlight: require('react-native').TouchableHighlight,
-  TouchableWithoutFeedback: require('react-native').TouchableWithoutFeedback,
-  TouchableNativeFeedback: require('react-native').TouchableNativeFeedback,
-  State: {},
-  PanGestureHandler: 'View',
-  BaseButton: 'View',
-  Directions: {},
-  TapGestureHandler: 'View',
-  gestureHandlerRootHOC: (component) => component,
-}));
+// Mock react-native-gesture-handler with newer Gesture API
+jest.mock('react-native-gesture-handler', () => {
+  const View = require('react-native').View;
+
+  // Create a mock Gesture object with chainable methods
+  const createMockGesture = () => {
+    const gesture = {
+      enabled: () => gesture,
+      onStart: () => gesture,
+      onUpdate: () => gesture,
+      onEnd: () => gesture,
+      onFinalize: () => gesture,
+      withTestId: () => gesture,
+      simultaneousWithExternalGesture: () => gesture,
+      requireExternalGestureToFail: () => gesture,
+    };
+    return gesture;
+  };
+
+  return {
+    // Legacy gesture handlers
+    Swipeable: View,
+    DrawerLayout: View,
+    State: {},
+    ScrollView: View,
+    Slider: View,
+    Switch: View,
+    TextInput: View,
+    ToolbarAndroid: View,
+    ViewPagerAndroid: View,
+    DrawerLayoutAndroid: View,
+    WebView: View,
+    NativeViewGestureHandler: View,
+    TapGestureHandler: View,
+    FlingGestureHandler: View,
+    ForceTouchGestureHandler: View,
+    LongPressGestureHandler: View,
+    PanGestureHandler: View,
+    PinchGestureHandler: View,
+    RotationGestureHandler: View,
+    RawButton: View,
+    BaseButton: View,
+    RectButton: View,
+    BorderlessButton: View,
+    TouchableHighlight: View,
+    TouchableNativeFeedback: View,
+    TouchableOpacity: View,
+    TouchableWithoutFeedback: View,
+    GestureHandlerRootView: View,
+    // Newer Gesture API
+    Gesture: {
+      Pan: () => createMockGesture(),
+      Tap: () => createMockGesture(),
+      LongPress: () => createMockGesture(),
+      Pinch: () => createMockGesture(),
+      Rotation: () => createMockGesture(),
+      Fling: () => createMockGesture(),
+      Race: () => createMockGesture(),
+      Simultaneous: () => createMockGesture(),
+      Exclusive: () => createMockGesture(),
+    },
+    GestureDetector: ({ children }) => children,
+    Directions: {
+      RIGHT: 1,
+      LEFT: 2,
+      UP: 4,
+      DOWN: 8,
+    },
+  };
+});
 
 // Set global __DEV__ for React Native
 global.__DEV__ = true;

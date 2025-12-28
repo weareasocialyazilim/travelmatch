@@ -1,16 +1,23 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Modal,
-  Animated,
   TouchableOpacity,
   Platform,
   Vibration,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  interpolate,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 import { LAYOUT } from '../constants/layout';
 import { VALUES } from '../constants/values';
@@ -23,6 +30,63 @@ interface Props {
   onViewApprovals?: () => void;
 }
 
+interface ConfettiPieceProps {
+  index: number;
+  totalPieces: number;
+  color: string;
+  visible: boolean;
+}
+
+const ConfettiPiece: React.FC<ConfettiPieceProps> = ({
+  index,
+  totalPieces,
+  color,
+  visible,
+}) => {
+  const progress = useSharedValue(0);
+  const angle = (index * 360) / totalPieces;
+  const distance = 100 + Math.random() * 50;
+  const randomRotation = Math.random() * 360;
+
+  useEffect(() => {
+    if (visible) {
+      progress.value = withTiming(1, { duration: 800 });
+    } else {
+      progress.value = 0;
+    }
+
+    return () => {
+      cancelAnimation(progress);
+    };
+  }, [visible, progress]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const translateX = interpolate(
+      progress.value,
+      [0, 1],
+      [0, distance * Math.cos((angle * Math.PI) / 180)],
+    );
+    const translateY = interpolate(
+      progress.value,
+      [0, 1],
+      [0, -distance * Math.sin((angle * Math.PI) / 180)],
+    );
+    const opacity = interpolate(progress.value, [0, 0.8, 1], [1, 1, 0]);
+    const rotate = interpolate(progress.value, [0, 1], [0, randomRotation]);
+
+    return {
+      transform: [{ translateX }, { translateY }, { rotate: `${rotate}deg` }],
+      opacity,
+    };
+  });
+
+  return (
+    <Animated.View
+      style={[styles.confetti, { backgroundColor: color }, animatedStyle]}
+    />
+  );
+};
+
 export const GiftSuccessModal: React.FC<Props> = ({
   visible,
   amount,
@@ -30,16 +94,19 @@ export const GiftSuccessModal: React.FC<Props> = ({
   momentTitle: _momentTitle,
   onViewApprovals: _onViewApprovals,
 }) => {
-  const scaleAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const confettiAnims = useRef(
-    Array.from({ length: 12 }, () => ({
-      translateY: new Animated.Value(0),
-      translateX: new Animated.Value(0),
-      opacity: new Animated.Value(1),
-      rotate: new Animated.Value(0),
-    })),
-  ).current;
+  const scale = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
+  const confettiColors = useMemo(
+    () => [
+      COLORS.coral,
+      COLORS.mint,
+      COLORS.success,
+      COLORS.softOrange,
+      COLORS.white,
+    ],
+    [],
+  );
 
   useEffect(() => {
     if (visible) {
@@ -53,68 +120,29 @@ export const GiftSuccessModal: React.FC<Props> = ({
       }
 
       // Success icon animation
-      Animated.parallel([
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          tension: 50,
-          friction: 7,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      // Confetti animations
-      confettiAnims.forEach((anim, index) => {
-        const angle = (index * 360) / confettiAnims.length;
-        const distance = 100 + Math.random() * 50;
-
-        Animated.parallel([
-          Animated.timing(anim.translateY, {
-            toValue: -distance * Math.sin((angle * Math.PI) / 180),
-            duration: 800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim.translateX, {
-            toValue: distance * Math.cos((angle * Math.PI) / 180),
-            duration: 800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim.opacity, {
-            toValue: 0,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim.rotate, {
-            toValue: Math.random() * 360,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-        ]).start();
+      scale.value = withSpring(1, {
+        damping: 12,
+        stiffness: 100,
       });
+      opacity.value = withTiming(1, { duration: 300 });
     } else {
-      // Reset animations
-      scaleAnim.setValue(0);
-      fadeAnim.setValue(0);
-      confettiAnims.forEach((anim) => {
-        anim.translateY.setValue(0);
-        anim.translateX.setValue(0);
-        anim.opacity.setValue(1);
-        anim.rotate.setValue(0);
-      });
+      scale.value = 0;
+      opacity.value = 0;
     }
-  }, [visible, confettiAnims, fadeAnim, scaleAnim]);
 
-  const confettiColors = [
-    COLORS.coral,
-    COLORS.mint,
-    COLORS.success,
-    COLORS.softOrange,
-    COLORS.white,
-  ];
+    return () => {
+      cancelAnimation(scale);
+      cancelAnimation(opacity);
+    };
+  }, [visible, scale, opacity]);
+
+  const contentStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  const iconStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
     <Modal
@@ -124,43 +152,22 @@ export const GiftSuccessModal: React.FC<Props> = ({
       onRequestClose={onClose}
     >
       <View style={styles.container}>
-        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+        <Animated.View style={[styles.content, contentStyle]}>
           {/* Confetti particles */}
           <View style={styles.confettiContainer}>
-            {confettiAnims.map((anim, index) => (
-              <Animated.View
+            {Array.from({ length: 12 }).map((_, index) => (
+              <ConfettiPiece
                 key={index}
-                style={[
-                  styles.confetti,
-                  {
-                    backgroundColor:
-                      confettiColors[index % confettiColors.length],
-                    transform: [
-                      { translateX: anim.translateX },
-                      { translateY: anim.translateY },
-                      {
-                        rotate: anim.rotate.interpolate({
-                          inputRange: [0, 360],
-                          outputRange: ['0deg', '360deg'],
-                        }),
-                      },
-                    ],
-                    opacity: anim.opacity,
-                  },
-                ]}
+                index={index}
+                totalPieces={12}
+                color={confettiColors[index % confettiColors.length]}
+                visible={visible}
               />
             ))}
           </View>
 
           {/* Success icon */}
-          <Animated.View
-            style={[
-              styles.iconContainer,
-              {
-                transform: [{ scale: scaleAnim }],
-              },
-            ]}
-          >
+          <Animated.View style={[styles.iconContainer, iconStyle]}>
             <MaterialCommunityIcons
               name="check-circle"
               size={80}
