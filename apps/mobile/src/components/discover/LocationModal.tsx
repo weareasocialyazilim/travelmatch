@@ -53,7 +53,10 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           {/* Header */}
           <View style={styles.locationModalHeader}>
             <Text style={styles.locationModalTitle}>Select Location</Text>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity
+              onPress={onClose}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <MaterialCommunityIcons
                 name="close"
                 size={24}

@@ -166,6 +166,14 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
           }
           accessible={true}
           aria-label="Show password"
+          hitSlop={
+            {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
           onPress={[Function]}
           ref={null}
           style={
@@ -495,6 +503,14 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
           }
           accessible={true}
           aria-label="Show password"
+          hitSlop={
+            {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
           onPress={[Function]}
           ref={null}
           style={
