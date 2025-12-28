@@ -1,100 +1,176 @@
 /**
- * Dark Mode Color Palette
- * Complete color system for light and dark themes
+ * TravelMatch Awwwards Design System - Colors
+ *
+ * Premium color palette designed for modern travel experiences
+ * with careful attention to contrast ratios and accessibility
  */
 
-export const LIGHT_COLORS = {
-  // Primary colors
-  primary: '#FF6B6B',
-  primaryLight: '#FF8E8E',
-  primaryDark: '#E85555',
+// ============================================
+// 1. BRAND COLORS
+// ============================================
+export const COLORS = {
+  brand: {
+    primary: '#FF6B6B',
+    primaryLight: '#FF8E8E',
+    primaryDark: '#E85555',
+    secondary: '#4ECDC4',
+    secondaryLight: '#6FD9D1',
+    secondaryDark: '#3AAFA7',
+    accent: '#FFD43B',
+  },
 
-  // Secondary colors
-  secondary: '#4ECDC4',
-  secondaryLight: '#6FD9D1',
-  secondaryDark: '#3AAFA7',
+  // ============================================
+  // 2. TEXT COLORS
+  // ============================================
+  text: {
+    primary: '#212529',
+    secondary: '#6C757D',
+    tertiary: '#ADB5BD',
+    muted: '#CED4DA',
+    link: '#FF6B6B',
+    // On dark backgrounds
+    onDark: '#FFFFFF',
+    onDarkSecondary: 'rgba(255, 255, 255, 0.85)',
+    onDarkMuted: 'rgba(255, 255, 255, 0.6)',
+  },
 
-  // Neutral colors
-  background: '#FFFFFF',
-  surface: '#F8F9FA',
-  card: '#FFFFFF',
+  // ============================================
+  // 3. BACKGROUND COLORS
+  // ============================================
+  background: {
+    primary: '#FFFFFF',
+    secondary: '#F8F9FA',
+    tertiary: '#E9ECEF',
+    elevated: '#FFFFFF',
+  },
 
-  // Text colors
-  text: '#212529',
-  textSecondary: '#6C757D',
-  textTertiary: '#ADB5BD',
+  // ============================================
+  // 4. SURFACE COLORS
+  // ============================================
+  surface: {
+    card: '#FFFFFF',
+    modal: '#FFFFFF',
+    overlay: 'rgba(0, 0, 0, 0.5)',
+  },
 
-  // Border colors
-  border: '#DEE2E6',
-  divider: '#E9ECEF',
+  // ============================================
+  // 5. BORDER COLORS
+  // ============================================
+  border: {
+    default: '#DEE2E6',
+    light: '#E9ECEF',
+    dark: '#ADB5BD',
+    focus: '#FF6B6B',
+  },
 
-  // Status colors
-  success: '#51CF66',
-  warning: '#FFD43B',
-  error: '#FF6B6B',
-  info: '#339AF0',
+  // ============================================
+  // 6. FEEDBACK COLORS
+  // ============================================
+  feedback: {
+    success: '#51CF66',
+    successLight: '#D3F9D8',
+    warning: '#FFD43B',
+    warningLight: '#FFF3BF',
+    error: '#FF6B6B',
+    errorLight: '#FFE3E3',
+    info: '#339AF0',
+    infoLight: '#D0EBFF',
+  },
 
-  // Utility colors
-  white: '#FFFFFF',
-  black: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
-  disabled: '#CED4DA',
+  // ============================================
+  // 7. UTILITY COLORS
+  // ============================================
+  utility: {
+    white: '#FFFFFF',
+    black: '#000000',
+    transparent: 'transparent',
+    disabled: '#CED4DA',
+  },
 
-  // Chart colors
-  chart1: '#FF6B6B',
-  chart2: '#4ECDC4',
-  chart3: '#FFD43B',
-  chart4: '#51CF66',
-  chart5: '#339AF0',
+  // ============================================
+  // 8. GRADIENT COLORS
+  // ============================================
+  gradient: {
+    primary: ['#FF6B6B', '#FF8E8E'],
+    secondary: ['#4ECDC4', '#6FD9D1'],
+    warm: ['#FFD43B', '#FF6B6B'],
+    cool: ['#339AF0', '#4ECDC4'],
+    dark: ['#212529', '#495057'],
+  },
 } as const;
 
-export const DARK_COLORS = {
-  // Primary colors
-  primary: '#FF8E8E',
-  primaryLight: '#FFB1B1',
-  primaryDark: '#FF6B6B',
+// ============================================
+// 9. DARK MODE COLORS
+// ============================================
+export const COLORS_DARK = {
+  brand: {
+    primary: '#FF8E8E',
+    primaryLight: '#FFB1B1',
+    primaryDark: '#FF6B6B',
+    secondary: '#6FD9D1',
+    secondaryLight: '#92E3DC',
+    secondaryDark: '#4ECDC4',
+    accent: '#FFE066',
+  },
 
-  // Secondary colors
-  secondary: '#6FD9D1',
-  secondaryLight: '#92E3DC',
-  secondaryDark: '#4ECDC4',
+  text: {
+    primary: '#E9ECEF',
+    secondary: '#ADB5BD',
+    tertiary: '#6C757D',
+    muted: '#495057',
+    link: '#FF8E8E',
+    onDark: '#FFFFFF',
+    onDarkSecondary: 'rgba(255, 255, 255, 0.85)',
+    onDarkMuted: 'rgba(255, 255, 255, 0.6)',
+  },
 
-  // Neutral colors
-  background: '#121212',
-  surface: '#1E1E1E',
-  card: '#2A2A2A',
+  background: {
+    primary: '#121212',
+    secondary: '#1E1E1E',
+    tertiary: '#2A2A2A',
+    elevated: '#2A2A2A',
+  },
 
-  // Text colors
-  text: '#E9ECEF',
-  textSecondary: '#ADB5BD',
-  textTertiary: '#6C757D',
+  surface: {
+    card: '#2A2A2A',
+    modal: '#1E1E1E',
+    overlay: 'rgba(0, 0, 0, 0.7)',
+  },
 
-  // Border colors
-  border: '#343A40',
-  divider: '#2C3135',
+  border: {
+    default: '#343A40',
+    light: '#2C3135',
+    dark: '#495057',
+    focus: '#FF8E8E',
+  },
 
-  // Status colors
-  success: '#69DB7C',
-  warning: '#FFE066',
-  error: '#FF8787',
-  info: '#4DABF7',
+  feedback: {
+    success: '#69DB7C',
+    successLight: '#1A3B23',
+    warning: '#FFE066',
+    warningLight: '#3B3510',
+    error: '#FF8787',
+    errorLight: '#3B1A1A',
+    info: '#4DABF7',
+    infoLight: '#102A40',
+  },
 
-  // Utility colors
-  white: '#FFFFFF',
-  black: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.7)',
-  disabled: '#495057',
+  utility: {
+    white: '#FFFFFF',
+    black: '#000000',
+    transparent: 'transparent',
+    disabled: '#495057',
+  },
 
-  // Chart colors
-  chart1: '#FF8787',
-  chart2: '#6FD9D1',
-  chart3: '#FFE066',
-  chart4: '#69DB7C',
-  chart5: '#4DABF7',
+  gradient: {
+    primary: ['#FF8E8E', '#FFB1B1'],
+    secondary: ['#6FD9D1', '#92E3DC'],
+    warm: ['#FFE066', '#FF8E8E'],
+    cool: ['#4DABF7', '#6FD9D1'],
+    dark: ['#2A2A2A', '#1E1E1E'],
+  },
 } as const;
 
-// ColorPalette type - uses string for color values to support both themes
-export type ColorPalette = {
-  [K in keyof typeof LIGHT_COLORS]: string;
-};
-export type ColorName = keyof ColorPalette;
+// Type exports
+export type Colors = typeof COLORS;
+export type ColorCategory = keyof Colors;

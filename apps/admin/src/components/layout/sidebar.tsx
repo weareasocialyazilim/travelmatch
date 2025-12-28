@@ -43,14 +43,27 @@ import {
   FileEdit,
   History,
   Flag,
+  LogOut,
+  User,
+  CheckCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useUIStore } from '@/stores/ui-store';
 import { usePermission } from '@/hooks/use-permission';
+import { useAuth } from '@/hooks/use-auth';
 
 interface NavItem {
   title: string;
@@ -315,6 +328,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { sidebarCollapsed, setSidebarCollapsed } = useUIStore();
   const { can } = usePermission();
+  const { user, logout } = useAuth();
 
   const NavLink = ({ item }: { item: NavItem }) => {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -328,20 +342,25 @@ export function Sidebar() {
       <Link
         href={item.href}
         className={cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent',
-          isActive
-            ? 'bg-accent text-accent-foreground font-medium'
-            : 'text-muted-foreground hover:text-foreground',
+          'sidebar-nav-item group relative',
+          isActive && 'sidebar-nav-item-active',
           sidebarCollapsed && 'justify-center px-2'
         )}
       >
-        <item.icon className="h-4 w-4 shrink-0" />
+        {/* Gradient accent indicator for active state */}
+        {isActive && (
+          <div className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-amber-400 to-amber-600" />
+        )}
+        <item.icon className={cn(
+          'h-4.5 w-4.5 shrink-0 transition-colors',
+          isActive ? 'text-amber-600 dark:text-amber-400' : 'group-hover:text-foreground'
+        )} />
         {!sidebarCollapsed && (
           <>
-            <span className="flex-1">{item.title}</span>
+            <span className="flex-1 truncate">{item.title}</span>
             {item.badge !== undefined && item.badge > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
-                {item.badge}
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-1.5 text-xs font-medium text-white shadow-sm">
+                {item.badge > 99 ? '99+' : item.badge}
               </span>
             )}
           </>
@@ -378,7 +397,7 @@ export function Sidebar() {
     return (
       <div className="space-y-1">
         {!sidebarCollapsed && (
-          <h4 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <h4 className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
             {title}
           </h4>
         )}
@@ -392,24 +411,30 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'flex h-screen flex-col border-r bg-card transition-all duration-300',
-        sidebarCollapsed ? 'w-16' : 'w-64'
+        'sidebar',
+        sidebarCollapsed ? 'w-[64px]' : 'w-[260px]'
       )}
     >
-      {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      {/* Logo & Toggle */}
+      <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
         {!sidebarCollapsed && (
-          <Link href="/queue" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">TM</span>
+          <Link href="/queue" className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 shadow-md">
+              <span className="text-sm font-bold text-white">TM</span>
             </div>
-            <span className="font-semibold">Admin</span>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold leading-none">TravelMatch</span>
+              <span className="text-[10px] text-muted-foreground">Admin Panel</span>
+            </div>
           </Link>
         )}
         <Button
           variant="ghost"
           size="icon"
-          className={cn('h-8 w-8', sidebarCollapsed && 'mx-auto')}
+          className={cn(
+            'h-8 w-8 hover:bg-sidebar-active',
+            sidebarCollapsed && 'mx-auto'
+          )}
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         >
           {sidebarCollapsed ? (
@@ -424,22 +449,81 @@ export function Sidebar() {
       <ScrollArea className="flex-1 px-3 py-4">
         <div className="space-y-6">
           <NavSection title="Ana Menü" items={mainNavItems} />
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <NavSection title="Yönetim" items={managementNavItems} />
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <NavSection title="Operasyon" items={operationsNavItems} />
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <NavSection title="Analitik" items={analyticsNavItems} />
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <NavSection title="Büyüme" items={growthNavItems} />
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <NavSection title="İçerik" items={contentNavItems} />
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <NavSection title="Teknoloji" items={techNavItems} />
-          <Separator />
+          <Separator className="bg-sidebar-border" />
           <NavSection title="Sistem" items={settingsNavItems} />
         </div>
       </ScrollArea>
+
+      {/* User Section with Trust Ring */}
+      <div className="border-t border-sidebar-border p-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={cn(
+                'flex w-full items-center gap-3 rounded-lg p-2 transition-colors hover:bg-sidebar-active',
+                sidebarCollapsed && 'justify-center'
+              )}
+            >
+              <div className="relative">
+                <Avatar className="h-9 w-9 ring-2 ring-emerald-500 ring-offset-2 ring-offset-sidebar">
+                  <AvatarImage src={user?.avatar_url} />
+                  <AvatarFallback className="bg-gradient-to-br from-amber-400 to-amber-600 text-white text-xs font-semibold">
+                    {user?.name?.charAt(0) || 'A'}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Verified badge */}
+                <div className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-sidebar">
+                  <CheckCircle className="h-2.5 w-2.5 text-white" />
+                </div>
+              </div>
+              {!sidebarCollapsed && (
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-medium leading-none">{user?.name || 'Admin User'}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{user?.role || 'Super Admin'}</p>
+                </div>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56" side={sidebarCollapsed ? 'right' : 'top'}>
+            <DropdownMenuLabel>
+              <div className="flex flex-col">
+                <span>{user?.name || 'Admin User'}</span>
+                <span className="text-xs font-normal text-muted-foreground">{user?.email || 'admin@travelmatch.com'}</span>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/settings/profile" className="flex items-center">
+                <User className="mr-2 h-4 w-4" />
+                Profil
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="flex items-center">
+                <Settings className="mr-2 h-4 w-4" />
+                Ayarlar
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => logout()} className="text-destructive focus:text-destructive">
+              <LogOut className="mr-2 h-4 w-4" />
+              Çıkış Yap
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </aside>
   );
 }

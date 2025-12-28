@@ -17,9 +17,9 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/constants/colors-ultimate';
-import { TYPOGRAPHY } from '@/constants/typography-ultimate';
-import { RADIUS, SIZES, SPACING } from '@/constants/spacing-ultimate';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY } from '@/constants/typography';
+import { RADIUS, SIZES, SPACING } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
 
 type PillVariant = 'default' | 'selected' | 'outlined' | 'muted';
