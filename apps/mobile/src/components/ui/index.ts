@@ -10,6 +10,13 @@ export { LoadingSpinner } from './LoadingSpinner';
 export { SkeletonList } from './SkeletonList';
 export type { SkeletonItemType } from './SkeletonList';
 
+// TravelMatch Ultimate Design System 2026 Components
+export { TMButton } from './TMButton';
+export { TMTrustRing } from './TMTrustRing';
+export { TMCard } from './TMCard';
+export type { MomentData } from './TMCard';
+export { TMPill, TMCategoryChip } from './TMPill';
+
 // Form Components
 export { PasswordInput } from './PasswordInput';
 export { ControlledInput } from './ControlledInput';
