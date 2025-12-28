@@ -1,26 +1,419 @@
 @import "tailwindcss";
 
+/* ============================
+   TravelMatch Design System
+   "Cinematic Travel + Trust Jewelry"
+   ============================ */
+
+/* CSS Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Brand Colors */
+  --primary: #FF6B6B;
+  --primary-light: #FF8A8A;
+  --primary-dark: #E55555;
+  --secondary: #4ECDC4;
+  --secondary-light: #6ED9D2;
+  --secondary-dark: #3DBDB5;
+  --accent: #FFE66D;
+  --accent-light: #FFEC8A;
+  --accent-dark: #E6CF5D;
+
+  /* Trust System Colors */
+  --trust: #10B981;
+  --trust-light: #34D399;
+  --trust-dark: #059669;
+
+  /* Neutral Palette */
+  --cream: #FFFEF7;
+  --cream-dark: #F5F4ED;
+  --stone-50: #FAFAF9;
+  --stone-100: #F5F5F4;
+  --stone-200: #E7E5E4;
+  --stone-300: #D6D3D1;
+  --stone-400: #A8A29E;
+  --stone-500: #78716C;
+  --stone-600: #57534E;
+  --stone-700: #44403C;
+  --stone-800: #292524;
+  --stone-900: #1C1917;
+  --stone-950: #0C0A09;
+
+  /* Semantic */
+  --background: var(--cream);
+  --foreground: var(--stone-900);
+  --muted: var(--stone-500);
+  --border: var(--stone-200);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--stone-950);
+    --foreground: var(--stone-50);
+    --muted: var(--stone-400);
+    --border: var(--stone-800);
+  }
+}
+
+.dark {
+  --background: var(--stone-950);
+  --foreground: var(--stone-50);
+  --muted: var(--stone-400);
+  --border: var(--stone-800);
+}
+
+/* Theme inline configuration */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-trust: var(--trust);
+  --color-cream: var(--cream);
+  --color-cream-dark: var(--cream-dark);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base Styles */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================
+   Custom Background Classes
+   ============================ */
+
+.bg-cream {
+  background-color: var(--cream);
+}
+
+.bg-cream-dark {
+  background-color: var(--cream-dark);
+}
+
+/* Gradient Backgrounds */
+.bg-gradient-radial-glow {
+  background: radial-gradient(ellipse at center, rgba(255, 107, 107, 0.15) 0%, transparent 70%);
+}
+
+.bg-gradient-hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.bg-gradient-trust {
+  background: linear-gradient(135deg, var(--trust-light) 0%, var(--trust) 100%);
+}
+
+.bg-gradient-discover {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+}
+
+.bg-gradient-sunset {
+  background: linear-gradient(180deg, #FF6B6B 0%, #FFE66D 50%, #4ECDC4 100%);
+}
+
+/* ============================
+   Typography
+   ============================ */
+
+.heading-hero {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.heading-display {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--stone-900);
+}
+
+.dark .heading-display {
+  color: var(--stone-50);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================
+   Layout
+   ============================ */
+
+.section-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .section-container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-container {
+    padding: 0 4rem;
+  }
+}
+
+.section-padding {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 7rem;
+    padding-bottom: 7rem;
+  }
+}
+
+/* ============================
+   Buttons
+   ============================ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 14px 0 rgba(255, 107, 107, 0.4);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(255, 107, 107, 0.5);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: transparent;
+  color: var(--stone-900);
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 1rem;
+  border: 2px solid var(--stone-200);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.dark .btn-outline {
+  color: var(--stone-50);
+  border-color: var(--stone-700);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--secondary);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background: var(--secondary-dark);
+  transform: translateY(-1px);
+}
+
+.shadow-button {
+  box-shadow: 0 4px 14px 0 rgba(255, 107, 107, 0.4);
+}
+
+/* ============================
+   Cards
+   ============================ */
+
+.card-base {
+  background: white;
+  border-radius: 1.5rem;
+  border: 1px solid var(--stone-100);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.dark .card-base {
+  background: var(--stone-800);
+  border-color: var(--stone-700);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Glass Effects */
+.glass-dark {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================
+   Trust System
+   ============================ */
+
+.badge-trust {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, var(--trust-light) 0%, var(--trust) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.trust-glow {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================
+   Animations
+   ============================ */
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulseSoft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulseSoft 2s ease-in-out infinite;
+}
+
+/* ============================
+   Color Classes
+   ============================ */
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-secondary {
+  color: var(--secondary);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.text-trust {
+  color: var(--trust);
+}
+
+/* ============================
+   Utilities
+   ============================ */
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
