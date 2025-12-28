@@ -56,8 +56,8 @@
     "prepare": "husky",
     "validate:hooks": "node scripts/validate-husky-setup.js",
     "tm": "node bin/tm.mjs",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "android": "pnpm --filter @travelmatch/mobile android",
+    "ios": "pnpm --filter @travelmatch/mobile ios"
   },
   "bin": {
     "tm": "./bin/tm.mjs"

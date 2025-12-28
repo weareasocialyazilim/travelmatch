@@ -119,8 +119,8 @@ const CreateMomentScreen: React.FC = () => {
             ? {
                 name: data.place.name,
                 city:
-                  data.place.address.split(',')[0]?.trim() || data.place.name,
-                country: data.place.address.split(',')[1]?.trim() || '',
+                  data.place.address?.split(',')[0]?.trim() || data.place.name,
+                country: data.place.address?.split(',')[1]?.trim() || '',
               }
             : undefined,
           date: data.date.toISOString(),
@@ -159,6 +159,7 @@ const CreateMomentScreen: React.FC = () => {
       } finally {
         setIsSubmitting(false);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [createMoment, navigation],
   );

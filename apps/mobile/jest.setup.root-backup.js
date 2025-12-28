@@ -1130,39 +1130,80 @@ jest.mock('@sentry/react-native', () => ({
   init: jest.fn(),
 }));
 
-// Mock Reanimated
+// Mock Reanimated with comprehensive mocks for testing
 jest.mock('react-native-reanimated', () => {
   const View = require('react-native').View;
+
+  // Create a proper shared value mock
+  const useSharedValue = (initialValue) => {
+    const ref = { current: initialValue };
+    return new Proxy(
+      {},
+      {
+        get(target, prop) {
+          if (prop === 'value') return ref.current;
+          if (prop === 'get') return () => ref.current;
+          if (prop === 'set')
+            return (newValue) => {
+              ref.current =
+                typeof newValue === 'function'
+                  ? newValue(ref.current)
+                  : newValue;
+            };
+          return undefined;
+        },
+        set(target, prop, newValue) {
+          if (prop === 'value') {
+            ref.current = newValue;
+            return true;
+          }
+          return false;
+        },
+      },
+    );
+  };
+
   return {
+    __esModule: true,
     default: {
       View,
-      call: () => {},
+      createAnimatedComponent: (Component) => Component,
     },
     View,
-    useSharedValue: jest.fn((val) => ({ value: val })),
-    useAnimatedStyle: jest.fn((cb) => cb()),
-    withSpring: jest.fn((val) => val),
-    withTiming: jest.fn((val) => val),
-    withDelay: jest.fn((_, val) => val),
-    withSequence: jest.fn((...args) => args[args.length - 1]),
-    withRepeat: jest.fn((val) => val),
+    Text: require('react-native').Text,
+    Image: require('react-native').Image,
+    ScrollView: require('react-native').ScrollView,
+    useSharedValue,
+    useAnimatedStyle: (cb) => cb(),
+    useDerivedValue: (cb) => ({ value: cb() }),
+    useAnimatedProps: (cb) => cb(),
+    withSpring: (val) => val,
+    withTiming: (val) => val,
+    withDelay: (_, val) => val,
+    withSequence: (...args) => args[args.length - 1],
+    withRepeat: (val) => val,
     cancelAnimation: jest.fn(),
+    runOnJS: (fn) => fn,
+    runOnUI: (fn) => fn,
     Easing: {
-      linear: jest.fn(),
-      ease: jest.fn(),
-      quad: jest.fn(),
-      bezier: jest.fn(),
+      linear: (t) => t,
+      ease: (t) => t,
+      quad: (t) => t,
+      cubic: (t) => t,
+      bezier: () => (t) => t,
+      inOut: () => (t) => t,
+      in: () => (t) => t,
+      out: () => (t) => t,
     },
-    interpolate: jest.fn((val) => val),
+    interpolate: (val) => val,
     Extrapolation: {
       CLAMP: 'clamp',
       EXTEND: 'extend',
       IDENTITY: 'identity',
     },
-    runOnJS: jest.fn((fn) => fn),
-    useDerivedValue: jest.fn((cb) => ({ value: cb() })),
-    useAnimatedGestureHandler: jest.fn(() => ({})),
-    useAnimatedScrollHandler: jest.fn(() => ({})),
+    useAnimatedGestureHandler: () => ({}),
+    useAnimatedScrollHandler: () => ({}),
+    useAnimatedRef: () => ({ current: null }),
     createAnimatedComponent: (Component) => Component,
   };
 });

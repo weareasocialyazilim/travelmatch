@@ -160,6 +160,7 @@ export const Input: React.FC<InputProps> = memo(
             <TouchableOpacity
               onPress={togglePassword}
               style={styles.rightIconContainer}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityLabel={
                 showPassword ? 'Hide password' : 'Show password'
               }
@@ -176,6 +177,7 @@ export const Input: React.FC<InputProps> = memo(
             <TouchableOpacity
               onPress={onRightIconPress}
               style={styles.rightIconContainer}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               disabled={!onRightIconPress}
               testID={rest.testID ? `${rest.testID}-toggle` : undefined}
             >

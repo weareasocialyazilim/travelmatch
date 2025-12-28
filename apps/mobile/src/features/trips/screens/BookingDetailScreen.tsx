@@ -6,13 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -122,7 +122,8 @@ export const BookingDetailScreen: React.FC = () => {
   const handleCancelBooking = () => {
     showConfirmation({
       title: 'Cancel Booking',
-      message: 'Are you sure you want to cancel this booking? This action cannot be undone.',
+      message:
+        'Are you sure you want to cancel this booking? This action cannot be undone.',
       type: 'danger',
       icon: 'close-circle',
       confirmText: 'Cancel Booking',
@@ -144,8 +145,41 @@ export const BookingDetailScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Booking Details</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.skeletonImageContainer}>
+            <Skeleton width="100%" height={200} borderRadius={16} />
+          </View>
+          <View style={styles.skeletonSection}>
+            <Skeleton width={200} height={24} />
+            <View style={styles.skeletonRow}>
+              <Skeleton width={40} height={40} borderRadius={20} />
+              <Skeleton width={120} height={16} />
+            </View>
+          </View>
+          <View style={styles.skeletonCard}>
+            <Skeleton width="100%" height={20} />
+            <Skeleton width="80%" height={16} />
+            <Skeleton width="60%" height={16} />
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -415,12 +449,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -680,6 +708,34 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 32,
+  },
+  placeholder: {
+    width: 40,
+  },
+  scrollContent: {
+    paddingBottom: 32,
+  },
+  skeletonImageContainer: {
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
+  skeletonSection: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    gap: 12,
+  },
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  skeletonCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    gap: 8,
   },
 });
 

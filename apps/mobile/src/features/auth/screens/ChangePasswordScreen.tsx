@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { updatePassword } from '@/services/supabaseAuthService';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -119,114 +120,119 @@ export const ChangePasswordScreen: React.FC = () => {
   );
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          {...a11y.button('Back button')}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={24}
-            color={COLORS.text}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.header}>
-          <MaterialCommunityIcons
-            name="shield-lock-outline"
-            size={64}
-            color={COLORS.primary}
-          />
-          <Text style={styles.title}>Change Password</Text>
-          <Text style={styles.subtitle}>
-            Create a strong password with at least 8 characters, including
-            uppercase, lowercase, and numbers
-          </Text>
-        </View>
-
-        <View style={styles.form}>
-          {renderPasswordInput(
-            'Current Password',
-            currentPassword,
-            setCurrentPassword,
-            showCurrentPassword,
-            setShowCurrentPassword,
-            'Enter current password',
-            'Current password input',
-          )}
-
-          {renderPasswordInput(
-            'New Password',
-            newPassword,
-            setNewPassword,
-            showNewPassword,
-            setShowNewPassword,
-            'Enter new password',
-            'New password input',
-          )}
-
-          {newPassword.length > 0 && (
-            <View style={styles.requirements}>
-              <RequirementItem
-                met={newPassword.length >= 8}
-                text="At least 8 characters"
-              />
-              <RequirementItem
-                met={/[A-Z]/.test(newPassword)}
-                text="One uppercase letter"
-              />
-              <RequirementItem
-                met={/[a-z]/.test(newPassword)}
-                text="One lowercase letter"
-              />
-              <RequirementItem met={/\d/.test(newPassword)} text="One number" />
-            </View>
-          )}
-
-          {renderPasswordInput(
-            'Confirm New Password',
-            confirmPassword,
-            setConfirmPassword,
-            showConfirmPassword,
-            setShowConfirmPassword,
-            'Confirm new password',
-            'Confirm password input',
-          )}
-
-          {confirmPassword.length > 0 && newPassword !== confirmPassword && (
-            <Text style={styles.mismatchError}>Passwords do not match</Text>
-          )}
-
           <TouchableOpacity
-            style={[
-              styles.button,
-              (!canSubmit || isLoading) && styles.buttonDisabled,
-            ]}
-            onPress={handleChangePassword}
-            disabled={!canSubmit || isLoading}
-            {...a11y.button(
-              'Update password',
-              undefined,
-              !canSubmit || isLoading,
-            )}
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            {...a11y.button('Back button')}
           >
-            {isLoading ? (
-              <ActivityIndicator color="#FFF" />
-            ) : (
-              <Text style={styles.buttonText}>Update Password</Text>
-            )}
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
           </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+          <View style={styles.header}>
+            <MaterialCommunityIcons
+              name="shield-lock-outline"
+              size={64}
+              color={COLORS.primary}
+            />
+            <Text style={styles.title}>Change Password</Text>
+            <Text style={styles.subtitle}>
+              Create a strong password with at least 8 characters, including
+              uppercase, lowercase, and numbers
+            </Text>
+          </View>
+
+          <View style={styles.form}>
+            {renderPasswordInput(
+              'Current Password',
+              currentPassword,
+              setCurrentPassword,
+              showCurrentPassword,
+              setShowCurrentPassword,
+              'Enter current password',
+              'Current password input',
+            )}
+
+            {renderPasswordInput(
+              'New Password',
+              newPassword,
+              setNewPassword,
+              showNewPassword,
+              setShowNewPassword,
+              'Enter new password',
+              'New password input',
+            )}
+
+            {newPassword.length > 0 && (
+              <View style={styles.requirements}>
+                <RequirementItem
+                  met={newPassword.length >= 8}
+                  text="At least 8 characters"
+                />
+                <RequirementItem
+                  met={/[A-Z]/.test(newPassword)}
+                  text="One uppercase letter"
+                />
+                <RequirementItem
+                  met={/[a-z]/.test(newPassword)}
+                  text="One lowercase letter"
+                />
+                <RequirementItem
+                  met={/\d/.test(newPassword)}
+                  text="One number"
+                />
+              </View>
+            )}
+
+            {renderPasswordInput(
+              'Confirm New Password',
+              confirmPassword,
+              setConfirmPassword,
+              showConfirmPassword,
+              setShowConfirmPassword,
+              'Confirm new password',
+              'Confirm password input',
+            )}
+
+            {confirmPassword.length > 0 && newPassword !== confirmPassword && (
+              <Text style={styles.mismatchError}>Passwords do not match</Text>
+            )}
+
+            <TouchableOpacity
+              style={[
+                styles.button,
+                (!canSubmit || isLoading) && styles.buttonDisabled,
+              ]}
+              onPress={handleChangePassword}
+              disabled={!canSubmit || isLoading}
+              {...a11y.button(
+                'Update password',
+                undefined,
+                !canSubmit || isLoading,
+              )}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.buttonText}>Update Password</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -247,6 +253,10 @@ const RequirementItem: React.FC<{ met: boolean; text: string }> = ({
 );
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

@@ -31,7 +31,10 @@ export interface NotificationCardProps {
 // Type config defined outside component to avoid recreation
 const typeConfig: Record<
   NotificationType,
-  { icon: 'gift' | 'check' | 'close' | 'message' | 'star' | 'bell'; color: string }
+  {
+    icon: 'gift' | 'check' | 'close' | 'message' | 'star' | 'bell';
+    color: string;
+  }
 > = {
   gift_received: { icon: 'gift', color: COLORS.primary },
   request_accepted: { icon: 'check', color: COLORS.success },
@@ -42,12 +45,24 @@ const typeConfig: Record<
 };
 
 export const NotificationCard: React.FC<NotificationCardProps> = memo(
-  ({ type, title, message, timestamp, read, avatar, onPress, onMarkAsRead }) => {
+  ({
+    type,
+    title,
+    message,
+    timestamp,
+    read,
+    avatar,
+    onPress,
+    onMarkAsRead,
+  }) => {
     // Memoize config lookup
     const config = useMemo(() => typeConfig[type], [type]);
 
     // Memoize card style
-    const cardStyle = useMemo(() => [styles.card, !read && styles.unread], [read]);
+    const cardStyle = useMemo(
+      () => [styles.card, !read && styles.unread],
+      [read],
+    );
 
     // Memoize icon background style
     const iconBgStyle = useMemo(
@@ -56,7 +71,10 @@ export const NotificationCard: React.FC<NotificationCardProps> = memo(
     );
 
     // Memoize avatar source
-    const avatarSource = useMemo(() => (avatar ? { uri: avatar } : null), [avatar]);
+    const avatarSource = useMemo(
+      () => (avatar ? { uri: avatar } : null),
+      [avatar],
+    );
 
     return (
       <TouchableOpacity style={cardStyle} onPress={onPress} activeOpacity={0.7}>
@@ -65,7 +83,11 @@ export const NotificationCard: React.FC<NotificationCardProps> = memo(
             <Image source={avatarSource} style={styles.avatar} />
           ) : (
             <View style={iconBgStyle}>
-              <MaterialCommunityIcons name={config.icon} size={20} color={config.color} />
+              <MaterialCommunityIcons
+                name={config.icon}
+                size={20}
+                color={config.color}
+              />
             </View>
           )}
         </View>
@@ -81,7 +103,11 @@ export const NotificationCard: React.FC<NotificationCardProps> = memo(
         </View>
 
         {!read && (
-          <TouchableOpacity style={styles.markReadButton} onPress={onMarkAsRead}>
+          <TouchableOpacity
+            style={styles.markReadButton}
+            onPress={onMarkAsRead}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <View style={styles.unreadDot} />
           </TouchableOpacity>
         )}

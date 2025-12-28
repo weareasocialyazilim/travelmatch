@@ -40,8 +40,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       // Location permissions
       NSLocationWhenInUseUsageDescription:
         'TravelMatch uses your location to show nearby experiences and verify travel moments.',
-      NSLocationAlwaysAndWhenInUseUsageDescription:
-        'TravelMatch uses your location to show nearby experiences and verify travel moments.',
 
       // Camera and Photos
       NSCameraUsageDescription:
@@ -57,14 +55,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
       // Push notifications background modes
       UIBackgroundModes: ['fetch', 'remote-notification'],
-
-      // Microphone for video recording
-      NSMicrophoneUsageDescription:
-        'TravelMatch needs microphone access to record videos of travel moments.',
-
-      // Contacts for friend invites
-      NSContactsUsageDescription:
-        'TravelMatch can access contacts to help you invite friends.',
 
       // App Transport Security
       NSAppTransportSecurity: {
@@ -110,7 +100,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'android.permission.ACCESS_COARSE_LOCATION',
       'android.permission.ACCESS_FINE_LOCATION',
       'android.permission.CAMERA',
-      'android.permission.RECORD_AUDIO',
       'android.permission.VIBRATE',
       'android.permission.USE_BIOMETRIC',
       'android.permission.USE_FINGERPRINT',
@@ -168,7 +157,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-notifications',
       {
-        icon: './assets/notification-icon.png',
+        icon: './assets/icon.png',
         color: '#F59E0B',
       },
     ],
@@ -181,8 +170,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-location',
       {
-        locationAlwaysAndWhenInUsePermission:
-          'TravelMatch uses your location to show nearby experiences.',
         locationWhenInUsePermission:
           'TravelMatch uses your location to show nearby experiences.',
       },
