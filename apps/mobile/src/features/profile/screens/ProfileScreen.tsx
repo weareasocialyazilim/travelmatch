@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  ActivityIndicator,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -444,10 +443,6 @@ const styles = StyleSheet.create({
   momentsGrid: {
     paddingHorizontal: 16,
     paddingTop: 16,
-  },
-  loadingContainer: {
-    paddingVertical: 40,
-    alignItems: 'center',
   },
   itemSeparator: {
     height: 12,
