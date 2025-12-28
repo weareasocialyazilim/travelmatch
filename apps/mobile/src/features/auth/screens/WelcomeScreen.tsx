@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SocialButton } from '@/components';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 
@@ -72,41 +72,30 @@ export const WelcomeScreen: React.FC<{
         {/* Action Section */}
         <View style={styles.actionSection}>
           <View style={styles.buttonContainer}>
-            {/* Apple Sign In */}
-            <TouchableOpacity
-              style={[styles.socialButton, styles.appleButton]}
-              onPress={handleAppleSignIn}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel="Apple ile devam et"
-            >
-              <View style={styles.socialButtonContent}>
-                <MaterialCommunityIcons
-                  name="apple"
-                  size={24}
-                  color={COLORS.utility.white}
-                />
-                <Text style={styles.socialButtonText}>Apple ile devam et</Text>
-              </View>
-            </TouchableOpacity>
-
-            {/* Google Sign In */}
-            <TouchableOpacity
-              style={[styles.socialButton, styles.googleButton]}
-              onPress={handleGoogleSignIn}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel="Google ile devam et"
-            >
-              <View style={styles.socialButtonContent}>
-                <MaterialCommunityIcons
-                  name="google"
-                  size={24}
-                  color={COLORS.utility.white}
-                />
-                <Text style={styles.socialButtonText}>Google ile devam et</Text>
-              </View>
-            </TouchableOpacity>
+            {/* Social Sign In Icons - Horizontal Row */}
+            <View style={styles.socialIconsRow}>
+              <SocialButton
+                provider="apple"
+                size="icon"
+                onPress={handleAppleSignIn}
+                useProviderColors
+              />
+              <SocialButton
+                provider="google"
+                size="icon"
+                onPress={handleGoogleSignIn}
+                useProviderColors
+              />
+              <SocialButton
+                provider="facebook"
+                size="icon"
+                onPress={() => {
+                  logger.debug('[Auth] Facebook sign in initiated from Welcome screen');
+                  navigation.navigate('Register');
+                }}
+                useProviderColors
+              />
+            </View>
 
             {/* Divider */}
             <View style={styles.divider}>
@@ -210,29 +199,12 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 16,
   },
-  socialButton: {
-    borderRadius: 28,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  socialButtonContent: {
+  socialIconsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-  },
-  socialButtonText: {
-    color: COLORS.utility.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  appleButton: {
-    backgroundColor: COLORS.apple,
-  },
-  googleButton: {
-    backgroundColor: '#4285F4',
+    alignItems: 'center',
+    gap: 16,
+    paddingVertical: 8,
   },
   divider: {
     flexDirection: 'row',

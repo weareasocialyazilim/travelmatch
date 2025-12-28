@@ -201,6 +201,43 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
     return 'map-marker';
   };
 
+  // Memoized render function for FlashList performance
+  const renderResultItem = useCallback(
+    ({ item }: { item: PlaceResult }) => (
+      <TouchableOpacity
+        style={styles.resultItem}
+        onPress={() => handleSelectPlace(item)}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`Select ${item.name}`}
+        accessibilityHint={`Located at ${item.address}`}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <View style={styles.resultIcon}>
+          <MaterialCommunityIcons
+            name={getCategoryIcon(item.category)}
+            size={20}
+            color={COLORS.brand.primary}
+          />
+        </View>
+        <View style={styles.resultContent}>
+          <Text style={styles.resultName} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text style={styles.resultAddress} numberOfLines={1}>
+            {item.address}
+          </Text>
+        </View>
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={20}
+          color={COLORS.text.tertiary}
+        />
+      </TouchableOpacity>
+    ),
+    [handleSelectPlace, getCategoryIcon]
+  );
+
   return (
     <Modal
       visible={visible}
@@ -267,38 +304,8 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
               keyExtractor={(item) => item.id}
               keyboardShouldPersistTaps="handled"
               estimatedItemSize={72}
-              renderItem={useCallback(({ item }: { item: PlaceResult }) => (
-                <TouchableOpacity
-                  style={styles.resultItem}
-                  onPress={() => handleSelectPlace(item)}
-                  activeOpacity={0.7}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Select ${item.name}`}
-                  accessibilityHint={`Located at ${item.address}`}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <View style={styles.resultIcon}>
-                    <MaterialCommunityIcons
-                      name={getCategoryIcon(item.category)}
-                      size={20}
-                      color={COLORS.brand.primary}
-                    />
-                  </View>
-                  <View style={styles.resultContent}>
-                    <Text style={styles.resultName} numberOfLines={1}>
-                      {item.name}
-                    </Text>
-                    <Text style={styles.resultAddress} numberOfLines={1}>
-                      {item.address}
-                    </Text>
-                  </View>
-                  <MaterialCommunityIcons
-                    name="chevron-right"
-                    size={20}
-                    color={COLORS.text.tertiary}
-                  />
-                </TouchableOpacity>
-              ), [handleSelectPlace, getCategoryIcon])}
+              renderItem={renderResultItem}
+            />
           ) : query.length > 0 && !isLoading ? (
             <View style={styles.emptyState}>
               <MaterialCommunityIcons

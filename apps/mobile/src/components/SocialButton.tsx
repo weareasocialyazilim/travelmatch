@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 
@@ -13,36 +13,51 @@ export interface SocialButtonProps {
   onPress?: () => void;
   style?: ViewStyle;
   label?: string;
+  /** Use provider-specific colors (Apple black, Google blue, etc.) */
+  useProviderColors?: boolean;
 }
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
-// Provider config defined outside component to avoid recreation
-const providerConfig: Record<Provider, { icon: IconName; text: string }> = {
+// Provider config with brand colors
+const providerConfig: Record<
+  Provider,
+  { icon: IconName; text: string; color: string; iconColor: string }
+> = {
   google: {
     icon: 'google',
     text: 'Continue with Google',
+    color: '#4285F4', // Google blue
+    iconColor: COLORS.utility.white,
   },
   apple: {
     icon: 'apple',
     text: 'Continue with Apple',
+    color: '#000000', // Apple black
+    iconColor: COLORS.utility.white,
   },
   facebook: {
     icon: 'facebook',
     text: 'Continue with Facebook',
+    color: '#1877F2', // Facebook blue
+    iconColor: COLORS.utility.white,
   },
   phone: {
     icon: 'phone',
     text: 'Continue with Phone',
+    color: COLORS.mint,
+    iconColor: COLORS.utility.white,
   },
   email: {
     icon: 'email',
     text: 'Continue with Email',
+    color: COLORS.buttonDark,
+    iconColor: COLORS.utility.white,
   },
 };
 
 const SocialButton: React.FC<SocialButtonProps> = memo(
-  ({ provider, size = 'large', onPress, style, label }) => {
+  ({ provider, size = 'large', onPress, style, label, useProviderColors = false }) => {
     // Memoize config lookup
     const config = useMemo(() => providerConfig[provider], [provider]);
 
@@ -52,19 +67,27 @@ const SocialButton: React.FC<SocialButtonProps> = memo(
       [label, config.text],
     );
 
+    // Memoize background color
+    const backgroundColor = useMemo(
+      () => (useProviderColors ? config.color : COLORS.buttonDark),
+      [useProviderColors, config.color],
+    );
+
     if (size === 'icon') {
       return (
         <TouchableOpacity
-          style={[styles.iconButton, style]}
+          style={[styles.iconButton, { backgroundColor }, style]}
           onPress={onPress}
           activeOpacity={0.8}
           accessibilityRole="button"
           accessibilityLabel={displayText}
+          accessibilityHint={`Sign in with ${provider}`}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <MaterialCommunityIcons
             name={config.icon}
             size={24}
-            color={COLORS.utility.white}
+            color={config.iconColor}
           />
         </TouchableOpacity>
       );
@@ -72,16 +95,17 @@ const SocialButton: React.FC<SocialButtonProps> = memo(
 
     return (
       <TouchableOpacity
-        style={[styles.largeButton, style]}
+        style={[styles.largeButton, { backgroundColor }, style]}
         onPress={onPress}
         activeOpacity={0.8}
         accessibilityRole="button"
         accessibilityLabel={displayText}
+        accessibilityHint={`Sign in with ${provider}`}
       >
         <MaterialCommunityIcons
           name={config.icon}
           size={24}
-          color={COLORS.utility.white}
+          color={config.iconColor}
         />
         <Text style={styles.largeButtonText}>{displayText}</Text>
       </TouchableOpacity>
@@ -90,7 +114,8 @@ const SocialButton: React.FC<SocialButtonProps> = memo(
   (prevProps, nextProps) =>
     prevProps.provider === nextProps.provider &&
     prevProps.size === nextProps.size &&
-    prevProps.label === nextProps.label,
+    prevProps.label === nextProps.label &&
+    prevProps.useProviderColors === nextProps.useProviderColors,
 );
 
 SocialButton.displayName = 'SocialButton';
@@ -99,10 +124,9 @@ const styles = StyleSheet.create({
   iconButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: COLORS.buttonDark,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
   },
   largeButton: {
     flexDirection: 'row',
@@ -110,7 +134,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.buttonDark,
     paddingHorizontal: 20,
     gap: 12,
   },
@@ -121,4 +144,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export { SocialButton };
 export default SocialButton;
