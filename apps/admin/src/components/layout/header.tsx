@@ -1,24 +1,33 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+/**
+ * TravelMatch Admin Header V2
+ * "Cinematic Travel + Trust Jewelry" Design
+ */
+
+import { useState, useCallback, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import {
-  Bell,
   Search,
+  Bell,
+  Command,
+  ChevronRight,
+  Settings,
   Moon,
   Sun,
   LogOut,
   User,
-  Settings,
-  Command,
+  HelpCircle,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -29,12 +38,42 @@ import { useUIStore } from '@/stores/ui-store';
 import { useAuth } from '@/hooks/use-auth';
 import { getInitials } from '@/lib/utils';
 
+// Breadcrumb mapping
+const routeLabels: Record<string, string> = {
+  dashboard: 'Dashboard',
+  users: 'Kullanıcılar',
+  moments: 'Momentler',
+  disputes: 'Anlaşmazlıklar',
+  finance: 'Finans',
+  analytics: 'Analitik',
+  settings: 'Ayarlar',
+  queue: 'İş Kuyruğu',
+  'trust-safety': 'Güvenlik',
+  support: 'Destek',
+  notifications: 'Bildirimler',
+  campaigns: 'Kampanyalar',
+  profile: 'Profil',
+  kyc: 'KYC',
+  reports: 'Raporlar',
+};
+
 export function Header() {
+  const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const [searchFocused, setSearchFocused] = useState(false);
+
   const user = useAuthStore((state) => state.user);
   const { setCommandPaletteOpen } = useUIStore();
   const { logout } = useAuth();
+
+  // Generate breadcrumbs from pathname
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const breadcrumbs = pathSegments.map((segment, index) => ({
+    label: routeLabels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1),
+    href: '/' + pathSegments.slice(0, index + 1).join('/'),
+    isLast: index === pathSegments.length - 1,
+  }));
 
   // Keyboard shortcut for command palette
   useEffect(() => {
@@ -53,84 +92,122 @@ export function Header() {
     await logout();
   }, [logout]);
 
-  const getRoleBadge = (role: string) => {
-    const roleLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'success' | 'warning' }> = {
-      super_admin: { label: 'Super Admin', variant: 'default' },
-      manager: { label: 'Manager', variant: 'success' },
-      moderator: { label: 'Moderator', variant: 'secondary' },
-      finance: { label: 'Finance', variant: 'warning' },
-      marketing: { label: 'Marketing', variant: 'secondary' },
-      support: { label: 'Support', variant: 'secondary' },
-      viewer: { label: 'Viewer', variant: 'secondary' },
-    };
-
-    const config = roleLabels[role] || { label: role, variant: 'secondary' as const };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+  const handleSearchClick = () => {
+    setCommandPaletteOpen(true);
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background px-6">
-      {/* Search */}
-      <Button
-        variant="outline"
-        className="h-9 w-64 justify-start text-muted-foreground"
-        onClick={() => setCommandPaletteOpen(true)}
-      >
-        <Search className="mr-2 h-4 w-4" />
-        <span>Ara...</span>
-        <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-          <Command className="h-3 w-3" />K
-        </kbd>
-      </Button>
+    <header className="admin-header">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center gap-1 text-sm">
+        <Link
+          href="/dashboard"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Ana Sayfa
+        </Link>
+        {breadcrumbs.map((crumb) => (
+          <div key={crumb.href} className="flex items-center gap-1">
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            {crumb.isLast ? (
+              <span className="font-medium">{crumb.label}</span>
+            ) : (
+              <Link
+                href={crumb.href}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {crumb.label}
+              </Link>
+            )}
+          </div>
+        ))}
+      </nav>
 
-      {/* Right side */}
-      <div className="flex items-center gap-2">
+      {/* Right Section */}
+      <div className="admin-header-actions">
+        {/* Search */}
+        <div
+          className={cn(
+            'admin-header-search cursor-pointer',
+            searchFocused && 'ring-2 ring-primary/50'
+          )}
+          onClick={handleSearchClick}
+        >
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Ara... (⌘K)"
+            className="border-0 bg-transparent p-0 h-auto focus-visible:ring-0 w-40 text-sm cursor-pointer"
+            onFocus={() => {
+              setSearchFocused(true);
+              setCommandPaletteOpen(true);
+            }}
+            onBlur={() => setSearchFocused(false)}
+            readOnly
+          />
+          <kbd className="hidden sm:inline-flex items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
+            <Command className="h-3 w-3" />K
+          </kbd>
+        </div>
+
+        {/* Help */}
+        <Button variant="ghost" size="icon" className="h-9 w-9">
+          <HelpCircle className="h-5 w-5 text-muted-foreground" />
+        </Button>
+
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
+            <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+              <Bell className="h-5 w-5 text-muted-foreground" />
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] font-bold text-white flex items-center justify-center">
                 3
               </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Bildirimler</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-80 overflow-auto">
-              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                <div className="flex w-full items-center justify-between">
-                  <span className="font-medium">Yeni KYC Başvurusu</span>
-                  <span className="text-xs text-muted-foreground">2 dk önce</span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  Kullanıcı Ali Veli KYC doğrulaması bekliyor
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                <div className="flex w-full items-center justify-between">
-                  <span className="font-medium">Ödeme Onayı Gerekli</span>
-                  <span className="text-xs text-muted-foreground">15 dk önce</span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  ₺2,500 tutarında ödeme onay bekliyor
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                <div className="flex w-full items-center justify-between">
-                  <span className="font-medium">Yeni Şikayet</span>
-                  <span className="text-xs text-muted-foreground">1 saat önce</span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  Kullanıcı dolandırıcılık şikayeti bildirdi
-                </span>
-              </DropdownMenuItem>
+            <div className="flex items-center justify-between px-4 py-2 border-b">
+              <span className="font-semibold">Bildirimler</span>
+              <Badge variant="secondary" className="text-xs">3 yeni</Badge>
             </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="justify-center text-primary">
-              Tümünü Gör
-            </DropdownMenuItem>
+            <div className="max-h-[300px] overflow-y-auto">
+              {/* Notification items */}
+              <div className="px-4 py-3 hover:bg-muted/50 cursor-pointer border-b">
+                <div className="flex items-start gap-3">
+                  <div className="h-2 w-2 mt-2 rounded-full bg-destructive shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium">Yüksek öncelikli KYC bekliyor</p>
+                    <p className="text-xs text-muted-foreground">24 kullanıcı onay bekliyor</p>
+                    <p className="text-xs text-muted-foreground mt-1">5 dk önce</p>
+                  </div>
+                </div>
+              </div>
+              <div className="px-4 py-3 hover:bg-muted/50 cursor-pointer border-b">
+                <div className="flex items-start gap-3">
+                  <div className="h-2 w-2 mt-2 rounded-full bg-warning shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium">Sistem performansı düştü</p>
+                    <p className="text-xs text-muted-foreground">Notification servisi %98.5 uptime</p>
+                    <p className="text-xs text-muted-foreground mt-1">15 dk önce</p>
+                  </div>
+                </div>
+              </div>
+              <div className="px-4 py-3 hover:bg-muted/50 cursor-pointer">
+                <div className="flex items-start gap-3">
+                  <div className="h-2 w-2 mt-2 rounded-full bg-trust shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium">Günlük rapor hazır</p>
+                    <p className="text-xs text-muted-foreground">17 Aralık raporu oluşturuldu</p>
+                    <p className="text-xs text-muted-foreground mt-1">1 saat önce</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-2 border-t">
+              <Button variant="ghost" className="w-full text-sm">
+                Tüm bildirimleri gör
+              </Button>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -138,36 +215,34 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
+          className="h-9 w-9"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <Sun className="h-5 w-5 text-muted-foreground rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 text-muted-foreground rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Tema değiştir</span>
         </Button>
 
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 gap-2 px-2">
+            <Button variant="ghost" className="h-9 gap-2 pl-2 pr-3">
               <Avatar className="h-7 w-7">
                 <AvatarImage src={user?.avatar_url || undefined} alt={user?.name} />
-                <AvatarFallback className="text-xs">
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                   {user ? getInitials(user.name) : '??'}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden flex-col items-start md:flex">
-                <span className="text-sm font-medium">{user?.name}</span>
-              </div>
+              <span className="hidden md:inline text-sm font-medium">
+                {user?.name?.split(' ')[0] || 'Kullanıcı'}
+              </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-2">
-                <p className="text-sm font-medium">{user?.name}</p>
-                <p className="text-xs text-muted-foreground">{user?.email}</p>
-                {user?.role && getRoleBadge(user.role)}
-              </div>
-            </DropdownMenuLabel>
+            <div className="px-2 py-1.5">
+              <p className="font-medium text-sm">{user?.name}</p>
+              <p className="text-xs text-muted-foreground">{user?.email || 'Super Admin'}</p>
+            </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
               <User className="mr-2 h-4 w-4" />
