@@ -350,7 +350,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               logger.info('[Auth] Session invalid, clearing auth data');
               await clearAuthData();
             }
-          } catch (refreshError) {
+          } catch {
             // If refresh fails but we have a valid expiry, try to continue
             // This handles offline scenarios
             if (expiresAt > Date.now()) {

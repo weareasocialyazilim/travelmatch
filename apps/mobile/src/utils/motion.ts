@@ -24,10 +24,14 @@ import {
   withDelay,
   withRepeat,
   Easing,
-  SharedValue,
-  runOnJS,
+  SharedValue as _SharedValue,
+  runOnJS as _runOnJS,
 } from 'react-native-reanimated';
-import { triggerHaptic, HapticType, smartHaptic } from './haptics';
+import {
+  triggerHaptic as _triggerHaptic,
+  HapticType,
+  smartHaptic,
+} from './haptics';
 
 // ═══════════════════════════════════════════════════
 // SPRING CONFIGS - "Unified Physics"
@@ -131,7 +135,7 @@ export const useFadeSlideUp = (delay = 0, translateY = 20) => {
   useEffect(() => {
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration: TIMING.default })
+      withTiming(1, { duration: TIMING.default }),
     );
     translate.value = withDelay(delay, withSpring(0, SPRING.gentle));
   }, [delay, opacity, translate, translateY]);
@@ -155,7 +159,7 @@ export const useStaggeredItem = (index: number, staggerDelay = 50) => {
     const delay = index * staggerDelay;
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration: TIMING.default })
+      withTiming(1, { duration: TIMING.default }),
     );
     translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
   }, [index, opacity, staggerDelay, translateY]);
@@ -178,10 +182,10 @@ export const usePulse = (minScale = 1, maxScale = 1.03, duration = 2000) => {
     scale.value = withRepeat(
       withSequence(
         withTiming(maxScale, { duration }),
-        withTiming(minScale, { duration })
+        withTiming(minScale, { duration }),
       ),
       -1,
-      false
+      false,
     );
   }, [duration, maxScale, minScale, scale]);
 
@@ -203,10 +207,10 @@ export const useShimmer = (enabled = true) => {
       opacity.value = withRepeat(
         withSequence(
           withTiming(1, { duration: 800 }),
-          withTiming(0.5, { duration: 800 })
+          withTiming(0.5, { duration: 800 }),
         ),
         -1,
-        true
+        true,
       );
     }
   }, [enabled, opacity]);
@@ -231,7 +235,7 @@ export const useShake = () => {
       withTiming(8, { duration: 100 }),
       withTiming(-6, { duration: 100 }),
       withTiming(6, { duration: 100 }),
-      withTiming(0, { duration: 50 })
+      withTiming(0, { duration: 50 }),
     );
     void HAPTIC.error();
   }, [translateX]);
@@ -253,7 +257,7 @@ export const useSuccessBounce = () => {
     scale.value = withSequence(
       withSpring(1.15, SPRING.bouncy),
       withSpring(0.95, SPRING.snappy),
-      withSpring(1, SPRING.default)
+      withSpring(1, SPRING.default),
     );
     void HAPTIC.success();
   }, [scale]);
@@ -275,11 +279,11 @@ export const useCleanSpark = () => {
   const spark = useCallback(() => {
     scale.value = withSequence(
       withTiming(1.2, { duration: 150 }),
-      withSpring(1, SPRING.bouncy)
+      withSpring(1, SPRING.bouncy),
     );
     sparkOpacity.value = withSequence(
       withTiming(1, { duration: 100 }),
-      withDelay(400, withTiming(0, { duration: 200 }))
+      withDelay(400, withTiming(0, { duration: 200 })),
     );
     void HAPTIC.success();
   }, [scale, sparkOpacity]);
@@ -343,7 +347,7 @@ export const useCardEntrance = (index: number, staggerDelay = 50) => {
     translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration: TIMING.default })
+      withTiming(1, { duration: TIMING.default }),
     );
     scale.value = withDelay(delay, withSpring(1, SPRING.gentle));
   }, [index, opacity, scale, staggerDelay, translateY]);
@@ -374,10 +378,7 @@ export const useFABAnimation = () => {
   }, [rotation, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { rotate: `${rotation.value}deg` },
-    ],
+    transform: [{ scale: scale.value }, { rotate: `${rotation.value}deg` }],
   }));
 
   return { scale, rotation, show, hide, animatedStyle };
@@ -393,10 +394,10 @@ export const useSkeletonPulse = () => {
     opacity.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 800, easing: TIMING.easeInOut }),
-        withTiming(0.3, { duration: 800, easing: TIMING.easeInOut })
+        withTiming(0.3, { duration: 800, easing: TIMING.easeInOut }),
       ),
       -1,
-      false
+      false,
     );
   }, [opacity]);
 

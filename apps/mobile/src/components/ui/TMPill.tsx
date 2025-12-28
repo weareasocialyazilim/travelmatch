@@ -143,11 +143,7 @@ export const TMPill: React.FC<TMPillProps> = ({
         />
       )}
       <Text
-        style={[
-          styles.text,
-          textSizeStyles[size],
-          { color: getTextColor() },
-        ]}
+        style={[styles.text, textSizeStyles[size], { color: getTextColor() }]}
         numberOfLines={1}
       >
         {children}
@@ -175,11 +171,12 @@ export const TMPill: React.FC<TMPillProps> = ({
         style={[
           styles.pill,
           sizeStyles[size],
+          styles.pillDynamic,
           {
             backgroundColor: getBackgroundColor(),
             borderColor: getBorderColor(),
-            borderWidth: effectiveVariant === 'outlined' ? 1 : 0,
           },
+          effectiveVariant === 'outlined' && styles.outlined,
           disabled && styles.disabled,
           style,
         ]}
@@ -201,11 +198,12 @@ export const TMPill: React.FC<TMPillProps> = ({
       style={[
         styles.pill,
         sizeStyles[size],
+        styles.pillDynamic,
         {
           backgroundColor: getBackgroundColor(),
           borderColor: getBorderColor(),
-          borderWidth: effectiveVariant === 'outlined' ? 1 : 0,
         },
+        effectiveVariant === 'outlined' && styles.outlined,
         disabled && styles.disabled,
         animatedStyle,
         style,
@@ -232,12 +230,7 @@ export const TMCategoryChip: React.FC<TMCategoryChipProps> = ({
   onPress,
   testID,
 }) => (
-  <TMPill
-    emoji={emoji}
-    selected={selected}
-    onPress={onPress}
-    testID={testID}
-  >
+  <TMPill emoji={emoji} selected={selected} onPress={onPress} testID={testID}>
     {category}
   </TMPill>
 );
@@ -249,6 +242,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: RADIUS.chip,
     gap: SPACING.xs,
+  },
+  pillDynamic: {
+    borderWidth: 0,
+  },
+  outlined: {
+    borderWidth: 1,
   },
   text: {
     textAlign: 'center',
