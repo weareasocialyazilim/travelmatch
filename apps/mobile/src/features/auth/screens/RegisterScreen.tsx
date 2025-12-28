@@ -13,9 +13,10 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import type { RootStackParamList } from '@/navigation/routeParams';
 import { useAuth } from '@/context/AuthContext';
 import { registerSchema, type RegisterInput, type Gender } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
@@ -52,7 +53,7 @@ const calculateAge = (birthDate: Date): number => {
 };
 
 export const RegisterScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { showToast: _showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -369,6 +370,14 @@ export const RegisterScreen: React.FC = () => {
             {isLoading ? 'Hesap Oluşturuluyor...' : 'Kayıt Ol'}
           </Text>
         </TouchableOpacity>
+
+        {/* Login Link */}
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Zaten hesabın var mı? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Giriş Yap</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -545,6 +554,21 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
+    fontWeight: '600',
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 24,
+    marginBottom: 20,
+  },
+  loginText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  loginLink: {
+    color: COLORS.mint,
+    fontSize: 14,
     fontWeight: '600',
   },
 });
