@@ -897,6 +897,7 @@ Output Types:
     if args.files:
         for file_path in args.files:
             try:
+                # deepcode ignore PT: read_file_safely validates path via validate_safe_path
                 content = read_file_safely(file_path)
                 data = json.loads(content)
                 synthesizer.load_from_json(data if isinstance(data, list) else [data])
