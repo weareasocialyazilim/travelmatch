@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,18 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  Animated,
   Dimensions,
   Modal,
   Platform,
-  PanResponder,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '../constants/colors';
 import { VALUES } from '../constants/values';
@@ -76,73 +82,57 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethod>('apple-pay');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
+
+  // Reanimated shared values for 60fps animations
+  const translateY = useSharedValue(SHEET_HEIGHT);
+  const backdropOpacity = useSharedValue(0);
 
   // Enable screenshot protection when visible
   useScreenSecurity();
 
-  // Pan responder for swipe to dismiss
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        return Math.abs(gestureState.dy) > 5;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          translateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > 100 || gestureState.vy > 0.5) {
-          closeSheet();
-        } else {
-          Animated.spring(translateY, {
-            toValue: 0,
-            useNativeDriver: true,
-            tension: 100,
-            friction: 10,
-          }).start();
-        }
-      },
-    }),
-  ).current;
+  // Animated styles using worklets (runs on UI thread)
+  const sheetAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
+
+  const resetAndClose = useCallback(() => {
+    setPaymentMethod('apple-pay');
+    onClose();
+  }, [onClose]);
 
   const openSheet = useCallback(() => {
-    Animated.parallel([
-      Animated.spring(translateY, {
-        toValue: 0,
-        useNativeDriver: true,
-        tension: 100,
-        friction: 10,
-      }),
-      Animated.timing(backdropOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [backdropOpacity, translateY]);
+    translateY.value = withSpring(0, { damping: 20, stiffness: 200 });
+    backdropOpacity.value = withTiming(1, { duration: 300 });
+  }, [translateY, backdropOpacity]);
 
   const closeSheet = useCallback(() => {
-    Animated.parallel([
-      Animated.spring(translateY, {
-        toValue: SHEET_HEIGHT,
-        useNativeDriver: true,
-        tension: 100,
-        friction: 10,
-      }),
-      Animated.timing(backdropOpacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setPaymentMethod('apple-pay');
-      onClose();
+    translateY.value = withSpring(SHEET_HEIGHT, { damping: 20, stiffness: 200 });
+    backdropOpacity.value = withTiming(0, { duration: 300 }, () => {
+      runOnJS(resetAndClose)();
     });
-  }, [backdropOpacity, onClose, translateY]);
+  }, [translateY, backdropOpacity, resetAndClose]);
+
+  // Gesture handler for swipe to dismiss (runs on UI thread)
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      if (event.translationY > 0) {
+        translateY.value = event.translationY;
+      }
+    })
+    .onEnd((event) => {
+      if (event.translationY > 100 || event.velocityY > 500) {
+        translateY.value = withSpring(SHEET_HEIGHT, { damping: 20, stiffness: 200 });
+        backdropOpacity.value = withTiming(0, { duration: 300 }, () => {
+          runOnJS(resetAndClose)();
+        });
+      } else {
+        translateY.value = withSpring(0, { damping: 20, stiffness: 200 });
+      }
+    });
 
   useEffect(() => {
     if (visible && moment) {
@@ -177,20 +167,24 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
       statusBarTranslucent
     >
       {/* Backdrop */}
-      <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
+      <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
         <TouchableOpacity
           style={styles.backdropTouch}
           onPress={closeSheet}
           activeOpacity={1}
+          accessibilityRole="button"
+          accessibilityLabel="Close gift sheet"
         />
       </Animated.View>
 
       {/* Bottom Sheet */}
-      <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
+      <Animated.View style={[styles.sheet, sheetAnimatedStyle]}>
         {/* Drag Handle */}
-        <View {...panResponder.panHandlers} style={styles.handleContainer}>
-          <View style={styles.handle} />
-        </View>
+        <GestureDetector gesture={panGesture}>
+          <View style={styles.handleContainer}>
+            <View style={styles.handle} />
+          </View>
+        </GestureDetector>
 
         <ScrollView
           style={styles.content}

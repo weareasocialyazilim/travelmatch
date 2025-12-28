@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -96,30 +96,36 @@ export function DeletedMomentsScreen() {
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
           }
-          renderItem={({ item }: { item: DeletedMoment }) => (
-            <View style={styles.momentItem}>
-              <View style={styles.momentInfo}>
-                <Text style={styles.momentTitle}>{item.title}</Text>
-                <Text style={styles.momentDescription} numberOfLines={2}>
-                  {item.description}
-                </Text>
-                <View style={styles.deletedInfo}>
-                  <Text style={styles.deletedText}>
-                    Deleted {formatDistanceToNow(new Date(item.deleted_at))} ago
+          renderItem={useCallback(
+            ({ item }: { item: DeletedMoment }) => (
+              <View style={styles.momentItem}>
+                <View style={styles.momentInfo}>
+                  <Text style={styles.momentTitle}>{item.title}</Text>
+                  <Text style={styles.momentDescription} numberOfLines={2}>
+                    {item.description}
                   </Text>
+                  <View style={styles.deletedInfo}>
+                    <Text style={styles.deletedText}>
+                      Deleted {formatDistanceToNow(new Date(item.deleted_at))} ago
+                    </Text>
+                  </View>
                 </View>
-              </View>
 
-              {/* Restore Button */}
-              <TouchableOpacity
-                onPress={() => restoreMutation.mutate(item.id)}
-                disabled={restoreMutation.isPending}
-                style={styles.restoreButton}
-              >
-                <Undo2 size={16} color="white" />
-                <Text style={styles.restoreButtonText}>Restore</Text>
-              </TouchableOpacity>
-            </View>
+                {/* Restore Button */}
+                <TouchableOpacity
+                  onPress={() => restoreMutation.mutate(item.id)}
+                  disabled={restoreMutation.isPending}
+                  style={styles.restoreButton}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Restore ${item.title}`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Undo2 size={16} color="white" />
+                  <Text style={styles.restoreButtonText}>Restore</Text>
+                </TouchableOpacity>
+              </View>
+            ),
+            [restoreMutation]
           )}
           ListEmptyComponent={
             <EmptyState
