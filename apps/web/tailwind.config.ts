@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 import designSystemPreset from '@travelmatch/design-system/src/tailwind.preset';
 
 /**
- * TravelMatch Admin Panel - Tailwind Config
+ * TravelMatch Landing Page - Tailwind Config
  * Extends the shared design system preset
  */
 
