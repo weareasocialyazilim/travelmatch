@@ -72,6 +72,10 @@ const config: Config = {
           DEFAULT: 'hsl(var(--warning))',
           foreground: 'hsl(var(--warning-foreground))',
         },
+        trust: {
+          DEFAULT: 'hsl(var(--trust))',
+          foreground: 'hsl(var(--trust-foreground))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

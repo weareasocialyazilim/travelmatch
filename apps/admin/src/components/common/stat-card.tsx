@@ -1,75 +1,86 @@
 'use client';
 
-import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { ReactNode } from 'react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon?: LucideIcon;
-  iconColor?: string;
-  iconBgColor?: string;
+  icon?: ReactNode;
   change?: number;
   changeLabel?: string;
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
   className?: string;
 }
+
+const variantStyles = {
+  default: {
+    card: 'bg-card',
+    icon: 'bg-muted text-muted-foreground',
+  },
+  primary: {
+    card: 'bg-card',
+    icon: 'bg-primary/10 text-primary',
+  },
+  success: {
+    card: 'bg-card',
+    icon: 'bg-trust/10 text-trust',
+  },
+  warning: {
+    card: 'bg-card',
+    icon: 'bg-warning/10 text-warning',
+  },
+  danger: {
+    card: 'bg-card',
+    icon: 'bg-destructive/10 text-destructive',
+  },
+};
 
 export function StatCard({
   title,
   value,
-  icon: Icon,
-  iconColor = 'text-primary',
-  iconBgColor = 'bg-primary/10',
+  icon,
   change,
-  changeLabel,
+  changeLabel = 'son 30 gün',
+  variant = 'default',
   className,
 }: StatCardProps) {
   const isPositiveChange = change !== undefined && change >= 0;
+  const styles = variantStyles[variant];
 
   return (
-    <Card className={className}>
-      <CardContent className="pt-6">
-        <div className="flex items-center gap-4">
-          {Icon && (
-            <div
-              className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-lg',
-                iconBgColor
+    <div className={cn('admin-stat-card', styles.card, className)}>
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <p className="text-2xl font-bold tracking-tight">{value}</p>
+          {change !== undefined && (
+            <div className="flex items-center gap-1.5 text-sm">
+              {isPositiveChange ? (
+                <TrendingUp className="h-4 w-4 text-trust" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-destructive" />
               )}
-            >
-              <Icon className={cn('h-5 w-5', iconColor)} />
+              <span className={cn(
+                'font-medium',
+                isPositiveChange ? 'text-trust' : 'text-destructive'
+              )}>
+                {isPositiveChange ? '+' : ''}{change}%
+              </span>
+              <span className="text-muted-foreground">{changeLabel}</span>
             </div>
           )}
-          <div className="flex-1">
-            <p className="text-sm text-muted-foreground">{title}</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-bold">{value}</p>
-              {change !== undefined && (
-                <div
-                  className={cn(
-                    'flex items-center gap-0.5 text-xs font-medium',
-                    isPositiveChange ? 'text-green-600' : 'text-red-600'
-                  )}
-                >
-                  {isPositiveChange ? (
-                    <TrendingUp className="h-3 w-3" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3" />
-                  )}
-                  <span>
-                    {isPositiveChange ? '+' : ''}
-                    {change}%
-                  </span>
-                </div>
-              )}
-            </div>
-            {changeLabel && (
-              <p className="text-xs text-muted-foreground mt-1">{changeLabel}</p>
-            )}
-          </div>
         </div>
-      </CardContent>
-    </Card>
+        {icon && (
+          <div className={cn(
+            'flex h-12 w-12 items-center justify-center rounded-xl',
+            styles.icon
+          )}>
+            {icon}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

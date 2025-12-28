@@ -28,6 +28,8 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 6 78% 57%;
     --radius: 0.5rem;
+    --trust: 160 84% 39%;
+    --trust-foreground: 210 40% 98%;
   }
 
   .dark {
@@ -54,6 +56,8 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 6 78% 57%;
+    --trust: 160 84% 39%;
+    --trust-foreground: 210 40% 98%;
   }
 }
 
@@ -143,4 +147,118 @@
 
 .status-completed {
   @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+}
+
+/* Admin Dashboard - Cinematic Travel + Trust Jewelry */
+.admin-card {
+  @apply rounded-xl border bg-card p-6 shadow-sm;
+}
+
+.admin-card-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.admin-card-title {
+  @apply text-base font-semibold tracking-tight;
+}
+
+.admin-card-description {
+  @apply text-sm text-muted-foreground mt-0.5;
+}
+
+.admin-stat-card {
+  @apply rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md;
+}
+
+.admin-btn-ghost {
+  @apply inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors;
+}
+
+.admin-badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+.admin-badge-danger {
+  @apply bg-destructive/10 text-destructive;
+}
+
+.admin-badge-warning {
+  @apply bg-warning/10 text-warning;
+}
+
+.admin-badge-success {
+  @apply bg-trust/10 text-trust;
+}
+
+/* Admin Activity Feed */
+.admin-activity-item {
+  @apply flex items-start gap-3 py-2;
+}
+
+.admin-activity-dot {
+  @apply mt-1.5 h-2 w-2 rounded-full shrink-0;
+}
+
+.admin-activity-content {
+  @apply flex-1 min-w-0;
+}
+
+.admin-activity-message {
+  @apply text-sm truncate;
+}
+
+.admin-activity-time {
+  @apply text-xs text-muted-foreground;
+}
+
+/* Admin Quick Links */
+.admin-quick-link {
+  @apply flex items-center gap-4 rounded-xl border bg-card p-4 transition-all hover:shadow-md hover:border-primary/20 cursor-pointer;
+}
+
+.admin-quick-link-icon {
+  @apply flex h-10 w-10 items-center justify-center rounded-lg shrink-0;
+}
+
+.admin-quick-link-title {
+  @apply font-medium;
+}
+
+.admin-quick-link-description {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Admin Chart Tooltip */
+.admin-chart-tooltip {
+  @apply rounded-lg border bg-card p-3 shadow-lg;
+}
+
+/* Status Indicators */
+.status-dot {
+  @apply h-2 w-2 rounded-full;
+}
+
+.status-healthy {
+  @apply bg-trust;
+}
+
+.status-degraded {
+  @apply bg-warning;
+}
+
+.status-down {
+  @apply bg-destructive;
+}
+
+/* Trust color utilities */
+.bg-trust {
+  background-color: hsl(var(--trust));
+}
+
+.text-trust {
+  color: hsl(var(--trust));
+}
+
+.bg-trust\/10 {
+  background-color: hsl(var(--trust) / 0.1);
 }
