@@ -1,4 +1,6 @@
 export { Button } from './ui/Button';
+export { SocialButton } from './SocialButton';
+export type { SocialButtonProps } from './SocialButton';
 export {
   ErrorBoundary,
   AppErrorBoundary,
