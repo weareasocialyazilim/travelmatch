@@ -12,7 +12,12 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import { useGiftInbox, type GiftInboxItem, type SortOption, type FilterOption } from '@/hooks/useGiftInbox';
+import {
+  useGiftInbox,
+  type GiftInboxItem,
+  type SortOption,
+  type FilterOption,
+} from '@/hooks/useGiftInbox';
 import { GiftInboxCard } from '../components/GiftInboxCard';
 import { FilterSortBar, SortFilterModal } from '../components/FilterSortBar';
 import { TopPicksSection } from '../components/TopPicksSection';
@@ -60,14 +65,22 @@ const GiftInboxScreen: React.FC = () => {
       senderVerified: item.sender.isVerified,
       senderTripCount: item.sender.tripCount ?? 0,
       senderCity: item.sender.city ?? '',
-      gifts: item.gifts.map(g => ({
+      gifts: item.gifts.map((g) => ({
         id: g.id,
         momentTitle: g.momentTitle ?? '',
         momentEmoji: g.momentEmoji ?? '🎁',
         amount: g.amount,
         message: g.message ?? '',
-        paymentType: (g.paymentType ?? 'direct') as 'direct' | 'half_escrow' | 'full_escrow',
-        status: (g.status ?? 'received') as 'received' | 'pending_proof' | 'verifying' | 'verified' | 'failed',
+        paymentType: (g.paymentType ?? 'direct') as
+          | 'direct'
+          | 'half_escrow'
+          | 'full_escrow',
+        status: (g.status ?? 'received') as
+          | 'received'
+          | 'pending_proof'
+          | 'verifying'
+          | 'verified'
+          | 'failed',
         createdAt: g.createdAt,
       })),
       totalAmount: item.totalAmount,
@@ -108,15 +121,25 @@ const GiftInboxScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Offline Banner */}
       {!isConnected && (
-        <OfflineState 
-          compact 
+        <OfflineState
+          compact
           onRetry={refreshNetwork}
           message="İnternet bağlantısı yok"
         />
       )}
-      
+
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>🎁 Gift Inbox</Text>
         <TouchableOpacity style={styles.settingsButton}>
           <MaterialCommunityIcons
@@ -130,14 +153,21 @@ const GiftInboxScreen: React.FC = () => {
       <NetworkGuard
         offlineMessage={
           sortedItems.length > 0
-            ? "Son yüklenen hediye mesajlarını gösteriyorsunuz"
-            : "Hediye kutusunu görmek için internet bağlantısı gerekli"
+            ? 'Son yüklenen hediye mesajlarını gösteriyorsunuz'
+            : 'Hediye kutusunu görmek için internet bağlantısı gerekli'
         }
         onRetry={onRefresh}
       >
         {loading && sortedItems.length === 0 ? (
-          <SkeletonList type="gift" count={5} show={loading} minDisplayTime={500} />
-        ) : sortedItems.length === 0 && topPicks.length === 0 && newToday.length === 0 ? (
+          <SkeletonList
+            type="gift"
+            count={5}
+            show={loading}
+            minDisplayTime={500}
+          />
+        ) : sortedItems.length === 0 &&
+          topPicks.length === 0 &&
+          newToday.length === 0 ? (
           <EmptyState
             icon="gift-outline"
             title="No Gifts Yet"
@@ -146,80 +176,83 @@ const GiftInboxScreen: React.FC = () => {
             onAction={() => navigation.navigate('Discover')}
           />
         ) : (
-        <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Top Picks Section */}
-        <TopPicksSection topPicks={topPicks} onItemPress={handleItemPress} />
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Top Picks Section */}
+            <TopPicksSection
+              topPicks={topPicks}
+              onItemPress={handleItemPress}
+            />
 
-        {/* New Today Section */}
-        {newToday.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>
-                🆕 New Today ({newToday.length})
-              </Text>
-            </View>
-
-            <View style={styles.inboxList}>
-              {newToday.slice(0, 3).map((item) => (
-                <GiftInboxCard
-                  key={item.id}
-                  item={item}
-                  onPress={() => handleItemPress(item)}
-                  getStatusIcon={getStatusIcon}
-                />
-              ))}
-              {newToday.length > 3 && (
-                <TouchableOpacity style={styles.seeAllButton}>
-                  <Text style={styles.seeAllText}>
-                    See All ({newToday.length})
+            {/* New Today Section */}
+            {newToday.length > 0 && (
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>
+                    🆕 New Today ({newToday.length})
                   </Text>
-                  <MaterialCommunityIcons
-                    name="chevron-right"
-                    size={16}
-                    color={COLORS.primary}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        )}
+                </View>
 
-        {/* All Gifts Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
-              📥 All Gifts ({sortedItems.length})
-            </Text>
-          </View>
+                <View style={styles.inboxList}>
+                  {newToday.slice(0, 3).map((item) => (
+                    <GiftInboxCard
+                      key={item.id}
+                      item={item}
+                      onPress={() => handleItemPress(item)}
+                      getStatusIcon={getStatusIcon}
+                    />
+                  ))}
+                  {newToday.length > 3 && (
+                    <TouchableOpacity style={styles.seeAllButton}>
+                      <Text style={styles.seeAllText}>
+                        See All ({newToday.length})
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="chevron-right"
+                        size={16}
+                        color={COLORS.primary}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            )}
 
-          <FilterSortBar
-            sortBy={sortBy}
-            filterBy={filterBy}
-            onSortPress={() => setShowSortModal(true)}
-            onFilterPress={() => setShowFilterModal(true)}
-            getSortLabel={getSortLabel}
-            getFilterLabel={getFilterLabel}
-          />
+            {/* All Gifts Section */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>
+                  📥 All Gifts ({sortedItems.length})
+                </Text>
+              </View>
 
-          <View style={styles.inboxList}>
-            {sortedItems.map((item) => (
-              <GiftInboxCard
-                key={item.id}
-                item={item}
-                onPress={() => handleItemPress(item)}
-                getStatusIcon={getStatusIcon}
+              <FilterSortBar
+                sortBy={sortBy}
+                filterBy={filterBy}
+                onSortPress={() => setShowSortModal(true)}
+                onFilterPress={() => setShowFilterModal(true)}
+                getSortLabel={getSortLabel}
+                getFilterLabel={getFilterLabel}
               />
-            ))}
-          </View>
-        </View>
-      </ScrollView>
+
+              <View style={styles.inboxList}>
+                {sortedItems.map((item) => (
+                  <GiftInboxCard
+                    key={item.id}
+                    item={item}
+                    onPress={() => handleItemPress(item)}
+                    getStatusIcon={getStatusIcon}
+                  />
+                ))}
+              </View>
+            </View>
+          </ScrollView>
         )}
       </NetworkGuard>
 
@@ -257,15 +290,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
+  backButton: {
+    padding: 8,
+  },
   headerTitle: {
-    ...TYPOGRAPHY.h2,
+    ...TYPOGRAPHY.h3,
     fontWeight: '700',
     color: COLORS.text,
+    flex: 1,
+    textAlign: 'center',
   },
   settingsButton: {
     padding: 8,
@@ -309,7 +347,7 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ErrorBoundary for gift inbox screen
-export default withErrorBoundary(GiftInboxScreen, { 
+export default withErrorBoundary(GiftInboxScreen, {
   fallbackType: 'generic',
-  displayName: 'GiftInboxScreen' 
+  displayName: 'GiftInboxScreen',
 });
