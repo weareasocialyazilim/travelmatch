@@ -18,6 +18,7 @@ import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
 import { paymentService } from '@/services/paymentService';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { Skeleton } from '@/components/ui/Skeleton';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Transaction } from '@/services/paymentService';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -97,14 +98,35 @@ export const TransactionDetailScreen: React.FC<
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View
-          style={[
-            styles.container,
-            { justifyContent: 'center', alignItems: 'center' },
-          ]}
-        >
-          <ActivityIndicator size="large" color={COLORS.primary} />
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Transaction Details</Text>
+          <View style={styles.placeholder} />
         </View>
+        <ScrollView style={styles.content}>
+          <View style={styles.skeletonContainer}>
+            <Skeleton width={80} height={80} borderRadius={40} />
+            <View style={styles.skeletonTextGroup}>
+              <Skeleton width={150} height={24} />
+              <Skeleton width={100} height={16} />
+            </View>
+          </View>
+          <View style={styles.skeletonCard}>
+            <Skeleton width="100%" height={20} />
+            <Skeleton width="80%" height={16} />
+            <Skeleton width="60%" height={16} />
+          </View>
+          <View style={styles.skeletonCard}>
+            <Skeleton width="100%" height={20} />
+            <Skeleton width="90%" height={16} />
+            <Skeleton width="70%" height={16} />
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -466,6 +488,26 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     textAlign: 'right',
+  },
+  placeholder: {
+    width: 40,
+  },
+  skeletonContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: LAYOUT.padding * 2,
+    gap: LAYOUT.padding,
+  },
+  skeletonTextGroup: {
+    gap: LAYOUT.padding / 2,
+  },
+  skeletonCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: VALUES.borderRadius,
+    marginHorizontal: LAYOUT.padding * 2,
+    marginBottom: LAYOUT.padding,
+    padding: LAYOUT.padding * 2,
+    gap: LAYOUT.padding / 2,
   },
 });
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -36,67 +36,71 @@ const CATEGORIES: Category[] = [
   { id: 'local', label: 'Local Experience', icon: 'account-group' },
 ];
 
-export const ChooseCategoryBottomSheet: React.FC<
-  ChooseCategoryBottomSheetProps
-> = ({ visible, onClose, onSelectCategory, selectedCategoryId }) => {
-  const handleSelectCategory = (category: Category) => {
-    onSelectCategory(category);
-    onClose();
-  };
+export const ChooseCategoryBottomSheet: React.FC<ChooseCategoryBottomSheetProps> =
+  memo(({ visible, onClose, onSelectCategory, selectedCategoryId }) => {
+    const handleSelectCategory = useCallback(
+      (category: Category) => {
+        onSelectCategory(category);
+        onClose();
+      },
+      [onSelectCategory, onClose],
+    );
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop} />
-      </TouchableWithoutFeedback>
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
 
-      <View style={styles.bottomSheet}>
-        {/* Handle */}
-        <View style={styles.handleContainer}>
-          <View style={styles.handle} />
-        </View>
+        <View style={styles.bottomSheet}>
+          {/* Handle */}
+          <View style={styles.handleContainer}>
+            <View style={styles.handle} />
+          </View>
 
-        {/* Header */}
-        <Text style={styles.header}>Choose Category</Text>
+          {/* Header */}
+          <Text style={styles.header}>Choose Category</Text>
 
-        {/* Category List */}
-        <ScrollView style={styles.listContainer}>
-          {CATEGORIES.map((category) => (
-            <TouchableOpacity
-              key={category.id}
-              style={[
-                styles.categoryItem,
-                selectedCategoryId === category.id &&
-                  styles.categoryItemSelected,
-              ]}
-              onPress={() => handleSelectCategory(category)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.categoryContent}>
-                <View style={styles.iconContainer}>
-                  <MaterialCommunityIcons
-                    name={category.icon}
-                    size={24}
-                    color={COLORS.primary}
-                  />
+          {/* Category List */}
+          <ScrollView style={styles.listContainer}>
+            {CATEGORIES.map((category) => (
+              <TouchableOpacity
+                key={category.id}
+                style={[
+                  styles.categoryItem,
+                  selectedCategoryId === category.id &&
+                    styles.categoryItemSelected,
+                ]}
+                onPress={() => handleSelectCategory(category)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.categoryContent}>
+                  <View style={styles.iconContainer}>
+                    <MaterialCommunityIcons
+                      name={category.icon}
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  </View>
+                  <Text style={styles.categoryLabel}>{category.label}</Text>
                 </View>
-                <Text style={styles.categoryLabel}>{category.label}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
-        {/* Bottom Padding */}
-        <View style={styles.bottomPadding} />
-      </View>
-    </Modal>
-  );
-};
+          {/* Bottom Padding */}
+          <View style={styles.bottomPadding} />
+        </View>
+      </Modal>
+    );
+  });
+
+ChooseCategoryBottomSheet.displayName = 'ChooseCategoryBottomSheet';
 
 const styles = StyleSheet.create({
   backdrop: {
