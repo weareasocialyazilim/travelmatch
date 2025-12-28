@@ -159,7 +159,6 @@ const CreateMomentScreen: React.FC = () => {
       } finally {
         setIsSubmitting(false);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [createMoment, navigation],
   );

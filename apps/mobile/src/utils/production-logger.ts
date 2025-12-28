@@ -105,7 +105,6 @@ class ProductionLogger {
     if (!this.shouldLog('warn')) return;
 
     if (__DEV__) {
-      // eslint-disable-next-line no-console -- Logger utility needs direct console access
       console.warn(`[WARN] ${message}`, this.sanitizeContext(context));
     }
 
@@ -124,7 +123,6 @@ class ProductionLogger {
   error(message: string, error?: Error, context?: LogContext): void {
     // Always log errors (even in production for debugging)
     if (__DEV__) {
-      // eslint-disable-next-line no-console -- Logger utility needs direct console access
       console.error(`[ERROR] ${message}`, error, this.sanitizeContext(context));
     }
 

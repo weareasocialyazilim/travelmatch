@@ -13,8 +13,8 @@
 import {
   StackCardInterpolationProps,
   StackCardStyleInterpolator,
-  TransitionSpecs,
-  TransitionPresets,
+  TransitionSpecs as _TransitionSpecs,
+  TransitionPresets as _TransitionPresets,
 } from '@react-navigation/stack';
 import { Easing } from 'react-native-reanimated';
 

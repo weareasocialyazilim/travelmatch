@@ -14,8 +14,8 @@ import {
   runOnJS,
   useSharedValue,
   useAnimatedStyle,
-  interpolate,
-  Extrapolation,
+  interpolate as _interpolate,
+  Extrapolation as _Extrapolation,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
@@ -144,7 +144,7 @@ export const shimmerAnimation = (opacity: SharedValue<number>) => {
   opacity.value = withSequence(
     withTiming(0.4, { duration: 400 }),
     withTiming(1, { duration: 400 }),
-    withTiming(0.7, { duration: 300 })
+    withTiming(0.7, { duration: 300 }),
   );
 };
 
@@ -154,10 +154,10 @@ export const shimmerLoopAnimation = (opacity: SharedValue<number>) => {
   opacity.value = withRepeat(
     withSequence(
       withTiming(1, { duration: 800 }),
-      withTiming(0.5, { duration: 800 })
+      withTiming(0.5, { duration: 800 }),
     ),
     -1,
-    true
+    true,
   );
 };
 
@@ -165,7 +165,7 @@ export const shimmerLoopAnimation = (opacity: SharedValue<number>) => {
 export const cardEntranceAnimation = (
   translateY: SharedValue<number>,
   opacity: SharedValue<number>,
-  index: number
+  index: number,
 ) => {
   'worklet';
   const delay = index * 50;
@@ -182,7 +182,7 @@ export const sheetSlideUp = (translateY: SharedValue<number>) => {
 // Sheet slide down
 export const sheetSlideDown = (
   translateY: SharedValue<number>,
-  targetY: number
+  targetY: number,
 ) => {
   'worklet';
   translateY.value = withSpring(targetY, SPRING.gentle);
@@ -191,16 +191,16 @@ export const sheetSlideDown = (
 // Clean spark (proof verified)
 export const cleanSparkAnimation = (
   scale: SharedValue<number>,
-  opacity: SharedValue<number>
+  opacity: SharedValue<number>,
 ) => {
   'worklet';
   scale.value = withSequence(
     withTiming(1.3, { duration: 150 }),
-    withSpring(1, SPRING.bouncy)
+    withSpring(1, SPRING.bouncy),
   );
   opacity.value = withSequence(
     withTiming(1, { duration: 100 }),
-    withDelay(400, withTiming(0, { duration: 200 }))
+    withDelay(400, withTiming(0, { duration: 200 })),
   );
 };
 
@@ -209,7 +209,7 @@ export const fadeInAnimation = (opacity: SharedValue<number>, delay = 0) => {
   'worklet';
   opacity.value = withDelay(
     delay,
-    withTiming(1, { duration: TIMING.default, easing: TIMING.easeOut })
+    withTiming(1, { duration: TIMING.default, easing: TIMING.easeOut }),
   );
 };
 
@@ -225,7 +225,7 @@ export const fadeOutAnimation = (opacity: SharedValue<number>) => {
 // Slide in from bottom
 export const slideInFromBottom = (
   translateY: SharedValue<number>,
-  delay = 0
+  delay = 0,
 ) => {
   'worklet';
   translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
@@ -234,7 +234,7 @@ export const slideInFromBottom = (
 // Slide in from right
 export const slideInFromRight = (
   translateX: SharedValue<number>,
-  delay = 0
+  delay = 0,
 ) => {
   'worklet';
   translateX.value = withDelay(delay, withSpring(0, SPRING.gentle));
@@ -246,7 +246,7 @@ export const bounceAnimation = (scale: SharedValue<number>) => {
   scale.value = withSequence(
     withSpring(1.15, SPRING.quick),
     withSpring(0.9, SPRING.quick),
-    withSpring(1, SPRING.bouncy)
+    withSpring(1, SPRING.bouncy),
   );
 };
 
@@ -258,7 +258,7 @@ export const shakeAnimation = (translateX: SharedValue<number>) => {
     withTiming(10, { duration: 50 }),
     withTiming(-10, { duration: 50 }),
     withTiming(10, { duration: 50 }),
-    withSpring(0, SPRING.snappy)
+    withSpring(0, SPRING.snappy),
   );
 };
 
@@ -268,10 +268,10 @@ export const pulseAnimation = (scale: SharedValue<number>) => {
   scale.value = withRepeat(
     withSequence(
       withTiming(1.05, { duration: 500 }),
-      withTiming(1, { duration: 500 })
+      withTiming(1, { duration: 500 }),
     ),
     -1,
-    true
+    true,
   );
 };
 
@@ -350,7 +350,7 @@ export const useFadeIn = (delay = 0) => {
   const startAnimation = useCallback(() => {
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration: TIMING.default, easing: TIMING.easeOut })
+      withTiming(1, { duration: TIMING.default, easing: TIMING.easeOut }),
     );
   }, [delay]);
 
@@ -371,13 +371,13 @@ export const useFadeIn = (delay = 0) => {
 export const useSlideIn = (
   direction: 'up' | 'down' | 'left' | 'right' = 'up',
   distance = 20,
-  delay = 0
+  delay = 0,
 ) => {
   const translateX = useSharedValue(
-    direction === 'left' ? -distance : direction === 'right' ? distance : 0
+    direction === 'left' ? -distance : direction === 'right' ? distance : 0,
   );
   const translateY = useSharedValue(
-    direction === 'up' ? distance : direction === 'down' ? -distance : 0
+    direction === 'up' ? distance : direction === 'down' ? -distance : 0,
   );
   const opacity = useSharedValue(0);
 
@@ -386,7 +386,7 @@ export const useSlideIn = (
     translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration: TIMING.default })
+      withTiming(1, { duration: TIMING.default }),
     );
   }, [delay]);
 
@@ -444,10 +444,10 @@ export const useTrustShimmer = (enabled = true) => {
     shimmerOpacity.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 800 }),
-        withTiming(0.5, { duration: 800 })
+        withTiming(0.5, { duration: 800 }),
       ),
       -1,
-      true
+      true,
     );
   }, [enabled]);
 
