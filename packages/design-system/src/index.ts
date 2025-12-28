@@ -9,3 +9,6 @@ export * from './components/NavigationStates';
 
 // Tokens
 export * from './tokens';
+
+// Tailwind Preset
+export { default as tailwindPreset } from './tailwind.preset';
