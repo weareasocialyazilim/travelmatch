@@ -231,6 +231,7 @@ function App() {
                 totalSteps: 9,
                 currentService: null,
                 services: new Map(),
+                isComplete: false,
                 canContinue: true,
               }
             }

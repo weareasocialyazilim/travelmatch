@@ -35,7 +35,7 @@ async function getSentry(): Promise<SentryType | null> {
 class AnalyticsService {
   private static instance: AnalyticsService;
   private initialized = false;
-  private posthog: PostHog | null = null;
+  private posthog: InstanceType<typeof PostHog> | null = null;
 
   private constructor() {}
 
