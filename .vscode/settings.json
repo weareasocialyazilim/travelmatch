@@ -62,7 +62,9 @@
       "**/*.spec.tsx",
       "**/node_modules/**",
       "**/dist/**",
-      "**/build/**"
+      "**/build/**",
+      "**/scripts/ux-research/**",
+      "**/packages/design-system/scripts/**"
     ]
   }
 }
