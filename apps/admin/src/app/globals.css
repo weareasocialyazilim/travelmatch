@@ -28,6 +28,33 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 6 78% 57%;
     --radius: 0.5rem;
+
+    /* Admin Sidebar Variables */
+    --sidebar: 30 6% 98%;
+    --sidebar-dark: 20 14.3% 4.1%;
+    --sidebar-border: 30 6% 90%;
+    --sidebar-active: 38 92% 50% / 0.1;
+    --sidebar-active-border: 38 92% 50%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-foreground-muted: 215.4 16.3% 46.9%;
+
+    /* Admin Chart Colors (HSL for theme support) */
+    --chart-1: 38 92% 50%;
+    --chart-2: 330 81% 60%;
+    --chart-3: 173 58% 39%;
+    --chart-4: 160 84% 39%;
+    --chart-5: 217 91% 60%;
+    --chart-6: 263 70% 50%;
+
+    /* Admin Stat Card Variables */
+    --stat-default-bg: 210 40% 98%;
+    --stat-default-border: 214.3 31.8% 91.4%;
+    --stat-success-bg: 142 76% 96%;
+    --stat-success-border: 142 76% 36%;
+    --stat-warning-bg: 38 92% 95%;
+    --stat-warning-border: 38 92% 50%;
+    --stat-critical-bg: 0 84% 96%;
+    --stat-critical-border: 0 84.2% 60.2%;
   }
 
   .dark {
@@ -54,6 +81,25 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 6 78% 57%;
+
+    /* Admin Sidebar Variables - Dark */
+    --sidebar: 20 14.3% 4.1%;
+    --sidebar-dark: 20 14.3% 4.1%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-active: 38 92% 50% / 0.15;
+    --sidebar-active-border: 38 92% 50%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-foreground-muted: 215 20.2% 65.1%;
+
+    /* Admin Stat Card Variables - Dark */
+    --stat-default-bg: 217.2 32.6% 12%;
+    --stat-default-border: 217.2 32.6% 20%;
+    --stat-success-bg: 142 40% 12%;
+    --stat-success-border: 142 76% 36%;
+    --stat-warning-bg: 38 40% 12%;
+    --stat-warning-border: 38 92% 50%;
+    --stat-critical-bg: 0 40% 12%;
+    --stat-critical-border: 0 84.2% 60.2%;
   }
 }
 
@@ -143,4 +189,197 @@
 
 .status-completed {
   @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+}
+
+/* ========================================
+   ADMIN PANEL DESIGN SYSTEM STYLES
+   ======================================== */
+
+/* Stat Card Variants */
+.stat-card {
+  @apply rounded-lg border bg-card p-6 transition-all duration-200;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card-success {
+  @apply border-l-4;
+  border-left-color: hsl(var(--stat-success-border));
+  background: hsl(var(--stat-success-bg));
+}
+
+.stat-card-warning {
+  @apply border-l-4;
+  border-left-color: hsl(var(--stat-warning-border));
+  background: hsl(var(--stat-warning-bg));
+}
+
+.stat-card-critical {
+  @apply border-l-4;
+  border-left-color: hsl(var(--stat-critical-border));
+  background: hsl(var(--stat-critical-bg));
+}
+
+/* Sidebar V2 Styles */
+.sidebar-v2 {
+  @apply flex h-screen flex-col border-r transition-all duration-300;
+  background: hsl(var(--sidebar));
+  border-color: hsl(var(--sidebar-border));
+}
+
+.sidebar-v2-nav-item {
+  @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200;
+  color: hsl(var(--sidebar-foreground-muted));
+}
+
+.sidebar-v2-nav-item:hover {
+  @apply bg-accent/50;
+  color: hsl(var(--sidebar-foreground));
+}
+
+.sidebar-v2-nav-item-active {
+  @apply font-medium;
+  background: hsl(var(--sidebar-active));
+  color: hsl(var(--sidebar-foreground));
+  box-shadow: inset 3px 0 0 0 hsl(var(--sidebar-active-border));
+}
+
+/* Glass Effect for Active States */
+.glass-effect {
+  @apply backdrop-blur-sm;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Trust Ring (for user avatars) */
+.trust-ring {
+  @apply ring-2 ring-offset-2;
+  --tw-ring-color: hsl(var(--chart-4));
+}
+
+.trust-ring-verified {
+  @apply ring-2 ring-offset-2;
+  --tw-ring-color: hsl(160 84% 39%);
+}
+
+/* Data Table V2 Enhancements */
+.data-table-v2 {
+  @apply rounded-lg border overflow-hidden;
+}
+
+.data-table-v2 thead {
+  @apply bg-muted/50;
+}
+
+.data-table-v2 th {
+  @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground;
+}
+
+.data-table-v2 td {
+  @apply px-4 py-3 text-sm;
+}
+
+.data-table-v2 tbody tr {
+  @apply border-t transition-colors duration-150;
+}
+
+.data-table-v2 tbody tr:hover {
+  @apply bg-muted/30;
+}
+
+.data-table-v2 tbody tr[data-state="selected"] {
+  @apply bg-primary/5;
+}
+
+/* Chart Container */
+.chart-container {
+  @apply rounded-lg border bg-card p-4;
+}
+
+.chart-legend-item {
+  @apply flex items-center gap-2 text-sm text-muted-foreground;
+}
+
+.chart-legend-dot {
+  @apply h-3 w-3 rounded-full;
+}
+
+/* Quick Action Cards */
+.quick-action-card {
+  @apply flex items-center gap-4 rounded-lg border bg-card p-4 transition-all duration-200 cursor-pointer;
+}
+
+.quick-action-card:hover {
+  @apply bg-accent/50 border-accent;
+  transform: translateY(-2px);
+}
+
+/* System Health Indicator */
+.health-indicator {
+  @apply h-2.5 w-2.5 rounded-full;
+}
+
+.health-indicator-healthy {
+  @apply bg-status-healthy;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.health-indicator-degraded {
+  @apply bg-status-degraded animate-pulse-subtle;
+}
+
+.health-indicator-down {
+  @apply bg-status-down;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.health-indicator-maintenance {
+  @apply bg-status-maintenance;
+}
+
+/* Badge Gradient (for premium indicators) */
+.badge-gradient-amber {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  @apply text-white;
+}
+
+.badge-gradient-magenta {
+  background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+  @apply text-white;
+}
+
+.badge-gradient-emerald {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  @apply text-white;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Content area max width */
+.admin-content {
+  @apply mx-auto w-full;
+  max-width: 1400px;
+  padding: 24px;
 }
