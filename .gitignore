@@ -91,7 +91,9 @@ Thumbs.db
 desktop.ini
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.sublime-*
 

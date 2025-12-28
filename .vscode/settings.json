@@ -13,12 +13,7 @@
   "typescript.validate.enable": true,
 
   // ESLint
-  "eslint.workingDirectories": [
-    "./apps/mobile",
-    "./admin",
-    "./packages/design-system",
-    "./packages/shared"
-  ],
+  "eslint.workingDirectories": ["./apps/mobile", "./admin", "./packages/design-system", "./packages/shared"],
 
   // Files - exclude from search/watch
   "files.exclude": {
@@ -27,7 +22,7 @@
     "**/node_modules": true,
     "**/.turbo": true
   },
-  
+
   // Search - exclude node_modules from search
   "search.exclude": {
     "**/node_modules": true,
@@ -36,12 +31,38 @@
     "**/dist": true,
     "**/build": true
   },
-  
+
   // Python
   "python.analysis.typeCheckingMode": "strict",
-  
+
   // GitHub Actions
   "yaml.schemas": {
     "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+  },
+
+  // Snyk Configuration
+  // Exclude test files from Snyk Code scanning (false positives for mock credentials)
+  "snyk.features.codeSecurity": true,
+  "snyk.features.codeQuality": true,
+  "snyk.advanced.additionalParameters": "--policy-path=.snyk",
+  "snyk.severity": {
+    "low": false,
+    "medium": true,
+    "high": true,
+    "critical": true
+  },
+  // Exclude test directories from Snyk scanning
+  "snyk.codeScanPatterns": {
+    "exclude": [
+      "**/__tests__/**",
+      "**/tests/**",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**"
+    ]
   }
 }
