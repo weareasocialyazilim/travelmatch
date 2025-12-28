@@ -18,7 +18,10 @@ import {
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createMomentSchema, type CreateMomentInput } from '../../../utils/forms/schemas';
+import {
+  createMomentSchema,
+  type CreateMomentInput,
+} from '../../../utils/forms/schemas';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -96,66 +99,70 @@ const CreateMomentScreen: React.FC = () => {
   }, [amount]);
 
   // Handle publish
-  const onPublish = useCallback(async (data: CreateMomentInput) => {
-    setIsSubmitting(true);
+  const onPublish = useCallback(
+    async (data: CreateMomentInput) => {
+      setIsSubmitting(true);
 
-    try {
-      const categoryObj = CATEGORIES.find((c) => c.id === data.category);
+      try {
+        const categoryObj = CATEGORIES.find((c) => c.id === data.category);
 
-      const momentData = {
-        title: data.title.trim(),
-        story: data.story?.trim() || undefined,
-        price: data.amount,
-        category: {
-          id: data.category,
-          label: categoryObj?.label || data.category,
-          emoji: getCategoryEmoji(data.category),
-        },
-        location: data.place
-          ? {
-              name: data.place.name,
-              city: data.place.address.split(',')[0]?.trim() || data.place.name,
-              country: data.place.address.split(',')[1]?.trim() || '',
-            }
-          : undefined,
-        date: data.date.toISOString(),
-        imageUrl: photo || undefined,
-        availability: 'Available',
-      };
+        const momentData = {
+          title: data.title.trim(),
+          story: data.story?.trim() || undefined,
+          price: data.amount,
+          category: {
+            id: data.category,
+            label: categoryObj?.label || data.category,
+            emoji: getCategoryEmoji(data.category),
+          },
+          location: data.place
+            ? {
+                name: data.place.name,
+                city:
+                  data.place.address?.split(',')[0]?.trim() || data.place.name,
+                country: data.place.address?.split(',')[1]?.trim() || '',
+              }
+            : undefined,
+          date: data.date.toISOString(),
+          imageUrl: photo || undefined,
+          availability: 'Available',
+        };
 
-      // Convert to CreateMomentData format
-      const createMomentInput = {
-        title: momentData.title,
-        description: momentData.story || '',
-        category: momentData.category.id,
-        location: {
-          city: momentData.location?.city || '',
-          country: momentData.location?.country || '',
-        },
-        images: momentData.imageUrl ? [momentData.imageUrl] : [],
-        pricePerGuest: momentData.price,
-        currency: 'USD',
-        maxGuests: 4,
-        duration: '2 hours',
-        availability: [momentData.date],
-      };
+        // Convert to CreateMomentData format
+        const createMomentInput = {
+          title: momentData.title,
+          description: momentData.story || '',
+          category: momentData.category.id,
+          location: {
+            city: momentData.location?.city || '',
+            country: momentData.location?.country || '',
+          },
+          images: momentData.imageUrl ? [momentData.imageUrl] : [],
+          pricePerGuest: momentData.price,
+          currency: 'USD',
+          maxGuests: 4,
+          duration: '2 hours',
+          availability: [momentData.date],
+        };
 
-      const createdMoment = await createMoment(createMomentInput);
+        const createdMoment = await createMoment(createMomentInput);
 
-      if (createdMoment) {
-        Alert.alert('Success!', 'Your moment has been published', [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-      } else {
-        showToast('Could not create moment. Please try again.', 'error');
+        if (createdMoment) {
+          Alert.alert('Success!', 'Your moment has been published', [
+            { text: 'OK', onPress: () => navigation.goBack() },
+          ]);
+        } else {
+          showToast('Could not create moment. Please try again.', 'error');
+        }
+      } catch {
+        showToast('Something went wrong. Please try again.', 'error');
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch {
-      showToast('Something went wrong. Please try again.', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createMoment, navigation]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [createMoment, navigation],
+  );
 
   // Handlers
   const handleDatePress = useCallback(() => setShowDatePicker(true), []);
@@ -200,10 +207,13 @@ const CreateMomentScreen: React.FC = () => {
           keyboardShouldPersistTaps="handled"
         >
           {/* Photo Section */}
-          <PhotoSection photo={photo} onPhotoSelected={(uri) => {
-            setPhoto(uri);
-            setValue('photo', uri);
-          }} />
+          <PhotoSection
+            photo={photo}
+            onPhotoSelected={(uri) => {
+              setPhoto(uri);
+              setValue('photo', uri);
+            }}
+          />
 
           {/* Title Input */}
           <Controller
@@ -244,7 +254,10 @@ const CreateMomentScreen: React.FC = () => {
           )}
 
           {/* Story Section */}
-          <StorySection story={story || ''} onStoryChange={(s) => setValue('story', s)} />
+          <StorySection
+            story={story || ''}
+            onStoryChange={(s) => setValue('story', s)}
+          />
 
           {/* Live Preview */}
           <MomentPreview

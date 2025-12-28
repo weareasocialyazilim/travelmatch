@@ -29,9 +29,9 @@ interface ArchivedChat {
 }
 
 export const ArchivedChatsScreen: React.FC = () => {
-    const { showToast: _showToast } = useToast();
+  const { showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
-const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([
     {
