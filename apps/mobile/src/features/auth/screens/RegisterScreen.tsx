@@ -12,11 +12,7 @@ import {
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import type { RootStackParamList } from '@/navigation/routeParams';
 import { useAuth } from '@/context/AuthContext';
 import { registerSchema, type RegisterInput, type Gender } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
@@ -296,296 +292,116 @@ export const RegisterScreen: React.FC = () => {
           visible={showDatePicker}
           onRequestClose={() => setShowDatePicker(false)}
         >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={24}
-            color={COLORS.text}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Kayıt Ol</Text>
-        <View style={styles.placeholder} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Hesap Oluştur</Text>
-        <Text style={styles.subtitle}>Başlamak için kayıt olun</Text>
-
-        {/* Full Name */}
-        <Controller
-          control={control}
-          name="fullName"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Ad Soyad</Text>
-              <TextInput
-                testID="fullname-input"
-                style={[styles.input, error && styles.inputError]}
-                placeholder="Adınız ve soyadınız"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                autoCapitalize="words"
-                editable={!isLoading}
-              />
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
-            </View>
-          )}
-        />
-
-        {/* Email */}
-        <Controller
-          control={control}
-          name="email"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>E-posta</Text>
-              <TextInput
-                testID="email-input"
-                style={[styles.input, error && styles.inputError]}
-                placeholder="ornek@email.com"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={!isLoading}
-              />
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
-            </View>
-          )}
-        />
-
-        {/* Gender Selection */}
-        <Controller
-          control={control}
-          name="gender"
-          render={({ fieldState: { error } }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Cinsiyet</Text>
-              <View style={styles.genderContainer}>
-                {GENDER_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.genderOption,
-                      selectedGender === option.value &&
-                        styles.genderOptionSelected,
-                    ]}
-                    onPress={() =>
-                      setValue('gender', option.value, { shouldValidate: true })
-                    }
-                    disabled={isLoading}
-                  >
-                    <Text
-                      style={[
-                        styles.genderOptionText,
-                        selectedGender === option.value &&
-                          styles.genderOptionTextSelected,
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.modalCancel}>İptal</Text>
+                </TouchableOpacity>
+                <Text style={styles.modalTitle}>Doğum Tarihi</Text>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.modalDone}>Tamam</Text>
+                </TouchableOpacity>
               </View>
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
-            </View>
-          )}
-        />
-
-        {/* Date of Birth */}
-        <Controller
-          control={control}
-          name="dateOfBirth"
-          render={({ fieldState: { error } }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Doğum Tarihi</Text>
-              <TouchableOpacity
-                style={[
-                  styles.input,
-                  styles.dateInput,
-                  error && styles.inputError,
-                ]}
-                onPress={() => setShowDatePicker(true)}
-                disabled={isLoading}
-              >
-                <Text
-                  style={
-                    selectedDate ? styles.dateText : styles.datePlaceholder
-                  }
-                >
-                  {selectedDate
-                    ? `${formatDate(selectedDate)} (${calculateAge(
-                        selectedDate,
-                      )} yaş)`
-                    : 'Doğum tarihinizi seçin'}
-                </Text>
-              </TouchableOpacity>
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
-              <Text style={styles.hintText}>18 yaşından büyük olmalısınız</Text>
-            </View>
-          )}
-        />
-
-        {/* Date Picker Modal for iOS */}
-        {Platform.OS === 'ios' && showDatePicker && (
-          <Modal
-            transparent
-            animationType="slide"
-            visible={showDatePicker}
-            onRequestClose={() => setShowDatePicker(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-                <View style={styles.modalHeader}>
-                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                    <Text style={styles.modalCancel}>İptal</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.modalTitle}>Doğum Tarihi</Text>
-                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                    <Text style={styles.modalDone}>Tamam</Text>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  value={selectedDate || defaultDate}
-                  mode="date"
-                  display="spinner"
-                  onChange={handleDateChange}
-                  maximumDate={new Date()}
-                  minimumDate={new Date(1900, 0, 1)}
-                  locale="tr"
-                />
-              </View>
-            </View>
-          </Modal>
-        )}
-
-        {/* Date Picker for Android */}
-        {Platform.OS === 'android' && showDatePicker && (
-          <DateTimePicker
-            value={selectedDate || defaultDate}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-            maximumDate={new Date()}
-            minimumDate={new Date(1900, 0, 1)}
-          />
-        )}
-
-        {/* Password */}
-        <Controller
-          control={control}
-          name="password"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Şifre</Text>
-              <TextInput
-                testID="password-input"
-                style={[styles.input, error && styles.inputError]}
-                placeholder="En az 8 karakter"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                secureTextEntry
-                editable={!isLoading}
+              <DateTimePicker
+                value={selectedDate || defaultDate}
+                mode="date"
+                display="spinner"
+                onChange={handleDateChange}
+                maximumDate={new Date()}
+                minimumDate={new Date(1900, 0, 1)}
+                locale="tr"
               />
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
-          )}
+          </View>
+        </Modal>
+      )}
+
+      {/* Date Picker for Android */}
+      {Platform.OS === 'android' && showDatePicker && (
+        <DateTimePicker
+          value={selectedDate || defaultDate}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+          maximumDate={new Date()}
+          minimumDate={new Date(1900, 0, 1)}
         />
+      )}
 
-        {/* Confirm Password */}
-        <Controller
-          control={control}
-          name="confirmPassword"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Şifre Tekrar</Text>
-              <TextInput
-                testID="confirm-password-input"
-                style={[styles.input, error && styles.inputError]}
-                placeholder="Şifrenizi tekrar girin"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                secureTextEntry
-                editable={!isLoading}
-              />
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
-            </View>
-          )}
-        />
+      {/* Password */}
+      <Controller
+        control={control}
+        name="password"
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Şifre</Text>
+            <TextInput
+              testID="password-input"
+              style={[styles.input, error && styles.inputError]}
+              placeholder="En az 8 karakter"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              secureTextEntry
+              editable={!isLoading}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </View>
+        )}
+      />
 
-        <TouchableOpacity
-          testID="register-button"
-          style={[
-            styles.button,
-            (isLoading ||
-              !canSubmitForm({ formState } as {
-                formState: MinimalFormState;
-              })) &&
-              styles.buttonDisabled,
-          ]}
-          onPress={handleSubmit(onSubmit)}
-          disabled={
-            isLoading ||
-            !canSubmitForm({ formState } as { formState: MinimalFormState })
-          }
-        >
-          <Text style={styles.buttonText}>
-            {isLoading ? 'Hesap Oluşturuluyor...' : 'Kayıt Ol'}
-          </Text>
-        </TouchableOpacity>
+      {/* Confirm Password */}
+      <Controller
+        control={control}
+        name="confirmPassword"
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Şifre Tekrar</Text>
+            <TextInput
+              testID="confirm-password-input"
+              style={[styles.input, error && styles.inputError]}
+              placeholder="Şifrenizi tekrar girin"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              secureTextEntry
+              editable={!isLoading}
+            />
+            {error && <Text style={styles.errorText}>{error.message}</Text>}
+          </View>
+        )}
+      />
 
-        {/* Login Link */}
-        <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>Zaten hesabın var mı? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.loginLink}>Giriş Yap</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <TouchableOpacity
+        testID="register-button"
+        style={[
+          styles.button,
+          (isLoading ||
+            !canSubmitForm({ formState } as { formState: MinimalFormState })) &&
+            styles.buttonDisabled,
+        ]}
+        onPress={handleSubmit(onSubmit)}
+        disabled={
+          isLoading ||
+          !canSubmitForm({ formState } as { formState: MinimalFormState })
+        }
+      >
+        <Text style={styles.buttonText}>
+          {isLoading ? 'Hesap Oluşturuluyor...' : 'Kayıt Ol'}
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  placeholder: {
-    width: 40,
-  },
   container: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -756,21 +572,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
-  },
-  loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 24,
-    marginBottom: 20,
-  },
-  loginText: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-  },
-  loginLink: {
-    color: COLORS.mint,
-    fontSize: 14,
     fontWeight: '600',
   },
 });

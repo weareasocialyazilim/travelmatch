@@ -18,13 +18,20 @@ jest.mock('expo/virtual/env', () => ({
 jest.mock('react-hook-form', () => ({
   useForm: () => ({
     control: {},
-    handleSubmit: (fn: Function) => fn,
+    handleSubmit: (fn: (data: unknown) => void) => fn,
     formState: { errors: {}, isValid: true, isSubmitting: false },
     watch: jest.fn(),
     setValue: jest.fn(),
     reset: jest.fn(),
   }),
-  Controller: ({ render: renderProp }: any) =>
+  Controller: ({
+    render: renderProp,
+  }: {
+    render: (props: {
+      field: { onChange: jest.Mock; onBlur: jest.Mock; value: string };
+      fieldState: { error: null };
+    }) => React.ReactNode;
+  }) =>
     renderProp({
       field: { onChange: jest.fn(), onBlur: jest.fn(), value: '' },
       fieldState: { error: null },
