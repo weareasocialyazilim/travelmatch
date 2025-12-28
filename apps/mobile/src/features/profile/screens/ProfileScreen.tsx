@@ -13,6 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { SkeletonList } from '@/components/ui/SkeletonList';
 import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
 import BottomNav from '@/components/BottomNav';
 import {
@@ -341,9 +342,7 @@ const ProfileScreen: React.FC = () => {
           {/* Moments Grid */}
           <View style={styles.momentsGrid}>
             {myMomentsLoading && myMoments.length === 0 ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={COLORS.coral} />
-              </View>
+              <SkeletonList type="moment" count={4} />
             ) : displayedMoments.length > 0 ? (
               <FlashList
                 data={displayedMoments}

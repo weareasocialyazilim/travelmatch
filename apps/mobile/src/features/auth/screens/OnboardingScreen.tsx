@@ -13,12 +13,12 @@ import React, { useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
-  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -38,7 +38,6 @@ import { logger } from '../../../utils/logger';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { HORIZONTAL_LIST_CONFIG } from '@/utils/listOptimization';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
@@ -50,7 +49,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
+  const flashListRef = useRef<FlashList<OnboardingPage>>(null);
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
 
@@ -114,7 +113,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     ]).start(() => {
       if (currentIndex < ONBOARDING_PAGES.length - 1) {
         const nextIndex = currentIndex + 1;
-        flatListRef.current?.scrollToIndex({
+        flashListRef.current?.scrollToIndex({
           index: nextIndex,
           animated: true,
         });
@@ -218,8 +217,8 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
   return (
     <View style={styles.container}>
-      <FlatList<OnboardingPage>
-        ref={flatListRef}
+      <FlashList<OnboardingPage>
+        ref={flashListRef}
         data={ONBOARDING_PAGES}
         renderItem={renderPage}
         horizontal
@@ -233,8 +232,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           setCurrentIndex(index);
         }}
         scrollEnabled={true}
-        style={styles.flatList}
-        {...HORIZONTAL_LIST_CONFIG}
+        estimatedItemSize={SCREEN_WIDTH}
         showsHorizontalScrollIndicator={false}
       />
 
@@ -293,9 +291,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.black,
-  },
-  flatList: {
-    flex: 1,
   },
   pageContainer: {
     width: SCREEN_WIDTH,

@@ -5,7 +5,7 @@
  * Features hero image, trust ring, KYC badge, story text, and gift button.
  * Part of iOS 26.3 design system for TravelMatch.
  */
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -69,153 +69,153 @@ interface WishCardProps {
   isSaved?: boolean;
 }
 
-export const WishCard: React.FC<WishCardProps> = ({
-  wish,
-  onGift,
-  onPress,
-  onSave,
-  isSaved = false,
-}) => {
-  const scale = useSharedValue(1);
+export const WishCard: React.FC<WishCardProps> = memo(
+  ({ wish, onGift, onPress, onSave, isSaved = false }) => {
+    const scale = useSharedValue(1);
 
-  const cardAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+    const cardAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
 
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.98, { damping: 15 });
-  }, [scale]);
+    const handlePressIn = useCallback(() => {
+      scale.value = withSpring(0.98, { damping: 15 });
+    }, [scale]);
 
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, { damping: 15 });
-  }, [scale]);
+    const handlePressOut = useCallback(() => {
+      scale.value = withSpring(1, { damping: 15 });
+    }, [scale]);
 
-  const handleCardPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-  }, [onPress]);
+    const handleCardPress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress();
+    }, [onPress]);
 
-  const handleSavePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    onSave();
-  }, [onSave]);
+    const handleSavePress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      onSave();
+    }, [onSave]);
 
-  return (
-    <Animated.View style={[styles.container, cardAnimatedStyle]}>
-      <TouchableOpacity
-        activeOpacity={0.95}
-        onPress={handleCardPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-      >
-        {/* Hero Image */}
-        <View style={styles.imageContainer}>
-          <OptimizedImage
-            source={{ uri: wish.imageUrl }}
-            style={styles.image}
-            contentFit="cover"
-          />
+    return (
+      <Animated.View style={[styles.container, cardAnimatedStyle]}>
+        <TouchableOpacity
+          activeOpacity={0.95}
+          onPress={handleCardPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+        >
+          {/* Hero Image */}
+          <View style={styles.imageContainer}>
+            <OptimizedImage
+              source={{ uri: wish.imageUrl }}
+              style={styles.image}
+              contentFit="cover"
+            />
 
-          {/* Gradient Overlay */}
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.7)']}
-            style={styles.gradient}
-          />
+            {/* Gradient Overlay */}
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.7)']}
+              style={styles.gradient}
+            />
 
-          {/* Save/Bookmark Button */}
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={handleSavePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <BlurView intensity={60} tint="light" style={styles.saveBlur}>
-              <MaterialCommunityIcons
-                name={isSaved ? 'bookmark' : 'bookmark-outline'}
-                size={24}
-                color={isSaved ? COLORS.primary : COLORS.white}
-              />
-            </BlurView>
-          </TouchableOpacity>
-
-          {/* User Badge with Trust Ring */}
-          <View style={styles.userBadge}>
-            <BlurView intensity={80} tint="dark" style={styles.userBlur}>
-              <View style={styles.avatarContainer}>
-                <TrustRing score={wish.user.trustScore} size={48} strokeWidth={2}>
-                  <OptimizedImage
-                    source={{ uri: wish.user.avatar || 'https://via.placeholder.com/40' }}
-                    style={styles.avatar}
-                    contentFit="cover"
-                  />
-                </TrustRing>
-                <KYCBadge
-                  level={wish.user.kycLevel}
-                  size={12}
-                  offset={{ bottom: -1, right: -1 }}
+            {/* Save/Bookmark Button */}
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleSavePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <BlurView intensity={60} tint="light" style={styles.saveBlur}>
+                <MaterialCommunityIcons
+                  name={isSaved ? 'bookmark' : 'bookmark-outline'}
+                  size={24}
+                  color={isSaved ? COLORS.primary : COLORS.white}
                 />
-              </View>
+              </BlurView>
+            </TouchableOpacity>
 
-              <View style={styles.userInfo}>
-                <Text style={styles.userName} numberOfLines={1}>
-                  {wish.user.name}
-                </Text>
-                <View style={styles.trustRow}>
-                  <MaterialCommunityIcons
-                    name="shield-check"
+            {/* User Badge with Trust Ring */}
+            <View style={styles.userBadge}>
+              <BlurView intensity={80} tint="dark" style={styles.userBlur}>
+                <View style={styles.avatarContainer}>
+                  <TrustRing
+                    score={wish.user.trustScore}
+                    size={48}
+                    strokeWidth={2}
+                  >
+                    <OptimizedImage
+                      source={{
+                        uri:
+                          wish.user.avatar || 'https://via.placeholder.com/40',
+                      }}
+                      style={styles.avatar}
+                      contentFit="cover"
+                    />
+                  </TrustRing>
+                  <KYCBadge
+                    level={wish.user.kycLevel}
                     size={12}
-                    color={COLORS.success}
+                    offset={{ bottom: -1, right: -1 }}
                   />
-                  <Text style={styles.trustText}>
-                    {wish.user.trustScore}
-                  </Text>
                 </View>
-              </View>
-            </BlurView>
-          </View>
 
-          {/* Content Overlay */}
-          <View style={styles.contentOverlay}>
-            <Text style={styles.wishTitle} numberOfLines={2}>
-              {wish.title}
-            </Text>
-            {wish.story && (
-              <Text style={styles.wishStory} numberOfLines={2}>
-                "{wish.story}"
+                <View style={styles.userInfo}>
+                  <Text style={styles.userName} numberOfLines={1}>
+                    {wish.user.name}
+                  </Text>
+                  <View style={styles.trustRow}>
+                    <MaterialCommunityIcons
+                      name="shield-check"
+                      size={12}
+                      color={COLORS.success}
+                    />
+                    <Text style={styles.trustText}>{wish.user.trustScore}</Text>
+                  </View>
+                </View>
+              </BlurView>
+            </View>
+
+            {/* Content Overlay */}
+            <View style={styles.contentOverlay}>
+              <Text style={styles.wishTitle} numberOfLines={2}>
+                {wish.title}
               </Text>
-            )}
-            <View style={styles.locationRow}>
-              <MaterialCommunityIcons
-                name="map-marker"
-                size={16}
-                color="rgba(255,255,255,0.8)"
-              />
-              <Text style={styles.locationText}>
-                {wish.location.name}, {wish.location.city}
-              </Text>
+              {wish.story && (
+                <Text style={styles.wishStory} numberOfLines={2}>
+                  "{wish.story}"
+                </Text>
+              )}
+              <View style={styles.locationRow}>
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={16}
+                  color="rgba(255,255,255,0.8)"
+                />
+                <Text style={styles.locationText}>
+                  {wish.location.name}, {wish.location.city}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Bottom Section */}
-        <View style={styles.bottomSection}>
-          <View style={styles.priceTag}>
-            <Text style={styles.priceLabel}>yaklaşık</Text>
-            <Text style={styles.priceValue}>
-              {wish.currency || '₺'}{wish.price}
-            </Text>
+          {/* Bottom Section */}
+          <View style={styles.bottomSection}>
+            <View style={styles.priceTag}>
+              <Text style={styles.priceLabel}>yaklaşık</Text>
+              <Text style={styles.priceValue}>
+                {wish.currency || '₺'}
+                {wish.price}
+              </Text>
+            </View>
+            <View style={styles.giftButtonContainer}>
+              <GiftButton onPress={onGift} size="medium" fullWidth />
+            </View>
           </View>
-          <View style={styles.giftButtonContainer}>
-            <GiftButton
-              onPress={onGift}
-              size="medium"
-              fullWidth
-            />
-          </View>
-        </View>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  },
+);
+
+WishCard.displayName = 'WishCard';
 
 const styles = StyleSheet.create({
   container: {

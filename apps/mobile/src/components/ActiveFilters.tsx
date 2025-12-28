@@ -3,7 +3,7 @@
  * Shows applied filters with remove functionality
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   View,
   Text,
@@ -28,47 +28,50 @@ type ActiveFiltersProps = {
   onClearAll: () => void;
 };
 
-export const ActiveFilters: React.FC<ActiveFiltersProps> = ({
-  filters,
-  onRemove,
-  onClearAll,
-}) => {
-  if (filters.length === 0) return null;
+export const ActiveFilters: React.FC<ActiveFiltersProps> = memo(
+  ({ filters, onRemove, onClearAll }) => {
+    if (filters.length === 0) return null;
 
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {filters.map((filter) => (
-          <View key={filter.key} style={styles.filterTag}>
-            <Text style={styles.filterText} numberOfLines={1}>
-              {filter.label}: {filter.value}
-            </Text>
+    return (
+      <View style={styles.container}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {filters.map((filter) => (
+            <View key={filter.key} style={styles.filterTag}>
+              <Text style={styles.filterText} numberOfLines={1}>
+                {filter.label}: {filter.value}
+              </Text>
+              <TouchableOpacity
+                onPress={() => onRemove(filter.key)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <MaterialCommunityIcons
+                  name="close-circle"
+                  size={16}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          {filters.length > 1 && (
             <TouchableOpacity
-              onPress={() => onRemove(filter.key)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.clearAllButton}
+              onPress={onClearAll}
             >
-              <MaterialCommunityIcons
-                name="close-circle"
-                size={16}
-                color={COLORS.primary}
-              />
+              <Text style={styles.clearAllText}>Clear All</Text>
             </TouchableOpacity>
-          </View>
-        ))}
+          )}
+        </ScrollView>
+      </View>
+    );
+  },
+);
 
-        {filters.length > 1 && (
-          <TouchableOpacity style={styles.clearAllButton} onPress={onClearAll}>
-            <Text style={styles.clearAllText}>Clear All</Text>
-          </TouchableOpacity>
-        )}
-      </ScrollView>
-    </View>
-  );
-};
+ActiveFilters.displayName = 'ActiveFilters';
 
 const styles = StyleSheet.create({
   container: {
