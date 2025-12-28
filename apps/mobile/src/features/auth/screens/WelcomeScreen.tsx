@@ -8,7 +8,9 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
 
 const { height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -29,6 +31,18 @@ export const WelcomeScreen: React.FC<{
 
   const handlePrivacyPress = () => {
     navigation.navigate('PrivacyPolicy');
+  };
+
+  const handleAppleSignIn = () => {
+    logger.debug('[Auth] Apple sign in initiated from Welcome screen');
+    // TODO: Implement Apple Sign In with Supabase
+    navigation.navigate('Register');
+  };
+
+  const handleGoogleSignIn = () => {
+    logger.debug('[Auth] Google sign in initiated from Welcome screen');
+    // TODO: Implement Google Sign In with Supabase
+    navigation.navigate('Register');
   };
 
   return (
@@ -58,39 +72,67 @@ export const WelcomeScreen: React.FC<{
         {/* Action Section */}
         <View style={styles.actionSection}>
           <View style={styles.buttonContainer}>
-            {/* Apple Sign In (Mock) */}
+            {/* Apple Sign In */}
             <TouchableOpacity
-              style={[styles.primaryButton, styles.appleButton]}
-              onPress={() => navigation.navigate('Register')} // Mock action
+              style={[styles.socialButton, styles.appleButton]}
+              onPress={handleAppleSignIn}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Apple ile devam et"
             >
-              <View style={styles.appleButtonContent}>
-                {/* Use text icon for now as we don't have Apple icon asset guaranteed */}
-                <Text
-                  style={[styles.primaryButtonText, styles.appleIconSpacing]}
-                >
-                  
-                </Text>
-                <Text style={styles.primaryButtonText}>
-                  Continue with Apple
-                </Text>
+              <View style={styles.socialButtonContent}>
+                <MaterialCommunityIcons
+                  name="apple"
+                  size={24}
+                  color={COLORS.white}
+                />
+                <Text style={styles.socialButtonText}>Apple ile devam et</Text>
               </View>
             </TouchableOpacity>
+
+            {/* Google Sign In */}
+            <TouchableOpacity
+              style={[styles.socialButton, styles.googleButton]}
+              onPress={handleGoogleSignIn}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Google ile devam et"
+            >
+              <View style={styles.socialButtonContent}>
+                <MaterialCommunityIcons
+                  name="google"
+                  size={24}
+                  color={COLORS.white}
+                />
+                <Text style={styles.socialButtonText}>Google ile devam et</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>veya</Text>
+              <View style={styles.dividerLine} />
+            </View>
 
             <TouchableOpacity
               style={styles.primaryButton}
               onPress={handleCreateAccount}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Hesap oluştur"
             >
-              <Text style={styles.primaryButtonText}>Create an account</Text>
+              <Text style={styles.primaryButtonText}>Hesap oluştur</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={handleLogin}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Giriş yap"
             >
-              <Text style={styles.secondaryButtonText}>Log in</Text>
+              <Text style={styles.secondaryButtonText}>Giriş yap</Text>
             </TouchableOpacity>
           </View>
 
@@ -113,14 +155,6 @@ export const WelcomeScreen: React.FC<{
 };
 
 const styles = StyleSheet.create({
-  appleButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  appleIconSpacing: {
-    marginRight: 8,
-  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -173,8 +207,48 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    gap: 16,
+    gap: 12,
     marginBottom: 16,
+  },
+  socialButton: {
+    borderRadius: 28,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  socialButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  socialButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  appleButton: {
+    backgroundColor: COLORS.apple,
+  },
+  googleButton: {
+    backgroundColor: '#4285F4',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
+    width: '100%',
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   primaryButton: {
     backgroundColor: COLORS.mint,
@@ -205,10 +279,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.25,
-  },
-  appleButton: {
-    backgroundColor: COLORS.apple,
-    marginBottom: 12,
   },
   footerText: {
     fontSize: 14,
