@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * TravelMatch Admin Sidebar V2
+ * "Cinematic Travel + Trust Jewelry" Design
+ */
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -15,40 +20,35 @@ import {
   ChevronLeft,
   ChevronRight,
   ListTodo,
-  Plug,
   Bell,
   Megaphone,
   Brain,
-  Zap,
   Gift,
   UserCog,
   Globe,
   TrendingUp,
   Activity,
-  Siren,
-  Bug,
   Star,
-  HeartHandshake,
   UsersRound,
   Code,
-  BookOpen,
-  Lightbulb,
-  CalendarDays,
-  Building2,
-  Languages,
-  Trophy,
-  Wallet,
-  Accessibility,
-  Heart,
-  FileEdit,
   History,
   Flag,
+  MapPin,
+  LogOut,
+  Moon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useUIStore } from '@/stores/ui-store';
 import { usePermission } from '@/hooks/use-permission';
 
@@ -60,255 +60,48 @@ interface NavItem {
   resource?: string;
 }
 
+// Navigation sections
 const mainNavItems: NavItem[] = [
-  {
-    title: 'İş Kuyruğu',
-    href: '/queue',
-    icon: ListTodo,
-    badge: 0,
-  },
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
+  { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { title: 'Is Kuyrugu', href: '/queue', icon: ListTodo, badge: 0 },
 ];
 
 const managementNavItems: NavItem[] = [
-  {
-    title: 'Kullanıcılar',
-    href: '/users',
-    icon: Users,
-    resource: 'users',
-  },
-  {
-    title: 'Momentler',
-    href: '/moments',
-    icon: Image,
-    resource: 'moments',
-  },
-  {
-    title: 'Anlaşmazlıklar',
-    href: '/disputes',
-    icon: AlertTriangle,
-    resource: 'disputes',
-  },
-  {
-    title: 'Creators',
-    href: '/creators',
-    icon: Star,
-    resource: 'users',
-  },
+  { title: 'Kullanicilar', href: '/users', icon: Users, resource: 'users' },
+  { title: 'Momentler', href: '/moments', icon: Image, resource: 'moments' },
+  { title: 'Anlasmazliklar', href: '/disputes', icon: AlertTriangle, resource: 'disputes' },
+  { title: 'Creators', href: '/creators', icon: Star, resource: 'users' },
 ];
 
 const operationsNavItems: NavItem[] = [
-  {
-    title: 'Finans',
-    href: '/finance',
-    icon: DollarSign,
-    resource: 'transactions',
-  },
-  {
-    title: 'Gelir Analizi',
-    href: '/revenue',
-    icon: TrendingUp,
-    resource: 'transactions',
-  },
-  {
-    title: 'Fiyatlandırma',
-    href: '/pricing',
-    icon: Wallet,
-    resource: 'transactions',
-  },
-  {
-    title: 'Güvenlik',
-    href: '/trust-safety',
-    icon: Shield,
-    resource: 'reports',
-  },
-  {
-    title: 'Güvenlik Merkezi',
-    href: '/safety-center',
-    icon: HeartHandshake,
-    resource: 'reports',
-  },
-  {
-    title: 'Destek',
-    href: '/support',
-    icon: MessageSquare,
-    resource: 'reports',
-  },
-  {
-    title: 'Müşteri Başarısı',
-    href: '/customer-success',
-    icon: Heart,
-    resource: 'users',
-  },
+  { title: 'Finans', href: '/finance', icon: DollarSign, resource: 'transactions' },
+  { title: 'Gelir Analizi', href: '/revenue', icon: TrendingUp, resource: 'transactions' },
+  { title: 'Guvenlik', href: '/trust-safety', icon: Shield, resource: 'reports' },
+  { title: 'Destek', href: '/support', icon: MessageSquare, resource: 'reports' },
 ];
 
 const analyticsNavItems: NavItem[] = [
-  {
-    title: 'Analitik',
-    href: '/analytics',
-    icon: BarChart3,
-    resource: 'analytics',
-  },
-  {
-    title: 'Coğrafya',
-    href: '/geographic',
-    icon: Globe,
-    resource: 'analytics',
-  },
-  {
-    title: 'Ops Merkezi',
-    href: '/ops-center',
-    icon: Activity,
-    resource: 'analytics',
-  },
-  {
-    title: 'Olaylar',
-    href: '/incidents',
-    icon: Siren,
-    resource: 'settings',
-  },
-  {
-    title: 'Hatalar',
-    href: '/errors',
-    icon: Bug,
-    resource: 'settings',
-  },
+  { title: 'Analitik', href: '/analytics', icon: BarChart3, resource: 'analytics' },
+  { title: 'Cografya', href: '/geographic', icon: Globe, resource: 'analytics' },
+  { title: 'Ops Merkezi', href: '/ops-center', icon: Activity, resource: 'analytics' },
 ];
 
 const growthNavItems: NavItem[] = [
-  {
-    title: 'Bildirimler',
-    href: '/notifications',
-    icon: Bell,
-    resource: 'users',
-  },
-  {
-    title: 'Kampanyalar',
-    href: '/campaigns',
-    icon: Megaphone,
-    resource: 'users',
-  },
-  {
-    title: 'Etkinlikler',
-    href: '/events',
-    icon: CalendarDays,
-    resource: 'users',
-  },
-  {
-    title: 'Gamification',
-    href: '/gamification',
-    icon: Trophy,
-    resource: 'users',
-  },
-  {
-    title: 'Promosyonlar',
-    href: '/promos',
-    icon: Gift,
-    resource: 'users',
-  },
-  {
-    title: 'Partnerler',
-    href: '/partners',
-    icon: Building2,
-    resource: 'users',
-  },
-];
-
-const contentNavItems: NavItem[] = [
-  {
-    title: 'Editorial',
-    href: '/editorial',
-    icon: FileEdit,
-    resource: 'moments',
-  },
-  {
-    title: 'Bilgi Bankası',
-    href: '/knowledge-base',
-    icon: BookOpen,
-    resource: 'settings',
-  },
-  {
-    title: 'Geri Bildirim',
-    href: '/feedback',
-    icon: Lightbulb,
-    resource: 'users',
-  },
-  {
-    title: 'Yerelleştirme',
-    href: '/localization',
-    icon: Languages,
-    resource: 'settings',
-  },
-  {
-    title: 'Erişilebilirlik',
-    href: '/accessibility',
-    icon: Accessibility,
-    resource: 'settings',
-  },
+  { title: 'Bildirimler', href: '/notifications', icon: Bell, resource: 'users' },
+  { title: 'Kampanyalar', href: '/campaigns', icon: Megaphone, resource: 'users' },
+  { title: 'Promosyonlar', href: '/promos', icon: Gift, resource: 'users' },
 ];
 
 const techNavItems: NavItem[] = [
-  {
-    title: 'AI Center',
-    href: '/ai-center',
-    icon: Brain,
-    resource: 'analytics',
-  },
-  {
-    title: 'Otomasyon',
-    href: '/automation',
-    icon: Zap,
-    resource: 'settings',
-  },
-  {
-    title: 'Entegrasyonlar',
-    href: '/integrations',
-    icon: Plug,
-    resource: 'integrations',
-  },
-  {
-    title: 'Dev Tools',
-    href: '/dev-tools',
-    icon: Code,
-    resource: 'settings',
-  },
-  {
-    title: 'Feature Flags',
-    href: '/feature-flags',
-    icon: Flag,
-    resource: 'settings',
-  },
+  { title: 'AI Center', href: '/ai-center', icon: Brain, resource: 'analytics' },
+  { title: 'Feature Flags', href: '/feature-flags', icon: Flag, resource: 'settings' },
+  { title: 'Dev Tools', href: '/dev-tools', icon: Code, resource: 'settings' },
 ];
 
 const settingsNavItems: NavItem[] = [
-  {
-    title: 'Ekip',
-    href: '/team',
-    icon: UsersRound,
-    resource: 'admin_users',
-  },
-  {
-    title: 'Admin Kullanıcıları',
-    href: '/admin-users',
-    icon: UserCog,
-    resource: 'admin_users',
-  },
-  {
-    title: 'Audit Logs',
-    href: '/audit-logs',
-    icon: History,
-    resource: 'admin_users',
-  },
-  {
-    title: 'Ayarlar',
-    href: '/settings',
-    icon: Settings,
-    resource: 'settings',
-  },
+  { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
+  { title: 'Audit Logs', href: '/audit-logs', icon: History, resource: 'admin_users' },
+  { title: 'Ayarlar', href: '/settings', icon: Settings, resource: 'settings' },
 ];
 
 export function Sidebar() {
@@ -319,7 +112,6 @@ export function Sidebar() {
   const NavLink = ({ item }: { item: NavItem }) => {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
 
-    // Check permission if resource is specified
     if (item.resource && !can(item.resource as never, 'view')) {
       return null;
     }
@@ -328,21 +120,17 @@ export function Sidebar() {
       <Link
         href={item.href}
         className={cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent',
-          isActive
-            ? 'bg-accent text-accent-foreground font-medium'
-            : 'text-muted-foreground hover:text-foreground',
+          'admin-sidebar-item',
+          isActive && 'admin-sidebar-item-active',
           sidebarCollapsed && 'justify-center px-2'
         )}
       >
-        <item.icon className="h-4 w-4 shrink-0" />
+        <item.icon className="admin-sidebar-item-icon" />
         {!sidebarCollapsed && (
           <>
             <span className="flex-1">{item.title}</span>
             {item.badge !== undefined && item.badge > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
-                {item.badge}
-              </span>
+              <span className="admin-sidebar-badge">{item.badge}</span>
             )}
           </>
         )}
@@ -356,9 +144,7 @@ export function Sidebar() {
           <TooltipContent side="right" className="flex items-center gap-2">
             {item.title}
             {item.badge !== undefined && item.badge > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
-                {item.badge}
-              </span>
+              <span className="admin-sidebar-badge">{item.badge}</span>
             )}
           </TooltipContent>
         </Tooltip>
@@ -376,15 +162,15 @@ export function Sidebar() {
     if (visibleItems.length === 0) return null;
 
     return (
-      <div className="space-y-1">
+      <div className="admin-sidebar-section">
         {!sidebarCollapsed && (
-          <h4 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {title}
-          </h4>
+          <h4 className="admin-sidebar-section-title">{title}</h4>
         )}
-        {visibleItems.map((item) => (
-          <NavLink key={item.href} item={item} />
-        ))}
+        <div className="space-y-1">
+          {visibleItems.map((item) => (
+            <NavLink key={item.href} item={item} />
+          ))}
+        </div>
       </div>
     );
   };
@@ -392,54 +178,112 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'flex h-screen flex-col border-r bg-card transition-all duration-300',
+        'admin-sidebar',
         sidebarCollapsed ? 'w-16' : 'w-64'
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="admin-sidebar-logo">
         {!sidebarCollapsed && (
-          <Link href="/queue" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">TM</span>
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <div className="admin-sidebar-logo-icon">
+              <MapPin className="h-5 w-5" />
             </div>
-            <span className="font-semibold">Admin</span>
+            <div className="flex flex-col">
+              <span className="font-bold text-sm">TravelMatch</span>
+              <span className="text-xs text-muted-foreground">Admin Panel</span>
+            </div>
           </Link>
         )}
+        {sidebarCollapsed && (
+          <div className="admin-sidebar-logo-icon mx-auto">
+            <MapPin className="h-5 w-5" />
+          </div>
+        )}
+      </div>
+
+      {/* Toggle Button */}
+      <div className="px-3 py-2 border-b">
         <Button
           variant="ghost"
-          size="icon"
-          className={cn('h-8 w-8', sidebarCollapsed && 'mx-auto')}
+          size="sm"
+          className={cn(
+            'w-full justify-start gap-2 text-muted-foreground hover:text-foreground',
+            sidebarCollapsed && 'justify-center'
+          )}
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         >
           {sidebarCollapsed ? (
             <ChevronRight className="h-4 w-4" />
           ) : (
-            <ChevronLeft className="h-4 w-4" />
+            <>
+              <ChevronLeft className="h-4 w-4" />
+              <span>Daralt</span>
+            </>
           )}
         </Button>
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-4">
-        <div className="space-y-6">
-          <NavSection title="Ana Menü" items={mainNavItems} />
-          <Separator />
-          <NavSection title="Yönetim" items={managementNavItems} />
-          <Separator />
-          <NavSection title="Operasyon" items={operationsNavItems} />
-          <Separator />
-          <NavSection title="Analitik" items={analyticsNavItems} />
-          <Separator />
-          <NavSection title="Büyüme" items={growthNavItems} />
-          <Separator />
-          <NavSection title="İçerik" items={contentNavItems} />
-          <Separator />
-          <NavSection title="Teknoloji" items={techNavItems} />
-          <Separator />
-          <NavSection title="Sistem" items={settingsNavItems} />
-        </div>
+      <ScrollArea className="admin-sidebar-nav flex-1">
+        <NavSection title="Ana Menu" items={mainNavItems} />
+        <NavSection title="Yonetim" items={managementNavItems} />
+        <NavSection title="Operasyon" items={operationsNavItems} />
+        <NavSection title="Analitik" items={analyticsNavItems} />
+        <NavSection title="Buyume" items={growthNavItems} />
+        <NavSection title="Teknoloji" items={techNavItems} />
+        <NavSection title="Sistem" items={settingsNavItems} />
       </ScrollArea>
+
+      {/* User Section */}
+      <div className="border-t p-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={cn(
+                'flex w-full items-center gap-3 rounded-lg p-2 text-sm transition-colors hover:bg-muted',
+                sidebarCollapsed && 'justify-center'
+              )}
+            >
+              <Avatar className="h-8 w-8 border-2 border-primary/20">
+                <AvatarImage src="/avatars/admin.jpg" />
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                  KY
+                </AvatarFallback>
+              </Avatar>
+              {!sidebarCollapsed && (
+                <div className="flex-1 text-left">
+                  <p className="font-medium text-sm">Kemal Y.</p>
+                  <p className="text-xs text-muted-foreground">Super Admin</p>
+                </div>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <div className="px-2 py-1.5">
+              <p className="font-medium text-sm">Kemal Y.</p>
+              <p className="text-xs text-muted-foreground">kemal@travelmatch.app</p>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <UserCog className="mr-2 h-4 w-4" />
+              Profil Ayarlari
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Moon className="mr-2 h-4 w-4" />
+              Karanlik Mod
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive">
+              <LogOut className="mr-2 h-4 w-4" />
+              Cikis Yap
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </aside>
   );
 }
+
+// Export SidebarV2 as alias for backwards compatibility
+export { Sidebar as SidebarV2 };
