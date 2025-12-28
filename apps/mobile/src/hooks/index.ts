@@ -69,3 +69,41 @@ export {
   useInteractionManager,
   useWhyDidYouUpdate,
 } from './usePerformanceMonitor';
+
+// Animation hooks
+export {
+  // Spring & timing configurations
+  SPRINGS,
+  TIMINGS,
+  // Press animations
+  useScalePressAnimation,
+  usePressOpacityAnimation,
+  // Entrance animations
+  useFadeIn,
+  useFadeSlideUp,
+  useBounceIn,
+  useStaggeredItem,
+  // Continuous animations
+  usePulse,
+  useBreathing,
+  useFloating,
+  useRotation,
+  // Feedback animations
+  useShakeAnimation,
+  useSuccessBounce,
+  // Scroll-based animations
+  useParallax,
+  useHeaderCollapse,
+  // Utility hooks
+  useAnimatedValue,
+  useProgress,
+} from './useAnimations';
+
+// Existing animation hooks (for backwards compatibility)
+export { usePressAnimation, useBounceAnimation } from './usePressAnimation';
+export {
+  useEnterAnimation,
+  useStaggeredAnimation,
+  useFadeAnimation,
+  useSlideAnimation,
+} from './useEnterAnimation';
