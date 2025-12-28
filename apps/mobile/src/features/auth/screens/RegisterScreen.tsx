@@ -22,6 +22,7 @@ import { registerSchema, type RegisterInput, type Gender } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
+import { PasswordStrengthMeter } from '@/components/ui';
 import { COLORS } from '@/constants/colors';
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
@@ -328,6 +329,7 @@ export const RegisterScreen: React.FC = () => {
                 secureTextEntry
                 editable={!isLoading}
               />
+              <PasswordStrengthMeter password={value} showRequirements />
               {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}

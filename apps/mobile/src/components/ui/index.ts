@@ -20,6 +20,7 @@ export { TMPill, TMCategoryChip } from './TMPill';
 // Form Components
 export { PasswordInput } from './PasswordInput';
 export { ControlledInput } from './ControlledInput';
+export { PasswordStrengthMeter } from './PasswordStrengthMeter';
 
 // Performance Optimized
 export { OptimizedImage } from './OptimizedImage';

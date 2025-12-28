@@ -345,7 +345,32 @@ export const messageService = {
 
       if (error) throw error;
 
-      // Decrypt messages
+      // Type for user with encryption keys
+      interface UserWithEncryption {
+        id: string;
+        public_key?: string;
+      }
+
+      // Batch fetch: Collect all unique sender IDs for encrypted messages
+      const encryptedMsgs = data.filter(
+        (msg) => (msg as { nonce?: string }).nonce && msg.type === 'text'
+      );
+      const senderIds = [...new Set(encryptedMsgs.map((msg) => msg.sender_id))];
+
+      // Single batch query for all senders (fixes N+1 pattern)
+      let senderMap = new Map<string, UserWithEncryption>();
+      if (senderIds.length > 0) {
+        const { data: senders } = await supabase
+          .from('users')
+          .select('id, public_key')
+          .in('id', senderIds);
+
+        if (senders) {
+          senderMap = new Map(senders.map((s) => [s.id, s as UserWithEncryption]));
+        }
+      }
+
+      // Decrypt messages using batched sender data
       const decryptedMessages: Message[] = await Promise.all(
         data.map(async (msg) => {
           let content = msg.content;
@@ -354,16 +379,8 @@ export const messageService = {
           const msgNonce = (msg as { nonce?: string }).nonce;
           if (msgNonce && msg.type === 'text') {
             try {
-              // We need the sender's public key
-              const { data: sender } = await usersService.getById(
-                msg.sender_id,
-              );
-
-              // Type assertion for user with encryption keys
-              interface UserWithEncryption {
-                public_key?: string;
-              }
-              const senderWithKey = sender as UserWithEncryption | null;
+              // Use batched sender data instead of individual queries
+              const senderWithKey = senderMap.get(msg.sender_id);
 
               if (senderWithKey?.public_key) {
                 content = await encryptionService.decrypt(
