@@ -78,6 +78,7 @@ export const Input: React.FC<InputProps> = memo(
     onRightIconPress,
     containerStyle,
     secureTextEntry,
+    showSuccess,
     onFocus: onFocusProp,
     onBlur: onBlurProp,
     ...rest
@@ -90,9 +91,10 @@ export const Input: React.FC<InputProps> = memo(
     // Memoize border color calculation
     const borderColor = useMemo((): string => {
       if (error) return COLORS.feedback.error;
+      if (showSuccess) return COLORS.feedback.success;
       if (isFocused) return COLORS.brand.primary;
       return primitives.stone[200];
-    }, [error, isFocused]);
+    }, [error, showSuccess, isFocused]);
 
     // Memoize callbacks
     const handleFocus = useCallback(
@@ -129,6 +131,7 @@ export const Input: React.FC<InputProps> = memo(
             { borderColor },
             isFocused && styles.inputFocused,
             error && styles.inputError,
+            showSuccess && !error && styles.inputSuccess,
           ]}
         >
           {leftIcon && (
@@ -173,7 +176,7 @@ export const Input: React.FC<InputProps> = memo(
             </TouchableOpacity>
           )}
 
-          {rightIcon && !isPassword && (
+          {rightIcon && !isPassword && !showSuccess && (
             <TouchableOpacity
               onPress={onRightIconPress}
               style={styles.rightIconContainer}
@@ -187,6 +190,16 @@ export const Input: React.FC<InputProps> = memo(
                 color={primitives.stone[400]}
               />
             </TouchableOpacity>
+          )}
+
+          {showSuccess && !error && !isPassword && (
+            <View style={styles.successIconContainer}>
+              <MaterialCommunityIcons
+                name="check-circle"
+                size={20}
+                color={COLORS.feedback.success}
+              />
+            </View>
           )}
         </View>
 
@@ -224,6 +237,9 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: COLORS.feedback.error,
   },
+  inputSuccess: {
+    borderColor: COLORS.feedback.success,
+  },
   input: {
     flex: 1,
     fontSize: 16,
@@ -240,6 +256,10 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   rightIconContainer: {
+    marginLeft: 12,
+    padding: 4,
+  },
+  successIconContainer: {
     marginLeft: 12,
     padding: 4,
   },
