@@ -33,7 +33,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { COLORS } from '../../constants/colors';
+import { COLORS, primitives } from '../../constants/colors';
 import { a11yProps } from '../../utils/accessibility';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -263,7 +263,7 @@ export const GenericBottomSheet = forwardRef<
                     <MaterialCommunityIcons
                       name="close"
                       size={24}
-                      color={COLORS.textSecondary}
+                      color={COLORS.text.secondary}
                     />
                   </TouchableOpacity>
                 )}
@@ -506,7 +506,9 @@ export function SelectionBottomSheet<T = string>({
                   option.icon as keyof typeof MaterialCommunityIcons.glyphMap
                 }
                 size={24}
-                color={option.disabled ? COLORS.gray[300] : COLORS.text}
+                color={
+                  option.disabled ? primitives.stone[300] : COLORS.text.primary
+                }
                 style={selectionStyles.optionIcon}
                 testID={`option-icon-${option.icon}`}
               />
@@ -530,7 +532,7 @@ export function SelectionBottomSheet<T = string>({
               <MaterialCommunityIcons
                 name="check"
                 size={24}
-                color={COLORS.primary}
+                color={COLORS.brand.primary}
               />
             )}
           </TouchableOpacity>
@@ -547,10 +549,10 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.overlay50,
+    backgroundColor: COLORS.overlay.backdrop,
   },
   sheet: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.utility.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     overflow: 'hidden',
@@ -563,7 +565,7 @@ const styles = StyleSheet.create({
   handle: {
     width: 40,
     height: 4,
-    backgroundColor: COLORS.gray[300],
+    backgroundColor: primitives.stone[300],
     borderRadius: 2,
   },
   header: {
@@ -580,12 +582,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   closeButton: {
     padding: 4,
@@ -598,7 +600,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: COLORS.border.default,
   },
   keyboardView: {
     flex: 1,
@@ -612,7 +614,7 @@ const confirmStyles = StyleSheet.create({
   },
   message: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 24,
@@ -628,26 +630,26 @@ const confirmStyles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: primitives.stone[100],
   },
   confirmButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   destructiveButton: {
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.feedback.error,
   },
   cancelText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   confirmText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
   destructiveText: {
-    color: COLORS.white,
+    color: COLORS.utility.white,
   },
 });
 
@@ -660,7 +662,7 @@ const selectionStyles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   lastOption: {
     borderBottomWidth: 0,
@@ -677,14 +679,14 @@ const selectionStyles = StyleSheet.create({
   optionLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   optionLabelDisabled: {
-    color: COLORS.gray[400],
+    color: primitives.stone[400],
   },
   optionDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: 2,
   },
 });
