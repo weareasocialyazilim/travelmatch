@@ -24,6 +24,9 @@ module.exports = {
     '^(\\.\\./)+components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
     // Mock expo virtual env module (ES module that Jest can't handle)
     '^expo/virtual/env$': '<rootDir>/__mocks__/expo-virtual-env.js',
+    // Shared mocks in tests/__mocks__/ to avoid duplication across packages
+    '^react-native$': '<rootDir>/../../tests/__mocks__/react-native.js',
+    '^react-native-reanimated$': '<rootDir>/../../tests/__mocks__/react-native-reanimated.js',
     // Now spread the preset (contains generic @/ mappings)
     ...jestExpoPreset.moduleNameMapper,
     // Explicit mappings for commonly mocked modules (needed for jest.mock hoisting)
@@ -56,7 +59,8 @@ module.exports = {
     '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',
     '^@travelmatch/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',
     '^@react-native-community/datetimepicker$': '<rootDir>/__mocks__/@react-native-community/datetimepicker.js',
-    '^react-native-svg$': '<rootDir>/__mocks__/react-native-svg.js',
+    // Shared mocks in tests/__mocks__/ to avoid duplication
+    '^react-native-svg$': '<rootDir>/../../tests/__mocks__/react-native-svg.js',
   },
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',

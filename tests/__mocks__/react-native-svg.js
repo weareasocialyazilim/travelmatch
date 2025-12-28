@@ -1,4 +1,7 @@
-// Mock react-native-svg for mobile tests
+/**
+ * Shared react-native-svg mock for Jest tests
+ * This mock is used by all packages in the monorepo
+ */
 const React = require('react');
 
 const createComponent = (name) => {
