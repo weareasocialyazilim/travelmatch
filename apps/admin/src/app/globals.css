@@ -24,6 +24,8 @@
     --success-foreground: 210 40% 98%;
     --warning: 38 92% 50%;
     --warning-foreground: 222.2 84% 4.9%;
+    --trust: 160 84% 39%;
+    --trust-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 6 78% 57%;
@@ -51,6 +53,8 @@
     --success-foreground: 210 40% 98%;
     --warning: 38 92% 50%;
     --warning-foreground: 222.2 84% 4.9%;
+    --trust: 160 84% 39%;
+    --trust-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 6 78% 57%;
@@ -143,4 +147,31 @@
 
 .status-completed {
   @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+}
+
+/* Stat Card - Cinematic Travel + Trust Jewelry Design */
+.stat-card {
+  @apply relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all duration-300;
+  @apply hover:shadow-lg hover:border-border/80;
+  @apply dark:bg-stone-900/50 dark:border-stone-700/50;
+  @apply dark:hover:bg-stone-900/70 dark:hover:border-stone-600/50;
+}
+
+.stat-card-label {
+  @apply text-sm font-medium text-muted-foreground tracking-wide uppercase;
+  @apply dark:text-stone-400;
+}
+
+.stat-card-value {
+  @apply text-3xl font-bold tracking-tight text-foreground;
+  @apply dark:text-stone-100;
+}
+
+.stat-card-trend {
+  @apply flex items-center gap-1.5 text-sm font-medium;
+}
+
+.stat-card-icon {
+  @apply flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300;
+  @apply group-hover:scale-110;
 }
