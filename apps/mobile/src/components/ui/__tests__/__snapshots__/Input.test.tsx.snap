@@ -229,6 +229,14 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
       accessible={true}
       aria-disabled={true}
       disabled={true}
+      hitSlop={
+        {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       ref={null}
       style={
         {

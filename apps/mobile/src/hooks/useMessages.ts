@@ -183,10 +183,53 @@ export const useMessages = (): UseMessagesReturn => {
   }, [messagePage, hasMoreMessages, messagesLoading]);
 
   /**
-   * Send a message
+   * Send a message with optimistic UI
+   * Message appears immediately with 'sending' status, then updates on success/failure
    */
   const sendMessage = useCallback(
     async (data: SendMessageRequest): Promise<Message | null> => {
+      // Create optimistic message with temporary ID
+      const tempId = `temp-${Date.now()}`;
+      const optimisticMessage: Message = {
+        id: tempId,
+        conversationId: data.conversationId,
+        senderId: 'current-user', // Will be updated with real sender
+        content: data.content || '',
+        type: data.type || 'text',
+        imageUrl: data.imageUrl,
+        location: data.location,
+        createdAt: new Date().toISOString(),
+        status: 'sending' as MessageStatus,
+      };
+
+      // Add optimistic message immediately (appears as "sending")
+      if (mountedRef.current) {
+        setMessages((prev) => [optimisticMessage, ...prev]);
+
+        // Update conversation's last message optimistically
+        setConversations((prev) =>
+          prev
+            .map((conv) =>
+              conv.id === data.conversationId
+                ? {
+                    ...conv,
+                    lastMessage: data.content || 'Attachment',
+                    lastMessageAt: optimisticMessage.createdAt,
+                  }
+                : conv,
+            )
+            .sort((a, b) => {
+              const bTime = b.lastMessageAt
+                ? new Date(b.lastMessageAt).getTime()
+                : 0;
+              const aTime = a.lastMessageAt
+                ? new Date(a.lastMessageAt).getTime()
+                : 0;
+              return bTime - aTime;
+            }),
+        );
+      }
+
       try {
         const newMessage = await retryWithErrorHandling(
           () => messageService.sendMessage(data),
@@ -199,10 +242,16 @@ export const useMessages = (): UseMessagesReturn => {
 
         if (!mountedRef.current) return newMessage;
 
-        // Add to messages list
-        setMessages((prev) => [newMessage, ...prev]);
+        // Replace optimistic message with real message
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === tempId
+              ? { ...newMessage, status: 'sent' as MessageStatus }
+              : msg,
+          ),
+        );
 
-        // Update conversation's last message
+        // Update conversation with real message data
         setConversations((prev) =>
           prev
             .map((conv) =>
@@ -229,6 +278,18 @@ export const useMessages = (): UseMessagesReturn => {
       } catch (error) {
         const standardizedError = ErrorHandler.handle(error, 'sendMessage');
         logger.error('Failed to send message:', standardizedError);
+
+        // Mark optimistic message as failed (allows retry in UI)
+        if (mountedRef.current) {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === tempId
+                ? { ...msg, status: 'failed' as MessageStatus }
+                : msg,
+            ),
+          );
+        }
+
         return null;
       }
     },

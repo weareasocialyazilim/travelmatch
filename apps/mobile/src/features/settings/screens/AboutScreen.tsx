@@ -38,7 +38,16 @@ export const AboutScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerSpacer} />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>About TravelMatch</Text>
         <View style={styles.headerSpacer} />
       </View>
@@ -116,6 +125,12 @@ const styles = StyleSheet.create({
   },
   headerSpacer: {
     width: 48,
+  },
+  backButton: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
     flex: 1,

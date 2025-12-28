@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { useToast } from '@/context/ToastContext';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { usePayments } from '@/hooks/usePayments';
@@ -26,6 +27,7 @@ type FilterType = 'all' | 'incoming' | 'outgoing';
 const WalletScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+  const toast = useToast();
 
   // Use payments hook
   const {
@@ -75,6 +77,7 @@ const WalletScreen = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      toast.error('Failed to refresh wallet data');
     }
   };
 

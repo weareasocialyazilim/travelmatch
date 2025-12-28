@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import supabaseDb from '@/services/supabaseDbService';
 import { useAuth } from '@/context/AuthContext';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -65,62 +67,81 @@ export function DeletedMomentsScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Deleted Moments</Text>
-        <Text style={styles.headerSubtitle}>
-          Items are kept for 90 days before permanent deletion
-        </Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
+        </TouchableOpacity>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>Deleted Moments</Text>
+          <Text style={styles.headerSubtitle}>
+            Items are kept for 90 days before permanent deletion
+          </Text>
+        </View>
+        <View style={styles.placeholder} />
       </View>
 
-      {/* List */}
-      <FlashList
-        data={deletedMoments || []}
-        refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
-        }
-        renderItem={({ item }: { item: DeletedMoment }) => (
-          <View style={styles.momentItem}>
-            <View style={styles.momentInfo}>
-              <Text style={styles.momentTitle}>{item.title}</Text>
-              <Text style={styles.momentDescription} numberOfLines={2}>
-                {item.description}
-              </Text>
-              <View style={styles.deletedInfo}>
-                <Text style={styles.deletedText}>
-                  Deleted {formatDistanceToNow(new Date(item.deleted_at))} ago
+      <View style={styles.container}>
+        {/* List */}
+        <FlashList
+          data={deletedMoments || []}
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          }
+          renderItem={({ item }: { item: DeletedMoment }) => (
+            <View style={styles.momentItem}>
+              <View style={styles.momentInfo}>
+                <Text style={styles.momentTitle}>{item.title}</Text>
+                <Text style={styles.momentDescription} numberOfLines={2}>
+                  {item.description}
                 </Text>
+                <View style={styles.deletedInfo}>
+                  <Text style={styles.deletedText}>
+                    Deleted {formatDistanceToNow(new Date(item.deleted_at))} ago
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            {/* Restore Button */}
-            <TouchableOpacity
-              onPress={() => restoreMutation.mutate(item.id)}
-              disabled={restoreMutation.isPending}
-              style={styles.restoreButton}
-            >
-              <Undo2 size={16} color="white" />
-              <Text style={styles.restoreButtonText}>Restore</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        ListEmptyComponent={
-          <EmptyState
-            icon="delete-empty-outline"
-            title="No deleted moments"
-            description="Deleted moments will appear here and can be restored within 90 days"
-            actionLabel="My Moments"
-            onAction={() => navigation.navigate('MyMoments' as never)}
-          />
-        }
-        contentContainerStyle={styles.listContent}
-      />
-    </View>
+              {/* Restore Button */}
+              <TouchableOpacity
+                onPress={() => restoreMutation.mutate(item.id)}
+                disabled={restoreMutation.isPending}
+                style={styles.restoreButton}
+              >
+                <Undo2 size={16} color="white" />
+                <Text style={styles.restoreButtonText}>Restore</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          ListEmptyComponent={
+            <EmptyState
+              icon="delete-empty-outline"
+              title="No deleted moments"
+              description="Deleted moments will appear here and can be restored within 90 days"
+              actionLabel="My Moments"
+              onAction={() => navigation.navigate('MyMoments' as never)}
+            />
+          }
+          contentContainerStyle={styles.listContent}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -135,20 +156,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   header: {
-    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
     backgroundColor: COLORS.card,
   },
+  backButton: {
+    padding: 8,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: COLORS.text,
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
-    marginTop: 4,
+    marginTop: 2,
+  },
+  placeholder: {
+    width: 40,
   },
   momentItem: {
     padding: 16,

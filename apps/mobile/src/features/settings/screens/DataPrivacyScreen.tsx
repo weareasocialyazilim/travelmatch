@@ -12,6 +12,9 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as FileSystem from 'expo-file-system';
 import { documentDirectory, EncodingType } from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
@@ -33,6 +36,7 @@ interface ConsentSettings {
 }
 
 const DataPrivacyScreen = () => {
+  const navigation = useNavigation();
   const { user } = useAuth();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -290,111 +294,154 @@ const DataPrivacyScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>GDPR Rights</Text>
-        <Text style={styles.sectionDescription}>
-          Under GDPR, you have the right to access, export, and delete your
-          personal data.
-        </Text>
-
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      {/* Header */}
+      <View style={styles.header}>
         <TouchableOpacity
-          style={styles.actionButton}
-          onPress={handleExportData}
-          disabled={exportLoading}
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          {exportLoading ? (
-            <ActivityIndicator size="small" color={COLORS.white} />
-          ) : (
-            <Text style={styles.actionButtonText}>Export My Data</Text>
-          )}
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text}
+          />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.actionButton, styles.dangerButton]}
-          onPress={handleDeleteAccount}
-          disabled={deleteLoading}
-        >
-          {deleteLoading ? (
-            <ActivityIndicator size="small" color={COLORS.white} />
-          ) : (
-            <Text style={styles.actionButtonText}>Delete My Account</Text>
-          )}
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Data Privacy</Text>
+        <View style={styles.placeholder} />
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Privacy Preferences</Text>
+      <ScrollView style={styles.container}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>GDPR Rights</Text>
+          <Text style={styles.sectionDescription}>
+            Under GDPR, you have the right to access, export, and delete your
+            personal data.
+          </Text>
 
-        <View style={styles.consentRow}>
-          <View style={styles.consentInfo}>
-            <Text style={styles.consentTitle}>Marketing Communications</Text>
-            <Text style={styles.consentDescription}>
-              Receive emails about new features, tips, and special offers
-            </Text>
-          </View>
-          <Switch
-            value={consents.marketingConsent}
-            onValueChange={(value) => updateConsent('marketing', value)}
-            trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
-          />
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={handleExportData}
+            disabled={exportLoading}
+          >
+            {exportLoading ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={styles.actionButtonText}>Export My Data</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.dangerButton]}
+            onPress={handleDeleteAccount}
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={styles.actionButtonText}>Delete My Account</Text>
+            )}
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.consentRow}>
-          <View style={styles.consentInfo}>
-            <Text style={styles.consentTitle}>Analytics & Performance</Text>
-            <Text style={styles.consentDescription}>
-              Help us improve by sharing anonymous usage data
-            </Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Privacy Preferences</Text>
+
+          <View style={styles.consentRow}>
+            <View style={styles.consentInfo}>
+              <Text style={styles.consentTitle}>Marketing Communications</Text>
+              <Text style={styles.consentDescription}>
+                Receive emails about new features, tips, and special offers
+              </Text>
+            </View>
+            <Switch
+              value={consents.marketingConsent}
+              onValueChange={(value) => updateConsent('marketing', value)}
+              trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
+            />
           </View>
-          <Switch
-            value={consents.analyticsConsent}
-            onValueChange={(value) => updateConsent('analytics', value)}
-            trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
-          />
+
+          <View style={styles.consentRow}>
+            <View style={styles.consentInfo}>
+              <Text style={styles.consentTitle}>Analytics & Performance</Text>
+              <Text style={styles.consentDescription}>
+                Help us improve by sharing anonymous usage data
+              </Text>
+            </View>
+            <Switch
+              value={consents.analyticsConsent}
+              onValueChange={(value) => updateConsent('analytics', value)}
+              trackColor={{ false: COLORS.disabled, true: COLORS.primary }}
+            />
+          </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Legal Documents</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Legal Documents</Text>
 
-        <TouchableOpacity style={styles.linkButton}>
-          <Text style={styles.linkText}>Privacy Policy</Text>
-          {consents.privacyPolicyVersion && (
-            <Text style={styles.versionText}>
-              v{consents.privacyPolicyVersion}
-            </Text>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.linkButton}>
+            <Text style={styles.linkText}>Privacy Policy</Text>
+            {consents.privacyPolicyVersion && (
+              <Text style={styles.versionText}>
+                v{consents.privacyPolicyVersion}
+              </Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.linkButton}>
-          <Text style={styles.linkText}>Terms of Service</Text>
-          {consents.termsAcceptedAt && (
-            <Text style={styles.versionText}>
-              Accepted {new Date(consents.termsAcceptedAt).toLocaleDateString()}
-            </Text>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.linkButton}>
+            <Text style={styles.linkText}>Terms of Service</Text>
+            {consents.termsAcceptedAt && (
+              <Text style={styles.versionText}>
+                Accepted{' '}
+                {new Date(consents.termsAcceptedAt).toLocaleDateString()}
+              </Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.linkButton}
-          onPress={handleViewConsentHistory}
-        >
-          <Text style={styles.linkText}>View Consent History</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={handleViewConsentHistory}
+          >
+            <Text style={styles.linkText}>View Consent History</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.footerText}>
-          Your privacy is important to us. We are committed to protecting your
-          personal data in accordance with GDPR and other privacy regulations.
-        </Text>
-      </View>
-    </ScrollView>
+        <View style={styles.section}>
+          <Text style={styles.footerText}>
+            Your privacy is important to us. We are committed to protecting your
+            personal data in accordance with GDPR and other privacy regulations.
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  placeholder: {
+    width: 40,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

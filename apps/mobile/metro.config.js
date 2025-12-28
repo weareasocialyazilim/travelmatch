@@ -38,6 +38,9 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     const possibleExtensions = ['.ts', '.tsx', '.js', '.jsx', '.json'];
     const srcPath = path.resolve(projectRoot, 'src', aliasedPath);
 
+    // Try exact path first, then with extensions
+    const fs = require('fs');
+
     // Check if it's a directory with index file
     if (fs.existsSync(srcPath) && fs.statSync(srcPath).isDirectory()) {
       for (const ext of possibleExtensions) {

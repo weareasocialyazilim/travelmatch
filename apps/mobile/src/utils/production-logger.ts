@@ -74,7 +74,6 @@ class ProductionLogger {
     if (!this.shouldLog('debug')) return;
 
     if (isDevelopment() && __DEV__) {
-      // eslint-disable-next-line no-console -- Logger utility needs direct console access
       console.log(`[DEBUG] ${message}`, this.sanitizeContext(context));
     }
   }
@@ -86,7 +85,6 @@ class ProductionLogger {
     if (!this.shouldLog('info')) return;
 
     if (isDevelopment() && __DEV__) {
-      // eslint-disable-next-line no-console -- Logger utility needs direct console access
       console.log(`[INFO] ${message}`, this.sanitizeContext(context));
     }
 

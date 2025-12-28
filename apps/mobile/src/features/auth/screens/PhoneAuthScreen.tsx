@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   signInWithPhone,
   verifyPhoneOtp,
@@ -146,152 +147,164 @@ export const PhoneAuthScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          {...a11y.button('Back button')}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={24}
-            color={COLORS.text}
-          />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            {...a11y.button('Back button')}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text}
+            />
+          </TouchableOpacity>
 
-        <View style={styles.header}>
-          <MaterialCommunityIcons
-            name={step === 'phone' ? 'phone' : 'message-text'}
-            size={64}
-            color={COLORS.primary}
-          />
-          <Text style={styles.title}>
-            {step === 'phone'
-              ? 'Phone Authentication'
-              : 'Enter Verification Code'}
-          </Text>
-          <Text style={styles.subtitle}>
-            {step === 'phone'
-              ? "We'll send you a verification code"
-              : `Code sent to ${phoneNumber}`}
-          </Text>
-        </View>
-
-        {step === 'phone' ? (
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Phone Number</Text>
-            <View style={styles.phoneInputWrapper}>
-              <Text style={styles.countryCode}>+1</Text>
-              <TextInput
-                style={styles.phoneInput}
-                value={phoneNumber}
-                onChangeText={(text) => setPhoneNumber(formatPhoneNumber(text))}
-                placeholder="(555) 123-4567"
-                placeholderTextColor={COLORS.textSecondary}
-                keyboardType="phone-pad"
-                maxLength={14}
-                editable={!isLoading}
-                {...a11y.textInput('Phone number input')}
-              />
-            </View>
-
-            <TouchableOpacity
-              style={[styles.button, isLoading && styles.buttonDisabled]}
-              onPress={handleSendOtp}
-              disabled={isLoading}
-              {...a11y.button('Send verification code', undefined, isLoading)}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <Text style={styles.buttonText}>Send Code</Text>
-              )}
-            </TouchableOpacity>
+          <View style={styles.header}>
+            <MaterialCommunityIcons
+              name={step === 'phone' ? 'phone' : 'message-text'}
+              size={64}
+              color={COLORS.primary}
+            />
+            <Text style={styles.title}>
+              {step === 'phone'
+                ? 'Phone Authentication'
+                : 'Enter Verification Code'}
+            </Text>
+            <Text style={styles.subtitle}>
+              {step === 'phone'
+                ? "We'll send you a verification code"
+                : `Code sent to ${phoneNumber}`}
+            </Text>
           </View>
-        ) : (
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Verification Code</Text>
-            <View style={styles.otpContainer}>
-              {otpCode.map((digit, index) => (
+
+          {step === 'phone' ? (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Phone Number</Text>
+              <View style={styles.phoneInputWrapper}>
+                <Text style={styles.countryCode}>+1</Text>
                 <TextInput
-                  key={index}
-                  ref={(ref) => {
-                    otpInputRefs.current[index] = ref;
-                  }}
-                  style={[styles.otpInput, digit && styles.otpInputFilled]}
-                  value={digit}
-                  onChangeText={(value) => handleOtpChange(index, value)}
-                  onKeyPress={({ nativeEvent }) =>
-                    handleOtpKeyPress(index, nativeEvent.key)
+                  style={styles.phoneInput}
+                  value={phoneNumber}
+                  onChangeText={(text) =>
+                    setPhoneNumber(formatPhoneNumber(text))
                   }
-                  keyboardType="number-pad"
-                  maxLength={1}
+                  placeholder="(555) 123-4567"
+                  placeholderTextColor={COLORS.textSecondary}
+                  keyboardType="phone-pad"
+                  maxLength={14}
                   editable={!isLoading}
-                  {...a11y.textInput(`Digit ${index + 1} of verification code`)}
+                  {...a11y.textInput('Phone number input')}
                 />
-              ))}
-            </View>
+              </View>
 
-            <TouchableOpacity
-              style={[styles.button, isLoading && styles.buttonDisabled]}
-              onPress={handleVerifyOtp}
-              disabled={isLoading}
-              {...a11y.button('Verify code', undefined, isLoading)}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <Text style={styles.buttonText}>Verify</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.resendButton}
-              onPress={handleResendOtp}
-              disabled={countdown > 0}
-              {...a11y.button(
-                countdown > 0
-                  ? `Resend code in ${countdown} seconds`
-                  : 'Resend code',
-                undefined,
-                countdown > 0,
-              )}
-            >
-              <Text
-                style={[
-                  styles.resendText,
-                  countdown > 0 && styles.resendTextDisabled,
-                ]}
+              <TouchableOpacity
+                style={[styles.button, isLoading && styles.buttonDisabled]}
+                onPress={handleSendOtp}
+                disabled={isLoading}
+                {...a11y.button('Send verification code', undefined, isLoading)}
               >
-                {countdown > 0 ? `Resend code in ${countdown}s` : 'Resend Code'}
-              </Text>
-            </TouchableOpacity>
+                {isLoading ? (
+                  <ActivityIndicator color="#FFF" />
+                ) : (
+                  <Text style={styles.buttonText}>Send Code</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Verification Code</Text>
+              <View style={styles.otpContainer}>
+                {otpCode.map((digit, index) => (
+                  <TextInput
+                    key={index}
+                    ref={(ref) => {
+                      otpInputRefs.current[index] = ref;
+                    }}
+                    style={[styles.otpInput, digit && styles.otpInputFilled]}
+                    value={digit}
+                    onChangeText={(value) => handleOtpChange(index, value)}
+                    onKeyPress={({ nativeEvent }) =>
+                      handleOtpKeyPress(index, nativeEvent.key)
+                    }
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    editable={!isLoading}
+                    {...a11y.textInput(
+                      `Digit ${index + 1} of verification code`,
+                    )}
+                  />
+                ))}
+              </View>
 
-            <TouchableOpacity
-              style={styles.changePhoneButton}
-              onPress={() => {
-                setStep('phone');
-                setOtpCode(['', '', '', '', '', '']);
-              }}
-              {...a11y.button('Change phone number')}
-            >
-              <Text style={styles.changePhoneText}>Change Phone Number</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+              <TouchableOpacity
+                style={[styles.button, isLoading && styles.buttonDisabled]}
+                onPress={handleVerifyOtp}
+                disabled={isLoading}
+                {...a11y.button('Verify code', undefined, isLoading)}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#FFF" />
+                ) : (
+                  <Text style={styles.buttonText}>Verify</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.resendButton}
+                onPress={handleResendOtp}
+                disabled={countdown > 0}
+                {...a11y.button(
+                  countdown > 0
+                    ? `Resend code in ${countdown} seconds`
+                    : 'Resend code',
+                  undefined,
+                  countdown > 0,
+                )}
+              >
+                <Text
+                  style={[
+                    styles.resendText,
+                    countdown > 0 && styles.resendTextDisabled,
+                  ]}
+                >
+                  {countdown > 0
+                    ? `Resend code in ${countdown}s`
+                    : 'Resend Code'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.changePhoneButton}
+                onPress={() => {
+                  setStep('phone');
+                  setOtpCode(['', '', '', '', '', '']);
+                }}
+                {...a11y.button('Change phone number')}
+              >
+                <Text style={styles.changePhoneText}>Change Phone Number</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

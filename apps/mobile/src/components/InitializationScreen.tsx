@@ -7,17 +7,22 @@
  * - Loading progress with service names
  * - Error states with retry option
  * - Graceful transition to main app
+ * Uses react-native-reanimated for native-thread animations.
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Image,
-  Animated,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withDelay,
+  withRepeat,
+  withSequence,
+  Easing,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants/colors';
@@ -37,36 +42,32 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
   progress,
   onRetry,
 }) => {
-  const logoScale = useRef(new Animated.Value(0.8)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const progressOpacity = useRef(new Animated.Value(0)).current;
+  const logoScale = useSharedValue(0.8);
+  const logoOpacity = useSharedValue(0);
+  const progressOpacity = useSharedValue(0);
   const [showDetails, setShowDetails] = useState(false);
 
   // Animate logo on mount
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(logoOpacity, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.spring(logoScale, {
-        toValue: 1,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    logoOpacity.value = withTiming(1, { duration: 600 });
+    logoScale.value = withSpring(1, { damping: 15, stiffness: 120 });
 
     // Show progress after logo animation
-    setTimeout(() => {
-      Animated.timing(progressOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }, 400);
+    progressOpacity.value = withDelay(400, withTiming(1, { duration: 300 }));
   }, [logoOpacity, logoScale, progressOpacity]);
+
+  const logoContainerStyle = useAnimatedStyle(() => ({
+    opacity: logoOpacity.value,
+    transform: [{ scale: logoScale.value }],
+  }));
+
+  const logoTextStyle = useAnimatedStyle(() => ({
+    opacity: logoOpacity.value,
+  }));
+
+  const progressSectionStyle = useAnimatedStyle(() => ({
+    opacity: progressOpacity.value,
+  }));
 
   const failedServices = Array.from(progress.services.values()).filter(
     (s) => s.status === 'failed',
@@ -89,20 +90,12 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
 
       <View style={styles.content}>
         {/* Logo */}
-        <Animated.View
-          style={[
-            styles.logoContainer,
-            {
-              opacity: logoOpacity,
-              transform: [{ scale: logoScale }],
-            },
-          ]}
-        >
+        <Animated.View style={[styles.logoContainer, logoContainerStyle]}>
           <Image source={appIcon} style={styles.logo} resizeMode="contain" />
         </Animated.View>
 
         {/* App Name */}
-        <Animated.View style={{ opacity: logoOpacity }}>
+        <Animated.View style={logoTextStyle}>
           <Text style={styles.appName}>TravelMatch</Text>
           <Text style={styles.tagline}>
             Connect with locals. Share experiences.
@@ -111,9 +104,7 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
       </View>
 
       {/* Progress Section */}
-      <Animated.View
-        style={[styles.progressSection, { opacity: progressOpacity }]}
-      >
+      <Animated.View style={[styles.progressSection, progressSectionStyle]}>
         {/* Progress Bar */}
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarBackground}>
@@ -187,49 +178,61 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
 
 // Animated loading dots
 const LoadingDots: React.FC = () => {
-  const dot1 = useRef(new Animated.Value(0.3)).current;
-  const dot2 = useRef(new Animated.Value(0.3)).current;
-  const dot3 = useRef(new Animated.Value(0.3)).current;
+  const dot1Opacity = useSharedValue(0.3);
+  const dot2Opacity = useSharedValue(0.3);
+  const dot3Opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    const animate = (dot: Animated.Value, delay: number) => {
-      return Animated.loop(
-        Animated.sequence([
-          Animated.timing(dot, {
-            toValue: 1,
-            duration: 400,
-            delay,
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot, {
-            toValue: 0.3,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-        ]),
-      );
-    };
+    // Staggered dot animations
+    dot1Opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1,
+      false,
+    );
 
-    const animation1 = animate(dot1, 0);
-    const animation2 = animate(dot2, 150);
-    const animation3 = animate(dot3, 300);
+    dot2Opacity.value = withDelay(
+      150,
+      withRepeat(
+        withSequence(
+          withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+        ),
+        -1,
+        false,
+      ),
+    );
 
-    animation1.start();
-    animation2.start();
-    animation3.start();
+    dot3Opacity.value = withDelay(
+      300,
+      withRepeat(
+        withSequence(
+          withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+        ),
+        -1,
+        false,
+      ),
+    );
 
     return () => {
-      animation1.stop();
-      animation2.stop();
-      animation3.stop();
+      cancelAnimation(dot1Opacity);
+      cancelAnimation(dot2Opacity);
+      cancelAnimation(dot3Opacity);
     };
-  }, [dot1, dot2, dot3]);
+  }, [dot1Opacity, dot2Opacity, dot3Opacity]);
+
+  const dot1Style = useAnimatedStyle(() => ({ opacity: dot1Opacity.value }));
+  const dot2Style = useAnimatedStyle(() => ({ opacity: dot2Opacity.value }));
+  const dot3Style = useAnimatedStyle(() => ({ opacity: dot3Opacity.value }));
 
   return (
     <View style={styles.dotsContainer}>
-      <Animated.View style={[styles.dot, { opacity: dot1 }]} />
-      <Animated.View style={[styles.dot, { opacity: dot2 }]} />
-      <Animated.View style={[styles.dot, { opacity: dot3 }]} />
+      <Animated.View style={[styles.dot, dot1Style]} />
+      <Animated.View style={[styles.dot, dot2Style]} />
+      <Animated.View style={[styles.dot, dot3Style]} />
     </View>
   );
 };
