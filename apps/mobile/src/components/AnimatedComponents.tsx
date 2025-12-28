@@ -1,7 +1,17 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import type { ViewStyle } from 'react-native';
-import { Animated, StyleSheet, Pressable, View } from 'react-native';
+import { StyleSheet, Pressable, View, Text } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  withDelay,
+  withSequence,
+  withRepeat,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 
 interface AnimatedButtonProps {
@@ -41,6 +51,11 @@ interface PulseViewProps {
   pulseScale?: number;
 }
 
+const SPRING_CONFIG = {
+  damping: 15,
+  stiffness: 150,
+};
+
 /**
  * Button with scale animation on press
  */
@@ -51,30 +66,29 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   haptic = true,
   children,
 }) => {
-  const scaleValue = useRef(new Animated.Value(1)).current;
+  const scale = useSharedValue(1);
 
-  const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: 0.95,
-      useNativeDriver: true,
-    }).start();
-  };
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
-  const handlePressOut = () => {
-    Animated.spring(scaleValue, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
-  };
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(0.95, SPRING_CONFIG);
+  }, [scale]);
 
-  const handlePress = () => {
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, {
+      damping: 10,
+      stiffness: 100,
+    });
+  }, [scale]);
+
+  const handlePress = useCallback(() => {
     if (haptic) {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     onPress();
-  };
+  }, [haptic, onPress]);
 
   return (
     <Pressable
@@ -84,11 +98,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       disabled={disabled}
     >
       <Animated.View
-        style={[
-          style,
-          { transform: [{ scale: scaleValue }] },
-          disabled && styles.disabled,
-        ]}
+        style={[style, animatedStyle, disabled && styles.disabled]}
       >
         {children}
       </Animated.View>
@@ -105,21 +115,22 @@ export const FadeInView: React.FC<FadeInViewProps> = ({
   duration = 300,
   style,
 }) => {
-  const fadeValue = useRef(new Animated.Value(0)).current;
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    Animated.timing(fadeValue, {
-      toValue: 1,
-      duration,
-      delay,
-      useNativeDriver: true,
-    }).start();
-  }, [fadeValue, delay, duration]);
+    opacity.value = withDelay(delay, withTiming(1, { duration }));
+
+    return () => {
+      cancelAnimation(opacity);
+    };
+  }, [opacity, delay, duration]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   return (
-    <Animated.View style={[style, { opacity: fadeValue }]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>
   );
 };
 
@@ -133,42 +144,37 @@ export const SlideInView: React.FC<SlideInViewProps> = ({
   duration = 300,
   style,
 }) => {
-  const translateValue = useRef(
-    new Animated.Value(getInitialTranslate(direction)),
-  ).current;
-  const opacityValue = useRef(new Animated.Value(0)).current;
+  const initialTranslate = getInitialTranslate(direction);
+  const translateX = useSharedValue(
+    direction === 'left' || direction === 'right' ? initialTranslate : 0,
+  );
+  const translateY = useSharedValue(
+    direction === 'up' || direction === 'down' ? initialTranslate : 0,
+  );
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(translateValue, {
-        toValue: 0,
-        duration,
-        delay,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityValue, {
-        toValue: 1,
-        duration,
-        delay,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [translateValue, opacityValue, delay, duration]);
+    translateX.value = withDelay(delay, withTiming(0, { duration }));
+    translateY.value = withDelay(delay, withTiming(0, { duration }));
+    opacity.value = withDelay(delay, withTiming(1, { duration }));
 
-  const transform = getTransform(direction, translateValue);
+    return () => {
+      cancelAnimation(translateX);
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
+    };
+  }, [translateX, translateY, opacity, delay, duration]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+    ],
+  }));
 
   return (
-    <Animated.View
-      style={[
-        style,
-        {
-          opacity: opacityValue,
-          transform,
-        },
-      ]}
-    >
-      {children}
-    </Animated.View>
+    <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>
   );
 };
 
@@ -179,32 +185,32 @@ export const ScaleOnPress: React.FC<ScaleOnPressProps> = ({
   children,
   onPress,
   style,
-  scale = 0.97,
+  scale: scaleTarget = 0.97,
   haptic = true,
 }) => {
-  const scaleValue = useRef(new Animated.Value(1)).current;
+  const scale = useSharedValue(1);
 
-  const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: scale,
-      useNativeDriver: true,
-    }).start();
-  };
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
-  const handlePressOut = () => {
-    Animated.spring(scaleValue, {
-      toValue: 1,
-      friction: 3,
-      useNativeDriver: true,
-    }).start();
-  };
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(scaleTarget, SPRING_CONFIG);
+  }, [scale, scaleTarget]);
 
-  const handlePress = () => {
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, {
+      damping: 10,
+      stiffness: 100,
+    });
+  }, [scale]);
+
+  const handlePress = useCallback(() => {
     if (haptic) {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     onPress?.();
-  };
+  }, [haptic, onPress]);
 
   return (
     <Pressable
@@ -212,9 +218,7 @@ export const ScaleOnPress: React.FC<ScaleOnPressProps> = ({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
     >
-      <Animated.View style={[style, { transform: [{ scale: scaleValue }] }]}>
-        {children}
-      </Animated.View>
+      <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>
     </Pressable>
   );
 };
@@ -227,31 +231,29 @@ export const PulseView: React.FC<PulseViewProps> = ({
   style,
   pulseScale = 1.1,
 }) => {
-  const scaleValue = useRef(new Animated.Value(1)).current;
+  const scale = useSharedValue(1);
 
   useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: pulseScale,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(pulseScale, { duration: 500 }),
+        withTiming(1, { duration: 500 }),
+      ),
+      -1,
+      false,
     );
-    pulse.start();
-    return () => pulse.stop();
-  }, [scaleValue, pulseScale]);
+
+    return () => {
+      cancelAnimation(scale);
+    };
+  }, [scale, pulseScale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <Animated.View style={[style, { transform: [{ scale: scaleValue }] }]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>
   );
 };
 
@@ -279,39 +281,23 @@ export const StaggeredList: React.FC<{
  * Shake animation for errors
  */
 export const useShakeAnimation = () => {
-  const shakeValue = useRef(new Animated.Value(0)).current;
+  const translateX = useSharedValue(0);
 
-  const shake = () => {
-    Animated.sequence([
-      Animated.timing(shakeValue, {
-        toValue: 10,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeValue, {
-        toValue: -10,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeValue, {
-        toValue: 10,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeValue, {
-        toValue: -10,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeValue, {
-        toValue: 0,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
-  return { shakeValue, shake };
+  const shake = useCallback(() => {
+    translateX.value = withSequence(
+      withTiming(10, { duration: 50 }),
+      withTiming(-10, { duration: 50 }),
+      withTiming(10, { duration: 50 }),
+      withTiming(-10, { duration: 50 }),
+      withTiming(0, { duration: 50 }),
+    );
+  }, [translateX]);
+
+  return { animatedStyle, shake };
 };
 
 /**
@@ -321,51 +307,47 @@ export const SuccessAnimation: React.FC<{
   visible: boolean;
   onComplete?: () => void;
 }> = ({ visible, onComplete }) => {
-  const scaleValue = useRef(new Animated.Value(0)).current;
-  const opacityValue = useRef(new Animated.Value(0)).current;
+  const scale = useSharedValue(0);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
     if (visible) {
-      Animated.parallel([
-        Animated.spring(scaleValue, {
-          toValue: 1,
-          friction: 4,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityValue, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        onComplete?.();
+      scale.value = withSpring(1, {
+        damping: 8,
+        stiffness: 100,
       });
+      opacity.value = withTiming(1, { duration: 200 });
+
+      // Call onComplete after animation duration
+      // Using timeout for compatibility with test mocks
+      if (onComplete) {
+        const timer = setTimeout(onComplete, 300);
+        return () => clearTimeout(timer);
+      }
     } else {
-      scaleValue.setValue(0);
-      opacityValue.setValue(0);
+      scale.value = 0;
+      opacity.value = 0;
     }
-  }, [visible, scaleValue, opacityValue, onComplete]);
+    return undefined;
+  }, [visible, scale, opacity, onComplete]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+  }));
 
   if (!visible) return null;
 
   return (
-    <Animated.View
-      style={[
-        styles.successContainer,
-        {
-          opacity: opacityValue,
-          transform: [{ scale: scaleValue }],
-        },
-      ]}
-    >
+    <Animated.View style={[styles.successContainer, animatedStyle]}>
       <View style={styles.successCircle}>
-        <Animated.Text style={styles.successCheckmark}>✓</Animated.Text>
+        <Text style={styles.successCheckmark}>✓</Text>
       </View>
     </Animated.View>
   );
 };
 
-// Helper functions
+// Helper function
 function getInitialTranslate(direction: string): number {
   switch (direction) {
     case 'up':
@@ -378,19 +360,6 @@ function getInitialTranslate(direction: string): number {
       return -20;
     default:
       return 20;
-  }
-}
-
-function getTransform(direction: string, value: Animated.Value) {
-  switch (direction) {
-    case 'up':
-    case 'down':
-      return [{ translateY: value }];
-    case 'left':
-    case 'right':
-      return [{ translateX: value }];
-    default:
-      return [{ translateY: value }];
   }
 }
 

@@ -3,15 +3,14 @@
  * UI components for error handling and network status
  */
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
@@ -163,20 +162,20 @@ export const OfflineBanner: React.FC<OfflineBannerProps> = ({
   visible,
   onRetry,
 }) => {
-  const [fadeAnim] = React.useState(new Animated.Value(0));
+  const opacity = useSharedValue(0);
 
-  React.useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: visible ? 1 : 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, [visible, fadeAnim]);
+  useEffect(() => {
+    opacity.value = withTiming(visible ? 1 : 0, { duration: 300 });
+  }, [visible, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   if (!visible) return null;
 
   return (
-    <Animated.View style={[styles.offlineBanner, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.offlineBanner, animatedStyle]}>
       <MaterialCommunityIcons name="wifi-off" size={20} color={COLORS.white} />
       <Text style={styles.offlineBannerText}>No Internet Connection</Text>
       {onRetry && (
