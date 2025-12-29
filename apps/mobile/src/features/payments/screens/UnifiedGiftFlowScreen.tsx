@@ -667,42 +667,6 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     marginTop: 2,
   },
-  summary: {
-    padding: SPACING.md,
-    backgroundColor: primitives.stone[50],
-    borderRadius: RADII.md,
-    marginBottom: SPACING.lg,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: SPACING.sm,
-  },
-  summaryLabel: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
-  },
-  summaryValue: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '500',
-    color: COLORS.text.primary,
-  },
-  summaryTotal: {
-    paddingTop: SPACING.sm,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border.default,
-    marginBottom: 0,
-  },
-  totalLabel: {
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-  },
-  totalValue: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.brand.primary,
-  },
   purchaseButton: {
     backgroundColor: COLORS.brand.primary,
     borderRadius: RADII.md,

@@ -7,6 +7,7 @@
  * - 100+ TL: Required (always proof)
  */
 
+/* eslint-disable react-native/no-inline-styles */
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';

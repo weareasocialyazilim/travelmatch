@@ -640,32 +640,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.text.secondary,
   },
-  viewToggle: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.surface.base,
-    borderRadius: 8,
-    padding: 4,
-  },
-  viewToggleButton: {
-    width: 32,
-    height: 28,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  viewToggleButtonActive: {
-    backgroundColor: COLORS.brand.primary,
-  },
 
   // Single List Container
   singleListContainer: {
-    paddingHorizontal: 16,
-  },
-
-  // Grid Container
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     paddingHorizontal: 16,
   },
 
