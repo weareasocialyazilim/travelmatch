@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Admin Sidebar V2
+ * TravelMatch Admin Sidebar
  * "Cinematic Travel + Trust Jewelry" Design
  */
 
@@ -285,5 +285,3 @@ export function Sidebar() {
   );
 }
 
-// Export SidebarV2 as alias for backwards compatibility
-export { Sidebar as SidebarV2 };
