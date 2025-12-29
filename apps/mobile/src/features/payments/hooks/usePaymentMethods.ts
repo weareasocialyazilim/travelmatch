@@ -119,7 +119,7 @@ export const usePaymentMethods = () => {
         onConfirm: () => {
           Linking.openSettings().catch(() => {
             logger.warn('Could not open device settings');
-            showToast('Could not open settings', 'error');
+            showToast('Ayarlar açılamadı. Lütfen elle açın.', 'error');
           });
           logger.info(`Opening device settings for ${walletName} setup`);
         },

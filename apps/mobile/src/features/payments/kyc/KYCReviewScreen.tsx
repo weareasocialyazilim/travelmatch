@@ -52,7 +52,7 @@ const KYCReviewScreen: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       navigation.navigate('KYCPending');
     } catch {
-      showToast('Failed to submit verification. Please try again.', 'error');
+      showToast('Doğrulama gönderilemedi. Lütfen tekrar deneyin.', 'error');
     } finally {
       setLoading(false);
     }
