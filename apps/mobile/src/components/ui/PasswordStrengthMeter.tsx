@@ -5,6 +5,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
+import { useI18n } from '@/context/I18nContext';
 
 interface PasswordStrengthMeterProps {
   password: string;
@@ -13,18 +14,18 @@ interface PasswordStrengthMeterProps {
 
 interface StrengthResult {
   score: number; // 0-4
-  label: string;
+  labelKey: string;
   color: string;
 }
 
 interface Requirement {
-  label: string;
+  labelKey: string;
   met: boolean;
 }
 
 const getPasswordStrength = (password: string): StrengthResult => {
   if (!password) {
-    return { score: 0, label: '', color: COLORS.border.default };
+    return { score: 0, labelKey: '', color: COLORS.border.default };
   }
 
   let score = 0;
@@ -41,29 +42,30 @@ const getPasswordStrength = (password: string): StrengthResult => {
   // Cap at 4
   score = Math.min(score, 4);
 
-  const strengthMap: Record<number, { label: string; color: string }> = {
-    0: { label: 'Çok Zayıf', color: COLORS.feedback.error },
-    1: { label: 'Zayıf', color: '#FF6B6B' },
-    2: { label: 'Orta', color: COLORS.feedback.warning },
-    3: { label: 'Güçlü', color: '#4ECDC4' },
-    4: { label: 'Çok Güçlü', color: COLORS.feedback.success },
+  const strengthMap: Record<number, { labelKey: string; color: string }> = {
+    0: { labelKey: 'passwordStrength.veryWeak', color: COLORS.feedback.error },
+    1: { labelKey: 'passwordStrength.weak', color: '#FF6B6B' },
+    2: { labelKey: 'passwordStrength.fair', color: COLORS.feedback.warning },
+    3: { labelKey: 'passwordStrength.strong', color: '#4ECDC4' },
+    4: { labelKey: 'passwordStrength.veryStrong', color: COLORS.feedback.success },
   };
 
   return { score, ...strengthMap[score] };
 };
 
 const getRequirements = (password: string): Requirement[] => [
-  { label: 'En az 8 karakter', met: password.length >= 8 },
-  { label: 'Büyük harf (A-Z)', met: /[A-Z]/.test(password) },
-  { label: 'Küçük harf (a-z)', met: /[a-z]/.test(password) },
-  { label: 'Rakam (0-9)', met: /\d/.test(password) },
-  { label: 'Özel karakter (!@#$...)', met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) },
+  { labelKey: 'passwordStrength.requirements.minLength', met: password.length >= 8 },
+  { labelKey: 'passwordStrength.requirements.uppercase', met: /[A-Z]/.test(password) },
+  { labelKey: 'passwordStrength.requirements.lowercase', met: /[a-z]/.test(password) },
+  { labelKey: 'passwordStrength.requirements.number', met: /\d/.test(password) },
+  { labelKey: 'passwordStrength.requirements.special', met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) },
 ];
 
 export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
   password,
   showRequirements = true,
 }) => {
+  const { t } = useI18n();
   const strength = useMemo(() => getPasswordStrength(password), [password]);
   const requirements = useMemo(() => getRequirements(password), [password]);
 
@@ -87,9 +89,9 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
         <View style={styles.barBackground}>
           <Animated.View style={[styles.barFill, barWidthStyle, barColorStyle]} />
         </View>
-        {strength.label && (
+        {strength.labelKey && (
           <Text style={[styles.label, { color: strength.color }]}>
-            {strength.label}
+            {t(strength.labelKey)}
           </Text>
         )}
       </View>
@@ -111,7 +113,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
                   req.met && styles.requirementTextMet,
                 ]}
               >
-                {req.label}
+                {t(req.labelKey)}
               </Text>
             </View>
           ))}

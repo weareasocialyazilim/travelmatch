@@ -285,5 +285,46 @@
     "step2Description": "Book moments and chat with hosts",
     "step3Title": "Share Your Story",
     "step3Description": "Create your own moments and earn money"
+  },
+  "welcome": {
+    "title": "Welcome to TravelMatch",
+    "subtitle": "Connect with locals. Share experiences.\nMake every trip meaningful.",
+    "continueWithApple": "Continue with Apple",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithFacebook": "Continue with Facebook",
+    "or": "or",
+    "createAccount": "Create Account",
+    "login": "Login",
+    "termsPrefix": "By continuing, you agree to our",
+    "terms": "Terms",
+    "and": "&",
+    "privacy": "Privacy"
+  },
+  "passwordStrength": {
+    "veryWeak": "Very Weak",
+    "weak": "Weak",
+    "fair": "Fair",
+    "strong": "Strong",
+    "veryStrong": "Very Strong",
+    "requirements": {
+      "minLength": "At least 8 characters",
+      "uppercase": "Uppercase letter (A-Z)",
+      "lowercase": "Lowercase letter (a-z)",
+      "number": "Number (0-9)",
+      "special": "Special character (!@#$...)"
+    }
+  },
+  "camera": {
+    "takePhoto": "Take Photo",
+    "chooseFromGallery": "Choose from Gallery",
+    "permissionRequired": "Camera permission is required",
+    "galleryPermissionRequired": "Gallery permission is required"
+  },
+  "keyboard": {
+    "done": "Done",
+    "next": "Next",
+    "search": "Search",
+    "send": "Send",
+    "go": "Go"
   }
 }

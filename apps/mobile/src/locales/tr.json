@@ -285,5 +285,46 @@
     "step2Description": "Anları rezerve edin ve ev sahipleriyle sohbet edin",
     "step3Title": "Hikayenizi Paylaşın",
     "step3Description": "Kendi anlarınızı oluşturun ve para kazanın"
+  },
+  "welcome": {
+    "title": "TravelMatch'e Hoş Geldiniz",
+    "subtitle": "Yerel halkla tanışın. Deneyimlerinizi paylaşın.\nHer seyahati anlamlı kılın.",
+    "continueWithApple": "Apple ile devam et",
+    "continueWithGoogle": "Google ile devam et",
+    "continueWithFacebook": "Facebook ile devam et",
+    "or": "veya",
+    "createAccount": "Hesap Oluştur",
+    "login": "Giriş Yap",
+    "termsPrefix": "Devam ederek,",
+    "terms": "Kullanım Şartları",
+    "and": "ve",
+    "privacy": "Gizlilik Politikası'nı kabul etmiş olursunuz"
+  },
+  "passwordStrength": {
+    "veryWeak": "Çok Zayıf",
+    "weak": "Zayıf",
+    "fair": "Orta",
+    "strong": "Güçlü",
+    "veryStrong": "Çok Güçlü",
+    "requirements": {
+      "minLength": "En az 8 karakter",
+      "uppercase": "Büyük harf (A-Z)",
+      "lowercase": "Küçük harf (a-z)",
+      "number": "Rakam (0-9)",
+      "special": "Özel karakter (!@#$...)"
+    }
+  },
+  "camera": {
+    "takePhoto": "Fotoğraf Çek",
+    "chooseFromGallery": "Galeriden Seç",
+    "permissionRequired": "Kamera izni gerekli",
+    "galleryPermissionRequired": "Galeri izni gerekli"
+  },
+  "keyboard": {
+    "done": "Tamam",
+    "next": "İleri",
+    "search": "Ara",
+    "send": "Gönder",
+    "go": "Git"
   }
 }
