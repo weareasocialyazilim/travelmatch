@@ -18,7 +18,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/constants/typography';
+import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SIZES, SPACING } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
 
@@ -97,36 +97,36 @@ export const TMPill: React.FC<TMPillProps> = ({
   const iconSize = size === 'lg' ? 18 : size === 'md' ? 16 : 14;
 
   const getBackgroundColor = (): string => {
-    if (disabled) return COLORS.surface.baseMuted;
+    if (disabled) return COLORS.surfaceMuted;
     switch (effectiveVariant) {
       case 'selected':
-        return COLORS.brand.primary;
+        return COLORS.primary;
       case 'outlined':
         return 'transparent';
       case 'muted':
-        return COLORS.surface.baseMuted;
+        return COLORS.surfaceMuted;
       default:
-        return COLORS.surface.baseSubtle;
+        return COLORS.surfaceSubtle;
     }
   };
 
   const getTextColor = (): string => {
-    if (disabled) return COLORS.text.primaryDisabled;
+    if (disabled) return COLORS.textDisabled;
     switch (effectiveVariant) {
       case 'selected':
-        return COLORS.utility.white;
+        return COLORS.white;
       case 'outlined':
-        return COLORS.text.primary;
+        return COLORS.text;
       case 'muted':
-        return COLORS.text.secondary;
+        return COLORS.textSecondary;
       default:
-        return COLORS.text.primary;
+        return COLORS.text;
     }
   };
 
   const getBorderColor = (): string => {
     if (effectiveVariant === 'outlined') {
-      return disabled ? COLORS.border.light : COLORS.border.default;
+      return disabled ? COLORS.borderLight : COLORS.border;
     }
     return 'transparent';
   };
@@ -143,7 +143,11 @@ export const TMPill: React.FC<TMPillProps> = ({
         />
       )}
       <Text
-        style={[styles.text, textSizeStyles[size], { color: getTextColor() }]}
+        style={[
+          styles.text,
+          textSizeStyles[size],
+          { color: getTextColor() },
+        ]}
         numberOfLines={1}
       >
         {children}
@@ -171,12 +175,11 @@ export const TMPill: React.FC<TMPillProps> = ({
         style={[
           styles.pill,
           sizeStyles[size],
-          styles.pillDynamic,
           {
             backgroundColor: getBackgroundColor(),
             borderColor: getBorderColor(),
+            borderWidth: effectiveVariant === 'outlined' ? 1 : 0,
           },
-          effectiveVariant === 'outlined' && styles.outlined,
           disabled && styles.disabled,
           style,
         ]}
@@ -198,12 +201,11 @@ export const TMPill: React.FC<TMPillProps> = ({
       style={[
         styles.pill,
         sizeStyles[size],
-        styles.pillDynamic,
         {
           backgroundColor: getBackgroundColor(),
           borderColor: getBorderColor(),
+          borderWidth: effectiveVariant === 'outlined' ? 1 : 0,
         },
-        effectiveVariant === 'outlined' && styles.outlined,
         disabled && styles.disabled,
         animatedStyle,
         style,
@@ -230,7 +232,12 @@ export const TMCategoryChip: React.FC<TMCategoryChipProps> = ({
   onPress,
   testID,
 }) => (
-  <TMPill emoji={emoji} selected={selected} onPress={onPress} testID={testID}>
+  <TMPill
+    emoji={emoji}
+    selected={selected}
+    onPress={onPress}
+    testID={testID}
+  >
     {category}
   </TMPill>
 );
@@ -242,12 +249,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: RADIUS.chip,
     gap: SPACING.xs,
-  },
-  pillDynamic: {
-    borderWidth: 0,
-  },
-  outlined: {
-    borderWidth: 1,
   },
   text: {
     textAlign: 'center',

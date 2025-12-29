@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/constants/typography';
+import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SIZES, SPACING } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
 
@@ -99,31 +99,31 @@ export const TMButton: React.FC<TMButtonProps> = ({
   const iconSize = size === 'xl' ? 24 : size === 'lg' ? 22 : size === 'md' ? 20 : size === 'sm' ? 18 : 16;
 
   const getTextColor = (): string => {
-    if (disabled) return COLORS.text.primaryDisabled;
+    if (disabled) return COLORS.textDisabled;
     switch (variant) {
       case 'primary':
-        return COLORS.utility.white;
+        return COLORS.white;
       case 'secondary':
-        return COLORS.brand.primary;
+        return COLORS.primary;
       case 'outline':
-        return COLORS.brand.primary;
+        return COLORS.primary;
       case 'ghost':
-        return COLORS.brand.primary;
+        return COLORS.primary;
       case 'danger':
-        return COLORS.utility.white;
+        return COLORS.white;
       default:
-        return COLORS.utility.white;
+        return COLORS.white;
     }
   };
 
   const getIconColor = (): string => {
-    if (disabled) return COLORS.text.primaryDisabled;
+    if (disabled) return COLORS.textDisabled;
     switch (variant) {
       case 'primary':
       case 'danger':
-        return COLORS.utility.white;
+        return COLORS.white;
       default:
-        return COLORS.brand.primary;
+        return COLORS.primary;
     }
   };
 
@@ -131,7 +131,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
     <>
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' || variant === 'danger' ? '#FFF' : COLORS.brand.primary}
+          color={variant === 'primary' || variant === 'danger' ? '#FFF' : COLORS.primary}
           size="small"
         />
       ) : (
@@ -289,13 +289,13 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: COLORS.brand.primary,
+    borderColor: COLORS.primary,
   },
   ghost: {
     backgroundColor: 'transparent',
   },
   danger: {
-    backgroundColor: COLORS.feedback.error,
+    backgroundColor: COLORS.error,
   },
   disabled: {
     opacity: 0.5,
