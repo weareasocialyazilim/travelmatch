@@ -1,40 +1,110 @@
-// constants/spacing.ts
-// TravelMatch Design System - "8pt Premium Grid"
-// Motto: "Give a moment. See it happen."
+/**
+ * TravelMatch Ultimate Design System 2026 - "8pt Premium Grid"
+ * Motto: "Give a moment. See it happen."
+ *
+ * Based on 8pt grid system for consistent visual rhythm
+ * All values are multiples of 4 for sub-grid alignment
+ *
+ * Usage:
+ * - Use SPACING for semantic spacing (recommended)
+ * - Use spacing for numeric scale (0-16)
+ */
 
 import { Dimensions, Platform, StatusBar } from 'react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // ═══════════════════════════════════════════════════════════════════
-// SPACING - 8pt grid system
+// Numeric Scale (8pt grid)
+// ═══════════════════════════════════════════════════════════════════
+export const spacing = {
+  0: 0,
+  1: 4, // xs
+  2: 8, // sm
+  3: 12, // md (8 + 4)
+  4: 16, // lg
+  5: 20, // (16 + 4)
+  6: 24, // xl
+  8: 32, // 2xl
+  10: 40, // 3xl
+  12: 48, // 4xl
+  16: 64, // 5xl
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════
+// Semantic Spacing
 // ═══════════════════════════════════════════════════════════════════
 export const SPACING = {
   // Base scale (multiples of 4)
   none: 0,
   xxs: 2,
-  xs: 4,
-  sm: 8,
-  md: 12,
-  base: 16,
-  lg: 20,
-  xl: 24,
-  '2xl': 32,
-  '3xl': 40,
-  '4xl': 48,
-  '5xl': 64,
+  xs: spacing[1], // 4
+  sm: spacing[2], // 8
+  md: spacing[3], // 12
+  base: spacing[4], // 16
+  lg: spacing[5], // 20
+  xl: spacing[6], // 24
+  '2xl': spacing[8], // 32
+  '3xl': spacing[10], // 40
+  '4xl': spacing[12], // 48
+  '5xl': spacing[16], // 64
   '6xl': 80,
   '7xl': 96,
+
+  // Legacy alias for backwards compatibility
+  xxl: spacing[12], // 48
 
   // Semantic spacing (Award standard)
   screenPadding: 20, // Dış boşluklar: 20-24
   screenPaddingLarge: 24,
   cardPadding: 16, // Kart içi: 14-16
   cardPaddingSmall: 12,
+  cardPaddingLarge: 24,
   sectionGap: 24, // Bölümler arası
   itemGap: 12, // Liste item arası
   inlineGap: 8, // İç içe elemanlar
   componentGap: 16, // Component arası
+
+  // Interactive element sizes
+  buttonHeight: 56,
+  buttonHeightSmall: 44,
+  buttonHeightLarge: 64,
+  inputHeight: 52,
+  inputHeightSmall: 44,
+
+  // Avatar sizes
+  avatarXs: 24,
+  avatarSm: 32,
+  avatarMd: 40,
+  avatarLg: 56,
+  avatarXl: 80,
+  avatarSmall: 40, // Legacy alias
+  avatarMedium: 56, // Legacy alias
+  avatarLarge: 80, // Legacy alias
+
+  // Icon sizes
+  iconXs: 16,
+  iconSm: 20,
+  iconMd: 24,
+  iconLg: 32,
+  iconXl: 40,
+
+  // Border radius
+  radiusXs: 4,
+  radiusSm: 8,
+  radiusMd: 12,
+  radiusLg: 16,
+  radiusXl: 24,
+  radiusFull: 9999,
+
+  // Bottom sheet/modal
+  bottomSheetRadius: 28,
+  modalRadius: 24,
+
+  // Navigation
+  bottomNavHeight: 84,
+  headerHeight: 56,
+  tabBarHeight: 48,
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -224,21 +294,6 @@ export const HIT_SLOP = {
 
 // Type exports for TypeScript
 export type SpacingKey = keyof typeof SPACING;
+export type SpacingValue = (typeof SPACING)[SpacingKey];
 export type RadiusKey = keyof typeof RADIUS;
 export type SizeKey = keyof typeof SIZES;
-
-// ═══════════════════════════════════════════════════════════════════
-// BACKWARD COMPATIBILITY ALIASES
-// ═══════════════════════════════════════════════════════════════════
-export const spacing = SPACING;
-export const radii = RADIUS;
-
-export const BORDER = {
-  none: 0,
-  thin: 1,
-  medium: 2,
-  thick: 3,
-  hairline: 0.5,
-} as const;
-
-export type BorderKey = keyof typeof BORDER;

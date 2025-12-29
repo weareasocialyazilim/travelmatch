@@ -21,7 +21,7 @@ import Svg, {
 } from 'react-native-svg';
 import { COLORS, SHADOWS } from '@/constants/colors';
 import { SIZES, SPACING } from '@/constants/spacing';
-import { TYPOGRAPHY } from '@/constants/typography';
+import { TYPOGRAPHY } from '@/theme/typography';
 
 type TrustLevel = 'platinum' | 'gold' | 'silver' | 'bronze';
 type RingSize = 'xs' | 'sm' | 'md' | 'lg' | 'hero';
@@ -153,7 +153,7 @@ export const TMTrustRing: React.FC<TMTrustRingProps> = ({
             cx={config.container / 2}
             cy={config.container / 2}
             r={radius}
-            stroke={COLORS.border.default}
+            stroke={COLORS.border}
             strokeWidth={config.stroke}
             fill="transparent"
           />
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   avatarContainer: {
-    backgroundColor: COLORS.surface.base,
+    backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -4,
     right: -4,
-    backgroundColor: COLORS.trust.primary,
+    backgroundColor: COLORS.trust,
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     ...TYPOGRAPHY.score,
-    color: COLORS.utility.white,
+    color: COLORS.white,
   },
   scoreTextSmall: {
     fontSize: 10,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...TYPOGRAPHY.captionMedium,
-    color: COLORS.text.secondary,
+    color: COLORS.textSecondary,
     marginTop: SPACING.xs,
   },
   labelSmall: {
