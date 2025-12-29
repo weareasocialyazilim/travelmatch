@@ -175,7 +175,7 @@ export const paymentsApi = {
         type: string;
         amount: number;
         currency: string | null;
-        status: string;
+        status: string | null;
         created_at: string | null;
         description: string | null;
         metadata: unknown;
@@ -186,7 +186,7 @@ export const paymentsApi = {
         type: tx.type as TransactionRecord['type'],
         amount: tx.amount,
         currency: tx.currency ?? '',
-        status: tx.status as TransactionRecord['status'],
+        status: (tx.status ?? 'pending') as TransactionRecord['status'],
         createdAt: tx.created_at ?? '',
         description: tx.description ?? undefined,
         metadata: toRecord(tx.metadata),
