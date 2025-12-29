@@ -145,7 +145,7 @@
   @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
 }
 
-/* Admin Sidebar V2 - Cinematic Travel + Trust Jewelry Design */
+/* Admin Sidebar - Cinematic Travel + Trust Jewelry Design */
 .admin-sidebar {
   @apply flex h-screen flex-col border-r bg-card transition-all duration-300;
 }
