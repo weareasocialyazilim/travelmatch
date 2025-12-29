@@ -15,7 +15,6 @@ async function getSentry(): Promise<SentryType | null> {
     return null;
   }
 }
-<<<<<<< Updated upstream
 
 /**
  * PII patterns to sanitize from analytics data
@@ -106,8 +105,6 @@ function sanitizeProperties(
 
   return sanitized;
 }
-=======
->>>>>>> Stashed changes
 
 /**
  * Analytics Service
@@ -177,11 +174,7 @@ class AnalyticsService {
       logger.info('[Analytics] PostHog initialized successfully');
     } catch (error) {
       logger.warn(
-<<<<<<< Updated upstream
         '[Analytics] PostHog initialization failed, analytics disabled:',
-=======
-        '[Analytics] PostHog initialization failed or timed out, analytics disabled:',
->>>>>>> Stashed changes
         error,
       );
       // Don't throw - analytics failure shouldn't block app startup
@@ -204,12 +197,9 @@ class AnalyticsService {
       // Sanitize properties to remove PII before sending
       const sanitizedProps = sanitizeProperties(properties);
 
-<<<<<<< Updated upstream
       // Send to PostHog
       this.posthog?.capture(eventName, sanitizedProps);
 
-=======
->>>>>>> Stashed changes
       // Add Sentry breadcrumb for debugging (async, non-blocking)
       const sentry = await getSentry();
       sentry?.addBreadcrumb({
@@ -241,11 +231,8 @@ class AnalyticsService {
       // Sanitize properties to remove PII
       const sanitizedProps = sanitizeProperties(properties);
 
-<<<<<<< Updated upstream
       this.posthog?.screen(screenName, sanitizedProps);
 
-=======
->>>>>>> Stashed changes
       const sentry = await getSentry();
       sentry?.addBreadcrumb({
         category: 'navigation',
