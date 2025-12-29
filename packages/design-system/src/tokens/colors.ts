@@ -1,102 +1,68 @@
 /**
- * Design Tokens - Colors
- * TravelMatch "Liquid Warmth" Design System
+ * TravelMatch Ultimate Design System - Colors
  *
- * Design Philosophy:
- * - Gift-giving = warmth, emotion, connection
- * - Travel = discovery, adventure, freedom
- * - Trust = reliability, transparency
+ * "Cinematic Travel + Trust Jewelry"
+ * Palette A: Sunset Proof
+ *
+ * Usage:
+ * - Primary (Amber): Actions - Gift, Create, Continue
+ * - Secondary (Magenta): Emotion - Reactions, Highlights, Proof
+ * - Accent (Seafoam): Discovery - Map, Location, Filters
+ * - Trust (Emerald): Reliability - Scores, Verification
  */
 
-// ============================================
-// PRIMITIVE PALETTE
-// ============================================
-export const primitives = {
-  // Primary: Warm Orange (Gift warmth)
-  orange: {
-    50: '#FFF7ED',
-    100: '#FFEDD5',
-    200: '#FED7AA',
-    300: '#FDBA74',
-    400: '#FB923C',
-    500: '#F97316', // Main
-    600: '#EA580C',
-    700: '#C2410C',
-    800: '#9A3412',
-    900: '#7C2D12',
+// ═══════════════════════════════════════════════════
+// PRIMITIVES
+// ═══════════════════════════════════════════════════
+const primitives = {
+  amber: {
+    50: '#FFFBEB',
+    100: '#FEF3C7',
+    200: '#FDE68A',
+    300: '#FCD34D',
+    400: '#FBBF24',
+    500: '#F59E0B',
+    600: '#D97706',
+    700: '#B45309',
+    800: '#92400E',
+    900: '#78350F',
   },
-
-  // Secondary: Rose (Emotional connection)
-  rose: {
-    50: '#FFF1F2',
-    100: '#FFE4E6',
-    200: '#FECDD3',
-    300: '#FDA4AF',
-    400: '#FB7185',
-    500: '#F43F5E', // Main
-    600: '#E11D48',
-    700: '#BE123C',
-    800: '#9F1239',
-    900: '#881337',
+  magenta: {
+    50: '#FDF2F8',
+    100: '#FCE7F3',
+    200: '#FBCFE8',
+    300: '#F9A8D4',
+    400: '#F472B6',
+    500: '#EC4899',
+    600: '#DB2777',
+    700: '#BE185D',
+    800: '#9D174D',
+    900: '#831843',
   },
-
-  // Accent: Aurora Violet (Premium feel)
-  violet: {
-    50: '#FAF5FF',
-    100: '#F3E8FF',
-    200: '#E9D5FF',
-    300: '#D8B4FE',
-    400: '#C084FC',
-    500: '#A855F7', // Main
-    600: '#9333EA',
-    700: '#7C3AED',
-    800: '#6B21A8',
-    900: '#581C87',
+  seafoam: {
+    50: '#F0FDFA',
+    100: '#CCFBF1',
+    200: '#99F6E4',
+    300: '#5EEAD4',
+    400: '#2DD4BF',
+    500: '#14B8A6',
+    600: '#0D9488',
+    700: '#0F766E',
+    800: '#115E59',
+    900: '#134E4A',
   },
-
-  // Trust: Emerald (Reliability)
   emerald: {
     50: '#ECFDF5',
     100: '#D1FAE5',
     200: '#A7F3D0',
     300: '#6EE7B7',
     400: '#34D399',
-    500: '#10B981', // Main
+    500: '#10B981',
     600: '#059669',
     700: '#047857',
     800: '#065F46',
     900: '#064E3B',
   },
-
-  // Info: Sky Blue
-  sky: {
-    50: '#F0F9FF',
-    100: '#E0F2FE',
-    200: '#BAE6FD',
-    300: '#7DD3FC',
-    400: '#38BDF8',
-    500: '#0EA5E9', // Main
-    600: '#0284C7',
-    700: '#0369A1',
-    800: '#075985',
-    900: '#0C4A6E',
-  },
-
-  // Error: Red
-  red: {
-    50: '#FEF2F2',
-    100: '#FEE2E2',
-    200: '#FECACA',
-    300: '#FCA5A5',
-    400: '#F87171',
-    500: '#EF4444', // Main
-    600: '#DC2626',
-    700: '#B91C1C',
-    800: '#991B1B',
-    900: '#7F1D1D',
-  },
-
-  // Neutral: Warm Stone
   stone: {
     0: '#FFFFFF',
     50: '#FAFAF9',
@@ -111,177 +77,256 @@ export const primitives = {
     900: '#1C1917',
     950: '#0C0A09',
   },
+  red: {
+    50: '#FEF2F2',
+    100: '#FEE2E2',
+    500: '#EF4444',
+    600: '#DC2626',
+  },
+  blue: {
+    50: '#EFF6FF',
+    500: '#3B82F6',
+    600: '#2563EB',
+  },
 } as const;
 
-// ============================================
+// ═══════════════════════════════════════════════════
 // SEMANTIC COLORS
-// ============================================
-export const colors = {
-  // Primary Colors (Orange)
-  primary: {
-    50: primitives.orange[50],
-    100: primitives.orange[100],
-    200: primitives.orange[200],
-    300: primitives.orange[300],
-    400: primitives.orange[400],
-    500: primitives.orange[500], // Main primary
-    600: primitives.orange[600],
-    700: primitives.orange[700],
-    800: primitives.orange[800],
-    900: primitives.orange[900],
-  },
+// ═══════════════════════════════════════════════════
+export const COLORS = {
+  // Primary (Actions)
+  primary: primitives.amber[500],
+  primaryLight: primitives.amber[400],
+  primaryDark: primitives.amber[600],
+  primaryMuted: 'rgba(245, 158, 11, 0.12)',
+  primarySurface: primitives.amber[50],
 
-  // Secondary Colors (Rose)
-  secondary: {
-    50: primitives.rose[50],
-    100: primitives.rose[100],
-    200: primitives.rose[200],
-    300: primitives.rose[300],
-    400: primitives.rose[400],
-    500: primitives.rose[500], // Main secondary
-    600: primitives.rose[600],
-    700: primitives.rose[700],
-    800: primitives.rose[800],
-    900: primitives.rose[900],
-  },
+  // Secondary (Emotion)
+  secondary: primitives.magenta[500],
+  secondaryLight: primitives.magenta[400],
+  secondaryDark: primitives.magenta[600],
+  secondaryMuted: 'rgba(236, 72, 153, 0.12)',
+  secondarySurface: primitives.magenta[50],
 
-  // Accent Colors (Violet)
-  accent: {
-    50: primitives.violet[50],
-    100: primitives.violet[100],
-    200: primitives.violet[200],
-    300: primitives.violet[300],
-    400: primitives.violet[400],
-    500: primitives.violet[500], // Main accent
-    600: primitives.violet[600],
-    700: primitives.violet[700],
-    800: primitives.violet[800],
-    900: primitives.violet[900],
-  },
+  // Accent (Discovery)
+  accent: primitives.seafoam[500],
+  accentLight: primitives.seafoam[400],
+  accentDark: primitives.seafoam[600],
+  accentMuted: 'rgba(20, 184, 166, 0.12)',
+  accentSurface: primitives.seafoam[50],
 
-  // Semantic Colors
-  success: {
-    50: primitives.emerald[50],
-    100: primitives.emerald[100],
-    200: primitives.emerald[200],
-    300: primitives.emerald[300],
-    400: primitives.emerald[400],
-    500: primitives.emerald[500], // Main success
-    600: primitives.emerald[600],
-    700: primitives.emerald[700],
-    800: primitives.emerald[800],
-    900: primitives.emerald[900],
-  },
+  // Trust (Reliability)
+  trust: primitives.emerald[500],
+  trustLight: primitives.emerald[400],
+  trustDark: primitives.emerald[600],
+  trustMuted: 'rgba(16, 185, 129, 0.15)',
+  trustSurface: primitives.emerald[50],
 
-  warning: {
-    50: primitives.orange[50],
-    100: primitives.orange[100],
-    200: primitives.orange[200],
-    300: primitives.orange[300],
-    400: primitives.orange[400],
-    500: primitives.orange[500], // Main warning
-    600: primitives.orange[600],
-    700: primitives.orange[700],
-    800: primitives.orange[800],
-    900: primitives.orange[900],
-  },
+  // Trust Levels (Jewelry Tiers)
+  trustPlatinum: '#E5E4E2',
+  trustGold: '#FFD700',
+  trustSilver: '#C0C0C0',
+  trustBronze: '#CD7F32',
 
-  error: {
-    50: primitives.red[50],
-    100: primitives.red[100],
-    200: primitives.red[200],
-    300: primitives.red[300],
-    400: primitives.red[400],
-    500: primitives.red[500], // Main error
-    600: primitives.red[600],
-    700: primitives.red[700],
-    800: primitives.red[800],
-    900: primitives.red[900],
-  },
+  // Background
+  background: '#FFFCF8',
+  backgroundSecondary: '#FFF9F2',
+  backgroundTertiary: '#FFF5E8',
+  backgroundDark: '#0C0A09',
+  backgroundDarkSecondary: '#1C1917',
+  backgroundDarkTertiary: '#292524',
 
-  info: {
-    50: primitives.sky[50],
-    100: primitives.sky[100],
-    200: primitives.sky[200],
-    300: primitives.sky[300],
-    400: primitives.sky[400],
-    500: primitives.sky[500], // Main info
-    600: primitives.sky[600],
-    700: primitives.sky[700],
-    800: primitives.sky[800],
-    900: primitives.sky[900],
-  },
+  // Surface
+  surface: '#FFFFFF',
+  surfaceMuted: primitives.stone[50],
+  surfaceSubtle: primitives.stone[100],
 
-  // Neutral Colors (Warm Stone)
-  neutral: {
-    0: primitives.stone[0],
-    50: primitives.stone[50],
-    100: primitives.stone[100],
-    200: primitives.stone[200],
-    300: primitives.stone[300],
-    400: primitives.stone[400],
-    500: primitives.stone[500],
-    600: primitives.stone[600],
-    700: primitives.stone[700],
-    800: primitives.stone[800],
-    900: primitives.stone[900],
-    950: primitives.stone[950],
-  },
+  // Glass
+  glass: 'rgba(255, 252, 248, 0.78)',
+  glassBorder: 'rgba(255, 255, 255, 0.2)',
+  glassLight: 'rgba(255, 255, 255, 0.92)',
+  glassDark: 'rgba(28, 25, 23, 0.88)',
+  glassDarkBorder: 'rgba(255, 255, 255, 0.08)',
 
-  // Background Colors
-  background: {
-    primary: '#FFFCF7', // Warm cream
-    secondary: '#FFF9F0', // Slightly warmer
-    tertiary: '#FFF5E6', // Warm tint
-    elevated: '#FFFFFF', // Pure white for cards
-    dark: primitives.stone[950],
-    darkSecondary: primitives.stone[900],
-  },
+  // Text
+  text: primitives.stone[900],
+  textSecondary: primitives.stone[500],
+  textTertiary: primitives.stone[400],
+  textMuted: primitives.stone[400],
+  textDisabled: primitives.stone[300],
+  textInverse: '#FFFFFF',
+  textOnDark: '#FFFFFF',
+  textOnDarkSecondary: 'rgba(255, 255, 255, 0.72)',
+  textOnDarkMuted: 'rgba(255, 255, 255, 0.48)',
 
-  // Text Colors
-  text: {
-    primary: primitives.stone[900],
-    secondary: primitives.stone[500],
-    tertiary: primitives.stone[400],
-    disabled: primitives.stone[300],
-    inverse: '#FFFFFF',
-  },
+  // Border
+  border: primitives.stone[200],
+  borderLight: primitives.stone[100],
+  borderStrong: primitives.stone[300],
+  borderFocus: primitives.amber[500],
+  hairline: 'rgba(0, 0, 0, 0.1)',
+  hairlineLight: 'rgba(255, 255, 255, 0.1)',
 
-  // Border Colors
-  border: {
-    light: primitives.stone[100],
-    medium: primitives.stone[200],
-    dark: primitives.stone[300],
-  },
+  // Feedback
+  success: primitives.emerald[500],
+  successLight: primitives.emerald[50],
+  error: primitives.red[500],
+  errorLight: primitives.red[50],
+  warning: primitives.amber[500],
+  warningLight: primitives.amber[50],
+  info: primitives.blue[500],
+  infoLight: primitives.blue[50],
 
-  // Overlay Colors
-  overlay: {
-    light: 'rgba(0, 0, 0, 0.04)',
-    medium: 'rgba(0, 0, 0, 0.3)',
-    dark: 'rgba(0, 0, 0, 0.6)',
-    backdrop: 'rgba(0, 0, 0, 0.4)',
-  },
+  // Overlay
+  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlayLight: 'rgba(0, 0, 0, 0.3)',
+  overlayDark: 'rgba(0, 0, 0, 0.7)',
+  backdrop: 'rgba(0, 0, 0, 0.4)',
 
-  // Trust Colors
-  trust: {
-    primary: primitives.emerald[500],
-    light: primitives.emerald[400],
-    dark: primitives.emerald[600],
-    platinum: '#E5E4E2',
-    gold: '#FFD700',
-    silver: '#C0C0C0',
-    bronze: '#CD7F32',
-  },
+  // Social
+  apple: '#000000',
+  google: '#4285F4',
 
-  // Social Colors
-  social: {
-    apple: '#000000',
-    google: '#4285F4',
-    facebook: '#1877F2',
-    twitter: '#1DA1F2',
-    instagram: '#E4405F',
-    whatsapp: '#25D366',
+  // Utility
+  white: '#FFFFFF',
+  black: '#000000',
+  transparent: 'transparent',
+
+  // Card (alias)
+  card: '#FFFFFF',
+  cardBackground: '#FFFFFF',
+  inputBackground: primitives.stone[50],
+} as const;
+
+// ═══════════════════════════════════════════════════
+// GRADIENTS
+// ═══════════════════════════════════════════════════
+export const GRADIENTS = {
+  // Hero/Splash
+  hero: [primitives.amber[500], primitives.magenta[500]] as const,
+  heroVertical: ['#F59E0B', '#EC4899', '#0C0A09'] as const,
+
+  // Gift CTA
+  gift: [primitives.amber[500], primitives.magenta[500]] as const,
+  giftSoft: [primitives.amber[400], primitives.magenta[400]] as const,
+  giftButton: [primitives.amber[500], primitives.magenta[500]] as const,
+
+  // Trust
+  trust: [primitives.emerald[400], primitives.emerald[600]] as const,
+  trustShimmer: ['#34D399', '#10B981', '#34D399'] as const,
+
+  // Discovery
+  discover: [primitives.seafoam[400], primitives.seafoam[600]] as const,
+
+  // Sunset (Onboarding)
+  sunset: ['#FCD34D', '#F59E0B', '#EC4899'] as const,
+  sunsetSoft: ['rgba(252, 211, 77, 0.3)', 'rgba(236, 72, 153, 0.2)'] as const,
+  aurora: [primitives.magenta[500], primitives.amber[500]] as const,
+  celebration: [primitives.magenta[500], primitives.amber[400]] as const,
+
+  // Card Overlays
+  cardOverlay: [
+    'transparent',
+    'rgba(0, 0, 0, 0.4)',
+    'rgba(0, 0, 0, 0.75)',
+  ] as const,
+  cardOverlayLight: [
+    'transparent',
+    'rgba(0, 0, 0, 0.2)',
+    'rgba(0, 0, 0, 0.5)',
+  ] as const,
+
+  // Glass
+  glassLight: ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.7)'] as const,
+  glassDark: ['rgba(28, 25, 23, 0.9)', 'rgba(28, 25, 23, 0.7)'] as const,
+
+  // Map
+  mapPeek: ['rgba(255, 252, 248, 0)', 'rgba(255, 252, 248, 1)'] as const,
+
+  // Disabled
+  disabled: [primitives.stone[300], primitives.stone[400]] as const,
+} as const;
+
+// ═══════════════════════════════════════════════════
+// SHADOWS
+// ═══════════════════════════════════════════════════
+export const SHADOWS = {
+  card: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  cardHover: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  button: {
+    shadowColor: primitives.amber[500],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  buttonPressed: {
+    shadowColor: primitives.amber[500],
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  trustGlow: {
+    shadowColor: primitives.emerald[500],
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  elevated: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  subtle: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  // Legacy compatibility
+  sm: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  md: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 8,
   },
 } as const;
 
-export type Colors = typeof colors;
+export { primitives };
+
+// Type exports
+export type ColorName = keyof typeof COLORS;
+export type GradientName = keyof typeof GRADIENTS;
+export type ShadowName = keyof typeof SHADOWS;

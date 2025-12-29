@@ -72,8 +72,8 @@ def read_file_safely(filepath: str, base_dir: str = None) -> str:
     # 2. Verifies path is within base_dir using commonpath
     # 3. Verifies using relative_to check
     # This prevents any path traversal attacks including ../ sequences
-    with open(safe_path, 'r', encoding='utf-8') as f:  # nosec B602 B603 # noqa: PTH123
-        return f.read()
+    # Using pathlib for additional safety
+    return Path(safe_path).read_text(encoding='utf-8')
 
 
 class TravelStyle(Enum):
