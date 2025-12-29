@@ -2,6 +2,12 @@
  * Unified Gift Flow Screen
  * Single screen replacing modal chain for smoother UX
  * Replaces: GiftBottomSheet → PaymentSheet → SuccessModal → ShareModal
+ *
+ * Updated with:
+ * - Dynamic proof requirements based on gift amount
+ * - PayTR integration for Turkish payment processing
+ * - Commission calculation and display
+ * - KVKK compliant consent collection
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
@@ -15,6 +21,7 @@ import {
   Image,
   Platform,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,6 +43,14 @@ import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Moment } from '../types';
 import type { StackScreenProps } from '@react-navigation/stack';
+import {
+  getProofTier,
+  ProofRequirementBadge,
+  ProofSelectionCard,
+  DirectPayIndicator,
+  ProofRequiredIndicator,
+  PaymentSummaryWithProof,
+} from '../components/ProofRequirementComponents';
 
 interface PaymentMethod {
   id: string;
@@ -104,6 +119,28 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   const [submittedData, setSubmittedData] = useState<SendGiftInput | null>(
     null,
   );
+
+  // Dynamic proof requirement state
+  const [requestProof, setRequestProof] = useState<boolean | null>(null);
+  const [paymentConsent, setPaymentConsent] = useState(false);
+  const [commissionData, setCommissionData] = useState<{
+    giverPays: number;
+    receiverGets: number;
+    commission: number;
+  } | null>(null);
+
+  // Calculate proof tier based on moment price
+  const proofTier = useMemo(
+    () => getProofTier(moment.price),
+    [moment.price],
+  );
+
+  // Determine if this is direct pay or escrow
+  const isDirectPay = useMemo(() => {
+    if (proofTier.requirement === 'none') return true;
+    if (proofTier.requirement === 'optional' && requestProof === false) return true;
+    return false;
+  }, [proofTier.requirement, requestProof]);
 
   const {
     control,
@@ -400,38 +437,81 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
             ))}
           </View>
 
-          {/* Summary */}
-          <View style={styles.summary}>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Moment price</Text>
-              <Text style={styles.summaryValue}>${moment.price}</Text>
+          {/* Proof Requirement Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Teslimat Yöntemi</Text>
+              <ProofRequirementBadge amount={moment.price} currency="TL" />
             </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Service fee</Text>
-              <Text style={styles.summaryValue}>$0.00</Text>
-            </View>
-            <View style={[styles.summaryRow, styles.summaryTotal]}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>${moment.price}</Text>
-            </View>
+
+            {proofTier.requirement === 'none' && (
+              <DirectPayIndicator amount={moment.price} currency="TL" />
+            )}
+
+            {proofTier.requirement === 'optional' && (
+              <ProofSelectionCard
+                amount={moment.price}
+                currency="TL"
+                onSelect={setRequestProof}
+                selectedOption={requestProof}
+              />
+            )}
+
+            {proofTier.requirement === 'required' && (
+              <ProofRequiredIndicator amount={moment.price} currency="TL" />
+            )}
           </View>
+
+          {/* Summary with Proof */}
+          <PaymentSummaryWithProof
+            amount={moment.price}
+            currency="TL"
+            commission={commissionData?.commission || 0}
+            receiverGets={commissionData?.receiverGets || moment.price}
+            proofRequired={proofTier.requirement === 'required' || requestProof === true}
+            isDirectPay={isDirectPay}
+            receiverName={recipientName}
+          />
+
+          {/* Payment Consent */}
+          <TouchableOpacity
+            style={styles.consentRow}
+            onPress={() => setPaymentConsent(!paymentConsent)}
+          >
+            <View style={[styles.checkbox, paymentConsent && styles.checkboxChecked]}>
+              {paymentConsent && (
+                <Icon name="check" size={14} color={COLORS.utility.white} />
+              )}
+            </View>
+            <Text style={styles.consentText}>
+              Ödeme yapmadan önce{' '}
+              <Text style={styles.consentLink}>Mesafeli Satış Sözleşmesi</Text>
+              {' '}ve{' '}
+              <Text style={styles.consentLink}>KVKK Aydınlatma Metni</Text>
+              'ni okudum ve kabul ediyorum.
+            </Text>
+          </TouchableOpacity>
 
           {/* Purchase Button */}
           <TouchableOpacity
             style={[
               styles.purchaseButton,
-              (!recipientEmail || loading) && styles.purchaseButtonDisabled,
+              (!recipientEmail || loading || !paymentConsent || (proofTier.requirement === 'optional' && requestProof === null)) && styles.purchaseButtonDisabled,
             ]}
             onPress={handleSubmit(onPurchase)}
-            disabled={!recipientEmail || loading}
+            disabled={!recipientEmail || loading || !paymentConsent || (proofTier.requirement === 'optional' && requestProof === null)}
           >
             <Text style={styles.purchaseButtonText}>
-              {loading ? 'Sending Gift...' : `Send Gift • $${moment.price}`}
+              {loading
+                ? 'Hediye Gönderiliyor...'
+                : `Hediye Gönder • ${commissionData?.giverPays || moment.price} ₺`}
             </Text>
           </TouchableOpacity>
           {recipientEmail && (
             <Text style={styles.paymentHint}>
-              Secure payment processing. Your information is protected.
+              {isDirectPay
+                ? 'Para anında alıcıya aktarılacaktır.'
+                : 'Para, kanıt onaylanana kadar güvenli emanette tutulacaktır.'}
             </Text>
           )}
         </ScrollView>
@@ -747,5 +827,41 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  consentRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: COLORS.border.default,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  checkboxChecked: {
+    backgroundColor: COLORS.brand.primary,
+    borderColor: COLORS.brand.primary,
+  },
+  consentText: {
+    flex: 1,
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.text.secondary,
+    lineHeight: 20,
+  },
+  consentLink: {
+    color: COLORS.brand.primary,
+    textDecorationLine: 'underline',
   },
 });

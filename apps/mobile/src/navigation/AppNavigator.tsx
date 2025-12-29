@@ -163,6 +163,8 @@ import {
   SuccessScreen,
   SuccessConfirmationScreen,
   PaymentFailedScreen,
+  ProofReviewScreen,
+  PayTRWebViewScreen,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -203,6 +205,12 @@ import {
   MaintenanceScreen,
   DataPrivacyScreen,
 } from '../features/settings';
+
+// Legal screens - Turkish compliance
+import {
+  KVKKAydinlatmaScreen,
+  MesafeliSatisScreen,
+} from '../features/settings/screens/legal';
 
 // ===================================
 // TYPE IMPORTS
@@ -388,6 +396,7 @@ const AppNavigator = () => {
             {/* Proof System */}
             <Stack.Screen name="ProofFlow" component={ProofFlowScreen} />
             <Stack.Screen name="ProofDetail" component={ProofDetailScreen} />
+            <Stack.Screen name="ProofReview" component={ProofReviewScreen} />
 
             {/* Approval & Matching */}
             <Stack.Screen
@@ -489,6 +498,14 @@ const AppNavigator = () => {
               component={PrivacyPolicyScreen}
             />
             <Stack.Screen name="PaymentsKYC" component={PaymentsKYCScreen} />
+            <Stack.Screen
+              name="KVKKAydinlatma"
+              component={KVKKAydinlatmaScreen}
+            />
+            <Stack.Screen
+              name="MesafeliSatis"
+              component={MesafeliSatisScreen}
+            />
 
             {/* Withdraw */}
             <Stack.Screen name="Withdraw" component={WithdrawScreen} />
@@ -547,6 +564,10 @@ const AppNavigator = () => {
             <Stack.Screen
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
+            />
+            <Stack.Screen
+              name="PayTRWebView"
+              component={PayTRWebViewScreen}
             />
 
             {/* Footer Pages */}

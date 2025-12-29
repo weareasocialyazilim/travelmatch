@@ -10,6 +10,7 @@ import { InitializationScreen } from './src/components/InitializationScreen';
 import { AuthProvider } from './src/context/AuthContext';
 import { BiometricAuthProvider } from './src/context/BiometricAuthContext';
 import { ConfirmationProvider } from './src/context/ConfirmationContext';
+import { CurrencyProvider } from './src/context/CurrencyContext';
 import { NetworkProvider } from './src/context/NetworkContext';
 import { RealtimeProvider } from './src/context/RealtimeContext';
 import { ToastProvider } from './src/context/ToastContext';
@@ -252,7 +253,8 @@ function App() {
         <SafeAreaProvider>
           <NetworkProvider>
             <AuthProvider>
-              <BiometricAuthProvider>
+              <CurrencyProvider>
+                <BiometricAuthProvider>
                 <RealtimeProvider>
                   <ToastProvider>
                     <ConfirmationProvider>
@@ -275,7 +277,8 @@ function App() {
                     </ConfirmationProvider>
                   </ToastProvider>
                 </RealtimeProvider>
-              </BiometricAuthProvider>
+                </BiometricAuthProvider>
+              </CurrencyProvider>
             </AuthProvider>
           </NetworkProvider>
         </SafeAreaProvider>
