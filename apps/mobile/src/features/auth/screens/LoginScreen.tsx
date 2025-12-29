@@ -35,8 +35,11 @@ export const LoginScreen: React.FC = () => {
   const {
     biometricAvailable,
     biometricEnabled,
+    hasCredentials,
     biometricTypeName,
     authenticateForAppLaunch,
+    getCredentials,
+    saveCredentials,
   } = useBiometric();
   const { props: a11y } = useAccessibility();
 
@@ -57,6 +60,17 @@ export const LoginScreen: React.FC = () => {
         password: data.password,
       });
       if (result.success) {
+        // Save credentials for biometric login if enabled
+        if (biometricEnabled) {
+          try {
+            await saveCredentials({
+              email: data.email,
+              password: data.password,
+            });
+          } catch {
+            // Silent fail - biometric login won't work but normal login is fine
+          }
+        }
         // Navigate to Discover on successful login
         navigation.reset({
           index: 0,
@@ -83,16 +97,51 @@ export const LoginScreen: React.FC = () => {
   const handleBiometricLogin = async () => {
     try {
       setIsBiometricLoading(true);
+
+      // Check if we have saved credentials
+      if (!hasCredentials) {
+        showToast(
+          'Biyometrik giriş için önce şifrenizle giriş yapın',
+          'info',
+        );
+        return;
+      }
+
+      // Authenticate with biometric
       const success = await authenticateForAppLaunch();
 
       if (success) {
-        // User authenticated with biometric, proceed with login
-        // In a real app, you would retrieve stored credentials and call login
-        // For now, we'll just show a success message
-        showToast(
-          biometricTypeName + ' ile başarıyla giriş yaptınız',
-          'success',
-        );
+        // Get saved credentials and login
+        const credentials = await getCredentials();
+        if (!credentials) {
+          showToast(
+            'Kayıtlı kimlik bilgisi bulunamadı. Lütfen şifrenizle giriş yapın',
+            'error',
+          );
+          return;
+        }
+
+        // Perform actual login with saved credentials
+        const result = await login({
+          email: credentials.email,
+          password: credentials.password,
+        });
+
+        if (result.success) {
+          showToast(
+            biometricTypeName + ' ile başarıyla giriş yaptınız',
+            'success',
+          );
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Discover' }],
+          });
+        } else {
+          showToast(
+            'Oturum süresi dolmuş. Lütfen şifrenizle tekrar giriş yapın',
+            'error',
+          );
+        }
       } else {
         showToast(
           biometricTypeName +
@@ -256,7 +305,7 @@ export const LoginScreen: React.FC = () => {
               </Text>
             </TouchableOpacity>
 
-            {biometricAvailable && biometricEnabled && (
+            {biometricAvailable && biometricEnabled && hasCredentials && (
               <>
                 <View style={styles.divider}>
                   <View style={styles.dividerLine} />

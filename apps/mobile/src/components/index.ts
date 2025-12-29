@@ -50,6 +50,7 @@ export { UnblockUserBottomSheet } from './UnblockUserBottomSheet';
 export { CompleteGiftBottomSheet } from './CompleteGiftBottomSheet';
 export { ReportBlockBottomSheet } from './ReportBlockBottomSheet';
 export { FeedbackModal } from './FeedbackModal';
+export { EmailVerificationModal } from './EmailVerificationModal';
 export { EmptyStateIllustration } from './ui/EmptyStateIllustration';
 export { EmptyState } from './ui/EmptyState';
 export { Spinner } from './ui/Spinner';

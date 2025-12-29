@@ -263,7 +263,8 @@ export const resetPassword = async (
 };
 
 /**
- * Update password
+ * Update password (without current password verification)
+ * Use changePasswordWithVerification for secure password change
  */
 export const updatePassword = async (
   newPassword: string,
@@ -282,6 +283,54 @@ export const updatePassword = async (
     return { error: null };
   } catch (error) {
     logger.error('[Auth] Update password exception:', error);
+    return { error: error as AuthError };
+  }
+};
+
+/**
+ * Change password with current password verification
+ * This is the secure way to change password - requires re-authentication
+ */
+export const changePasswordWithVerification = async (
+  currentPassword: string,
+  newPassword: string,
+): Promise<{ error: AuthError | null }> => {
+  if (!isSupabaseConfigured()) {
+    return { error: { message: 'Supabase not configured' } as AuthError };
+  }
+
+  try {
+    // Get current user's email
+    const { data: userData } = await auth.getUser();
+    if (!userData?.user?.email) {
+      return { error: { message: 'User email not found' } as AuthError };
+    }
+
+    // Verify current password by re-authenticating
+    const { error: signInError } = await auth.signInWithPassword({
+      email: userData.user.email,
+      password: currentPassword,
+    });
+
+    if (signInError) {
+      logger.error('[Auth] Current password verification failed:', signInError);
+      return { error: { message: 'Mevcut şifre yanlış' } as AuthError };
+    }
+
+    // Current password verified, now update to new password
+    const { error: updateError } = await auth.updateUser({
+      password: newPassword,
+    });
+
+    if (updateError) {
+      logger.error('[Auth] Update password error:', updateError);
+      return { error: updateError };
+    }
+
+    logger.info('[Auth] Password changed successfully with verification');
+    return { error: null };
+  } catch (error) {
+    logger.error('[Auth] Change password exception:', error);
     return { error: error as AuthError };
   }
 };
@@ -506,6 +555,7 @@ export default {
   getCurrentUser,
   resetPassword,
   updatePassword,
+  changePasswordWithVerification,
   updateProfile,
   deleteAccount,
   signInWithPhone,

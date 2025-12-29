@@ -118,12 +118,11 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
       const result = await twilioClient.verifyPhoneOtp(phone, codeToVerify);
 
       if (result.success && result.valid) {
-        showToast('Phone verified successfully!', 'success');
-        // Navigate to complete profile
-        navigation.navigate('CompleteProfile', {
-          email,
-          phone,
-          fullName,
+        showToast('Telefon numarası doğrulandı!', 'success');
+        // Navigate to main app after phone verification
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Discover' }],
         });
       } else {
         showToast(result.error || 'Invalid verification code', 'error');

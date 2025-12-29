@@ -646,18 +646,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /**
    * Change password (when logged in)
+   * Requires current password verification for security
    */
   const changePassword = async (
-    _currentPassword: string,
+    currentPassword: string,
     newPassword: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Note: Supabase doesn't verify current password, just updates to new
-      const { error } = await authService.updatePassword(newPassword);
+      // Use changePasswordWithVerification which verifies current password first
+      const { error } = await authService.changePasswordWithVerification(
+        currentPassword,
+        newPassword,
+      );
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Change failed';
+      const message = error instanceof Error ? error.message : 'Şifre değiştirilemedi';
       return { success: false, error: message };
     }
   };
