@@ -1,8 +1,9 @@
 // Single Moment Card - Full width card for single column view
 import React, { memo } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
+import { OptimizedImage } from '../ui/OptimizedImage';
 import type { MomentCardProps } from './types';
 
 export const SingleMomentCard: React.FC<MomentCardProps> = memo(
@@ -19,10 +20,13 @@ export const SingleMomentCard: React.FC<MomentCardProps> = memo(
         accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${locationName} konumunda, ${item.price} dolar`}
         accessibilityHint="Detayları görmek için dokunun"
       >
-        {/* Image */}
-        <Image
+        {/* Image - Using OptimizedImage for better performance */}
+        <OptimizedImage
           source={{ uri: item.imageUrl }}
           style={styles.singleImage}
+          contentFit="cover"
+          transition={200}
+          priority="high"
           accessibilityLabel={`${item.title} fotoğrafı`}
         />
 
@@ -30,11 +34,13 @@ export const SingleMomentCard: React.FC<MomentCardProps> = memo(
         <View style={styles.singleContent}>
           {/* Creator Row */}
           <View style={styles.creatorRow}>
-            <Image
+            <OptimizedImage
               source={{
                 uri: item.user?.avatar || 'https://via.placeholder.com/40',
               }}
               style={styles.creatorAvatar}
+              contentFit="cover"
+              transition={150}
               accessibilityLabel={`${creatorName} profil fotoğrafı`}
             />
             <View style={styles.creatorInfo}>

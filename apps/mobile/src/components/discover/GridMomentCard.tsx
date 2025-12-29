@@ -1,8 +1,9 @@
 // Grid Moment Card - Compact card for 2-column grid view
 import React, { memo } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
+import { OptimizedImage } from '../ui/OptimizedImage';
 import type { GridCardProps } from './types';
 
 export const GridMomentCard: React.FC<GridCardProps> = memo(
@@ -19,9 +20,13 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
           accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${item.price} dolar`}
           accessibilityHint="Detayları görmek için dokunun"
         >
-          <Image
+          {/* Image - Using OptimizedImage for better performance */}
+          <OptimizedImage
             source={{ uri: item.imageUrl }}
             style={styles.gridImage}
+            contentFit="cover"
+            transition={200}
+            priority="normal"
             accessibilityLabel={`${item.title} fotoğrafı`}
           />
 
@@ -29,11 +34,13 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
           <View style={styles.gridContent}>
             {/* Creator */}
             <View style={styles.gridCreatorRow}>
-              <Image
+              <OptimizedImage
                 source={{
                   uri: item.user?.avatar || 'https://via.placeholder.com/24',
                 }}
                 style={styles.gridAvatar}
+                contentFit="cover"
+                transition={150}
                 accessibilityLabel={`${creatorName} profil fotoğrafı`}
               />
               <Text style={styles.gridCreatorName} numberOfLines={1}>

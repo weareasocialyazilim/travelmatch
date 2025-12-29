@@ -52,12 +52,12 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "kemalteksal@me.com",
-        "ascAppId": "6740496053",
-        "appleTeamId": "ZWCGM5V955"
+        "appleId": "${APPLE_ID}",
+        "ascAppId": "${ASC_APP_ID}",
+        "appleTeamId": "${APPLE_TEAM_ID}"
       },
       "android": {
-        "serviceAccountKeyPath": "./google-services.json",
+        "serviceAccountKeyPath": "./google-play-key.json",
         "track": "internal"
       }
     }
