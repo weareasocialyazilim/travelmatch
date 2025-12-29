@@ -1,5 +1,9 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Animated, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedScrollHandler,
+} from 'react-native-reanimated';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GiftMomentBottomSheet } from '@/components/GiftMomentBottomSheet';
@@ -34,6 +38,7 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import type { MomentData } from '../types';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
+import { logger } from '@/utils/production-logger';
 
 type MomentDetailRouteProp = RouteProp<RootStackParamList, 'MomentDetail'>;
 
@@ -155,7 +160,7 @@ const MomentDetailScreen: React.FC = () => {
           .eq('status', 'completed');
 
         if (error) {
-          console.error('Failed to fetch contributors:', error);
+          logger.error('Failed to fetch contributors', error);
           return;
         }
 
@@ -212,16 +217,13 @@ const MomentDetailScreen: React.FC = () => {
     }
   }, [isOwner, moment.id, isValidUUID]);
 
-  // Animation
-  const scrollY = useRef(new Animated.Value(0)).current;
-
-  // Header animations for potential future use
-  // Scroll-based transformations
-
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: false },
-  );
+  // Animation - using Reanimated for native-driven scroll
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
 
   // Effects
   useEffect(() => {
@@ -408,7 +410,7 @@ const MomentDetailScreen: React.FC = () => {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
-          onScroll={handleScroll}
+          onScroll={scrollHandler}
           contentContainerStyle={styles.scrollViewContent}
         >
           <View style={styles.content}>

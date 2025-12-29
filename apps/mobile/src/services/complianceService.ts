@@ -9,6 +9,7 @@
  */
 
 import { supabase } from './supabase';
+import { logger } from '../utils/production-logger';
 import type { CurrencyCode } from '../constants/currencies';
 
 // ============================================
@@ -85,9 +86,7 @@ export const checkUserLimits = async (
 ): Promise<LimitCheckResult> => {
   // Placeholder: Return allowed with no warnings until RPC is implemented
   // TODO: Implement check_user_limits RPC function in database
-  console.warn(
-    '[ComplianceService] check_user_limits RPC not yet implemented, allowing all',
-  );
+  logger.debug('check_user_limits RPC not yet implemented, allowing all');
 
   // Basic client-side checks as fallback
   const defaultLimits: Record<typeof category, number> = {
@@ -222,7 +221,7 @@ export const getUserRiskProfile = async (): Promise<UserRiskProfile | null> => {
         block_reason: null,
       };
     }
-    console.error('Error fetching risk profile:', error);
+    logger.error('Error fetching risk profile', error);
     return null;
   }
 
@@ -259,7 +258,7 @@ export const getKycStatus = async (): Promise<KycStatus | null> => {
     if (error.code === 'PGRST116') {
       return null; // No KYC verification yet
     }
-    console.error('Error fetching KYC status:', error);
+    logger.error('Error fetching KYC status', error);
     return null;
   }
 

@@ -17,6 +17,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { useAnalytics } from './useAnalytics';
+import { logger } from '@/utils/production-logger';
 
 // Types
 export interface IdenfyVerificationResult {
@@ -83,7 +84,7 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
         .single();
 
       if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Error fetching KYC status:', fetchError);
+        logger.error('Error fetching KYC status', fetchError);
         return;
       }
 
@@ -116,7 +117,10 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
         statusMap[(data.status as KycStatus) || 'pending'] || 'none',
       );
     } catch (err) {
-      console.error('Error checking KYC status:', err);
+      logger.error(
+        'Error checking KYC status',
+        err instanceof Error ? err : new Error(String(err)),
+      );
     }
   }, []);
 

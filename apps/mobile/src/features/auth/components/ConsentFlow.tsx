@@ -27,6 +27,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { supabase } from '@/config/supabase';
+import { logger } from '@/utils/production-logger';
 
 // =============================================================================
 // TYPES
@@ -202,7 +203,7 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
         );
 
         if (error) {
-          console.error('Error saving consents:', error);
+          logger.error('Error saving consents', error);
           Alert.alert('Hata', 'Onaylar kaydedilirken bir hata oluştu.');
           return;
         }
@@ -210,7 +211,10 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
 
       onComplete(consents);
     } catch (error) {
-      console.error('Error in consent flow:', error);
+      logger.error(
+        'Error in consent flow',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       Alert.alert('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setLoading(false);

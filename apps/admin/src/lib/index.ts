@@ -37,3 +37,6 @@ export * from './export';
 
 // Rate limiting
 export * from './rate-limit';
+
+// Redis configuration
+export { initializeRedis, getRedisInstance, isRedisConnected } from './redis';

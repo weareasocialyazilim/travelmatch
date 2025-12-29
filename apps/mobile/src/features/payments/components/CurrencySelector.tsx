@@ -18,6 +18,7 @@ import {
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '@/constants/colors';
 import { supabase } from '@/services/supabase';
+import { logger } from '@/utils/production-logger';
 import type { CurrencyCode } from '@/constants/currencies';
 
 // Supported currencies
@@ -80,7 +81,10 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
 
       setExchangeRates(rates);
     } catch (err) {
-      console.error('Error fetching exchange rates:', err);
+      logger.error(
+        'Error fetching exchange rates',
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +114,10 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
         updated_at: new Date().toISOString(),
       });
     } catch (err) {
-      console.error('Error updating currency preference:', err);
+      logger.error(
+        'Error updating currency preference',
+        err instanceof Error ? err : new Error(String(err)),
+      );
     }
   };
 

@@ -27,6 +27,7 @@ import { ConfirmGiftModal } from './ConfirmGiftModal';
 import { useScreenSecurity } from '../hooks/useScreenSecurity';
 import { useComplianceCheck } from '../hooks/useComplianceCheck';
 import { formatCurrency } from '../utils/currencyFormatter';
+import { logger } from '../utils/production-logger';
 import type { CurrencyCode } from '../constants/currencies';
 import type { MomentData } from '../types';
 
@@ -87,7 +88,9 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethod>('apple-pay');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [complianceWarning, setComplianceWarning] = useState<string | null>(null);
+  const [complianceWarning, setComplianceWarning] = useState<string | null>(
+    null,
+  );
 
   // Compliance check hook
   const { isChecking, checkSendLimit, checkContribution, checkCompliance } =
@@ -120,7 +123,10 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
   }, [translateY, backdropOpacity]);
 
   const closeSheet = useCallback(() => {
-    translateY.value = withSpring(SHEET_HEIGHT, { damping: 20, stiffness: 200 });
+    translateY.value = withSpring(SHEET_HEIGHT, {
+      damping: 20,
+      stiffness: 200,
+    });
     backdropOpacity.value = withTiming(0, { duration: 300 }, () => {
       runOnJS(resetAndClose)();
     });
@@ -135,7 +141,10 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
     })
     .onEnd((event) => {
       if (event.translationY > 100 || event.velocityY > 500) {
-        translateY.value = withSpring(SHEET_HEIGHT, { damping: 20, stiffness: 200 });
+        translateY.value = withSpring(SHEET_HEIGHT, {
+          damping: 20,
+          stiffness: 200,
+        });
         backdropOpacity.value = withTiming(0, { duration: 300 }, () => {
           runOnJS(resetAndClose)();
         });
@@ -166,18 +175,17 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
 
       if (!limitResult.allowed) {
         if (limitResult.promptKyc) {
-          Alert.alert(
-            'Kimlik Doğrulama Gerekli',
-            limitResult.message,
-            [
-              { text: 'İptal', style: 'cancel' },
-              { text: 'Doğrula', onPress: () => {
+          Alert.alert('Kimlik Doğrulama Gerekli', limitResult.message, [
+            { text: 'İptal', style: 'cancel' },
+            {
+              text: 'Doğrula',
+              onPress: () => {
                 // Navigate to KYC screen
                 closeSheet();
                 // TODO: Navigate to KYC
-              }},
-            ]
-          );
+              },
+            },
+          ]);
           return;
         }
 
@@ -187,11 +195,14 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             `${limitResult.message}\n\nLimitlerinizi artırmak için planınızı yükseltin.`,
             [
               { text: 'İptal', style: 'cancel' },
-              { text: 'Planları Gör', onPress: () => {
-                closeSheet();
-                // TODO: Navigate to subscription plans
-              }},
-            ]
+              {
+                text: 'Planları Gör',
+                onPress: () => {
+                  closeSheet();
+                  // TODO: Navigate to subscription plans
+                },
+              },
+            ],
           );
           return;
         }
@@ -204,11 +215,9 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
       const contributionResult = await checkContribution(moment.id, amount);
 
       if (!contributionResult.allowed) {
-        Alert.alert(
-          'Katkı Limiti',
-          contributionResult.message,
-          [{ text: 'Tamam' }]
-        );
+        Alert.alert('Katkı Limiti', contributionResult.message, [
+          { text: 'Tamam' },
+        ]);
         return;
       }
 
@@ -216,7 +225,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
       const complianceResult = await checkCompliance(
         amount,
         currency,
-        moment.user?.id
+        moment.user?.id,
       );
 
       if (!complianceResult.allowed) {
@@ -233,10 +242,13 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
       // All checks passed, show confirmation modal
       setShowConfirmModal(true);
     } catch (error) {
-      console.error('Compliance check failed:', error);
+      logger.error(
+        'Compliance check failed',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       Alert.alert(
         'Hata',
-        'İşlem kontrolü yapılırken bir hata oluştu. Lütfen tekrar deneyin.'
+        'İşlem kontrolü yapılırken bir hata oluştu. Lütfen tekrar deneyin.',
       );
     }
   };
@@ -373,7 +385,10 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             <View style={styles.paymentRow}>
               <Text style={styles.paymentLabel}>Amount</Text>
               <Text style={styles.paymentValue}>
-                {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
+                {formatCurrency(
+                  moment.price ?? 0,
+                  (moment.currency as CurrencyCode) || 'TRY',
+                )}
               </Text>
             </View>
             <View style={styles.paymentRow}>
@@ -384,7 +399,10 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             <View style={styles.paymentRow}>
               <Text style={styles.paymentTotal}>Total</Text>
               <Text style={styles.paymentTotal}>
-                {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
+                {formatCurrency(
+                  moment.price ?? 0,
+                  (moment.currency as CurrencyCode) || 'TRY',
+                )}
               </Text>
             </View>
           </View>
@@ -506,7 +524,11 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
                 <ActivityIndicator color={COLORS.utility.white} />
               ) : (
                 <Text style={styles.ctaButtonText}>
-                  Send • {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
+                  Send •{' '}
+                  {formatCurrency(
+                    moment.price ?? 0,
+                    (moment.currency as CurrencyCode) || 'TRY',
+                  )}
                 </Text>
               )}
             </TouchableOpacity>
