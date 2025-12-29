@@ -1,35 +1,50 @@
 'use client';
 
-/**
- * TravelMatch Admin Data Table
- * "Cinematic Travel + Trust Jewelry" Design
- *
- * A reusable data table with sorting, filtering, and pagination
- */
-
-import { useState, ReactNode } from 'react';
+import * as React from 'react';
 import {
-  ChevronUp,
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+  RowSelectionState,
+  Row,
+} from '@tanstack/react-table';
+import {
   ChevronDown,
-  ChevronsUpDown,
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Search,
-  Filter,
+  Settings2,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   MoreHorizontal,
+  Filter,
   Download,
   RefreshCw,
+  X,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -45,191 +60,177 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-// Types
-export interface Column<T> {
-  key: keyof T | string;
-  header: string;
-  sortable?: boolean;
-  width?: string;
-  render?: (item: T) => ReactNode;
+interface BulkAction<TData> {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: (rows: Row<TData>[]) => void;
+  variant?: 'default' | 'destructive';
 }
 
-export interface DataTableProps<T> {
-  data: T[];
-  columns: Column<T>[];
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  searchColumn?: string;
   searchPlaceholder?: string;
-  searchKey?: keyof T;
-  onRowClick?: (item: T) => void;
-  selectable?: boolean;
-  onSelectionChange?: (selectedItems: T[]) => void;
-  actions?: {
-    label: string;
-    icon?: ReactNode;
-    onClick: (item: T) => void;
-    variant?: 'default' | 'danger';
-  }[];
-  bulkActions?: {
-    label: string;
-    icon?: ReactNode;
-    onClick: (selectedItems: T[]) => void;
-  }[];
   pageSize?: number;
-  loading?: boolean;
-  emptyMessage?: string;
+  pageSizeOptions?: number[];
+  showColumnVisibility?: boolean;
+  showPagination?: boolean;
+  showRowSelection?: boolean;
+  isLoading?: boolean;
+  enableSorting?: boolean;
+  bulkActions?: BulkAction<TData>[];
   onRefresh?: () => void;
   onExport?: () => void;
-  onFilter?: () => void;
+  filterComponent?: React.ReactNode;
+  emptyState?: React.ReactNode;
+  className?: string;
 }
 
-type SortDirection = 'asc' | 'desc' | null;
-
-export function DataTable<T extends { id: string | number }>({
-  data,
+export function DataTable<TData, TValue>({
   columns,
+  data,
+  searchColumn,
   searchPlaceholder = 'Ara...',
-  searchKey,
-  onRowClick,
-  selectable = false,
-  onSelectionChange,
-  actions,
-  bulkActions,
-  pageSize: initialPageSize = 10,
-  loading = false,
-  emptyMessage = 'Veri bulunamadı',
+  pageSize = 10,
+  pageSizeOptions = [10, 20, 30, 40, 50],
+  showColumnVisibility = true,
+  showPagination = true,
+  showRowSelection = true,
+  isLoading = false,
+  enableSorting = true,
+  bulkActions = [],
   onRefresh,
   onExport,
-  onFilter,
-}: DataTableProps<T>) {
-  const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(
-    new Set(),
+  filterComponent,
+  emptyState,
+  className,
+}: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
   );
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(initialPageSize);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+  const [globalFilter, setGlobalFilter] = React.useState('');
 
-  // Filter data by search
-  const filteredData = searchKey
-    ? data.filter((item) => {
-        const value = item[searchKey];
-        if (typeof value === 'string') {
-          return value.toLowerCase().includes(search.toLowerCase());
-        }
-        return true;
-      })
-    : data;
+  // Add selection column if row selection is enabled
+  const columnsWithSelection = React.useMemo(() => {
+    if (!showRowSelection) return columns;
 
-  // Sort data
-  const sortedData = sortKey
-    ? [...filteredData].sort((a, b) => {
-        const aVal = (a as Record<string, unknown>)[sortKey];
-        const bVal = (b as Record<string, unknown>)[sortKey];
-        if (sortDirection === 'asc') {
-          return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-        } else {
-          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
-        }
-      })
-    : filteredData;
+    const selectionColumn: ColumnDef<TData, TValue> = {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Tümünü seç"
+          className="translate-y-[2px]"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Satır seç"
+          className="translate-y-[2px]"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    };
 
-  // Paginate data
-  const totalPages = Math.ceil(sortedData.length / pageSize);
-  const paginatedData = sortedData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
+    return [selectionColumn, ...columns];
+  }, [columns, showRowSelection]);
 
-  // Handlers
-  const handleSort = (key: string) => {
-    if (sortKey === key) {
-      if (sortDirection === 'asc') {
-        setSortDirection('desc');
-      } else if (sortDirection === 'desc') {
-        setSortKey(null);
-        setSortDirection(null);
-      }
-    } else {
-      setSortKey(key);
-      setSortDirection('asc');
-    }
-  };
+  const table = useReactTable({
+    data,
+    columns: columnsWithSelection,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: 'includesString',
+    enableSorting,
+    initialState: {
+      pagination: {
+        pageSize,
+      },
+    },
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+    },
+  });
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(new Set(paginatedData.map((item) => item.id)));
-    } else {
-      setSelectedIds(new Set());
-    }
-    onSelectionChange?.(checked ? paginatedData : []);
-  };
-
-  const handleSelectRow = (item: T, checked: boolean) => {
-    const newSelected = new Set(selectedIds);
-    if (checked) {
-      newSelected.add(item.id);
-    } else {
-      newSelected.delete(item.id);
-    }
-    setSelectedIds(newSelected);
-    onSelectionChange?.(data.filter((d) => newSelected.has(d.id)));
-  };
-
-  const handlePageSizeChange = (value: string) => {
-    const newPageSize = Number(value);
-    setPageSize(newPageSize);
-    setCurrentPage(1);
-  };
-
-  const isAllSelected =
-    paginatedData.length > 0 &&
-    paginatedData.every((item) => selectedIds.has(item.id));
-
-  const SortIcon = ({ columnKey }: { columnKey: string }) => {
-    if (sortKey !== columnKey) {
-      return <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />;
-    }
-    return sortDirection === 'asc' ? (
-      <ChevronUp className="h-4 w-4 text-primary" />
-    ) : (
-      <ChevronDown className="h-4 w-4 text-primary" />
-    );
-  };
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const hasSelection = selectedRows.length > 0;
 
   return (
-    <div className="space-y-4">
+    <div className={cn('w-full space-y-4', className)}>
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 flex-1">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-1 items-center gap-2">
           {/* Search */}
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={searchPlaceholder}
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-9"
-            />
-          </div>
+          {searchColumn && (
+            <div className="relative max-w-sm flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={searchPlaceholder}
+                value={
+                  (table.getColumn(searchColumn)?.getFilterValue() as string) ??
+                  ''
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn(searchColumn)
+                    ?.setFilterValue(event.target.value)
+                }
+                className="pl-9"
+              />
+            </div>
+          )}
 
+          {/* Custom filters */}
+          {filterComponent}
+        </div>
+
+        <div className="flex items-center gap-2">
           {/* Bulk Actions */}
-          {selectable && selectedIds.size > 0 && bulkActions && (
-            <div className="flex items-center gap-2 ml-2">
-              <span className="text-sm text-muted-foreground">
-                {selectedIds.size} seçili
-              </span>
+          {hasSelection && bulkActions.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="gap-1 text-xs">
+                {selectedRows.length} seçili
+                <button
+                  onClick={() => table.toggleAllRowsSelected(false)}
+                  className="ml-1 rounded-full p-0.5 hover:bg-muted"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
               {bulkActions.map((action, index) => (
                 <Button
                   key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    action.onClick(data.filter((d) => selectedIds.has(d.id)))
+                  variant={
+                    action.variant === 'destructive' ? 'destructive' : 'outline'
                   }
+                  size="sm"
+                  onClick={() => action.onClick(selectedRows)}
                 >
                   {action.icon}
                   {action.label}
@@ -237,220 +238,247 @@ export function DataTable<T extends { id: string | number }>({
               ))}
             </div>
           )}
-        </div>
 
-        <div className="flex items-center gap-2">
-          {onFilter && (
-            <Button variant="outline" size="sm" onClick={onFilter}>
-              <Filter className="h-4 w-4 mr-2" />
-              Filtrele
-            </Button>
-          )}
-          {onExport && (
-            <Button variant="outline" size="sm" onClick={onExport}>
-              <Download className="h-4 w-4 mr-2" />
-              Dışa Aktar
-            </Button>
-          )}
+          {/* Refresh */}
           {onRefresh && (
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9"
               onClick={onRefresh}
+              className="h-9 w-9"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw
+                className={cn('h-4 w-4', isLoading && 'animate-spin')}
+              />
             </Button>
+          )}
+
+          {/* Export */}
+          {onExport && (
+            <Button variant="outline" size="sm" onClick={onExport}>
+              <Download className="mr-2 h-4 w-4" />
+              Dışa Aktar
+            </Button>
+          )}
+
+          {/* Column visibility */}
+          {showColumnVisibility && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  Sütunlar
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Görünür sütunlar</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border overflow-hidden">
+      <div className="data-table-v2">
         <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              {selectable && (
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={isAllSelected}
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Tümünü seç"
-                  />
-                </TableHead>
-              )}
-              {columns.map((column) => (
-                <TableHead
-                  key={column.key as string}
-                  className={cn(
-                    column.sortable &&
-                      'cursor-pointer select-none hover:bg-muted/50',
-                  )}
-                  style={{ width: column.width }}
-                  onClick={() =>
-                    column.sortable && handleSort(column.key as string)
-                  }
-                >
-                  <div className="flex items-center gap-2">
-                    {column.header}
-                    {column.sortable && (
-                      <SortIcon columnKey={column.key as string} />
-                    )}
-                  </div>
-                </TableHead>
-              ))}
-              {actions && <TableHead className="w-12"></TableHead>}
-            </TableRow>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                {headerGroup.headers.map((header) => {
+                  const isSortable = header.column.getCanSort();
+                  const sortDirection = header.column.getIsSorted();
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(isSortable && 'cursor-pointer select-none')}
+                      onClick={
+                        isSortable
+                          ? header.column.getToggleSortingHandler()
+                          : undefined
+                      }
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div className="flex items-center gap-2">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          {isSortable && (
+                            <span className="text-muted-foreground">
+                              {sortDirection === 'asc' ? (
+                                <ArrowUp className="h-3.5 w-3.5" />
+                              ) : sortDirection === 'desc' ? (
+                                <ArrowDown className="h-3.5 w-3.5" />
+                              ) : (
+                                <ArrowUpDown className="h-3.5 w-3.5 opacity-50" />
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
-            {loading ? (
-              // Loading skeleton
+            {isLoading ? (
+              // Loading state
               Array.from({ length: pageSize }).map((_, index) => (
                 <TableRow key={index}>
-                  {selectable && (
-                    <TableCell>
-                      <div className="h-4 w-4 bg-muted rounded animate-pulse" />
-                    </TableCell>
-                  )}
-                  {columns.map((column) => (
-                    <TableCell key={column.key as string}>
-                      <div className="h-4 bg-muted rounded animate-pulse" />
+                  {columnsWithSelection.map((_, cellIndex) => (
+                    <TableCell key={cellIndex}>
+                      <div className="h-5 w-full animate-pulse rounded bg-muted" />
                     </TableCell>
                   ))}
-                  {actions && (
-                    <TableCell>
-                      <div className="h-8 w-8 bg-muted rounded animate-pulse" />
-                    </TableCell>
-                  )}
                 </TableRow>
               ))
-            ) : paginatedData.length === 0 ? (
-              // Empty state
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className={cn(
+                    'group transition-colors',
+                    row.getIsSelected() && 'bg-primary/5',
+                  )}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
               <TableRow>
                 <TableCell
-                  colSpan={
-                    columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)
-                  }
-                  className="text-center py-12"
+                  colSpan={columnsWithSelection.length}
+                  className="h-32 text-center"
                 >
-                  <p className="text-muted-foreground">{emptyMessage}</p>
+                  {emptyState || (
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <Filter className="h-8 w-8 opacity-50" />
+                      <p>Sonuç bulunamadı.</p>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
-            ) : (
-              // Data rows
-              paginatedData.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className={cn(
-                    onRowClick && 'cursor-pointer',
-                    selectedIds.has(item.id) && 'bg-primary/5',
-                  )}
-                  onClick={() => onRowClick?.(item)}
-                >
-                  {selectable && (
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedIds.has(item.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectRow(item, checked as boolean)
-                        }
-                        aria-label="Satırı seç"
-                      />
-                    </TableCell>
-                  )}
-                  {columns.map((column) => (
-                    <TableCell key={column.key as string}>
-                      {column.render
-                        ? column.render(item)
-                        : String(
-                            (item as Record<string, unknown>)[
-                              column.key as string
-                            ] ?? '',
-                          )}
-                    </TableCell>
-                  ))}
-                  {actions && (
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {actions.map((action, index) => (
-                            <DropdownMenuItem
-                              key={index}
-                              onClick={() => action.onClick(item)}
-                              className={
-                                action.variant === 'danger'
-                                  ? 'text-destructive'
-                                  : ''
-                              }
-                            >
-                              {action.icon}
-                              {action.label}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
             )}
           </TableBody>
         </Table>
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {sortedData.length} sonuçtan {(currentPage - 1) * pageSize + 1}-
-            {Math.min(currentPage * pageSize, sortedData.length)} arası
-            gösteriliyor
-          </p>
-          <div className="flex items-center gap-2">
-            <Select
-              value={String(pageSize)}
-              onValueChange={handlePageSizeChange}
-            >
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
+      {showPagination && (
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm text-muted-foreground">
+            {showRowSelection && (
+              <>
+                {table.getFilteredSelectedRowModel().rows.length} /{' '}
+                {table.getFilteredRowModel().rows.length} satır seçildi
+                <span className="mx-2">|</span>
+              </>
+            )}
+            Toplam {table.getFilteredRowModel().rows.length} kayıt
+          </div>
+
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6 lg:gap-8">
+            {/* Page size selector */}
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium">Sayfa başına</p>
+              <Select
+                value={`${table.getState().pagination.pageSize}`}
+                onValueChange={(value) => {
+                  table.setPageSize(Number(value));
+                }}
+              >
+                <SelectTrigger className="h-8 w-[70px]">
+                  <SelectValue
+                    placeholder={table.getState().pagination.pageSize}
+                  />
+                </SelectTrigger>
+                <SelectContent side="top">
+                  {pageSizeOptions.map((size) => (
+                    <SelectItem key={size} value={`${size}`}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Page info */}
+            <div className="flex w-[120px] items-center justify-center text-sm font-medium">
+              Sayfa {table.getState().pagination.pageIndex + 1} /{' '}
+              {table.getPageCount() || 1}
+            </div>
+
+            {/* Pagination buttons */}
             <div className="flex items-center gap-1">
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <span className="sr-only">İlk sayfa</span>
+                <ChevronsLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm px-2">
-                {currentPage} / {totalPages}
-              </span>
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
               >
+                <span className="sr-only">Önceki sayfa</span>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                <span className="sr-only">Sonraki sayfa</span>
                 <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+              >
+                <span className="sr-only">Son sayfa</span>
+                <ChevronsRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -459,3 +487,31 @@ export function DataTable<T extends { id: string | number }>({
     </div>
   );
 }
+
+// Helper component for row actions
+interface RowActionsProps {
+  children: React.ReactNode;
+}
+
+export function RowActions({ children }: RowActionsProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
+        >
+          <MoreHorizontal className="h-4 w-4" />
+          <span className="sr-only">İşlemler</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-40">
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// Re-export dropdown menu items for convenience
+export { DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel };

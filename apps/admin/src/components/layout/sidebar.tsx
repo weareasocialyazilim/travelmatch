@@ -51,7 +51,11 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -331,7 +335,8 @@ export function Sidebar() {
   const { user, logout } = useAuth();
 
   const NavLink = ({ item }: { item: NavItem }) => {
-    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+    const isActive =
+      pathname === item.href || pathname.startsWith(item.href + '/');
 
     // Check permission if resource is specified
     if (item.resource && !can(item.resource as never, 'view')) {
@@ -342,19 +347,23 @@ export function Sidebar() {
       <Link
         href={item.href}
         className={cn(
-          'sidebar-nav-item group relative',
-          isActive && 'sidebar-nav-item-active',
-          sidebarCollapsed && 'justify-center px-2'
+          'sidebar-v2-nav-item group relative',
+          isActive && 'sidebar-v2-nav-item-active',
+          sidebarCollapsed && 'justify-center px-2',
         )}
       >
         {/* Gradient accent indicator for active state */}
         {isActive && (
           <div className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-amber-400 to-amber-600" />
         )}
-        <item.icon className={cn(
-          'h-4.5 w-4.5 shrink-0 transition-colors',
-          isActive ? 'text-amber-600 dark:text-amber-400' : 'group-hover:text-foreground'
-        )} />
+        <item.icon
+          className={cn(
+            'h-4.5 w-4.5 shrink-0 transition-colors',
+            isActive
+              ? 'text-amber-600 dark:text-amber-400'
+              : 'group-hover:text-foreground',
+          )}
+        />
         {!sidebarCollapsed && (
           <>
             <span className="flex-1 truncate">{item.title}</span>
@@ -387,9 +396,15 @@ export function Sidebar() {
     return content;
   };
 
-  const NavSection = ({ title, items }: { title: string; items: NavItem[] }) => {
+  const NavSection = ({
+    title,
+    items,
+  }: {
+    title: string;
+    items: NavItem[];
+  }) => {
     const visibleItems = items.filter(
-      (item) => !item.resource || can(item.resource as never, 'view')
+      (item) => !item.resource || can(item.resource as never, 'view'),
     );
 
     if (visibleItems.length === 0) return null;
@@ -410,10 +425,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={cn(
-        'sidebar',
-        sidebarCollapsed ? 'w-[64px]' : 'w-[260px]'
-      )}
+      className={cn('sidebar-v2', sidebarCollapsed ? 'w-[64px]' : 'w-[260px]')}
     >
       {/* Logo & Toggle */}
       <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
@@ -423,8 +435,12 @@ export function Sidebar() {
               <span className="text-sm font-bold text-white">TM</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold leading-none">TravelMatch</span>
-              <span className="text-[10px] text-muted-foreground">Admin Panel</span>
+              <span className="text-sm font-semibold leading-none">
+                TravelMatch
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                Admin Panel
+              </span>
             </div>
           </Link>
         )}
@@ -433,7 +449,7 @@ export function Sidebar() {
           size="icon"
           className={cn(
             'h-8 w-8 hover:bg-sidebar-active',
-            sidebarCollapsed && 'mx-auto'
+            sidebarCollapsed && 'mx-auto',
           )}
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         >
@@ -473,7 +489,7 @@ export function Sidebar() {
             <button
               className={cn(
                 'flex w-full items-center gap-3 rounded-lg p-2 transition-colors hover:bg-sidebar-active',
-                sidebarCollapsed && 'justify-center'
+                sidebarCollapsed && 'justify-center',
               )}
             >
               <div className="relative">
@@ -490,17 +506,27 @@ export function Sidebar() {
               </div>
               {!sidebarCollapsed && (
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium leading-none">{user?.name || 'Admin User'}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{user?.role || 'Super Admin'}</p>
+                  <p className="text-sm font-medium leading-none">
+                    {user?.name || 'Admin User'}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {user?.role || 'Super Admin'}
+                  </p>
                 </div>
               )}
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56" side={sidebarCollapsed ? 'right' : 'top'}>
+          <DropdownMenuContent
+            align="end"
+            className="w-56"
+            side={sidebarCollapsed ? 'right' : 'top'}
+          >
             <DropdownMenuLabel>
               <div className="flex flex-col">
                 <span>{user?.name || 'Admin User'}</span>
-                <span className="text-xs font-normal text-muted-foreground">{user?.email || 'admin@travelmatch.com'}</span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  {user?.email || 'admin@travelmatch.com'}
+                </span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -517,7 +543,10 @@ export function Sidebar() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => logout()} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              onClick={() => logout()}
+              className="text-destructive focus:text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Çıkış Yap
             </DropdownMenuItem>
