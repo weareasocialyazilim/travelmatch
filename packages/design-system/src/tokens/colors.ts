@@ -1,5 +1,5 @@
 /**
- * Design Tokens - Colors V2
+ * Design Tokens - Colors
  * TravelMatch "Liquid Warmth" Design System
  *
  * Design Philosophy:

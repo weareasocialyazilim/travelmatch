@@ -1,105 +1,124 @@
 /**
- * TravelMatch iOS 26.3 Design System Colors
+ * TravelMatch Awwwards Design System - Colors
  *
- * Semantic Color System for gift-moment experience
- * - Warm amber/pink palette for celebration and emotional connection
- * - Designed with 8pt grid system and WCAG accessibility standards
+ * "Liquid Warmth" aesthetic - Organic Luxury meets Playful Warmth
+ *
+ * Design Philosophy:
+ * - Gift-giving = warmth, emotion, connection
+ * - Travel = discovery, adventure, freedom
+ * - Trust = reliability, transparency
  *
  * Architecture:
  * 1. PRIMITIVES - Raw color values (internal use only)
  * 2. COLORS - Semantic colors (use these in components)
  * 3. GRADIENTS - Gradient presets for common use cases
- * 4. LEGACY_ALIASES - Backwards compatibility (deprecated)
+ * 4. SHADOWS - Shadow presets for elevation
  */
 
 // ============================================
 // 1. PRIMITIVE COLORS (Raw values - DO NOT use directly)
 // ============================================
 const primitives = {
-  amber: {
-    50: '#FFFBEB',
-    100: '#FEF3C7',
-    200: '#FDE68A',
-    300: '#FCD34D',
-    400: '#FBBF24',
-    500: '#F59E0B',  // Main amber
-    600: '#D97706',
-    700: '#B45309',
-    800: '#92400E',
-    900: '#78350F',
+  // Primary: Warm Orange (Gift warmth)
+  orange: {
+    50: '#FFF7ED',
+    100: '#FFEDD5',
+    200: '#FED7AA',
+    300: '#FDBA74',
+    400: '#FB923C',
+    500: '#F97316', // ← Main
+    600: '#EA580C',
+    700: '#C2410C',
+    800: '#9A3412',
+    900: '#7C2D12',
   },
-  pink: {
-    50: '#FDF2F8',
-    100: '#FCE7F3',
-    200: '#FBCFE8',
-    300: '#F9A8D4',
-    400: '#F472B6',
-    500: '#EC4899',  // Main pink
-    600: '#DB2777',
-    700: '#BE185D',
-    800: '#9D174D',
-    900: '#831843',
+
+  // Secondary: Rose (Emotional connection)
+  rose: {
+    50: '#FFF1F2',
+    100: '#FFE4E6',
+    200: '#FECDD3',
+    300: '#FDA4AF',
+    400: '#FB7185',
+    500: '#F43F5E', // ← Main
+    600: '#E11D48',
+    700: '#BE123C',
+    800: '#9F1239',
+    900: '#881337',
   },
+
+  // Accent: Aurora Violet (Premium feel)
+  violet: {
+    50: '#FAF5FF',
+    100: '#F3E8FF',
+    200: '#E9D5FF',
+    300: '#D8B4FE',
+    400: '#C084FC',
+    500: '#A855F7', // ← Main
+    600: '#9333EA',
+    700: '#7C3AED',
+    800: '#6B21A8',
+    900: '#581C87',
+  },
+
+  // Trust: Emerald (Reliability)
   emerald: {
     50: '#ECFDF5',
     100: '#D1FAE5',
     200: '#A7F3D0',
     300: '#6EE7B7',
     400: '#34D399',
-    500: '#10B981',  // Main emerald (Trust)
+    500: '#10B981', // ← Main
     600: '#059669',
     700: '#047857',
     800: '#065F46',
     900: '#064E3B',
   },
+
+  // Info: Sky Blue
+  sky: {
+    50: '#F0F9FF',
+    100: '#E0F2FE',
+    200: '#BAE6FD',
+    300: '#7DD3FC',
+    400: '#38BDF8',
+    500: '#0EA5E9', // ← Main
+    600: '#0284C7',
+    700: '#0369A1',
+    800: '#075985',
+    900: '#0C4A6E',
+  },
+
+  // Error: Red
   red: {
     50: '#FEF2F2',
     100: '#FEE2E2',
     200: '#FECACA',
     300: '#FCA5A5',
     400: '#F87171',
-    500: '#EF4444',  // Main error
+    500: '#EF4444', // ← Main
     600: '#DC2626',
     700: '#B91C1C',
     800: '#991B1B',
     900: '#7F1D1D',
   },
-  blue: {
-    50: '#EFF6FF',
-    100: '#DBEAFE',
-    200: '#BFDBFE',
-    300: '#93C5FD',
-    400: '#60A5FA',
-    500: '#3B82F6',  // Main info
-    600: '#2563EB',
-    700: '#1D4ED8',
-    800: '#1E40AF',
-    900: '#1E3A8A',
+
+  // Neutral: Warm Stone
+  stone: {
+    0: '#FFFFFF',
+    50: '#FAFAF9',
+    100: '#F5F5F4',
+    200: '#E7E5E4',
+    300: '#D6D3D1',
+    400: '#A8A29E',
+    500: '#78716C',
+    600: '#57534E',
+    700: '#44403C',
+    800: '#292524',
+    900: '#1C1917',
+    950: '#0C0A09',
   },
-  purple: {
-    50: '#FAF5FF',
-    100: '#F3E8FF',
-    200: '#E9D5FF',
-    300: '#D8B4FE',
-    400: '#C084FC',
-    500: '#8B5CF6',  // Main purple
-    600: '#7C3AED',
-    700: '#6D28D9',
-    800: '#5B21B6',
-    900: '#4C1D95',
-  },
-  gray: {
-    50: '#F9FAFB',
-    100: '#F3F4F6',
-    200: '#E5E7EB',
-    300: '#D1D5DB',
-    400: '#9CA3AF',
-    500: '#6B7280',
-    600: '#4B5563',
-    700: '#374151',
-    800: '#1F2937',
-    900: '#111827',
-  },
+
   white: '#FFFFFF',
   black: '#000000',
 } as const;
@@ -109,25 +128,28 @@ const primitives = {
 // ============================================
 export const COLORS = {
   // --------------------------------------------
-  // Brand - Primary (Warm Amber)
+  // Brand - Primary (Warm Orange)
   // --------------------------------------------
-  primary: primitives.amber[500],
-  primaryLight: primitives.amber[400],
-  primaryDark: primitives.amber[600],
-  primaryMuted: `rgba(245, 158, 11, 0.15)`,
+  primary: primitives.orange[500],
+  primaryLight: primitives.orange[400],
+  primaryDark: primitives.orange[600],
+  primaryMuted: 'rgba(249, 115, 22, 0.12)',
 
   // --------------------------------------------
-  // Brand - Secondary (Emotional Pink)
+  // Brand - Secondary (Rose)
   // --------------------------------------------
-  secondary: primitives.pink[500],
-  secondaryLight: primitives.pink[400],
-  secondaryMuted: `rgba(236, 72, 153, 0.15)`,
+  secondary: primitives.rose[500],
+  secondaryLight: primitives.rose[400],
+  secondaryDark: primitives.rose[600],
+  secondaryMuted: 'rgba(244, 63, 94, 0.12)',
 
   // --------------------------------------------
-  // Brand - Accent (Coral)
+  // Brand - Accent (Aurora Violet)
   // --------------------------------------------
-  accent: '#FF6B6B',
-  coral: '#FF6B6B',
+  accent: primitives.violet[500],
+  accentLight: primitives.violet[400],
+  accentDark: primitives.violet[600],
+  accentMuted: 'rgba(168, 85, 247, 0.12)',
 
   // --------------------------------------------
   // Trust System
@@ -135,13 +157,13 @@ export const COLORS = {
   trust: primitives.emerald[500],
   trustLight: primitives.emerald[400],
   trustDark: primitives.emerald[600],
-  trustMuted: `rgba(16, 185, 129, 0.15)`,
+  trustMuted: 'rgba(16, 185, 129, 0.12)',
 
   // Trust Score Ring Levels
-  trustLow: primitives.red[500],
-  trustMedium: primitives.amber[500],
+  trustLow: primitives.stone[400],
+  trustMedium: primitives.orange[500],
   trustHigh: primitives.emerald[500],
-  trustPlatinum: '#FFD700',
+  trustPlatinum: '#E5E4E2',
 
   // KYC Badge Colors
   kycBronze: '#CD7F32',
@@ -155,74 +177,105 @@ export const COLORS = {
   success: primitives.emerald[500],
   successLight: primitives.emerald[50],
   successDark: primitives.emerald[600],
-  successMuted: `rgba(16, 185, 129, 0.15)`,
+  successMuted: 'rgba(16, 185, 129, 0.12)',
+  successBorder: primitives.emerald[200],
 
   error: primitives.red[500],
-  errorLight: primitives.red[100],
+  errorLight: primitives.red[50],
   errorDark: primitives.red[600],
+  errorBorder: primitives.red[200],
   danger: primitives.red[500],
   destructive: primitives.red[600],
 
-  warning: primitives.amber[500],
-  warningLight: primitives.amber[100],
-  warningDark: primitives.amber[600],
+  warning: primitives.orange[500],
+  warningLight: primitives.orange[50],
+  warningDark: primitives.orange[600],
+  warningBorder: primitives.orange[200],
 
-  info: primitives.blue[500],
-  infoLight: primitives.blue[50],
-  infoDark: primitives.blue[600],
+  info: primitives.sky[500],
+  infoLight: primitives.sky[50],
+  infoDark: primitives.sky[600],
+  infoBorder: primitives.sky[200],
 
   // --------------------------------------------
   // Text
   // --------------------------------------------
-  text: primitives.gray[800],
-  textPrimary: primitives.gray[800],
-  textSecondary: primitives.gray[500],
-  textTertiary: primitives.gray[400],
-  textMuted: primitives.gray[400],
+  text: primitives.stone[900],
+  textPrimary: primitives.stone[900],
+  textSecondary: primitives.stone[500],
+  textTertiary: primitives.stone[400],
+  textMuted: primitives.stone[400],
+  textDisabled: primitives.stone[300],
   textInverse: primitives.white,
+  textAccent: primitives.orange[600],
+  textLink: primitives.sky[600],
   subtitle: 'rgba(255, 255, 255, 0.9)',
+
+  // Text on dark backgrounds
+  textOnDark: primitives.white,
+  textOnDarkSecondary: 'rgba(255, 255, 255, 0.7)',
+  textOnDarkMuted: 'rgba(255, 255, 255, 0.5)',
 
   // --------------------------------------------
   // Background
   // --------------------------------------------
-  background: '#FFFBF5',         // Warm white
-  backgroundSecondary: '#FFF8F0',
+  background: '#FFFCF7',           // Warm cream
+  backgroundSecondary: '#FFF9F0',  // Slightly warmer
+  backgroundTertiary: '#FFF5E6',   // Warm tint
   backgroundLight: primitives.white,
-  backgroundDark: '#0E1B14',
+  backgroundDark: primitives.stone[950],
+  backgroundDarkSecondary: primitives.stone[900],
+  backgroundElevated: primitives.white,
 
   // --------------------------------------------
   // Surface
   // --------------------------------------------
   surface: primitives.white,
   surfaceLight: primitives.white,
-  surfaceDark: '#1A2F23',
+  surfaceMuted: primitives.stone[50],
+  surfaceSubtle: primitives.stone[100],
+  surfaceDark: primitives.stone[800],
 
   // --------------------------------------------
   // Border
   // --------------------------------------------
-  border: primitives.gray[200],
-  borderLight: primitives.gray[100],
-  borderDark: '#2D4A3A',
+  border: primitives.stone[200],
+  borderLight: primitives.stone[100],
+  borderStrong: primitives.stone[300],
+  borderFocus: primitives.orange[500],
+  borderError: primitives.red[500],
+  borderDark: primitives.stone[700],
+  borderDarkSubtle: primitives.stone[800],
 
   // --------------------------------------------
-  // Glass Effects (iOS 26 Liquid Glass)
+  // Interactive
   // --------------------------------------------
-  glass: 'rgba(255, 251, 245, 0.85)',
-  glassBorder: 'rgba(255, 255, 255, 0.3)',
-  glassLight: 'rgba(255, 255, 255, 0.95)',
+  interactive: primitives.orange[500],
+  interactiveHover: primitives.orange[600],
+  interactivePressed: primitives.orange[700],
 
   // --------------------------------------------
-  // Overlay (Simplified - only 3 levels needed)
+  // Glass Effects (iOS Liquid Glass)
+  // --------------------------------------------
+  glass: 'rgba(255, 252, 247, 0.75)',
+  glassBorder: 'rgba(255, 255, 255, 0.25)',
+  glassLight: 'rgba(255, 255, 255, 0.9)',
+  glassDark: 'rgba(28, 25, 23, 0.85)',
+  glassDarkBorder: 'rgba(255, 255, 255, 0.1)',
+
+  // --------------------------------------------
+  // Overlay
   // --------------------------------------------
   overlay: 'rgba(0, 0, 0, 0.5)',
-  overlayLight: 'rgba(0, 0, 0, 0.3)',
+  overlayLight: 'rgba(0, 0, 0, 0.04)',
+  overlayMedium: 'rgba(0, 0, 0, 0.3)',
   overlayDark: 'rgba(0, 0, 0, 0.7)',
   modalBackdrop: 'rgba(0, 0, 0, 0.4)',
 
   // --------------------------------------------
-  // Gray Scale
+  // Gray Scale (Warm Stone)
   // --------------------------------------------
-  gray: primitives.gray,
+  gray: primitives.stone,
 
   // --------------------------------------------
   // UI Essentials
@@ -230,34 +283,35 @@ export const COLORS = {
   white: primitives.white,
   black: primitives.black,
   transparent: 'transparent',
-  disabled: primitives.gray[300],
-  shadow: primitives.black,
-  shadowColor: primitives.black,
+  disabled: primitives.stone[300],
+  shadow: primitives.stone[950],
+  shadowColor: primitives.stone[950],
 
   // --------------------------------------------
   // Card
   // --------------------------------------------
   card: primitives.white,
   cardBackground: primitives.white,
-  cardDark: '#243D2F',
+  cardDark: primitives.stone[800],
 
   // --------------------------------------------
   // Input
   // --------------------------------------------
-  inputBackground: primitives.gray[50],
+  inputBackground: primitives.stone[50],
 
   // --------------------------------------------
   // Button
   // --------------------------------------------
-  buttonPrimary: primitives.amber[500],
-  buttonDark: primitives.gray[800],
-  buttonDisabled: primitives.gray[300],
+  buttonPrimary: primitives.orange[500],
+  buttonSecondary: primitives.rose[500],
+  buttonDark: primitives.stone[800],
+  buttonDisabled: primitives.stone[300],
 
   // --------------------------------------------
   // Social/Brand Colors
   // --------------------------------------------
   facebook: '#1877F2',
-  google: '#EA4335',
+  google: '#4285F4',
   apple: primitives.black,
   twitter: '#1DA1F2',
   whatsapp: '#25D366',
@@ -271,29 +325,46 @@ export const COLORS = {
   // --------------------------------------------
   // Additional Named Colors
   // --------------------------------------------
-  amber: primitives.amber[500],
-  amberLight: primitives.amber[100],
-  amberDark: primitives.amber[600],
-  amberBright: primitives.amber[400],
+  orange: primitives.orange[500],
+  orangeLight: primitives.orange[400],
+  orangeDark: primitives.orange[600],
+  orangeBright: primitives.orange[300],
+
+  rose: primitives.rose[500],
+  roseLight: primitives.rose[400],
+  roseDark: primitives.rose[600],
+
+  violet: primitives.violet[500],
+  violetLight: primitives.violet[400],
+  violetDark: primitives.violet[600],
+
   emerald: primitives.emerald[500],
-  purple: primitives.purple[500],
-  violet: primitives.purple[500],
-  pink: primitives.pink[500],
-  blue: primitives.blue[500],
+  emeraldLight: primitives.emerald[400],
+  emeraldDark: primitives.emerald[600],
+
+  sky: primitives.sky[500],
+  skyLight: primitives.sky[400],
+  skyDark: primitives.sky[600],
+
   gold: '#FFD700',
+  silver: '#C0C0C0',
+  bronze: '#CD7F32',
+  platinum: '#E5E4E2',
+
   teal: '#14B8A6',
   indigo: '#6366F1',
-  orange: '#F97316',
-  orangeDark: '#EA580C',
-  orangeBright: '#FB923C',
+  coral: primitives.rose[500],
+  mint: primitives.emerald[500],
+  purple: primitives.violet[500],
+  pink: primitives.rose[400],
+  blue: primitives.sky[500],
 
   // ============================================
   // LEGACY ALIASES (Deprecated - use semantic names)
   // These are kept for backwards compatibility only
   // ============================================
 
-  // Legacy overlay variants (use overlay, overlayLight, overlayDark)
-  overlayMedium: 'rgba(0, 0, 0, 0.4)',
+  // Legacy overlay variants
   overlay30: 'rgba(0, 0, 0, 0.3)',
   overlay40: 'rgba(0, 0, 0, 0.4)',
   overlay50: 'rgba(0, 0, 0, 0.5)',
@@ -325,7 +396,6 @@ export const COLORS = {
   blackTransparentDarker: 'rgba(0, 0, 0, 0.08)',
 
   // Legacy mint colors (use trust/emerald/success)
-  mint: primitives.emerald[500],
   mintDark: primitives.emerald[600],
   mintTransparent: 'rgba(16, 185, 129, 0.12)',
   mintTransparentLight: 'rgba(16, 185, 129, 0.15)',
@@ -333,108 +403,161 @@ export const COLORS = {
   mintBorder: primitives.emerald[200],
   mintBackground: primitives.emerald[100],
 
-  // Legacy error variants (use error, errorLight)
+  // Legacy error variants
   errorRed: primitives.red[500],
   errorRedLight: primitives.red[100],
   errorBackground: primitives.red[50],
 
   // Legacy color transparency
-  primaryTransparent: 'rgba(245, 158, 11, 0.15)',
-  secondaryTransparent: 'rgba(236, 72, 153, 0.15)',
-  coralTransparent: 'rgba(255, 107, 107, 0.15)',
-  coralTransparentLight: 'rgba(255, 107, 107, 0.1)',
-  softOrangeTransparent: 'rgba(255, 169, 77, 0.15)',
-  purpleTransparent: 'rgba(139, 92, 246, 0.15)',
-  softGrayTransparent: 'rgba(184, 180, 175, 0.15)',
+  primaryTransparent: 'rgba(249, 115, 22, 0.15)',
+  secondaryTransparent: 'rgba(244, 63, 94, 0.15)',
+  coralTransparent: 'rgba(244, 63, 94, 0.15)',
+  coralTransparentLight: 'rgba(244, 63, 94, 0.1)',
+  softOrangeTransparent: 'rgba(251, 146, 60, 0.15)',
+  purpleTransparent: 'rgba(168, 85, 247, 0.15)',
+  softGrayTransparent: 'rgba(168, 162, 158, 0.15)',
   successTransparent: 'rgba(16, 185, 129, 0.15)',
   errorTransparent10: 'rgba(239, 68, 68, 0.1)',
   errorTransparent20: 'rgba(239, 68, 68, 0.2)',
-  tealTransparent20: 'rgba(0, 128, 128, 0.2)',
-  warningTransparent20: 'rgba(245, 158, 11, 0.2)',
+  tealTransparent20: 'rgba(20, 184, 166, 0.2)',
+  warningTransparent20: 'rgba(249, 115, 22, 0.2)',
   successTransparent33: 'rgba(16, 185, 129, 0.33)',
-  infoTransparent33: 'rgba(59, 130, 246, 0.33)',
-  warningTransparent33: 'rgba(245, 158, 11, 0.33)',
+  infoTransparent33: 'rgba(14, 165, 233, 0.33)',
+  warningTransparent33: 'rgba(249, 115, 22, 0.33)',
   emeraldTransparent20: 'rgba(16, 185, 129, 0.2)',
   whatsappTransparent20: 'rgba(37, 211, 102, 0.2)',
-  instagramTransparent20: 'rgba(225, 48, 108, 0.2)',
+  instagramTransparent20: 'rgba(228, 64, 95, 0.2)',
 
   // Legacy filter/pill
-  filterPillActive: 'rgba(245, 158, 11, 0.2)',
-  filterPillActiveBorder: 'rgba(245, 158, 11, 0.5)',
+  filterPillActive: 'rgba(249, 115, 22, 0.2)',
+  filterPillActiveBorder: 'rgba(249, 115, 22, 0.5)',
 
   // Legacy misc
-  backgroundGradient: '#FFFBF5',
-  glassBackground: 'rgba(255, 251, 245, 0.85)',
-  mapHeader: 'rgba(255, 251, 245, 0.95)',
+  backgroundGradient: '#FFFCF7',
+  glassBackground: 'rgba(255, 252, 247, 0.85)',
+  mapHeader: 'rgba(255, 252, 247, 0.95)',
   beige: '#E8D9CE',
   beigeLight: '#F4ECE7',
   brown: '#9C6C49',
   brownDark: '#221710',
-  brownGray: '#A8A29E',
+  brownGray: primitives.stone[400],
   greenSuccess: primitives.emerald[500],
-  greenBright: '#22C55E',
-  greenDark: '#15803D',
-  orangeAlt: '#F97316',
-  softOrange: '#FFA94D',
-  softRed: '#FF8787',
-  softGray: '#B8B4AF',
-  grayMedium: primitives.gray[500],
-  grayLight: primitives.gray[400],
-  darkGray: '#D4D4D4',
-  lightGray: primitives.gray[200],
+  greenBright: primitives.emerald[400],
+  greenDark: primitives.emerald[700],
+  orangeAlt: primitives.orange[500],
+  softOrange: primitives.orange[300],
+  softRed: primitives.red[300],
+  softGray: primitives.stone[400],
+  grayMedium: primitives.stone[500],
+  grayLight: primitives.stone[400],
+  darkGray: primitives.stone[300],
+  lightGray: primitives.stone[200],
+
+  // Legacy amber aliases (now using orange)
+  amber: primitives.orange[500],
+  amberLight: primitives.orange[100],
+  amberDark: primitives.orange[600],
+  amberBright: primitives.orange[400],
 } as const;
 
 // ============================================
 // 3. GRADIENT PRESETS
 // ============================================
 export const GRADIENTS = {
+  // Hero gradients
+  hero: [primitives.orange[500], primitives.rose[500], primitives.violet[500]] as const,
+  heroVertical: ['#F97316', '#F43F5E', '#0C0A09'] as const,
+
   // Primary gradients
-  primary: [primitives.amber[500], primitives.amber[400]] as const,
-  secondary: [primitives.pink[500], primitives.pink[400]] as const,
+  primary: [primitives.orange[500], primitives.orange[400]] as const,
+  secondary: [primitives.rose[500], primitives.rose[400]] as const,
 
   // Gift-moment specific
-  gift: [primitives.amber[500], primitives.pink[500]] as const,
-  giftButton: [primitives.amber[500], primitives.pink[500]] as const,
-  celebration: [primitives.pink[500], primitives.purple[500]] as const,
+  gift: [primitives.orange[500], primitives.rose[500]] as const,
+  giftButton: [primitives.orange[500], primitives.rose[500]] as const,
+  giftVertical: [primitives.orange[400], primitives.rose[600]] as const,
 
   // Trust/Success
-  trust: [primitives.emerald[500], primitives.emerald[600]] as const,
+  trust: [primitives.emerald[400], primitives.emerald[600]] as const,
 
   // Decorative
-  sunset: [primitives.amber[500], primitives.red[500]] as const,
-  aurora: [primitives.purple[500], primitives.pink[500]] as const,
+  sunset: [primitives.orange[500], primitives.red[500]] as const,
+  aurora: [primitives.violet[500], primitives.rose[500], primitives.orange[500]] as const,
+  celebration: [primitives.rose[500], primitives.violet[500], primitives.sky[500]] as const,
 
   // Card overlay (for image cards)
+  cardOverlay: ['transparent', 'rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.8)'] as const,
+  cardOverlayLight: ['transparent', 'rgba(0, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.5)'] as const,
   hero: ['transparent', 'rgba(0, 0, 0, 0.7)'] as const,
   heroLight: ['transparent', 'rgba(0, 0, 0, 0.5)'] as const,
+
+  // Glass
+  glassLight: ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.7)'] as const,
+  glassDark: ['rgba(28, 25, 23, 0.9)', 'rgba(28, 25, 23, 0.7)'] as const,
+
+  // Button states
+  buttonDisabled: [primitives.stone[300], primitives.stone[400]] as const,
 } as const;
 
 // ============================================
 // 4. SHADOW PRESETS
 // ============================================
-export const CARD_SHADOW = {
-  shadowColor: primitives.black,
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.08,
-  shadowRadius: 8,
-  elevation: 3,
+export const SHADOWS = {
+  xs: {
+    shadowColor: primitives.stone[950],
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  sm: {
+    shadowColor: primitives.stone[950],
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: primitives.stone[950],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: primitives.stone[950],
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  xl: {
+    shadowColor: primitives.stone[950],
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  glow: {
+    shadowColor: primitives.orange[500],
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  glowRose: {
+    shadowColor: primitives.rose[500],
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 10,
+  },
 } as const;
 
-export const CARD_SHADOW_LIGHT = {
-  shadowColor: primitives.black,
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.05,
-  shadowRadius: 3,
-  elevation: 2,
-} as const;
-
-export const CARD_SHADOW_HEAVY = {
-  shadowColor: primitives.black,
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.12,
-  shadowRadius: 12,
-  elevation: 5,
-} as const;
+// Legacy shadow exports for backwards compatibility
+export const CARD_SHADOW = SHADOWS.md;
+export const CARD_SHADOW_LIGHT = SHADOWS.sm;
+export const CARD_SHADOW_HEAVY = SHADOWS.lg;
 
 // Export primitives for advanced use cases (theme generation, etc.)
 export { primitives };
