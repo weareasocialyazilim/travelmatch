@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     const { data: logs, count, error } = await query;
 
     if (error) {
-      console.error('Audit logs query error:', error);
+      logger.error('Audit logs query error:', error);
       return NextResponse.json({ error: 'Audit logları yüklenemedi' }, { status: 500 });
     }
 
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Audit logs GET error:', error);
+    logger.error('Audit logs GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

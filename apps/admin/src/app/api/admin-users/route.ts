@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     const { data: admins, count, error } = await query;
 
     if (error) {
-      console.error('Admin users query error:', error);
+      logger.error('Admin users query error:', error);
       return NextResponse.json({ error: 'Admin kullanıcıları yüklenemedi' }, { status: 500 });
     }
 
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Admin users GET error:', error);
+    logger.error('Admin users GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Admin user creation error:', error);
+      logger.error('Admin user creation error:', error);
       return NextResponse.json({ error: 'Admin kullanıcı oluşturulamadı' }, { status: 500 });
     }
 
@@ -135,7 +136,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ admin }, { status: 201 });
   } catch (error) {
-    console.error('Admin users POST error:', error);
+    logger.error('Admin users POST error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

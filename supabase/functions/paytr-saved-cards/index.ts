@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /**
  * PayTR Saved Cards Management
  *
@@ -97,7 +100,7 @@ serve(async (req: Request) => {
         );
     }
   } catch (error) {
-    console.error('Saved Cards Error:', error);
+    logger.error('Saved Cards Error:', error);
 
     if (error.message === 'Authentication required') {
       return new Response(

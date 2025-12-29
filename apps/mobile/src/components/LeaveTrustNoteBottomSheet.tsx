@@ -102,6 +102,9 @@ export const LeaveTrustNoteBottomSheet: React.FC<
               onPress={handleSubmit}
               disabled={!isValid}
               activeOpacity={0.8}
+              accessibilityLabel="Submit trust note"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !isValid }}
             >
               <Text style={styles.submitButtonText}>Submit Note</Text>
             </TouchableOpacity>
@@ -110,6 +113,8 @@ export const LeaveTrustNoteBottomSheet: React.FC<
               style={styles.cancelButton}
               onPress={onClose}
               activeOpacity={0.8}
+              accessibilityLabel="Cancel and close"
+              accessibilityRole="button"
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>

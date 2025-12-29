@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
     const { data: disputes, count, error } = await query;
 
     if (error) {
-      console.error('Disputes query error:', error);
+      logger.error('Disputes query error:', error);
       return NextResponse.json({ error: 'Anlaşmazlıklar yüklenemedi' }, { status: 500 });
     }
 
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Disputes GET error:', error);
+    logger.error('Disputes GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Dispute creation error:', error);
+      logger.error('Dispute creation error:', error);
       return NextResponse.json({ error: 'Anlaşmazlık oluşturulamadı' }, { status: 500 });
     }
 
@@ -135,7 +136,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ dispute }, { status: 201 });
   } catch (error) {
-    console.error('Disputes POST error:', error);
+    logger.error('Disputes POST error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

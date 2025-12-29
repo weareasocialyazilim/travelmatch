@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /**
  * PayTR Transfer Edge Function
  *
@@ -291,7 +294,7 @@ serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('PayTR Transfer Error:', error);
+    logger.error('PayTR Transfer Error:', error);
 
     return new Response(
       JSON.stringify({

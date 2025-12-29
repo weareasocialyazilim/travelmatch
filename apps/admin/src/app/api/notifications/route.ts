@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
 
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
       total: count,
     });
   } catch (error) {
-    console.error('Notifications API error:', error);
+    logger.error('Notifications API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch notifications' },
       { status: 500 }
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    console.error('Create notification error:', error);
+    logger.error('Create notification error:', error);
     return NextResponse.json(
       { error: 'Failed to create notification' },
       { status: 500 }

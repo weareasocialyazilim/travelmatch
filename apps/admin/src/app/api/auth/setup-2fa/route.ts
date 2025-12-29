@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
@@ -122,7 +123,7 @@ export async function GET(request: NextRequest) {
       message: 'QR kodu authenticator uygulamanız ile tarayın',
     });
   } catch (error) {
-    console.error('2FA setup error:', error);
+    logger.error('2FA setup error:', error);
     return NextResponse.json(
       { success: false, error: '2FA kurulumu başarısız' },
       { status: 500 }
@@ -212,7 +213,7 @@ export async function POST(request: NextRequest) {
         secret,
       });
     } catch (decryptError) {
-      console.error('TOTP decryption error:', decryptError);
+      logger.error('TOTP decryption error:', decryptError);
       return NextResponse.json(
         { success: false, error: 'Doğrulama işlemi başarısız' },
         { status: 500 }
@@ -256,7 +257,7 @@ export async function POST(request: NextRequest) {
       message: '2FA başarıyla aktifleştirildi',
     });
   } catch (error) {
-    console.error('2FA setup verification error:', error);
+    logger.error('2FA setup verification error:', error);
     return NextResponse.json(
       { success: false, error: '2FA doğrulama işlemi başarısız' },
       { status: 500 }
@@ -370,7 +371,7 @@ export async function DELETE(request: NextRequest) {
       message: '2FA başarıyla devre dışı bırakıldı',
     });
   } catch (error) {
-    console.error('2FA disable error:', error);
+    logger.error('2FA disable error:', error);
     return NextResponse.json(
       { success: false, error: '2FA devre dışı bırakma başarısız' },
       { status: 500 }

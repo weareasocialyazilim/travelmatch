@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -147,7 +150,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Feed delta error:', error);
+    logger.error('Feed delta error:', error);
 
     if (error instanceof z.ZodError) {
       return new Response(

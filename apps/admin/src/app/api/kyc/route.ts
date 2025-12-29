@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
     const { data: submissions, count, error } = await query;
 
     if (error) {
-      console.error('KYC query error:', error);
+      logger.error('KYC query error:', error);
       // If table doesn't exist, query profiles for KYC status
       const profilesQuery = supabase
         .from('profiles')
@@ -113,7 +114,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('KYC GET error:', error);
+    logger.error('KYC GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -190,7 +191,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('KYC update error:', updateError);
+      logger.error('KYC update error:', updateError);
       return NextResponse.json({ error: 'KYC güncellenemedi' }, { status: 500 });
     }
 
@@ -224,7 +225,7 @@ export async function PUT(request: NextRequest) {
       message: action === 'approve' ? 'KYC onaylandı' : 'KYC reddedildi',
     });
   } catch (error) {
-    console.error('KYC PUT error:', error);
+    logger.error('KYC PUT error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

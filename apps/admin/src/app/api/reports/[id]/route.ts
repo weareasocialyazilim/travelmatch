@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
 
@@ -31,7 +32,7 @@ export async function GET(
 
     return NextResponse.json(report);
   } catch (error) {
-    console.error('Get report error:', error);
+    logger.error('Get report error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch report' },
       { status: 500 }
@@ -65,7 +66,7 @@ export async function PATCH(
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Update report error:', error);
+    logger.error('Update report error:', error);
     return NextResponse.json(
       { error: 'Failed to update report' },
       { status: 500 }

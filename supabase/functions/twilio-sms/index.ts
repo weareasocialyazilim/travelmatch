@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /**
  * Twilio SMS Edge Function
  *
@@ -80,7 +83,7 @@ async function twilioRequest(
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('[Twilio] API error:', data);
+      logger.error('[Twilio] API error:', data);
       return {
         success: false,
         error: data.message || `Twilio API error: ${response.status}`,
@@ -89,7 +92,7 @@ async function twilioRequest(
 
     return { success: true, data };
   } catch (error) {
-    console.error('[Twilio] Request error:', error);
+    logger.error('[Twilio] Request error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -135,7 +138,7 @@ async function sendOtp(
   body.append('To', formattedPhone);
   body.append('Channel', channel);
 
-  console.log('[Twilio] Sending OTP to:', formattedPhone.slice(-4));
+  logger.info('[Twilio] Sending OTP to:', formattedPhone.slice(-4));
 
   return twilioRequest(url, 'POST', body);
 }
@@ -158,7 +161,7 @@ async function verifyOtp(
   body.append('To', formattedPhone);
   body.append('Code', code);
 
-  console.log('[Twilio] Verifying OTP for:', formattedPhone.slice(-4));
+  logger.info('[Twilio] Verifying OTP for:', formattedPhone.slice(-4));
 
   const result = await twilioRequest(url, 'POST', body);
 
@@ -192,7 +195,7 @@ async function sendSms(to: string, body: string): Promise<TwilioResponse> {
   params.append('From', TWILIO_PHONE_NUMBER);
   params.append('Body', body);
 
-  console.log('[Twilio] Sending SMS to:', formattedPhone.slice(-4));
+  logger.info('[Twilio] Sending SMS to:', formattedPhone.slice(-4));
 
   return twilioRequest(url, 'POST', params);
 }
@@ -362,7 +365,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('[Twilio Edge] Error:', error);
+    logger.error('[Twilio Edge] Error:', error);
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Internal error',

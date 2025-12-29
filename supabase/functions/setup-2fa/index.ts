@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -139,7 +142,7 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    console.error('[2FA Setup] Error:', error);
+    logger.error('[2FA Setup] Error:', error);
     return new Response(
       JSON.stringify({ error: error.message || '2FA setup failed' }),
       {

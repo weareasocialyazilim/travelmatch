@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -273,7 +276,7 @@ serve(async (req) => {
       });
 
     if (insertError) {
-      console.error('Failed to store verification result:', insertError);
+      logger.error('Failed to store verification result:', insertError);
       // Continue anyway - verification succeeded, storage failed
     }
 
@@ -298,7 +301,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Verify proof error:', error);
+    logger.error('Verify proof error:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Verification failed', 

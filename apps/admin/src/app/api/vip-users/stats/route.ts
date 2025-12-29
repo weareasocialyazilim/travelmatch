@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * VIP Users Stats API
  *
@@ -68,7 +69,7 @@ export async function GET() {
       commissionSaved: Math.max(0, commissionSaved),
     });
   } catch (error) {
-    console.error('VIP stats error:', error);
+    logger.error('VIP stats error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

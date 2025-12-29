@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Compliance Stats API
  *
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Compliance stats error:', error);
+    logger.error('Compliance stats error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

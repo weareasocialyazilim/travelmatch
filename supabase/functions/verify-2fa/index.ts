@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -203,7 +206,7 @@ serve(async (req) => {
     );
     return toHttpSuccessResponse(success, corsHeaders);
   } catch (error) {
-    console.error('[2FA Verify] Error:', error);
+    logger.error('[2FA Verify] Error:', error);
     
     if (error instanceof z.ZodError) {
       const validationError = createValidationError({

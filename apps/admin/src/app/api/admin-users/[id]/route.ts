@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
@@ -43,7 +44,7 @@ export async function GET(
 
     return NextResponse.json({ admin });
   } catch (error) {
-    console.error('Admin user GET error:', error);
+    logger.error('Admin user GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -111,7 +112,7 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error('Admin user update error:', error);
+      logger.error('Admin user update error:', error);
       return NextResponse.json({ error: 'Admin kullanıcı güncellenemedi' }, { status: 500 });
     }
 
@@ -129,7 +130,7 @@ export async function PATCH(
 
     return NextResponse.json({ admin });
   } catch (error) {
-    console.error('Admin user PATCH error:', error);
+    logger.error('Admin user PATCH error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -175,7 +176,7 @@ export async function DELETE(
       .eq('id', id);
 
     if (error) {
-      console.error('Admin user delete error:', error);
+      logger.error('Admin user delete error:', error);
       return NextResponse.json({ error: 'Admin kullanıcı silinemedi' }, { status: 500 });
     }
 
@@ -195,7 +196,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Admin user DELETE error:', error);
+    logger.error('Admin user DELETE error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

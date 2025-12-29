@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -110,7 +113,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[upload-cloudflare-image] Cloudflare error:', errorText);
+      logger.error('[upload-cloudflare-image] Cloudflare error:', errorText);
       return new Response(
         JSON.stringify({ error: 'Cloudflare upload failed', details: errorText }),
         { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -120,7 +123,7 @@ serve(async (req) => {
     const result = await response.json();
 
     // Log upload for audit
-    console.log('[upload-cloudflare-image] Success:', {
+    logger.info('[upload-cloudflare-image] Success:', {
       imageId: result.result.id,
       userId: user.id,
       size: bytes.length,
@@ -132,7 +135,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('[upload-cloudflare-image] Error:', error);
+    logger.error('[upload-cloudflare-image] Error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

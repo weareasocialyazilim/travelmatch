@@ -42,6 +42,8 @@ export const DeleteProofModal: React.FC<DeleteProofModalProps> = ({
               style={styles.cancelButton}
               onPress={onCancel}
               activeOpacity={0.7}
+              accessibilityLabel="Cancel deletion"
+              accessibilityRole="button"
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
@@ -52,6 +54,8 @@ export const DeleteProofModal: React.FC<DeleteProofModalProps> = ({
               style={styles.deleteButton}
               onPress={onDelete}
               activeOpacity={0.7}
+              accessibilityLabel="Confirm delete proof"
+              accessibilityRole="button"
             >
               <Text style={styles.deleteButtonText}>Delete</Text>
             </TouchableOpacity>

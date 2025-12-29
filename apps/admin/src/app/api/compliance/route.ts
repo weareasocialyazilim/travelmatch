@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Compliance API Routes
  *
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
       const { data: reports, count, error } = await query;
 
       if (error) {
-        console.error('SAR query error:', error);
+        logger.error('SAR query error:', error);
         return NextResponse.json(
           { error: 'SAR kayıtları yüklenemedi' },
           { status: 500 }
@@ -92,7 +93,7 @@ export async function GET(request: NextRequest) {
       const { data: profiles, count, error } = await query;
 
       if (error) {
-        console.error('Risk profiles query error:', error);
+        logger.error('Risk profiles query error:', error);
         return NextResponse.json(
           { error: 'Risk profilleri yüklenemedi' },
           { status: 500 }
@@ -115,7 +116,7 @@ export async function GET(request: NextRequest) {
         .order('risk_score', { ascending: false });
 
       if (error) {
-        console.error('AML thresholds query error:', error);
+        logger.error('AML thresholds query error:', error);
         return NextResponse.json(
           { error: 'AML eşikleri yüklenemedi' },
           { status: 500 }
@@ -133,7 +134,7 @@ export async function GET(request: NextRequest) {
         .order('risk_score', { ascending: false });
 
       if (error) {
-        console.error('Fraud rules query error:', error);
+        logger.error('Fraud rules query error:', error);
         return NextResponse.json(
           { error: 'Fraud kuralları yüklenemedi' },
           { status: 500 }
@@ -145,7 +146,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ error: 'Geçersiz tip' }, { status: 400 });
   } catch (error) {
-    console.error('Compliance GET error:', error);
+    logger.error('Compliance GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        console.error('SAR creation error:', error);
+        logger.error('SAR creation error:', error);
         return NextResponse.json(
           { error: 'SAR oluşturulamadı' },
           { status: 500 }
@@ -223,7 +224,7 @@ export async function POST(request: NextRequest) {
         });
 
       if (error) {
-        console.error('User block error:', error);
+        logger.error('User block error:', error);
         return NextResponse.json(
           { error: 'Kullanıcı engellenemedi' },
           { status: 500 }
@@ -257,7 +258,7 @@ export async function POST(request: NextRequest) {
         .eq('user_id', user_id);
 
       if (error) {
-        console.error('User unblock error:', error);
+        logger.error('User unblock error:', error);
         return NextResponse.json(
           { error: 'Kullanıcı engeli kaldırılamadı' },
           { status: 500 }
@@ -280,7 +281,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Geçersiz işlem' }, { status: 400 });
   } catch (error) {
-    console.error('Compliance POST error:', error);
+    logger.error('Compliance POST error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -346,7 +347,7 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('SAR update error:', error);
+      logger.error('SAR update error:', error);
       return NextResponse.json(
         { error: 'SAR güncellenemedi' },
         { status: 500 }
@@ -366,7 +367,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ sar });
   } catch (error) {
-    console.error('Compliance PATCH error:', error);
+    logger.error('Compliance PATCH error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

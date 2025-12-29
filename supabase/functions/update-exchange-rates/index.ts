@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /**
  * Exchange Rate Update Edge Function
  * Fetches live rates from ExchangeRate-API (free tier)
@@ -43,7 +46,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log('[ExchangeRates] Fetching rates from API...');
+    logger.info('[ExchangeRates] Fetching rates from API...');
 
     // Fetch rates from free API
     const response = await fetch(API_URL);
@@ -58,7 +61,7 @@ serve(async (req) => {
       throw new Error('API returned error');
     }
 
-    console.log('[ExchangeRates] API response:', {
+    logger.info('[ExchangeRates] API response:', {
       base: data.base_code,
       lastUpdate: data.time_last_update_utc,
       rateCount: Object.keys(data.rates).length,
@@ -72,7 +75,7 @@ serve(async (req) => {
       }
     }
 
-    console.log('[ExchangeRates] Supported rates:', supportedRates);
+    logger.info('[ExchangeRates] Supported rates:', supportedRates);
 
     // Generate all currency pairs
     const ratesToInsert: Array<{
@@ -115,7 +118,7 @@ serve(async (req) => {
       }
     }
 
-    console.log('[ExchangeRates] Inserting', ratesToInsert.length, 'rates...');
+    logger.info('[ExchangeRates] Inserting', ratesToInsert.length, 'rates...');
 
     // Insert rates using the upsert function
     let successCount = 0;
@@ -145,7 +148,7 @@ serve(async (req) => {
     const eurRate = supportedRates['EUR'];
     const gbpRate = supportedRates['GBP'];
 
-    console.log('[ExchangeRates] Key rates (1 USD =):', {
+    logger.info('[ExchangeRates] Key rates (1 USD =):', {
       TRY: tryRate?.toFixed(4),
       EUR: eurRate?.toFixed(4),
       GBP: gbpRate?.toFixed(4),
@@ -171,13 +174,13 @@ serve(async (req) => {
       },
     };
 
-    console.log('[ExchangeRates] Complete:', result);
+    logger.info('[ExchangeRates] Complete:', result);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('[ExchangeRates] Error:', error);
+    logger.error('[ExchangeRates] Error:', error);
 
     return new Response(
       JSON.stringify({

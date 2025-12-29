@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     const { data: escrowTransactions, count, error } = await query;
 
     if (error) {
-      console.error('Escrow query error:', error);
+      logger.error('Escrow query error:', error);
       return NextResponse.json({ error: 'Escrow işlemleri yüklenemedi' }, { status: 500 });
     }
 
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Escrow GET error:', error);
+    logger.error('Escrow GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('Escrow update error:', updateError);
+      logger.error('Escrow update error:', updateError);
       return NextResponse.json({ error: 'Escrow güncellenemedi' }, { status: 500 });
     }
 
@@ -184,7 +185,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ escrow: updated, message: 'İşlem başarılı' });
   } catch (error) {
-    console.error('Escrow POST error:', error);
+    logger.error('Escrow POST error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

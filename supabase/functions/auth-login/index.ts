@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -64,7 +67,7 @@ serve(async (req) => {
     });
 
     if (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       const errorResponse = handleSupabaseAuthError(error);
       return toHttpResponse(errorResponse, corsHeaders);
     }

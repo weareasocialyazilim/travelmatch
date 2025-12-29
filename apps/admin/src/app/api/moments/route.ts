@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     const { data: moments, count, error } = await query;
 
     if (error) {
-      console.error('Moments query error:', error);
+      logger.error('Moments query error:', error);
       return NextResponse.json({ error: 'Momentler yüklenemedi' }, { status: 500 });
     }
 
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Moments GET error:', error);
+    logger.error('Moments GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

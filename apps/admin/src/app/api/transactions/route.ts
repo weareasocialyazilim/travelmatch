@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
     const { data: transactions, count, error } = await query;
 
     if (error) {
-      console.error('Transactions query error:', error);
+      logger.error('Transactions query error:', error);
       return NextResponse.json({ error: 'İşlemler yüklenemedi' }, { status: 500 });
     }
 
@@ -105,7 +106,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Transactions GET error:', error);
+    logger.error('Transactions GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
