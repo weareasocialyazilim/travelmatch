@@ -75,8 +75,7 @@ CREATE TABLE admin_sessions (
 CREATE INDEX idx_admin_sessions_admin_id ON admin_sessions(admin_id);
 CREATE INDEX idx_admin_sessions_expires ON admin_sessions(expires_at);
 
--- Cleanup expired sessions
-CREATE INDEX idx_admin_sessions_cleanup ON admin_sessions(expires_at) WHERE expires_at < now();
+-- Note: Partial index with now() removed - use expires_at index for cleanup queries
 
 -- =====================================================
 -- ROLE PERMISSIONS TABLE
@@ -95,10 +94,10 @@ CREATE TABLE role_permissions (
 CREATE INDEX idx_role_permissions_role ON role_permissions(role);
 
 -- =====================================================
--- AUDIT LOGS TABLE
+-- ADMIN AUDIT LOGS TABLE (separate from main audit_logs)
 -- =====================================================
 
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS admin_audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   admin_id UUID REFERENCES admin_users(id),
   action TEXT NOT NULL,
@@ -111,14 +110,11 @@ CREATE TABLE audit_logs (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Indexes for audit log queries
-CREATE INDEX idx_audit_logs_admin_id ON audit_logs(admin_id);
-CREATE INDEX idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX idx_audit_logs_resource ON audit_logs(resource_type, resource_id);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
-
--- Partition by month for better performance (optional, uncomment if needed)
--- CREATE INDEX idx_audit_logs_created_month ON audit_logs(date_trunc('month', created_at));
+-- Indexes for admin audit log queries
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_admin_id ON admin_audit_logs(admin_id);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_action ON admin_audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_resource ON admin_audit_logs(resource_type, resource_id);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_created_at ON admin_audit_logs(created_at DESC);
 
 -- =====================================================
 -- TASKS TABLE (Task Queue)
@@ -206,9 +202,9 @@ CREATE POLICY "Admins can view audit logs"
     )
   );
 
--- All authenticated admins can insert audit logs
-CREATE POLICY "Admins can insert audit logs"
-  ON audit_logs FOR INSERT
+-- All authenticated admins can insert admin audit logs
+CREATE POLICY "Admins can insert admin audit logs"
+  ON admin_audit_logs FOR INSERT
   WITH CHECK (admin_id = auth.uid());
 
 -- Tasks - admins can view tasks assigned to them or their role

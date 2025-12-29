@@ -105,24 +105,26 @@ BEGIN
     NOW()
   );
 
-  -- Log audit event
+  -- Log audit event (using correct audit_logs schema: user_id, action, metadata)
   INSERT INTO audit_logs (
-    event_type,
-    entity_type,
-    entity_id,
     user_id,
-    old_values,
-    new_values,
+    action,
     ip_address,
+    metadata,
     created_at
   ) VALUES (
-    'transfer.completed',
-    'transaction',
-    v_transaction_id,
     p_sender_id,
-    jsonb_build_object('sender_balance', v_sender_balance, 'recipient_balance', v_recipient_balance),
-    jsonb_build_object('sender_balance', v_sender_balance - p_amount, 'recipient_balance', v_recipient_balance + p_amount),
+    'transfer.completed',
     '0.0.0.0',
+    jsonb_build_object(
+      'transaction_id', v_transaction_id,
+      'sender_balance_before', v_sender_balance,
+      'sender_balance_after', v_sender_balance - p_amount,
+      'recipient_id', p_recipient_id,
+      'recipient_balance_before', v_recipient_balance,
+      'recipient_balance_after', v_recipient_balance + p_amount,
+      'amount', p_amount
+    ),
     NOW()
   );
 
@@ -151,6 +153,4 @@ $$;
 GRANT EXECUTE ON FUNCTION public.atomic_transfer TO authenticated;
 
 -- Add comment for documentation
-COMMENT ON FUNCTION public.atomic_transfer IS 
-'Atomically transfers funds between two users with FOR UPDATE locks to prevent race conditions. 
-Returns JSON with success status, transaction_id, and new balances.';
+COMMENT ON FUNCTION public.atomic_transfer IS 'Atomically transfers funds between two users with FOR UPDATE locks to prevent race conditions. Returns JSON with success status, transaction_id, and new balances.';
