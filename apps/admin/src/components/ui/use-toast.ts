@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export interface Toast {
+export interface ToastProps {
   id: string;
   title?: string;
   description?: string;
@@ -8,11 +8,9 @@ export interface Toast {
   variant?: 'default' | 'destructive';
 }
 
-type ToasterToast = Toast & {
-  id: string;
-  title?: string;
-  description?: string;
-  action?: React.ReactNode;
+type ToasterToast = ToastProps & {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const TOAST_LIMIT = 1;
@@ -122,9 +120,9 @@ function dispatch(action: ActionType) {
   });
 }
 
-type Toast = Omit<ToasterToast, 'id'>;
+type ToastInput = Omit<ToasterToast, 'id' | 'open' | 'onOpenChange'>;
 
-function toast({ ...props }: Toast) {
+function toast(props: ToastInput) {
   const id = Math.random().toString(36).substr(2, 9);
 
   const update = (props: ToasterToast) =>
