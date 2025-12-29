@@ -33,6 +33,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
 }) => {
   const {
     gestureId,
+    senderId,
     momentTitle,
     amount,
     senderName,
@@ -104,10 +105,10 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
   };
 
   const handleSayThanks = () => {
-    if (!isAnonymous) {
+    if (!isAnonymous && senderId) {
       navigation.navigate('Chat', {
         otherUser: {
-          id: gestureId,
+          id: senderId,  // Fixed: use senderId instead of gestureId
           name: senderName || 'Anonymous',
           avatar: senderAvatar || 'https://via.placeholder.com/100',
           isVerified: true,
@@ -121,7 +122,12 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
   };
 
   const handleUploadProof = () => {
-    navigation.navigate('ProofFlow');
+    navigation.navigate('ProofFlow', {
+      escrowId: gestureId,  // gestureId is the escrow/gift transaction ID
+      giftId: gestureId,
+      momentTitle,
+      senderId,
+    });
   };
 
   const handleViewBalance = () => {

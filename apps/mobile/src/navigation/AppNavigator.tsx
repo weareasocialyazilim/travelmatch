@@ -163,6 +163,7 @@ import {
   SuccessScreen,
   SuccessConfirmationScreen,
   PaymentFailedScreen,
+  ProofReviewScreen,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -394,6 +395,7 @@ const AppNavigator = () => {
             {/* Proof System */}
             <Stack.Screen name="ProofFlow" component={ProofFlowScreen} />
             <Stack.Screen name="ProofDetail" component={ProofDetailScreen} />
+            <Stack.Screen name="ProofReview" component={ProofReviewScreen} />
 
             {/* Approval & Matching */}
             <Stack.Screen

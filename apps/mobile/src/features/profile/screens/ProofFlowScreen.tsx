@@ -29,6 +29,9 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
+import { supabase } from '@/config/supabase';
+import { uploadFile } from '@/services/supabaseStorageService';
+import { useAuth } from '@/context/AuthContext';
 
 type IconName = React.ComponentProps<typeof Icon>['name'];
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
@@ -81,11 +84,16 @@ type ProofFlowScreenProps = StackScreenProps<RootStackParamList, 'ProofFlow'>;
 
 export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   navigation,
+  route,
 }) => {
   const { showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [loading, setLoading] = useState(false);
+
+  // Get escrow/gift context from route params
+  const { escrowId, giftId, momentId, momentTitle: routeMomentTitle, senderId } = route.params || {};
 
   const {
     control,
@@ -281,13 +289,110 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     );
   };
 
-  const onSubmit = (_data: ProofInput) => {
+  const onSubmit = async (data: ProofInput) => {
+    if (!user?.id) {
+      showToast('Lütfen giriş yapın', 'error');
+      return;
+    }
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // 1. Upload all photos to Supabase Storage
+      const uploadedPhotoUrls: string[] = [];
+      for (const photoUri of data.photos) {
+        const result = await uploadFile('proofs', photoUri, user.id);
+        if (result.error) {
+          throw new Error(`Fotoğraf yüklenemedi: ${result.error.message}`);
+        }
+        if (result.url) {
+          uploadedPhotoUrls.push(result.url);
+        }
+      }
+
+      // 2. Upload ticket if exists
+      let ticketUrl: string | null = null;
+      if (data.ticket) {
+        const ticketResult = await uploadFile('proofs', data.ticket, user.id, {
+          fileName: `${user.id}/ticket-${Date.now()}.pdf`,
+        });
+        if (ticketResult.url) {
+          ticketUrl = ticketResult.url;
+        }
+      }
+
+      // 3. Create proof_verifications record
+      const { data: proofRecord, error: proofError } = await supabase
+        .from('proof_verifications')
+        .insert({
+          user_id: user.id,
+          escrow_id: escrowId || null,
+          moment_id: momentId || null,
+          photo_urls: uploadedPhotoUrls,
+          ticket_url: ticketUrl,
+          location: data.location ? {
+            lat: data.location.lat,
+            lng: data.location.lng,
+            name: data.location.name,
+          } : null,
+          title: data.title,
+          description: data.description,
+          proof_type: data.type,
+          status: 'pending_review',
+          submitted_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (proofError) {
+        throw new Error(`Kanıt kaydedilemedi: ${proofError.message}`);
+      }
+
+      // 4. Update escrow_transactions if escrowId exists
+      if (escrowId) {
+        const { error: escrowError } = await supabase
+          .from('escrow_transactions')
+          .update({
+            proof_submitted: true,
+            proof_verification_date: new Date().toISOString(),
+          })
+          .eq('id', escrowId);
+
+        if (escrowError) {
+          logger.warn('Failed to update escrow', escrowError);
+        }
+      }
+
+      // 5. Send notification to the gift sender
+      if (senderId) {
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .insert({
+            user_id: senderId,
+            type: 'proof_submitted',
+            title: 'Kanıt yüklendi! 📸',
+            body: `Hediyeniz için kanıt yüklendi. Onayınız bekleniyor.`,
+            data: {
+              proof_id: proofRecord?.id,
+              escrow_id: escrowId,
+              gift_id: giftId,
+            },
+          });
+
+        if (notifError) {
+          logger.warn('Failed to send notification', notifError);
+        }
+      }
+
+      // 6. Navigate to success
       setLoading(false);
       navigation.navigate('Success', { type: 'proof_uploaded' });
-    }, 2000);
+
+    } catch (error) {
+      setLoading(false);
+      const message = error instanceof Error ? error.message : 'Kanıt yüklenirken hata oluştu';
+      showToast(message, 'error');
+      logger.error('Proof upload failed', error as Error);
+    }
   };
 
   const renderTypeSelection = () => (
