@@ -23,6 +23,8 @@ import { COLORS, primitives } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { ConfirmGiftModal } from './ConfirmGiftModal';
 import { useScreenSecurity } from '../hooks/useScreenSecurity';
+import { formatCurrency } from '../utils/currencyFormatter';
+import type { CurrencyCode } from '../constants/currencies';
 import type { MomentData } from '../types';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -280,7 +282,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             <View style={styles.paymentRow}>
               <Text style={styles.paymentLabel}>Amount</Text>
               <Text style={styles.paymentValue}>
-                ${(moment.price ?? 0).toFixed(2)}
+                {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
               </Text>
             </View>
             <View style={styles.paymentRow}>
@@ -291,7 +293,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             <View style={styles.paymentRow}>
               <Text style={styles.paymentTotal}>Total</Text>
               <Text style={styles.paymentTotal}>
-                ${(moment.price ?? 0).toFixed(2)}
+                {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
               </Text>
             </View>
           </View>
@@ -397,7 +399,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
               activeOpacity={0.8}
             >
               <Text style={styles.ctaButtonText}>
-                Send • ${(moment.price ?? 0).toFixed(2)}
+                Send • {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
               </Text>
             </TouchableOpacity>
           </View>
