@@ -19,9 +19,9 @@ import Svg, {
   LinearGradient as SvgGradient,
   Stop,
 } from 'react-native-svg';
-import { COLORS, SHADOWS } from '@/constants/colors-ultimate';
-import { SIZES, SPACING } from '@/constants/spacing-ultimate';
-import { TYPOGRAPHY } from '@/constants/typography-ultimate';
+import { COLORS, SHADOWS } from '@/constants/colors';
+import { SIZES, SPACING } from '@/constants/spacing';
+import { TYPOGRAPHY } from '@/theme/typography';
 
 type TrustLevel = 'platinum' | 'gold' | 'silver' | 'bronze';
 type RingSize = 'xs' | 'sm' | 'md' | 'lg' | 'hero';
