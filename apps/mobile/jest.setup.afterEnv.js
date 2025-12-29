@@ -1,20 +1,48 @@
 // Setup react-native-gesture-handler mocks inline to avoid babel transformation issues
-jest.mock('react-native-gesture-handler', () => ({
-  GestureHandlerRootView: ({ children }) => children,
-  ScrollView: require('react-native').ScrollView,
-  FlatList: require('react-native').FlatList,
-  Pressable: require('react-native').Pressable,
-  TouchableOpacity: require('react-native').TouchableOpacity,
-  TouchableHighlight: require('react-native').TouchableHighlight,
-  TouchableWithoutFeedback: require('react-native').TouchableWithoutFeedback,
-  TouchableNativeFeedback: require('react-native').TouchableNativeFeedback,
-  State: {},
-  PanGestureHandler: 'View',
-  BaseButton: 'View',
-  Directions: {},
-  TapGestureHandler: 'View',
-  gestureHandlerRootHOC: (component) => component,
-}));
+jest.mock('react-native-gesture-handler', () => {
+  // Mock gesture builder that returns chainable methods
+  const createGestureMock = () => ({
+    enabled: jest.fn().mockReturnThis(),
+    onStart: jest.fn().mockReturnThis(),
+    onUpdate: jest.fn().mockReturnThis(),
+    onEnd: jest.fn().mockReturnThis(),
+    onFinalize: jest.fn().mockReturnThis(),
+    withTestId: jest.fn().mockReturnThis(),
+    runOnJS: jest.fn().mockReturnThis(),
+    simultaneousWithExternalGesture: jest.fn().mockReturnThis(),
+    requireExternalGestureToFail: jest.fn().mockReturnThis(),
+  });
+
+  return {
+    GestureHandlerRootView: ({ children }) => children,
+    ScrollView: require('react-native').ScrollView,
+    FlatList: require('react-native').FlatList,
+    Pressable: require('react-native').Pressable,
+    TouchableOpacity: require('react-native').TouchableOpacity,
+    TouchableHighlight: require('react-native').TouchableHighlight,
+    TouchableWithoutFeedback: require('react-native').TouchableWithoutFeedback,
+    TouchableNativeFeedback: require('react-native').TouchableNativeFeedback,
+    State: {},
+    PanGestureHandler: 'View',
+    BaseButton: 'View',
+    Directions: {},
+    TapGestureHandler: 'View',
+    gestureHandlerRootHOC: (component) => component,
+    // Add Gesture API mock
+    Gesture: {
+      Pan: createGestureMock,
+      Tap: createGestureMock,
+      LongPress: createGestureMock,
+      Fling: createGestureMock,
+      Pinch: createGestureMock,
+      Rotation: createGestureMock,
+      Simultaneous: jest.fn((...gestures) => createGestureMock()),
+      Exclusive: jest.fn((...gestures) => createGestureMock()),
+      Race: jest.fn((...gestures) => createGestureMock()),
+    },
+    GestureDetector: ({ children }) => children,
+  };
+});
 
 // Set global __DEV__ for React Native
 global.__DEV__ = true;
@@ -581,11 +609,19 @@ try {
   jest.mock('@/components/ui/EmptyState', () => {
     const React = require('react');
     const { View, Text, TouchableOpacity } = require('react-native');
-    const EmptyState = ({ title, description, actionLabel, onAction }) =>
-      React.createElement(
+    const EmptyState = ({
+      title,
+      description,
+      subtitle,
+      actionLabel,
+      onAction,
+    }) => {
+      const desc = description || subtitle;
+      return React.createElement(
         View,
         null,
         React.createElement(Text, null, title || 'empty'),
+        desc ? React.createElement(Text, null, desc) : null,
         actionLabel
           ? React.createElement(
               TouchableOpacity,
@@ -594,6 +630,7 @@ try {
             )
           : null,
       );
+    };
     return { __esModule: true, EmptyState };
   });
 } catch (e) {

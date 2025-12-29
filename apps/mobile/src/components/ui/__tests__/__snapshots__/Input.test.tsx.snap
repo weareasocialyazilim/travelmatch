@@ -190,7 +190,7 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
           "marginRight": 12,
         }
       }
-      testID="icon-magnify"
+      testID="RCTText"
     >
       magnify
     </RCTText>
@@ -250,7 +250,7 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
         name="close"
         ref={null}
         size={20}
-        testID="icon-close"
+        testID="RCTText"
       >
         close
       </RCTText>
