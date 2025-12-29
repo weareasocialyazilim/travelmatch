@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ interface SetPriceBottomSheetProps {
 
 const PRESET_PRICES = [5, 10, 20, 50, 0]; // 0 represents "Free"
 
-export const SetPriceBottomSheet: React.FC<SetPriceBottomSheetProps> = ({
+export const SetPriceBottomSheet: React.FC<SetPriceBottomSheetProps> = memo(({
   visible,
   onClose,
   onSetPrice,
@@ -141,7 +141,9 @@ export const SetPriceBottomSheet: React.FC<SetPriceBottomSheetProps> = ({
       </View>
     </Modal>
   );
-};
+});
+
+SetPriceBottomSheet.displayName = 'SetPriceBottomSheet';
 
 const styles = StyleSheet.create({
   backdrop: {

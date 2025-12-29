@@ -159,33 +159,53 @@ export const useChatScreen = ({
     [startTyping, stopTyping],
   );
 
-  // Handle send message
+  // Handle send message with OPTIMISTIC UI
   const handleSend = useCallback(async () => {
-    if (messageText.trim() && !isSending) {
-      setIsSending(true);
-      trackInteraction('message_sent', {
-        message_length: messageText.length,
-        recipient: otherUserName,
-      });
+    const trimmedMessage = messageText.trim();
+    if (!trimmedMessage || isSending) return;
 
-      try {
-        // Send via API if conversationId exists
-        if (conversationId) {
-          await sendMessage({
-            conversationId,
-            content: messageText.trim(),
-            type: 'text',
-          });
-        }
+    // Generate optimistic message ID
+    const optimisticId = `optimistic-${Date.now()}`;
+    const optimisticMessage: Message = {
+      id: optimisticId,
+      type: 'text',
+      text: trimmedMessage,
+      user: 'me',
+      timestamp: new Date().toISOString(),
+    };
 
-        stopTyping();
-        setMessageText('');
-      } catch (error) {
-        logger.error('Failed to send message', error as Error);
-        showToast('Please try again', 'error');
-      } finally {
-        setIsSending(false);
+    // 1. IMMEDIATELY add message to UI (optimistic update)
+    setMessages((prev) => [...prev, optimisticMessage]);
+
+    // 2. IMMEDIATELY clear input
+    setMessageText('');
+    stopTyping();
+
+    // 3. Track interaction
+    trackInteraction('message_sent', {
+      message_length: trimmedMessage.length,
+      recipient: otherUserName,
+    });
+
+    // 4. Send to server in background
+    setIsSending(true);
+    try {
+      if (conversationId) {
+        await sendMessage({
+          conversationId,
+          content: trimmedMessage,
+          type: 'text',
+        });
       }
+      // Message sent successfully - real message will come via realtime subscription
+    } catch (error) {
+      logger.error('Failed to send message', error as Error);
+      showToast('Mesaj gönderilemedi. Tekrar deneyin.', 'error');
+
+      // Rollback: Remove optimistic message on failure
+      setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId));
+    } finally {
+      setIsSending(false);
     }
   }, [
     messageText,
@@ -195,6 +215,7 @@ export const useChatScreen = ({
     stopTyping,
     trackInteraction,
     otherUserName,
+    showToast,
   ]);
 
   // Handle attachment sheet actions
