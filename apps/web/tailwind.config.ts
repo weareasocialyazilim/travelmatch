@@ -1,9 +1,6 @@
 import type { Config } from 'tailwindcss';
-// @ts-expect-error - design-system exports preset but types aren't built
-import designSystemPreset from '@travelmatch/design-system/src/tailwind.preset';
-import tailwindcssAnimate from 'tailwindcss-animate';
-// @ts-expect-error - types exist but module resolution differs
-import typography from '@tailwindcss/typography';
+// @ts-ignore - design-system exports preset but types aren't built
+import designSystemPreset from '../../packages/design-system/src/tailwind.preset';
 
 /**
  * TravelMatch Landing Page - Tailwind Config
@@ -18,7 +15,6 @@ const config: Config = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  plugins: [tailwindcssAnimate, typography],
 };
 
 export default config;

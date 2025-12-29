@@ -35,7 +35,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com",
+      "connect-src 'self' http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321 https://*.supabase.co wss://*.supabase.co https://api.stripe.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -50,10 +50,7 @@ const securityHeaders = [
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  eslint: {
-    // Disable ESLint during builds since root .eslintrc is missing dependencies
-    ignoreDuringBuilds: true,
-  },
+  // Note: ESLint configuration moved to eslint.config.mjs (Next.js 16+ requirement)
   typescript: {
     // Allow production builds to complete even with type errors
     // This is needed because Supabase types aren't generated for this project
