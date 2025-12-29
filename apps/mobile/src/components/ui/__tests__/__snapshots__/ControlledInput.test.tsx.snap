@@ -122,7 +122,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
               "marginRight": 12,
             }
           }
-          testID="icon-lock-outline"
+          testID="RCTText"
         >
           lock-outline
         </RCTText>
@@ -188,7 +188,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             name="eye"
             ref={null}
             size={20}
-            testID="icon-eye"
+            testID="RCTText"
           >
             eye
           </RCTText>
@@ -459,7 +459,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
               "marginRight": 12,
             }
           }
-          testID="icon-lock-outline"
+          testID="RCTText"
         >
           lock-outline
         </RCTText>
@@ -525,7 +525,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             name="eye"
             ref={null}
             size={20}
-            testID="icon-eye"
+            testID="RCTText"
           >
             eye
           </RCTText>

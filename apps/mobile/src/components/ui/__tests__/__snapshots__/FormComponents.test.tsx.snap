@@ -307,7 +307,7 @@ exports[`FormComponents FormInput - Snapshots should match snapshot with error 1
       name="alert-circle"
       ref={null}
       size={14}
-      testID="icon-alert-circle"
+      testID="RCTText"
     >
       alert-circle
     </RCTText>

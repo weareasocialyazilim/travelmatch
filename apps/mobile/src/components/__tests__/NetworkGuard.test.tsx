@@ -6,12 +6,17 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { NetworkGuard } from '../NetworkGuard';
-import { useNetworkStatus } from '../../context/NetworkContext';
 
 // Mock NetworkContext
-jest.mock('../../context/NetworkContext');
+jest.mock('../../context/NetworkContext', () => ({
+  useNetworkStatus: jest.fn(),
+}));
 
-const mockUseNetworkStatus = useNetworkStatus ;
+import { useNetworkStatus } from '../../context/NetworkContext';
+
+const mockUseNetworkStatus = useNetworkStatus as jest.MockedFunction<
+  typeof useNetworkStatus
+>;
 
 describe('NetworkGuard', () => {
   const TestChild = () => <Text>Protected Content</Text>;
@@ -30,7 +35,7 @@ describe('NetworkGuard', () => {
       const { getByText } = render(
         <NetworkGuard>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(getByText('Protected Content')).toBeTruthy();
@@ -46,7 +51,7 @@ describe('NetworkGuard', () => {
         <NetworkGuard>
           <Text>First Child</Text>
           <Text>Second Child</Text>
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(getByText('First Child')).toBeTruthy();
@@ -64,12 +69,12 @@ describe('NetworkGuard', () => {
       const { queryByText, UNSAFE_root } = render(
         <NetworkGuard>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       // Children should not be rendered
       expect(queryByText('Protected Content')).toBeNull();
-      
+
       // OfflineState should be rendered
       expect(UNSAFE_root).toBeTruthy();
     });
@@ -84,7 +89,7 @@ describe('NetworkGuard', () => {
       const { getByText } = render(
         <NetworkGuard offlineMessage={customMessage}>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(getByText(customMessage)).toBeTruthy();
@@ -100,7 +105,7 @@ describe('NetworkGuard', () => {
       const { UNSAFE_root } = render(
         <NetworkGuard>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -110,7 +115,7 @@ describe('NetworkGuard', () => {
     it('should use custom onRetry when provided', () => {
       const mockRefresh = jest.fn();
       const mockCustomRetry = jest.fn();
-      
+
       mockUseNetworkStatus.mockReturnValue({
         isConnected: false,
         refresh: mockRefresh,
@@ -119,7 +124,7 @@ describe('NetworkGuard', () => {
       const { UNSAFE_root } = render(
         <NetworkGuard onRetry={mockCustomRetry}>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -137,7 +142,7 @@ describe('NetworkGuard', () => {
       const { UNSAFE_root } = render(
         <NetworkGuard compact>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -152,7 +157,7 @@ describe('NetworkGuard', () => {
       const { UNSAFE_root } = render(
         <NetworkGuard compact={false}>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -174,7 +179,7 @@ describe('NetworkGuard', () => {
       const { getByText, getByTestId } = render(
         <NetworkGuard offlineProps={customOfflineProps}>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       expect(getByText('Reload')).toBeTruthy();
@@ -187,7 +192,7 @@ describe('NetworkGuard', () => {
       const { rerender, getByText, queryByText } = render(
         <NetworkGuard>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
 
       // Start offline
@@ -198,7 +203,7 @@ describe('NetworkGuard', () => {
       rerender(
         <NetworkGuard>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
       expect(queryByText('Protected Content')).toBeNull();
 
@@ -210,7 +215,7 @@ describe('NetworkGuard', () => {
       rerender(
         <NetworkGuard>
           <TestChild />
-        </NetworkGuard>
+        </NetworkGuard>,
       );
       expect(getByText('Protected Content')).toBeTruthy();
     });

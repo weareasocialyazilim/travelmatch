@@ -82,7 +82,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       name="map-marker"
       ref={null}
       size={16}
-      testID="icon-map-marker"
+      testID="RCTText"
     >
       map-marker
     </RCTText>
@@ -129,7 +129,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       name="shield-check"
       ref={null}
       size={16}
-      testID="icon-shield-check"
+      testID="RCTText"
     >
       shield-check
     </RCTText>
@@ -153,7 +153,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       name="chevron-right"
       ref={null}
       size={16}
-      testID="icon-chevron-right"
+      testID="RCTText"
     >
       chevron-right
     </RCTText>
@@ -263,7 +263,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       name="map-marker"
       ref={null}
       size={16}
-      testID="icon-map-marker"
+      testID="RCTText"
     >
       map-marker
     </RCTText>
@@ -310,7 +310,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       name="shield-check"
       ref={null}
       size={16}
-      testID="icon-shield-check"
+      testID="RCTText"
     >
       shield-check
     </RCTText>
@@ -334,7 +334,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       name="chevron-right"
       ref={null}
       size={16}
-      testID="icon-chevron-right"
+      testID="RCTText"
     >
       chevron-right
     </RCTText>
