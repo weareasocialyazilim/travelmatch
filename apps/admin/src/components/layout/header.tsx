@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Admin Header V2
+ * TravelMatch Admin Header
  * "Cinematic Travel + Trust Jewelry" Design
  */
 
@@ -70,7 +70,9 @@ export function Header() {
   // Generate breadcrumbs from pathname
   const pathSegments = pathname.split('/').filter(Boolean);
   const breadcrumbs = pathSegments.map((segment, index) => ({
-    label: routeLabels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1),
+    label:
+      routeLabels[segment] ||
+      segment.charAt(0).toUpperCase() + segment.slice(1),
     href: '/' + pathSegments.slice(0, index + 1).join('/'),
     isLast: index === pathSegments.length - 1,
   }));
@@ -129,7 +131,7 @@ export function Header() {
         <div
           className={cn(
             'admin-header-search cursor-pointer',
-            searchFocused && 'ring-2 ring-primary/50'
+            searchFocused && 'ring-2 ring-primary/50',
           )}
           onClick={handleSearchClick}
         >
@@ -168,7 +170,9 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-80">
             <div className="flex items-center justify-between px-4 py-2 border-b">
               <span className="font-semibold">Bildirimler</span>
-              <Badge variant="secondary" className="text-xs">3 yeni</Badge>
+              <Badge variant="secondary" className="text-xs">
+                3 yeni
+              </Badge>
             </div>
             <div className="max-h-[300px] overflow-y-auto">
               {/* Notification items */}
@@ -176,9 +180,15 @@ export function Header() {
                 <div className="flex items-start gap-3">
                   <div className="h-2 w-2 mt-2 rounded-full bg-destructive shrink-0" />
                   <div>
-                    <p className="text-sm font-medium">Yüksek öncelikli KYC bekliyor</p>
-                    <p className="text-xs text-muted-foreground">24 kullanıcı onay bekliyor</p>
-                    <p className="text-xs text-muted-foreground mt-1">5 dk önce</p>
+                    <p className="text-sm font-medium">
+                      Yüksek öncelikli KYC bekliyor
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      24 kullanıcı onay bekliyor
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      5 dk önce
+                    </p>
                   </div>
                 </div>
               </div>
@@ -186,9 +196,15 @@ export function Header() {
                 <div className="flex items-start gap-3">
                   <div className="h-2 w-2 mt-2 rounded-full bg-warning shrink-0" />
                   <div>
-                    <p className="text-sm font-medium">Sistem performansı düştü</p>
-                    <p className="text-xs text-muted-foreground">Notification servisi %98.5 uptime</p>
-                    <p className="text-xs text-muted-foreground mt-1">15 dk önce</p>
+                    <p className="text-sm font-medium">
+                      Sistem performansı düştü
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Notification servisi %98.5 uptime
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      15 dk önce
+                    </p>
                   </div>
                 </div>
               </div>
@@ -197,8 +213,12 @@ export function Header() {
                   <div className="h-2 w-2 mt-2 rounded-full bg-trust shrink-0" />
                   <div>
                     <p className="text-sm font-medium">Günlük rapor hazır</p>
-                    <p className="text-xs text-muted-foreground">17 Aralık raporu oluşturuldu</p>
-                    <p className="text-xs text-muted-foreground mt-1">1 saat önce</p>
+                    <p className="text-xs text-muted-foreground">
+                      17 Aralık raporu oluşturuldu
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      1 saat önce
+                    </p>
                   </div>
                 </div>
               </div>
@@ -228,7 +248,10 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-9 gap-2 pl-2 pr-3">
               <Avatar className="h-7 w-7">
-                <AvatarImage src={user?.avatar_url || undefined} alt={user?.name} />
+                <AvatarImage
+                  src={user?.avatar_url || undefined}
+                  alt={user?.name}
+                />
                 <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                   {user ? getInitials(user.name) : '??'}
                 </AvatarFallback>
@@ -241,7 +264,9 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <div className="px-2 py-1.5">
               <p className="font-medium text-sm">{user?.name}</p>
-              <p className="text-xs text-muted-foreground">{user?.email || 'Super Admin'}</p>
+              <p className="text-xs text-muted-foreground">
+                {user?.email || 'Super Admin'}
+              </p>
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
@@ -253,7 +278,10 @@ export function Header() {
               Ayarlar
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Çıkış Yap
             </DropdownMenuItem>
