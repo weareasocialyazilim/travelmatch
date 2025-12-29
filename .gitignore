@@ -73,6 +73,7 @@ supabase/.temp/
 # Infisical local cache
 .infisical/
 .infisical.json
+.env.infisical
 
 # ============================================
 # CLEANUP: Temporary and backup files
