@@ -1,73 +1,89 @@
 // Grid Moment Card - Compact card for 2-column grid view
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import type { GridCardProps } from './types';
 
-export const GridMomentCard: React.FC<GridCardProps> = ({
-  item,
-  index,
-  onPress,
-}) => (
-  <View style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}>
-    <TouchableOpacity
-      style={styles.gridCard}
-      onPress={() => onPress(item)}
-      activeOpacity={0.95}
-    >
-      <Image source={{ uri: item.imageUrl }} style={styles.gridImage} />
+export const GridMomentCard: React.FC<GridCardProps> = memo(
+  ({ item, index, onPress }) => {
+    const creatorName = item.user?.name?.split(' ')[0] || 'Anonim';
 
-      {/* Content */}
-      <View style={styles.gridContent}>
-        {/* Creator */}
-        <View style={styles.gridCreatorRow}>
+    return (
+      <View style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}>
+        <TouchableOpacity
+          style={styles.gridCard}
+          onPress={() => onPress(item)}
+          activeOpacity={0.95}
+          accessibilityRole="button"
+          accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${item.price} dolar`}
+          accessibilityHint="Detayları görmek için dokunun"
+        >
           <Image
-            source={{
-              uri: item.user?.avatar || 'https://via.placeholder.com/24',
-            }}
-            style={styles.gridAvatar}
+            source={{ uri: item.imageUrl }}
+            style={styles.gridImage}
+            accessibilityLabel={`${item.title} fotoğrafı`}
           />
-          <Text style={styles.gridCreatorName} numberOfLines={1}>
-            {item.user?.name?.split(' ')[0] || 'Anon'}
-          </Text>
-          {item.user?.isVerified && (
-            <MaterialCommunityIcons
-              name="check-decagram"
-              size={10}
-              color={COLORS.mint}
-            />
-          )}
-        </View>
 
-        {/* Title */}
-        <Text style={styles.gridTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
+          {/* Content */}
+          <View style={styles.gridContent}>
+            {/* Creator */}
+            <View style={styles.gridCreatorRow}>
+              <Image
+                source={{
+                  uri: item.user?.avatar || 'https://via.placeholder.com/24',
+                }}
+                style={styles.gridAvatar}
+                accessibilityLabel={`${creatorName} profil fotoğrafı`}
+              />
+              <Text style={styles.gridCreatorName} numberOfLines={1}>
+                {creatorName}
+              </Text>
+              {item.user?.isVerified && (
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={10}
+                  color={COLORS.mint}
+                  accessibilityLabel="Doğrulanmış kullanıcı"
+                />
+              )}
+            </View>
 
-        {/* Story */}
-        {item.story && (
-          <Text style={styles.gridStory} numberOfLines={1}>
-            {item.story}
-          </Text>
-        )}
+            {/* Title */}
+            <Text style={styles.gridTitle} numberOfLines={2}>
+              {item.title}
+            </Text>
 
-        {/* Footer */}
-        <View style={styles.gridFooter}>
-          <View style={styles.gridLocationRow}>
-            <MaterialCommunityIcons
-              name="map-marker"
-              size={10}
-              color={COLORS.text.secondary}
-            />
-            <Text style={styles.gridDistance}>{item.distance || '?'} km</Text>
+            {/* Story */}
+            {item.story && (
+              <Text style={styles.gridStory} numberOfLines={1}>
+                {item.story}
+              </Text>
+            )}
+
+            {/* Footer */}
+            <View style={styles.gridFooter}>
+              <View style={styles.gridLocationRow}>
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={10}
+                  color={COLORS.text.secondary}
+                />
+                <Text style={styles.gridDistance}>{item.distance || '?'} km</Text>
+              </View>
+              <Text style={styles.gridPrice}>${item.price}</Text>
+            </View>
           </View>
-          <Text style={styles.gridPrice}>${item.price}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
-  </View>
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.item.id === nextProps.item.id &&
+    prevProps.index === nextProps.index,
 );
+
+GridMomentCard.displayName = 'GridMomentCard';
 
 const styles = StyleSheet.create({
   gridItemLeft: {
