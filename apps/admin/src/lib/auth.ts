@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { createServiceClient } from '@/lib/supabase';
 import crypto from 'crypto';
+import { logger } from './logger';
 
 export interface AdminSession {
   admin: {
@@ -59,7 +60,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
       permissions: permissions || [],
     };
   } catch (error) {
-    console.error('Session check error:', error);
+    logger.error('Session check error', error);
     return null;
   }
 }
@@ -103,6 +104,6 @@ export async function createAuditLog(
       user_agent: userAgent,
     });
   } catch (error) {
-    console.error('Audit log error:', error);
+    logger.error('Audit log error', error);
   }
 }

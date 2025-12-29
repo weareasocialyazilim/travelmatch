@@ -133,9 +133,9 @@ serve(async (req) => {
       });
 
       if (error) {
-        console.error(
-          `[ExchangeRates] Error inserting ${rateData.base}/${rateData.target}:`,
-          error
+        logger.error(
+          `[ExchangeRates] Error inserting ${rateData.base}/${rateData.target}`,
+          error,
         );
         errorCount++;
       } else {
@@ -157,7 +157,7 @@ serve(async (req) => {
     // Calculate EUR/TRY for logging
     if (tryRate && eurRate) {
       const eurTry = tryRate / eurRate;
-      console.log(`[ExchangeRates] 1 EUR = ${eurTry.toFixed(4)} TRY`);
+      logger.info(`[ExchangeRates] 1 EUR = ${eurTry.toFixed(4)} TRY`);
     }
 
     const result = {
@@ -191,7 +191,7 @@ serve(async (req) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });

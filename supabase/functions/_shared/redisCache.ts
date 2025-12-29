@@ -1,25 +1,29 @@
 /**
  * Redis Cache Service for Heavy Operations
- * 
+ *
  * Optimizes expensive operations like export-user-data with caching
- * 
+ *
  * Features:
  * - TTL-based cache expiration
  * - Automatic cache invalidation
  * - Compression for large payloads
  * - Rate limiting integration
  * - Performance metrics
- * 
+ *
  * Setup with Upstash Redis (serverless, globally distributed):
  * 1. Create Upstash account: https://upstash.com
  * 2. Create Redis database
  * 3. Get UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN
  * 4. Set environment variables in Supabase Edge Functions
- * 
+ *
  * @see https://upstash.com/docs/redis
  */
 
 import { Redis } from 'https://esm.sh/@upstash/redis@1.20.1';
+import { Logger } from './logger.ts';
+
+const logger = new Logger('redis-cache');
+const IS_PRODUCTION = Deno.env.get('DENO_ENV') === 'production';
 
 const redis = new Redis({
   url: Deno.env.get('UPSTASH_REDIS_REST_URL')!,
@@ -69,16 +73,24 @@ export async function setCache<T>(
     const serialized = JSON.stringify(value);
     const sizeKB = new Blob([serialized]).size / 1024;
 
-    console.log(`[Redis] Setting cache: ${key} (${sizeKB.toFixed(2)}KB, TTL: ${ttl}s)`);
+    if (!IS_PRODUCTION) {
+      logger.debug(
+        `Setting cache: ${key} (${sizeKB.toFixed(2)}KB, TTL: ${ttl}s)`,
+      );
+    }
 
     // For large payloads (>100KB), consider compression
-    if (sizeKB > 100) {
-      console.log(`[Redis] Large payload detected, consider compression`);
+    if (sizeKB > 100 && !IS_PRODUCTION) {
+      logger.debug(`Large payload detected, consider compression`);
     }
 
     await redis.set(key, serialized, { ex: ttl });
   } catch (error) {
-    console.error('[Redis] Set cache failed:', error);
+    logger.error(
+      'Set cache failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { key },
+    );
     throw error;
   }
 }
@@ -89,16 +101,20 @@ export async function setCache<T>(
 export async function getCache<T>(key: string): Promise<T | null> {
   try {
     const cached = await redis.get(key);
-    
+
     if (!cached) {
-      console.log(`[Redis] Cache miss: ${key}`);
+      if (!IS_PRODUCTION) logger.debug(`Cache miss: ${key}`);
       return null;
     }
 
-    console.log(`[Redis] Cache hit: ${key}`);
+    if (!IS_PRODUCTION) logger.debug(`Cache hit: ${key}`);
     return typeof cached === 'string' ? JSON.parse(cached) : cached;
   } catch (error) {
-    console.error('[Redis] Get cache failed:', error);
+    logger.error(
+      'Get cache failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { key },
+    );
     return null;
   }
 }
@@ -109,9 +125,13 @@ export async function getCache<T>(key: string): Promise<T | null> {
 export async function deleteCache(key: string): Promise<void> {
   try {
     await redis.del(key);
-    console.log(`[Redis] Cache deleted: ${key}`);
+    if (!IS_PRODUCTION) logger.debug(`Cache deleted: ${key}`);
   } catch (error) {
-    console.error('[Redis] Delete cache failed:', error);
+    logger.error(
+      'Delete cache failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { key },
+    );
     throw error;
   }
 }
@@ -123,18 +143,24 @@ export async function deleteCachePattern(pattern: string): Promise<number> {
   try {
     // Get all keys matching pattern
     const keys = await redis.keys(pattern);
-    
+
     if (keys.length === 0) {
       return 0;
     }
 
     // Delete all matching keys
     await redis.del(...keys);
-    console.log(`[Redis] Deleted ${keys.length} keys matching: ${pattern}`);
-    
+    if (!IS_PRODUCTION) {
+      logger.debug(`Deleted ${keys.length} keys matching: ${pattern}`);
+    }
+
     return keys.length;
   } catch (error) {
-    console.error('[Redis] Delete pattern failed:', error);
+    logger.error(
+      'Delete pattern failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { pattern },
+    );
     throw error;
   }
 }
@@ -147,7 +173,11 @@ export async function hasCache(key: string): Promise<boolean> {
     const exists = await redis.exists(key);
     return exists === 1;
   } catch (error) {
-    console.error('[Redis] Check cache failed:', error);
+    logger.error(
+      'Check cache failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { key },
+    );
     return false;
   }
 }
@@ -159,7 +189,11 @@ export async function getCacheTTL(key: string): Promise<number> {
   try {
     return await redis.ttl(key);
   } catch (error) {
-    console.error('[Redis] Get TTL failed:', error);
+    logger.error(
+      'Get TTL failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { key },
+    );
     return -1;
   }
 }
@@ -173,14 +207,18 @@ export async function incrementCounter(
 ): Promise<number> {
   try {
     const count = await redis.incr(key);
-    
+
     if (ttl && count === 1) {
       await redis.expire(key, ttl);
     }
-    
+
     return count;
   } catch (error) {
-    console.error('[Redis] Increment failed:', error);
+    logger.error(
+      'Increment failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { key },
+    );
     throw error;
   }
 }
@@ -188,7 +226,7 @@ export async function incrementCounter(
 /**
  * Cached function wrapper
  * Automatically caches function results
- * 
+ *
  * @example
  * const getUserData = cached(
  *   (userId: string) => fetchUserData(userId),
@@ -203,7 +241,7 @@ export function cached<TArgs extends any[], TResult>(
 ) {
   return async (...args: TArgs): Promise<TResult> => {
     const key = keyGenerator(...args);
-    
+
     // Try to get from cache
     const cached = await getCache<TResult>(key);
     if (cached !== null) {
@@ -212,10 +250,10 @@ export function cached<TArgs extends any[], TResult>(
 
     // Execute function
     const result = await fn(...args);
-    
+
     // Store in cache
     await setCache(key, result, ttl);
-    
+
     return result;
   };
 }
@@ -260,14 +298,16 @@ export const exportDataCache = {
   /**
    * Get export generation status
    */
-  async getStatus(userId: string): Promise<'pending' | 'ready' | 'expired' | 'not_found'> {
+  async getStatus(
+    userId: string,
+  ): Promise<'pending' | 'ready' | 'expired' | 'not_found'> {
     const key = getCacheKey(CACHE_PREFIX.EXPORT, userId);
     const ttl = await getCacheTTL(key);
-    
+
     if (ttl === -2) return 'not_found'; // Key doesn't exist
     if (ttl === -1) return 'expired'; // Key exists but no TTL (shouldn't happen)
     if (ttl > 0) return 'ready'; // Key exists with TTL
-    
+
     return 'pending';
   },
 };
@@ -279,7 +319,11 @@ export const queryCache = {
   /**
    * Cache query results
    */
-  async set(queryKey: string, results: any, ttl: number = CACHE_TTL.MEDIUM): Promise<void> {
+  async set(
+    queryKey: string,
+    results: any,
+    ttl: number = CACHE_TTL.MEDIUM,
+  ): Promise<void> {
     const key = getCacheKey(CACHE_PREFIX.QUERY, queryKey);
     await setCache(key, results, ttl);
   },
@@ -305,7 +349,11 @@ export const queryCache = {
  * Session cache
  */
 export const sessionCache = {
-  async set(sessionId: string, data: any, ttl: number = CACHE_TTL.DAY): Promise<void> {
+  async set(
+    sessionId: string,
+    data: any,
+    ttl: number = CACHE_TTL.DAY,
+  ): Promise<void> {
     const key = getCacheKey(CACHE_PREFIX.SESSION, sessionId);
     await setCache(key, data, ttl);
   },
@@ -337,11 +385,11 @@ export const rateLimiter = {
     const key = getCacheKey(CACHE_PREFIX.RATE_LIMIT, identifier);
     const count = await incrementCounter(key, windowSeconds);
     const ttl = await getCacheTTL(key);
-    
+
     return {
       allowed: count <= limit,
       remaining: Math.max(0, limit - count),
-      resetAt: Date.now() + (ttl * 1000),
+      resetAt: Date.now() + ttl * 1000,
     };
   },
 
@@ -365,10 +413,13 @@ export async function getCacheStats() {
       info: info,
     };
   } catch (error) {
-    console.error('[Redis] Get stats failed:', error);
+    logger.error(
+      'Get stats failed',
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return {
       connected: false,
-      error: error.message,
+      error: (error as Error).message,
     };
   }
 }
@@ -377,7 +428,7 @@ export async function getCacheStats() {
  * Clear all cache (use with caution!)
  */
 export async function clearAllCache(): Promise<void> {
-  console.warn('[Redis] Clearing ALL cache - this is destructive!');
+  logger.warn('Clearing ALL cache - this is destructive!');
   await redis.flushdb();
 }
 
@@ -390,18 +441,18 @@ export default {
   hasCache,
   getCacheTTL,
   incrementCounter,
-  
+
   // Specialized caches
   exportDataCache,
   queryCache,
   sessionCache,
   rateLimiter,
-  
+
   // Utilities
   cached,
   getCacheStats,
   clearAllCache,
-  
+
   // Constants
   CACHE_TTL,
   CACHE_PREFIX,

@@ -5,7 +5,10 @@ const logger = new Logger();
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import {
+  createUpstashRateLimiter,
+  RateLimitPresets,
+} from '../_shared/upstashRateLimit.ts';
 import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import {
   ErrorCode,
@@ -23,9 +26,9 @@ import {
 
 /**
  * GDPR Data Export Edge Function
- * 
+ *
  * Exports all user data in compliance with GDPR Article 20 (Right to Data Portability)
- * 
+ *
  * Returns:
  * - User profile data
  * - Moments created
@@ -37,7 +40,7 @@ import {
  * - Favorites
  * - Blocks
  * - Reports filed
- * 
+ *
  * Format: JSON (can be extended to CSV)
  */
 
@@ -139,12 +142,12 @@ serve(async (req) => {
 
     const userId = user.id;
 
-    console.log(`[GDPR Export] Starting data export for user: ${userId}`);
+    logger.info('[GDPR Export] Starting data export', { userId });
 
     // Check Redis cache first
     const cachedExport = await exportDataCache.get(userId);
     if (cachedExport) {
-      console.log(`[GDPR Export] Serving from cache for user: ${userId}`);
+      logger.info('[GDPR Export] Serving from cache', { userId });
       const success = createSuccessResponse(
         cachedExport,
         'Export retrieved from cache',
@@ -160,7 +163,9 @@ serve(async (req) => {
       });
     }
 
-    console.log(`[GDPR Export] Cache miss, generating fresh export for user: ${userId}`);
+    logger.info('[GDPR Export] Cache miss, generating fresh export', {
+      userId,
+    });
 
     // 1. Get user profile
     const { data: profile } = await supabaseClient
@@ -198,13 +203,14 @@ serve(async (req) => {
 
     // 5. Get messages
     const conversationIds = conversations?.map((c) => c.id) || [];
-    const { data: messages } = conversationIds.length > 0
-      ? await supabaseClient
-          .from('messages')
-          .select('*')
-          .in('conversation_id', conversationIds)
-          .order('created_at', { ascending: false })
-      : { data: [] };
+    const { data: messages } =
+      conversationIds.length > 0
+        ? await supabaseClient
+            .from('messages')
+            .select('*')
+            .in('conversation_id', conversationIds)
+            .order('created_at', { ascending: false })
+        : { data: [] };
 
     // 6. Get transactions
     const { data: transactions } = await supabaseClient
@@ -293,17 +299,17 @@ serve(async (req) => {
       },
     };
 
-    console.log(
-      `[GDPR Export] Export completed for user: ${userId}`,
-      `- Moments: ${exportData.metadata.totalMoments}`,
-      `- Requests: ${exportData.metadata.totalRequests}`,
-      `- Messages: ${exportData.metadata.totalMessages}`,
-      `- Transactions: ${exportData.metadata.totalTransactions}`,
-    );
+    logger.info('[GDPR Export] Export completed', {
+      userId,
+      moments: exportData.metadata.totalMoments,
+      requests: exportData.metadata.totalRequests,
+      messages: exportData.metadata.totalMessages,
+      transactions: exportData.metadata.totalTransactions,
+    });
 
     // Cache the export data (1 week TTL)
     await exportDataCache.set(userId, exportData);
-    console.log(`[GDPR Export] Cached export for user: ${userId}`);
+    logger.info('[GDPR Export] Cached export', { userId });
 
     // Log the export request for compliance
     await supabaseClient.from('audit_logs').insert({
@@ -319,7 +325,10 @@ serve(async (req) => {
     });
 
     // Return the data with cache headers
-    const success = createSuccessResponse(exportData, 'Export generated successfully');
+    const success = createSuccessResponse(
+      exportData,
+      'Export generated successfully',
+    );
     return new Response(JSON.stringify(success.data, null, 2), {
       status: 200,
       headers: {

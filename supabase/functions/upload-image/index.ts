@@ -5,13 +5,13 @@ const logger = new Logger();
 
 /**
  * Image Upload Proxy - Server-side Cloudflare Images wrapper
- * 
+ *
  * Prevents exposing Cloudflare Images token in client bundle
  * Implements rate limiting, validation, and cost optimization
- * 
+ *
  * Endpoints:
  * - POST /upload-image - Upload image to Cloudflare
- * 
+ *
  * Security:
  * - Cloudflare API token stored server-side only
  * - Rate limiting via Upstash Redis
@@ -22,7 +22,10 @@ const logger = new Logger();
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import {
+  createUpstashRateLimiter,
+  RateLimitPresets,
+} from '../_shared/upstashRateLimit.ts';
 import { corsHeaders } from '../_shared/security-middleware.ts';
 import {
   createErrorResponse,
@@ -120,8 +123,15 @@ serve(async (req) => {
     const rateLimit = await rateLimiter.check(req, user.id);
     if (!rateLimit.success) {
       const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000);
-      const { response, headers: rateLimitHeaders } = createRateLimitError(retryAfter, rateLimit.remaining);
-      return toHttpResponse(response, { ...corsHeaders, ...rateLimitHeaders }, 429);
+      const { response, headers: rateLimitHeaders } = createRateLimitError(
+        retryAfter,
+        rateLimit.remaining,
+      );
+      return toHttpResponse(
+        response,
+        { ...corsHeaders, ...rateLimitHeaders },
+        429,
+      );
     }
 
     // 3. Parse multipart form data
@@ -141,7 +151,9 @@ serve(async (req) => {
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
       const error = createValidationError({
         fields: {
-          file: [`Invalid file type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`],
+          file: [
+            `Invalid file type. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`,
+          ],
         },
       });
       return toHttpResponse(error, corsHeaders, 400);
@@ -151,7 +163,9 @@ serve(async (req) => {
     if (file.size > MAX_FILE_SIZE) {
       const error = createValidationError({
         fields: {
-          file: [`File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`],
+          file: [
+            `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+          ],
         },
       });
       return toHttpResponse(error, corsHeaders, 400);
@@ -180,7 +194,7 @@ serve(async (req) => {
     // 7. Upload to Cloudflare Images
     const uploadFormData = new FormData();
     uploadFormData.append('file', blob, file.name);
-    
+
     // Add metadata
     const cfMetadata = {
       userId: user.id,
@@ -189,7 +203,7 @@ serve(async (req) => {
     };
     uploadFormData.append('metadata', JSON.stringify(cfMetadata));
 
-    console.log(`Uploading image for user: ${user.id}`);
+    logger.info('Uploading image', { userId: user.id });
     const uploadResponse = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/images/v1`,
       {
@@ -198,7 +212,7 @@ serve(async (req) => {
           Authorization: `Bearer ${CF_API_TOKEN}`,
         },
         body: uploadFormData,
-      }
+      },
     );
 
     if (!uploadResponse.ok) {

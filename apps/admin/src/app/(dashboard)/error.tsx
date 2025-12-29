@@ -3,7 +3,14 @@
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -13,7 +20,7 @@ interface ErrorProps {
 export default function DashboardError({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log the error
-    console.error('Dashboard Error:', error);
+    logger.error('Dashboard Error', error);
   }, [error]);
 
   return (
@@ -33,7 +40,9 @@ export default function DashboardError({ error, reset }: ErrorProps) {
             <div className="rounded-lg bg-muted p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Bug className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">Debug Info</span>
+                <span className="text-xs font-medium text-muted-foreground">
+                  Debug Info
+                </span>
               </div>
               <p className="text-xs font-mono text-muted-foreground break-all">
                 {error.message}
@@ -50,7 +59,11 @@ export default function DashboardError({ error, reset }: ErrorProps) {
               <RefreshCw className="mr-2 h-4 w-4" />
               Tekrar Dene
             </Button>
-            <Button variant="outline" onClick={() => window.location.href = '/queue'} className="flex-1">
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/queue')}
+              className="flex-1"
+            >
               <Home className="mr-2 h-4 w-4" />
               Ana Sayfa
             </Button>

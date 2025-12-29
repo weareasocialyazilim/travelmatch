@@ -66,6 +66,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDate, getInitials } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // =============================================================================
 // TYPES
@@ -381,7 +382,7 @@ export default function VIPManagementPage() {
       setVIPUsers(data.users || []);
       setTotal(data.total || 0);
     } catch (err) {
-      console.error('VIP users fetch error:', err);
+      logger.error('VIP users fetch error', err);
       setError('VIP kullanıcıları yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
@@ -396,7 +397,7 @@ export default function VIPManagementPage() {
       const data = await res.json();
       setStats(data);
     } catch (err) {
-      console.error('Stats fetch error:', err);
+      logger.error('Stats fetch error', err);
     }
   }, []);
 
@@ -434,7 +435,11 @@ export default function VIPManagementPage() {
   };
 
   const handleRemoveVIP = async (userId: string) => {
-    if (!confirm('Bu kullanıcının VIP statüsünü kaldırmak istediğinize emin misiniz?')) {
+    if (
+      !confirm(
+        'Bu kullanıcının VIP statüsünü kaldırmak istediğinize emin misiniz?',
+      )
+    ) {
       return;
     }
 
@@ -448,7 +453,7 @@ export default function VIPManagementPage() {
       fetchVIPUsers();
       fetchStats();
     } catch (err) {
-      console.error('Remove VIP error:', err);
+      logger.error('Remove VIP error', err);
       setError('VIP statüsü kaldırılırken bir hata oluştu');
     }
   };
@@ -458,7 +463,9 @@ export default function VIPManagementPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">VIP kullanıcıları yükleniyor...</p>
+          <p className="text-muted-foreground">
+            VIP kullanıcıları yükleniyor...
+          </p>
         </div>
       </div>
     );
@@ -632,7 +639,7 @@ export default function VIPManagementPage() {
                         {getInitials(
                           vipUser.user.display_name ||
                             vipUser.user.full_name ||
-                            vipUser.user.email
+                            vipUser.user.email,
                         )}
                       </AvatarFallback>
                     </Avatar>

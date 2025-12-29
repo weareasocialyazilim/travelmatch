@@ -1,24 +1,27 @@
 /**
  * ⚠️ DEPRECATED: In-memory Rate Limiting
- * 
+ *
  * This file is kept for backward compatibility but should not be used in production.
  * Use upstashRateLimit.ts for production-ready distributed rate limiting.
- * 
+ *
  * Migration Guide:
  * ```typescript
  * // OLD (in-memory, not distributed)
  * import { createRateLimiter } from '../_shared/rateLimit.ts';
- * 
+ *
  * // NEW (Upstash Redis, distributed)
  * import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
- * 
+ *
  * const limiter = createUpstashRateLimiter(RateLimitPresets.STANDARD);
  * ```
- * 
+ *
  * @deprecated Use upstashRateLimit.ts instead
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
+import { Logger } from './logger.ts';
+
+const logger = new Logger('rate-limit-deprecated');
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -143,7 +146,10 @@ export class RateLimiter {
         remaining: this.config.max - existing.count - 1,
       };
     } catch (error) {
-      console.error('Rate limit check failed:', error);
+      logger.error(
+        'Rate limit check failed',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       // On error, allow request (fail open)
       return { ok: true, remaining: this.config.max };
     }
@@ -166,19 +172,19 @@ export const RateLimitPresets = {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // 5 attempts
   },
-  
+
   // Medium limit for signup
   signup: {
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 3, // 3 signups per hour
   },
-  
+
   // Generous limit for general API
   api: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // 100 requests
   },
-  
+
   // Tight limit for password reset
   passwordReset: {
     windowMs: 60 * 60 * 1000, // 1 hour

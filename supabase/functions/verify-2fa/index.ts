@@ -5,9 +5,9 @@ const logger = new Logger();
 
 /**
  * 2FA Verify Edge Function
- * 
+ *
  * Verifies TOTP code and enables 2FA for user
- * 
+ *
  * Security Features:
  * - Authentication required
  * - TOTP code verification (6 digits)
@@ -19,7 +19,10 @@ const logger = new Logger();
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import {
+  createUpstashRateLimiter,
+  RateLimitPresets,
+} from '../_shared/upstashRateLimit.ts';
 import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import { createHmac } from 'https://deno.land/std@0.168.0/node/crypto.ts';
 import {
@@ -33,7 +36,10 @@ import {
 } from '../_shared/errorHandler.ts';
 
 const VerifyCodeSchema = z.object({
-  code: z.string().length(6, 'Code must be 6 digits').regex(/^\d{6}$/, 'Code must be numeric'),
+  code: z
+    .string()
+    .length(6, 'Code must be 6 digits')
+    .regex(/^\d{6}$/, 'Code must be numeric'),
 });
 
 // Rate limiter: 5 attempts per 15 minutes (prevent brute force)
@@ -45,12 +51,12 @@ const verify2FALimiter = createUpstashRateLimiter(RateLimitPresets.AUTH);
 function generateTOTP(secret: string, time?: number): string {
   const epoch = Math.floor((time || Date.now()) / 1000);
   const counter = Math.floor(epoch / 30);
-  
+
   // Convert base32 secret to bytes
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
   const secretBytes: number[] = [];
   const secretUpper = secret.toUpperCase().replace(/\s/g, '');
-  
+
   for (let i = 0; i < secretUpper.length; i += 8) {
     let bits = 0;
     for (let j = 0; j < 8 && i + j < secretUpper.length; j++) {
@@ -92,7 +98,7 @@ function generateTOTP(secret: string, time?: number): string {
  */
 function verifyTOTP(secret: string, code: string, window = 1): boolean {
   const now = Date.now();
-  
+
   // Check current time and ±window intervals (30 seconds each)
   for (let i = -window; i <= window; i++) {
     const time = now + i * 30000;
@@ -101,7 +107,7 @@ function verifyTOTP(secret: string, code: string, window = 1): boolean {
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -178,7 +184,7 @@ serve(async (req) => {
     const isValid = verifyTOTP(totpSecret, code);
 
     if (!isValid) {
-      console.log(`[2FA Verify] Invalid code for user ${user.id}`);
+      logger.info('[2FA Verify] Invalid code attempt', { userId: user.id });
       const error = createErrorResponse(
         'Invalid verification code',
         ErrorCode.INVALID_INPUT,
@@ -198,7 +204,9 @@ serve(async (req) => {
     }
 
     // Log audit event
-    console.log(`[2FA Verify] User ${user.id} enabled 2FA successfully`);
+    logger.info('[2FA Verify] User enabled 2FA successfully', {
+      userId: user.id,
+    });
 
     const success = createSuccessResponse(
       { user_id: user.id, totp_enabled: true },
@@ -207,11 +215,11 @@ serve(async (req) => {
     return toHttpSuccessResponse(success, corsHeaders);
   } catch (error) {
     logger.error('[2FA Verify] Error:', error);
-    
+
     if (error instanceof z.ZodError) {
       const validationError = createValidationError({
         fields: Object.fromEntries(
-          error.errors.map(err => [err.path.join('.'), [err.message]])
+          error.errors.map((err) => [err.path.join('.'), [err.message]]),
         ),
       });
       return toHttpResponse(validationError, corsHeaders);

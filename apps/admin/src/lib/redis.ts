@@ -6,6 +6,7 @@
  */
 
 import { setRateLimitStore, createUpstashStore } from './rate-limit';
+import { logger } from './logger';
 
 // Singleton Redis instance
 let redisInstance: unknown | null = null;
@@ -21,10 +22,8 @@ export function initializeRedis(): void {
 
   if (!redisUrl || !redisToken) {
     if (process.env.NODE_ENV !== 'test') {
-      console.warn(
-        '[Redis] UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN not configured.',
-        'Falling back to in-memory rate limiting.',
-        'Note: In-memory rate limiting will reset on server restart and is not suitable for multi-instance deployments.',
+      logger.warn(
+        '[Redis] UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN not configured. Falling back to in-memory rate limiting.',
       );
     }
     return;
@@ -54,13 +53,13 @@ export function initializeRedis(): void {
       });
       setRateLimitStore(upstashStore);
 
-      console.info(
+      logger.info(
         '[Redis] Successfully connected to Upstash Redis for rate limiting',
       );
     })();
   } catch (error) {
-    console.error('[Redis] Failed to initialize Upstash Redis:', error);
-    console.warn('[Redis] Falling back to in-memory rate limiting');
+    logger.error('[Redis] Failed to initialize Upstash Redis', error);
+    logger.warn('[Redis] Falling back to in-memory rate limiting');
   }
 }
 

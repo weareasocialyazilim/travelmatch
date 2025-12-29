@@ -1,6 +1,6 @@
 /**
  * Security Middleware for Payment Edge Functions
- * 
+ *
  * Provides reusable security features:
  * - Authentication validation
  * - Rate limiting
@@ -12,6 +12,9 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { Logger } from './logger.ts';
+
+const logger = new Logger('security-middleware');
 
 /**
  * Allowed origins for CORS
@@ -23,14 +26,18 @@ const ALLOWED_ORIGINS = [
   'https://staging.travelmatch.app',
   /^https:\/\/travelmatch-.*\.vercel\.app$/,
   ...(Deno.env.get('DENO_ENV') !== 'production'
-    ? ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8081']
+    ? [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:8081',
+      ]
     : []),
 ];
 
 function isOriginAllowed(origin: string | null): boolean {
   if (!origin) return false;
-  return ALLOWED_ORIGINS.some((allowed) => 
-    typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
+  return ALLOWED_ORIGINS.some((allowed) =>
+    typeof allowed === 'string' ? allowed === origin : allowed.test(origin),
   );
 }
 
@@ -42,7 +49,7 @@ export function getCorsHeaders(origin: string | null): Record<string, string> {
       'authorization, x-client-info, apikey, content-type, stripe-signature',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
     'Access-Control-Allow-Credentials': 'true',
-    'Vary': 'Origin',
+    Vary: 'Origin',
   };
 }
 
@@ -131,9 +138,7 @@ export class RateLimiter {
 /**
  * Authenticate request and return user context
  */
-export async function authenticateRequest(
-  req: Request,
-): Promise<AuthContext> {
+export async function authenticateRequest(req: Request): Promise<AuthContext> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -188,7 +193,10 @@ export async function logRequest(
       created_at: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Failed to log request:', error);
+    logger.error(
+      'Failed to log request',
+      error instanceof Error ? error : new Error(String(error)),
+    );
   }
 }
 
@@ -198,10 +206,7 @@ export async function logRequest(
 export function sanitizeInput(input: any): any {
   if (typeof input === 'string') {
     // Remove potentially dangerous characters
-    return input
-      .replace(/[<>]/g, '')
-      .trim()
-      .slice(0, 1000); // Limit length
+    return input.replace(/[<>]/g, '').trim().slice(0, 1000); // Limit length
   }
 
   if (Array.isArray(input)) {
@@ -246,7 +251,11 @@ export function errorResponse(
  * Create standardized success response
  * @param origin - Optional origin for CORS validation
  */
-export function successResponse(data: any, status: number = 200, origin?: string | null): Response {
+export function successResponse(
+  data: any,
+  status: number = 200,
+  origin?: string | null,
+): Response {
   const headers = getCorsHeaders(origin);
   return new Response(JSON.stringify(data), {
     status,
@@ -325,7 +334,10 @@ export function validateCurrency(currency: string): ValidationError[] {
 /**
  * Validate UUID format
  */
-export function validateUUID(uuid: string, fieldName: string): ValidationError[] {
+export function validateUUID(
+  uuid: string,
+  fieldName: string,
+): ValidationError[] {
   const errors: ValidationError[] = [];
   const uuidRegex =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -358,7 +370,10 @@ export function validateRequest(
     const value = data[rule.field];
 
     // Check required
-    if (rule.required && (value === undefined || value === null || value === '')) {
+    if (
+      rule.required &&
+      (value === undefined || value === null || value === '')
+    ) {
       errors.push({
         field: rule.field,
         message: `${rule.field} is required`,
@@ -461,10 +476,16 @@ export function withMiddleware(
       // Call handler
       return await handler(req, context!);
     } catch (error) {
-      console.error('Middleware error:', error);
+      logger.error(
+        'Middleware error',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       const origin = req.headers.get('origin');
 
-      if (error.message === 'Unauthorized' || error.message === 'Missing authorization header') {
+      if (
+        error.message === 'Unauthorized' ||
+        error.message === 'Missing authorization header'
+      ) {
         return errorResponse(error.message, 401, undefined, origin);
       }
 

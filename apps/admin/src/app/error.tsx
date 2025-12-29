@@ -3,7 +3,14 @@
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -13,7 +20,7 @@ interface ErrorProps {
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Application Error:', error);
+    logger.error('Application Error', error);
   }, [error]);
 
   return (
@@ -25,7 +32,8 @@ export default function Error({ error, reset }: ErrorProps) {
           </div>
           <CardTitle className="text-2xl">Bir Hata Oluştu</CardTitle>
           <CardDescription>
-            Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin veya ana sayfaya dönün.
+            Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin veya ana sayfaya
+            dönün.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -46,7 +54,11 @@ export default function Error({ error, reset }: ErrorProps) {
               <RefreshCw className="mr-2 h-4 w-4" />
               Tekrar Dene
             </Button>
-            <Button variant="outline" onClick={() => window.location.href = '/queue'} className="flex-1">
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/queue')}
+              className="flex-1"
+            >
               <Home className="mr-2 h-4 w-4" />
               Ana Sayfa
             </Button>

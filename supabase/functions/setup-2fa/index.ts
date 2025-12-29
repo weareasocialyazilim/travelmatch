@@ -5,9 +5,9 @@ const logger = new Logger();
 
 /**
  * 2FA Setup Edge Function
- * 
+ *
  * Generates TOTP secret and QR code for user to scan
- * 
+ *
  * Security Features:
  * - Authentication required
  * - TOTP secret generation (base32)
@@ -18,7 +18,10 @@ const logger = new Logger();
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+import {
+  createUpstashRateLimiter,
+  RateLimitPresets,
+} from '../_shared/upstashRateLimit.ts';
 import { getCorsHeaders } from '../_shared/security-middleware.ts';
 import { createHmac } from 'https://deno.land/std@0.168.0/node/crypto.ts';
 
@@ -49,7 +52,7 @@ function generateQRCodeURL(secret: string, email: string): string {
     digits: '6',
     period: '30',
   });
-  
+
   const otpauthURL = `otpauth://totp/${encodeURIComponent(label)}?${params}`;
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthURL)}`;
 }
@@ -102,13 +105,10 @@ serve(async (req) => {
     } = await supabaseClient.auth.getUser();
 
     if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'Not authenticated' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
-      );
+      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Generate TOTP secret
@@ -128,7 +128,7 @@ serve(async (req) => {
     }
 
     // Log audit event
-    console.log(`[2FA Setup] User ${user.id} generated TOTP secret`);
+    logger.info('[2FA Setup] User generated TOTP secret', { userId: user.id });
 
     return new Response(
       JSON.stringify({

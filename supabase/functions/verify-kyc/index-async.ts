@@ -2,10 +2,14 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
+import { Logger } from '../_shared/logger.ts';
+
+const logger = new Logger('verify-kyc-async');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type',
 };
 
 const KycSchema = z.object({
@@ -39,17 +43,20 @@ serve(async (req) => {
         {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
     // Get user from JWT
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      );
     }
 
     const supabaseClient = createClient(
@@ -59,7 +66,7 @@ serve(async (req) => {
         global: {
           headers: { Authorization: authHeader },
         },
-      }
+      },
     );
 
     const {
@@ -76,14 +83,14 @@ serve(async (req) => {
 
     // Parse and validate request body
     const body = await req.json();
-    console.log('Processing KYC verification request for user:', user.id);
+    logger.info('Processing KYC verification request', { userId: user.id });
 
     const validatedData = KycSchema.parse(body);
 
     // Check if user already has pending KYC verification
     const serviceClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
     const { data: existingUser } = await serviceClient
@@ -101,7 +108,7 @@ serve(async (req) => {
         {
           status: 409, // Conflict
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -115,7 +122,7 @@ serve(async (req) => {
       provider: validatedData.provider || 'onfido',
     };
 
-    console.log('Enqueueing KYC job to queue:', JOB_QUEUE_URL);
+    logger.info('Enqueueing KYC job to queue', { queueUrl: JOB_QUEUE_URL });
 
     const queueResponse = await fetch(`${JOB_QUEUE_URL}/jobs/kyc`, {
       method: 'POST',
@@ -127,7 +134,7 @@ serve(async (req) => {
 
     if (!queueResponse.ok) {
       const errorText = await queueResponse.text();
-      console.error('Failed to enqueue job:', errorText);
+      logger.error('Failed to enqueue job', new Error(errorText));
       throw new Error(`Failed to enqueue KYC verification: ${errorText}`);
     }
 
@@ -156,10 +163,13 @@ serve(async (req) => {
       {
         status: 202, // Accepted (async processing)
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   } catch (error) {
-    console.error('KYC verification error:', error);
+    logger.error(
+      'KYC verification error',
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof z.ZodError) {
       return new Response(
@@ -170,7 +180,7 @@ serve(async (req) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -182,7 +192,7 @@ serve(async (req) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });

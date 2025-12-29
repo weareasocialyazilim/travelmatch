@@ -101,10 +101,9 @@ async function sendEmail(
     ],
   };
 
-  console.log(
-    '[SendGrid] Sending email to:',
-    to.map((r) => r.email).join(', '),
-  );
+  logger.info('[SendGrid] Sending email', {
+    recipients: to.map((r) => r.email).join(', '),
+  });
 
   return sendgridRequest('/mail/send', 'POST', payload);
 }
@@ -133,10 +132,9 @@ async function sendTemplateEmail(
     template_id: templateId,
   };
 
-  console.log(
-    '[SendGrid] Sending template email to:',
-    to.map((r) => r.email).join(', '),
-  );
+  logger.info('[SendGrid] Sending template email', {
+    recipients: to.map((r) => r.email).join(', '),
+  });
 
   return sendgridRequest('/mail/send', 'POST', payload);
 }
