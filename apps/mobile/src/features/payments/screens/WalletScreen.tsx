@@ -77,7 +77,7 @@ const WalletScreen = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      toast.error('Failed to refresh wallet data');
+      toast.error('Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.');
     }
   };
 

@@ -25,6 +25,7 @@ import {
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADII } from '../constants/radii';
@@ -266,20 +267,21 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   // Main flow
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Gift this Moment</Text>
-        </View>
+      <NetworkGuard offlineMessage="İnternet bağlantısı gerekli. Ödeme yapmak için lütfen bağlanın.">
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+            >
+              <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Gift this Moment</Text>
+          </View>
 
         <ScrollView
           style={styles.scrollView}
@@ -433,7 +435,8 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
             </Text>
           )}
         </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </NetworkGuard>
     </SafeAreaView>
   );
 };

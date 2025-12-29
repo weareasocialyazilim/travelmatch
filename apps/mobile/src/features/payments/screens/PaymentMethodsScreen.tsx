@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { AddCardBottomSheet } from '@/components/AddCardBottomSheet';
 import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
@@ -101,16 +102,17 @@ const PaymentMethodsScreen = () => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Payment methods</Text>
-          <View style={styles.backButton} />
-        </View>
+        <NetworkGuard offlineMessage="İnternet bağlantısı gerekli. Ödeme yöntemlerini yönetmek için lütfen bağlanın.">
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Payment methods</Text>
+            <View style={styles.backButton} />
+          </View>
 
-        <ScrollView
+          <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -179,6 +181,7 @@ const PaymentMethodsScreen = () => {
             <Text style={styles.addCardButtonText}>Add new card</Text>
           </TouchableOpacity>
         </ScrollView>
+        </NetworkGuard>
       </SafeAreaView>
 
       <BottomNav activeTab="Profile" />
