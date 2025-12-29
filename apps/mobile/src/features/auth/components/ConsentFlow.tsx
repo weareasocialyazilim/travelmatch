@@ -19,15 +19,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
-  Linking,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
-import { supabase } from '@/lib/supabase';
+import { TYPOGRAPHY } from '@/constants/typography';
+import { supabase } from '@/config/supabase';
 
 // =============================================================================
 // TYPES
@@ -133,17 +132,23 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
 
   const [loading, setLoading] = useState(false);
 
-  const updateConsent = useCallback((key: keyof ConsentState, value: boolean) => {
-    setConsents((prev) => ({ ...prev, [key]: value }));
-  }, []);
+  const updateConsent = useCallback(
+    (key: keyof ConsentState, value: boolean) => {
+      setConsents((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
 
-  const canProceed = consents.kvkkAydinlatma && consents.termsOfService && consents.privacyPolicy;
+  const canProceed =
+    consents.kvkkAydinlatma &&
+    consents.termsOfService &&
+    consents.privacyPolicy;
 
   const handleSubmit = async () => {
     if (!canProceed) {
       Alert.alert(
         'Zorunlu Alanlar',
-        'Devam edebilmek için zorunlu metinleri okuduğunuzu onaylamanız gerekmektedir.'
+        'Devam edebilmek için zorunlu metinleri okuduğunuzu onaylamanız gerekmektedir.',
       );
       return;
     }
@@ -151,33 +156,50 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
     setLoading(true);
     try {
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (user) {
         // Save consents to database
-        const { error } = await supabase.from('user_consents').upsert({
-          user_id: user.id,
-          kvkk_aydinlatma_accepted: consents.kvkkAydinlatma,
-          kvkk_aydinlatma_accepted_at: consents.kvkkAydinlatma ? new Date().toISOString() : null,
-          kvkk_aydinlatma_version: '1.0',
-          terms_of_service_accepted: consents.termsOfService,
-          terms_of_service_accepted_at: consents.termsOfService ? new Date().toISOString() : null,
-          terms_of_service_version: '1.0',
-          privacy_policy_accepted: consents.privacyPolicy,
-          privacy_policy_accepted_at: consents.privacyPolicy ? new Date().toISOString() : null,
-          privacy_policy_version: '1.0',
-          commercial_sms_allowed: consents.commercialSms,
-          commercial_sms_allowed_at: consents.commercialSms ? new Date().toISOString() : null,
-          commercial_email_allowed: consents.commercialEmail,
-          commercial_email_allowed_at: consents.commercialEmail ? new Date().toISOString() : null,
-          commercial_push_allowed: consents.commercialPush,
-          commercial_push_allowed_at: consents.commercialPush ? new Date().toISOString() : null,
-          cookie_analytics: consents.cookieAnalytics,
-          cookie_marketing: consents.cookieMarketing,
-          cookie_preferences_set_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id',
-        });
+        const { error } = await supabase.from('user_consents').upsert(
+          {
+            user_id: user.id,
+            kvkk_aydinlatma_accepted: consents.kvkkAydinlatma,
+            kvkk_aydinlatma_accepted_at: consents.kvkkAydinlatma
+              ? new Date().toISOString()
+              : null,
+            kvkk_aydinlatma_version: '1.0',
+            terms_of_service_accepted: consents.termsOfService,
+            terms_of_service_accepted_at: consents.termsOfService
+              ? new Date().toISOString()
+              : null,
+            terms_of_service_version: '1.0',
+            privacy_policy_accepted: consents.privacyPolicy,
+            privacy_policy_accepted_at: consents.privacyPolicy
+              ? new Date().toISOString()
+              : null,
+            privacy_policy_version: '1.0',
+            commercial_sms_allowed: consents.commercialSms,
+            commercial_sms_allowed_at: consents.commercialSms
+              ? new Date().toISOString()
+              : null,
+            commercial_email_allowed: consents.commercialEmail,
+            commercial_email_allowed_at: consents.commercialEmail
+              ? new Date().toISOString()
+              : null,
+            commercial_push_allowed: consents.commercialPush,
+            commercial_push_allowed_at: consents.commercialPush
+              ? new Date().toISOString()
+              : null,
+            cookie_analytics: consents.cookieAnalytics,
+            cookie_marketing: consents.cookieMarketing,
+            cookie_preferences_set_at: new Date().toISOString(),
+          },
+          {
+            onConflict: 'user_id',
+          },
+        );
 
         if (error) {
           console.error('Error saving consents:', error);
@@ -196,13 +218,21 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+    >
       <SafeAreaView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           {onCancel && (
             <TouchableOpacity style={styles.closeButton} onPress={onCancel}>
-              <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text.primary}
+              />
             </TouchableOpacity>
           )}
           <Text style={styles.headerTitle}>
@@ -218,10 +248,15 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
         >
           {/* KVKK Info Banner */}
           <View style={styles.infoBanner}>
-            <MaterialCommunityIcons name="shield-check" size={24} color="#1976D2" />
+            <MaterialCommunityIcons
+              name="shield-check"
+              size={24}
+              color="#1976D2"
+            />
             <Text style={styles.infoBannerText}>
-              TravelMatch olarak kişisel verilerinizin güvenliğine önem veriyoruz.
-              Aşağıdaki onayları vererek hizmetlerimizden faydalanabilirsiniz.
+              TravelMatch olarak kişisel verilerinizin güvenliğine önem
+              veriyoruz. Aşağıdaki onayları vererek hizmetlerimizden
+              faydalanabilirsiniz.
             </Text>
           </View>
 
@@ -238,7 +273,9 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
               onChange={(v) => updateConsent('kvkkAydinlatma', v)}
               required
               linkText="Metni oku →"
-              onLinkPress={() => {/* Navigate to KVKK screen */}}
+              onLinkPress={() => {
+                /* Navigate to KVKK screen */
+              }}
             />
 
             <ConsentCheckbox
@@ -247,7 +284,9 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
               onChange={(v) => updateConsent('termsOfService', v)}
               required
               linkText="Koşulları oku →"
-              onLinkPress={() => {/* Navigate to Terms screen */}}
+              onLinkPress={() => {
+                /* Navigate to Terms screen */
+              }}
             />
 
             <ConsentCheckbox
@@ -256,13 +295,17 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
               onChange={(v) => updateConsent('privacyPolicy', v)}
               required
               linkText="Politikayı oku →"
-              onLinkPress={() => {/* Navigate to Privacy screen */}}
+              onLinkPress={() => {
+                /* Navigate to Privacy screen */
+              }}
             />
           </View>
 
           {/* Optional Section - Commercial Messages */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Ticari İleti İzinleri (Opsiyonel)</Text>
+            <Text style={styles.sectionTitle}>
+              Ticari İleti İzinleri (Opsiyonel)
+            </Text>
             <Text style={styles.sectionSubtitle}>
               Kampanya ve fırsatlardan haberdar olun
             </Text>
@@ -288,7 +331,9 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
 
           {/* Optional Section - Cookies */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Çerez Tercihleri (Opsiyonel)</Text>
+            <Text style={styles.sectionTitle}>
+              Çerez Tercihleri (Opsiyonel)
+            </Text>
             <Text style={styles.sectionSubtitle}>
               Deneyiminizi iyileştirmemize yardımcı olun
             </Text>
@@ -308,9 +353,14 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
 
           {/* Info Note */}
           <View style={styles.infoNote}>
-            <MaterialCommunityIcons name="information-outline" size={18} color={COLORS.text.tertiary} />
+            <MaterialCommunityIcons
+              name="information-outline"
+              size={18}
+              color={COLORS.text.tertiary}
+            />
             <Text style={styles.infoNoteText}>
-              Opsiyonel izinlerinizi istediğiniz zaman Ayarlar {'>'} Gizlilik bölümünden değiştirebilirsiniz.
+              Opsiyonel izinlerinizi istediğiniz zaman Ayarlar {'>'} Gizlilik
+              bölümünden değiştirebilirsiniz.
             </Text>
           </View>
         </ScrollView>
@@ -318,7 +368,10 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
         {/* Footer */}
         <View style={styles.footer}>
           <TouchableOpacity
-            style={[styles.submitButton, !canProceed && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              !canProceed && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={!canProceed || loading}
           >
@@ -329,7 +382,11 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
               style={styles.submitButtonGradient}
             >
               <Text style={styles.submitButtonText}>
-                {loading ? 'Kaydediliyor...' : mode === 'registration' ? 'Devam Et' : 'Kaydet'}
+                {loading
+                  ? 'Kaydediliyor...'
+                  : mode === 'registration'
+                    ? 'Devam Et'
+                    : 'Kaydet'}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -378,7 +435,11 @@ export const PaymentConsent: React.FC<PaymentConsentProps> = ({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Ödeme Onayı</Text>
             <TouchableOpacity onPress={onCancel}>
-              <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text.primary}
+              />
             </TouchableOpacity>
           </View>
 
@@ -404,7 +465,9 @@ export const PaymentConsent: React.FC<PaymentConsentProps> = ({
               onChange={setPreInfoAccepted}
               required
               linkText="Formu oku →"
-              onLinkPress={() => {/* Show pre-info form */}}
+              onLinkPress={() => {
+                /* Show pre-info form */
+              }}
             />
 
             <ConsentCheckbox
@@ -413,7 +476,9 @@ export const PaymentConsent: React.FC<PaymentConsentProps> = ({
               onChange={setContractAccepted}
               required
               linkText="Sözleşmeyi oku →"
-              onLinkPress={() => {/* Show contract */}}
+              onLinkPress={() => {
+                /* Show contract */
+              }}
             />
           </View>
 
@@ -424,7 +489,10 @@ export const PaymentConsent: React.FC<PaymentConsentProps> = ({
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.confirmButton, !canProceed && styles.confirmButtonDisabled]}
+              style={[
+                styles.confirmButton,
+                !canProceed && styles.confirmButtonDisabled,
+              ]}
               onPress={handleAccept}
               disabled={!canProceed}
             >

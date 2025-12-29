@@ -180,6 +180,7 @@ export interface Moment {
   image?: string;
   images?: string[]; // Multiple images support
   price: number;
+  currency?: string; // Multi-currency support (TRY, EUR, USD)
   pricePerGuest?: number; // Alternative price field from some APIs
   location: MomentLocation;
   availability: string;

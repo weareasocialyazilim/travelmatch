@@ -8,12 +8,7 @@
  */
 
 import React, { useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
@@ -107,7 +102,7 @@ export function formatCurrency(amount: number, currency: string): string {
 
 export const ProofRequirementBadge: React.FC<ProofRequirementBadgeProps> = ({
   amount,
-  currency,
+  currency: _currency,
   size = 'medium',
 }) => {
   const tier = useMemo(() => getProofTier(amount), [amount]);
@@ -160,8 +155,17 @@ export const ProofRequirementBadge: React.FC<ProofRequirementBadgeProps> = ({
         },
       ]}
     >
-      <MaterialCommunityIcons name={config.icon as any} size={s.iconSize} color={config.color} />
-      <Text style={[styles.badgeText, { color: config.color, fontSize: s.fontSize }]}>
+      <MaterialCommunityIcons
+        name={config.icon as any}
+        size={s.iconSize}
+        color={config.color}
+      />
+      <Text
+        style={[
+          styles.badgeText,
+          { color: config.color, fontSize: s.fontSize },
+        ]}
+      >
         {size === 'small' ? config.label : config.labelFull}
       </Text>
     </View>
@@ -203,7 +207,8 @@ export const ProofSelectionCard: React.FC<ProofSelectionCardProps> = ({
       icon: 'shield-check',
       title: 'Kanıt İste',
       subtitle: 'Güvence altında gönder',
-      description: 'Alıcı deneyimi gerçekleştirip kanıt yükleyene kadar para güvende tutulur.',
+      description:
+        'Alıcı deneyimi gerçekleştirip kanıt yükleyene kadar para güvende tutulur.',
       color: '#2196F3',
       bgColor: '#E3F2FD',
       pros: ['🔒 Para güvende', '📸 Deneyim kanıtı'],
@@ -213,11 +218,10 @@ export const ProofSelectionCard: React.FC<ProofSelectionCardProps> = ({
   return (
     <View style={styles.selectionContainer}>
       <View style={styles.selectionHeader}>
-        <Text style={styles.selectionTitle}>
-          Nasıl göndermek istersin?
-        </Text>
+        <Text style={styles.selectionTitle}>Nasıl göndermek istersin?</Text>
         <Text style={styles.selectionSubtitle}>
-          {formatCurrency(amount, currency)} tutarındaki hediye için seçim yapabilirsin
+          {formatCurrency(amount, currency)} tutarındaki hediye için seçim
+          yapabilirsin
         </Text>
       </View>
 
@@ -231,8 +235,12 @@ export const ProofSelectionCard: React.FC<ProofSelectionCardProps> = ({
               style={[
                 styles.optionCard,
                 {
-                  backgroundColor: isSelected ? option.bgColor : COLORS.utility.white,
-                  borderColor: isSelected ? option.color : COLORS.border.default,
+                  backgroundColor: isSelected
+                    ? option.bgColor
+                    : COLORS.utility.white,
+                  borderColor: isSelected
+                    ? option.color
+                    : COLORS.border.default,
                   borderWidth: isSelected ? 2 : 1,
                 },
               ]}
@@ -240,34 +248,53 @@ export const ProofSelectionCard: React.FC<ProofSelectionCardProps> = ({
               activeOpacity={0.7}
             >
               {/* Selection indicator */}
-              <View style={[
-                styles.radioOuter,
-                { borderColor: isSelected ? option.color : COLORS.border.default }
-              ]}>
+              <View
+                style={[
+                  styles.radioOuter,
+                  {
+                    borderColor: isSelected
+                      ? option.color
+                      : COLORS.border.default,
+                  },
+                ]}
+              >
                 {isSelected && (
-                  <View style={[styles.radioInner, { backgroundColor: option.color }]} />
+                  <View
+                    style={[
+                      styles.radioInner,
+                      { backgroundColor: option.color },
+                    ]}
+                  />
                 )}
               </View>
 
               {/* Icon */}
-              <View style={[styles.optionIconContainer, { backgroundColor: option.bgColor }]}>
-                <MaterialCommunityIcons name={option.icon as any} size={28} color={option.color} />
+              <View
+                style={[
+                  styles.optionIconContainer,
+                  { backgroundColor: option.bgColor },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name={option.icon as any}
+                  size={28}
+                  color={option.color}
+                />
               </View>
 
               {/* Title */}
-              <Text style={styles.optionTitle}>
-                {option.title}
-              </Text>
+              <Text style={styles.optionTitle}>{option.title}</Text>
 
               {/* Subtitle */}
-              <Text style={styles.optionSubtitle}>
-                {option.subtitle}
-              </Text>
+              <Text style={styles.optionSubtitle}>{option.subtitle}</Text>
 
               {/* Pros */}
               <View style={styles.prosContainer}>
                 {option.pros.map((pro, idx) => (
-                  <Text key={idx} style={[styles.proText, { color: option.color }]}>
+                  <Text
+                    key={idx}
+                    style={[styles.proText, { color: option.color }]}
+                  >
                     {pro}
                   </Text>
                 ))}
@@ -279,23 +306,25 @@ export const ProofSelectionCard: React.FC<ProofSelectionCardProps> = ({
 
       {/* Info text based on selection */}
       {selectedOption !== null && (
-        <View style={[
-          styles.infoBox,
-          {
-            backgroundColor: selectedOption
-              ? '#E3F2FD'
-              : '#E8F5E9'
-          }
-        ]}>
+        <View
+          style={[
+            styles.infoBox,
+            {
+              backgroundColor: selectedOption ? '#E3F2FD' : '#E8F5E9',
+            },
+          ]}
+        >
           <MaterialCommunityIcons
             name={selectedOption ? 'information' : 'flash'}
             size={18}
             color={selectedOption ? '#2196F3' : '#4CAF50'}
           />
-          <Text style={[
-            styles.infoText,
-            { color: selectedOption ? '#1565C0' : '#2E7D32' }
-          ]}>
+          <Text
+            style={[
+              styles.infoText,
+              { color: selectedOption ? '#1565C0' : '#2E7D32' },
+            ]}
+          >
             {selectedOption
               ? 'Para, alıcı deneyimi kanıtlayana kadar güvenli şekilde tutulur. 7 gün içinde kanıt yüklenmezse iade edilir.'
               : 'Ödeme tamamlandığında para direkt alıcıya aktarılır. Geri alma imkanı yoktur.'}
@@ -317,7 +346,7 @@ interface DirectPayIndicatorProps {
 
 export const DirectPayIndicator: React.FC<DirectPayIndicatorProps> = ({
   amount,
-  currency,
+  currency: _currency,
 }) => {
   const tier = useMemo(() => getProofTier(amount), [amount]);
 
@@ -354,7 +383,7 @@ interface ProofRequiredIndicatorProps {
 
 export const ProofRequiredIndicator: React.FC<ProofRequiredIndicatorProps> = ({
   amount,
-  currency,
+  currency: _currency,
 }) => {
   const tier = useMemo(() => getProofTier(amount), [amount]);
 
@@ -379,12 +408,14 @@ export const ProofRequiredIndicator: React.FC<ProofRequiredIndicatorProps> = ({
 // PAYMENT SUMMARY WITH PROOF INFO
 // =============================================================================
 
-export const PaymentSummaryWithProof: React.FC<PaymentSummaryWithProofProps> = ({
+export const PaymentSummaryWithProof: React.FC<
+  PaymentSummaryWithProofProps
+> = ({
   amount,
   currency,
   commission,
   receiverGets,
-  proofRequired,
+  proofRequired: _proofRequired,
   isDirectPay,
   receiverName,
 }) => {
@@ -393,26 +424,20 @@ export const PaymentSummaryWithProof: React.FC<PaymentSummaryWithProofProps> = (
       {/* Amount breakdown */}
       <View style={styles.summarySection}>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>
-            Hediye tutarı
-          </Text>
+          <Text style={styles.summaryLabel}>Hediye tutarı</Text>
           <Text style={styles.summaryValue}>
             {formatCurrency(amount, currency)}
           </Text>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>
-            Platform ücreti
-          </Text>
+          <Text style={styles.summaryLabel}>Platform ücreti</Text>
           <Text style={styles.summaryValue}>
             {formatCurrency(commission, currency)}
           </Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.summaryRow}>
-          <Text style={styles.totalLabel}>
-            Toplam ödeme
-          </Text>
+          <Text style={styles.totalLabel}>Toplam ödeme</Text>
           <Text style={styles.totalValue}>
             {formatCurrency(amount + commission, currency)}
           </Text>
@@ -424,35 +449,42 @@ export const PaymentSummaryWithProof: React.FC<PaymentSummaryWithProofProps> = (
         <View style={styles.receiverRow}>
           <MaterialCommunityIcons name="gift" size={20} color="#43A047" />
           <Text style={styles.receiverLabel}>{receiverName} alacak:</Text>
-          <Text style={styles.receiverValue}>{formatCurrency(receiverGets, currency)}</Text>
+          <Text style={styles.receiverValue}>
+            {formatCurrency(receiverGets, currency)}
+          </Text>
         </View>
       </View>
 
       {/* Delivery method */}
-      <View style={[
-        styles.deliverySection,
-        { backgroundColor: isDirectPay ? '#E8F5E9' : '#E3F2FD' }
-      ]}>
+      <View
+        style={[
+          styles.deliverySection,
+          { backgroundColor: isDirectPay ? '#E8F5E9' : '#E3F2FD' },
+        ]}
+      >
         <MaterialCommunityIcons
           name={isDirectPay ? 'flash' : 'shield-check'}
           size={24}
           color={isDirectPay ? '#43A047' : '#1976D2'}
         />
         <View style={styles.deliveryTextContainer}>
-          <Text style={[
-            styles.deliveryTitle,
-            { color: isDirectPay ? '#2E7D32' : '#1565C0' }
-          ]}>
+          <Text
+            style={[
+              styles.deliveryTitle,
+              { color: isDirectPay ? '#2E7D32' : '#1565C0' },
+            ]}
+          >
             {isDirectPay ? 'Anında İletim' : 'Güvenli İletim'}
           </Text>
-          <Text style={[
-            styles.deliverySubtitle,
-            { color: isDirectPay ? '#388E3C' : '#1976D2' }
-          ]}>
+          <Text
+            style={[
+              styles.deliverySubtitle,
+              { color: isDirectPay ? '#388E3C' : '#1976D2' },
+            ]}
+          >
             {isDirectPay
               ? `Ödeme sonrası ${receiverName} hemen alacak`
-              : `${receiverName} kanıt yükleyince aktarılacak`
-            }
+              : `${receiverName} kanıt yükleyince aktarılacak`}
           </Text>
         </View>
         {!isDirectPay && (
@@ -482,8 +514,8 @@ export const AmountInputWithTier: React.FC<AmountInputWithTierProps> = ({
   value,
   onChange,
   currency,
-  minAmount = 10,
-  maxAmount = 10000,
+  minAmount: _minAmount = 10,
+  maxAmount: _maxAmount = 10000,
 }) => {
   const amount = parseFloat(value) || 0;
   const tier = useMemo(() => getProofTier(amount), [amount]);
@@ -502,31 +534,57 @@ export const AmountInputWithTier: React.FC<AmountInputWithTierProps> = ({
               style={[
                 styles.tierDot,
                 {
-                  backgroundColor: tier.requirement === t
-                    ? (t === 'none' ? '#4CAF50' : t === 'optional' ? '#FF9800' : '#2196F3')
-                    : COLORS.border.default,
+                  backgroundColor:
+                    tier.requirement === t
+                      ? t === 'none'
+                        ? '#4CAF50'
+                        : t === 'optional'
+                          ? '#FF9800'
+                          : '#2196F3'
+                      : COLORS.border.default,
                 },
               ]}
             />
           ))}
         </View>
         <View style={styles.tierLabels}>
-          <Text style={[
-            styles.tierLabel,
-            { color: tier.requirement === 'none' ? '#4CAF50' : COLORS.text.tertiary }
-          ]}>
+          <Text
+            style={[
+              styles.tierLabel,
+              {
+                color:
+                  tier.requirement === 'none'
+                    ? '#4CAF50'
+                    : COLORS.text.tertiary,
+              },
+            ]}
+          >
             0-30
           </Text>
-          <Text style={[
-            styles.tierLabel,
-            { color: tier.requirement === 'optional' ? '#FF9800' : COLORS.text.tertiary }
-          ]}>
+          <Text
+            style={[
+              styles.tierLabel,
+              {
+                color:
+                  tier.requirement === 'optional'
+                    ? '#FF9800'
+                    : COLORS.text.tertiary,
+              },
+            ]}
+          >
             30-100
           </Text>
-          <Text style={[
-            styles.tierLabel,
-            { color: tier.requirement === 'required' ? '#2196F3' : COLORS.text.tertiary }
-          ]}>
+          <Text
+            style={[
+              styles.tierLabel,
+              {
+                color:
+                  tier.requirement === 'required'
+                    ? '#2196F3'
+                    : COLORS.text.tertiary,
+              },
+            ]}
+          >
             100+
           </Text>
         </View>
@@ -534,27 +592,37 @@ export const AmountInputWithTier: React.FC<AmountInputWithTierProps> = ({
 
       {/* Current tier info */}
       {amount > 0 && (
-        <View style={[
-          styles.currentTierInfo,
-          {
-            backgroundColor: tier.requirement === 'none'
-              ? '#E8F5E9'
-              : tier.requirement === 'optional'
-                ? '#FFF3E0'
-                : '#E3F2FD',
-          }
-        ]}>
-          <ProofRequirementBadge amount={amount} currency={currency} size="small" />
-          <Text style={[
-            styles.currentTierText,
+        <View
+          style={[
+            styles.currentTierInfo,
             {
-              color: tier.requirement === 'none'
-                ? '#2E7D32'
-                : tier.requirement === 'optional'
-                  ? '#E65100'
-                  : '#1565C0',
-            }
-          ]}>
+              backgroundColor:
+                tier.requirement === 'none'
+                  ? '#E8F5E9'
+                  : tier.requirement === 'optional'
+                    ? '#FFF3E0'
+                    : '#E3F2FD',
+            },
+          ]}
+        >
+          <ProofRequirementBadge
+            amount={amount}
+            currency={currency}
+            size="small"
+          />
+          <Text
+            style={[
+              styles.currentTierText,
+              {
+                color:
+                  tier.requirement === 'none'
+                    ? '#2E7D32'
+                    : tier.requirement === 'optional'
+                      ? '#E65100'
+                      : '#1565C0',
+              },
+            ]}
+          >
             {tier.descriptionTr}
           </Text>
         </View>
@@ -570,16 +638,20 @@ export const AmountInputWithTier: React.FC<AmountInputWithTierProps> = ({
               style={[
                 styles.quickAmountBtn,
                 {
-                  backgroundColor: amount === qa ? COLORS.primary.default : COLORS.utility.white,
-                  borderColor: amount === qa ? COLORS.primary.default : COLORS.border.default,
+                  backgroundColor:
+                    amount === qa ? COLORS.primary : COLORS.utility.white,
+                  borderColor:
+                    amount === qa ? COLORS.primary : COLORS.border.default,
                 },
               ]}
               onPress={() => onChange(qa.toString())}
             >
-              <Text style={[
-                styles.quickAmountText,
-                { color: amount === qa ? '#fff' : COLORS.text.primary }
-              ]}>
+              <Text
+                style={[
+                  styles.quickAmountText,
+                  { color: amount === qa ? '#fff' : COLORS.text.primary },
+                ]}
+              >
                 {qa}
               </Text>
               {qaTier.isDirectPay && (
@@ -783,7 +855,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.primary.default,
+    color: COLORS.primary,
   },
   receiverSection: {
     backgroundColor: '#E8F5E9',

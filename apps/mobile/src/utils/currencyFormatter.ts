@@ -4,7 +4,6 @@
  */
 
 import {
-  CURRENCIES,
   CurrencyCode,
   DEFAULT_CURRENCY,
   getCurrency,
@@ -30,9 +29,14 @@ export interface FormatCurrencyOptions {
 export const formatCurrency = (
   amount: number,
   currencyCode: CurrencyCode = DEFAULT_CURRENCY,
-  options: FormatCurrencyOptions = {}
+  options: FormatCurrencyOptions = {},
 ): string => {
-  const { showSymbol = true, showCode = false, locale, compact = false } = options;
+  const {
+    showSymbol = true,
+    showCode = false,
+    locale,
+    compact = false,
+  } = options;
 
   const currency = getCurrency(currencyCode);
 
@@ -49,7 +53,10 @@ export const formatCurrency = (
       formatOptions.compactDisplay = 'short';
     }
 
-    const formatter = new Intl.NumberFormat(locale || currency.locale, formatOptions);
+    const formatter = new Intl.NumberFormat(
+      locale || currency.locale,
+      formatOptions,
+    );
     let formatted = formatter.format(amount);
 
     if (!showSymbol) {
@@ -75,7 +82,7 @@ export const formatCurrency = (
 export const formatAmount = (
   amount: number,
   currencyCode: CurrencyCode = DEFAULT_CURRENCY,
-  locale?: string
+  locale?: string,
 ): string => {
   const currency = getCurrency(currencyCode);
 
@@ -141,7 +148,7 @@ export const parseCurrencyInput = (input: string): number => {
 export const formatPriceRange = (
   min: number,
   max: number,
-  currencyCode: CurrencyCode = DEFAULT_CURRENCY
+  currencyCode: CurrencyCode = DEFAULT_CURRENCY,
 ): string => {
   const symbol = getCurrencySymbol(currencyCode);
   const minFormatted = formatAmount(min, currencyCode);
@@ -158,7 +165,7 @@ export const formatConvertedPrice = (
   originalAmount: number,
   originalCurrency: CurrencyCode,
   convertedAmount: number,
-  displayCurrency: CurrencyCode
+  displayCurrency: CurrencyCode,
 ): string => {
   const displayFormatted = formatCurrency(convertedAmount, displayCurrency);
 
@@ -177,7 +184,7 @@ export const formatPriceDisplay = (
   amount: number,
   currency: CurrencyCode,
   userCurrency: CurrencyCode,
-  convertedAmount?: number
+  convertedAmount?: number,
 ): { primary: string; secondary?: string } => {
   if (currency === userCurrency || !convertedAmount) {
     return { primary: formatCurrency(amount, currency) };
@@ -192,7 +199,10 @@ export const formatPriceDisplay = (
 /**
  * Get display-friendly currency name
  */
-export const getCurrencyName = (code: CurrencyCode, language: 'en' | 'tr' = 'tr'): string => {
+export const getCurrencyName = (
+  code: CurrencyCode,
+  language: 'en' | 'tr' = 'tr',
+): string => {
   const currency = getCurrency(code);
   return language === 'tr' ? currency.nameTr : currency.name;
 };
@@ -203,7 +213,7 @@ export const getCurrencyName = (code: CurrencyCode, language: 'en' | 'tr' = 'tr'
 export const isValidAmount = (
   amount: number,
   min: number = 0,
-  max: number = Infinity
+  max: number = Infinity,
 ): boolean => {
   return !isNaN(amount) && amount >= min && amount <= max;
 };
@@ -213,7 +223,7 @@ export const isValidAmount = (
  */
 export const roundToCurrency = (
   amount: number,
-  currencyCode: CurrencyCode = DEFAULT_CURRENCY
+  currencyCode: CurrencyCode = DEFAULT_CURRENCY,
 ): number => {
   const currency = getCurrency(currencyCode);
   const multiplier = Math.pow(10, currency.decimalPlaces);

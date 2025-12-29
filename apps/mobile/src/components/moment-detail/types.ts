@@ -29,6 +29,7 @@ export interface MomentData {
   title: string;
   imageUrl: string;
   price: number;
+  currency?: string; // Multi-currency support
   story?: string;
   status?: string;
   availability?: string;

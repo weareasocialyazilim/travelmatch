@@ -4,5 +4,5 @@
  * Turkish legal compliance screens for KVKK and Consumer Protection Law.
  */
 
-export { KVKKAydinlatmaScreen } from './KVKKAydinlatmaScreen';
-export { MesafeliSatisScreen } from './MesafeliSatisScreen';
+export { default as KVKKAydinlatmaScreen } from './KVKKAydinlatmaScreen';
+export { default as MesafeliSatisScreen } from './MesafeliSatisScreen';

@@ -133,7 +133,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
   };
 
   const handleUploadProof = (_giftId: string) => {
-    navigation.navigate('ProofFlow');
+    navigation.navigate('ProofFlow', {});
   };
 
   const getGiftStatusInfo = (
@@ -157,9 +157,17 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       case 'verified':
         return { icon: 'check-decagram', color: COLORS.mint, text: 'Verified' };
       case 'failed':
-        return { icon: 'close-circle', color: COLORS.feedback.error, text: 'Failed' };
+        return {
+          icon: 'close-circle',
+          color: COLORS.feedback.error,
+          text: 'Failed',
+        };
       default:
-        return { icon: 'gift-outline', color: COLORS.brand.primary, text: 'Pending' };
+        return {
+          icon: 'gift-outline',
+          color: COLORS.brand.primary,
+          text: 'Pending',
+        };
     }
   };
 
@@ -333,7 +341,9 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
             <MaterialCommunityIcons
               name="message-outline"
               size={20}
-              color={canStartChat ? COLORS.utility.white : COLORS.text.secondary}
+              color={
+                canStartChat ? COLORS.utility.white : COLORS.text.secondary
+              }
             />
             <Text
               style={[
@@ -370,7 +380,10 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
                 color={COLORS.feedback.error}
               />
               <Text
-                style={[styles.secondaryButtonText, { color: COLORS.feedback.error }]}
+                style={[
+                  styles.secondaryButtonText,
+                  { color: COLORS.feedback.error },
+                ]}
               >
                 Report
               </Text>

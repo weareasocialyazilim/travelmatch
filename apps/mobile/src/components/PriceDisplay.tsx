@@ -45,7 +45,9 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
   const { userCurrency, convert, needsConversion } = useCurrency();
 
   const shouldConvert = needsConversion(currency) && showConversion;
-  const convertedAmount = shouldConvert ? convert(amount, currency, userCurrency) : amount;
+  const convertedAmount = shouldConvert
+    ? convert(amount, currency, userCurrency)
+    : amount;
   const displayCurrency = shouldConvert ? userCurrency : currency;
 
   const fontSize = {
@@ -66,18 +68,14 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
 
   return (
     <View style={[styles.container, { alignItems: getAlign(align) }, style]}>
-      <Text
-        style={[
-          styles.price,
-          { fontSize, textAlign },
-          priceStyle,
-        ]}
-      >
+      <Text style={[styles.price, { fontSize, textAlign }, priceStyle]}>
         {formatCurrency(convertedAmount, displayCurrency)}
       </Text>
 
       {shouldConvert && (
-        <Text style={[styles.original, { fontSize: originalFontSize, textAlign }]}>
+        <Text
+          style={[styles.original, { fontSize: originalFontSize, textAlign }]}
+        >
           (~{formatCurrency(amount, currency)})
         </Text>
       )}
@@ -135,12 +133,12 @@ export const CompactPriceDisplay: React.FC<{
   const displayCurrency = shouldConvert ? userCurrency : currency;
 
   return (
-    <View style={[styles.compactContainer, style]}>
-      <Text style={styles.compactPrice}>
+    <View style={[compactStyles.compactContainer, style]}>
+      <Text style={compactStyles.compactPrice}>
         {formatCurrency(displayAmount, displayCurrency, { compact: true })}
       </Text>
       {shouldConvert && (
-        <Text style={styles.compactOriginal}>
+        <Text style={compactStyles.compactOriginal}>
           ~{formatCurrency(amount, currency, { compact: true })}
         </Text>
       )}
@@ -164,7 +162,5 @@ const compactStyles = StyleSheet.create({
     color: COLORS.text.secondary,
   },
 });
-
-Object.assign(styles, compactStyles);
 
 export default PriceDisplay;

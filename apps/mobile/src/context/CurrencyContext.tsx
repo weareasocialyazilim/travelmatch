@@ -16,7 +16,6 @@ import { supabase } from '@/config/supabase';
 import {
   CurrencyCode,
   DEFAULT_CURRENCY,
-  CURRENCIES,
   isSupportedCurrency,
 } from '@/constants/currencies';
 import { useAuth } from './AuthContext';
@@ -68,7 +67,9 @@ const RATES_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 // Context
 // ============================================
 
-const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
+const CurrencyContext = createContext<CurrencyContextType | undefined>(
+  undefined,
+);
 
 // ============================================
 // Provider
@@ -78,9 +79,12 @@ interface CurrencyProviderProps {
   children: ReactNode;
 }
 
-export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
+export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({
+  children,
+}) => {
   const { user } = useAuth();
-  const [userCurrency, setUserCurrencyState] = useState<CurrencyCode>(DEFAULT_CURRENCY);
+  const [userCurrency, setUserCurrencyState] =
+    useState<CurrencyCode>(DEFAULT_CURRENCY);
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({});
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -96,14 +100,14 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
         if (user?.id) {
           const { data, error } = await supabase
             .from('users')
-            .select('preferred_currency')
+            .select('currency')
             .eq('id', user.id)
             .single();
 
-          if (!error && data?.preferred_currency && isSupportedCurrency(data.preferred_currency)) {
-            setUserCurrencyState(data.preferred_currency as CurrencyCode);
-            await AsyncStorage.setItem(STORAGE_KEY, data.preferred_currency);
-            logger.info('[Currency] Loaded from DB:', data.preferred_currency);
+          if (!error && data?.currency && isSupportedCurrency(data.currency)) {
+            setUserCurrencyState(data.currency as CurrencyCode);
+            await AsyncStorage.setItem(STORAGE_KEY, data.currency);
+            logger.info('[Currency] Loaded from DB:', data.currency);
             return;
           }
         }
@@ -169,7 +173,13 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
         if (latestError) throw latestError;
 
         if (latestData && latestData.length > 0) {
-          processRates(latestData);
+          processRates(
+            latestData as Array<{
+              base_currency: string;
+              target_currency: string;
+              rate: number;
+            }>,
+          );
           return;
         }
 
@@ -177,7 +187,13 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
       }
 
       if (data && data.length > 0) {
-        processRates(data);
+        processRates(
+          data as Array<{
+            base_currency: string;
+            target_currency: string;
+            rate: number;
+          }>,
+        );
       } else {
         // Use cached rates if no fresh data
         logger.warn('[Currency] No fresh rates, using cached');
@@ -191,7 +207,11 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
   }, []);
 
   const processRates = async (
-    data: Array<{ base_currency: string; target_currency: string; rate: number }>
+    data: Array<{
+      base_currency: string;
+      target_currency: string;
+      rate: number;
+    }>,
   ) => {
     const rates: ExchangeRates = {};
 
@@ -209,7 +229,11 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
 
     setExchangeRates(rates);
     setLastUpdated(new Date());
-    logger.info('[Currency] Loaded', Object.keys(rates).length, 'exchange rates');
+    logger.info(
+      '[Currency] Loaded',
+      Object.keys(rates).length,
+      'exchange rates',
+    );
   };
 
   useEffect(() => {
@@ -233,7 +257,7 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
     if (user?.id) {
       const { error } = await supabase
         .from('users')
-        .update({ preferred_currency: code })
+        .update({ currency: code })
         .eq('id', user.id);
 
       if (error) {
@@ -270,9 +294,11 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
       // Cross-rate through TRY
       if (from !== 'TRY' && target !== 'TRY') {
         const fromToTry =
-          exchangeRates[`${from}_TRY`] || 1 / (exchangeRates[`TRY_${from}`] || 1);
+          exchangeRates[`${from}_TRY`] ||
+          1 / (exchangeRates[`TRY_${from}`] || 1);
         const tryToTarget =
-          exchangeRates[`TRY_${target}`] || 1 / (exchangeRates[`${target}_TRY`] || 1);
+          exchangeRates[`TRY_${target}`] ||
+          1 / (exchangeRates[`${target}_TRY`] || 1);
 
         if (fromToTry && tryToTarget) {
           return Math.round(amount * fromToTry * tryToTarget * 100) / 100;
@@ -282,7 +308,7 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
       logger.warn('[Currency] No rate found for', from, 'to', target);
       return amount; // Return original if no rate found
     },
-    [exchangeRates, userCurrency]
+    [exchangeRates, userCurrency],
   );
 
   // ==========================================
@@ -293,7 +319,7 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
     (currency: CurrencyCode): boolean => {
       return currency !== userCurrency;
     },
-    [userCurrency]
+    [userCurrency],
   );
 
   // ==========================================
@@ -311,7 +337,11 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
     needsConversion,
   };
 
-  return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
+  return (
+    <CurrencyContext.Provider value={value}>
+      {children}
+    </CurrencyContext.Provider>
+  );
 };
 
 // ============================================
@@ -337,7 +367,7 @@ export const useCurrency = (): CurrencyContextType => {
  */
 export const useConvertedPrice = (
   amount: number,
-  currency: CurrencyCode
+  currency: CurrencyCode,
 ): {
   displayAmount: number;
   displayCurrency: CurrencyCode;

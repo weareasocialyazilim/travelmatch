@@ -21,7 +21,6 @@ import {
   TouchableOpacity,
   Alert,
   BackHandler,
-  Platform,
 } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -60,8 +59,14 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
   route,
   navigation,
 }) => {
-  const { iframeToken, merchantOid, amount, currency, giftId, isTestMode } =
-    route.params;
+  const {
+    iframeToken,
+    merchantOid,
+    amount,
+    currency,
+    giftId: _giftId,
+    isTestMode,
+  } = route.params;
 
   const webViewRef = useRef<WebView>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,7 +74,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
   const [canGoBack, setCanGoBack] = useState(false);
 
   // Security: Prevent screenshots during payment
-  useScreenSecurity({ preventScreenCapture: true });
+  useScreenSecurity();
 
   const { trackEvent } = useAnalytics();
 
@@ -108,14 +113,14 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
               });
             },
           },
-        ]
+        ],
       );
       return true;
     };
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      handleBackPress
+      handleBackPress,
     );
 
     return () => backHandler.remove();
@@ -133,7 +138,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
 
       // Check for success
       const isSuccess = SUCCESS_PATTERNS.some((pattern) =>
-        currentUrl.includes(pattern)
+        currentUrl.includes(pattern),
       );
       if (isSuccess) {
         trackEvent('paytr_payment_success', { merchantOid, amount });
@@ -151,7 +156,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
 
       // Check for failure
       const isFailure = FAILURE_PATTERNS.some((pattern) =>
-        currentUrl.includes(pattern)
+        currentUrl.includes(pattern),
       );
       if (isFailure) {
         trackEvent('paytr_payment_failed', { merchantOid });
@@ -162,7 +167,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
         return;
       }
     },
-    [merchantOid, amount, navigation, trackEvent]
+    [merchantOid, amount, navigation, trackEvent],
   );
 
   // Handle WebView messages from injected JS
@@ -198,7 +203,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
         // Not a JSON message, ignore
       }
     },
-    [merchantOid, amount, navigation, trackEvent]
+    [merchantOid, amount, navigation, trackEvent],
   );
 
   // Handle load errors
@@ -208,7 +213,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
       setLoadError(description);
       trackEvent('paytr_webview_error', { merchantOid, error: description });
     },
-    [merchantOid, trackEvent]
+    [merchantOid, trackEvent],
   );
 
   // Handle close button
@@ -226,7 +231,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
             navigation.goBack();
           },
         },
-      ]
+      ],
     );
   }, [merchantOid, navigation, trackEvent]);
 
@@ -293,8 +298,8 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
           <Icon name="alert-circle" size={64} color={COLORS.feedback.error} />
           <Text style={styles.errorTitle}>Bağlantı Hatası</Text>
           <Text style={styles.errorMessage}>
-            Ödeme sayfası yüklenemedi. Lütfen internet bağlantınızı kontrol
-            edip tekrar deneyin.
+            Ödeme sayfası yüklenemedi. Lütfen internet bağlantınızı kontrol edip
+            tekrar deneyin.
           </Text>
           <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
             <Icon name="refresh" size={20} color={COLORS.utility.white} />
@@ -403,7 +408,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider.default,
+    borderBottomColor: COLORS.border.default,
   },
   closeButton: {
     width: 40,
@@ -442,9 +447,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: COLORS.background.secondary,
+    backgroundColor: COLORS.bg.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider.default,
+    borderBottomColor: COLORS.border.default,
   },
   amountLabel: {
     fontSize: 14,
@@ -481,8 +486,8 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: COLORS.divider.default,
-    backgroundColor: COLORS.background.secondary,
+    borderTopColor: COLORS.border.default,
+    backgroundColor: COLORS.bg.secondary,
   },
   securityText: {
     fontSize: 12,

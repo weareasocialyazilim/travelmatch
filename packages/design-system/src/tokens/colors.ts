@@ -282,6 +282,11 @@ export const colors = {
     instagram: '#E4405F',
     whatsapp: '#25D366',
   },
+
+  // Additional semantic colors for compliance features
+  coral: primitives.rose[400], // #FB7185 - for highlights and accents
+  divider: primitives.stone[200], // #E7E5E4 - for separators
+  background: primitives.stone[50], // #FAFAF9 - general background
 } as const;
 
 export type Colors = typeof colors;
