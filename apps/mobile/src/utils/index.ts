@@ -67,3 +67,26 @@ export {
   ServiceBreakers,
 } from './circuitBreaker';
 export type { CircuitBreakerConfig } from './circuitBreaker';
+
+// SSL Pinning
+export {
+  requiresPinning,
+  isDomainPinned,
+  getPinsForDomain,
+  validateSSLCertificate,
+  createPinnedFetch,
+  addSecurityHeaders,
+  logSSLEvent,
+  PINNED_ENDPOINTS,
+  SECURITY_HEADERS,
+} from './sslPinning';
+
+// Device Integrity
+export {
+  checkDeviceIntegrity,
+  isDevicePotentiallyCompromised,
+  handleCompromisedDevice,
+  guardSensitiveOperation,
+  logIntegrityEvent,
+} from './deviceIntegrity';
+export type { IntegrityCheckResult, CompromisedDeviceAction } from './deviceIntegrity';

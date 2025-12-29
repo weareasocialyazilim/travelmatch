@@ -61,6 +61,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       NSContactsUsageDescription:
         'TravelMatch can help you find friends who are also using the app.',
 
+      // App Tracking Transparency (iOS 14.5+)
+      NSUserTrackingUsageDescription:
+        'TravelMatch uses this to provide personalized recommendations and improve app experience. Your data is never sold to third parties.',
+
       // Push notifications background modes
       UIBackgroundModes: ['fetch', 'remote-notification'],
 
@@ -142,6 +146,48 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // Expo Plugins
   // ============================================
   plugins: [
+    // Build Properties - iOS Privacy Manifests (iOS 17+)
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          privacyManifests: {
+            NSPrivacyAccessedAPITypes: [
+              // User Defaults API - Used for app preferences
+              {
+                NSPrivacyAccessedAPIType:
+                  'NSPrivacyAccessedAPICategoryUserDefaults',
+                NSPrivacyAccessedAPITypeReasons: ['CA92.1'],
+              },
+              // File Timestamp API - Used for cache management
+              {
+                NSPrivacyAccessedAPIType:
+                  'NSPrivacyAccessedAPICategoryFileTimestamp',
+                NSPrivacyAccessedAPITypeReasons: ['C617.1'],
+              },
+              // System Boot Time API - Used for analytics session tracking
+              {
+                NSPrivacyAccessedAPIType:
+                  'NSPrivacyAccessedAPICategorySystemBootTime',
+                NSPrivacyAccessedAPITypeReasons: ['35F9.1'],
+              },
+              // Disk Space API - Used for storage management
+              {
+                NSPrivacyAccessedAPIType:
+                  'NSPrivacyAccessedAPICategoryDiskSpace',
+                NSPrivacyAccessedAPITypeReasons: ['E174.1'],
+              },
+            ],
+          },
+        },
+        android: {
+          // Enable R8 full mode for better code shrinking
+          enableProguardInReleaseBuilds: true,
+          // Use hermes for better performance
+          usesCleartextTraffic: false,
+        },
+      },
+    ],
     'expo-localization',
     [
       '@sentry/react-native/expo',
