@@ -182,6 +182,8 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   PaymentsKYC: undefined;
+  KVKKAydinlatma: undefined;
+  MesafeliSatis: undefined;
 
   // Withdraw
   Withdraw: undefined;

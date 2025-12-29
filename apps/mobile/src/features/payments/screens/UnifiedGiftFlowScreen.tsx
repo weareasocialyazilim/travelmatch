@@ -50,7 +50,6 @@ import {
   DirectPayIndicator,
   ProofRequiredIndicator,
   PaymentSummaryWithProof,
-  type ProofTier,
 } from '../components/ProofRequirementComponents';
 
 interface PaymentMethod {
@@ -122,7 +121,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   );
 
   // Dynamic proof requirement state
-  const [requestProof, setRequestProof] = useState(false);
+  const [requestProof, setRequestProof] = useState<boolean | null>(null);
   const [paymentConsent, setPaymentConsent] = useState(false);
   const [commissionData, setCommissionData] = useState<{
     giverPays: number;
@@ -131,7 +130,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   } | null>(null);
 
   // Calculate proof tier based on moment price
-  const proofTier = useMemo<ProofTier>(
+  const proofTier = useMemo(
     () => getProofTier(moment.price),
     [moment.price],
   );
@@ -139,7 +138,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   // Determine if this is direct pay or escrow
   const isDirectPay = useMemo(() => {
     if (proofTier.requirement === 'none') return true;
-    if (proofTier.requirement === 'optional' && !requestProof) return true;
+    if (proofTier.requirement === 'optional' && requestProof === false) return true;
     return false;
   }, [proofTier.requirement, requestProof]);
 
@@ -442,33 +441,36 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Teslimat Yöntemi</Text>
-              <ProofRequirementBadge tier={proofTier} />
+              <ProofRequirementBadge amount={moment.price} currency="TL" />
             </View>
 
             {proofTier.requirement === 'none' && (
-              <DirectPayIndicator />
+              <DirectPayIndicator amount={moment.price} currency="TL" />
             )}
 
             {proofTier.requirement === 'optional' && (
               <ProofSelectionCard
-                requestProof={requestProof}
-                onToggle={setRequestProof}
+                amount={moment.price}
+                currency="TL"
+                onSelect={setRequestProof}
+                selectedOption={requestProof}
               />
             )}
 
             {proofTier.requirement === 'required' && (
-              <ProofRequiredIndicator escrowHours={proofTier.escrowHours || 72} />
+              <ProofRequiredIndicator amount={moment.price} currency="TL" />
             )}
           </View>
 
           {/* Summary with Proof */}
           <PaymentSummaryWithProof
-            baseAmount={moment.price}
-            giverPays={commissionData?.giverPays || moment.price}
-            receiverGets={commissionData?.receiverGets || moment.price}
+            amount={moment.price}
+            currency="TL"
             commission={commissionData?.commission || 0}
+            receiverGets={commissionData?.receiverGets || moment.price}
+            proofRequired={proofTier.requirement === 'required' || requestProof === true}
             isDirectPay={isDirectPay}
-            escrowHours={proofTier.escrowHours}
+            receiverName={recipientName}
           />
 
           {/* Payment Consent */}
@@ -494,10 +496,10 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.purchaseButton,
-              (!recipientEmail || loading || !paymentConsent) && styles.purchaseButtonDisabled,
+              (!recipientEmail || loading || !paymentConsent || (proofTier.requirement === 'optional' && requestProof === null)) && styles.purchaseButtonDisabled,
             ]}
             onPress={handleSubmit(onPurchase)}
-            disabled={!recipientEmail || loading || !paymentConsent}
+            disabled={!recipientEmail || loading || !paymentConsent || (proofTier.requirement === 'optional' && requestProof === null)}
           >
             <Text style={styles.purchaseButtonText}>
               {loading

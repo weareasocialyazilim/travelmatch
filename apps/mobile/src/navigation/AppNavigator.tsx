@@ -204,6 +204,12 @@ import {
   DataPrivacyScreen,
 } from '../features/settings';
 
+// Legal screens - Turkish compliance
+import {
+  KVKKAydinlatmaScreen,
+  MesafeliSatisScreen,
+} from '../features/settings/screens/legal';
+
 // ===================================
 // TYPE IMPORTS
 // ===================================
@@ -489,6 +495,14 @@ const AppNavigator = () => {
               component={PrivacyPolicyScreen}
             />
             <Stack.Screen name="PaymentsKYC" component={PaymentsKYCScreen} />
+            <Stack.Screen
+              name="KVKKAydinlatma"
+              component={KVKKAydinlatmaScreen}
+            />
+            <Stack.Screen
+              name="MesafeliSatis"
+              component={MesafeliSatisScreen}
+            />
 
             {/* Withdraw */}
             <Stack.Screen name="Withdraw" component={WithdrawScreen} />
