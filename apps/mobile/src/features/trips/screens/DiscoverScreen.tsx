@@ -31,10 +31,8 @@ import {
   DiscoverHeader,
   StoryItem,
   POPULAR_CITIES,
-  USER_STORIES,
 } from '@/components/discover';
 import MomentSingleCard from '@/components/discover/cards/MomentSingleCard';
-import MomentGridCard from '@/components/discover/cards/MomentGridCard';
 import { SkeletonList } from '../../../components/ui/SkeletonList';
 import { COLORS } from '@/constants/colors';
 import { useMoments } from '@/hooks/useMoments';
@@ -46,11 +44,7 @@ import { OfflineState } from '../../../components/OfflineState';
 import { NetworkGuard } from '../../../components/NetworkGuard';
 
 // Import modular components
-import type {
-  ViewMode,
-  UserStory,
-  PriceRange,
-} from '@/components/discover/types';
+import type { UserStory, PriceRange } from '@/components/discover/types';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Moment } from '@/hooks/useMoments';
 import type { Moment as DomainMoment } from '@/types';
@@ -73,7 +67,6 @@ const DiscoverScreen = () => {
   } = useMoments();
 
   // UI States
-  const [viewMode, setViewMode] = useState<ViewMode>('single');
   const [refreshing, setRefreshing] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -95,6 +88,7 @@ const DiscoverScreen = () => {
     min: 0,
     max: 500,
   });
+  const [selectedGender, setSelectedGender] = useState('all');
 
   // Location state
   const [selectedLocation, setSelectedLocation] = useState('San Francisco, CA');
@@ -128,15 +122,15 @@ const DiscoverScreen = () => {
       setCurrentStoryIndex((prev) => prev + 1);
     } else {
       const nextUserIndex = currentUserIndex + 1;
-      if (nextUserIndex < USER_STORIES.length) {
+      if (nextUserIndex < recentStories.length) {
         setCurrentUserIndex(nextUserIndex);
-        setSelectedStoryUser(USER_STORIES[nextUserIndex]);
+        setSelectedStoryUser(recentStories[nextUserIndex]);
         setCurrentStoryIndex(0);
       } else {
         closeStoryViewer();
       }
     }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, recentStories]);
 
   const goToPreviousStory = useCallback(() => {
     if (!selectedStoryUser) return;
@@ -146,13 +140,13 @@ const DiscoverScreen = () => {
     } else {
       const prevUserIndex = currentUserIndex - 1;
       if (prevUserIndex >= 0) {
-        const prevUser = USER_STORIES[prevUserIndex];
+        const prevUser = recentStories[prevUserIndex];
         setCurrentUserIndex(prevUserIndex);
         setSelectedStoryUser(prevUser);
         setCurrentStoryIndex(prevUser.stories.length - 1);
       }
     }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex]);
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, recentStories]);
 
   const closeStoryViewer = useCallback(() => {
     setShowStoryViewer(false);
@@ -166,6 +160,83 @@ const DiscoverScreen = () => {
   const baseMoments = useMemo(() => {
     return apiMoments;
   }, [apiMoments]);
+
+  // Generate stories from moments created in the last 24 hours
+  // Each unique host with recent moments becomes a story
+  const recentStories = useMemo((): UserStory[] => {
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    // Filter moments from last 24 hours
+    const recentMoments = baseMoments.filter((moment) => {
+      const createdAt = new Date(moment.createdAt);
+      return createdAt >= twentyFourHoursAgo;
+    });
+
+    // Group moments by host
+    const hostMomentsMap = new Map<
+      string,
+      { host: (typeof recentMoments)[0]; moments: typeof recentMoments }
+    >();
+
+    recentMoments.forEach((moment) => {
+      const hostId = moment.hostId;
+      if (!hostMomentsMap.has(hostId)) {
+        hostMomentsMap.set(hostId, { host: moment, moments: [] });
+      }
+      hostMomentsMap.get(hostId)!.moments.push(moment);
+    });
+
+    // Convert to UserStory format
+    const stories: UserStory[] = [];
+    hostMomentsMap.forEach(({ host, moments }) => {
+      // Calculate time ago for the most recent moment
+      const mostRecentMoment = moments.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )[0];
+      const timeDiff =
+        now.getTime() - new Date(mostRecentMoment.createdAt).getTime();
+      const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minsAgo = Math.floor(timeDiff / (1000 * 60));
+      const timeAgo = hoursAgo > 0 ? `${hoursAgo}h ago` : `${minsAgo}m ago`;
+
+      stories.push({
+        id: host.hostId,
+        name: host.hostName || 'Unknown',
+        avatar: host.hostAvatar || 'https://via.placeholder.com/60',
+        hasStory: true,
+        isNew: hoursAgo < 6, // Mark as new if less than 6 hours old
+        stories: moments.map((m) => ({
+          id: m.id,
+          imageUrl:
+            m.image || m.images?.[0] || 'https://via.placeholder.com/400',
+          title: m.title,
+          description: m.description || '',
+          location:
+            typeof m.location === 'string'
+              ? m.location
+              : m.location?.city || 'Unknown',
+          distance: m.distance || '0 km',
+          price: m.price || m.pricePerGuest || 0,
+          time: timeAgo,
+        })),
+      });
+    });
+
+    // Sort by most recent first
+    return stories.sort((a, b) => {
+      const aTime = a.stories[0]?.time || '24h ago';
+      const bTime = b.stories[0]?.time || '24h ago';
+      const parseTime = (t: string) => {
+        const match = t.match(/(\d+)(m|h)/);
+        if (!match) return 999;
+        const [, num, unit] = match;
+        return unit === 'm' ? parseInt(num) : parseInt(num) * 60;
+      };
+      return parseTime(aTime) - parseTime(bTime);
+    });
+  }, [baseMoments]);
 
   // Filter and sort moments
   const filteredMoments = useMemo(() => {
@@ -257,13 +328,16 @@ const DiscoverScreen = () => {
     [navigation],
   );
 
-  const handleStoryPress = useCallback((user: UserStory) => {
-    const userIndex = USER_STORIES.findIndex((u) => u.id === user.id);
-    setCurrentUserIndex(userIndex);
-    setSelectedStoryUser(user);
-    setCurrentStoryIndex(0);
-    setShowStoryViewer(true);
-  }, []);
+  const handleStoryPress = useCallback(
+    (user: UserStory) => {
+      const userIndex = recentStories.findIndex((u) => u.id === user.id);
+      setCurrentUserIndex(userIndex >= 0 ? userIndex : 0);
+      setSelectedStoryUser(user);
+      setCurrentStoryIndex(0);
+      setShowStoryViewer(true);
+    },
+    [recentStories],
+  );
 
   const handleLocationSelect = useCallback(
     (location: string) => {
@@ -287,7 +361,7 @@ const DiscoverScreen = () => {
     if (maxDistance !== 50) count++;
     if (priceRange.min !== 0 || priceRange.max !== 500) count++;
     return count;
-  }, [selectedCategory, sortBy, maxDistance, priceRange]);
+  }, [selectedCategory, sortBy, maxDistance, priceRange, selectedGender]);
 
   // Clear all filters
   const clearFilters = useCallback(() => {
@@ -295,6 +369,7 @@ const DiscoverScreen = () => {
     setSortBy('nearest');
     setMaxDistance(50);
     setPriceRange({ min: 0, max: 500 });
+    setSelectedGender('all');
   }, []);
 
   // Memoized modal handlers to prevent unnecessary re-renders
@@ -302,14 +377,6 @@ const DiscoverScreen = () => {
   const closeLocationModal = useCallback(() => setShowLocationModal(false), []);
   const openFilterModal = useCallback(() => setShowFilterModal(true), []);
   const closeFilterModal = useCallback(() => setShowFilterModal(false), []);
-
-  // Memoized view mode handlers
-  const setViewModeSingle = useCallback(() => setViewMode('single'), []);
-  const setViewModeGrid = useCallback(() => setViewMode('grid'), []);
-  const toggleViewMode = useCallback(
-    () => setViewMode((prev) => (prev === 'single' ? 'grid' : 'single')),
-    [],
-  );
 
   // Memoized render functions
   const renderStoryItem = useCallback(
@@ -321,18 +388,9 @@ const DiscoverScreen = () => {
 
   const renderMomentCard = useCallback(
     ({ item, index }: { item: Moment; index: number }) => {
-      if (viewMode === 'single') {
-        return <MomentSingleCard moment={item} onPress={handleMomentPress} />;
-      }
-      return (
-        <MomentGridCard
-          moment={item}
-          index={index}
-          onPress={handleMomentPress}
-        />
-      );
+      return <MomentSingleCard moment={item} onPress={handleMomentPress} />;
     },
-    [viewMode, handleMomentPress],
+    [handleMomentPress],
   );
 
   return (
@@ -351,11 +409,9 @@ const DiscoverScreen = () => {
       {/* Header */}
       <DiscoverHeader
         location={selectedLocation}
-        viewMode={viewMode}
         activeFiltersCount={activeFilterCount}
         onLocationPress={openLocationModal}
         onFilterPress={openFilterModal}
-        onViewModeToggle={toggleViewMode}
       />
 
       <NetworkGuard
@@ -379,71 +435,25 @@ const DiscoverScreen = () => {
           onScroll={handleScroll}
           scrollEventThrottle={400}
         >
-          {/* Stories */}
-          <FlashList
-            data={USER_STORIES}
-            renderItem={renderStoryItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.storiesContainer}
-            estimatedItemSize={80}
-          />
+          {/* Stories - Recent moments from last 24 hours */}
+          {recentStories.length > 0 && (
+            <FlashList
+              data={recentStories}
+              renderItem={renderStoryItem}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.storiesContainer}
+              estimatedItemSize={80}
+            />
+          )}
 
-          {/* Results Bar */}
+          {/* Results Bar - simplified without view toggle */}
           <View style={styles.resultsBar}>
             <Text style={styles.resultsText}>
               {loading
                 ? 'Loading...'
                 : `${filteredMoments.length} moments nearby`}
             </Text>
-            <View style={styles.viewToggle}>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'single' && styles.viewToggleButtonActive,
-                ]}
-                onPress={setViewModeSingle}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                {...a11y.button(
-                  'Single column view',
-                  'Display moments in a single column',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'single' }}
-              >
-                <MaterialCommunityIcons
-                  name="square-outline"
-                  size={18}
-                  color={
-                    viewMode === 'single' ? COLORS.utility.white : COLORS.text.secondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.viewToggleButton,
-                  viewMode === 'grid' && styles.viewToggleButtonActive,
-                ]}
-                onPress={setViewModeGrid}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                {...a11y.button(
-                  'Grid view',
-                  'Display moments in a grid layout',
-                  false,
-                )}
-                accessibilityState={{ selected: viewMode === 'grid' }}
-              >
-                <MaterialCommunityIcons
-                  name="view-grid-outline"
-                  size={18}
-                  color={
-                    viewMode === 'grid' ? COLORS.utility.white : COLORS.text.secondary
-                  }
-                  accessible={false}
-                />
-              </TouchableOpacity>
-            </View>
           </View>
 
           {/* Error State */}
@@ -484,17 +494,12 @@ const DiscoverScreen = () => {
               <FlashList
                 data={filteredMoments}
                 renderItem={renderMomentCard}
-                numColumns={viewMode === 'grid' ? 2 : 1}
-                key={viewMode}
-                contentContainerStyle={
-                  viewMode === 'single'
-                    ? styles.singleListContainer
-                    : styles.gridContainer
-                }
+                numColumns={1}
+                contentContainerStyle={styles.singleListContainer}
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.5}
                 scrollEnabled={false}
-                estimatedItemSize={viewMode === 'grid' ? 200 : 350}
+                estimatedItemSize={350}
               />
             </View>
           )}
@@ -545,6 +550,8 @@ const DiscoverScreen = () => {
         setMaxDistance={setMaxDistance}
         priceRange={priceRange}
         setPriceRange={setPriceRange}
+        selectedGender={selectedGender}
+        setSelectedGender={setSelectedGender}
       />
 
       <StoryViewer

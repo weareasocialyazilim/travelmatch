@@ -173,14 +173,30 @@ const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
   const getToastStyle = () => {
     switch (toast.type) {
       case 'success':
-        return { backgroundColor: COLORS.feedback.success };
+        // Use light background with dark text for better contrast (WCAG AA)
+        return { backgroundColor: COLORS.feedback.successLight };
       case 'error':
         return { backgroundColor: COLORS.feedback.error };
       case 'warning':
-        return { backgroundColor: COLORS.feedback.warning };
+        // Use light background with dark text for better contrast (WCAG AA)
+        return { backgroundColor: COLORS.feedback.warningLight };
       case 'info':
       default:
         return { backgroundColor: COLORS.brand.primary };
+    }
+  };
+
+  // Get text color based on toast type for WCAG AA contrast compliance
+  const getTextColor = () => {
+    switch (toast.type) {
+      case 'success':
+        return COLORS.text.primary; // Dark text on light green bg
+      case 'warning':
+        return COLORS.text.primary; // Dark text on light yellow bg
+      case 'error':
+      case 'info':
+      default:
+        return COLORS.utility.white; // White text on dark bg
     }
   };
 
@@ -214,8 +230,13 @@ const ToastItem: React.FC<ToastItemProps> = memo(({ toast, onDismiss }) => {
         onPress={handleDismiss}
         activeOpacity={0.9}
       >
-        <Text style={styles.icon}>{getIcon()}</Text>
-        <Text style={styles.message} numberOfLines={3}>
+        <Text style={[styles.icon, { color: getTextColor() }]}>
+          {getIcon()}
+        </Text>
+        <Text
+          style={[styles.message, { color: getTextColor() }]}
+          numberOfLines={3}
+        >
           {toast.message}
         </Text>
       </TouchableOpacity>
@@ -235,14 +256,12 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   icon: {
-    color: COLORS.utility.white,
     ...TYPOGRAPHY.h3,
     fontWeight: 'bold',
     marginRight: SPACING.sm,
   },
   message: {
     ...TYPOGRAPHY.body,
-    color: COLORS.utility.white,
     flex: 1,
     fontWeight: '500',
   },

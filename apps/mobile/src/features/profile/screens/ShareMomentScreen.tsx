@@ -205,7 +205,7 @@ export const ShareMomentScreen: React.FC = () => {
     {
       id: 'telegram',
       label: 'Telegram',
-      icon: 'telegram',
+      icon: 'send',
       color: COLORS.telegram,
       action: handleShareToTelegram,
     },
@@ -226,7 +226,11 @@ export const ShareMomentScreen: React.FC = () => {
           style={styles.closeButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
+          <MaterialCommunityIcons
+            name="close"
+            size={24}
+            color={COLORS.text.primary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Share Moment</Text>
         <View style={styles.headerSpacer} />

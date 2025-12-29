@@ -22,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
+import { CityAutocomplete } from '@/components/CityAutocomplete';
 import { editProfileSchema, type EditProfileInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -491,28 +492,16 @@ const EditProfileScreen = () => {
                   control={control}
                   name="location"
                   render={({
-                    field: { onChange, onBlur, value },
+                    field: { onChange, value },
                     fieldState: { error },
                   }) => (
                     <>
-                      <View style={styles.locationInputContainer}>
-                        <MaterialCommunityIcons
-                          name="map-marker"
-                          size={18}
-                          color={COLORS.text.secondary}
-                        />
-                        <TextInput
-                          style={[styles.textInput, styles.locationInput]}
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          placeholder="City, Country"
-                          placeholderTextColor={COLORS.text.secondary}
-                        />
-                      </View>
-                      {error && (
-                        <Text style={styles.errorText}>{error.message}</Text>
-                      )}
+                      <CityAutocomplete
+                        value={value || ''}
+                        onSelect={onChange}
+                        placeholder="Search city..."
+                        error={error?.message}
+                      />
                     </>
                   )}
                 />

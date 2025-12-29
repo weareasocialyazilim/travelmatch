@@ -67,7 +67,11 @@ export function getOptimizedImageUrl(
 ): string {
   // Priority 1: Cloudflare CDN (WebP/AVIF optimized)
   if (item.imageCloudflareId) {
-    return getImageUrl(item.imageCloudflareId, variant);
+    const cloudflareUrl = getImageUrl(item.imageCloudflareId, variant);
+    // Only use Cloudflare URL if it's valid (account hash is configured)
+    if (cloudflareUrl) {
+      return cloudflareUrl;
+    }
   }
 
   // Priority 2: Legacy URL (direct URL)
@@ -101,7 +105,11 @@ export function getOptimizedAvatarUrl(
   fallbackUrl?: string,
 ): string {
   if (user.avatarCloudflareId) {
-    return getImageUrl(user.avatarCloudflareId, variant);
+    const cloudflareUrl = getImageUrl(user.avatarCloudflareId, variant);
+    // Only use Cloudflare URL if it's valid (account hash is configured)
+    if (cloudflareUrl) {
+      return cloudflareUrl;
+    }
   }
 
   return user.avatar || fallbackUrl || '';
