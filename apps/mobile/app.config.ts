@@ -83,7 +83,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // ============================================
   android: {
     package: 'com.travelmatch.app',
-    versionCode: 1,
+    versionCode: 24, // Must match iOS buildNumber for consistency
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#FFFBF5',

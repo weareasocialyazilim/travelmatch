@@ -64,7 +64,7 @@ const SECTIONS: Section[] = [
     id: '8',
     title: 'Contact Us',
     content:
-      'If you have any questions or concerns about this Privacy Policy, please contact us at privacy@travelmatch.com.',
+      'If you have any questions or concerns about this Privacy Policy, please contact us at privacy@travelmatch.app.',
   },
 ];
 

@@ -125,10 +125,10 @@ export default function PrivacyPage() {
               If you have any questions or concerns about this Privacy Policy,
               please contact us at{' '}
               <a
-                href="mailto:privacy@travelmatch.com"
+                href="mailto:privacy@travelmatch.app"
                 className="text-primary hover:underline"
               >
-                privacy@travelmatch.com
+                privacy@travelmatch.app
               </a>
             </p>
           </section>
