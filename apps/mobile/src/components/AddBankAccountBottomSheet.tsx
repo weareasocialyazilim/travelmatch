@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ interface AddBankAccountBottomSheetProps {
 
 export const AddBankAccountBottomSheet: React.FC<
   AddBankAccountBottomSheetProps
-> = ({ visible, onClose, onSave }) => {
+> = memo(({ visible, onClose, onSave }) => {
   const [iban, setIban] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
 
@@ -118,7 +118,9 @@ export const AddBankAccountBottomSheet: React.FC<
       </KeyboardAvoidingView>
     </Modal>
   );
-};
+});
+
+AddBankAccountBottomSheet.displayName = 'AddBankAccountBottomSheet';
 
 const styles = StyleSheet.create({
   modalContainer: {

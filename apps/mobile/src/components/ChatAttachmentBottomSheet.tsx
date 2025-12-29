@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ interface ChatAttachmentBottomSheetProps {
 
 export const ChatAttachmentBottomSheet: React.FC<
   ChatAttachmentBottomSheetProps
-> = ({ visible, onClose, onPhotoVideo, onGift }) => {
+> = memo(({ visible, onClose, onPhotoVideo, onGift }) => {
   const options = [
     {
       id: 'photo',
@@ -112,7 +112,9 @@ export const ChatAttachmentBottomSheet: React.FC<
       </Pressable>
     </Modal>
   );
-};
+});
+
+ChatAttachmentBottomSheet.displayName = 'ChatAttachmentBottomSheet';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
