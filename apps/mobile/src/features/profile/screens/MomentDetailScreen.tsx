@@ -20,7 +20,7 @@ import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/config/supabase';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { requestService } from '@/services/requestService';
 import { reviewService } from '@/services/reviewService';
@@ -138,33 +138,46 @@ const MomentDetailScreen: React.FC = () => {
         return;
       }
 
+      // Skip if not a valid UUID (mock data)
+      if (!isValidUUID(moment.id)) {
+        return;
+      }
+
       try {
-        const { data, error } = await supabase.rpc('get_moment_contributors', {
-          p_moment_id: moment.id,
-        });
+        // This RPC function is expected to be created via migrations
+        // For now, we use a workaround with direct query
+        const { data, error } = await supabase
+          .from('escrow_contributions')
+          .select(
+            'user_id, amount, is_anonymous, users:user_id(name, avatar_url)',
+          )
+          .eq('moment_id', moment.id)
+          .eq('status', 'completed');
 
         if (error) {
           console.error('Failed to fetch contributors:', error);
           return;
         }
 
-        if (data?.success) {
-          setMaxContributors(data.maxContributors);
-          setContributorCount(data.currentCount || 0);
+        if (data) {
+          // Calculate max contributors based on moment price
+          const calculatedMax =
+            moment.price >= 500 ? 10 : moment.price >= 200 ? 5 : 3;
+          setMaxContributors(calculatedMax);
+          setContributorCount(data.length || 0);
           setContributors(
-            (data.contributors || []).map(
-              (c: {
-                userId: string;
-                name: string;
-                avatar?: string;
-                isAnonymous?: boolean;
-              }) => ({
-                userId: c.userId,
-                name: c.name,
-                avatar: c.avatar,
-                isAnonymous: c.isAnonymous,
-              }),
-            ),
+            (
+              (data || []) as {
+                user_id: string;
+                is_anonymous?: boolean;
+                users?: { name?: string; avatar_url?: string } | null;
+              }[]
+            ).map((c) => ({
+              userId: c.user_id,
+              name: c.users?.name || 'Anonymous',
+              avatar: c.users?.avatar_url,
+              isAnonymous: c.is_anonymous,
+            })),
           );
         }
       } catch {
@@ -173,7 +186,7 @@ const MomentDetailScreen: React.FC = () => {
     };
 
     fetchContributors();
-  }, [moment.id, moment.price]);
+  }, [moment.id, moment.price, isValidUUID]);
 
   useEffect(() => {
     // Skip API call for mock story IDs

@@ -311,6 +311,13 @@ export const TEXT_STYLES = {
     color: COLORS.text.secondary,
   } as TextStyle,
 
+  // Body medium - compliance features
+  bodyMedium: {
+    ...TYPE_SCALE.body.base,
+    fontWeight: '500',
+    color: COLORS.text.primary,
+  } as TextStyle,
+
   // Caption text
   caption: {
     ...TYPE_SCALE.body.caption,

@@ -21,7 +21,6 @@ import {
   Image,
   Platform,
   KeyboardAvoidingView,
-  Alert,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -123,22 +122,20 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   // Dynamic proof requirement state
   const [requestProof, setRequestProof] = useState<boolean | null>(null);
   const [paymentConsent, setPaymentConsent] = useState(false);
-  const [commissionData, setCommissionData] = useState<{
+  const [commissionData, _setCommissionData] = useState<{
     giverPays: number;
     receiverGets: number;
     commission: number;
   } | null>(null);
 
   // Calculate proof tier based on moment price
-  const proofTier = useMemo(
-    () => getProofTier(moment.price),
-    [moment.price],
-  );
+  const proofTier = useMemo(() => getProofTier(moment.price), [moment.price]);
 
   // Determine if this is direct pay or escrow
   const isDirectPay = useMemo(() => {
     if (proofTier.requirement === 'none') return true;
-    if (proofTier.requirement === 'optional' && requestProof === false) return true;
+    if (proofTier.requirement === 'optional' && requestProof === false)
+      return true;
     return false;
   }, [proofTier.requirement, requestProof]);
 
@@ -320,201 +317,222 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
             <Text style={styles.headerTitle}>Gift this Moment</Text>
           </View>
 
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Moment Preview */}
-          <View style={styles.momentPreview}>
-            <Image
-              source={{ uri: moment.imageUrl }}
-              style={styles.momentImage}
-            />
-            <View style={styles.momentInfo}>
-              <Text style={styles.momentTitle} numberOfLines={2}>
-                {moment.title}
-              </Text>
-              <Text style={styles.momentLocation}>
-                {moment.location?.city || 'Unknown Location'}
-              </Text>
-              <Text style={styles.momentPrice}>${moment.price}</Text>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Moment Preview */}
+            <View style={styles.momentPreview}>
+              <Image
+                source={{ uri: moment.imageUrl }}
+                style={styles.momentImage}
+              />
+              <View style={styles.momentInfo}>
+                <Text style={styles.momentTitle} numberOfLines={2}>
+                  {moment.title}
+                </Text>
+                <Text style={styles.momentLocation}>
+                  {moment.location?.city || 'Unknown Location'}
+                </Text>
+                <Text style={styles.momentPrice}>${moment.price}</Text>
+              </View>
             </View>
-          </View>
 
-          {/* Recipient Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Send to</Text>
-            <Controller
-              control={control}
-              name="recipientEmail"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Recipient's email"
-                  placeholderTextColor={COLORS.text.tertiary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              )}
-            />
-            {errors.recipientEmail && (
-              <Text style={styles.errorText}>
-                {errors.recipientEmail.message}
-              </Text>
-            )}
-          </View>
-
-          {/* Message Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Personal message (optional)</Text>
-            <Controller
-              control={control}
-              name="message"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder="Add a personal message..."
-                  placeholderTextColor={COLORS.text.tertiary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  multiline
-                  numberOfLines={3}
-                  maxLength={200}
-                  textAlignVertical="top"
-                />
-              )}
-            />
-            <Text style={styles.charCount}>{(message || '').length}/200</Text>
-            {errors.message && (
-              <Text style={styles.errorText}>{errors.message.message}</Text>
-            )}
-          </View>
-
-          {/* Payment Method Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Payment method</Text>
-            {PAYMENT_METHODS.map((method) => (
-              <TouchableOpacity
-                key={method.id}
-                style={[
-                  styles.paymentMethod,
-                  selectedPayment === method.id && styles.paymentMethodSelected,
-                ]}
-                onPress={() => handleSelectPayment(method.id)}
-              >
-                <Icon
-                  name={
-                    method.icon as React.ComponentProps<typeof Icon>['name']
-                  }
-                  size={24}
-                  color={
-                    selectedPayment === method.id
-                      ? COLORS.brand.primary
-                      : COLORS.text.secondary
-                  }
-                />
-                <View style={styles.paymentInfo}>
-                  <Text style={styles.paymentName}>{method.name}</Text>
-                  {method.lastFour && (
-                    <Text style={styles.paymentDetails}>
-                      •••• {method.lastFour}
-                    </Text>
-                  )}
-                </View>
-                {selectedPayment === method.id && (
-                  <Icon
-                    name="check-circle"
-                    size={24}
-                    color={COLORS.brand.primary}
+            {/* Recipient Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Send to</Text>
+              <Controller
+                control={control}
+                name="recipientEmail"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Recipient's email"
+                    placeholderTextColor={COLORS.text.tertiary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
                   />
                 )}
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Proof Requirement Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Teslimat Yöntemi</Text>
-              <ProofRequirementBadge amount={moment.price} currency="TL" />
-            </View>
-
-            {proofTier.requirement === 'none' && (
-              <DirectPayIndicator amount={moment.price} currency="TL" />
-            )}
-
-            {proofTier.requirement === 'optional' && (
-              <ProofSelectionCard
-                amount={moment.price}
-                currency="TL"
-                onSelect={setRequestProof}
-                selectedOption={requestProof}
               />
-            )}
-
-            {proofTier.requirement === 'required' && (
-              <ProofRequiredIndicator amount={moment.price} currency="TL" />
-            )}
-          </View>
-
-          {/* Summary with Proof */}
-          <PaymentSummaryWithProof
-            amount={moment.price}
-            currency="TL"
-            commission={commissionData?.commission || 0}
-            receiverGets={commissionData?.receiverGets || moment.price}
-            proofRequired={proofTier.requirement === 'required' || requestProof === true}
-            isDirectPay={isDirectPay}
-            receiverName={recipientName}
-          />
-
-          {/* Payment Consent */}
-          <TouchableOpacity
-            style={styles.consentRow}
-            onPress={() => setPaymentConsent(!paymentConsent)}
-          >
-            <View style={[styles.checkbox, paymentConsent && styles.checkboxChecked]}>
-              {paymentConsent && (
-                <Icon name="check" size={14} color={COLORS.utility.white} />
+              {errors.recipientEmail && (
+                <Text style={styles.errorText}>
+                  {errors.recipientEmail.message}
+                </Text>
               )}
             </View>
-            <Text style={styles.consentText}>
-              Ödeme yapmadan önce{' '}
-              <Text style={styles.consentLink}>Mesafeli Satış Sözleşmesi</Text>
-              {' '}ve{' '}
-              <Text style={styles.consentLink}>KVKK Aydınlatma Metni</Text>
-              'ni okudum ve kabul ediyorum.
-            </Text>
-          </TouchableOpacity>
 
-          {/* Purchase Button */}
-          <TouchableOpacity
-            style={[
-              styles.purchaseButton,
-              (!recipientEmail || loading || !paymentConsent || (proofTier.requirement === 'optional' && requestProof === null)) && styles.purchaseButtonDisabled,
-            ]}
-            onPress={handleSubmit(onPurchase)}
-            disabled={!recipientEmail || loading || !paymentConsent || (proofTier.requirement === 'optional' && requestProof === null)}
-          >
-            <Text style={styles.purchaseButtonText}>
-              {loading
-                ? 'Hediye Gönderiliyor...'
-                : `Hediye Gönder • ${commissionData?.giverPays || moment.price} ₺`}
-            </Text>
-          </TouchableOpacity>
-          {recipientEmail && (
-            <Text style={styles.paymentHint}>
-              {isDirectPay
-                ? 'Para anında alıcıya aktarılacaktır.'
-                : 'Para, kanıt onaylanana kadar güvenli emanette tutulacaktır.'}
-            </Text>
-          )}
-        </ScrollView>
+            {/* Message Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Personal message (optional)
+              </Text>
+              <Controller
+                control={control}
+                name="message"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder="Add a personal message..."
+                    placeholderTextColor={COLORS.text.tertiary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    multiline
+                    numberOfLines={3}
+                    maxLength={200}
+                    textAlignVertical="top"
+                  />
+                )}
+              />
+              <Text style={styles.charCount}>{(message || '').length}/200</Text>
+              {errors.message && (
+                <Text style={styles.errorText}>{errors.message.message}</Text>
+              )}
+            </View>
+
+            {/* Payment Method Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Payment method</Text>
+              {PAYMENT_METHODS.map((method) => (
+                <TouchableOpacity
+                  key={method.id}
+                  style={[
+                    styles.paymentMethod,
+                    selectedPayment === method.id &&
+                      styles.paymentMethodSelected,
+                  ]}
+                  onPress={() => handleSelectPayment(method.id)}
+                >
+                  <Icon
+                    name={
+                      method.icon as React.ComponentProps<typeof Icon>['name']
+                    }
+                    size={24}
+                    color={
+                      selectedPayment === method.id
+                        ? COLORS.brand.primary
+                        : COLORS.text.secondary
+                    }
+                  />
+                  <View style={styles.paymentInfo}>
+                    <Text style={styles.paymentName}>{method.name}</Text>
+                    {method.lastFour && (
+                      <Text style={styles.paymentDetails}>
+                        •••• {method.lastFour}
+                      </Text>
+                    )}
+                  </View>
+                  {selectedPayment === method.id && (
+                    <Icon
+                      name="check-circle"
+                      size={24}
+                      color={COLORS.brand.primary}
+                    />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Proof Requirement Section */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Teslimat Yöntemi</Text>
+                <ProofRequirementBadge amount={moment.price} currency="TL" />
+              </View>
+
+              {proofTier.requirement === 'none' && (
+                <DirectPayIndicator amount={moment.price} currency="TL" />
+              )}
+
+              {proofTier.requirement === 'optional' && (
+                <ProofSelectionCard
+                  amount={moment.price}
+                  currency="TL"
+                  onSelect={setRequestProof}
+                  selectedOption={requestProof}
+                />
+              )}
+
+              {proofTier.requirement === 'required' && (
+                <ProofRequiredIndicator amount={moment.price} currency="TL" />
+              )}
+            </View>
+
+            {/* Summary with Proof */}
+            <PaymentSummaryWithProof
+              amount={moment.price}
+              currency="TL"
+              commission={commissionData?.commission || 0}
+              receiverGets={commissionData?.receiverGets || moment.price}
+              proofRequired={
+                proofTier.requirement === 'required' || requestProof === true
+              }
+              isDirectPay={isDirectPay}
+              receiverName={recipientName}
+            />
+
+            {/* Payment Consent */}
+            <TouchableOpacity
+              style={styles.consentRow}
+              onPress={() => setPaymentConsent(!paymentConsent)}
+            >
+              <View
+                style={[
+                  styles.checkbox,
+                  paymentConsent && styles.checkboxChecked,
+                ]}
+              >
+                {paymentConsent && (
+                  <Icon name="check" size={14} color={COLORS.utility.white} />
+                )}
+              </View>
+              <Text style={styles.consentText}>
+                Ödeme yapmadan önce{' '}
+                <Text style={styles.consentLink}>
+                  Mesafeli Satış Sözleşmesi
+                </Text>{' '}
+                ve <Text style={styles.consentLink}>KVKK Aydınlatma Metni</Text>
+                'ni okudum ve kabul ediyorum.
+              </Text>
+            </TouchableOpacity>
+
+            {/* Purchase Button */}
+            <TouchableOpacity
+              style={[
+                styles.purchaseButton,
+                (!recipientEmail ||
+                  loading ||
+                  !paymentConsent ||
+                  (proofTier.requirement === 'optional' &&
+                    requestProof === null)) &&
+                  styles.purchaseButtonDisabled,
+              ]}
+              onPress={handleSubmit(onPurchase)}
+              disabled={
+                !recipientEmail ||
+                loading ||
+                !paymentConsent ||
+                (proofTier.requirement === 'optional' && requestProof === null)
+              }
+            >
+              <Text style={styles.purchaseButtonText}>
+                {loading
+                  ? 'Hediye Gönderiliyor...'
+                  : `Hediye Gönder • ${commissionData?.giverPays || moment.price} ₺`}
+              </Text>
+            </TouchableOpacity>
+            {recipientEmail && (
+              <Text style={styles.paymentHint}>
+                {isDirectPay
+                  ? 'Para anında alıcıya aktarılacaktır.'
+                  : 'Para, kanıt onaylanana kadar güvenli emanette tutulacaktır.'}
+              </Text>
+            )}
+          </ScrollView>
         </KeyboardAvoidingView>
       </NetworkGuard>
     </SafeAreaView>

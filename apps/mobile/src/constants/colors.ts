@@ -498,6 +498,11 @@ export const COLORS = {
 
   // Text color aliases (legacy - prefer COLORS.text.xxx)
   subtitle: PALETTE.sand[500], // Subtitle text color
+
+  // Compliance feature colors
+  coral: PALETTE.rose[400], // #FB7185 - highlights and accents
+  divider: PALETTE.sand[200], // #E7E5E4 - separators
+  background: PALETTE.sand[50], // #FAFAF9 - general background
 } as const;
 
 // ============================================

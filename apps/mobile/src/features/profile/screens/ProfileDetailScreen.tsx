@@ -20,7 +20,10 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
-import { getRecentTrustNotes, type TrustNote } from '@/services/trustNotesService';
+import {
+  getRecentTrustNotes,
+  type TrustNote,
+} from '@/services/trustNotesService';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -312,7 +315,9 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
             <Text style={styles.trustNotesTitle}>Güven Notları</Text>
             {trustNotes.length > 0 && (
               <View style={styles.trustNotesCount}>
-                <Text style={styles.trustNotesCountText}>{trustNotes.length}</Text>
+                <Text style={styles.trustNotesCountText}>
+                  {trustNotes.length}
+                </Text>
               </View>
             )}
           </View>
@@ -337,12 +342,15 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
                   <View style={styles.trustNoteHeader}>
                     <Image
                       source={{
-                        uri: note.writerAvatar || 'https://via.placeholder.com/32',
+                        uri:
+                          note.writerAvatar || 'https://via.placeholder.com/32',
                       }}
                       style={styles.trustNoteAvatar}
                     />
                     <View style={styles.trustNoteHeaderInfo}>
-                      <Text style={styles.trustNoteAuthor}>{note.writerName}</Text>
+                      <Text style={styles.trustNoteAuthor}>
+                        {note.writerName}
+                      </Text>
                       {note.momentTitle && (
                         <Text style={styles.trustNoteMoment} numberOfLines={1}>
                           {note.momentTitle}

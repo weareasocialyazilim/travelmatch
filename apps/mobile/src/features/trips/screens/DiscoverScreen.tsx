@@ -112,42 +112,6 @@ const DiscoverScreen = () => {
     }
   }, [refreshMoments]);
 
-  // Story navigation handlers
-  const goToNextStory = useCallback(() => {
-    if (!selectedStoryUser) return;
-
-    const currentUserStories = selectedStoryUser.stories;
-
-    if (currentStoryIndex < currentUserStories.length - 1) {
-      setCurrentStoryIndex((prev) => prev + 1);
-    } else {
-      const nextUserIndex = currentUserIndex + 1;
-      if (nextUserIndex < recentStories.length) {
-        setCurrentUserIndex(nextUserIndex);
-        setSelectedStoryUser(recentStories[nextUserIndex]);
-        setCurrentStoryIndex(0);
-      } else {
-        closeStoryViewer();
-      }
-    }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, recentStories]);
-
-  const goToPreviousStory = useCallback(() => {
-    if (!selectedStoryUser) return;
-
-    if (currentStoryIndex > 0) {
-      setCurrentStoryIndex((prev) => prev - 1);
-    } else {
-      const prevUserIndex = currentUserIndex - 1;
-      if (prevUserIndex >= 0) {
-        const prevUser = recentStories[prevUserIndex];
-        setCurrentUserIndex(prevUserIndex);
-        setSelectedStoryUser(prevUser);
-        setCurrentStoryIndex(prevUser.stories.length - 1);
-      }
-    }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, recentStories]);
-
   const closeStoryViewer = useCallback(() => {
     setShowStoryViewer(false);
     setSelectedStoryUser(null);
@@ -237,6 +201,48 @@ const DiscoverScreen = () => {
       return parseTime(aTime) - parseTime(bTime);
     });
   }, [baseMoments]);
+
+  // Story navigation handlers (must be defined after recentStories)
+  const goToNextStory = useCallback(() => {
+    if (!selectedStoryUser) return;
+
+    const currentUserStories = selectedStoryUser.stories;
+
+    if (currentStoryIndex < currentUserStories.length - 1) {
+      setCurrentStoryIndex((prev) => prev + 1);
+    } else {
+      const nextUserIndex = currentUserIndex + 1;
+      if (nextUserIndex < recentStories.length) {
+        setCurrentUserIndex(nextUserIndex);
+        setSelectedStoryUser(recentStories[nextUserIndex]);
+        setCurrentStoryIndex(0);
+      } else {
+        closeStoryViewer();
+      }
+    }
+  }, [
+    selectedStoryUser,
+    currentStoryIndex,
+    currentUserIndex,
+    recentStories,
+    closeStoryViewer,
+  ]);
+
+  const goToPreviousStory = useCallback(() => {
+    if (!selectedStoryUser) return;
+
+    if (currentStoryIndex > 0) {
+      setCurrentStoryIndex((prev) => prev - 1);
+    } else {
+      const prevUserIndex = currentUserIndex - 1;
+      if (prevUserIndex >= 0) {
+        const prevUser = recentStories[prevUserIndex];
+        setCurrentUserIndex(prevUserIndex);
+        setSelectedStoryUser(prevUser);
+        setCurrentStoryIndex(prevUser.stories.length - 1);
+      }
+    }
+  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, recentStories]);
 
   // Filter and sort moments
   const filteredMoments = useMemo(() => {
@@ -387,7 +393,7 @@ const DiscoverScreen = () => {
   );
 
   const renderMomentCard = useCallback(
-    ({ item, index }: { item: Moment; index: number }) => {
+    ({ item, index: _index }: { item: Moment; index: number }) => {
       return <MomentSingleCard moment={item} onPress={handleMomentPress} />;
     },
     [handleMomentPress],

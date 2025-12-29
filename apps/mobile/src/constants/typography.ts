@@ -611,6 +611,10 @@ export const typography = {
   body2: TYPE_SCALE.body.small,
   bodyLarge: TYPE_SCALE.body.large,
   bodySmall: TYPE_SCALE.body.small,
+  bodyMedium: {
+    ...TYPE_SCALE.body.base,
+    fontWeight: '500',
+  } as TextStyle, // Medium weight body text for compliance features
   subtitle: TYPE_SCALE.body.large,
   caption: TYPE_SCALE.body.caption,
   captionSmall: TYPE_SCALE.body.tiny,

@@ -11,7 +11,6 @@ import { logger } from '@/utils/logger';
 import {
   validateNoteContent,
   hasWarningWords,
-  TRUST_NOTES_CONTENT,
 } from '@/constants/trustNotesRules';
 
 export interface TrustNote {
@@ -39,8 +38,13 @@ export interface CreateTrustNoteParams {
  * Create a trust note
  */
 export const createTrustNote = async (
-  params: CreateTrustNoteParams
-): Promise<{ success: boolean; noteId?: string; error?: string; flagged?: boolean }> => {
+  params: CreateTrustNoteParams,
+): Promise<{
+  success: boolean;
+  noteId?: string;
+  error?: string;
+  flagged?: boolean;
+}> => {
   try {
     // Validate note content using rules
     const validation = validateNoteContent(params.note);
@@ -51,39 +55,54 @@ export const createTrustNote = async (
     // Check for warning words (flag for review but don't block)
     const flagged = hasWarningWords(params.note);
 
-    const { data, error } = await supabase.rpc('create_trust_note', {
-      p_receiver_id: params.receiverId,
-      p_note: params.note,
-      p_moment_id: params.momentId || null,
-      p_escrow_id: params.escrowId || null,
-      p_gift_id: params.giftId || null,
-    });
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('trust_notes')
+      .insert({
+        author_id: user.id,
+        recipient_id: params.receiverId,
+        note: params.note,
+        moment_id: params.momentId || null,
+        escrow_id: params.escrowId || null,
+        gift_id: params.giftId || null,
+        is_public: true,
+        is_approved: false,
+      })
+      .select('id')
+      .single();
 
     if (error) throw error;
 
+    const noteId = (data as { id: string } | null)?.id;
+
     logger.info('[TrustNotes] Note created', {
-      noteId: data?.noteId,
+      noteId,
       flagged,
     });
 
     // If flagged, log for admin review
     if (flagged) {
       logger.warn('[TrustNotes] Note flagged for review', {
-        noteId: data?.noteId,
+        noteId,
         reason: 'warning_words_detected',
       });
     }
 
     return {
       success: true,
-      noteId: data?.noteId,
+      noteId,
       flagged,
     };
   } catch (error) {
     logger.error('[TrustNotes] Failed to create note', error as Error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
     };
   }
 };
@@ -94,12 +113,13 @@ export const createTrustNote = async (
 export const getTrustNotesForUser = async (
   userId: string,
   limit: number = 10,
-  offset: number = 0
+  offset: number = 0,
 ): Promise<TrustNote[]> => {
   try {
     const { data, error } = await supabase
       .from('trust_notes')
-      .select(`
+      .select(
+        `
         id,
         author_id,
         recipient_id,
@@ -109,7 +129,8 @@ export const getTrustNotesForUser = async (
         is_public,
         author:users!author_id(full_name, avatar_url),
         moment:moments(title)
-      `)
+      `,
+      )
       .eq('recipient_id', userId)
       .eq('is_public', true)
       .eq('is_approved', true)
@@ -118,17 +139,19 @@ export const getTrustNotesForUser = async (
 
     if (error) throw error;
 
-    return (data || []).map((note: {
-      id: string;
-      author_id: string;
-      recipient_id: string;
-      moment_id: string | null;
-      note: string;
-      created_at: string;
-      is_public: boolean;
-      author: { full_name: string; avatar_url: string | null } | null;
-      moment: { title: string } | null;
-    }) => ({
+    return (
+      (data || []) as {
+        id: string;
+        author_id: string;
+        recipient_id: string;
+        moment_id: string | null;
+        note: string;
+        created_at: string;
+        is_public: boolean;
+        author: { full_name: string; avatar_url: string | null } | null;
+        moment: { title: string } | null;
+      }[]
+    ).map((note) => ({
       id: note.id,
       writerId: note.author_id,
       writerName: note.author?.full_name || 'Kullanıcı',
@@ -151,13 +174,16 @@ export const getTrustNotesForUser = async (
  */
 export const getTrustNoteCount = async (userId: string): Promise<number> => {
   try {
-    const { data, error } = await supabase.rpc('get_user_trust_note_count', {
-      p_user_id: userId,
-    });
+    const { count, error } = await supabase
+      .from('trust_notes')
+      .select('*', { count: 'exact', head: true })
+      .eq('recipient_id', userId)
+      .eq('is_public', true)
+      .eq('is_approved', true);
 
     if (error) throw error;
 
-    return data || 0;
+    return count || 0;
   } catch (error) {
     logger.error('[TrustNotes] Failed to get count', error as Error);
     return 0;
@@ -169,31 +195,45 @@ export const getTrustNoteCount = async (userId: string): Promise<number> => {
  */
 export const getRecentTrustNotes = async (
   userId: string,
-  limit: number = 3
+  limit: number = 3,
 ): Promise<TrustNote[]> => {
   try {
-    const { data, error } = await supabase.rpc('get_user_trust_notes', {
-      p_user_id: userId,
-      p_limit: limit,
-      p_offset: 0,
-    });
+    const { data, error } = await supabase
+      .from('trust_notes')
+      .select(
+        `
+        id,
+        author_id,
+        note,
+        created_at,
+        author:users!author_id(full_name, avatar_url),
+        moment:moments(title)
+      `,
+      )
+      .eq('recipient_id', userId)
+      .eq('is_public', true)
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false })
+      .limit(limit);
 
     if (error) throw error;
 
-    return (data || []).map((note: {
-      id: string;
-      author_name: string;
-      author_avatar: string | null;
-      note: string;
-      moment_title: string | null;
-      created_at: string;
-    }) => ({
+    return (
+      (data || []) as {
+        id: string;
+        author_id: string;
+        note: string;
+        created_at: string;
+        author: { full_name: string; avatar_url: string | null } | null;
+        moment: { title: string } | null;
+      }[]
+    ).map((note) => ({
       id: note.id,
-      writerId: '',
-      writerName: note.author_name,
-      writerAvatar: note.author_avatar || undefined,
+      writerId: note.author_id,
+      writerName: note.author?.full_name || 'Kullanıcı',
+      writerAvatar: note.author?.avatar_url || undefined,
       receiverId: userId,
-      momentTitle: note.moment_title || undefined,
+      momentTitle: note.moment?.title || undefined,
       note: note.note,
       createdAt: note.created_at,
       isPublic: true,
@@ -208,7 +248,7 @@ export const getRecentTrustNotes = async (
  * Delete a trust note (only writer can delete)
  */
 export const deleteTrustNote = async (
-  noteId: string
+  noteId: string,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
     const { error } = await supabase
@@ -225,7 +265,7 @@ export const deleteTrustNote = async (
     logger.error('[TrustNotes] Failed to delete note', error as Error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
     };
   }
 };
@@ -235,7 +275,7 @@ export const deleteTrustNote = async (
  */
 export const updateTrustNoteVisibility = async (
   noteId: string,
-  isPublic: boolean
+  isPublic: boolean,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
     const { error } = await supabase
@@ -250,7 +290,7 @@ export const updateTrustNoteVisibility = async (
     logger.error('[TrustNotes] Failed to update visibility', error as Error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
     };
   }
 };
@@ -259,10 +299,12 @@ export const updateTrustNoteVisibility = async (
  * Check if user has already written a note for this gift
  */
 export const hasWrittenNoteForGift = async (
-  giftId: string
+  giftId: string,
 ): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return false;
 
     const { data, error } = await supabase

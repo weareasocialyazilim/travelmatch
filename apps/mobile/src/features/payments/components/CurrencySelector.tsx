@@ -50,7 +50,7 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>(
-    {}
+    {},
   );
   const [isLoading, setIsLoading] = useState(false);
 
@@ -72,9 +72,11 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
       if (error) throw error;
 
       const rates: Record<string, number> = { TRY: 1 };
-      data?.forEach((item) => {
-        rates[item.to_currency] = item.rate;
-      });
+      (data as { to_currency: string; rate: number }[] | null)?.forEach(
+        (item) => {
+          rates[item.to_currency] = item.rate;
+        },
+      );
 
       setExchangeRates(rates);
     } catch (err) {
@@ -92,7 +94,7 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
       // Update user preference in database
       updateUserCurrencyPreference(currency);
     },
-    [onCurrencyChange]
+    [onCurrencyChange],
   );
 
   const updateUserCurrencyPreference = async (currency: CurrencyCode) => {
@@ -113,7 +115,7 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
   };
 
   const selectedCurrencyData = CURRENCIES.find(
-    (c) => c.code === selectedCurrency
+    (c) => c.code === selectedCurrency,
   );
 
   // Compact button version
@@ -125,15 +127,9 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
           onPress={() => !disabled && setIsModalVisible(true)}
           disabled={disabled}
         >
-          <Text style={styles.compactFlag}>
-            {selectedCurrencyData?.flag}
-          </Text>
+          <Text style={styles.compactFlag}>{selectedCurrencyData?.flag}</Text>
           <Text style={styles.compactCode}>{selectedCurrency}</Text>
-          <Icon
-            name="chevron-down"
-            size={16}
-            color={COLORS.text.secondary}
-          />
+          <Icon name="chevron-down" size={16} color={COLORS.text.secondary} />
         </TouchableOpacity>
 
         <CurrencyModal
@@ -206,11 +202,7 @@ const CurrencyModal: React.FC<CurrencyModalProps> = ({
   showRates,
   isLoading,
 }) => {
-  const renderCurrency = ({
-    item,
-  }: {
-    item: (typeof CURRENCIES)[0];
-  }) => {
+  const renderCurrency = ({ item }: { item: (typeof CURRENCIES)[0] }) => {
     const isSelected = item.code === selectedCurrency;
     const rate = exchangeRates[item.code];
 
@@ -234,11 +226,7 @@ const CurrencyModal: React.FC<CurrencyModalProps> = ({
             </Text>
           )}
           {isSelected && (
-            <Icon
-              name="check-circle"
-              size={24}
-              color={COLORS.brand.primary}
-            />
+            <Icon name="check-circle" size={24} color={COLORS.brand.primary} />
           )}
         </View>
       </TouchableOpacity>
@@ -300,7 +288,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.divider.default,
+    borderColor: COLORS.border.default,
   },
   selectedCurrency: {
     flexDirection: 'row',
@@ -328,7 +316,7 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 6,
-    backgroundColor: COLORS.background.secondary,
+    backgroundColor: COLORS.bg.secondary,
     borderRadius: 6,
   },
   compactFlag: {
@@ -344,7 +332,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: COLORS.bg.primary,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -353,7 +341,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider.default,
+    borderBottomColor: COLORS.border.default,
   },
   modalTitle: {
     fontSize: 20,
@@ -372,7 +360,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     padding: 12,
-    backgroundColor: COLORS.background.secondary,
+    backgroundColor: COLORS.bg.secondary,
   },
   loadingText: {
     fontSize: 14,
@@ -421,7 +409,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: COLORS.divider.default,
+    backgroundColor: COLORS.border.default,
     marginVertical: 4,
   },
   infoNote: {
@@ -429,9 +417,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
     padding: 16,
-    backgroundColor: COLORS.background.secondary,
+    backgroundColor: COLORS.bg.secondary,
     borderTopWidth: 1,
-    borderTopColor: COLORS.divider.default,
+    borderTopColor: COLORS.border.default,
   },
   infoText: {
     flex: 1,

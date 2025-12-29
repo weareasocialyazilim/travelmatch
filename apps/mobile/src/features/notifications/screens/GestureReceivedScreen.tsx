@@ -13,7 +13,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { LeaveTrustNoteBottomSheet } from '@/components/LeaveTrustNoteBottomSheet';
 import { ThankYouModal } from '@/components/ThankYouModal';
-import { createTrustNote, hasWrittenNoteForGift } from '@/services/trustNotesService';
+import {
+  createTrustNote,
+  hasWrittenNoteForGift,
+} from '@/services/trustNotesService';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -49,7 +52,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
   // State for trust note flow
   const [showTrustNoteSheet, setShowTrustNoteSheet] = useState(false);
   const [showThankYouModal, setShowThankYouModal] = useState(false);
-  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
+  const [_isSubmittingNote, setIsSubmittingNote] = useState(false);
 
   // Determine steps based on status
   const getTimelineSteps = (): TimelineStep[] => {
@@ -81,8 +84,8 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
           status === 'pending_verification'
             ? 'current'
             : status === 'verified'
-            ? 'completed'
-            : 'pending',
+              ? 'completed'
+              : 'pending',
         time: status === 'verified' ? '1 day ago' : undefined,
       },
       {
@@ -181,7 +184,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
 
   const handleUploadProof = () => {
     navigation.navigate('ProofFlow', {
-      escrowId: gestureId,  // gestureId is the escrow/gift transaction ID
+      escrowId: gestureId, // gestureId is the escrow/gift transaction ID
       giftId: gestureId,
       momentTitle,
       senderId,
@@ -279,7 +282,10 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
             <Text
               style={[
                 styles.statusText,
-                { color: status === 'verified' ? COLORS.mint : COLORS.brand.primary },
+                {
+                  color:
+                    status === 'verified' ? COLORS.mint : COLORS.brand.primary,
+                },
               ]}
             >
               {status === 'verified'
@@ -404,7 +410,9 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
                 <MaterialCommunityIcons
                   name="wallet-outline"
                   size={20}
-                  color={isAnonymous ? COLORS.utility.white : COLORS.brand.primary}
+                  color={
+                    isAnonymous ? COLORS.utility.white : COLORS.brand.primary
+                  }
                 />
                 <Text
                   style={[

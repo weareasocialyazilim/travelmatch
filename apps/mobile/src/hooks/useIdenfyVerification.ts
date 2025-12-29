@@ -14,7 +14,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Alert, Linking, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { useAnalytics } from './useAnalytics';
 
@@ -76,7 +76,7 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
 
       const { data, error: fetchError } = await supabase
         .from('kyc_verifications')
-        .select('status, created_at, expires_at')
+        .select('status, created_at, updated_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -92,10 +92,15 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
         return;
       }
 
-      // Check expiry
-      if (data.expires_at && new Date(data.expires_at) < new Date()) {
-        setVerificationStatus('expired');
-        return;
+      // Check expiry (KYC is valid for 1 year from approval date)
+      // Using updated_at as the approval timestamp since verified_at doesn't exist
+      if (data.status === 'approved' && data.updated_at) {
+        const expiryDate = new Date(data.updated_at);
+        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+        if (expiryDate < new Date()) {
+          setVerificationStatus('expired');
+          return;
+        }
       }
 
       // Map database status to UI status
@@ -107,7 +112,9 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
         expired: 'expired',
       };
 
-      setVerificationStatus(statusMap[data.status as KycStatus] || 'none');
+      setVerificationStatus(
+        statusMap[(data.status as KycStatus) || 'pending'] || 'none',
+      );
     } catch (err) {
       console.error('Error checking KYC status:', err);
     }
@@ -133,7 +140,7 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
         'verify-kyc',
         {
           body: { action: 'get_auth_token' },
-        }
+        },
       );
 
       if (fnError) {
@@ -150,8 +157,7 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
         expiresAt: data.expiresAt,
       };
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Token alınamadı';
+      const message = err instanceof Error ? err.message : 'Token alınamadı';
       setError(message);
       return null;
     } finally {
@@ -210,13 +216,11 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
             text: 'İptal',
             style: 'cancel',
           },
-        ]
+        ],
       );
     } catch (err) {
       const message =
-        err instanceof Error
-          ? err.message
-          : 'Kimlik doğrulama başlatılamadı';
+        err instanceof Error ? err.message : 'Kimlik doğrulama başlatılamadı';
       setError(message);
       trackEvent('kyc_verification_error', { error: message });
 
@@ -226,72 +230,9 @@ export const useIdenfyVerification = (): UseIdenfyVerificationReturn => {
     }
   }, [getAuthToken, trackEvent]);
 
-  /**
-   * Handle iDenfy SDK result
-   */
-  const handleVerificationResult = useCallback(
-    async (result: IdenfyVerificationResult) => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // Update local status
-        if (result.status === 'approved') {
-          setVerificationStatus('approved');
-        } else if (result.status === 'denied') {
-          setVerificationStatus('denied');
-        } else if (result.status === 'cancelled') {
-          // User cancelled, keep previous status
-          return;
-        } else {
-          setVerificationStatus('pending');
-        }
-
-        // Notify backend
-        await supabase.functions.invoke('verify-kyc', {
-          body: {
-            action: 'update_status',
-            status: result.status,
-            scanRef: result.scanRef,
-            documentType: result.documentType,
-            documentCountry: result.documentCountry,
-          },
-        });
-
-        trackEvent('kyc_verification_completed', {
-          status: result.status,
-          documentType: result.documentType,
-        });
-
-        // Show result to user
-        if (result.status === 'approved') {
-          Alert.alert(
-            'Doğrulama Başarılı',
-            'Kimliğiniz başarıyla doğrulandı. Artık tüm özellikleri kullanabilirsiniz.',
-            [{ text: 'Tamam' }]
-          );
-        } else if (result.status === 'denied') {
-          Alert.alert(
-            'Doğrulama Başarısız',
-            result.errorMessage ||
-              'Kimlik doğrulama reddedildi. Lütfen geçerli belgelerle tekrar deneyin.',
-            [
-              { text: 'Tamam' },
-              {
-                text: 'Tekrar Dene',
-                onPress: () => startVerification(),
-              },
-            ]
-          );
-        }
-      } catch (err) {
-        console.error('Error handling verification result:', err);
-      }
-    },
-    [trackEvent, startVerification]
-  );
+  // NOTE: _handleVerificationResult is prepared for future iDenfy SDK integration
+  // It will be used when the native SDK callback is implemented
+  // For now, keeping the types ready: IdenfyVerificationResult
 
   return {
     isLoading,

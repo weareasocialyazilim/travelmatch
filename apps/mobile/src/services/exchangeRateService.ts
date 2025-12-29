@@ -62,27 +62,39 @@ export interface EscrowTier {
  */
 export const getLiveExchangeRate = async (
   fromCurrency: CurrencyCode,
-  toCurrency: CurrencyCode = 'TRY'
+  toCurrency: CurrencyCode = 'TRY',
 ): Promise<LiveExchangeRate> => {
   try {
-    const { data, error } = await supabase.rpc('get_live_exchange_rate', {
-      p_from_currency: fromCurrency,
-      p_to_currency: toCurrency,
-    });
+    const { data, error } = await supabase
+      .from('exchange_rates')
+      .select('rate, buffer_percentage, updated_at')
+      .eq('from_currency', fromCurrency)
+      .eq('to_currency', toCurrency)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single();
 
     if (error) throw error;
 
-    if (!data || data.length === 0) {
+    if (!data) {
       throw new Error(`No rate found for ${fromCurrency}/${toCurrency}`);
     }
 
-    const row = data[0];
+    const rateData = data as {
+      buffer_percentage?: number;
+      updated_at: string;
+      rate: number;
+    };
+    const bufferPct = rateData.buffer_percentage || 3;
+    const rateTimestamp = new Date(rateData.updated_at);
+    const ageMinutes = (Date.now() - rateTimestamp.getTime()) / 60000;
+
     return {
-      rate: parseFloat(row.rate),
-      rateWithBuffer: parseFloat(row.rate_with_buffer),
-      bufferPercentage: parseFloat(row.buffer_percentage),
-      rateTimestamp: new Date(row.rate_timestamp),
-      isStale: row.is_stale,
+      rate: rateData.rate,
+      rateWithBuffer: rateData.rate * (1 + bufferPct / 100),
+      bufferPercentage: bufferPct,
+      rateTimestamp,
+      isStale: ageMinutes > 120, // Stale if older than 2 hours
     };
   } catch (error) {
     logger.error('[ExchangeRate] Failed to get live rate:', error);
@@ -99,7 +111,7 @@ export const getLiveExchangeRate = async (
  */
 export const convertToTryWithBuffer = async (
   amount: number,
-  fromCurrency: CurrencyCode
+  fromCurrency: CurrencyCode,
 ): Promise<ConversionResult> => {
   try {
     // TRY is already TRY
@@ -116,27 +128,18 @@ export const convertToTryWithBuffer = async (
       };
     }
 
-    const { data, error } = await supabase.rpc('convert_to_try_with_buffer', {
-      p_amount: amount,
-      p_from_currency: fromCurrency,
-    });
+    // Get live rate and calculate conversion
+    const liveRate = await getLiveExchangeRate(fromCurrency, 'TRY');
 
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      throw new Error(`Conversion failed for ${amount} ${fromCurrency}`);
-    }
-
-    const row = data[0];
     return {
-      originalAmount: parseFloat(row.original_amount),
-      originalCurrency: row.original_currency as CurrencyCode,
-      tryAmount: parseFloat(row.try_amount),
-      tryAmountWithBuffer: parseFloat(row.try_amount_with_buffer),
-      exchangeRate: parseFloat(row.exchange_rate),
-      bufferPercentage: parseFloat(row.buffer_percentage),
-      rateTimestamp: new Date(row.rate_timestamp),
-      isStale: row.is_stale,
+      originalAmount: amount,
+      originalCurrency: fromCurrency,
+      tryAmount: amount * liveRate.rate,
+      tryAmountWithBuffer: amount * liveRate.rateWithBuffer,
+      exchangeRate: liveRate.rate,
+      bufferPercentage: liveRate.bufferPercentage,
+      rateTimestamp: liveRate.rateTimestamp,
+      isStale: liveRate.isStale,
     };
   } catch (error) {
     logger.error('[ExchangeRate] Conversion failed:', error);
@@ -154,40 +157,67 @@ export const convertToTryWithBuffer = async (
  */
 export const getEscrowTier = async (
   amount: number,
-  currency: CurrencyCode
+  currency: CurrencyCode,
 ): Promise<EscrowTier> => {
   try {
-    const { data, error } = await supabase.rpc('get_escrow_tier_for_amount', {
-      p_amount: amount,
-      p_currency: currency,
-    });
+    // Convert to USD for tier calculation if needed
+    let amountUsd = amount;
+    if (currency !== 'USD') {
+      try {
+        const rate = await getLiveExchangeRate(currency, 'USD');
+        amountUsd = amount * rate.rate;
+      } catch {
+        // Use approximate conversion if rate fetch fails
+        const fallbackRates: Record<string, number> = {
+          TRY: 0.031,
+          EUR: 1.08,
+          GBP: 1.27,
+          USD: 1,
+        };
+        amountUsd = amount * (fallbackRates[currency] || 0.031);
+      }
+    }
 
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      // Default to required if no tier found
+    // Determine tier based on USD equivalent
+    if (amountUsd < 30) {
+      return {
+        tierName: 'direct',
+        escrowType: 'none',
+        maxContributors: null,
+        amountUsd,
+        descriptionTr: 'Küçük hediyeler anında iletilir',
+        descriptionEn: 'Small gifts are delivered instantly',
+      };
+    } else if (amountUsd < 100) {
+      return {
+        tierName: 'optional',
+        escrowType: 'optional',
+        maxContributors: null,
+        amountUsd,
+        descriptionTr: 'Kanıt talep edebilirsiniz',
+        descriptionEn: 'You can request proof',
+      };
+    } else {
       return {
         tierName: 'required',
         escrowType: 'required',
         maxContributors: 3,
-        amountUsd: amount,
-        descriptionTr: 'Escrow zorunlu',
-        descriptionEn: 'Escrow required',
+        amountUsd,
+        descriptionTr: 'Kanıt zorunludur',
+        descriptionEn: 'Proof is required',
       };
     }
-
-    const row = data[0];
-    return {
-      tierName: row.tier_name,
-      escrowType: row.escrow_type as 'none' | 'optional' | 'required',
-      maxContributors: row.max_contributors,
-      amountUsd: parseFloat(row.amount_usd),
-      descriptionTr: row.description_tr,
-      descriptionEn: row.description_en,
-    };
   } catch (error) {
     logger.error('[ExchangeRate] Failed to get escrow tier:', error);
-    throw error;
+    // Default to required tier on error
+    return {
+      tierName: 'required',
+      escrowType: 'required',
+      maxContributors: 3,
+      amountUsd: amount,
+      descriptionTr: 'Escrow zorunlu',
+      descriptionEn: 'Escrow required',
+    };
   }
 };
 
@@ -201,33 +231,56 @@ export const getEscrowTier = async (
  */
 export const calculatePaymentAmount = async (
   momentId: string,
-  userCurrency: CurrencyCode = 'TRY'
+  userCurrency: CurrencyCode = 'TRY',
 ): Promise<PaymentCalculation> => {
   try {
-    const { data, error } = await supabase.rpc('calculate_payment_amount', {
-      p_moment_id: momentId,
-      p_user_currency: userCurrency,
-    });
+    // Fetch moment price from database
+    const { data: moment, error: momentError } = await supabase
+      .from('moments')
+      .select('price, currency')
+      .eq('id', momentId)
+      .single();
 
-    if (error) throw error;
+    if (momentError) throw momentError;
+    if (!moment) throw new Error(`Moment ${momentId} not found`);
 
-    if (!data || data.length === 0) {
-      throw new Error(`Payment calculation failed for moment ${momentId}`);
+    const momentPrice = moment.price || 0;
+    const momentCurrency = (moment.currency || 'TRY') as CurrencyCode;
+
+    // Get escrow tier
+    const tier = await getEscrowTier(momentPrice, momentCurrency);
+
+    // Convert to user's currency if different
+    let userPays = momentPrice;
+    let exchangeRate = 1;
+    let bufferPercentage = 0;
+    let rateTimestamp = new Date();
+    let rateIsStale = false;
+
+    if (momentCurrency !== userCurrency) {
+      const conversion = await convertToTryWithBuffer(
+        momentPrice,
+        momentCurrency,
+      );
+      userPays = conversion.tryAmountWithBuffer;
+      exchangeRate = conversion.exchangeRate;
+      bufferPercentage = conversion.bufferPercentage;
+      rateTimestamp = conversion.rateTimestamp;
+      rateIsStale = conversion.isStale;
     }
 
-    const row = data[0];
     return {
-      momentPrice: parseFloat(row.moment_price),
-      momentCurrency: row.moment_currency as CurrencyCode,
-      userPays: parseFloat(row.user_pays),
-      userCurrency: row.user_currency as CurrencyCode,
-      exchangeRate: parseFloat(row.exchange_rate),
-      bufferPercentage: parseFloat(row.buffer_percentage),
-      escrowTier: row.escrow_tier as 'direct' | 'optional' | 'required',
-      escrowType: row.escrow_type as 'none' | 'optional' | 'required',
-      maxContributors: row.max_contributors,
-      rateTimestamp: new Date(row.rate_timestamp),
-      rateIsStale: row.rate_is_stale,
+      momentPrice,
+      momentCurrency,
+      userPays,
+      userCurrency,
+      exchangeRate,
+      bufferPercentage,
+      escrowTier: tier.tierName as 'direct' | 'optional' | 'required',
+      escrowType: tier.escrowType,
+      maxContributors: tier.maxContributors,
+      rateTimestamp,
+      rateIsStale,
     };
   } catch (error) {
     logger.error('[ExchangeRate] Payment calculation failed:', error);
@@ -247,7 +300,7 @@ export const quickConvert = (
   amount: number,
   fromCurrency: CurrencyCode,
   toCurrency: CurrencyCode,
-  cachedRates: Record<string, number>
+  cachedRates: Record<string, number>,
 ): number => {
   if (fromCurrency === toCurrency) return amount;
 
@@ -294,7 +347,7 @@ export const formatRateAge = (timestamp: Date): string => {
  */
 export const isRateAcceptable = (
   timestamp: Date,
-  maxAgeMinutes: number = 120
+  maxAgeMinutes: number = 120,
 ): boolean => {
   const ageMinutes = (Date.now() - timestamp.getTime()) / 60000;
   return ageMinutes <= maxAgeMinutes;
@@ -305,7 +358,7 @@ export const isRateAcceptable = (
  */
 export const getBufferExplanation = (
   bufferPercentage: number,
-  language: 'tr' | 'en' = 'tr'
+  language: 'tr' | 'en' = 'tr',
 ): string => {
   if (bufferPercentage === 0) return '';
 
@@ -337,7 +390,7 @@ export const hasContributorLimit = (tier: EscrowTier): boolean => {
  * Get escrow tier color for UI
  */
 export const getEscrowTierColor = (
-  escrowType: 'none' | 'optional' | 'required'
+  escrowType: 'none' | 'optional' | 'required',
 ): string => {
   switch (escrowType) {
     case 'none':

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS, PALETTE } from '../../constants/colors';
 
 export interface Contributor {
   userId: string;
@@ -17,8 +17,8 @@ interface ContributorSlotsSectionProps {
   maxContributors: number | null;
 }
 
-export const ContributorSlotsSection: React.FC<ContributorSlotsSectionProps> = React.memo(
-  ({ price, contributors, currentCount, maxContributors }) => {
+export const ContributorSlotsSection: React.FC<ContributorSlotsSectionProps> =
+  React.memo(({ price, contributors, currentCount, maxContributors }) => {
     // Only show for 100+ TL moments (3 max contributors)
     if (price < 100 || maxContributors === null) {
       return null;
@@ -65,13 +65,17 @@ export const ContributorSlotsSection: React.FC<ContributorSlotsSectionProps> = R
                   ) : (
                     <Image
                       source={{
-                        uri: slot.contributor.avatar || 'https://via.placeholder.com/48',
+                        uri:
+                          slot.contributor.avatar ||
+                          'https://via.placeholder.com/48',
                       }}
                       style={styles.contributorAvatar}
                     />
                   )}
                   <Text style={styles.contributorName} numberOfLines={1}>
-                    {slot.contributor.isAnonymous ? 'Anonim' : slot.contributor.name}
+                    {slot.contributor.isAnonymous
+                      ? 'Anonim'
+                      : slot.contributor.name}
                   </Text>
                 </View>
               ) : (
@@ -95,8 +99,7 @@ export const ContributorSlotsSection: React.FC<ContributorSlotsSectionProps> = R
         </Text>
       </View>
     );
-  },
-);
+  });
 
 ContributorSlotsSection.displayName = 'ContributorSlotsSection';
 
@@ -126,7 +129,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   badgeFull: {
-    backgroundColor: COLORS.coral + '20',
+    backgroundColor: PALETTE.rose[400] + '20',
   },
   badgeText: {
     fontSize: 12,
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
     color: COLORS.mint,
   },
   badgeTextFull: {
-    color: COLORS.coral,
+    color: PALETTE.rose[400],
   },
   slotsRow: {
     flexDirection: 'row',

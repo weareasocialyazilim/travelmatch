@@ -7,7 +7,6 @@
 
 import * as ImageManipulator from 'expo-image-manipulator';
 import {
-  IMAGE_DIMENSIONS,
   IMAGE_QUALITY,
   AVATAR,
   MOMENT_CARD,
@@ -249,10 +248,8 @@ export const flipImage = async (
   direction: 'horizontal' | 'vertical',
 ): Promise<ResizeResult> => {
   try {
-    const flip =
-      direction === 'horizontal'
-        ? ImageManipulator.FlipType.Horizontal
-        : ImageManipulator.FlipType.Vertical;
+    const flip: 'horizontal' | 'vertical' =
+      direction === 'horizontal' ? 'horizontal' : 'vertical';
 
     const result = await ImageManipulator.manipulateAsync(uri, [{ flip }], {
       format: ImageManipulator.SaveFormat.JPEG,
@@ -294,8 +291,7 @@ export const checkFileSize = async (
     const blob = await response.blob();
     const sizeMB = blob.size / (1024 * 1024);
 
-    const maxMB =
-      MAX_FILE_SIZES[type as keyof typeof MAX_FILE_SIZES] || 10;
+    const maxMB = MAX_FILE_SIZES[type as keyof typeof MAX_FILE_SIZES] || 10;
 
     return {
       valid: sizeMB <= maxMB,
@@ -387,7 +383,9 @@ export const prepareAvatar = async (uri: string): Promise<ResizeResult> => {
 /**
  * Prepare moment image for upload
  */
-export const prepareMomentImage = async (uri: string): Promise<ResizeResult> => {
+export const prepareMomentImage = async (
+  uri: string,
+): Promise<ResizeResult> => {
   return resizeImage({ type: 'moment', uri });
 };
 
