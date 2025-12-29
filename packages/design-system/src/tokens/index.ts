@@ -6,15 +6,7 @@
  * Palette A: Sunset Proof
  */
 
-import {
-  COLORS,
-  GRADIENTS,
-  SHADOWS,
-  primitives,
-  type ColorName,
-  type GradientName,
-  type ShadowName,
-} from './colors';
+import { COLORS, GRADIENTS, SHADOWS } from './colors';
 import {
   spacing,
   radius,
@@ -26,15 +18,7 @@ import {
 import { typography, type Typography } from './typography';
 
 // Color exports
-export {
-  COLORS,
-  GRADIENTS,
-  SHADOWS,
-  primitives,
-  type ColorName,
-  type GradientName,
-  type ShadowName,
-} from './colors';
+export { COLORS, GRADIENTS, SHADOWS } from './colors';
 
 // Typography exports
 export { typography, type Typography } from './typography';

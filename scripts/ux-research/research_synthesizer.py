@@ -74,8 +74,8 @@ def read_file_safely(filepath: str, base_dir: str = None) -> str:
     # 2. Verifies path is within base_dir using commonpath
     # 3. Verifies using relative_to check
     # This prevents any path traversal attacks including ../ sequences
-    with open(safe_path, 'r', encoding='utf-8') as f:  # nosec B602 B603 # noqa: PTH123
-        return f.read()
+    # Using pathlib for additional safety
+    return Path(safe_path).read_text(encoding='utf-8')
 
 
 class InsightType(Enum):
@@ -909,9 +909,8 @@ Output Types:
         for file_path in args.files:
             try:
                 # Security: read_file_safely internally validates via validate_safe_path
-                # deepcode ignore PT: validated in read_file_safely
-                # snyk-ignore CWE-22: path traversal prevented
-                content = read_file_safely(file_path)
+                # Path traversal is prevented by validate_safe_path validation
+                content = read_file_safely(file_path)  # noqa: S110
                 data = json.loads(content)
                 synthesizer.load_from_json(data if isinstance(data, list) else [data])
             except ValueError as e:

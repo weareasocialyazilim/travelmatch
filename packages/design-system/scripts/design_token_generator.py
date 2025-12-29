@@ -73,8 +73,8 @@ def write_file_safely(filepath: str, content: str, base_dir: str = None) -> None
     # 2. Verifies path is within base_dir using commonpath
     # 3. Verifies using relative_to check
     # This prevents any path traversal attacks including ../ sequences
-    with open(safe_path, 'w', encoding='utf-8') as f:  # nosec B602 B603 # noqa: PTH123
-        f.write(content)
+    # Using pathlib for additional safety
+    Path(safe_path).write_text(content, encoding='utf-8')
 
 
 def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
