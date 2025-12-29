@@ -25,6 +25,12 @@ import { logger } from '../utils/logger';
 // Storage keys
 const BIOMETRIC_ENABLED_KEY = 'biometric_auth_enabled';
 const BIOMETRIC_TYPE_KEY = 'biometric_type';
+const BIOMETRIC_CREDENTIALS_KEY = 'biometric_credentials';
+
+export interface BiometricCredentials {
+  email: string;
+  password: string;
+}
 
 export enum BiometricType {
   FINGERPRINT = 'fingerprint',
@@ -250,10 +256,63 @@ class BiometricAuthService {
     try {
       await secureStorage.deleteItem(BIOMETRIC_ENABLED_KEY);
       await secureStorage.deleteItem(BIOMETRIC_TYPE_KEY);
+      await secureStorage.deleteItem(BIOMETRIC_CREDENTIALS_KEY);
       logger.info('BiometricAuth', 'Disabled successfully');
     } catch (error) {
       logger.error('BiometricAuth', 'Failed to disable', error);
       throw error;
+    }
+  }
+
+  /**
+   * Save credentials for biometric login
+   * Called after successful password login when biometric is enabled
+   */
+  async saveCredentials(credentials: BiometricCredentials): Promise<void> {
+    try {
+      await secureStorage.setItem(
+        BIOMETRIC_CREDENTIALS_KEY,
+        JSON.stringify(credentials)
+      );
+      logger.info('BiometricAuth', 'Credentials saved for biometric login');
+    } catch (error) {
+      logger.error('BiometricAuth', 'Failed to save credentials', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get saved credentials for biometric login
+   * Returns null if no credentials are saved
+   */
+  async getCredentials(): Promise<BiometricCredentials | null> {
+    try {
+      const data = await secureStorage.getItem(BIOMETRIC_CREDENTIALS_KEY);
+      if (!data) return null;
+      return JSON.parse(data) as BiometricCredentials;
+    } catch (error) {
+      logger.error('BiometricAuth', 'Failed to get credentials', error);
+      return null;
+    }
+  }
+
+  /**
+   * Check if credentials are saved for biometric login
+   */
+  async hasCredentials(): Promise<boolean> {
+    const credentials = await this.getCredentials();
+    return credentials !== null;
+  }
+
+  /**
+   * Clear saved credentials
+   */
+  async clearCredentials(): Promise<void> {
+    try {
+      await secureStorage.deleteItem(BIOMETRIC_CREDENTIALS_KEY);
+      logger.info('BiometricAuth', 'Credentials cleared');
+    } catch (error) {
+      logger.error('BiometricAuth', 'Failed to clear credentials', error);
     }
   }
 

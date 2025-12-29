@@ -4,6 +4,11 @@
  */
 
 export { useMessages } from './useMessages';
+
+// Email verification hooks
+export { useEmailVerification } from './useEmailVerification';
+export type { EmailVerificationState } from './useEmailVerification';
+export { useRequireEmailVerification } from './useRequireEmailVerification';
 export { useNotifications } from './useNotifications';
 export { useMoments } from './useMoments';
 export type { Moment, MomentFilters, CreateMomentData } from './useMoments';

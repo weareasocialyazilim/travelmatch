@@ -26,7 +26,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { biometricAuth } from '../services/biometricAuth';
-import type { BiometricType } from '../services/biometricAuth';
+import type { BiometricType, BiometricCredentials } from '../services/biometricAuth';
 import { logger } from '../utils/logger';
 
 /**
@@ -37,6 +37,8 @@ interface BiometricAuthContextValue {
   biometricAvailable: boolean;
   /** Whether biometric authentication is enabled by user */
   biometricEnabled: boolean;
+  /** Whether credentials are saved for biometric login */
+  hasCredentials: boolean;
   /** Type of biometric authentication (fingerprint, facial, etc.) */
   biometricType: BiometricType | null;
   /** Human-readable biometric type name (Face ID, Touch ID, Fingerprint) */
@@ -53,6 +55,12 @@ interface BiometricAuthContextValue {
   authenticateForAppLaunch: () => Promise<boolean>;
   /** Authenticate for sensitive action (withdraw, payment, etc.) */
   authenticateForAction: (actionName: string) => Promise<boolean>;
+  /** Save credentials for biometric login */
+  saveCredentials: (credentials: BiometricCredentials) => Promise<void>;
+  /** Get saved credentials after biometric authentication */
+  getCredentials: () => Promise<BiometricCredentials | null>;
+  /** Clear saved credentials */
+  clearCredentials: () => Promise<void>;
   /** Refresh biometric state */
   refresh: () => Promise<void>;
 }
@@ -73,6 +81,7 @@ interface BiometricAuthProviderProps {
 export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ children }) => {
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [hasCredentials, setHasCredentials] = useState(false);
   const [biometricType, setBiometricType] = useState<BiometricType | null>(null);
   const [biometricTypeName, setBiometricTypeName] = useState('Biometric');
   const [isLoading, setIsLoading] = useState(true);
@@ -100,9 +109,14 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
       const enabled = await biometricAuth.isEnabled();
       setBiometricEnabled(enabled);
 
+      // Check if credentials are saved
+      const hasCreds = await biometricAuth.hasCredentials();
+      setHasCredentials(hasCreds);
+
       logger.info('BiometricAuthContext', 'Initialized', {
         available: capabilities.isAvailable,
         enabled,
+        hasCredentials: hasCreds,
         type: biometricTypeName,
       });
     } catch (error) {
@@ -192,6 +206,43 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
   }, []);
 
   /**
+   * Save credentials for biometric login
+   */
+  const saveCredentials = useCallback(async (credentials: BiometricCredentials): Promise<void> => {
+    try {
+      await biometricAuth.saveCredentials(credentials);
+      setHasCredentials(true);
+    } catch (error) {
+      logger.error('BiometricAuthContext', 'Failed to save credentials', error);
+      throw error;
+    }
+  }, []);
+
+  /**
+   * Get saved credentials
+   */
+  const getCredentials = useCallback(async (): Promise<BiometricCredentials | null> => {
+    try {
+      return await biometricAuth.getCredentials();
+    } catch (error) {
+      logger.error('BiometricAuthContext', 'Failed to get credentials', error);
+      return null;
+    }
+  }, []);
+
+  /**
+   * Clear saved credentials
+   */
+  const clearCredentials = useCallback(async (): Promise<void> => {
+    try {
+      await biometricAuth.clearCredentials();
+      setHasCredentials(false);
+    } catch (error) {
+      logger.error('BiometricAuthContext', 'Failed to clear credentials', error);
+    }
+  }, []);
+
+  /**
    * Refresh biometric state
    */
   const refresh = useCallback(async (): Promise<void> => {
@@ -203,6 +254,7 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
     () => ({
       biometricAvailable,
       biometricEnabled,
+      hasCredentials,
       biometricType,
       biometricTypeName,
       isLoading,
@@ -211,11 +263,15 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
       authenticate,
       authenticateForAppLaunch,
       authenticateForAction,
+      saveCredentials,
+      getCredentials,
+      clearCredentials,
       refresh,
     }),
     [
       biometricAvailable,
       biometricEnabled,
+      hasCredentials,
       biometricType,
       biometricTypeName,
       isLoading,
@@ -224,6 +280,9 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
       authenticate,
       authenticateForAppLaunch,
       authenticateForAction,
+      saveCredentials,
+      getCredentials,
+      clearCredentials,
       refresh,
     ],
   );

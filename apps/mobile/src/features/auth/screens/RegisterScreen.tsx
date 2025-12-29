@@ -73,6 +73,7 @@ export const RegisterScreen: React.FC = () => {
         password: '',
         confirmPassword: '',
         fullName: '',
+        phone: '',
         gender: undefined,
         dateOfBirth: undefined,
       },
@@ -92,10 +93,13 @@ export const RegisterScreen: React.FC = () => {
         dateOfBirth: data.dateOfBirth,
       });
       if (result.success) {
-        // Navigate to Discover on successful registration
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Discover' }],
+        // Navigate to phone verification (mandatory OTP)
+        // Format phone number with country code (+90 for Turkey)
+        const formattedPhone = `+90${data.phone}`;
+        navigation.navigate('VerifyPhone', {
+          email: data.email,
+          phone: formattedPhone,
+          fullName: data.fullName,
         });
       } else {
         Alert.alert('Kayıt Başarısız', result.error || 'Lütfen tekrar deneyin');
@@ -188,6 +192,45 @@ export const RegisterScreen: React.FC = () => {
                 editable={!isLoading}
               />
               {error && <Text style={styles.errorText}>{error.message}</Text>}
+            </View>
+          )}
+        />
+
+        {/* Phone Number */}
+        <Controller
+          control={control}
+          name="phone"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Telefon Numarası</Text>
+              <View style={styles.phoneInputContainer}>
+                <View style={styles.countryCodeBox}>
+                  <Text style={styles.countryCodeText}>+90</Text>
+                </View>
+                <TextInput
+                  testID="phone-input"
+                  style={[styles.phoneInput, error && styles.inputError]}
+                  placeholder="5XX XXX XX XX"
+                  placeholderTextColor={COLORS.text.secondary}
+                  value={value}
+                  onChangeText={(text) => {
+                    // Only allow digits, max 10
+                    const cleaned = text.replace(/\D/g, '').slice(0, 10);
+                    onChange(cleaned);
+                  }}
+                  onBlur={onBlur}
+                  keyboardType="phone-pad"
+                  maxLength={10}
+                  editable={!isLoading}
+                />
+              </View>
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
+              <Text style={styles.hintText}>
+                SMS ile doğrulama kodu gönderilecek
+              </Text>
             </View>
           )}
         />
@@ -471,6 +514,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
+  },
+
+  // Phone input styles
+  phoneInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  countryCodeBox: {
+    height: 50,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
+    borderRadius: 8,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    backgroundColor: COLORS.surface.base,
+    justifyContent: 'center',
+  },
+  countryCodeText: {
+    fontSize: 16,
+    color: COLORS.text.primary,
+    fontWeight: '500',
+  },
+  phoneInput: {
+    flex: 1,
+    height: 50,
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderColor: COLORS.border.default,
+    borderRadius: 8,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    backgroundColor: COLORS.surface.base,
+    color: COLORS.text.primary,
   },
 
   // Gender styles

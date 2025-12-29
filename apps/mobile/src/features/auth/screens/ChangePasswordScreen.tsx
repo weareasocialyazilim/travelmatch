@@ -13,7 +13,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { updatePassword } from '@/services/supabaseAuthService';
+import { changePasswordWithVerification } from '@/services/supabaseAuthService';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
@@ -61,15 +61,15 @@ export const ChangePasswordScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await updatePassword(newPassword);
+      const { error } = await changePasswordWithVerification(currentPassword, newPassword);
       if (error) {
-        showToast(error.message || 'Failed to update password', 'error');
+        showToast(error.message || 'Şifre güncellenemedi', 'error');
       } else {
-        showToast('Password updated successfully!', 'success');
+        showToast('Şifreniz başarıyla güncellendi!', 'success');
         navigation.goBack();
       }
     } catch {
-      showToast('An error occurred. Please try again.', 'error');
+      showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);
     }

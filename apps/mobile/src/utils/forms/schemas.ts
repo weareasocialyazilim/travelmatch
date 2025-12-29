@@ -35,7 +35,13 @@ export const optionalPasswordValidation = z
 export const phoneValidation = z
   .string()
   .min(1, 'forms.validation.phone.required')
-  .regex(/^\+?[1-9]\d{1,14}$/, 'forms.validation.phone.invalid');
+  .regex(/^\+?[1-9]\d{9,14}$/, 'forms.validation.phone.invalid');
+
+// Phone validation for registration (10 digits without country code)
+export const phoneInputValidation = z
+  .string()
+  .min(1, 'Telefon numarası gerekli')
+  .regex(/^\d{10}$/, 'Geçerli bir 10 haneli telefon numarası girin');
 
 export const nameValidation = z
   .string()
@@ -108,6 +114,7 @@ export const registerSchema = z
       .string()
       .min(1, 'forms.validation.confirmPassword.required'),
     fullName: nameValidation,
+    phone: phoneInputValidation,
     gender: genderValidation,
     dateOfBirth: dateOfBirthValidation,
   })
