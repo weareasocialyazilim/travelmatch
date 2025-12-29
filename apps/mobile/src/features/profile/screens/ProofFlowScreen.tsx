@@ -147,48 +147,36 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     }
   }, [photos, setValue, showToast]);
 
-  const handleGallerySelect = useCallback(async () => {
-    try {
-      // Use PROOF_PHOTO config for maximum quality
-      const assets = await launchGallery('PROOF_PHOTO', false);
-      if (assets.length > 0) {
-        setValue('photos', [...photos, assets[0].uri]);
-      }
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('permission')) {
-        Alert.alert(
-          'Permission Required',
-          'Gallery permission is needed to select photos',
-        );
-      } else {
-        showToast('Failed to select photo', 'error');
-      }
-    }
-  }, [photos, setValue, showToast]);
+  // SECURITY: Gallery selection disabled for proof photos
+  // Only live camera capture is allowed to prevent fraud
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _handleGallerySelect = useCallback(async () => {
+    // Disabled for security - keeping for potential admin override
+    showToast('Güvenlik nedeniyle galeriden seçim yapılamaz', 'info');
+  }, [showToast]);
 
   const handleAddPhoto = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ['Cancel', 'Take Photo', 'Choose from Gallery'],
-          cancelButtonIndex: 0,
-        },
-        (buttonIndex) => {
-          if (buttonIndex === 1) void handleCameraCapture();
-          if (buttonIndex === 2) void handleGallerySelect();
-        },
+    // If max photos reached, show warning
+    if (photos.length >= 3) {
+      showToast('En fazla 3 fotoğraf ekleyebilirsiniz', 'info');
+      return;
+    }
+
+    // Show security explanation on first use
+    if (photos.length === 0) {
+      Alert.alert(
+        '📸 Anlık Fotoğraf Gerekli',
+        'Güvenlik nedeniyle kanıt fotoğrafları sadece kamera ile çekilebilir. Galeriden seçim yapılamaz.',
+        [
+          { text: 'Anladım', onPress: () => void handleCameraCapture() },
+          { text: 'Vazgeç', style: 'cancel' },
+        ],
       );
     } else {
-      Alert.alert('Add Photo', 'Select proof photo', [
-        { text: 'Take Photo', onPress: () => void handleCameraCapture() },
-        {
-          text: 'Choose from Gallery',
-          onPress: () => void handleGallerySelect(),
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+      // Direct camera launch for subsequent photos
+      void handleCameraCapture();
     }
-  }, [handleCameraCapture, handleGallerySelect]);
+  }, [handleCameraCapture, photos.length, showToast]);
 
   const handleAddTicket = async () => {
     try {
