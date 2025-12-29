@@ -326,5 +326,61 @@
     "search": "Search",
     "send": "Send",
     "go": "Go"
+  },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "refundPolicy": "Refund Policy",
+    "dataPrivacy": "Data Privacy",
+    "lastUpdated": "Last Updated",
+    "iUnderstand": "I Understand",
+    "iAccept": "I Accept",
+    "sections": {
+      "dataCollection": "Data We Collect",
+      "locationUse": "Location Use",
+      "photosAndProof": "Photos & Proof Data",
+      "paymentsAndSecurity": "Payments & Security",
+      "dataRetention": "Data Retention",
+      "userRights": "Your Rights",
+      "deletingData": "Deleting Your Data",
+      "contactUs": "Contact Us"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "notifications": "Notifications",
+    "pushNotifications": "Push Notifications",
+    "emailNotifications": "Email Notifications",
+    "privacy": "Privacy",
+    "dataPrivacy": "Data & Privacy",
+    "blockedUsers": "Blocked Users",
+    "security": "Security",
+    "biometricLogin": "Biometric Login",
+    "twoFactorAuth": "Two-Factor Authentication",
+    "preferences": "Preferences",
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "about": "About",
+    "version": "Version",
+    "rateApp": "Rate App",
+    "shareApp": "Share App",
+    "helpCenter": "Help Center",
+    "contactSupport": "Contact Support",
+    "legal": "Legal",
+    "logout": "Log Out",
+    "deleteAccount": "Delete Account",
+    "deleteAccountWarning": "This action cannot be undone. All your data will be permanently deleted."
+  },
+  "store": {
+    "appName": "TravelMatch",
+    "subtitle": "Connect Through Travel Moments",
+    "shortDescription": "Connect with travelers. Share moments. Gift experiences. Travel differently.",
+    "keywords": "travel,experiences,local guide,tourism,gifts,moments,discover,adventure,trip,vacation,explore"
   }
 }

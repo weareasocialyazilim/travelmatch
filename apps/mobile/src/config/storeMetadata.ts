@@ -1,0 +1,190 @@
+/**
+ * Store Metadata Configuration
+ * Centralized store listing information for App Store and Play Store
+ *
+ * This file contains all metadata required for store submissions.
+ * Update this file when changing store listings to maintain consistency.
+ */
+
+export const STORE_METADATA = {
+  // App Identity
+  appName: 'TravelMatch',
+  subtitle: 'Connect Through Travel Moments',
+  shortDescription: 'Connect with travelers. Share moments. Gift experiences. Travel differently.',
+
+  // URLs
+  urls: {
+    website: 'https://travelmatch.app',
+    privacyPolicy: 'https://travelmatch.app/privacy',
+    termsOfService: 'https://travelmatch.app/terms',
+    support: 'https://travelmatch.app/support',
+    marketing: 'https://travelmatch.app',
+  },
+
+  // Contact
+  contact: {
+    supportEmail: 'support@travelmatch.app',
+    privacyEmail: 'privacy@travelmatch.app',
+    legalEmail: 'legal@travelmatch.app',
+  },
+
+  // Categories
+  categories: {
+    ios: {
+      primary: 'Travel',
+      secondary: 'Social Networking',
+    },
+    android: {
+      category: 'Travel & Local',
+      tags: ['Travel', 'Social', 'Experiences', 'Local Guide'],
+    },
+  },
+
+  // Age Rating
+  ageRating: {
+    ios: '12+',
+    android: 'Everyone 10+',
+    reasons: [
+      'User Generated Content (Moderated)',
+      'User Interaction (Chat)',
+      'Location Sharing (Optional)',
+      'Digital Purchases (In-App)',
+    ],
+  },
+
+  // Keywords (iOS - 100 chars max)
+  keywords: 'travel,experiences,local guide,tourism,gifts,moments,discover,adventure,trip,vacation,explore',
+
+  // Feature List for Marketing
+  features: [
+    {
+      emoji: '🌍',
+      title: 'Discover Moments',
+      description: 'Browse unique travel experiences shared by locals and travelers.',
+    },
+    {
+      emoji: '💝',
+      title: 'Gift Experiences',
+      description: 'Send gifts to moment creators with secure escrow protection.',
+    },
+    {
+      emoji: '💬',
+      title: 'Real-time Chat',
+      description: 'Connect with hosts through encrypted messaging.',
+    },
+    {
+      emoji: '🔒',
+      title: 'Trust & Safety',
+      description: 'KYC verification, secure payments, 24/7 support.',
+    },
+    {
+      emoji: '📍',
+      title: 'Location-Based Discovery',
+      description: 'Find moments near you or explore destinations worldwide.',
+    },
+    {
+      emoji: '🎁',
+      title: 'Wallet System',
+      description: 'Add funds, send gifts, withdraw easily.',
+    },
+  ],
+
+  // Screenshots Requirements
+  screenshotRequirements: {
+    ios: {
+      'iPhone 6.7"': { width: 1290, height: 2796, required: true },
+      'iPhone 6.5"': { width: 1284, height: 2778, required: true },
+      'iPhone 5.5"': { width: 1242, height: 2208, required: true },
+      'iPad Pro 12.9"': { width: 2048, height: 2732, required: false },
+    },
+    android: {
+      phone: { minWidth: 320, maxWidth: 3840, aspectRatio: '16:9 or 9:16', min: 2, max: 8 },
+      tablet7: { minWidth: 320, maxWidth: 3840, required: false },
+      tablet10: { minWidth: 320, maxWidth: 3840, required: false },
+    },
+  },
+
+  // Icon Requirements
+  iconRequirements: {
+    ios: {
+      size: 1024,
+      format: 'PNG',
+      notes: 'No alpha channel, no rounded corners (system applies mask)',
+    },
+    android: {
+      size: 512,
+      format: 'PNG',
+      notes: '32-bit PNG, no alpha for icon, separate feature graphic 1024x500',
+    },
+  },
+
+  // Data Privacy Declarations
+  dataPrivacy: {
+    dataCollected: [
+      { type: 'Name', purpose: 'Account, Profile', shared: false },
+      { type: 'Email', purpose: 'Account, Communication', shared: false },
+      { type: 'Phone', purpose: 'Verification', shared: false, optional: true },
+      { type: 'Location', purpose: 'App Functionality', shared: false },
+      { type: 'Photos', purpose: 'User Content', shared: true, note: 'Within app only' },
+      { type: 'Payment Info', purpose: 'Purchases', shared: true, processor: 'Stripe' },
+      { type: 'Messages', purpose: 'App Functionality', shared: false },
+    ],
+    securityPractices: [
+      'Data encrypted in transit (TLS 1.3)',
+      'Data encrypted at rest',
+      'Users can request data deletion',
+      'Independent security review',
+    ],
+    thirdPartyServices: [
+      { name: 'Stripe', purpose: 'Payment processing' },
+      { name: 'Supabase', purpose: 'Database and authentication' },
+      { name: 'Mapbox', purpose: 'Maps and location' },
+      { name: 'Sentry', purpose: 'Error tracking' },
+      { name: 'Expo', purpose: 'App updates' },
+    ],
+  },
+
+  // Version History Template
+  versionHistoryTemplate: (version: string, changes: string[]) => `
+Version ${version}
+${changes.map(change => `• ${change}`).join('\n')}
+`.trim(),
+
+  // Current Version Release Notes
+  currentVersion: {
+    version: '1.0.0',
+    changes: [
+      'Initial release',
+      'Discover and share travel moments',
+      'Secure gift system with escrow protection',
+      'Real-time encrypted messaging',
+      'KYC verification for trusted hosts',
+      'Apple Pay and card payments',
+    ],
+  },
+} as const;
+
+// Helper to generate full description
+export const generateFullDescription = (): string => {
+  const { shortDescription, features } = STORE_METADATA;
+
+  return `${STORE_METADATA.appName} connects travelers through unique experiences. Share your travel moments, discover local guides, and create unforgettable memories.
+
+KEY FEATURES:
+
+${features.map(f => `${f.emoji} ${f.title}
+${f.description}`).join('\n\n')}
+
+WHY TRAVELMATCH?
+We believe the best travel experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, TravelMatch brings people together.
+
+Download now and start your journey!`;
+};
+
+// Helper to generate release notes
+export const generateReleaseNotes = (): string => {
+  const { version, changes } = STORE_METADATA.currentVersion;
+  return STORE_METADATA.versionHistoryTemplate(version, changes);
+};
+
+export default STORE_METADATA;
