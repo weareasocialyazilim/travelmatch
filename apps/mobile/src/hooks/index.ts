@@ -70,13 +70,13 @@ export {
   useWhyDidYouUpdate,
 } from './usePerformanceMonitor';
 
-// Animation hooks
+// Animation hooks (Awwwards Design System)
 export {
   // Spring & timing configurations
   SPRINGS,
   TIMINGS,
   // Press animations
-  useScalePressAnimation,
+  usePressAnimation,
   usePressOpacityAnimation,
   // Entrance animations
   useFadeIn,
@@ -89,7 +89,7 @@ export {
   useFloating,
   useRotation,
   // Feedback animations
-  useShakeAnimation,
+  useShake,
   useSuccessBounce,
   // Scroll-based animations
   useParallax,
@@ -99,8 +99,8 @@ export {
   useProgress,
 } from './useAnimations';
 
-// Existing animation hooks (for backwards compatibility)
-export { usePressAnimation, useBounceAnimation } from './usePressAnimation';
+// Legacy animation hooks (backwards compatibility)
+export { usePressAnimation as useLegacyPressAnimation, useBounceAnimation } from './usePressAnimation';
 export {
   useEnterAnimation,
   useStaggeredAnimation,
