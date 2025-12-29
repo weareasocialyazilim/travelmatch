@@ -442,11 +442,64 @@ describe('Admin Validators', () => {
     });
   });
 
-  // Note: marketingCampaignSchema tests are skipped due to Zod 4 compatibility
-  // issues with z.record(z.unknown()). The schema itself is functional.
   describe('marketingCampaignSchema', () => {
-    it.skip('should accept valid marketing campaign data', () => {
-      // Skipped - Zod 4 compatibility issue with z.record(z.unknown())
+    it('should accept valid marketing campaign data', () => {
+      const validCampaign = {
+        name: 'Summer Promo Campaign',
+        description: 'This is a promotional campaign for the summer season with special discounts.',
+        type: 'email',
+        budget: 5000,
+        start_date: '2024-06-01T00:00:00Z',
+        end_date: '2024-08-31T23:59:59Z',
+        target_audience: { age: '18-35', location: 'Turkey' },
+      };
+
+      expect(() => _marketingCampaignSchema.parse(validCampaign)).not.toThrow();
+    });
+
+    it('should reject campaign with short name', () => {
+      const invalidCampaign = {
+        name: 'Test',
+        description: 'This is a promotional campaign for the summer season.',
+        type: 'email',
+        budget: 5000,
+        start_date: '2024-06-01T00:00:00Z',
+        end_date: '2024-08-31T23:59:59Z',
+        target_audience: {},
+      };
+
+      expect(() => _marketingCampaignSchema.parse(invalidCampaign)).toThrow();
+    });
+
+    it('should accept all valid campaign types', () => {
+      const types = ['email', 'push', 'social', 'display', 'influencer'];
+      types.forEach((type) => {
+        const campaign = {
+          name: 'Valid Campaign Name',
+          description: 'This is a valid campaign description with enough characters.',
+          type,
+          budget: 1000,
+          start_date: '2024-06-01T00:00:00Z',
+          end_date: '2024-08-31T23:59:59Z',
+          target_audience: {},
+        };
+
+        expect(() => _marketingCampaignSchema.parse(campaign)).not.toThrow();
+      });
+    });
+
+    it('should reject negative budget', () => {
+      const invalidCampaign = {
+        name: 'Valid Campaign Name',
+        description: 'This is a valid campaign description with enough characters.',
+        type: 'email',
+        budget: -100,
+        start_date: '2024-06-01T00:00:00Z',
+        end_date: '2024-08-31T23:59:59Z',
+        target_audience: {},
+      };
+
+      expect(() => _marketingCampaignSchema.parse(invalidCampaign)).toThrow();
     });
   });
 

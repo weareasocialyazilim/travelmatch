@@ -103,26 +103,55 @@ describe('Admin Formatters', () => {
     });
   });
 
-  // Note: formatDate, formatDateTime, and formatRelativeTime tests are skipped
-  // because they require complex date-fns locale mocking that's difficult to set up.
-  // These functions are thin wrappers around date-fns and are tested implicitly
-  // through integration tests.
-
   describe('formatDate', () => {
-    it.skip('should format date in Turkish locale', () => {
-      // Skipped - requires full date-fns locale mock
+    it('should format date correctly', () => {
+      // Test with a fixed date - January 15, 2024
+      const result = formatDate('2024-01-15');
+      // Turkish locale should format as "15 Oca 2024"
+      expect(result).toMatch(/15.*2024/);
+    });
+
+    it('should accept Date object', () => {
+      const date = new Date(2024, 0, 15); // January 15, 2024
+      const result = formatDate(date);
+      expect(result).toMatch(/15.*2024/);
+    });
+
+    it('should accept custom format string', () => {
+      const result = formatDate('2024-01-15', 'yyyy-MM-dd');
+      expect(result).toBe('2024-01-15');
     });
   });
 
   describe('formatDateTime', () => {
-    it.skip('should format date and time', () => {
-      // Skipped - requires full date-fns locale mock
+    it('should format date and time correctly', () => {
+      // Test with a fixed date and time
+      const result = formatDateTime('2024-01-15T14:30:00Z');
+      // Should include date and time
+      expect(result).toMatch(/15.*2024.*\d{1,2}:\d{2}/);
+    });
+
+    it('should accept Date object', () => {
+      const date = new Date(2024, 0, 15, 14, 30);
+      const result = formatDateTime(date);
+      expect(result).toMatch(/15.*2024/);
     });
   });
 
   describe('formatRelativeTime', () => {
-    it.skip('should format relative time in Turkish', () => {
-      // Skipped - requires full date-fns locale mock
+    it('should format recent time', () => {
+      const recentDate = new Date(Date.now() - 60000); // 1 minute ago
+      const result = formatRelativeTime(recentDate);
+      // Should contain Turkish relative time suffix
+      expect(result).toBeTruthy();
+      expect(typeof result).toBe('string');
+    });
+
+    it('should handle ISO date string', () => {
+      const isoDate = new Date(Date.now() - 3600000).toISOString(); // 1 hour ago
+      const result = formatRelativeTime(isoDate);
+      expect(result).toBeTruthy();
+      expect(typeof result).toBe('string');
     });
   });
 

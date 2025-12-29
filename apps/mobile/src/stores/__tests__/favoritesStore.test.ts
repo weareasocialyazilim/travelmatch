@@ -325,7 +325,7 @@ describe('favoritesStore', () => {
   });
 
   describe('persistence', () => {
-    it.skip('should persist favorites to AsyncStorage', async () => {
+    it('should persist favorites to AsyncStorage', async () => {
       const { result } = renderHook(() => useFavoritesStore());
 
       act(() => {
@@ -333,18 +333,19 @@ describe('favoritesStore', () => {
         result.current.addFavorite('moment-2');
       });
 
-      await waitFor(async () => {
-        const stored = await AsyncStorage.getItem('favorites-storage');
-        expect(stored).toBeTruthy();
-        
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          expect(parsed.state.favoriteIds).toEqual(['moment-1', 'moment-2']);
-        }
-      });
+      // Wait for zustand persist middleware to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = await AsyncStorage.getItem('favorites-storage');
+      expect(stored).toBeTruthy();
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        expect(parsed.state.favoriteIds).toEqual(['moment-1', 'moment-2']);
+      }
     });
 
-    it.skip('should persist after removal', async () => {
+    it('should persist after removal', async () => {
       const { result } = renderHook(() => useFavoritesStore());
 
       act(() => {
@@ -353,17 +354,18 @@ describe('favoritesStore', () => {
         result.current.removeFavorite('moment-1');
       });
 
-      await waitFor(async () => {
-        const stored = await AsyncStorage.getItem('favorites-storage');
-        
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          expect(parsed.state.favoriteIds).toEqual(['moment-2']);
-        }
-      });
+      // Wait for zustand persist middleware to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = await AsyncStorage.getItem('favorites-storage');
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        expect(parsed.state.favoriteIds).toEqual(['moment-2']);
+      }
     });
 
-    it.skip('should persist empty state after clearing', async () => {
+    it('should persist empty state after clearing', async () => {
       const { result } = renderHook(() => useFavoritesStore());
 
       act(() => {
@@ -371,14 +373,15 @@ describe('favoritesStore', () => {
         result.current.clearFavorites();
       });
 
-      await waitFor(async () => {
-        const stored = await AsyncStorage.getItem('favorites-storage');
-        
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          expect(parsed.state.favoriteIds).toEqual([]);
-        }
-      });
+      // Wait for zustand persist middleware to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = await AsyncStorage.getItem('favorites-storage');
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        expect(parsed.state.favoriteIds).toEqual([]);
+      }
     });
   });
 
