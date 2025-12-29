@@ -2,13 +2,19 @@
  * Secure Payment Service (Client-Side)
  *
  * Communicates with server-side Edge Functions for PCI-compliant payment processing
- * Never exposes Stripe secret keys on the client
+ * Uses PayTR for Turkish payment processing
  *
  * Features:
- * - Server-side Stripe API calls
+ * - Server-side PayTR API calls
  * - Automatic cache invalidation
  * - Error handling and retry logic
  * - Type-safe payment operations
+ *
+ * PayTR Edge Functions:
+ * - paytr-create-payment: Create payment and get iframeToken
+ * - paytr-webhook: Handle PayTR callbacks
+ * - paytr-saved-cards: Manage saved cards
+ * - paytr-transfer: Handle transfers
  */
 
 import { supabase, SUPABASE_EDGE_URL } from '../config/supabase';
@@ -26,9 +32,9 @@ import { toRecord } from '../utils/jsonHelper';
 import type { Database } from '../types/database.types';
 
 // Types
-export interface PaymentIntent {
-  clientSecret: string;
-  paymentIntentId: string;
+export interface PayTRPaymentResponse {
+  iframeToken: string;
+  merchantOid: string;
   transactionId?: string;
   amount: number;
   currency: string;
@@ -48,20 +54,17 @@ export interface Transaction {
   status: string | null;
   description: string | null;
   createdAt: string | null;
-  metadata?: Record<string, any> | null;
+  metadata?: Record<string, unknown> | null;
 }
 
-export interface CreatePaymentIntentParams {
+export interface CreatePaymentParams {
   momentId: string;
   amount: number;
-  currency?: string;
+  currency?: 'TRY' | 'EUR' | 'USD' | 'GBP';
   description?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface ConfirmPaymentParams {
-  paymentIntentId: string;
-  paymentMethodId?: string;
+  metadata?: Record<string, unknown>;
+  saveCard?: boolean;
+  cardToken?: string;
 }
 
 class SecurePaymentService {
@@ -86,38 +89,38 @@ class SecurePaymentService {
   }
 
   /**
-   * Create a payment intent (server-side)
+   * Create a payment via PayTR
    *
-   * This calls the Edge Function which securely communicates with Stripe
-   * The Stripe secret key never leaves the server
+   * Returns an iframeToken to be used in PayTR WebView
+   * The actual payment is completed in the WebView
    */
-  async createPaymentIntent(
-    params: CreatePaymentIntentParams,
-  ): Promise<PaymentIntent> {
+  async createPayment(params: CreatePaymentParams): Promise<PayTRPaymentResponse> {
     try {
       const headers = await this.getAuthHeaders();
 
       const response = await fetch(
-        `${this.EDGE_FUNCTION_BASE}/payment/create-payment-intent`,
+        `${this.EDGE_FUNCTION_BASE}/paytr-create-payment`,
         {
           method: 'POST',
           headers,
           body: JSON.stringify({
             momentId: params.momentId,
             amount: params.amount,
-            currency: params.currency || 'USD',
+            currency: params.currency || 'TRY',
             description: params.description,
             metadata: params.metadata,
+            saveCard: params.saveCard,
+            cardToken: params.cardToken,
           }),
         },
       );
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to create payment intent');
+        throw new Error(error.error || 'Failed to create payment');
       }
 
-      const paymentIntent: PaymentIntent = await response.json();
+      const paymentResponse: PayTRPaymentResponse = await response.json();
 
       // Invalidate relevant caches
       const {
@@ -128,60 +131,72 @@ class SecurePaymentService {
         await invalidateTransactions(user.id);
       }
 
-      logger.info('Payment intent created:', paymentIntent.paymentIntentId);
-      return paymentIntent;
+      logger.info('PayTR payment created:', paymentResponse.merchantOid);
+      return paymentResponse;
     } catch (error) {
-      logger.error('Create payment intent error:', error);
+      logger.error('Create payment error:', error);
       throw error;
     }
   }
 
   /**
-   * Confirm a payment intent (server-side)
-   *
-   * Securely confirms the payment with Stripe on the server
+   * Get saved cards for the user
    */
-  async confirmPayment(params: ConfirmPaymentParams): Promise<{
-    success: boolean;
-    status: string;
-    paymentIntentId: string;
-    requiresAction: boolean;
-    clientSecret?: string;
-  }> {
+  async getSavedCards(): Promise<
+    Array<{
+      cardToken: string;
+      last4: string;
+      cardBrand: string;
+      isDefault: boolean;
+    }>
+  > {
     try {
       const headers = await this.getAuthHeaders();
 
       const response = await fetch(
-        `${this.EDGE_FUNCTION_BASE}/payment/confirm-payment`,
+        `${this.EDGE_FUNCTION_BASE}/paytr-saved-cards`,
         {
-          method: 'POST',
+          method: 'GET',
           headers,
-          body: JSON.stringify({
-            paymentIntentId: params.paymentIntentId,
-            paymentMethodId: params.paymentMethodId,
-          }),
         },
       );
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to confirm payment');
+        throw new Error(error.error || 'Failed to get saved cards');
       }
 
-      const result = await response.json();
-
-      // Invalidate all payment caches after successful payment
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user && result.success) {
-        await invalidateAllPaymentCache(user.id);
-      }
-
-      logger.info('Payment confirmed:', result.paymentIntentId);
-      return result;
+      return await response.json();
     } catch (error) {
-      logger.error('Confirm payment error:', error);
+      logger.error('Get saved cards error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a saved card
+   */
+  async deleteSavedCard(cardToken: string): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(
+        `${this.EDGE_FUNCTION_BASE}/paytr-saved-cards`,
+        {
+          method: 'DELETE',
+          headers,
+          body: JSON.stringify({ cardToken }),
+        },
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete card');
+      }
+
+      logger.info('Card deleted successfully');
+    } catch (error) {
+      logger.error('Delete card error:', error);
       throw error;
     }
   }
@@ -208,7 +223,7 @@ class SecurePaymentService {
         return {
           available: cachedData.balance || 0,
           pending: cachedData.pendingBalance || 0,
-          currency: cachedData.currency || 'USD',
+          currency: cachedData.currency || 'TRY',
         };
       }
 
@@ -225,10 +240,10 @@ class SecurePaymentService {
       const balance: WalletBalance = {
         available: dbData.balance || 0,
         pending: 0,
-        currency: dbData.currency || 'USD',
+        currency: dbData.currency || 'TRY',
       };
 
-      // Cache the result - convert to WalletData format
+      // Cache the result
       await setCachedWallet(user.id, {
         balance: balance.available,
         currency: balance.currency,
@@ -313,7 +328,7 @@ class SecurePaymentService {
         metadata: toRecord(tx.metadata),
       }));
 
-      // Cache the result (coerce types for storage)
+      // Cache the result
       await setCachedTransactions(
         cacheKey,
         transactions.map((t) => ({
@@ -333,7 +348,7 @@ class SecurePaymentService {
   }
 
   /**
-   * Request withdrawal to bank account
+   * Request withdrawal to bank account via PayTR transfer
    */
   async requestWithdrawal(params: {
     amount: number;
@@ -351,37 +366,39 @@ class SecurePaymentService {
         throw new Error('Insufficient balance');
       }
 
-      // Create withdrawal transaction
-      const { data, error } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          type: 'withdrawal',
-          amount: -params.amount,
-          currency: balance.currency,
-          status: 'pending',
-          description: 'Withdrawal to bank account',
-          metadata: {
-            bank_account_id: params.bankAccountId,
-          },
-        })
-        .select()
-        .single();
+      // Call PayTR transfer edge function
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(
+        `${this.EDGE_FUNCTION_BASE}/paytr-transfer`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            amount: params.amount,
+            bankAccountId: params.bankAccountId,
+          }),
+        },
+      );
 
-      if (error) throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Withdrawal failed');
+      }
+
+      const result = await response.json();
 
       // Invalidate caches
       await invalidateAllPaymentCache(user.id);
 
       const transaction: Transaction = {
-        id: data.id,
-        type: data.type,
-        amount: data.amount,
-        currency: data.currency,
-        status: data.status,
-        description: data.description,
-        createdAt: data.created_at ?? null,
-        metadata: toRecord(data.metadata),
+        id: result.transactionId,
+        type: 'withdrawal',
+        amount: -params.amount,
+        currency: balance.currency,
+        status: 'pending',
+        description: 'Withdrawal to bank account',
+        createdAt: new Date().toISOString(),
+        metadata: { bank_account_id: params.bankAccountId },
       };
 
       logger.info('Withdrawal requested:', transaction.id);
@@ -468,7 +485,7 @@ class SecurePaymentService {
   /**
    * Subscribe to real-time payment updates
    */
-  subscribeToPaymentUpdates(callback: (payload: any) => void): () => void {
+  subscribeToPaymentUpdates(callback: (payload: unknown) => void): () => void {
     const channel = supabase
       .channel('payment-updates')
       .on(
