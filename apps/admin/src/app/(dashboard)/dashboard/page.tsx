@@ -1,37 +1,40 @@
 'use client';
 
-/**
- * TravelMatch Admin Dashboard
- * "Cinematic Travel + Trust Jewelry" Design
- */
-
 import {
   Users,
   Activity,
-  DollarSign,
   Camera,
+  DollarSign,
   ArrowRight,
   BarChart3,
-  Globe,
+  Heart,
   AlertTriangle,
   Shield,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
-  AreaChart,
-  Area,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/common/stat-card';
+import {
+  AdminAreaChart,
+  AdminLineChart,
+  CHART_COLORS,
+} from '@/components/common/admin-chart';
+import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
-// Mock data
+// Mock data - Enhanced with sparklines
 const overviewStats = {
   totalUsers: 125000,
   userGrowth: 8.5,
@@ -54,13 +57,13 @@ const userActivityData = [
 ];
 
 const revenueData = [
-  { date: '12 Ara', revenue: 42000, gifts: 28 },
-  { date: '13 Ara', revenue: 45000, gifts: 32 },
-  { date: '14 Ara', revenue: 38000, gifts: 24 },
-  { date: '15 Ara', revenue: 52000, gifts: 38 },
-  { date: '16 Ara', revenue: 58000, gifts: 42 },
-  { date: '17 Ara', revenue: 65000, gifts: 48 },
-  { date: '18 Ara', revenue: 48000, gifts: 35 },
+  { date: '12 Ara', revenue: 42000, subscriptions: 28000, gifts: 14000 },
+  { date: '13 Ara', revenue: 45000, subscriptions: 30000, gifts: 15000 },
+  { date: '14 Ara', revenue: 38000, subscriptions: 25000, gifts: 13000 },
+  { date: '15 Ara', revenue: 52000, subscriptions: 35000, gifts: 17000 },
+  { date: '16 Ara', revenue: 58000, subscriptions: 38000, gifts: 20000 },
+  { date: '17 Ara', revenue: 65000, subscriptions: 42000, gifts: 23000 },
+  { date: '18 Ara', revenue: 48000, subscriptions: 32000, gifts: 16000 },
 ];
 
 const pendingTasks = [
@@ -98,50 +101,16 @@ const pendingTasks = [
   },
 ];
 
-const systemHealth = [
-  { name: 'API', status: 'healthy', uptime: 99.98 },
-  { name: 'Database', status: 'healthy', uptime: 99.99 },
-  { name: 'Storage', status: 'healthy', uptime: 99.95 },
-  { name: 'Notifications', status: 'degraded', uptime: 98.5 },
-];
-
-const recentActivity = [
-  {
-    id: '1',
-    type: 'user',
-    message: 'Yeni kullanıcı kaydı: Ahmet Y.',
-    time: '2 dk önce',
-    color: 'bg-primary',
+const systemHealth = {
+  api: { status: 'healthy' as const, uptime: 99.98, label: 'API Gateway' },
+  database: { status: 'healthy' as const, uptime: 99.99, label: 'Database' },
+  storage: { status: 'healthy' as const, uptime: 99.95, label: 'Storage' },
+  notifications: {
+    status: 'degraded' as const,
+    uptime: 98.5,
+    label: 'Notifications',
   },
-  {
-    id: '2',
-    type: 'payment',
-    message: 'Premium abonelik: ₺149.99',
-    time: '5 dk önce',
-    color: 'bg-trust',
-  },
-  {
-    id: '3',
-    type: 'gift',
-    message: 'Gift gönderildi: $25',
-    time: '8 dk önce',
-    color: 'bg-secondary',
-  },
-  {
-    id: '4',
-    type: 'moment',
-    message: 'Moment onaylandı: #12345',
-    time: '12 dk önce',
-    color: 'bg-accent',
-  },
-  {
-    id: '5',
-    type: 'payout',
-    message: 'Ödeme onaylandı: ₺540',
-    time: '15 dk önce',
-    color: 'bg-trust',
-  },
-];
+};
 
 const quickLinks = [
   {
@@ -149,333 +118,343 @@ const quickLinks = [
     description: 'Detaylı metrikler',
     href: '/analytics',
     icon: BarChart3,
-    color: 'bg-primary/10 text-primary',
+    color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   },
   {
     title: 'Gelir',
     description: 'Finansal raporlar',
     href: '/revenue',
     icon: DollarSign,
-    color: 'bg-trust/10 text-trust',
+    color:
+      'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
   },
   {
     title: 'Coğrafya',
     description: 'Bölgesel analiz',
     href: '/geographic',
-    icon: Globe,
-    color: 'bg-accent/10 text-accent',
+    icon: Heart,
+    color:
+      'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
   },
   {
     title: 'Olaylar',
     description: 'Sistem durumu',
     href: '/incidents',
     icon: AlertTriangle,
-    color: 'bg-warning/10 text-warning',
+    color:
+      'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
   },
 ];
 
-// Custom tooltip for charts
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="admin-chart-tooltip">
-        <p className="font-medium text-sm mb-2">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: {entry.value.toLocaleString('tr-TR')}
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
+// Sparkline data generators
+const generateSparkline = (trend: 'up' | 'down' | 'stable') => {
+  const base = [20, 25, 22, 28, 32, 30, 35, 40];
+  if (trend === 'up') return base;
+  if (trend === 'down') return base.reverse();
+  return base.map((v) => v + Math.random() * 5 - 2.5);
 };
 
 export default function DashboardPage() {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      maximumFractionDigits: 0,
-    }).format(value);
+  const getStatusIcon = (
+    status: 'healthy' | 'degraded' | 'down' | 'maintenance',
+  ) => {
+    switch (status) {
+      case 'healthy':
+        return <CheckCircle2 className="h-4 w-4 text-status-healthy" />;
+      case 'degraded':
+        return <AlertCircle className="h-4 w-4 text-status-degraded" />;
+      case 'down':
+        return <XCircle className="h-4 w-4 text-status-down" />;
+      case 'maintenance':
+        return <Clock className="h-4 w-4 text-status-maintenance" />;
+      default:
+        return null;
+    }
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return (
+          <Badge className="badge-gradient-amber text-[10px] font-semibold">
+            Acil
+          </Badge>
+        );
+      case 'medium':
+        return (
+          <Badge variant="secondary" className="text-[10px] font-semibold">
+            Normal
+          </Badge>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="admin-content space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Platform genel bakış ve özet metrikleri
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Son güncelleme: şimdi
-          </span>
-          <div className="h-2 w-2 rounded-full bg-trust animate-pulse" />
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Platform genel bakış ve özet metrikleri
+        </p>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Key Metrics - Using new StatCard */}
+      <div className="dashboard-grid">
         <StatCard
           title="Toplam Kullanıcı"
           value={overviewStats.totalUsers.toLocaleString('tr-TR')}
+          icon={Users}
           change={overviewStats.userGrowth}
-          icon={<Users className="h-6 w-6" />}
-          variant="primary"
+          changeLabel="son 30 gün"
+          href="/users"
+          sparkline={generateSparkline('up')}
         />
         <StatCard
           title="Aktif Kullanıcı"
           value={overviewStats.activeUsers.toLocaleString('tr-TR')}
+          icon={Activity}
           change={overviewStats.activeGrowth}
           changeLabel="son 7 gün"
-          icon={<Activity className="h-6 w-6" />}
           variant="success"
+          href="/analytics"
+          sparkline={generateSparkline('up')}
         />
         <StatCard
           title="Toplam Gelir"
-          value={formatCurrency(overviewStats.totalRevenue)}
+          value={formatCurrency(overviewStats.totalRevenue, 'TRY')}
+          icon={DollarSign}
           change={overviewStats.revenueGrowth}
-          icon={<DollarSign className="h-6 w-6" />}
+          changeLabel="son 30 gün"
           variant="success"
+          href="/revenue"
+          sparkline={generateSparkline('up')}
         />
         <StatCard
           title="Toplam Moment"
           value={overviewStats.totalMoments.toLocaleString('tr-TR')}
+          icon={Camera}
           change={overviewStats.momentGrowth}
-          icon={<Camera className="h-6 w-6" />}
-          variant="primary"
+          changeLabel="son 30 gün"
+          href="/moments"
+          sparkline={generateSparkline('up')}
         />
       </div>
 
-      {/* Charts & Tasks */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* User Activity Chart */}
-        <div className="lg:col-span-2 admin-card">
-          <div className="admin-card-header">
-            <div>
-              <h3 className="admin-card-title">Kullanıcı Aktivitesi</h3>
-              <p className="admin-card-description">
-                Son 7 günlük DAU ve yeni kayıtlar
-              </p>
-            </div>
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={userActivityData}>
-                <defs>
-                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient
-                    id="colorNewUsers"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E7E5E4" />
-                <XAxis dataKey="date" stroke="#78716C" fontSize={12} />
-                <YAxis stroke="#78716C" fontSize={12} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area
-                  type="monotone"
-                  dataKey="users"
-                  stroke="#F59E0B"
-                  strokeWidth={2}
-                  fill="url(#colorUsers)"
-                  name="Aktif Kullanıcı"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="newUsers"
-                  stroke="#10B981"
-                  strokeWidth={2}
-                  fill="url(#colorNewUsers)"
-                  name="Yeni Kayıt"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+        {/* Charts - 2/3 width */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* User Activity Chart */}
+          <AdminAreaChart
+            title="Kullanıcı Aktivitesi"
+            description="Son 7 günlük DAU ve yeni kayıtlar"
+            data={userActivityData}
+            xAxisKey="date"
+            height={280}
+            areas={[
+              {
+                dataKey: 'users',
+                name: 'Aktif Kullanıcı',
+                color: CHART_COLORS.primary,
+              },
+              {
+                dataKey: 'newUsers',
+                name: 'Yeni Kayıt',
+                color: CHART_COLORS.trust,
+              },
+            ]}
+            formatter={(value, name) => [value.toLocaleString('tr-TR'), name]}
+          />
+
+          {/* Revenue Chart */}
+          <AdminLineChart
+            title="Günlük Gelir"
+            description="Son 7 günlük gelir trendi"
+            data={revenueData}
+            xAxisKey="date"
+            height={250}
+            lines={[
+              {
+                dataKey: 'subscriptions',
+                name: 'Abonelik',
+                color: CHART_COLORS.primary,
+              },
+              {
+                dataKey: 'gifts',
+                name: 'Hediye',
+                color: CHART_COLORS.secondary,
+              },
+            ]}
+            yAxisFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
+            formatter={(value, name) => [formatCurrency(value, 'TRY'), name]}
+          />
         </div>
 
-        {/* Pending Tasks */}
-        <div className="admin-card">
-          <div className="admin-card-header">
-            <h3 className="admin-card-title">Bekleyen Görevler</h3>
-            <Link href="/queue" className="admin-btn-ghost text-xs px-2 py-1">
-              Tümü <ArrowRight className="ml-1 h-3 w-3" />
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {pendingTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold',
-                      task.priority === 'high'
-                        ? 'bg-destructive/10 text-destructive'
-                        : 'bg-warning/10 text-warning',
-                    )}
+        {/* Right Sidebar - 1/3 width */}
+        <div className="space-y-6">
+          {/* Pending Tasks */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold">
+                  Bekleyen Görevler
+                </CardTitle>
+                <Link href="/queue">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1 text-xs"
                   >
-                    {task.count}
-                  </div>
-                  <span className="text-sm font-medium">{task.title}</span>
-                </div>
-                <span
+                    Tümü
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {pendingTasks.map((task) => (
+                <div
+                  key={task.id}
                   className={cn(
-                    'admin-badge',
-                    task.priority === 'high'
-                      ? 'admin-badge-danger'
-                      : 'admin-badge-warning',
+                    'flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50',
+                    task.priority === 'high' && 'border-l-4 border-l-amber-500',
                   )}
                 >
-                  {task.priority === 'high' ? 'Acil' : 'Normal'}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Revenue & System Health */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Revenue Chart */}
-        <div className="lg:col-span-2 admin-card">
-          <div className="admin-card-header">
-            <div>
-              <h3 className="admin-card-title">Günlük Gelir & Gift</h3>
-              <p className="admin-card-description">
-                Son 7 günlük gelir ve gift trendi
-              </p>
-            </div>
-          </div>
-          <div className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E7E5E4" />
-                <XAxis dataKey="date" stroke="#78716C" fontSize={12} />
-                <YAxis
-                  yAxisId="left"
-                  stroke="#78716C"
-                  fontSize={12}
-                  tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  stroke="#78716C"
-                  fontSize={12}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#10B981"
-                  strokeWidth={2}
-                  dot={{ fill: '#10B981', strokeWidth: 0 }}
-                  name="Gelir (₺)"
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="gifts"
-                  stroke="#EC4899"
-                  strokeWidth={2}
-                  dot={{ fill: '#EC4899', strokeWidth: 0 }}
-                  name="Gift Sayısı"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* System Health & Activity */}
-        <div className="space-y-6">
-          {/* System Health */}
-          <div className="admin-card">
-            <div className="admin-card-header">
-              <h3 className="admin-card-title">Sistem Durumu</h3>
-              <Link
-                href="/ops-center"
-                className="admin-btn-ghost text-xs px-2 py-1"
-              >
-                Detay <ArrowRight className="ml-1 h-3 w-3" />
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {systemHealth.map((system) => (
-                <div
-                  key={system.name}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        'status-dot',
-                        system.status === 'healthy' && 'status-healthy',
-                        system.status === 'degraded' && 'status-degraded',
-                        system.status === 'down' && 'status-down',
+                        'flex h-9 w-9 items-center justify-center rounded-lg',
+                        task.priority === 'high'
+                          ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                          : 'bg-muted text-muted-foreground',
+                      )}
+                    >
+                      <task.icon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{task.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {task.count} adet bekliyor
+                      </p>
+                    </div>
+                  </div>
+                  {getPriorityBadge(task.priority)}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* System Health */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold">
+                  Sistem Durumu
+                </CardTitle>
+                <Link href="/ops-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1 text-xs"
+                  >
+                    Detay
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Object.entries(systemHealth).map(([key, data]) => (
+                <div key={key} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        'health-indicator',
+                        data.status === 'healthy' && 'health-indicator-healthy',
+                        data.status === 'degraded' &&
+                          'health-indicator-degraded',
+                        data.status === 'down' && 'health-indicator-down',
+                        data.status === 'maintenance' &&
+                          'health-indicator-maintenance',
                       )}
                     />
-                    <span className="text-sm font-medium">{system.name}</span>
+                    <span className="text-sm font-medium">{data.label}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground tabular-nums">
-                    {system.uptime}%
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      {data.uptime}%
+                    </span>
+                    {getStatusIcon(data.status)}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Revenue Summary Mini Card */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold">
+                Bugünkü Özet
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Yeni Kayıt
+                  </span>
+                  <span className="text-sm font-semibold">+248</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Aktif Oturum
+                  </span>
+                  <span className="text-sm font-semibold">3,892</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Günlük Gelir
+                  </span>
+                  <span className="text-sm font-semibold text-emerald-600">
+                    ₺48,750
                   </span>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="admin-card">
-            <div className="admin-card-header">
-              <h3 className="admin-card-title">Son Aktivite</h3>
-            </div>
-            <div className="space-y-1">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="admin-activity-item">
-                  <div className={cn('admin-activity-dot', activity.color)} />
-                  <div className="admin-activity-content">
-                    <p className="admin-activity-message">{activity.message}</p>
-                    <p className="admin-activity-time">{activity.time}</p>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Yeni Moment
+                  </span>
+                  <span className="text-sm font-semibold">1,234</span>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Quick Links */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4">
         {quickLinks.map((link) => (
           <Link key={link.href} href={link.href}>
-            <div className="admin-quick-link">
-              <div className={cn('admin-quick-link-icon', link.color)}>
+            <Card className="quick-action-card">
+              <div
+                className={cn(
+                  'flex h-10 w-10 items-center justify-center rounded-xl',
+                  link.color,
+                )}
+              >
                 <link.icon className="h-5 w-5" />
               </div>
-              <div>
-                <p className="admin-quick-link-title">{link.title}</p>
-                <p className="admin-quick-link-description">
+              <div className="flex-1">
+                <p className="font-medium">{link.title}</p>
+                <p className="text-xs text-muted-foreground">
                   {link.description}
                 </p>
               </div>
-            </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+            </Card>
           </Link>
         ))}
       </div>
