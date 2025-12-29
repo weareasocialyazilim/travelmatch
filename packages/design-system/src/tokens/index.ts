@@ -7,13 +7,13 @@
  */
 
 import {
-  colors,
-  gradients,
-  shadows,
+  COLORS,
+  GRADIENTS,
+  SHADOWS,
   primitives,
-  type Colors,
-  type Gradients,
-  type Shadows,
+  type ColorName,
+  type GradientName,
+  type ShadowName,
 } from './colors';
 import {
   spacing,
@@ -27,13 +27,10 @@ import { typography, type Typography } from './typography';
 
 // Color exports
 export {
-  colors,
-  gradients,
-  shadows,
+  COLORS,
+  GRADIENTS,
+  SHADOWS,
   primitives,
-  type Colors,
-  type Gradients,
-  type Shadows,
   type ColorName,
   type GradientName,
   type ShadowName,
@@ -54,22 +51,22 @@ export {
 
 // Combined theme type
 export interface Theme {
-  colors: Colors;
-  gradients: Gradients;
+  colors: typeof COLORS;
+  gradients: typeof GRADIENTS;
   typography: Typography;
   spacing: Spacing;
   radius: Radius;
-  shadows: Shadows;
+  shadows: typeof SHADOWS;
   cssShadows: CSSShadows;
 }
 
 // Default theme
 export const defaultTheme: Theme = {
-  colors,
-  gradients,
+  colors: COLORS,
+  gradients: GRADIENTS,
   typography,
   spacing,
   radius,
-  shadows,
+  shadows: SHADOWS,
   cssShadows,
 };

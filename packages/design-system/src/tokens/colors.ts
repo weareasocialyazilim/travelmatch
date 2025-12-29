@@ -94,7 +94,7 @@ const primitives = {
 // ═══════════════════════════════════════════════════
 // SEMANTIC COLORS
 // ═══════════════════════════════════════════════════
-export const colors = {
+export const COLORS = {
   // Primary (Actions)
   primary: primitives.amber[500],
   primaryLight: primitives.amber[400],
@@ -203,7 +203,7 @@ export const colors = {
 // ═══════════════════════════════════════════════════
 // GRADIENTS
 // ═══════════════════════════════════════════════════
-export const gradients = {
+export const GRADIENTS = {
   // Hero/Splash
   hero: [primitives.amber[500], primitives.magenta[500]] as const,
   heroVertical: ['#F59E0B', '#EC4899', '#0C0A09'] as const,
@@ -245,7 +245,7 @@ export const gradients = {
 // ═══════════════════════════════════════════════════
 // SHADOWS
 // ═══════════════════════════════════════════════════
-export const shadows = {
+export const SHADOWS = {
   card: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
@@ -322,9 +322,6 @@ export const shadows = {
 export { primitives };
 
 // Type exports
-export type Colors = typeof colors;
-export type Gradients = typeof gradients;
-export type Shadows = typeof shadows;
-export type ColorName = keyof typeof colors;
-export type GradientName = keyof typeof gradients;
-export type ShadowName = keyof typeof shadows;
+export type ColorName = keyof typeof COLORS;
+export type GradientName = keyof typeof GRADIENTS;
+export type ShadowName = keyof typeof SHADOWS;
