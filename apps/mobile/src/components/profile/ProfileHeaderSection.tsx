@@ -1,8 +1,50 @@
-import React, { memo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+/**
+ * TravelMatch Awwwards Design System 2026 - Profile Header
+ *
+ * Modern profile header with:
+ * - Large avatar with animated trust ring
+ * - Glassmorphism stat cards
+ * - Floating edit button
+ * - Gradient background
+ *
+ * Designed for Awwwards Best UI nomination
+ */
 
+import React, { useCallback, useEffect, memo } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Image,
+  Dimensions,
+  Platform,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Reanimated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  withSpring,
+  withRepeat,
+  withSequence,
+  Easing,
+} from 'react-native-reanimated';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
+
+import { COLORS, GRADIENTS, PALETTE, getTrustRingColors, getTrustLevel } from '../../constants/colors';
+import { TYPE_SCALE } from '../../theme/typography';
+import { SPRINGS } from '../../hooks/useAnimations';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// ============================================
+// TYPES
+// ============================================
 interface UserShape {
   id?: string;
   name?: string;
@@ -10,22 +52,188 @@ interface UserShape {
   location?: { city?: string; country?: string } | string;
   kyc?: boolean;
   trust_score?: number;
+  isVerified?: boolean;
+  momentsCount?: number;
+  exchangesCount?: number;
+  responseRate?: number;
 }
 
 interface ProfileHeaderSectionProps {
-  // Backwards-compatible API: either pass individual fields or a `user` object
   user?: UserShape;
   avatarUrl?: string;
   userName?: string;
   location?: string | { city?: string; country?: string };
   isVerified?: boolean;
   trustScore?: number;
-  // onEditPress is used by tests; map to onAvatarPress/onTrustGardenPress when present
+  momentsCount?: number;
+  exchangesCount?: number;
+  responseRate?: number;
   onEditPress?: () => void;
   onAvatarPress?: () => void;
   onTrustGardenPress?: () => void;
+  onSettingsPress?: () => void;
 }
 
+// ============================================
+// ANIMATED TRUST RING COMPONENT
+// ============================================
+interface AnimatedTrustRingProps {
+  score: number;
+  size?: number;
+  strokeWidth?: number;
+  children: React.ReactNode;
+}
+
+const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
+  score,
+  size = 120,
+  strokeWidth = 4,
+  children,
+}) => {
+  const progress = useSharedValue(0);
+  const rotation = useSharedValue(0);
+
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const center = size / 2;
+
+  const colors = getTrustRingColors(score);
+
+  useEffect(() => {
+    // Animate progress
+    progress.value = withTiming(score / 100, {
+      duration: 1500,
+      easing: Easing.out(Easing.ease),
+    });
+
+    // Subtle rotation animation
+    rotation.value = withRepeat(
+      withSequence(
+        withTiming(360, { duration: 20000, easing: Easing.linear })
+      ),
+      -1,
+      false
+    );
+  }, [score]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  const strokeDashoffset = circumference * (1 - score / 100);
+
+  return (
+    <View style={[styles.trustRingContainer, { width: size, height: size }]}>
+      {/* Background Circle */}
+      <Svg
+        width={size}
+        height={size}
+        style={StyleSheet.absoluteFill}
+      >
+        <Circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+      </Svg>
+
+      {/* Animated Progress Ring */}
+      <Reanimated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+        <Svg width={size} height={size}>
+          <Defs>
+            <SvgGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <Stop offset="0%" stopColor={colors[0]} />
+              <Stop offset="100%" stopColor={colors[1]} />
+            </SvgGradient>
+          </Defs>
+          <Circle
+            cx={center}
+            cy={center}
+            r={radius}
+            stroke="url(#trustGradient)"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            fill="transparent"
+            transform={`rotate(-90 ${center} ${center})`}
+          />
+        </Svg>
+      </Reanimated.View>
+
+      {/* Avatar Container */}
+      <View style={[styles.avatarWrapper, { width: size - 16, height: size - 16 }]}>
+        {children}
+      </View>
+
+      {/* Trust Badge */}
+      <View style={[styles.trustBadge, { backgroundColor: colors[0] }]}>
+        <Text style={styles.trustBadgeText}>{score}</Text>
+      </View>
+    </View>
+  );
+};
+
+// ============================================
+// STAT CARD COMPONENT
+// ============================================
+interface StatCardProps {
+  value: string | number;
+  label: string;
+}
+
+const StatCard: React.FC<StatCardProps> = memo(({ value, label }) => {
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(20);
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    opacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.ease) });
+    translateY.value = withSpring(0, SPRINGS.gentle);
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [
+      { translateY: translateY.value },
+      { scale: scale.value },
+    ],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.95, SPRINGS.snappy);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, SPRINGS.bouncy);
+  };
+
+  return (
+    <Reanimated.View style={animatedStyle}>
+      <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={styles.statCardPressable}
+      >
+        <BlurView
+          intensity={Platform.OS === 'ios' ? 20 : 80}
+          tint="light"
+          style={styles.statCard}
+        >
+          <Text style={styles.statValue}>{value}</Text>
+          <Text style={styles.statLabel}>{label}</Text>
+        </BlurView>
+      </Pressable>
+    </Reanimated.View>
+  );
+});
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
 const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
   ({
     user,
@@ -34,99 +242,171 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     location,
     isVerified,
     trustScore,
+    momentsCount,
+    exchangesCount,
+    responseRate,
     onEditPress,
     onAvatarPress,
     onTrustGardenPress,
+    onSettingsPress,
   }) => {
+    const insets = useSafeAreaInsets();
+    const editButtonScale = useSharedValue(1);
+
     // Normalize values to support both `user` shape and individual props
     const resolvedAvatar = avatarUrl || user?.avatar || '';
     const resolvedName = userName || user?.name || '';
     const resolvedLocation =
       typeof location === 'string'
         ? location
-        : (location && (location as any).city) ||
+        : (location as any)?.city ||
           (user && typeof user.location === 'string'
             ? user.location
-            : user && (user.location as any)?.city) ||
+            : (user?.location as any)?.city) ||
           '';
-    // isVerified is now handled via direct prop or user?.kyc when needed
+    const resolvedVerified =
+      typeof isVerified === 'boolean' ? isVerified : !!user?.kyc || !!user?.isVerified;
     const resolvedTrust =
       typeof trustScore === 'number'
         ? trustScore
-        : (user?.trust_score ?? undefined);
-    const handleEditPress =
-      onEditPress || onAvatarPress || onTrustGardenPress || (() => {});
+        : (user?.trust_score ?? 0);
+    const resolvedMoments = momentsCount ?? user?.momentsCount ?? 0;
+    const resolvedExchanges = exchangesCount ?? user?.exchangesCount ?? 0;
+    const resolvedResponse = responseRate ?? user?.responseRate ?? 0;
+
+    const handleEditPress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onEditPress?.();
+    }, [onEditPress]);
+
+    const handleTrustPress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onTrustGardenPress?.();
+    }, [onTrustGardenPress]);
+
+    const handleSettingsPress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onSettingsPress?.();
+    }, [onSettingsPress]);
+
+    const editButtonAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: editButtonScale.value }],
+    }));
+
+    const handleEditPressIn = () => {
+      editButtonScale.value = withSpring(0.9, SPRINGS.snappy);
+    };
+
+    const handleEditPressOut = () => {
+      editButtonScale.value = withSpring(1, SPRINGS.bouncy);
+    };
+
     return (
-      <View style={styles.profileSection}>
-        {/* Avatar */}
-        <TouchableOpacity
-          style={styles.avatarWrapper}
-          onPress={onAvatarPress}
-          activeOpacity={0.9}
-        >
-          <Image
-            testID="profile-avatar"
-            source={{ uri: resolvedAvatar }}
-            style={styles.avatar}
-          />
-          {isVerified && (
-            <View style={styles.verifiedBadge}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        {/* Background Gradient */}
+        <LinearGradient
+          colors={GRADIENTS.gift}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.backgroundGradient}
+        />
+
+        {/* Header Actions */}
+        <View style={styles.headerActions}>
+          <View style={styles.headerSpacer} />
+          {onSettingsPress && (
+            <Pressable
+              onPress={handleSettingsPress}
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <BlurView
+                intensity={Platform.OS === 'ios' ? 30 : 80}
+                tint="light"
+                style={styles.headerButtonBlur}
+              >
+                <MaterialCommunityIcons
+                  name="cog-outline"
+                  size={22}
+                  color={PALETTE.white}
+                />
+              </BlurView>
+            </Pressable>
+          )}
+        </View>
+
+        {/* Avatar Section */}
+        <Pressable onPress={handleTrustPress} style={styles.avatarSection}>
+          <AnimatedTrustRing score={resolvedTrust}>
+            <Image
+              testID="profile-avatar"
+              source={{ uri: resolvedAvatar }}
+              style={styles.avatar}
+            />
+          </AnimatedTrustRing>
+        </Pressable>
+
+        {/* User Info */}
+        <View style={styles.userInfo}>
+          <View style={styles.nameRow}>
+            <Text style={styles.userName}>{resolvedName}</Text>
+            {resolvedVerified && (
               <MaterialCommunityIcons
                 name="check-decagram"
                 size={22}
-                color={COLORS.mint}
+                color={COLORS.trust.primary}
               />
+            )}
+          </View>
+
+          {resolvedLocation && (
+            <View style={styles.locationRow}>
+              <MaterialCommunityIcons
+                name="map-marker-outline"
+                size={16}
+                color="rgba(255,255,255,0.8)"
+              />
+              <Text style={styles.location}>{resolvedLocation}</Text>
             </View>
           )}
-        </TouchableOpacity>
-
-        {/* Name & Location */}
-        <Text style={styles.userName}>{resolvedName}</Text>
-        <View style={styles.locationRow}>
-          <MaterialCommunityIcons
-            name="map-marker"
-            size={16}
-            color={COLORS.text.secondary}
-          />
-          <Text style={styles.locationText}>{resolvedLocation}</Text>
         </View>
 
-        {/* ProofScore Badge */}
-        <TouchableOpacity
-          style={styles.proofScoreBadge}
-          onPress={onTrustGardenPress}
-          accessibilityLabel={`ProofScore ${trustScore} percent. Tap to view Trust Garden`}
-          accessibilityRole="button"
-        >
-          <MaterialCommunityIcons
-            name="shield-check"
-            size={16}
-            color={COLORS.mint}
-          />
-          <Text style={styles.proofScoreText}>
-            ProofScore {resolvedTrust ?? ''}%
-          </Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={16}
-            color={COLORS.mint}
-          />
-        </TouchableOpacity>
-        {/* Edit button used in tests */}
+        {/* Stats Row - Glass Cards */}
+        <View style={styles.statsRow}>
+          <StatCard value={resolvedMoments} label="Dilekler" />
+          <StatCard value={resolvedExchanges} label="Hediyeler" />
+          <StatCard value={`${resolvedResponse}%`} label="Yanıt" />
+        </View>
+
+        {/* Edit Button - Floating */}
         {onEditPress && (
-          <TouchableOpacity
-            testID="edit-button"
-            onPress={handleEditPress}
-            accessibilityRole="button"
-          >
-            <Text>Edit</Text>
-          </TouchableOpacity>
+          <Reanimated.View style={[styles.editButtonContainer, editButtonAnimatedStyle]}>
+            <Pressable
+              testID="edit-button"
+              onPress={handleEditPress}
+              onPressIn={handleEditPressIn}
+              onPressOut={handleEditPressOut}
+              style={styles.editButton}
+              accessibilityRole="button"
+            >
+              <BlurView
+                intensity={Platform.OS === 'ios' ? 30 : 80}
+                tint="light"
+                style={styles.editButtonBlur}
+              >
+                <MaterialCommunityIcons
+                  name="pencil-outline"
+                  size={20}
+                  color={PALETTE.white}
+                />
+              </BlurView>
+            </Pressable>
+          </Reanimated.View>
         )}
       </View>
     );
   },
   (prevProps, nextProps) => {
-    // If user object is used, compare key fields inside it
     if (prevProps.user || nextProps.user) {
       const pUser = prevProps.user || {};
       const nUser = nextProps.user || {};
@@ -151,70 +431,159 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
 
 ProfileHeaderSection.displayName = 'ProfileHeaderSection';
 
-const AVATAR_SIZE = 90;
-
+// ============================================
+// STYLES
+// ============================================
 const styles = StyleSheet.create({
-  profileSection: {
-    backgroundColor: COLORS.utility.white,
-    marginHorizontal: 16,
-    borderRadius: 20,
-    padding: 24,
+  container: {
+    position: 'relative',
+    paddingBottom: 24,
+  },
+  backgroundGradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: COLORS.utility.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    height: 44,
+  },
+  headerSpacer: {
+    width: 36,
+  },
+  headerButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  headerButtonBlur: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  avatarSection: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  trustRingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
   avatarWrapper: {
-    position: 'relative',
-    marginBottom: 16,
+    position: 'absolute',
+    borderRadius: 100,
+    overflow: 'hidden',
+    backgroundColor: PALETTE.white,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: AVATAR_SIZE / 2,
-    borderWidth: 3,
-    borderColor: COLORS.utility.white,
+    width: '100%',
+    height: '100%',
   },
-  verifiedBadge: {
+  trustBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: COLORS.utility.white,
-    borderRadius: 12,
-    padding: 2,
+    bottom: 4,
+    right: 4,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: PALETTE.white,
+  },
+  trustBadgeText: {
+    ...TYPE_SCALE.label.small,
+    color: PALETTE.white,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  userInfo: {
+    alignItems: 'center',
+    marginTop: 16,
+    paddingHorizontal: 20,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   userName: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    marginBottom: 4,
+    ...TYPE_SCALE.display.h2,
+    color: PALETTE.white,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    marginBottom: 16,
+    marginTop: 4,
   },
-  locationText: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
+  location: {
+    ...TYPE_SCALE.body.base,
+    color: 'rgba(255,255,255,0.8)',
   },
-  proofScoreBadge: {
+  statsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: COLORS.mintTransparent,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 20,
+    justifyContent: 'center',
+    gap: 12,
+    marginTop: 24,
+    paddingHorizontal: 20,
   },
-  proofScoreText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.mint,
+  statCardPressable: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  statCard: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    minWidth: 90,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  statValue: {
+    ...TYPE_SCALE.mono.priceSmall,
+    color: PALETTE.white,
+    fontSize: 20,
+  },
+  statLabel: {
+    ...TYPE_SCALE.body.caption,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 2,
+  },
+  editButtonContainer: {
+    position: 'absolute',
+    top: 80,
+    right: 20,
+  },
+  editButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
+    shadowColor: PALETTE.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  editButtonBlur: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
 });
 

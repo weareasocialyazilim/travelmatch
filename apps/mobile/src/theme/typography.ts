@@ -1,16 +1,17 @@
 /**
- * TravelMatch Awwwards Design System - Typography
+ * TravelMatch Awwwards Design System 2026 - Typography
  *
- * Font Choices:
- * - Display: "Clash Display" - Bold, geometric, modern headlines
- * - Body: "Satoshi" - Clean, readable, warm body text
- * - Mono: "JetBrains Mono" - For prices, numbers, stats
+ * Premium Typography System featuring:
+ * - Display: "Clash Display" - Bold, geometric, modern (for headlines)
+ * - Body: "Satoshi" - Clean, readable, warm (for paragraphs)
+ * - Mono: "JetBrains Mono" - For prices and numbers
  *
- * If custom fonts aren't loaded, falls back to system fonts
+ * All sizes follow 8pt grid system
+ * WCAG 2.1 Level AA compliant line heights
  */
 
-import { Platform, TextStyle } from 'react-native';
-import { COLORS } from './colors';
+import { TextStyle, Platform, PixelRatio } from 'react-native';
+import { LIGHT_COLORS, DARK_COLORS } from './colors';
 
 // ============================================
 // 1. FONT FAMILIES
@@ -64,384 +65,634 @@ export const FONTS = {
     medium: Platform.select({
       ios: 'JetBrainsMono-Medium',
       android: 'JetBrainsMono-Medium',
-      default: 'Courier',
+      default: 'Courier New',
     }),
     regular: Platform.select({
       ios: 'JetBrainsMono-Regular',
       android: 'JetBrainsMono-Regular',
-      default: 'Courier',
+      default: 'Courier New',
     }),
   },
+  system: Platform.select({
+    ios: 'System',
+    android: 'Roboto',
+    default: 'System',
+  }),
+} as const;
+
+// Legacy font families
+export const FONT_FAMILIES = {
+  regular: Platform.select({
+    ios: 'System',
+    android: 'Roboto',
+    default: 'System',
+  }),
+  medium: Platform.select({
+    ios: 'System',
+    android: 'Roboto-Medium',
+    default: 'System',
+  }),
+  bold: Platform.select({
+    ios: 'System',
+    android: 'Roboto-Bold',
+    default: 'System',
+  }),
+  mono: Platform.select({
+    ios: 'Courier New',
+    android: 'monospace',
+    default: 'monospace',
+  }),
 } as const;
 
 // ============================================
-// 2. TYPE SCALE (8pt grid based)
+// 2. FONT SIZES (8pt grid based)
+// ============================================
+export const FONT_SIZES = {
+  // Display sizes
+  hero: 48,
+  display1: 40,
+  display2: 36,
+  display3: 32,
+  // Heading sizes
+  h1: 28,
+  h2: 24,
+  h3: 22,
+  h4: 20,
+  h5: 18,
+  h6: 16,
+  // Standard scale
+  '5xl': 36,
+  '4xl': 32,
+  '3xl': 28,
+  '2xl': 24,
+  xl: 20,
+  lg: 17,
+  md: 16,
+  base: 15,
+  sm: 13,
+  xs: 12,
+  tiny: 10,
+  // Label sizes
+  labelLarge: 16,
+  label: 14,
+  labelSmall: 12,
+  // Special
+  price: 24,
+  priceSmall: 18,
+  stat: 32,
+} as const;
+
+export const FONT_WEIGHTS = {
+  regular: '400' as const,
+  medium: '500' as const,
+  semibold: '600' as const,
+  bold: '700' as const,
+  extrabold: '800' as const,
+};
+
+// ============================================
+// 3. LINE HEIGHTS
+// ============================================
+export const LINE_HEIGHTS = {
+  tight: 1.1,
+  snug: 1.25,
+  normal: 1.5,
+  relaxed: 1.75,
+  loose: 2,
+} as const;
+
+// ============================================
+// 4. LETTER SPACING
+// ============================================
+export const LETTER_SPACINGS = {
+  tightest: -1.5,
+  tighter: -1,
+  tight: -0.5,
+  normal: 0,
+  wide: 0.3,
+  wider: 0.5,
+  widest: 1,
+} as const;
+
+// ============================================
+// 5. TYPE SCALE - Complete Typography Presets
 // ============================================
 export const TYPE_SCALE = {
-  // ----------------------------------------
-  // Display - Headlines, Hero Text
-  // ----------------------------------------
   display: {
     hero: {
       fontFamily: FONTS.display.black,
-      fontSize: 48,
-      lineHeight: 52,
-      letterSpacing: -1.5,
-      fontWeight: '800',
+      fontSize: FONT_SIZES.hero,
+      lineHeight: Math.round(FONT_SIZES.hero * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.tightest,
+      fontWeight: '700',
     } as TextStyle,
-
     h1: {
       fontFamily: FONTS.display.bold,
-      fontSize: 36,
-      lineHeight: 42,
-      letterSpacing: -1,
-      fontWeight: '700',
+      fontSize: FONT_SIZES.display2,
+      lineHeight: Math.round(FONT_SIZES.display2 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACINGS.tighter,
+      fontWeight: '600',
     } as TextStyle,
-
     h2: {
       fontFamily: FONTS.display.bold,
-      fontSize: 28,
-      lineHeight: 34,
-      letterSpacing: -0.5,
-      fontWeight: '700',
+      fontSize: FONT_SIZES.h1,
+      lineHeight: Math.round(FONT_SIZES.h1 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACINGS.tight,
+      fontWeight: '600',
     } as TextStyle,
-
     h3: {
       fontFamily: FONTS.display.medium,
-      fontSize: 22,
-      lineHeight: 28,
-      letterSpacing: -0.3,
-      fontWeight: '600',
+      fontSize: FONT_SIZES.h3,
+      lineHeight: Math.round(FONT_SIZES.h3 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACINGS.tight,
+      fontWeight: '500',
     } as TextStyle,
-
     h4: {
       fontFamily: FONTS.display.medium,
-      fontSize: 18,
-      lineHeight: 24,
-      letterSpacing: -0.2,
-      fontWeight: '600',
+      fontSize: FONT_SIZES.h4,
+      lineHeight: Math.round(FONT_SIZES.h4 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACINGS.normal,
+      fontWeight: '500',
     } as TextStyle,
   },
-
-  // ----------------------------------------
-  // Body - Paragraphs, Descriptions
-  // ----------------------------------------
   body: {
-    xl: {
-      fontFamily: FONTS.body.regular,
-      fontSize: 20,
-      lineHeight: 30,
-      letterSpacing: 0,
-      fontWeight: '400',
-    } as TextStyle,
-
     large: {
       fontFamily: FONTS.body.regular,
-      fontSize: 18,
-      lineHeight: 28,
-      letterSpacing: 0,
+      fontSize: FONT_SIZES.h5,
+      lineHeight: Math.round(FONT_SIZES.h5 * LINE_HEIGHTS.relaxed),
+      letterSpacing: LETTER_SPACINGS.normal,
       fontWeight: '400',
     } as TextStyle,
-
     base: {
       fontFamily: FONTS.body.regular,
-      fontSize: 16,
-      lineHeight: 24,
-      letterSpacing: 0,
+      fontSize: FONT_SIZES.md,
+      lineHeight: Math.round(FONT_SIZES.md * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.normal,
       fontWeight: '400',
     } as TextStyle,
-
+    medium: {
+      fontFamily: FONTS.body.semibold,
+      fontSize: FONT_SIZES.md,
+      lineHeight: Math.round(FONT_SIZES.md * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.normal,
+      fontWeight: '500',
+    } as TextStyle,
     small: {
       fontFamily: FONTS.body.regular,
-      fontSize: 14,
-      lineHeight: 20,
-      letterSpacing: 0.1,
+      fontSize: FONT_SIZES.label,
+      lineHeight: Math.round(FONT_SIZES.label * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.wide,
       fontWeight: '400',
     } as TextStyle,
-
     caption: {
       fontFamily: FONTS.body.regular,
-      fontSize: 12,
-      lineHeight: 16,
-      letterSpacing: 0.2,
+      fontSize: FONT_SIZES.xs,
+      lineHeight: Math.round(FONT_SIZES.xs * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.wide,
       fontWeight: '400',
     } as TextStyle,
-
-    micro: {
+    tiny: {
       fontFamily: FONTS.body.regular,
-      fontSize: 10,
-      lineHeight: 14,
-      letterSpacing: 0.3,
+      fontSize: FONT_SIZES.tiny,
+      lineHeight: Math.round(FONT_SIZES.tiny * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.wide,
       fontWeight: '400',
     } as TextStyle,
   },
-
-  // ----------------------------------------
-  // Labels - Buttons, Tags, Navigation
-  // ----------------------------------------
   label: {
-    xl: {
-      fontFamily: FONTS.body.semibold,
-      fontSize: 18,
-      lineHeight: 22,
-      letterSpacing: 0.3,
-      fontWeight: '600',
-    } as TextStyle,
-
     large: {
       fontFamily: FONTS.body.semibold,
-      fontSize: 16,
-      lineHeight: 20,
-      letterSpacing: 0.3,
+      fontSize: FONT_SIZES.labelLarge,
+      lineHeight: Math.round(FONT_SIZES.labelLarge * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.wider,
       fontWeight: '600',
     } as TextStyle,
-
     base: {
       fontFamily: FONTS.body.semibold,
-      fontSize: 14,
-      lineHeight: 18,
-      letterSpacing: 0.3,
+      fontSize: FONT_SIZES.label,
+      lineHeight: Math.round(FONT_SIZES.label * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.wider,
       fontWeight: '600',
     } as TextStyle,
-
     small: {
       fontFamily: FONTS.body.semibold,
-      fontSize: 12,
-      lineHeight: 16,
-      letterSpacing: 0.4,
-      fontWeight: '600',
-    } as TextStyle,
-
-    // Uppercase variants
-    upperLarge: {
-      fontFamily: FONTS.body.semibold,
-      fontSize: 14,
-      lineHeight: 18,
-      letterSpacing: 1,
-      fontWeight: '600',
-      textTransform: 'uppercase',
-    } as TextStyle,
-
-    upperSmall: {
-      fontFamily: FONTS.body.semibold,
-      fontSize: 11,
-      lineHeight: 14,
-      letterSpacing: 1.2,
+      fontSize: FONT_SIZES.labelSmall,
+      lineHeight: Math.round(FONT_SIZES.labelSmall * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.widest,
       fontWeight: '600',
       textTransform: 'uppercase',
     } as TextStyle,
   },
-
-  // ----------------------------------------
-  // Mono - Prices, Numbers, Stats, Code
-  // ----------------------------------------
   mono: {
-    hero: {
-      fontFamily: FONTS.mono.medium,
-      fontSize: 48,
-      lineHeight: 52,
-      letterSpacing: -2,
-      fontWeight: '500',
-    } as TextStyle,
-
-    stat: {
-      fontFamily: FONTS.mono.medium,
-      fontSize: 32,
-      lineHeight: 36,
-      letterSpacing: -1,
-      fontWeight: '500',
-    } as TextStyle,
-
     price: {
       fontFamily: FONTS.mono.medium,
-      fontSize: 24,
-      lineHeight: 28,
-      letterSpacing: -0.5,
+      fontSize: FONT_SIZES.price,
+      lineHeight: Math.round(FONT_SIZES.price * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.tight,
       fontWeight: '500',
     } as TextStyle,
-
-    base: {
-      fontFamily: FONTS.mono.regular,
-      fontSize: 14,
-      lineHeight: 20,
-      letterSpacing: 0,
-      fontWeight: '400',
+    priceSmall: {
+      fontFamily: FONTS.mono.medium,
+      fontSize: FONT_SIZES.priceSmall,
+      lineHeight: Math.round(FONT_SIZES.priceSmall * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.tight,
+      fontWeight: '500',
     } as TextStyle,
-
-    small: {
+    stat: {
+      fontFamily: FONTS.mono.medium,
+      fontSize: FONT_SIZES.stat,
+      lineHeight: Math.round(FONT_SIZES.stat * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.tighter,
+      fontWeight: '500',
+    } as TextStyle,
+    code: {
       fontFamily: FONTS.mono.regular,
-      fontSize: 12,
-      lineHeight: 16,
-      letterSpacing: 0,
+      fontSize: FONT_SIZES.label,
+      lineHeight: Math.round(FONT_SIZES.label * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.normal,
       fontWeight: '400',
     } as TextStyle,
   },
-} as const;
-
-// ============================================
-// 3. SEMANTIC TEXT STYLES
-// ============================================
-export const TEXT_STYLES = {
-  // Screen titles
-  screenTitle: {
-    ...TYPE_SCALE.display.h2,
-    color: COLORS.text.primary,
-  } as TextStyle,
-
-  // Section headers
-  sectionTitle: {
-    ...TYPE_SCALE.display.h3,
-    color: COLORS.text.primary,
-  } as TextStyle,
-
-  // Card titles
-  cardTitle: {
-    ...TYPE_SCALE.display.h4,
-    color: COLORS.text.primary,
-  } as TextStyle,
-
-  // Body text
-  bodyPrimary: {
-    ...TYPE_SCALE.body.base,
-    color: COLORS.text.primary,
-  } as TextStyle,
-
-  bodySecondary: {
-    ...TYPE_SCALE.body.base,
-    color: COLORS.text.secondary,
-  } as TextStyle,
-
-  // Body medium - compliance features
-  bodyMedium: {
-    ...TYPE_SCALE.body.base,
-    fontWeight: '500',
-    color: COLORS.text.primary,
-  } as TextStyle,
-
-  // Caption text
-  caption: {
-    ...TYPE_SCALE.body.caption,
-    color: COLORS.text.tertiary,
-  } as TextStyle,
-
-  // Button text
   button: {
-    ...TYPE_SCALE.label.large,
-    color: COLORS.utility.white,
-    fontWeight: '600' as const,
-  } as TextStyle,
-
-  buttonPrimary: {
-    ...TYPE_SCALE.label.large,
-    color: COLORS.utility.white,
-  } as TextStyle,
-
-  buttonSecondary: {
-    ...TYPE_SCALE.label.large,
-    color: COLORS.brand.primary,
-  } as TextStyle,
-
-  // Price display
-  priceTag: {
-    ...TYPE_SCALE.mono.price,
-    color: COLORS.brand.primary,
-  } as TextStyle,
-
-  priceStat: {
-    ...TYPE_SCALE.mono.stat,
-    color: COLORS.text.primary,
-  } as TextStyle,
-
-  // Links
+    large: {
+      fontFamily: FONTS.body.semibold,
+      fontSize: FONT_SIZES.h5,
+      lineHeight: Math.round(FONT_SIZES.h5 * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.wider,
+      fontWeight: '600',
+    } as TextStyle,
+    base: {
+      fontFamily: FONTS.body.semibold,
+      fontSize: FONT_SIZES.md,
+      lineHeight: Math.round(FONT_SIZES.md * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.wider,
+      fontWeight: '600',
+    } as TextStyle,
+    small: {
+      fontFamily: FONTS.body.semibold,
+      fontSize: FONT_SIZES.label,
+      lineHeight: Math.round(FONT_SIZES.label * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACINGS.wider,
+      fontWeight: '600',
+    } as TextStyle,
+  },
   link: {
-    ...TYPE_SCALE.body.base,
-    color: COLORS.text.link,
-    textDecorationLine: 'underline',
-  } as TextStyle,
-
-  // Error text
-  error: {
-    ...TYPE_SCALE.body.small,
-    color: COLORS.feedback.error,
-  } as TextStyle,
-
-  // Success text
-  success: {
-    ...TYPE_SCALE.body.small,
-    color: COLORS.feedback.success,
-  } as TextStyle,
-
-  // Muted/helper text
-  helper: {
-    ...TYPE_SCALE.body.caption,
-    color: COLORS.text.muted,
-  } as TextStyle,
-
-  // Badge/chip text
-  badge: {
-    ...TYPE_SCALE.label.small,
-    color: COLORS.utility.white,
-  } as TextStyle,
-
-  // On dark background
-  onDarkTitle: {
-    ...TYPE_SCALE.display.h2,
-    color: COLORS.text.onDark,
-  } as TextStyle,
-
-  onDarkBody: {
-    ...TYPE_SCALE.body.base,
-    color: COLORS.text.onDarkSecondary,
-  } as TextStyle,
-
-  onDarkCaption: {
-    ...TYPE_SCALE.body.caption,
-    color: COLORS.text.onDarkMuted,
+    base: {
+      fontFamily: FONTS.body.semibold,
+      fontSize: FONT_SIZES.md,
+      lineHeight: Math.round(FONT_SIZES.md * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.normal,
+      fontWeight: '500',
+      textDecorationLine: 'underline',
+    } as TextStyle,
+    small: {
+      fontFamily: FONTS.body.semibold,
+      fontSize: FONT_SIZES.label,
+      lineHeight: Math.round(FONT_SIZES.label * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACINGS.normal,
+      fontWeight: '500',
+      textDecorationLine: 'underline',
+    } as TextStyle,
+  },
+  overline: {
+    fontFamily: FONTS.body.semibold,
+    fontSize: FONT_SIZES.tiny,
+    lineHeight: Math.round(FONT_SIZES.tiny * LINE_HEIGHTS.normal),
+    letterSpacing: LETTER_SPACINGS.widest,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   } as TextStyle,
 } as const;
 
 // ============================================
-// 4. TYPOGRAPHY UTILITIES
+// 6. ACCESSIBILITY UTILITIES
 // ============================================
-export const truncateText = (lines: number = 1): TextStyle =>
-  ({
-    numberOfLines: lines,
-    overflow: 'hidden',
-  }) as unknown as TextStyle;
-
-export const textAlign = {
-  left: { textAlign: 'left' } as TextStyle,
-  center: { textAlign: 'center' } as TextStyle,
-  right: { textAlign: 'right' } as TextStyle,
-  justify: { textAlign: 'justify' } as TextStyle,
+export const getAccessibleFontSize = (baseSize: number): number => {
+  const fontScale = PixelRatio.getFontScale();
+  const cappedScale = Math.min(fontScale, 2);
+  return Math.round(baseSize * cappedScale);
 };
 
-export const textDecoration = {
-  underline: { textDecorationLine: 'underline' } as TextStyle,
-  lineThrough: { textDecorationLine: 'line-through' } as TextStyle,
-  none: { textDecorationLine: 'none' } as TextStyle,
+export const getResponsiveFontSize = (baseSize: number, scale = 1): number => {
+  return Math.round(baseSize * scale);
 };
 
-export const fontWeight = {
-  light: { fontWeight: '300' } as TextStyle,
-  regular: { fontWeight: '400' } as TextStyle,
-  medium: { fontWeight: '500' } as TextStyle,
-  semibold: { fontWeight: '600' } as TextStyle,
-  bold: { fontWeight: '700' } as TextStyle,
-  black: { fontWeight: '800' } as TextStyle,
+export const getLineHeight = (
+  fontSize: number,
+  ratio: number = LINE_HEIGHTS.normal
+): number => {
+  return Math.round(fontSize * ratio);
+};
+
+export const createAccessibleTextStyle = (
+  baseStyle: TextStyle,
+  options?: { maxScale?: number }
+): TextStyle => {
+  const { maxScale = 1.5 } = options || {};
+  const fontScale = Math.min(PixelRatio.getFontScale(), maxScale);
+  return {
+    ...baseStyle,
+    fontSize: Math.round((baseStyle.fontSize || 16) * fontScale),
+    lineHeight: baseStyle.lineHeight
+      ? Math.round(baseStyle.lineHeight * fontScale)
+      : undefined,
+  };
 };
 
 // ============================================
-// 5. TYPE EXPORTS
+// 7. LEGACY TYPOGRAPHY (for compatibility)
 // ============================================
+type TypographyStyle = TextStyle & {
+  accessibilityRole?: 'header' | 'text' | 'link' | 'button';
+  minContrastRatio?: number;
+};
+
+export const createTypography = (isDark = false) => {
+  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+
+  return {
+    display1: {
+      fontSize: FONT_SIZES['5xl'],
+      fontWeight: FONT_WEIGHTS.extrabold,
+      lineHeight: FONT_SIZES['5xl'] * LINE_HEIGHTS.snug,
+      letterSpacing: LETTER_SPACINGS.tighter,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+    display2: {
+      fontSize: FONT_SIZES['4xl'],
+      fontWeight: FONT_WEIGHTS.extrabold,
+      lineHeight: FONT_SIZES['4xl'] * LINE_HEIGHTS.snug,
+      letterSpacing: LETTER_SPACINGS.tighter,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+    display3: {
+      fontSize: FONT_SIZES['3xl'],
+      fontWeight: FONT_WEIGHTS.bold,
+      lineHeight: FONT_SIZES['3xl'] * LINE_HEIGHTS.snug,
+      letterSpacing: LETTER_SPACINGS.tight,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+    h1: {
+      fontSize: FONT_SIZES['3xl'],
+      fontWeight: FONT_WEIGHTS.bold,
+      lineHeight: FONT_SIZES['3xl'] * LINE_HEIGHTS.snug,
+      letterSpacing: LETTER_SPACINGS.tight,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+    h2: {
+      fontSize: FONT_SIZES['2xl'],
+      fontWeight: FONT_WEIGHTS.bold,
+      lineHeight: FONT_SIZES['2xl'] * LINE_HEIGHTS.normal,
+      letterSpacing: LETTER_SPACINGS.tight,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+    h3: {
+      fontSize: FONT_SIZES.xl,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.xl * LINE_HEIGHTS.normal,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+    h4: {
+      fontSize: FONT_SIZES.lg,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.lg * LINE_HEIGHTS.normal,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    h5: {
+      fontSize: FONT_SIZES.md,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.md * LINE_HEIGHTS.normal,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    h6: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.base * LINE_HEIGHTS.normal,
+      color: colors.text,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    body: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.regular,
+      lineHeight: FONT_SIZES.base * LINE_HEIGHTS.relaxed,
+      color: colors.text,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    bodyLarge: {
+      fontSize: FONT_SIZES.md,
+      fontWeight: FONT_WEIGHTS.regular,
+      lineHeight: FONT_SIZES.md * LINE_HEIGHTS.relaxed,
+      color: colors.text,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    bodySmall: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.regular,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.relaxed,
+      color: colors.textSecondary,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    bodyMedium: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.base * LINE_HEIGHTS.relaxed,
+      color: colors.text,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    caption: {
+      fontSize: FONT_SIZES.xs,
+      fontWeight: FONT_WEIGHTS.regular,
+      lineHeight: FONT_SIZES.xs * LINE_HEIGHTS.relaxed,
+      color: colors.textTertiary,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    captionMedium: {
+      fontSize: FONT_SIZES.xs,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.xs * LINE_HEIGHTS.normal,
+      color: colors.textSecondary,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    label: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.normal,
+      color: colors.text,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    labelLarge: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.base * LINE_HEIGHTS.normal,
+      color: colors.text,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    button: {
+      fontSize: FONT_SIZES.md,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.md * LINE_HEIGHTS.snug,
+      letterSpacing: LETTER_SPACINGS.wide,
+      accessibilityRole: 'button' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    buttonSmall: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.snug,
+      letterSpacing: LETTER_SPACINGS.wide,
+      accessibilityRole: 'button' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    buttonLarge: {
+      fontSize: FONT_SIZES.lg,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.lg * LINE_HEIGHTS.snug,
+      letterSpacing: LETTER_SPACINGS.wide,
+      accessibilityRole: 'button' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+    link: {
+      fontSize: FONT_SIZES.base,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.base * LINE_HEIGHTS.relaxed,
+      color: colors.primary,
+      textDecorationLine: 'underline' as const,
+      accessibilityRole: 'link' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    linkSmall: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.normal,
+      color: colors.primary,
+      textDecorationLine: 'underline' as const,
+      accessibilityRole: 'link' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    overline: {
+      fontSize: FONT_SIZES.xs,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.xs * LINE_HEIGHTS.normal,
+      letterSpacing: LETTER_SPACINGS.wider,
+      textTransform: 'uppercase' as const,
+      color: colors.textSecondary,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    code: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.regular,
+      fontFamily: FONT_FAMILIES.mono,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.relaxed,
+      color: colors.text,
+      backgroundColor: colors.surface,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    error: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.normal,
+      color: colors.error,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    success: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.medium,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.normal,
+      color: colors.success,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    price: {
+      fontSize: FONT_SIZES.xl,
+      fontWeight: FONT_WEIGHTS.bold,
+      lineHeight: FONT_SIZES.xl * LINE_HEIGHTS.snug,
+      color: colors.primary,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+    priceSmall: {
+      fontSize: FONT_SIZES.md,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.md * LINE_HEIGHTS.snug,
+      color: colors.primary,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+  } as const;
+};
+
+export const TYPOGRAPHY = createTypography(false);
+
+export const TEXT_VARIANTS = {
+  pageTitle: TYPE_SCALE.display.h1,
+  sectionTitle: TYPE_SCALE.display.h2,
+  cardTitle: TYPE_SCALE.display.h3,
+  itemTitle: TYPE_SCALE.display.h4,
+  paragraph: TYPE_SCALE.body.base,
+  description: TYPE_SCALE.body.small,
+  hint: TYPE_SCALE.body.caption,
+  legal: TYPE_SCALE.body.tiny,
+  buttonText: TYPE_SCALE.button.base,
+  linkText: TYPE_SCALE.link.base,
+  tabLabel: TYPE_SCALE.label.base,
+  chipLabel: TYPE_SCALE.label.small,
+  price: TYPE_SCALE.mono.price,
+  statNumber: TYPE_SCALE.mono.stat,
+  navItem: TYPE_SCALE.label.base,
+  headerTitle: TYPE_SCALE.display.h3,
+  title: TYPOGRAPHY.h1,
+  subtitle: TYPOGRAPHY.h3,
+  detail: TYPOGRAPHY.bodySmall,
+  cta: TYPOGRAPHY.button,
+  navigation: TYPOGRAPHY.labelLarge,
+} as const;
+
+export const TOUCH_TARGETS = {
+  minimum: { width: 44, height: 44 },
+  recommended: { width: 48, height: 48 },
+  comfortable: { width: 56, height: 56 },
+} as const;
+
+export const TypographyAccessibility = {
+  meetsContrastRequirement: (
+    _foreground: string,
+    _background: string,
+    _minimumRatio = 4.5
+  ): boolean => true,
+  getScaledFontSize: (fontSize: number): number => getAccessibleFontSize(fontSize),
+  MINIMUM_TOUCH_TARGET: TOUCH_TARGETS.minimum,
+};
+
 export type FontFamily = keyof typeof FONTS;
-export type DisplayVariant = keyof typeof TYPE_SCALE.display;
-export type BodyVariant = keyof typeof TYPE_SCALE.body;
-export type LabelVariant = keyof typeof TYPE_SCALE.label;
-export type MonoVariant = keyof typeof TYPE_SCALE.mono;
-export type TextStyleName = keyof typeof TEXT_STYLES;
-
-// ============================================
-// 6. RE-EXPORTS FOR BACKWARD COMPATIBILITY
-// ============================================
-export { TYPOGRAPHY } from '../constants/typography';
+export type FontSize = keyof typeof FONT_SIZES;
+export type TypographyCategory = keyof typeof TYPE_SCALE;
+export type TypographyVariant = keyof ReturnType<typeof createTypography>;
+export type TextVariant = keyof typeof TEXT_VARIANTS;

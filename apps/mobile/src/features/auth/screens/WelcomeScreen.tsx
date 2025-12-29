@@ -1,329 +1,483 @@
-import React, { useState, useCallback } from 'react';
+/**
+ * TravelMatch Awwwards Design System 2026 - Welcome Screen
+ *
+ * Elegant simplicity with:
+ * - Breathing logo animation
+ * - Glow pulse effect
+ * - Staggered button animations
+ * - Ambient gradient orbs
+ *
+ * Designed for Awwwards Best UI/UX nomination
+ */
+
+import React, { useEffect, useCallback } from 'react';
 import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
+  Text,
+  StyleSheet,
   Dimensions,
-  Alert,
-  Linking,
+  Pressable,
+  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { SocialButton } from '@/components';
-import { COLORS } from '@/constants/colors';
-import { logger } from '@/utils/logger';
-import { signInWithOAuth } from '@/services/supabaseAuthService';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Reanimated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  withSequence,
+  withDelay,
+  withSpring,
+  Easing,
+} from 'react-native-reanimated';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
-const { height: _SCREEN_HEIGHT } = Dimensions.get('window');
+import { COLORS, GRADIENTS, PALETTE } from '../../../constants/colors';
+import { TYPE_SCALE } from '../../../theme/typography';
+import { SPRINGS, TIMINGS } from '../../../hooks/useAnimations';
 
-export const WelcomeScreen: React.FC<{
-  navigation: { navigate: (route: string) => void };
-}> = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState<
-    'apple' | 'google' | 'facebook' | null
-  >(null);
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-  const handleCreateAccount = () => {
-    navigation.navigate('Register');
+// ============================================
+// TYPES
+// ============================================
+interface WelcomeScreenProps {
+  navigation: {
+    navigate: (screen: string) => void;
   };
+}
 
-  const handleLogin = () => {
-    navigation.navigate('Login');
-  };
+// ============================================
+// ANIMATED LOGO COMPONENT
+// ============================================
+const AnimatedLogo: React.FC = () => {
+  const breathScale = useSharedValue(1);
+  const glowOpacity = useSharedValue(0.5);
+  const rotation = useSharedValue(0);
 
-  const handleTermsPress = () => {
-    navigation.navigate('TermsOfService');
-  };
+  useEffect(() => {
+    // Breathing animation
+    breathScale.value = withRepeat(
+      withSequence(
+        withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
 
-  const handlePrivacyPress = () => {
-    navigation.navigate('PrivacyPolicy');
-  };
+    // Glow pulse
+    glowOpacity.value = withRepeat(
+      withSequence(
+        withTiming(0.8, { duration: 1500 }),
+        withTiming(0.4, { duration: 1500 })
+      ),
+      -1,
+      false
+    );
 
-  const handleSocialSignIn = useCallback(
-    async (provider: 'apple' | 'google' | 'facebook') => {
-      if (isLoading) return;
+    // Subtle rotation
+    rotation.value = withRepeat(
+      withSequence(
+        withTiming(3, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(-3, { duration: 4000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+  }, []);
 
-      setIsLoading(provider);
-      logger.debug(`[Auth] ${provider} sign in initiated from Welcome screen`);
+  const logoStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: breathScale.value },
+      { rotate: `${rotation.value}deg` },
+    ],
+  }));
 
-      try {
-        const { url, error } = await signInWithOAuth(provider);
-
-        if (error) {
-          logger.error(`[Auth] ${provider} OAuth error:`, error);
-          Alert.alert(
-            'Sign In Error',
-            `Unable to sign in with ${provider}. Please try again or use email.`,
-            [{ text: 'OK' }],
-          );
-          return;
-        }
-
-        if (url) {
-          // Open OAuth URL in browser - user will be redirected back to app
-          const canOpen = await Linking.canOpenURL(url);
-          if (canOpen) {
-            await Linking.openURL(url);
-          } else {
-            Alert.alert(
-              'Browser Required',
-              'Please ensure you have a web browser installed.',
-              [{ text: 'OK' }],
-            );
-          }
-        }
-      } catch (err) {
-        logger.error(`[Auth] ${provider} sign in exception:`, err);
-        Alert.alert(
-          'Sign In Error',
-          'Something went wrong. Please try again.',
-          [{ text: 'OK' }],
-        );
-      } finally {
-        setIsLoading(null);
-      }
-    },
-    [isLoading],
-  );
-
-  const handleAppleSignIn = useCallback(() => {
-    handleSocialSignIn('apple');
-  }, [handleSocialSignIn]);
-
-  const handleGoogleSignIn = useCallback(() => {
-    handleSocialSignIn('google');
-  }, [handleSocialSignIn]);
-
-  const handleFacebookSignIn = useCallback(() => {
-    handleSocialSignIn('facebook');
-  }, [handleSocialSignIn]);
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: glowOpacity.value,
+  }));
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.main}>
-        {/* Content Section */}
-        <View style={styles.contentSection}>
-          {/* Illustration */}
-          <View style={styles.illustrationContainer}>
-            <Image
-              source={require('../../../../assets/icon.png')}
-              style={styles.illustration}
-              resizeMode="contain"
-            />
-          </View>
+    <View style={styles.logoContainer}>
+      {/* Glow Effect */}
+      <Reanimated.View style={[styles.logoGlow, glowStyle]}>
+        <LinearGradient
+          colors={GRADIENTS.aurora}
+          style={styles.glowGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+      </Reanimated.View>
 
-          {/* Headline & Body Text */}
-          <View style={styles.textSection}>
-            <Text style={styles.headline}>Welcome to TravelMatch</Text>
-            <Text style={styles.bodyText}>
-              Connect with locals. Share experiences.{'\n'}Make every trip
-              meaningful.
-            </Text>
-          </View>
+      {/* Logo */}
+      <Reanimated.View style={[styles.logoInner, logoStyle]}>
+        <Text style={styles.logoEmoji}>{'\u{1F381}'}</Text>
+      </Reanimated.View>
+    </View>
+  );
+};
+
+// ============================================
+// ANIMATED BUTTON COMPONENT
+// ============================================
+interface AnimatedButtonProps {
+  children: React.ReactNode;
+  onPress: () => void;
+  variant: 'apple' | 'google' | 'primary' | 'secondary';
+  delay?: number;
+}
+
+const AnimatedButton: React.FC<AnimatedButtonProps> = ({
+  children,
+  onPress,
+  variant,
+  delay = 0,
+}) => {
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(20);
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
+    translateY.value = withDelay(
+      delay,
+      withTiming(0, { duration: 500, easing: Easing.out(Easing.back(1.5)) })
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [
+      { translateY: translateY.value },
+      { scale: scale.value },
+    ],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withTiming(0.97, { duration: 100 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withTiming(1, { duration: 200 });
+  };
+
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  };
+
+  const getButtonStyle = () => {
+    switch (variant) {
+      case 'apple':
+        return styles.appleButton;
+      case 'google':
+        return styles.googleButton;
+      case 'primary':
+        return styles.primaryButton;
+      case 'secondary':
+        return styles.secondaryButton;
+      default:
+        return {};
+    }
+  };
+
+  return (
+    <Reanimated.View style={animatedStyle}>
+      <Pressable
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[styles.button, getButtonStyle()]}
+      >
+        {children}
+      </Pressable>
+    </Reanimated.View>
+  );
+};
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
+
+  const titleOpacity = useSharedValue(0);
+  const subtitleOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    titleOpacity.value = withDelay(200, withTiming(1, { duration: 800 }));
+    subtitleOpacity.value = withDelay(400, withTiming(1, { duration: 800 }));
+  }, []);
+
+  const titleStyle = useAnimatedStyle(() => ({
+    opacity: titleOpacity.value,
+  }));
+
+  const subtitleStyle = useAnimatedStyle(() => ({
+    opacity: subtitleOpacity.value,
+  }));
+
+  const handleAppleLogin = useCallback(() => {
+    navigation.navigate('Register');
+  }, [navigation]);
+
+  const handleGoogleLogin = useCallback(() => {
+    navigation.navigate('Register');
+  }, [navigation]);
+
+  const handleCreateAccount = useCallback(() => {
+    navigation.navigate('Register');
+  }, [navigation]);
+
+  const handleLogin = useCallback(() => {
+    navigation.navigate('Login');
+  }, [navigation]);
+
+  return (
+    <View style={styles.container}>
+      {/* Ambient Background */}
+      <LinearGradient
+        colors={[COLORS.bg.primary, COLORS.bg.tertiary]}
+        style={StyleSheet.absoluteFill}
+      />
+
+      {/* Decorative Gradient Orbs */}
+      <View style={styles.orbContainer}>
+        <LinearGradient
+          colors={['rgba(249, 115, 22, 0.15)', 'transparent']}
+          style={[styles.orb, styles.orbTopRight]}
+        />
+        <LinearGradient
+          colors={['rgba(244, 63, 94, 0.1)', 'transparent']}
+          style={[styles.orb, styles.orbBottomLeft]}
+        />
+      </View>
+
+      {/* Main Content */}
+      <View
+        style={[
+          styles.content,
+          {
+            paddingTop: insets.top + 40,
+            paddingBottom: insets.bottom + 20,
+          },
+        ]}
+      >
+        {/* Logo Section */}
+        <View style={styles.heroSection}>
+          <AnimatedLogo />
+
+          <Reanimated.View style={titleStyle}>
+            <Text style={styles.appName}>TravelMatch</Text>
+          </Reanimated.View>
+
+          <Reanimated.View style={subtitleStyle}>
+            <Text style={styles.tagline}>Dilekler paylaş, anılar hediye et</Text>
+          </Reanimated.View>
         </View>
 
         {/* Action Section */}
         <View style={styles.actionSection}>
-          <View style={styles.buttonContainer}>
-            {/* Social Sign In Icons - Horizontal Row */}
-            <View style={styles.socialIconsRow}>
-              <SocialButton
-                provider="apple"
-                size="icon"
-                onPress={handleAppleSignIn}
-                useProviderColors
-                disabled={isLoading !== null}
-                loading={isLoading === 'apple'}
-                accessibilityLabel="Sign in with Apple"
-                accessibilityHint="Opens Apple sign in in your browser"
-              />
-              <SocialButton
-                provider="google"
-                size="icon"
-                onPress={handleGoogleSignIn}
-                useProviderColors
-                disabled={isLoading !== null}
-                loading={isLoading === 'google'}
-                accessibilityLabel="Sign in with Google"
-                accessibilityHint="Opens Google sign in in your browser"
-              />
-              <SocialButton
-                provider="facebook"
-                size="icon"
-                onPress={handleFacebookSignIn}
-                useProviderColors
-                disabled={isLoading !== null}
-                loading={isLoading === 'facebook'}
-                accessibilityLabel="Sign in with Facebook"
-                accessibilityHint="Opens Facebook sign in in your browser"
-              />
-            </View>
+          {/* Social Logins */}
+          <AnimatedButton variant="apple" onPress={handleAppleLogin} delay={600}>
+            <MaterialCommunityIcons name="apple" size={22} color={PALETTE.white} />
+            <Text style={styles.socialButtonText}>Apple ile devam et</Text>
+          </AnimatedButton>
 
-            {/* Divider */}
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>veya</Text>
-              <View style={styles.dividerLine} />
-            </View>
+          <AnimatedButton variant="google" onPress={handleGoogleLogin} delay={700}>
+            <MaterialCommunityIcons name="google" size={22} color={PALETTE.white} />
+            <Text style={styles.socialButtonText}>Google ile devam et</Text>
+          </AnimatedButton>
 
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={handleCreateAccount}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel="Hesap oluştur"
-            >
-              <Text style={styles.primaryButtonText}>Hesap oluştur</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleLogin}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel="Giriş yap"
-            >
-              <Text style={styles.secondaryButtonText}>Giriş yap</Text>
-            </TouchableOpacity>
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>veya</Text>
+            <View style={styles.dividerLine} />
           </View>
 
-          {/* Footer Text */}
-          <Text style={styles.footerText}>
-            By continuing, you agree to our{' '}
-            <Text style={styles.footerLink} onPress={handleTermsPress}>
-              Terms
-            </Text>
-            {' & '}
-            <Text style={styles.footerLink} onPress={handlePrivacyPress}>
-              Privacy
-            </Text>
-            .
-          </Text>
+          {/* Email Options */}
+          <AnimatedButton variant="primary" onPress={handleCreateAccount} delay={800}>
+            <LinearGradient
+              colors={GRADIENTS.gift}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.gradientFill}
+            >
+              <Text style={styles.primaryButtonText}>Hesap oluştur</Text>
+            </LinearGradient>
+          </AnimatedButton>
+
+          <AnimatedButton variant="secondary" onPress={handleLogin} delay={900}>
+            <Text style={styles.secondaryButtonText}>Giriş yap</Text>
+          </AnimatedButton>
         </View>
+
+        {/* Footer */}
+        <Text style={styles.footer}>
+          Devam ederek{' '}
+          <Text style={styles.footerLink}>Kullanım Koşulları</Text> ve{' '}
+          <Text style={styles.footerLink}>Gizlilik Politikası</Text>'nı kabul
+          etmiş olursunuz.
+        </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
+// ============================================
+// STYLES
+// ============================================
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
   },
-  main: {
+  orbContainer: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  orb: {
+    position: 'absolute',
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+  },
+  orbTopRight: {
+    top: -100,
+    right: -150,
+  },
+  orbBottomLeft: {
+    bottom: -100,
+    left: -150,
+  },
+  content: {
     flex: 1,
+    paddingHorizontal: 28,
     justifyContent: 'space-between',
-    padding: 24,
   },
-  contentSection: {
-    flex: 1,
+  heroSection: {
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 40,
   },
-  illustrationContainer: {
-    width: '100%',
-    maxWidth: 320,
-    aspectRatio: 1,
+  logoContainer: {
+    width: 140,
+    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 32,
   },
-  illustration: {
-    width: '100%',
-    height: '100%',
+  logoGlow: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 70,
+    overflow: 'hidden',
   },
-  textSection: {
-    width: '100%',
+  glowGradient: {
+    flex: 1,
+    transform: [{ scale: 1.3 }],
+  },
+  logoInner: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: PALETTE.primary[500],
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 12,
   },
-  headline: {
-    fontSize: 32,
-    fontWeight: '700',
+  logoEmoji: {
+    fontSize: 48,
+  },
+  appName: {
+    ...TYPE_SCALE.display.h1,
     color: COLORS.text.primary,
-    textAlign: 'center',
     marginBottom: 12,
-    letterSpacing: -0.5,
   },
-  bodyText: {
-    fontSize: 16,
-    fontWeight: '400',
+  tagline: {
+    ...TYPE_SCALE.body.large,
     color: COLORS.text.secondary,
     textAlign: 'center',
-    lineHeight: 24,
   },
   actionSection: {
-    width: '100%',
-    paddingTop: 32,
-    paddingBottom: 16,
+    gap: 14,
   },
-  buttonContainer: {
-    width: '100%',
-    gap: 12,
-    marginBottom: 16,
+  button: {
+    height: 56,
+    borderRadius: 28,
+    overflow: 'hidden',
   },
-  socialIconsRow: {
+  appleButton: {
+    backgroundColor: PALETTE.black,
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    gap: 16,
-    paddingVertical: 8,
+    justifyContent: 'center',
+    gap: 10,
+  },
+  googleButton: {
+    backgroundColor: '#4285F4',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  socialButtonText: {
+    ...TYPE_SCALE.label.large,
+    color: PALETTE.white,
+  },
+  primaryButton: {
+    overflow: 'hidden',
+  },
+  gradientFill: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryButtonText: {
+    ...TYPE_SCALE.label.large,
+    color: PALETTE.white,
+  },
+  secondaryButton: {
+    borderWidth: 2,
+    borderColor: COLORS.interactive.primary,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  secondaryButtonText: {
+    ...TYPE_SCALE.label.large,
+    color: COLORS.interactive.primary,
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 8,
-    width: '100%',
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border.default,
+    backgroundColor: COLORS.text.muted,
+    opacity: 0.3,
   },
   dividerText: {
+    ...TYPE_SCALE.body.small,
+    color: COLORS.text.muted,
     marginHorizontal: 16,
-    fontSize: 14,
-    color: COLORS.text.secondary,
   },
-  primaryButton: {
-    backgroundColor: COLORS.mint,
-    borderRadius: 28,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  primaryButtonText: {
-    color: COLORS.utility.white,
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.25,
-  },
-  secondaryButton: {
-    backgroundColor: COLORS.utility.transparent,
-    borderRadius: 28,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    borderWidth: 2,
-    borderColor: COLORS.mint,
-  },
-  secondaryButtonText: {
-    color: COLORS.mint,
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.25,
-  },
-  footerText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.text.secondary,
+  footer: {
+    ...TYPE_SCALE.body.caption,
+    color: COLORS.text.muted,
     textAlign: 'center',
-    lineHeight: 20,
-    paddingTop: 16,
+    lineHeight: 18,
   },
   footerLink: {
-    textDecorationLine: 'underline',
+    color: COLORS.interactive.primary,
   },
 });
+
+export default WelcomeScreen;

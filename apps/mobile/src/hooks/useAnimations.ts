@@ -1,5 +1,5 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Animation Hooks V2
+ * TravelMatch Awwwards Design System 2026 - Animation Hooks
  *
  * Comprehensive animation system for Awwwards-level micro-interactions
  * Built on react-native-reanimated for 60fps performance
@@ -645,3 +645,6 @@ export const getTimingConfig = (
 // Export types
 export type SpringConfig = keyof typeof SPRINGS;
 export type TimingConfig = keyof typeof TIMINGS;
+
+// Default export
+export default useAnimations;
