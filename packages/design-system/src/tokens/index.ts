@@ -1,56 +1,72 @@
 /**
  * Design Tokens - Main Export
  * Central export for all design tokens
+ *
+ * "Cinematic Travel + Trust Jewelry"
+ * Palette A: Sunset Proof
  */
 
-import { colors, type Colors } from './colors';
+import {
+  COLORS,
+  GRADIENTS,
+  SHADOWS,
+  primitives,
+  type ColorName,
+  type GradientName,
+  type ShadowName,
+} from './colors';
 import {
   spacing,
   radius,
-  SIZES,
-  BORDER,
-  shadows,
+  shadows as cssShadows,
   type Spacing,
   type Radius,
-  type Sizes,
-  type Border,
-  type Shadows,
+  type Shadows as CSSShadows,
 } from './spacing';
 import { typography, type Typography } from './typography';
 
-export { colors, type Colors } from './colors';
+// Color exports
+export {
+  COLORS,
+  GRADIENTS,
+  SHADOWS,
+  primitives,
+  type ColorName,
+  type GradientName,
+  type ShadowName,
+} from './colors';
+
+// Typography exports
 export { typography, type Typography } from './typography';
+
+// Spacing exports
 export {
   spacing,
   radius,
-  SIZES,
-  BORDER,
-  shadows,
+  shadows as cssShadows,
   type Spacing,
   type Radius,
-  type Sizes,
-  type Border,
-  type Shadows,
+  type Shadows as CSSShadows,
 } from './spacing';
 
 // Combined theme type
 export interface Theme {
-  colors: Colors;
+  colors: typeof COLORS;
+  gradients: typeof GRADIENTS;
   typography: Typography;
   spacing: Spacing;
   radius: Radius;
-  sizes: Sizes;
-  border: Border;
-  shadows: Shadows;
+  shadows: typeof SHADOWS;
+  cssShadows: CSSShadows;
 }
 
 // Default theme
 export const defaultTheme: Theme = {
-  colors,
+  colors: COLORS,
+  gradients: GRADIENTS,
   typography,
   spacing,
   radius,
-  sizes: SIZES,
-  border: BORDER,
-  shadows,
+  shadows: SHADOWS,
+  cssShadows,
 };
