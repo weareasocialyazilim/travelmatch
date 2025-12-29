@@ -127,8 +127,7 @@ describe('PaymentService - Webhook Failures', () => {
   });
 
   describe('Webhook Timeout', () => {
-    // TODO: Fix timer handling - test is flaky due to fake timer issues
-    it.skip('should timeout webhook processing after 5 seconds', async () => {
+    it('should timeout webhook processing after specified timeout', async () => {
       const webhookEvent: WebhookEvent = {
         id: 'evt_123',
         type: 'payment_intent.succeeded',
@@ -141,11 +140,11 @@ describe('PaymentService - Webhook Failures', () => {
         },
       };
 
-      // Webhook that takes too long
-      const webhookPromise = handleWebhook(webhookEvent, 3000);
+      // Webhook with short timeout (50ms) while processing takes 100ms
+      const webhookPromise = handleWebhook(webhookEvent, 50);
 
-      // Simulate slow processing (6 seconds)
-      jest.advanceTimersByTime(6000);
+      // Advance time past the timeout but before processing completes
+      await jest.advanceTimersByTimeAsync(60);
 
       await expect(webhookPromise).rejects.toThrow(
         'Webhook processing timeout',
@@ -295,38 +294,26 @@ describe('PaymentService - Webhook Failures', () => {
   });
 
   describe('Webhook Retry Logic', () => {
-    // TODO: Fix timer handling - test is flaky due to fake timer issues
-    it.skip('should retry webhook delivery up to 3 times', async () => {
-      const webhookEvent: WebhookEvent = {
-        id: 'evt_123',
-        type: 'payment_intent.succeeded',
-        data: {
-          object: {
-            id: 'pi_123',
-            status: 'succeeded',
-            amount: 5000,
-          },
-        },
-      };
-
+    it('should retry webhook delivery with exponential backoff', async () => {
       let attempts = 0;
 
+      // Simulated retry handler with exponential backoff
       async function handleWebhookWithRetry(
-        event: WebhookEvent,
+        processAttempt: () => Promise<boolean>,
         maxRetries = 3,
       ): Promise<boolean> {
         for (let retry = 0; retry <= maxRetries; retry++) {
           attempts++;
           try {
-            logger.info(`Webhook attempt ${retry + 1}/${maxRetries + 1}`);
-            return await handleWebhook(event, 5000);
-          } catch (error: any) {
-            logger.warn(
-              `Webhook attempt ${retry + 1} failed: ${error.message}`,
-            );
+            mockLogger.info(`Webhook attempt ${retry + 1}/${maxRetries + 1}`);
+            return await processAttempt();
+          } catch (error: unknown) {
+            const errorMessage =
+              error instanceof Error ? error.message : 'Unknown error';
+            mockLogger.warn(`Webhook attempt ${retry + 1} failed: ${errorMessage}`);
 
             if (retry < maxRetries) {
-              const delay = 1000 * Math.pow(2, retry);
+              const delay = 100 * Math.pow(2, retry); // 100, 200, 400ms
               await new Promise((resolve) => setTimeout(resolve, delay));
             } else {
               throw error;
@@ -336,35 +323,73 @@ describe('PaymentService - Webhook Failures', () => {
         throw new Error('Webhook failed after retries');
       }
 
-      // First 2 attempts fail, 3rd succeeds
-      jest
-        .spyOn(global, 'setTimeout')
-        .mockImplementation((callback: any, delay: number) => {
-          if (attempts < 3) {
-            // Simulate failure
-            return setTimeout(() => {
-              throw new Error('Webhook timeout');
-            }, delay);
-          } else {
-            // Simulate success
-            return setTimeout(callback, delay);
+      // Mock that fails first 2 attempts, succeeds on 3rd
+      let callCount = 0;
+      const mockProcess = jest.fn(async () => {
+        callCount++;
+        if (callCount < 3) {
+          throw new Error('Webhook timeout');
+        }
+        return true;
+      });
+
+      const resultPromise = handleWebhookWithRetry(mockProcess, 3);
+
+      // Advance through retry delays: 100ms, then 200ms
+      await jest.advanceTimersByTimeAsync(100); // After 1st retry delay
+      await jest.advanceTimersByTimeAsync(200); // After 2nd retry delay
+
+      const result = await resultPromise;
+
+      expect(result).toBe(true);
+      expect(attempts).toBe(3);
+      expect(mockLogger.warn).toHaveBeenCalledTimes(2);
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('attempt 3/4'),
+      );
+    });
+
+    it('should throw after max retries exceeded', async () => {
+      let attempts = 0;
+
+      async function handleWebhookWithRetry(
+        processAttempt: () => Promise<boolean>,
+        maxRetries = 2,
+      ): Promise<boolean> {
+        for (let retry = 0; retry <= maxRetries; retry++) {
+          attempts++;
+          try {
+            return await processAttempt();
+          } catch (error: unknown) {
+            if (retry < maxRetries) {
+              const delay = 50 * Math.pow(2, retry);
+              await new Promise((resolve) => setTimeout(resolve, delay));
+            } else {
+              throw error;
+            }
           }
-        });
+        }
+        throw new Error('Webhook failed after retries');
+      }
 
-      void handleWebhookWithRetry(webhookEvent);
+      // Always fails
+      const mockProcess = jest.fn(async () => {
+        throw new Error('Persistent failure');
+      });
 
-      await jest.advanceTimersByTimeAsync(1000); // 1st retry
-      await jest.advanceTimersByTimeAsync(2000); // 2nd retry
-      await jest.advanceTimersByTimeAsync(200); // Success
+      const resultPromise = handleWebhookWithRetry(mockProcess, 2);
 
-      // Note: This test is simplified - actual retry logic would need better mocking
-      expect(attempts).toBeGreaterThan(0);
+      // Advance through retry delays: 50ms, 100ms
+      await jest.advanceTimersByTimeAsync(50);
+      await jest.advanceTimersByTimeAsync(100);
+
+      await expect(resultPromise).rejects.toThrow('Persistent failure');
+      expect(attempts).toBe(3); // Initial + 2 retries
     });
   });
 
   describe('Payment Status Reconciliation', () => {
-    // TODO: Fix timer handling - test is flaky due to fake timer issues
-    it.skip('should reconcile payment status via polling when webhook fails', async () => {
+    it('should reconcile payment status via polling when webhook times out', async () => {
       const mockTransaction = {
         id: 'tx-123',
         user_id: 'user-123',
@@ -376,13 +401,7 @@ describe('PaymentService - Webhook Failures', () => {
         description: 'Gift sent',
       };
 
-      // Create payment
-      mockTransactionsService.create.mockResolvedValue({
-        data: mockTransaction,
-        error: null,
-      });
-
-      // Webhook fails
+      // Webhook times out (50ms timeout, 100ms processing)
       const webhookEvent: WebhookEvent = {
         id: 'evt_123',
         type: 'payment_intent.succeeded',
@@ -395,18 +414,18 @@ describe('PaymentService - Webhook Failures', () => {
         },
       };
 
-      const webhookPromise = handleWebhook(webhookEvent, 3000).catch(() => {
-        logger.warn('Webhook failed, falling back to polling');
+      const webhookPromise = handleWebhook(webhookEvent, 50).catch(() => {
+        mockLogger.warn('Webhook failed, falling back to polling');
         return null;
       });
 
-      jest.advanceTimersByTime(5000);
+      // Advance past timeout
+      await jest.advanceTimersByTimeAsync(60);
 
       const webhookResult = await webhookPromise;
+      expect(webhookResult).toBeNull(); // Webhook timed out
 
-      expect(webhookResult).toBeNull(); // Webhook failed
-
-      // Fallback to polling
+      // Now fallback to polling - transaction is immediately completed
       mockTransactionsService.get.mockResolvedValue({
         data: { ...mockTransaction, status: 'completed' },
         error: null,
@@ -414,13 +433,15 @@ describe('PaymentService - Webhook Failures', () => {
 
       const pollingPromise = pollPaymentStatus('tx-123', 5, 1000);
 
-      await jest.advanceTimersByTimeAsync(1000);
-
+      // First poll should find completed status immediately
       const status = await pollingPromise;
 
       expect(status).toBe('completed');
       expect(mockLogger.warn).toHaveBeenCalledWith(
         expect.stringContaining('Webhook failed'),
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('Payment status resolved: completed'),
       );
     });
 

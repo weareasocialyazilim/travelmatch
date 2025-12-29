@@ -38,10 +38,25 @@ jest.mock('@/utils/logger', () => ({
   },
 }));
 
-// Mock realtimeChannelManager to prevent subscription issues in tests
+// Mock realtimeChannelManager to capture callbacks for testing
+const mockSubscribeCallbacks: {
+  messages: { onInsert?: (payload: { new: unknown }) => void; onUpdate?: (payload: { new: unknown }) => void };
+  conversations: { onInsert?: (payload: { new: unknown }) => void; onUpdate?: (payload: { new: unknown }) => void };
+} = {
+  messages: {},
+  conversations: {},
+};
+
 jest.mock('@/services/realtimeChannelManager', () => ({
   realtimeChannelManager: {
-    subscribeToTable: jest.fn(() => jest.fn()), // Returns unsubscribe function
+    subscribeToTable: jest.fn((tableName: string, options: { onInsert?: (payload: { new: unknown }) => void; onUpdate?: (payload: { new: unknown }) => void }) => {
+      if (tableName === 'messages') {
+        mockSubscribeCallbacks.messages = { onInsert: options.onInsert, onUpdate: options.onUpdate };
+      } else if (tableName === 'conversations') {
+        mockSubscribeCallbacks.conversations = { onInsert: options.onInsert, onUpdate: options.onUpdate };
+      }
+      return jest.fn(); // Returns unsubscribe function
+    }),
     unsubscribeFromTable: jest.fn(),
   },
 }));
@@ -109,7 +124,11 @@ describe('useMessages Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Setup mock channel
+    // Reset subscription callbacks
+    mockSubscribeCallbacks.messages = {};
+    mockSubscribeCallbacks.conversations = {};
+
+    // Setup mock channel (kept for backwards compatibility)
     mockChannelOn = jest.fn().mockReturnThis();
     mockChannelSubscribe = jest.fn().mockReturnValue('SUBSCRIBED');
 
@@ -217,28 +236,34 @@ describe('useMessages Hook', () => {
       });
     });
 
-    // TODO: This test is flaky with React 19 + testing library - state update not being detected
-    // The hook logic is correct, but test timing/batching seems off
-    it.skip('should mark conversation as read when loading messages', async () => {
+    it('should mark conversation as read when loading messages', async () => {
       const { result } = renderHook(() => useMessages());
 
       await waitFor(() => {
         expect(result.current.conversationsLoading).toBe(false);
       });
 
+      // Verify initial unread count
+      expect(result.current.conversations[0].unreadCount).toBe(2);
+
       await act(async () => {
         await result.current.loadMessages('conv-1');
       });
 
+      // Wait for all state updates to complete (React 19 batching)
+      await waitFor(
+        () => {
+          expect(result.current.messagesLoading).toBe(false);
+        },
+        { timeout: 1000 },
+      );
+
+      // Verify markAsRead was called
       expect(messageService.markAsRead).toHaveBeenCalledWith('conv-1');
 
-      // Conversation should have unreadCount set to 0
-      await waitFor(() => {
-        const conv = result.current.conversations.find(
-          (c) => c.id === 'conv-1',
-        );
-        expect(conv?.unreadCount).toBe(0);
-      });
+      // Conversation should have unreadCount set to 0 after loading completes
+      const conv = result.current.conversations.find((c) => c.id === 'conv-1');
+      expect(conv?.unreadCount).toBe(0);
     });
 
     it('should handle message loading errors', async () => {
@@ -653,34 +678,10 @@ describe('useMessages Hook', () => {
     });
   });
 
-  // TODO: Real-time subscription tests need to be updated - subscription callback handling changed
-  describe.skip('Real-time Subscriptions', () => {
+  describe('Real-time Subscriptions', () => {
     beforeEach(() => {
       // Reset markAsRead mock to resolve successfully
       messageService.markAsRead.mockResolvedValue(undefined);
-    });
-
-    it('should subscribe to message updates when conversation is loaded', async () => {
-      const { result } = renderHook(() => useMessages());
-
-      await waitFor(() => {
-        expect(result.current.conversationsLoading).toBe(false);
-      });
-
-      await act(async () => {
-        await result.current.loadMessages('conv-1');
-      });
-
-      expect(supabase.channel).toHaveBeenCalledWith('messages:conv-1');
-      expect(mockChannelOn).toHaveBeenCalledWith(
-        'postgres_changes',
-        expect.objectContaining({
-          event: 'INSERT',
-          table: 'messages',
-          filter: 'conversation_id=eq.conv-1',
-        }),
-        expect.any(Function),
-      );
     });
 
     it('should add new messages from real-time subscription', async () => {
@@ -698,14 +699,8 @@ describe('useMessages Hook', () => {
         expect(result.current.messages).toHaveLength(2);
       });
 
-      // Get the INSERT callback from the second 'on' call (for messages)
-      const onCalls = mockChannelOn.mock.calls;
-      const insertCall = onCalls.find(
-        (call) => call[1]?.event === 'INSERT' && call[1]?.table === 'messages',
-      );
-
-      expect(insertCall).toBeDefined();
-      const insertCallback = insertCall![2];
+      // Verify subscription callback was registered
+      expect(mockSubscribeCallbacks.messages.onInsert).toBeDefined();
 
       const newDbMessage = {
         id: 'msg-realtime',
@@ -716,16 +711,19 @@ describe('useMessages Hook', () => {
         created_at: '2024-12-07T12:00:00Z',
       };
 
+      // Trigger the insert callback
       await act(async () => {
-        insertCallback({ new: newDbMessage });
+        mockSubscribeCallbacks.messages.onInsert?.({ new: newDbMessage });
       });
 
       await waitFor(() => {
-        const newMessage = result.current.messages.find(
-          (m) => m.id === 'msg-realtime',
-        );
-        expect(newMessage?.content).toBe('Real-time message');
+        expect(result.current.messages).toHaveLength(3);
       });
+
+      const newMessage = result.current.messages.find(
+        (m) => m.id === 'msg-realtime',
+      );
+      expect(newMessage?.content).toBe('Real-time message');
     });
 
     it('should not add duplicate messages from real-time', async () => {
@@ -739,16 +737,13 @@ describe('useMessages Hook', () => {
         await result.current.loadMessages('conv-1');
       });
 
+      await waitFor(() => {
+        expect(result.current.messages).toHaveLength(2);
+      });
+
       const initialCount = result.current.messages.length;
 
-      // Get the INSERT callback
-      const onCalls = mockChannelOn.mock.calls;
-      const insertCall = onCalls.find(
-        (call) => call[1]?.event === 'INSERT' && call[1]?.table === 'messages',
-      );
-      const insertCallback = insertCall![2];
-
-      // Try to add existing message
+      // Try to add existing message via real-time
       const existingMessage = {
         id: 'msg-1', // Already exists
         conversation_id: 'conv-1',
@@ -759,9 +754,10 @@ describe('useMessages Hook', () => {
       };
 
       await act(async () => {
-        insertCallback({ new: existingMessage });
+        mockSubscribeCallbacks.messages.onInsert?.({ new: existingMessage });
       });
 
+      // Should not add duplicate
       expect(result.current.messages).toHaveLength(initialCount);
     });
 
@@ -780,12 +776,8 @@ describe('useMessages Hook', () => {
         expect(result.current.messages).toHaveLength(2);
       });
 
-      // Get the UPDATE callback
-      const onCalls = mockChannelOn.mock.calls;
-      const updateCall = onCalls.find(
-        (call) => call[1]?.event === 'UPDATE' && call[1]?.table === 'messages',
-      );
-      const updateCallback = updateCall![2];
+      // Verify update callback was registered
+      expect(mockSubscribeCallbacks.messages.onUpdate).toBeDefined();
 
       const updatedMessage = {
         id: 'msg-1',
@@ -793,34 +785,69 @@ describe('useMessages Hook', () => {
         read_at: '2024-12-07T12:00:00Z',
       };
 
+      // Trigger the update callback
       await act(async () => {
-        updateCallback({ new: updatedMessage });
+        mockSubscribeCallbacks.messages.onUpdate?.({ new: updatedMessage });
       });
 
-      await waitFor(() => {
-        const message = result.current.messages.find((m) => m.id === 'msg-1');
-        expect(message?.content).toBe('Updated content');
-      });
+      const message = result.current.messages.find((m) => m.id === 'msg-1');
+      expect(message?.content).toBe('Updated content');
     });
 
-    it('should subscribe to conversation updates', async () => {
-      renderHook(() => useMessages());
+    it('should handle conversation updates from real-time', async () => {
+      const { result } = renderHook(() => useMessages());
 
       await waitFor(() => {
-        expect(supabase.channel).toHaveBeenCalledWith('all-conversations');
+        expect(result.current.conversationsLoading).toBe(false);
       });
+
+      // Verify conversations subscription callback was registered
+      expect(mockSubscribeCallbacks.conversations.onUpdate).toBeDefined();
+
+      const updatedConversation = {
+        id: 'conv-1',
+        last_message_content: 'New last message',
+        updated_at: '2024-12-07T15:00:00Z',
+      };
+
+      // Trigger the update callback
+      await act(async () => {
+        mockSubscribeCallbacks.conversations.onUpdate?.({
+          new: updatedConversation,
+        });
+      });
+
+      const conversation = result.current.conversations.find(
+        (c) => c.id === 'conv-1',
+      );
+      expect(conversation?.lastMessage).toBe('New last message');
     });
 
-    it('should clean up subscriptions on unmount', async () => {
-      const { unmount } = renderHook(() => useMessages());
+    it('should refresh conversations when new one is created', async () => {
+      const { result } = renderHook(() => useMessages());
 
       await waitFor(() => {
-        expect(supabase.channel).toHaveBeenCalled();
+        expect(result.current.conversationsLoading).toBe(false);
       });
 
-      unmount();
+      // Clear mocks to track new calls
+      jest.clearAllMocks();
 
-      expect(supabase.removeChannel).toHaveBeenCalled();
+      // Verify conversations subscription callback was registered
+      expect(mockSubscribeCallbacks.conversations.onInsert).toBeDefined();
+
+      const newConversation = {
+        id: 'conv-new',
+        participant_id: 'user-789',
+      };
+
+      // Trigger the insert callback
+      await act(async () => {
+        mockSubscribeCallbacks.conversations.onInsert?.({ new: newConversation });
+      });
+
+      // Should trigger a refresh
+      expect(messageService.getConversations).toHaveBeenCalled();
     });
   });
 
