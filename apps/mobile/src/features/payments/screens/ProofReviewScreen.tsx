@@ -75,12 +75,12 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
                 'release_escrow',
                 {
                   p_escrow_id: escrowId,
-                }
+                },
               );
 
               if (releaseError) {
                 throw new Error(
-                  `Escrow serbest bırakılamadı: ${releaseError.message}`
+                  `Escrow serbest bırakılamadı: ${releaseError.message}`,
                 );
               }
 
@@ -111,7 +111,7 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -132,7 +132,7 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
                 'refund_escrow',
                 {
                   p_escrow_id: escrowId,
-                }
+                },
               );
 
               if (refundError) {
@@ -165,39 +165,35 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
             }
           },
         },
-      ]
+      ],
     );
   };
 
   const handleExtendTime = async () => {
-    Alert.alert(
-      'Süre Uzat',
-      'Alıcıya 7 gün daha süre vermek ister misiniz?',
-      [
-        { text: 'İptal', style: 'cancel' },
-        {
-          text: 'Uzat',
-          onPress: async () => {
-            try {
-              const { error } = await supabase
-                .from('escrow_transactions')
-                .update({
-                  expires_at: new Date(
-                    Date.now() + 7 * 24 * 60 * 60 * 1000
-                  ).toISOString(),
-                })
-                .eq('id', escrowId);
+    Alert.alert('Süre Uzat', 'Alıcıya 7 gün daha süre vermek ister misiniz?', [
+      { text: 'İptal', style: 'cancel' },
+      {
+        text: 'Uzat',
+        onPress: async () => {
+          try {
+            const { error } = await supabase
+              .from('escrow_transactions')
+              .update({
+                expires_at: new Date(
+                  Date.now() + 7 * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+              })
+              .eq('id', escrowId);
 
-              if (error) throw error;
+            if (error) throw error;
 
-              showToast('Süre 7 gün uzatıldı', 'success');
-            } catch (error) {
-              showToast('Süre uzatılamadı', 'error');
-            }
-          },
+            showToast('Süre 7 gün uzatıldı', 'success');
+          } catch {
+            showToast('Süre uzatılamadı', 'error');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const formatDate = (dateString: string) => {
@@ -280,7 +276,10 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
                     selectedPhoto === index && styles.thumbnailSelected,
                   ]}
                 >
-                  <Image source={{ uri: photo }} style={styles.thumbnailImage} />
+                  <Image
+                    source={{ uri: photo }}
+                    style={styles.thumbnailImage}
+                  />
                 </TouchableOpacity>
               ))}
             </ScrollView>

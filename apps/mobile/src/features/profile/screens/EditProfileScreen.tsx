@@ -680,16 +680,6 @@ const styles = StyleSheet.create({
     color: COLORS.brand.secondary,
   },
 
-  // Location
-  locationInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  locationInput: {
-    flex: 1,
-  },
-
   bottomSpacer: {
     height: 40,
   },
