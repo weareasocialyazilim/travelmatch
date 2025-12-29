@@ -24,8 +24,8 @@ describe('Button', () => {
     it('applies default variant and size', () => {
       render(<Button>Default</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-primary');
-      expect(button).toHaveClass('h-10');
+      expect(button).toHaveClass('bg-gradient-hero');
+      expect(button).toHaveClass('h-11');
     });
   });
 
@@ -37,19 +37,19 @@ describe('Button', () => {
 
     it('applies outline variant', () => {
       render(<Button variant="outline">Outline</Button>);
-      expect(screen.getByRole('button')).toHaveClass('border');
+      expect(screen.getByRole('button')).toHaveClass('border-2');
     });
 
     it('applies secondary variant', () => {
       render(<Button variant="secondary">Secondary</Button>);
-      expect(screen.getByRole('button')).toHaveClass('bg-secondary');
+      expect(screen.getByRole('button')).toHaveClass('bg-secondary/10');
     });
 
     it('applies ghost variant', () => {
       render(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole('button');
       expect(button).not.toHaveClass('bg-primary');
-      expect(button).toHaveClass('hover:bg-accent');
+      expect(button).toHaveClass('hover:bg-stone-100');
     });
 
     it('applies link variant', () => {
@@ -59,12 +59,12 @@ describe('Button', () => {
 
     it('applies success variant', () => {
       render(<Button variant="success">Success</Button>);
-      expect(screen.getByRole('button')).toHaveClass('bg-success');
+      expect(screen.getByRole('button')).toHaveClass('bg-trust');
     });
 
     it('applies warning variant', () => {
       render(<Button variant="warning">Warning</Button>);
-      expect(screen.getByRole('button')).toHaveClass('bg-warning');
+      expect(screen.getByRole('button')).toHaveClass('bg-primary');
     });
   });
 
@@ -76,12 +76,12 @@ describe('Button', () => {
 
     it('applies lg size', () => {
       render(<Button size="lg">Large</Button>);
-      expect(screen.getByRole('button')).toHaveClass('h-11');
+      expect(screen.getByRole('button')).toHaveClass('h-14');
     });
 
     it('applies icon size', () => {
       render(<Button size="icon">Icon</Button>);
-      expect(screen.getByRole('button')).toHaveClass('h-10', 'w-10');
+      expect(screen.getByRole('button')).toHaveClass('h-11', 'w-11');
     });
   });
 

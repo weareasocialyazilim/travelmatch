@@ -286,7 +286,7 @@ export const colors = {
   // Additional semantic colors for compliance features
   coral: primitives.rose[400], // #FB7185 - for highlights and accents
   divider: primitives.stone[200], // #E7E5E4 - for separators
-  background: primitives.stone[50], // #FAFAF9 - general background
+  backgroundDefault: primitives.stone[50], // #FAFAF9 - general background (renamed to avoid duplicate)
 } as const;
 
 export type Colors = typeof colors;
