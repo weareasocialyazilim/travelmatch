@@ -29,6 +29,7 @@ export { SuccessConfirmationScreen } from './screens/SuccessConfirmationScreen';
 export { UnifiedGiftFlowScreen } from './screens/UnifiedGiftFlowScreen';
 export { MyGiftsScreen } from './screens/MyGiftsScreen';
 export { ProofReviewScreen } from './screens/ProofReviewScreen';
+export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
 
 // KYC Screens
 export { default as KYCIntroScreen } from './kyc/KYCIntroScreen';
