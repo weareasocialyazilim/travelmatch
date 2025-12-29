@@ -169,7 +169,19 @@ export const paymentsApi = {
 
       if (error) throw error;
 
-      return (data || []).map((tx: any) => ({
+      // Define the transaction row type based on query selection
+      type TransactionRow = {
+        id: string;
+        type: string;
+        amount: number;
+        currency: string | null;
+        status: string;
+        created_at: string | null;
+        description: string | null;
+        metadata: unknown;
+      };
+
+      return (data || []).map((tx: TransactionRow) => ({
         id: tx.id,
         type: tx.type as TransactionRecord['type'],
         amount: tx.amount,
@@ -351,7 +363,12 @@ export const paymentsApi = {
 
       if (error) throw error;
 
-      const row: any = data;
+      // Type guard for the data shape
+      const row = data as {
+        kyc_status?: string | null;
+        verified?: boolean | null;
+        verified_at?: string | null;
+      } | null;
       return {
         status: (row?.kyc_status || 'pending') as
           | 'pending'

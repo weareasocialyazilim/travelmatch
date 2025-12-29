@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, memo } from 'react';
 import {
   View,
   Text,
@@ -87,139 +87,141 @@ const ConfettiPiece: React.FC<ConfettiPieceProps> = ({
   );
 };
 
-export const GiftSuccessModal: React.FC<Props> = ({
-  visible,
-  amount,
-  onClose,
-  momentTitle: _momentTitle,
-  onViewApprovals: _onViewApprovals,
-}) => {
-  const scale = useSharedValue(0);
-  const opacity = useSharedValue(0);
+export const GiftSuccessModal: React.FC<Props> = memo(
+  ({
+    visible,
+    amount,
+    onClose,
+    momentTitle: _momentTitle,
+    onViewApprovals: _onViewApprovals,
+  }) => {
+    const scale = useSharedValue(0);
+    const opacity = useSharedValue(0);
 
-  const confettiColors = useMemo(
-    () => [
-      COLORS.brand.secondary,
-      COLORS.mint,
-      COLORS.feedback.success,
-      COLORS.softOrange,
-      COLORS.utility.white,
-    ],
-    [],
-  );
+    const confettiColors = useMemo(
+      () => [
+        COLORS.brand.secondary,
+        COLORS.mint,
+        COLORS.feedback.success,
+        COLORS.softOrange,
+        COLORS.utility.white,
+      ],
+      [],
+    );
 
-  useEffect(() => {
-    if (visible) {
-      // Haptic feedback
-      if (Platform.OS === 'ios') {
-        void Haptics.notificationAsync(
-          Haptics.NotificationFeedbackType.Success,
-        );
+    useEffect(() => {
+      if (visible) {
+        // Haptic feedback
+        if (Platform.OS === 'ios') {
+          void Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success,
+          );
+        } else {
+          Vibration.vibrate(100);
+        }
+
+        // Success icon animation
+        scale.value = withSpring(1, {
+          damping: 12,
+          stiffness: 100,
+        });
+        opacity.value = withTiming(1, { duration: 300 });
       } else {
-        Vibration.vibrate(100);
+        scale.value = 0;
+        opacity.value = 0;
       }
 
-      // Success icon animation
-      scale.value = withSpring(1, {
-        damping: 12,
-        stiffness: 100,
-      });
-      opacity.value = withTiming(1, { duration: 300 });
-    } else {
-      scale.value = 0;
-      opacity.value = 0;
-    }
+      return () => {
+        cancelAnimation(scale);
+        cancelAnimation(opacity);
+      };
+    }, [visible, scale, opacity]);
 
-    return () => {
-      cancelAnimation(scale);
-      cancelAnimation(opacity);
-    };
-  }, [visible, scale, opacity]);
+    const contentStyle = useAnimatedStyle(() => ({
+      opacity: opacity.value,
+    }));
 
-  const contentStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
+    const iconStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
 
-  const iconStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View style={styles.container}>
+          <Animated.View style={[styles.content, contentStyle]}>
+            {/* Confetti particles */}
+            <View style={styles.confettiContainer}>
+              {Array.from({ length: 12 }).map((_, index) => (
+                <ConfettiPiece
+                  key={index}
+                  index={index}
+                  totalPieces={12}
+                  color={confettiColors[index % confettiColors.length]}
+                  visible={visible}
+                />
+              ))}
+            </View>
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.container}>
-        <Animated.View style={[styles.content, contentStyle]}>
-          {/* Confetti particles */}
-          <View style={styles.confettiContainer}>
-            {Array.from({ length: 12 }).map((_, index) => (
-              <ConfettiPiece
-                key={index}
-                index={index}
-                totalPieces={12}
-                color={confettiColors[index % confettiColors.length]}
-                visible={visible}
+            {/* Success icon */}
+            <Animated.View style={[styles.iconContainer, iconStyle]}>
+              <MaterialCommunityIcons
+                name="check-circle"
+                size={80}
+                color={COLORS.feedback.success}
               />
-            ))}
-          </View>
+            </Animated.View>
 
-          {/* Success icon */}
-          <Animated.View style={[styles.iconContainer, iconStyle]}>
-            <MaterialCommunityIcons
-              name="check-circle"
-              size={80}
-              color={COLORS.feedback.success}
-            />
+            {/* Success message */}
+            <Text style={styles.title}>Gesture Sent!</Text>
+            <Text style={styles.subtitle}>
+              Your ${amount.toFixed(2)} gift is on its way
+            </Text>
+
+            {amount >= VALUES.ESCROW_DIRECT_MAX && (
+              <View style={styles.infoBox}>
+                <MaterialCommunityIcons
+                  name="shield-check"
+                  size={20}
+                  color={COLORS.feedback.success}
+                />
+                <Text style={styles.infoText}>
+                  You&apos;ll be notified when proof is uploaded.
+                </Text>
+              </View>
+            )}
+
+            {amount < VALUES.ESCROW_DIRECT_MAX && (
+              <View style={styles.infoBox}>
+                <MaterialCommunityIcons
+                  name="flash"
+                  size={20}
+                  color={COLORS.feedback.success}
+                />
+                <Text style={styles.infoText}>
+                  Payment sent instantly to recipient.
+                </Text>
+              </View>
+            )}
+
+            {/* Return button - No approval needed for givers */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={onClose}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.buttonText}>Return Home</Text>
+            </TouchableOpacity>
           </Animated.View>
-
-          {/* Success message */}
-          <Text style={styles.title}>Gesture Sent!</Text>
-          <Text style={styles.subtitle}>
-            Your ${amount.toFixed(2)} gift is on its way
-          </Text>
-
-          {amount >= VALUES.ESCROW_DIRECT_MAX && (
-            <View style={styles.infoBox}>
-              <MaterialCommunityIcons
-                name="shield-check"
-                size={20}
-                color={COLORS.feedback.success}
-              />
-              <Text style={styles.infoText}>
-                You&apos;ll be notified when proof is uploaded.
-              </Text>
-            </View>
-          )}
-
-          {amount < VALUES.ESCROW_DIRECT_MAX && (
-            <View style={styles.infoBox}>
-              <MaterialCommunityIcons
-                name="flash"
-                size={20}
-                color={COLORS.feedback.success}
-              />
-              <Text style={styles.infoText}>
-                Payment sent instantly to recipient.
-              </Text>
-            </View>
-          )}
-
-          {/* Return button - No approval needed for givers */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={onClose}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonText}>Return Home</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    </Modal>
-  );
-};
+        </View>
+      </Modal>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   button: {

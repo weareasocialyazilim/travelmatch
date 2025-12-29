@@ -3,7 +3,7 @@
  * Modal for card management options
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   View,
   Text,
@@ -24,50 +24,60 @@ export interface CardOptionsModalProps {
   onRemove?: () => void;
 }
 
-export const CardOptionsModal: React.FC<CardOptionsModalProps> = ({
-  visible,
-  isDefault = false,
-  onClose,
-  onSetDefault,
-  onRemove,
-}) => {
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={styles.content}>
-              <Text style={styles.title}>Card Options</Text>
+export const CardOptionsModal: React.FC<CardOptionsModalProps> = memo(
+  ({ visible, isDefault = false, onClose, onSetDefault, onRemove }) => {
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.overlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.content}>
+                <Text style={styles.title}>Card Options</Text>
 
-              {!isDefault && (
-                <TouchableOpacity style={styles.option} onPress={onSetDefault}>
+                {!isDefault && (
+                  <TouchableOpacity
+                    style={styles.option}
+                    onPress={onSetDefault}
+                  >
+                    <MaterialCommunityIcons
+                      name="star-outline"
+                      size={24}
+                      color={COLORS.text.primary}
+                    />
+                    <Text style={styles.optionText}>Set as Default</Text>
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                  style={[styles.option, styles.dangerOption]}
+                  onPress={onRemove}
+                >
                   <MaterialCommunityIcons
-                    name="star-outline"
+                    name="trash-can-outline"
                     size={24}
-                    color={COLORS.text.primary}
+                    color={COLORS.feedback.error}
                   />
-                  <Text style={styles.optionText}>Set as Default</Text>
+                  <Text style={[styles.optionText, styles.dangerText]}>
+                    Remove Card
+                  </Text>
                 </TouchableOpacity>
-              )}
 
-              <TouchableOpacity
-                style={[styles.option, styles.dangerOption]}
-                onPress={onRemove}
-              >
-                <MaterialCommunityIcons name="trash-can-outline" size={24} color={COLORS.feedback.error} />
-                <Text style={[styles.optionText, styles.dangerText]}>Remove Card</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
-    </Modal>
-  );
-};
+                <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+                  <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   overlay: {

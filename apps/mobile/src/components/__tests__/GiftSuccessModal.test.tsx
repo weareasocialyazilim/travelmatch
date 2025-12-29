@@ -3,6 +3,21 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { Platform } from 'react-native';
 import { GiftSuccessModal } from '../GiftSuccessModal';
 
+// Mock react-native-reanimated
+jest.mock('react-native-reanimated', () => {
+  const Reanimated = require('react-native-reanimated/mock');
+  Reanimated.default.call = () => {};
+  return {
+    ...Reanimated,
+    useSharedValue: jest.fn((init) => ({ value: init })),
+    useAnimatedStyle: jest.fn(() => ({})),
+    withSpring: jest.fn((val) => val),
+    withTiming: jest.fn((val) => val),
+    interpolate: jest.fn((val) => val),
+    cancelAnimation: jest.fn(),
+  };
+});
+
 // Mock expo-haptics
 jest.mock('expo-haptics', () => ({
   notificationAsync: jest.fn(() => Promise.resolve()),
