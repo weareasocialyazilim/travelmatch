@@ -4,15 +4,42 @@
  * Handles phone verification via Twilio Verify
  *
  * Endpoints:
- * - POST /send-otp - Send verification code
- * - POST /verify-otp - Verify code
- * - POST /send-sms - Send direct SMS
+ * - POST /send-otp - Send verification code (rate limited: 1/min, 5/hour per phone)
+ * - POST /verify-otp - Verify code (rate limited: 5/min per phone)
+ * - POST /send-sms - Send direct SMS (rate limited: standard)
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { corsHeaders } from '../_shared/cors.ts';
+import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
 
 const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
+
+/**
+ * Rate limiters for OTP operations
+ * OTP send: Very strict (1 per minute per phone, 5 per hour)
+ * OTP verify: Moderate (5 attempts per minute to allow retries)
+ * SMS: Standard rate limiting
+ */
+const otpSendLimiter = createUpstashRateLimiter({
+  requests: 1,
+  window: 60, // 1 per minute
+  prefix: 'otp_send',
+});
+
+const otpHourlyLimiter = createUpstashRateLimiter({
+  requests: 5,
+  window: 3600, // 5 per hour
+  prefix: 'otp_hourly',
+});
+
+const otpVerifyLimiter = createUpstashRateLimiter({
+  requests: 5,
+  window: 60, // 5 per minute
+  prefix: 'otp_verify',
+});
+
+const smsLimiter = createUpstashRateLimiter(RateLimitPresets.STANDARD);
 const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
 const TWILIO_VERIFY_SERVICE_SID = Deno.env.get('TWILIO_VERIFY_SERVICE_SID');
 const TWILIO_PHONE_NUMBER = Deno.env.get('TWILIO_PHONE_NUMBER');
@@ -193,7 +220,7 @@ serve(async (req) => {
     let result: TwilioResponse;
 
     switch (path) {
-      case 'send-otp':
+      case 'send-otp': {
         if (!body.phone) {
           return new Response(
             JSON.stringify({ error: 'Phone number required' }),
@@ -203,10 +230,51 @@ serve(async (req) => {
             },
           );
         }
+
+        // Rate limit by phone number (1 per minute)
+        const phoneKey = formatPhoneNumber(body.phone);
+        const minuteLimit = await otpSendLimiter.checkByKey(phoneKey);
+        if (!minuteLimit.ok) {
+          return new Response(
+            JSON.stringify({
+              error: 'Too many OTP requests. Please wait before requesting another code.',
+              retryAfter: minuteLimit.retryAfter,
+            }),
+            {
+              status: 429,
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json',
+                'Retry-After': String(minuteLimit.retryAfter || 60),
+              },
+            },
+          );
+        }
+
+        // Hourly limit (5 per hour)
+        const hourlyLimit = await otpHourlyLimiter.checkByKey(phoneKey);
+        if (!hourlyLimit.ok) {
+          return new Response(
+            JSON.stringify({
+              error: 'Daily OTP limit reached. Please try again later.',
+              retryAfter: hourlyLimit.retryAfter,
+            }),
+            {
+              status: 429,
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json',
+                'Retry-After': String(hourlyLimit.retryAfter || 3600),
+              },
+            },
+          );
+        }
+
         result = await sendOtp(body.phone, body.channel);
         break;
+      }
 
-      case 'verify-otp':
+      case 'verify-otp': {
         if (!body.phone || !body.code) {
           return new Response(
             JSON.stringify({ error: 'Phone and code required' }),
@@ -216,10 +284,32 @@ serve(async (req) => {
             },
           );
         }
+
+        // Rate limit verification attempts (5 per minute)
+        const phoneKey = formatPhoneNumber(body.phone);
+        const verifyLimit = await otpVerifyLimiter.checkByKey(phoneKey);
+        if (!verifyLimit.ok) {
+          return new Response(
+            JSON.stringify({
+              error: 'Too many verification attempts. Please wait.',
+              retryAfter: verifyLimit.retryAfter,
+            }),
+            {
+              status: 429,
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json',
+                'Retry-After': String(verifyLimit.retryAfter || 60),
+              },
+            },
+          );
+        }
+
         result = await verifyOtp(body.phone, body.code);
         break;
+      }
 
-      case 'send-sms':
+      case 'send-sms': {
         if (!body.to || !body.message) {
           return new Response(
             JSON.stringify({ error: 'Recipient and message required' }),
@@ -229,8 +319,29 @@ serve(async (req) => {
             },
           );
         }
+
+        // Standard rate limit for SMS
+        const smsLimit = await smsLimiter.check(req);
+        if (!smsLimit.ok) {
+          return new Response(
+            JSON.stringify({
+              error: 'Rate limit exceeded',
+              retryAfter: smsLimit.retryAfter,
+            }),
+            {
+              status: 429,
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json',
+                'Retry-After': String(smsLimit.retryAfter || 60),
+              },
+            },
+          );
+        }
+
         result = await sendSms(body.to, body.message);
         break;
+      }
 
       default:
         return new Response(JSON.stringify({ error: 'Invalid endpoint' }), {

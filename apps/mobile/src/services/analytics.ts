@@ -17,6 +17,96 @@ async function getSentry(): Promise<SentryType | null> {
 }
 
 /**
+ * PII patterns to sanitize from analytics data
+ * Prevents accidental tracking of sensitive information
+ */
+const PII_PATTERNS: Record<string, RegExp> = {
+  email: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi,
+  phone: /(\+?[0-9]{1,4}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?[\d\s-]{6,14}/g,
+  creditCard: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g,
+  ssn: /\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g,
+  ipv4: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g,
+  jwt: /eyJ[A-Za-z0-9-_]+\.eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*/g,
+};
+
+/**
+ * Keys that should be completely removed from analytics
+ */
+const SENSITIVE_KEYS = new Set([
+  'password',
+  'token',
+  'secret',
+  'apiKey',
+  'api_key',
+  'accessToken',
+  'access_token',
+  'refreshToken',
+  'refresh_token',
+  'authorization',
+  'creditCard',
+  'credit_card',
+  'cardNumber',
+  'card_number',
+  'cvv',
+  'cvc',
+  'ssn',
+  'socialSecurityNumber',
+  'bankAccount',
+  'bank_account',
+  'routingNumber',
+  'routing_number',
+]);
+
+/**
+ * Sanitize a string value by redacting PII patterns
+ */
+function sanitizeString(value: string): string {
+  let sanitized = value;
+  for (const [_type, pattern] of Object.entries(PII_PATTERNS)) {
+    sanitized = sanitized.replace(pattern, '[REDACTED]');
+  }
+  return sanitized;
+}
+
+/**
+ * Recursively sanitize an object, removing sensitive keys and redacting PII
+ */
+function sanitizeProperties(
+  obj: Record<string, any> | undefined,
+  depth = 0,
+): Record<string, any> | undefined {
+  if (!obj || depth > 5) return obj; // Prevent infinite recursion
+
+  const sanitized: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    // Skip sensitive keys entirely
+    const lowerKey = key.toLowerCase();
+    if (SENSITIVE_KEYS.has(lowerKey) || SENSITIVE_KEYS.has(key)) {
+      continue;
+    }
+
+    if (typeof value === 'string') {
+      sanitized[key] = sanitizeString(value);
+    } else if (Array.isArray(value)) {
+      sanitized[key] = value.map((item) =>
+        typeof item === 'string'
+          ? sanitizeString(item)
+          : typeof item === 'object' && item !== null
+            ? sanitizeProperties(item, depth + 1)
+            : item,
+      );
+    } else if (typeof value === 'object' && value !== null) {
+      sanitized[key] = sanitizeProperties(value, depth + 1);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+
+  return sanitized;
+}
+
+/**
  * Analytics Service
  * Centralized analytics tracking with PostHog + Sentry
  *
@@ -95,6 +185,7 @@ class AnalyticsService {
   /**
    * Track a custom event
    * Sends to both PostHog and Sentry breadcrumbs
+   * All properties are sanitized to remove PII
    */
   public async trackEvent(eventName: string, properties?: Record<string, any>) {
     if (!this.initialized) {
@@ -103,19 +194,24 @@ class AnalyticsService {
     }
 
     try {
+      // Sanitize properties to remove PII before sending
+      const sanitizedProps = sanitizeProperties(properties);
+
       // Send to PostHog
-      this.posthog?.capture(eventName, properties);
+      this.posthog?.capture(eventName, sanitizedProps);
 
       // Add Sentry breadcrumb for debugging (async, non-blocking)
       const sentry = await getSentry();
       sentry?.addBreadcrumb({
         category: 'user-action',
         message: eventName,
-        data: properties,
+        data: sanitizedProps,
         level: 'info',
       });
 
-      logger.info(`[Analytics] Event tracked: ${eventName}`, properties);
+      if (__DEV__) {
+        logger.info(`[Analytics] Event tracked: ${eventName}`, sanitizedProps);
+      }
     } catch (error) {
       logger.error('[Analytics] Failed to track event:', error);
     }
@@ -123,6 +219,7 @@ class AnalyticsService {
 
   /**
    * Track a screen view
+   * Properties are sanitized to remove PII
    */
   public async trackScreen(
     screenName: string,
@@ -131,17 +228,22 @@ class AnalyticsService {
     if (!this.initialized) return;
 
     try {
-      this.posthog?.screen(screenName, properties);
+      // Sanitize properties to remove PII
+      const sanitizedProps = sanitizeProperties(properties);
+
+      this.posthog?.screen(screenName, sanitizedProps);
 
       const sentry = await getSentry();
       sentry?.addBreadcrumb({
         category: 'navigation',
         message: `Screen: ${screenName}`,
-        data: properties,
+        data: sanitizedProps,
         level: 'info',
       });
 
-      logger.info(`[Analytics] Screen viewed: ${screenName}`, properties);
+      if (__DEV__) {
+        logger.info(`[Analytics] Screen viewed: ${screenName}`, sanitizedProps);
+      }
     } catch (error) {
       logger.error('[Analytics] Failed to track screen:', error);
     }

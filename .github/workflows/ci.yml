@@ -49,11 +49,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test -- --ci --coverage --maxWorkers=2
       - uses: codecov/codecov-action@v4
-        continue-on-error: true
+        # Coverage should be tracked and significant drops flagged
+        continue-on-error: false
         with:
           file: ./coverage/lcov.info
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: travelmatch-coverage
 
   build:
     name: Build Check
