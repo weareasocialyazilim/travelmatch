@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { LeaveTrustNoteBottomSheet } from '@/components/LeaveTrustNoteBottomSheet';
+import { ThankYouModal } from '@/components/ThankYouModal';
+import { createTrustNote, hasWrittenNoteForGift } from '@/services/trustNotesService';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -41,6 +45,11 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
     isAnonymous,
     status,
   } = route.params;
+
+  // State for trust note flow
+  const [showTrustNoteSheet, setShowTrustNoteSheet] = useState(false);
+  const [showThankYouModal, setShowThankYouModal] = useState(false);
+  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
 
   // Determine steps based on status
   const getTimelineSteps = (): TimelineStep[] => {
@@ -104,11 +113,60 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
     }
   };
 
-  const handleSayThanks = () => {
+  const handleSayThanks = async () => {
     if (!isAnonymous && senderId) {
+      // Check if user already wrote a note for this gift
+      const alreadyWrote = await hasWrittenNoteForGift(gestureId);
+      if (alreadyWrote) {
+        // Directly go to chat if already wrote note
+        navigateToChat();
+      } else {
+        // Show trust note bottom sheet first
+        setShowTrustNoteSheet(true);
+      }
+    }
+  };
+
+  const handleSubmitTrustNote = async (note: string) => {
+    if (!senderId) return;
+
+    setIsSubmittingNote(true);
+    try {
+      const result = await createTrustNote({
+        receiverId: senderId,
+        note,
+        giftId: gestureId,
+      });
+
+      setShowTrustNoteSheet(false);
+
+      if (result.success) {
+        // Show thank you modal
+        setShowThankYouModal(true);
+      } else {
+        Alert.alert('Hata', result.error || 'Not gönderilemedi');
+      }
+    } finally {
+      setIsSubmittingNote(false);
+    }
+  };
+
+  const handleThankYouModalClose = () => {
+    setShowThankYouModal(false);
+    // Navigate to chat after modal closes
+    navigateToChat();
+  };
+
+  const handleSkipTrustNote = () => {
+    setShowTrustNoteSheet(false);
+    navigateToChat();
+  };
+
+  const navigateToChat = () => {
+    if (senderId) {
       navigation.navigate('Chat', {
         otherUser: {
-          id: senderId,  // Fixed: use senderId instead of gestureId
+          id: senderId,
           name: senderName || 'Anonymous',
           avatar: senderAvatar || 'https://via.placeholder.com/100',
           isVerified: true,
@@ -375,6 +433,23 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
           </Text>
         </View>
       </ScrollView>
+
+      {/* Trust Note Bottom Sheet */}
+      <LeaveTrustNoteBottomSheet
+        visible={showTrustNoteSheet}
+        onClose={handleSkipTrustNote}
+        onSubmit={handleSubmitTrustNote}
+        recipientName={senderName || 'Destekçi'}
+        momentTitle={momentTitle}
+      />
+
+      {/* Thank You Modal */}
+      <ThankYouModal
+        visible={showThankYouModal}
+        onClose={handleThankYouModalClose}
+        giverName={senderName || 'Destekçi'}
+        amount={amount}
+      />
     </SafeAreaView>
   );
 };
