@@ -25,7 +25,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -57,6 +63,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { formatRelativeDate, getInitials, cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
+import { logger } from '@/lib/logger';
 
 // Types
 interface SarReport {
@@ -158,7 +165,9 @@ export default function CompliancePage() {
   const [riskProfiles, setRiskProfiles] = useState<RiskProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSar, setSelectedSar] = useState<SarReport | null>(null);
-  const [selectedProfile, setSelectedProfile] = useState<RiskProfile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<RiskProfile | null>(
+    null,
+  );
   const [statusFilter, setStatusFilter] = useState('all');
   const [riskFilter, setRiskFilter] = useState('all');
   const [search, setSearch] = useState('');
@@ -173,7 +182,7 @@ export default function CompliancePage() {
         setStats(data);
       }
     } catch (error) {
-      console.error('Failed to fetch stats:', error);
+      logger.error('Failed to fetch stats', error);
     }
   }, []);
 
@@ -189,7 +198,7 @@ export default function CompliancePage() {
         setSarReports(data.reports || []);
       }
     } catch (error) {
-      console.error('Failed to fetch SAR reports:', error);
+      logger.error('Failed to fetch SAR reports', error);
     }
   }, [statusFilter]);
 
@@ -205,7 +214,7 @@ export default function CompliancePage() {
         setRiskProfiles(data.profiles || []);
       }
     } catch (error) {
-      console.error('Failed to fetch risk profiles:', error);
+      logger.error('Failed to fetch risk profiles', error);
     }
   }, [riskFilter]);
 
@@ -220,7 +229,11 @@ export default function CompliancePage() {
   }, [fetchStats, fetchSarReports, fetchRiskProfiles]);
 
   // Update SAR status
-  const updateSarStatus = async (id: string, status: string, notes?: string) => {
+  const updateSarStatus = async (
+    id: string,
+    status: string,
+    notes?: string,
+  ) => {
     try {
       const res = await fetch('/api/compliance', {
         method: 'PATCH',
@@ -241,13 +254,17 @@ export default function CompliancePage() {
         toast({ title: 'Güncelleme başarısız', variant: 'destructive' });
       }
     } catch (error) {
-      console.error('Failed to update SAR:', error);
+      logger.error('Failed to update SAR', error);
       toast({ title: 'Bir hata oluştu', variant: 'destructive' });
     }
   };
 
   // Block/Unblock user
-  const toggleUserBlock = async (userId: string, block: boolean, reason?: string) => {
+  const toggleUserBlock = async (
+    userId: string,
+    block: boolean,
+    reason?: string,
+  ) => {
     try {
       const res = await fetch('/api/compliance', {
         method: 'POST',
@@ -268,7 +285,7 @@ export default function CompliancePage() {
         toast({ title: 'İşlem başarısız', variant: 'destructive' });
       }
     } catch (error) {
-      console.error('Failed to toggle block:', error);
+      logger.error('Failed to toggle block', error);
       toast({ title: 'Bir hata oluştu', variant: 'destructive' });
     }
   };
@@ -278,17 +295,22 @@ export default function CompliancePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Compliance Center</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Compliance Center
+          </h1>
           <p className="text-muted-foreground">
             AML, Fraud Tespit ve Uyumluluk Yönetimi
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => {
-            fetchStats();
-            fetchSarReports();
-            fetchRiskProfiles();
-          }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              fetchStats();
+              fetchSarReports();
+              fetchRiskProfiles();
+            }}
+          >
             <RefreshCw className="mr-2 h-4 w-4" />
             Yenile
           </Button>
@@ -447,24 +469,34 @@ export default function CompliancePage() {
                             sar.risk_score >= 80
                               ? 'bg-red-100 dark:bg-red-900/30'
                               : sar.risk_score >= 50
-                              ? 'bg-orange-100 dark:bg-orange-900/30'
-                              : 'bg-yellow-100 dark:bg-yellow-900/30'
+                                ? 'bg-orange-100 dark:bg-orange-900/30'
+                                : 'bg-yellow-100 dark:bg-yellow-900/30',
                           )}
                         >
-                          <span className="text-sm font-bold">{sar.risk_score}</span>
+                          <span className="text-sm font-bold">
+                            {sar.risk_score}
+                          </span>
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">{sar.report_number}</span>
+                            <span className="font-medium">
+                              {sar.report_number}
+                            </span>
                             {getStatusBadge(sar.status)}
-                            <Badge variant="outline">{sar.report_type.toUpperCase()}</Badge>
+                            <Badge variant="outline">
+                              {sar.report_type.toUpperCase()}
+                            </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             {sar.user?.email || 'Bilinmeyen kullanıcı'}
                           </p>
                           <div className="mt-1 flex flex-wrap gap-1">
                             {sar.triggered_rules?.slice(0, 3).map((rule, i) => (
-                              <Badge key={i} variant="outline" className="text-xs">
+                              <Badge
+                                key={i}
+                                variant="outline"
+                                className="text-xs"
+                              >
                                 {rule}
                               </Badge>
                             ))}
@@ -476,7 +508,8 @@ export default function CompliancePage() {
                           </div>
                           <p className="mt-1 text-xs text-muted-foreground">
                             {formatRelativeDate(sar.created_at)} •{' '}
-                            {sar.total_amount?.toLocaleString('tr-TR')} {sar.currency}
+                            {sar.total_amount?.toLocaleString('tr-TR')}{' '}
+                            {sar.currency}
                           </p>
                         </div>
                       </div>
@@ -486,7 +519,9 @@ export default function CompliancePage() {
                           variant="outline"
                           onClick={() => {
                             setSelectedSar(sar);
-                            setInvestigationNotes(sar.investigation_notes || '');
+                            setInvestigationNotes(
+                              sar.investigation_notes || '',
+                            );
                           }}
                         >
                           <Eye className="mr-1 h-4 w-4" />
@@ -502,13 +537,17 @@ export default function CompliancePage() {
                             <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              onClick={() => updateSarStatus(sar.id, 'investigating')}
+                              onClick={() =>
+                                updateSarStatus(sar.id, 'investigating')
+                              }
                             >
                               <Clock className="mr-2 h-4 w-4" />
                               İncelemeye Al
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => updateSarStatus(sar.id, 'escalated')}
+                              onClick={() =>
+                                updateSarStatus(sar.id, 'escalated')
+                              }
                             >
                               <TrendingUp className="mr-2 h-4 w-4 text-orange-600" />
                               Yükselt
@@ -523,7 +562,9 @@ export default function CompliancePage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-600"
-                              onClick={() => updateSarStatus(sar.id, 'confirmed')}
+                              onClick={() =>
+                                updateSarStatus(sar.id, 'confirmed')
+                              }
                             >
                               <XCircle className="mr-2 h-4 w-4" />
                               Fraud Onayla
@@ -581,7 +622,7 @@ export default function CompliancePage() {
                         <div
                           className={cn(
                             'flex h-12 w-12 items-center justify-center rounded-full font-bold',
-                            getRiskLevelColor(profile.risk_level)
+                            getRiskLevelColor(profile.risk_level),
                           )}
                         >
                           {profile.risk_score}
@@ -604,13 +645,19 @@ export default function CompliancePage() {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Gönderilen: {profile.total_sent?.toLocaleString('tr-TR')} TL •
-                            Alınan: {profile.total_received?.toLocaleString('tr-TR')} TL
+                            Gönderilen:{' '}
+                            {profile.total_sent?.toLocaleString('tr-TR')} TL •
+                            Alınan:{' '}
+                            {profile.total_received?.toLocaleString('tr-TR')} TL
                           </p>
                           {profile.flags?.length > 0 && (
                             <div className="mt-1 flex flex-wrap gap-1">
                               {profile.flags.slice(0, 3).map((flag, i) => (
-                                <Badge key={i} variant="outline" className="text-xs">
+                                <Badge
+                                  key={i}
+                                  variant="outline"
+                                  className="text-xs"
+                                >
                                   {flag}
                                 </Badge>
                               ))}
@@ -631,7 +678,9 @@ export default function CompliancePage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => toggleUserBlock(profile.user_id, false)}
+                            onClick={() =>
+                              toggleUserBlock(profile.user_id, false)
+                            }
                           >
                             <Unlock className="mr-1 h-4 w-4 text-green-600" />
                             Aç
@@ -640,7 +689,13 @@ export default function CompliancePage() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => toggleUserBlock(profile.user_id, true, 'Manuel engel')}
+                            onClick={() =>
+                              toggleUserBlock(
+                                profile.user_id,
+                                true,
+                                'Manuel engel',
+                              )
+                            }
                           >
                             <Lock className="mr-1 h-4 w-4" />
                             Engelle
@@ -751,14 +806,62 @@ export default function CompliancePage() {
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { name: 'Rapid Fire', type: 'velocity', action: 'block', desc: '5 dk\'da 5+ hediye', active: true },
-                  { name: 'Ping Pong', type: 'pattern', action: 'block', desc: 'Karşılıklı transfer', active: true },
-                  { name: 'Circular Flow', type: 'pattern', action: 'block', desc: 'A→B→C→A döngüsü', active: true },
-                  { name: 'Self Gift', type: 'relationship', action: 'block', desc: 'Kendine hediye', active: true },
-                  { name: 'New User Max', type: 'behavioral', action: 'block', desc: '24h\'de ₺1000+', active: true },
-                  { name: 'Sanctioned Country', type: 'geographic', action: 'block', desc: 'KP, IR, SY, CU', active: true },
-                  { name: 'VPN Detection', type: 'geographic', action: 'challenge', desc: 'VPN/Proxy tespit', active: true },
-                  { name: 'Multi Account', type: 'device', action: 'flag', desc: 'Aynı cihazdan 2+ hesap', active: true },
+                  {
+                    name: 'Rapid Fire',
+                    type: 'velocity',
+                    action: 'block',
+                    desc: "5 dk'da 5+ hediye",
+                    active: true,
+                  },
+                  {
+                    name: 'Ping Pong',
+                    type: 'pattern',
+                    action: 'block',
+                    desc: 'Karşılıklı transfer',
+                    active: true,
+                  },
+                  {
+                    name: 'Circular Flow',
+                    type: 'pattern',
+                    action: 'block',
+                    desc: 'A→B→C→A döngüsü',
+                    active: true,
+                  },
+                  {
+                    name: 'Self Gift',
+                    type: 'relationship',
+                    action: 'block',
+                    desc: 'Kendine hediye',
+                    active: true,
+                  },
+                  {
+                    name: 'New User Max',
+                    type: 'behavioral',
+                    action: 'block',
+                    desc: "24h'de ₺1000+",
+                    active: true,
+                  },
+                  {
+                    name: 'Sanctioned Country',
+                    type: 'geographic',
+                    action: 'block',
+                    desc: 'KP, IR, SY, CU',
+                    active: true,
+                  },
+                  {
+                    name: 'VPN Detection',
+                    type: 'geographic',
+                    action: 'challenge',
+                    desc: 'VPN/Proxy tespit',
+                    active: true,
+                  },
+                  {
+                    name: 'Multi Account',
+                    type: 'device',
+                    action: 'flag',
+                    desc: 'Aynı cihazdan 2+ hesap',
+                    active: true,
+                  },
                 ].map((rule, i) => (
                   <div
                     key={i}
@@ -770,13 +873,13 @@ export default function CompliancePage() {
                           'flex h-10 w-10 items-center justify-center rounded-full',
                           rule.active
                             ? 'bg-green-100 dark:bg-green-900/30'
-                            : 'bg-gray-100 dark:bg-gray-900/30'
+                            : 'bg-gray-100 dark:bg-gray-900/30',
                         )}
                       >
                         <Shield
                           className={cn(
                             'h-5 w-5',
-                            rule.active ? 'text-green-600' : 'text-gray-400'
+                            rule.active ? 'text-green-600' : 'text-gray-400',
                           )}
                         />
                       </div>
@@ -789,18 +892,20 @@ export default function CompliancePage() {
                               rule.action === 'block'
                                 ? 'error'
                                 : rule.action === 'challenge'
-                                ? 'warning'
-                                : 'secondary'
+                                  ? 'warning'
+                                  : 'secondary'
                             }
                           >
                             {rule.action === 'block'
                               ? 'Engelle'
                               : rule.action === 'challenge'
-                              ? '2FA İste'
-                              : 'İşaretle'}
+                                ? '2FA İste'
+                                : 'İşaretle'}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{rule.desc}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {rule.desc}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -840,12 +945,15 @@ export default function CompliancePage() {
                 <div className="rounded-lg border p-3">
                   <p className="text-sm text-muted-foreground">Tutar</p>
                   <p className="font-medium">
-                    {selectedSar.total_amount?.toLocaleString('tr-TR')} {selectedSar.currency}
+                    {selectedSar.total_amount?.toLocaleString('tr-TR')}{' '}
+                    {selectedSar.currency}
                   </p>
                 </div>
                 <div className="rounded-lg border p-3">
                   <p className="text-sm text-muted-foreground">Tarih</p>
-                  <p className="font-medium">{formatRelativeDate(selectedSar.created_at)}</p>
+                  <p className="font-medium">
+                    {formatRelativeDate(selectedSar.created_at)}
+                  </p>
                 </div>
               </div>
 
@@ -881,7 +989,11 @@ export default function CompliancePage() {
               variant="outline"
               onClick={() =>
                 selectedSar &&
-                updateSarStatus(selectedSar.id, 'investigating', investigationNotes)
+                updateSarStatus(
+                  selectedSar.id,
+                  'investigating',
+                  investigationNotes,
+                )
               }
             >
               <Clock className="mr-2 h-4 w-4" />
@@ -913,7 +1025,10 @@ export default function CompliancePage() {
       </Dialog>
 
       {/* Risk Profile Detail Dialog */}
-      <Dialog open={!!selectedProfile} onOpenChange={() => setSelectedProfile(null)}>
+      <Dialog
+        open={!!selectedProfile}
+        onOpenChange={() => setSelectedProfile(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Risk Profili Detayı</DialogTitle>
@@ -924,13 +1039,15 @@ export default function CompliancePage() {
                 <div
                   className={cn(
                     'flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold',
-                    getRiskLevelColor(selectedProfile.risk_level)
+                    getRiskLevelColor(selectedProfile.risk_level),
                   )}
                 >
                   {selectedProfile.risk_score}
                 </div>
                 <div>
-                  <h3 className="font-semibold">{selectedProfile.user?.email}</h3>
+                  <h3 className="font-semibold">
+                    {selectedProfile.user?.email}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     Risk Seviyesi: {selectedProfile.risk_level.toUpperCase()}
                   </p>
@@ -956,7 +1073,9 @@ export default function CompliancePage() {
                 <div className="rounded-lg bg-red-100 dark:bg-red-900/30 p-4">
                   <div className="flex items-center gap-2">
                     <Lock className="h-5 w-5 text-red-600" />
-                    <span className="font-medium text-red-600">Hesap Engelli</span>
+                    <span className="font-medium text-red-600">
+                      Hesap Engelli
+                    </span>
                   </div>
                   <p className="mt-1 text-sm text-red-600">
                     {selectedProfile.block_reason || 'Sebep belirtilmedi'}
@@ -972,7 +1091,8 @@ export default function CompliancePage() {
             {selectedProfile?.is_blocked ? (
               <Button
                 onClick={() =>
-                  selectedProfile && toggleUserBlock(selectedProfile.user_id, false)
+                  selectedProfile &&
+                  toggleUserBlock(selectedProfile.user_id, false)
                 }
               >
                 <Unlock className="mr-2 h-4 w-4" />

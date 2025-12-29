@@ -1,4 +1,5 @@
 import { getClient } from './supabase';
+import { logger } from './logger';
 
 export interface AuditLogEntry {
   action: string;
@@ -34,7 +35,7 @@ export async function logAuditAction(
       user_agent: metadata?.user_agent,
     });
   } catch (error) {
-    console.error('Failed to log audit action:', error);
+    logger.error('Failed to log audit action', error);
     // Don't throw - audit logging should not break the main operation
   }
 }

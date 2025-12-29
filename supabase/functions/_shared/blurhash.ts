@@ -14,6 +14,10 @@
 
 import { encode } from 'https://esm.sh/blurhash@2.0.5';
 import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts';
+import { Logger } from './logger.ts';
+
+const logger = new Logger('blurhash');
+const IS_PRODUCTION = Deno.env.get('DENO_ENV') === 'production';
 
 /**
  * BlurHash configuration
@@ -50,7 +54,7 @@ const DEFAULT_CONFIG: BlurHashConfig = {
  */
 export async function generateBlurHash(
   imageBuffer: ArrayBuffer | Uint8Array,
-  config: BlurHashConfig = {}
+  config: BlurHashConfig = {},
 ): Promise<string> {
   const { componentX, componentY, maxDimension } = {
     ...DEFAULT_CONFIG,
@@ -59,22 +63,29 @@ export async function generateBlurHash(
 
   try {
     // Convert to Uint8Array if needed
-    const uint8Array = imageBuffer instanceof ArrayBuffer
-      ? new Uint8Array(imageBuffer)
-      : imageBuffer;
+    const uint8Array =
+      imageBuffer instanceof ArrayBuffer
+        ? new Uint8Array(imageBuffer)
+        : imageBuffer;
 
     // Decode image using imagescript
-    console.log('[BlurHash] Decoding image...');
+    if (!IS_PRODUCTION) logger.debug('Decoding image...');
     const image = await Image.decode(uint8Array);
 
     // Resize if needed to speed up BlurHash generation
     let processedImage = image;
-    if (maxDimension && (image.width > maxDimension || image.height > maxDimension)) {
+    if (
+      maxDimension &&
+      (image.width > maxDimension || image.height > maxDimension)
+    ) {
       const scale = maxDimension / Math.max(image.width, image.height);
       const newWidth = Math.round(image.width * scale);
       const newHeight = Math.round(image.height * scale);
 
-      console.log(`[BlurHash] Resizing from ${image.width}x${image.height} to ${newWidth}x${newHeight}`);
+      if (!IS_PRODUCTION)
+        logger.debug(
+          `Resizing from ${image.width}x${image.height} to ${newWidth}x${newHeight}`,
+        );
       processedImage = image.resize(newWidth, newHeight);
     }
 
@@ -90,25 +101,37 @@ export async function generateBlurHash(
         const color = processedImage.getPixelAt(x, y);
 
         // Extract RGBA from color (imagescript uses RGBA format)
-        pixels[pixelIndex] = (color >> 24) & 0xff;     // R
+        pixels[pixelIndex] = (color >> 24) & 0xff; // R
         pixels[pixelIndex + 1] = (color >> 16) & 0xff; // G
-        pixels[pixelIndex + 2] = (color >> 8) & 0xff;  // B
-        pixels[pixelIndex + 3] = color & 0xff;         // A
+        pixels[pixelIndex + 2] = (color >> 8) & 0xff; // B
+        pixels[pixelIndex + 3] = color & 0xff; // A
       }
     }
 
     // Generate BlurHash
-    console.log(`[BlurHash] Encoding ${width}x${height} image with ${componentX}x${componentY} components`);
-    const hash = encode(pixels, width, height, componentX || 4, componentY || 3);
+    if (!IS_PRODUCTION)
+      logger.debug(
+        `Encoding ${width}x${height} image with ${componentX}x${componentY} components`,
+      );
+    const hash = encode(
+      pixels,
+      width,
+      height,
+      componentX || 4,
+      componentY || 3,
+    );
 
-    console.log('[BlurHash] Successfully generated hash:', hash);
+    if (!IS_PRODUCTION) logger.debug('Successfully generated hash', { hash });
     return hash;
   } catch (error) {
-    console.error('[BlurHash] Generation failed:', error);
+    logger.error(
+      'Generation failed',
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     // Return a neutral gray BlurHash on error
     // This ensures the app doesn't break even if BlurHash generation fails
-    console.warn('[BlurHash] Returning fallback neutral gray hash');
+    logger.warn('Returning fallback neutral gray hash');
     return 'L00000fQfQfQfQfQfQfQfQfQfQfQ';
   }
 }
@@ -129,7 +152,7 @@ export async function generateBlurHash(
  */
 export async function generateBlurHashFromUrl(
   imageUrl: string,
-  config: BlurHashConfig = {}
+  config: BlurHashConfig = {},
 ): Promise<string> {
   try {
     const response = await fetch(imageUrl);
@@ -141,7 +164,11 @@ export async function generateBlurHashFromUrl(
     const arrayBuffer = await response.arrayBuffer();
     return await generateBlurHash(arrayBuffer, config);
   } catch (error) {
-    console.error('[BlurHash] Failed to generate from URL:', error);
+    logger.error(
+      'Failed to generate from URL',
+      error instanceof Error ? error : new Error(String(error)),
+      { imageUrl },
+    );
     throw error;
   }
 }
@@ -188,7 +215,8 @@ export function getBlurHashComponents(hash: string): {
  * Internal utility for BlurHash format
  */
 function decode83(str: string): number {
-  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#$%*+,-.:;=?@[]^_{|}~';
+  const characters =
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#$%*+,-.:;=?@[]^_{|}~';
   return characters.indexOf(str);
 }
 

@@ -1,11 +1,11 @@
 /**
  * Redis Cache Service (Supabase Edge Functions)
- * 
+ *
  * Provides caching layer for frequently accessed data:
  * - User profiles
  * - Popular moments
  * - Recent conversations
- * 
+ *
  * TTL Strategy:
  * - User profiles: 15 minutes
  * - Moments: 5 minutes
@@ -13,6 +13,9 @@
  */
 
 import { connect } from 'https://deno.land/x/redis@v0.29.0/mod.ts';
+import { Logger } from './logger.ts';
+
+const logger = new Logger('cache');
 
 // Redis connection configuration
 const REDIS_URL = Deno.env.get('REDIS_URL') || 'redis://localhost:6379';
@@ -47,14 +50,17 @@ export async function getCache<T>(key: string): Promise<T | null> {
   try {
     const redis = await getRedisClient();
     const data = await redis.get(key);
-    
+
     if (!data) {
       return null;
     }
-    
+
     return JSON.parse(data) as T;
   } catch (error) {
-    console.error(`[Cache] Get error for key ${key}:`, error);
+    logger.error(
+      `Get error for key ${key}`,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return null; // Fail-open: return null on cache miss
   }
 }
@@ -70,11 +76,14 @@ export async function setCache(
   try {
     const redis = await getRedisClient();
     const serialized = JSON.stringify(value);
-    
+
     await redis.setex(key, ttl, serialized);
     return true;
   } catch (error) {
-    console.error(`[Cache] Set error for key ${key}:`, error);
+    logger.error(
+      `Set error for key ${key}`,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return false; // Fail-open: return false on cache write failure
   }
 }
@@ -88,7 +97,10 @@ export async function deleteCache(key: string): Promise<boolean> {
     await redis.del(key);
     return true;
   } catch (error) {
-    console.error(`[Cache] Delete error for key ${key}:`, error);
+    logger.error(
+      `Delete error for key ${key}`,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return false;
   }
 }
@@ -100,15 +112,18 @@ export async function deleteCacheByPattern(pattern: string): Promise<number> {
   try {
     const redis = await getRedisClient();
     const keys = await redis.keys(pattern);
-    
+
     if (keys.length === 0) {
       return 0;
     }
-    
+
     await redis.del(...keys);
     return keys.length;
   } catch (error) {
-    console.error(`[Cache] Delete pattern error for ${pattern}:`, error);
+    logger.error(
+      `Delete pattern error for ${pattern}`,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return 0;
   }
 }
@@ -121,7 +136,7 @@ export const CacheKeys = {
   moment: (momentId: string) => `moment:${momentId}`,
   conversation: (conversationId: string) => `conversation:${conversationId}`,
   userConversations: (userId: string) => `user:${userId}:conversations`,
-  popularMoments: (category?: string) => 
+  popularMoments: (category?: string) =>
     category ? `moments:popular:${category}` : 'moments:popular',
 } as const;
 
@@ -137,19 +152,19 @@ export async function getCachedUserProfile<T>(
   fetchFn: () => Promise<T>,
 ): Promise<T> {
   const cacheKey = CacheKeys.userProfile(userId);
-  
+
   // Try cache first
   const cached = await getCache<T>(cacheKey);
   if (cached) {
     return cached;
   }
-  
+
   // Fetch from database
   const data = await fetchFn();
-  
+
   // Cache for future requests
   await setCache(cacheKey, data, CacheTTL.USER_PROFILE);
-  
+
   return data;
 }
 
@@ -161,15 +176,15 @@ export async function getCachedMoment<T>(
   fetchFn: () => Promise<T>,
 ): Promise<T> {
   const cacheKey = CacheKeys.moment(momentId);
-  
+
   const cached = await getCache<T>(cacheKey);
   if (cached) {
     return cached;
   }
-  
+
   const data = await fetchFn();
   await setCache(cacheKey, data, CacheTTL.MOMENT);
-  
+
   return data;
 }
 

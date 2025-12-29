@@ -15,7 +15,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -34,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { formatDate, formatCurrency, getInitials } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface User {
   id: string;
@@ -67,7 +74,10 @@ const statusConfig = {
   pending: { label: 'Beklemede', variant: 'secondary' as const },
 };
 
-const kycStatusConfig: Record<string, { label: string; variant: 'secondary' | 'warning' | 'success' | 'error' }> = {
+const kycStatusConfig: Record<
+  string,
+  { label: string; variant: 'secondary' | 'warning' | 'success' | 'error' }
+> = {
   not_started: { label: 'Başlamadı', variant: 'secondary' },
   pending: { label: 'Bekliyor', variant: 'warning' },
   verified: { label: 'Doğrulandı', variant: 'success' },
@@ -106,7 +116,7 @@ export default function UsersPage() {
       setUsers(data.users || []);
       setTotal(data.total || 0);
     } catch (err) {
-      console.error('Users fetch error:', err);
+      logger.error('Users fetch error', err);
       setError('Kullanıcılar yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
@@ -116,19 +126,21 @@ export default function UsersPage() {
   const fetchStats = useCallback(async () => {
     try {
       // Fetch stats for the cards
-      const [totalRes, activeRes, pendingKycRes, suspendedRes] = await Promise.all([
-        fetch('/api/users?limit=1'),
-        fetch('/api/users?status=active&limit=1'),
-        fetch('/api/kyc?status=pending&limit=1'),
-        fetch('/api/users?status=suspended&limit=1'),
-      ]);
+      const [totalRes, activeRes, pendingKycRes, suspendedRes] =
+        await Promise.all([
+          fetch('/api/users?limit=1'),
+          fetch('/api/users?status=active&limit=1'),
+          fetch('/api/kyc?status=pending&limit=1'),
+          fetch('/api/users?status=suspended&limit=1'),
+        ]);
 
-      const [totalData, activeData, pendingKycData, suspendedData] = await Promise.all([
-        totalRes.json(),
-        activeRes.json(),
-        pendingKycRes.json(),
-        suspendedRes.json(),
-      ]);
+      const [totalData, activeData, pendingKycData, suspendedData] =
+        await Promise.all([
+          totalRes.json(),
+          activeRes.json(),
+          pendingKycRes.json(),
+          suspendedRes.json(),
+        ]);
 
       setStats({
         totalUsers: totalData.total || 0,
@@ -137,7 +149,7 @@ export default function UsersPage() {
         suspendedUsers: suspendedData.total || 0,
       });
     } catch (err) {
-      console.error('Stats fetch error:', err);
+      logger.error('Stats fetch error', err);
     }
   }, []);
 
@@ -194,7 +206,9 @@ export default function UsersPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={fetchUsers} disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+            />
             Yenile
           </Button>
           <Button>
@@ -208,19 +222,27 @@ export default function UsersPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Kullanıcı</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Toplam Kullanıcı
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalUsers?.toLocaleString('tr-TR') || '-'}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalUsers?.toLocaleString('tr-TR') || '-'}
+            </div>
             <p className="text-xs text-muted-foreground">Kayıtlı kullanıcı</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Aktif Kullanıcı</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Aktif Kullanıcı
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.activeUsers?.toLocaleString('tr-TR') || '-'}</div>
+            <div className="text-2xl font-bold">
+              {stats?.activeUsers?.toLocaleString('tr-TR') || '-'}
+            </div>
             <p className="text-xs text-muted-foreground">Aktif hesaplar</p>
           </CardContent>
         </Card>
@@ -238,7 +260,9 @@ export default function UsersPage() {
             <CardTitle className="text-sm font-medium">Askıya Alınan</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.suspendedUsers || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.suspendedUsers || 0}
+            </div>
             <p className="text-xs text-muted-foreground">Askıdaki hesaplar</p>
           </CardContent>
         </Card>
@@ -250,9 +274,7 @@ export default function UsersPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Kullanıcı Listesi</CardTitle>
-              <CardDescription>
-                {total} kullanıcı bulundu
-              </CardDescription>
+              <CardDescription>{total} kullanıcı bulundu</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -268,7 +290,13 @@ export default function UsersPage() {
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(0); }}>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => {
+                setStatusFilter(v);
+                setPage(0);
+              }}
+            >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Durum" />
               </SelectTrigger>
@@ -279,7 +307,13 @@ export default function UsersPage() {
                 <SelectItem value="banned">Yasaklanmış</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={kycFilter} onValueChange={(v) => { setKycFilter(v); setPage(0); }}>
+            <Select
+              value={kycFilter}
+              onValueChange={(v) => {
+                setKycFilter(v);
+                setPage(0);
+              }}
+            >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="KYC Durumu" />
               </SelectTrigger>
@@ -320,7 +354,11 @@ export default function UsersPage() {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
                       <AvatarImage src={user.avatar_url || undefined} />
-                      <AvatarFallback>{getInitials(user.display_name || user.full_name || user.email)}</AvatarFallback>
+                      <AvatarFallback>
+                        {getInitials(
+                          user.display_name || user.full_name || user.email,
+                        )}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
                       <Link
@@ -334,11 +372,15 @@ export default function UsersPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-sm text-muted-foreground truncate">{user.email}</div>
+                  <div className="text-sm text-muted-foreground truncate">
+                    {user.email}
+                  </div>
                   <Badge variant={statusConfig[status].variant}>
                     {statusConfig[status].label}
                   </Badge>
-                  <Badge variant={kycStatusConfig[kycStatus]?.variant || 'secondary'}>
+                  <Badge
+                    variant={kycStatusConfig[kycStatus]?.variant || 'secondary'}
+                  >
                     {kycStatusConfig[kycStatus]?.label || kycStatus}
                   </Badge>
                   <div className="text-sm font-medium">
@@ -393,13 +435,14 @@ export default function UsersPage() {
           {total > limit && (
             <div className="mt-4 flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                {page * limit + 1} - {Math.min((page + 1) * limit, total)} / {total} kullanıcı
+                {page * limit + 1} - {Math.min((page + 1) * limit, total)} /{' '}
+                {total} kullanıcı
               </p>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(p => p - 1)}
+                  onClick={() => setPage((p) => p - 1)}
                   disabled={page === 0}
                 >
                   Önceki
@@ -407,7 +450,7 @@ export default function UsersPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(p => p + 1)}
+                  onClick={() => setPage((p) => p + 1)}
                   disabled={(page + 1) * limit >= total}
                 >
                   Sonraki

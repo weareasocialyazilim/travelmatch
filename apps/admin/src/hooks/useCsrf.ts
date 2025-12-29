@@ -6,6 +6,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 const CSRF_HEADER_NAME = 'x-csrf-token';
 
@@ -30,7 +31,7 @@ export function useCsrf() {
           setCsrfToken(token);
         }
       } catch (error) {
-        console.error('[CSRF] Failed to fetch token:', error);
+        logger.error('[CSRF] Failed to fetch token', error);
       }
     };
 

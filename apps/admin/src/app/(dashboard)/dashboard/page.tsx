@@ -20,7 +20,13 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/common/stat-card';
 import {
@@ -30,6 +36,7 @@ import {
 } from '@/components/common/admin-chart';
 import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // Types for API responses
 interface DashboardStats {
@@ -105,21 +112,24 @@ const quickLinks = [
     description: 'Finansal raporlar',
     href: '/revenue',
     icon: DollarSign,
-    color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+    color:
+      'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
   },
   {
     title: 'Coğrafya',
     description: 'Bölgesel analiz',
     href: '/geographic',
     icon: Heart,
-    color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+    color:
+      'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
   },
   {
     title: 'Olaylar',
     description: 'Sistem durumu',
     href: '/incidents',
     icon: AlertTriangle,
-    color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+    color:
+      'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
   },
 ];
 
@@ -128,7 +138,11 @@ const systemHealth = {
   api: { status: 'healthy' as const, uptime: 99.98, label: 'API Gateway' },
   database: { status: 'healthy' as const, uptime: 99.99, label: 'Database' },
   storage: { status: 'healthy' as const, uptime: 99.95, label: 'Storage' },
-  notifications: { status: 'healthy' as const, uptime: 99.9, label: 'Notifications' },
+  notifications: {
+    status: 'healthy' as const,
+    uptime: 99.9,
+    label: 'Notifications',
+  },
 };
 
 // Sparkline data generators
@@ -192,13 +206,21 @@ export default function DashboardPage() {
           taskCounts[task.type] = (taskCounts[task.type] || 0) + 1;
         });
 
-        const processedTasks: PendingTask[] = Object.entries(taskCounts).map(([type, count], idx) => ({
-          id: `task-${idx}`,
-          type,
-          title: taskLabels[type] || type,
-          count,
-          priority: ['kyc_verification', 'payout_approval', 'payment_approval'].includes(type) ? 'high' : 'medium',
-        }));
+        const processedTasks: PendingTask[] = Object.entries(taskCounts).map(
+          ([type, count], idx) => ({
+            id: `task-${idx}`,
+            type,
+            title: taskLabels[type] || type,
+            count,
+            priority: [
+              'kyc_verification',
+              'payout_approval',
+              'payment_approval',
+            ].includes(type)
+              ? 'high'
+              : 'medium',
+          }),
+        );
 
         // Sort by priority and count
         processedTasks.sort((a, b) => {
@@ -222,9 +244,15 @@ export default function DashboardPage() {
           setUserActivityData(
             days.map((day, i) => ({
               date: day,
-              users: Math.floor((analyticsData.metrics?.activeUsers || 1000) * (0.8 + Math.random() * 0.4)),
-              newUsers: Math.floor((analyticsData.metrics?.newUsers || 100) / 7 * (0.7 + Math.random() * 0.6)),
-            }))
+              users: Math.floor(
+                (analyticsData.metrics?.activeUsers || 1000) *
+                  (0.8 + Math.random() * 0.4),
+              ),
+              newUsers: Math.floor(
+                ((analyticsData.metrics?.newUsers || 100) / 7) *
+                  (0.7 + Math.random() * 0.6),
+              ),
+            })),
           );
         }
       }
@@ -240,21 +268,23 @@ export default function DashboardPage() {
           const avgRevenue = (financeData.summary?.totalRevenue || 350000) / 7;
           setRevenueData(
             days.map((day) => {
-              const dailyRevenue = Math.floor(avgRevenue * (0.7 + Math.random() * 0.6));
+              const dailyRevenue = Math.floor(
+                avgRevenue * (0.7 + Math.random() * 0.6),
+              );
               return {
                 date: day,
                 revenue: dailyRevenue,
                 subscriptions: Math.floor(dailyRevenue * 0.65),
                 gifts: Math.floor(dailyRevenue * 0.35),
               };
-            })
+            }),
           );
         }
       }
 
       setLastUpdated(new Date());
     } catch (err) {
-      console.error('Dashboard fetch error:', err);
+      logger.error('Dashboard fetch error', err);
       setError('Veriler yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
@@ -269,7 +299,9 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [fetchDashboardData]);
 
-  const getStatusIcon = (status: 'healthy' | 'degraded' | 'down' | 'maintenance') => {
+  const getStatusIcon = (
+    status: 'healthy' | 'degraded' | 'down' | 'maintenance',
+  ) => {
     switch (status) {
       case 'healthy':
         return <CheckCircle2 className="h-4 w-4 text-status-healthy" />;
@@ -335,7 +367,9 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Platform genel bakış ve özet metrikleri</p>
+          <p className="text-muted-foreground">
+            Platform genel bakış ve özet metrikleri
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {lastUpdated && (
@@ -349,7 +383,9 @@ export default function DashboardPage() {
             onClick={fetchDashboardData}
             disabled={loading}
           >
-            <RefreshCw className={cn('h-4 w-4 mr-1', loading && 'animate-spin')} />
+            <RefreshCw
+              className={cn('h-4 w-4 mr-1', loading && 'animate-spin')}
+            />
             Yenile
           </Button>
         </div>
@@ -364,7 +400,9 @@ export default function DashboardPage() {
           change={stats?.userGrowth || 0}
           changeLabel="son 30 gün"
           href="/users"
-          sparkline={generateSparkline(stats?.userGrowth && stats.userGrowth > 0 ? 'up' : 'stable')}
+          sparkline={generateSparkline(
+            stats?.userGrowth && stats.userGrowth > 0 ? 'up' : 'stable',
+          )}
         />
         <StatCard
           title="Aktif Kullanıcı"
@@ -374,7 +412,9 @@ export default function DashboardPage() {
           changeLabel="son 7 gün"
           variant="success"
           href="/analytics"
-          sparkline={generateSparkline(stats?.activeGrowth && stats.activeGrowth > 0 ? 'up' : 'stable')}
+          sparkline={generateSparkline(
+            stats?.activeGrowth && stats.activeGrowth > 0 ? 'up' : 'stable',
+          )}
         />
         <StatCard
           title="Toplam Gelir"
@@ -384,7 +424,9 @@ export default function DashboardPage() {
           changeLabel="son 30 gün"
           variant="success"
           href="/revenue"
-          sparkline={generateSparkline(stats?.revenueGrowth && stats.revenueGrowth > 0 ? 'up' : 'stable')}
+          sparkline={generateSparkline(
+            stats?.revenueGrowth && stats.revenueGrowth > 0 ? 'up' : 'stable',
+          )}
         />
         <StatCard
           title="Toplam Moment"
@@ -393,7 +435,9 @@ export default function DashboardPage() {
           change={stats?.momentGrowth || 0}
           changeLabel="son 30 gün"
           href="/moments"
-          sparkline={generateSparkline(stats?.momentGrowth && stats.momentGrowth > 0 ? 'up' : 'stable')}
+          sparkline={generateSparkline(
+            stats?.momentGrowth && stats.momentGrowth > 0 ? 'up' : 'stable',
+          )}
         />
       </div>
 
@@ -408,13 +452,18 @@ export default function DashboardPage() {
             xAxisKey="date"
             height={280}
             areas={[
-              { dataKey: 'users', name: 'Aktif Kullanıcı', color: CHART_COLORS.primary },
-              { dataKey: 'newUsers', name: 'Yeni Kayıt', color: CHART_COLORS.trust },
+              {
+                dataKey: 'users',
+                name: 'Aktif Kullanıcı',
+                color: CHART_COLORS.primary,
+              },
+              {
+                dataKey: 'newUsers',
+                name: 'Yeni Kayıt',
+                color: CHART_COLORS.trust,
+              },
             ]}
-            formatter={(value, name) => [
-              value.toLocaleString('tr-TR'),
-              name,
-            ]}
+            formatter={(value, name) => [value.toLocaleString('tr-TR'), name]}
           />
 
           {/* Revenue Chart */}
@@ -425,8 +474,16 @@ export default function DashboardPage() {
             xAxisKey="date"
             height={250}
             lines={[
-              { dataKey: 'subscriptions', name: 'Abonelik', color: CHART_COLORS.primary },
-              { dataKey: 'gifts', name: 'Hediye', color: CHART_COLORS.secondary },
+              {
+                dataKey: 'subscriptions',
+                name: 'Abonelik',
+                color: CHART_COLORS.primary,
+              },
+              {
+                dataKey: 'gifts',
+                name: 'Hediye',
+                color: CHART_COLORS.secondary,
+              },
             ]}
             yAxisFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
             formatter={(value, name) => [formatCurrency(value, 'TRY'), name]}
@@ -439,9 +496,15 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold">Bekleyen Görevler</CardTitle>
+                <CardTitle className="text-base font-semibold">
+                  Bekleyen Görevler
+                </CardTitle>
                 <Link href="/queue">
-                  <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1 text-xs"
+                  >
                     Tümü
                     <ArrowRight className="h-3 w-3" />
                   </Button>
@@ -462,7 +525,8 @@ export default function DashboardPage() {
                       key={task.id}
                       className={cn(
                         'flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50',
-                        task.priority === 'high' && 'border-l-4 border-l-amber-500'
+                        task.priority === 'high' &&
+                          'border-l-4 border-l-amber-500',
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -471,14 +535,16 @@ export default function DashboardPage() {
                             'flex h-9 w-9 items-center justify-center rounded-lg',
                             task.priority === 'high'
                               ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
-                              : 'bg-muted text-muted-foreground'
+                              : 'bg-muted text-muted-foreground',
                           )}
                         >
                           <TaskIcon className="h-4 w-4" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">{task.title}</p>
-                          <p className="text-xs text-muted-foreground">{task.count} adet bekliyor</p>
+                          <p className="text-xs text-muted-foreground">
+                            {task.count} adet bekliyor
+                          </p>
                         </div>
                       </div>
                       {getPriorityBadge(task.priority)}
@@ -493,9 +559,15 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold">Sistem Durumu</CardTitle>
+                <CardTitle className="text-base font-semibold">
+                  Sistem Durumu
+                </CardTitle>
                 <Link href="/ops-center">
-                  <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1 text-xs"
+                  >
                     Detay
                     <ArrowRight className="h-3 w-3" />
                   </Button>
@@ -510,15 +582,19 @@ export default function DashboardPage() {
                       className={cn(
                         'health-indicator',
                         data.status === 'healthy' && 'health-indicator-healthy',
-                        data.status === 'degraded' && 'health-indicator-degraded',
+                        data.status === 'degraded' &&
+                          'health-indicator-degraded',
                         data.status === 'down' && 'health-indicator-down',
-                        data.status === 'maintenance' && 'health-indicator-maintenance'
+                        data.status === 'maintenance' &&
+                          'health-indicator-maintenance',
                       )}
                     />
                     <span className="text-sm font-medium">{data.label}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">{data.uptime}%</span>
+                    <span className="text-sm text-muted-foreground">
+                      {data.uptime}%
+                    </span>
                     {getStatusIcon(data.status)}
                   </div>
                 </div>
@@ -529,25 +605,45 @@ export default function DashboardPage() {
           {/* Today's Summary */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold">Bugünkü Özet</CardTitle>
+              <CardTitle className="text-base font-semibold">
+                Bugünkü Özet
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Yeni Kayıt</span>
-                  <span className="text-sm font-semibold">+{todaySummary?.newRegistrations || 0}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Yeni Kayıt
+                  </span>
+                  <span className="text-sm font-semibold">
+                    +{todaySummary?.newRegistrations || 0}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Aktif Oturum</span>
-                  <span className="text-sm font-semibold">{(todaySummary?.activeSessions || 0).toLocaleString('tr-TR')}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Aktif Oturum
+                  </span>
+                  <span className="text-sm font-semibold">
+                    {(todaySummary?.activeSessions || 0).toLocaleString(
+                      'tr-TR',
+                    )}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Günlük Gelir</span>
-                  <span className="text-sm font-semibold text-emerald-600">{formatCurrency(todaySummary?.dailyRevenue || 0, 'TRY')}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Günlük Gelir
+                  </span>
+                  <span className="text-sm font-semibold text-emerald-600">
+                    {formatCurrency(todaySummary?.dailyRevenue || 0, 'TRY')}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Yeni Moment</span>
-                  <span className="text-sm font-semibold">{(todaySummary?.newMoments || 0).toLocaleString('tr-TR')}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Yeni Moment
+                  </span>
+                  <span className="text-sm font-semibold">
+                    {(todaySummary?.newMoments || 0).toLocaleString('tr-TR')}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -560,12 +656,19 @@ export default function DashboardPage() {
         {quickLinks.map((link) => (
           <Link key={link.href} href={link.href}>
             <Card className="quick-action-card">
-              <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', link.color)}>
+              <div
+                className={cn(
+                  'flex h-10 w-10 items-center justify-center rounded-xl',
+                  link.color,
+                )}
+              >
                 <link.icon className="h-5 w-5" />
               </div>
               <div className="flex-1">
                 <p className="font-medium">{link.title}</p>
-                <p className="text-xs text-muted-foreground">{link.description}</p>
+                <p className="text-xs text-muted-foreground">
+                  {link.description}
+                </p>
               </div>
               <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
             </Card>
