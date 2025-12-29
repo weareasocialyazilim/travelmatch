@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
@@ -194,7 +195,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error('Stats GET error:', error);
+    logger.error('Stats GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

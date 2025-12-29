@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
@@ -27,7 +28,7 @@ export async function GET(
 
     return NextResponse.json({ task });
   } catch (error) {
-    console.error('Task GET error:', error);
+    logger.error('Task GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -81,7 +82,7 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error('Task update error:', error);
+      logger.error('Task update error:', error);
       return NextResponse.json({ error: 'Görev güncellenemedi' }, { status: 500 });
     }
 
@@ -99,7 +100,7 @@ export async function PATCH(
 
     return NextResponse.json({ task });
   } catch (error) {
-    console.error('Task PATCH error:', error);
+    logger.error('Task PATCH error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -135,7 +136,7 @@ export async function DELETE(
       .eq('id', id);
 
     if (error) {
-      console.error('Task delete error:', error);
+      logger.error('Task delete error:', error);
       return NextResponse.json({ error: 'Görev silinemedi' }, { status: 500 });
     }
 
@@ -154,7 +155,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Task DELETE error:', error);
+    logger.error('Task DELETE error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

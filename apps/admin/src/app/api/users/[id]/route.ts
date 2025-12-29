@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
@@ -68,7 +69,7 @@ export async function GET(
       recent_transactions: recentTransactions || [],
     });
   } catch (error) {
-    console.error('User GET error:', error);
+    logger.error('User GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -135,7 +136,7 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error('User update error:', error);
+      logger.error('User update error:', error);
       return NextResponse.json({ error: 'Kullanıcı güncellenemedi' }, { status: 500 });
     }
 
@@ -153,7 +154,7 @@ export async function PATCH(
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error('User PATCH error:', error);
+    logger.error('User PATCH error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

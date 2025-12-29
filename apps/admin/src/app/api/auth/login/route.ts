@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { cookies } from 'next/headers';
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
       permissions: permissions || [],
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error:', error);
     return NextResponse.json(
       { error: 'Giriş yapılırken bir hata oluştu' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { authenticator } from 'otplib';
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
         secret: decryptedSecret,
       });
     } catch (decryptError) {
-      console.error('TOTP decryption error:', decryptError);
+      logger.error('TOTP decryption error:', decryptError);
       return NextResponse.json(
         { success: false, error: 'Doğrulama işlemi başarısız' },
         { status: 500 }
@@ -174,7 +175,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('2FA verification error:', error);
+    logger.error('2FA verification error:', error);
     return NextResponse.json(
       { success: false, error: 'Doğrulama işlemi başarısız' },
       { status: 500 }

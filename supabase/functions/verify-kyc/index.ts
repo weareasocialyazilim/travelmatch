@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';

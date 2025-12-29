@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -98,7 +101,7 @@ serve(async (req) => {
 
     // Check for errors (Mapbox returns 200 even for 0 results)
     if (!response.ok) {
-      console.error('Mapbox API error:', data);
+      logger.error('Mapbox API error:', data);
       const error = createErrorResponse(
         'Geocoding service failed',
         ErrorCode.EXTERNAL_SERVICE_ERROR,
@@ -122,7 +125,7 @@ serve(async (req) => {
       },
     });
   } catch (error) {
-    console.error('Geocoding error:', error);
+    logger.error('Geocoding error:', error);
     return toHttpResponse(handleUnexpectedError(error), corsHeaders);
   }
 });

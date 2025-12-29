@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession } from '@/lib/auth';
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
     const { data: tasks, count, error } = await query;
 
     if (error) {
-      console.error('Tasks query error:', error);
+      logger.error('Tasks query error:', error);
       return NextResponse.json({ error: 'Görevler yüklenemedi' }, { status: 500 });
     }
 
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Tasks GET error:', error);
+    logger.error('Tasks GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -149,7 +150,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Task creation error:', error);
+      logger.error('Task creation error:', error);
       return NextResponse.json({ error: 'Görev oluşturulamadı' }, { status: 500 });
     }
 
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ task }, { status: 201 });
   } catch (error) {
-    console.error('Tasks POST error:', error);
+    logger.error('Tasks POST error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

@@ -10,6 +10,9 @@ export { logAuditAction, AuditActions, withAudit } from './audit';
 // Permissions
 export { PERMISSIONS } from './permissions';
 
+// Logger
+export { logger } from './logger';
+
 // Utilities (selective export to avoid conflicts)
 export { cn, debounce, generateId, sleep } from './utils';
 

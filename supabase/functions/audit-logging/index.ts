@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -93,7 +96,7 @@ serve(async (req: Request) => {
         );
     }
   } catch (error) {
-    console.error('Audit logging error:', error);
+    logger.error('Audit logging error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -160,7 +163,7 @@ async function handleLogEvent(
     });
 
   if (insertError) {
-    console.error('Failed to insert audit log:', insertError);
+    logger.error('Failed to insert audit log:', insertError);
     // Don't fail the request - audit logging shouldn't break the app
     return new Response(
       JSON.stringify({ success: false, warning: 'Audit log insert failed' }),

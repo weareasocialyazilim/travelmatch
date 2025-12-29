@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 import {
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
       checked_at: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Integrations GET error:', error);
+    logger.error('Integrations GET error:', error);
     return NextResponse.json(
       { error: 'Entegrasyon durumu kontrol edilirken bir hata oluştu' },
       { status: 500 },

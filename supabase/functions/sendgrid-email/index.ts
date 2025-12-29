@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /**
  * SendGrid Email Edge Function
  *
@@ -60,7 +63,7 @@ async function sendgridRequest(
     }
 
     const errorData = await response.json().catch(() => ({}));
-    console.error('[SendGrid] API error:', errorData);
+    logger.error('[SendGrid] API error:', errorData);
     return {
       success: false,
       error:
@@ -68,7 +71,7 @@ async function sendgridRequest(
           ?.message || `SendGrid error: ${response.status}`,
     };
   } catch (error) {
-    console.error('[SendGrid] Request error:', error);
+    logger.error('[SendGrid] Request error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -336,7 +339,7 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    console.error('[SendGrid Edge] Error:', error);
+    logger.error('[SendGrid Edge] Error:', error);
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Internal error',

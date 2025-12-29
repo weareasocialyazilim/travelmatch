@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -162,15 +165,15 @@ serve(async (req) => {
     // 6.5. Generate BlurHash for placeholder
     let blurHash: string | undefined;
     try {
-      console.log('[BlurHash] Generating hash for image...');
+      logger.info('[BlurHash] Generating hash for image...');
       blurHash = await generateBlurHash(arrayBuffer, {
         componentX: 4,
         componentY: 3,
         maxDimension: 100,
       });
-      console.log('[BlurHash] Generated:', blurHash);
+      logger.info('[BlurHash] Generated:', blurHash);
     } catch (error) {
-      console.warn('[BlurHash] Generation failed (non-critical):', error);
+      logger.warn('[BlurHash] Generation failed (non-critical):', error);
       // Continue without BlurHash - it's optional
     }
 
@@ -200,7 +203,7 @@ serve(async (req) => {
 
     if (!uploadResponse.ok) {
       const errorData = await uploadResponse.text();
-      console.error('Cloudflare API error:', errorData);
+      logger.error('Cloudflare API error:', errorData);
       const error = createErrorResponse({
         code: 'UPLOAD_FAILED',
         message: 'Failed to upload image to CDN',
@@ -237,7 +240,7 @@ serve(async (req) => {
 
     return toHttpSuccessResponse(response, corsHeaders);
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error:', error);
     const errorResponse = handleUnexpectedError(error);
     return toHttpResponse(errorResponse, corsHeaders, 500);
   }

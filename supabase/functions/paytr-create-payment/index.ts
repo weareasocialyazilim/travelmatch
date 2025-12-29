@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /**
  * PayTR Create Payment Edge Function
  *
@@ -190,7 +193,7 @@ serve(async (req: Request) => {
     );
 
     if (complianceError) {
-      console.error('Compliance check error:', complianceError);
+      logger.error('Compliance check error:', complianceError);
       return new Response(
         JSON.stringify({
           success: false,
@@ -237,7 +240,7 @@ serve(async (req: Request) => {
 
     // If requires manual review, still allow but flag
     if (complianceCheck?.requires_review) {
-      console.log('Transaction flagged for review:', {
+      logger.info('Transaction flagged for review:', {
         userId: giverId,
         amount: body.baseAmount,
         currency,
@@ -440,7 +443,7 @@ serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('PayTR Create Payment Error:', error);
+    logger.error('PayTR Create Payment Error:', error);
 
     return new Response(
       JSON.stringify({

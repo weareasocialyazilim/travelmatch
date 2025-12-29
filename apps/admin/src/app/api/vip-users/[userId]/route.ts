@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Individual VIP User API
  *
@@ -45,7 +46,7 @@ export async function DELETE(
     });
 
     if (error) {
-      console.error('Remove VIP error:', error);
+      logger.error('Remove VIP error:', error);
       return NextResponse.json(
         { error: 'VIP statüsü kaldırılamadı: ' + error.message },
         { status: 500 }
@@ -54,7 +55,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('VIP DELETE error:', error);
+    logger.error('VIP DELETE error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -140,7 +141,7 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error('Update VIP error:', error);
+      logger.error('Update VIP error:', error);
       return NextResponse.json(
         { error: 'VIP ayarları güncellenemedi: ' + error.message },
         { status: 500 }
@@ -149,7 +150,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('VIP PATCH error:', error);
+    logger.error('VIP PATCH error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

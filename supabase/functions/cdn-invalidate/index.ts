@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -154,7 +157,7 @@ serve(async (req) => {
     }
 
     // Execute purge
-    console.log('Purging Cloudflare cache:', purgePayload);
+    logger.info('Purging Cloudflare cache:', purgePayload);
     const result = await purgeCloudflare(purgePayload);
 
     const latencyMs = Date.now() - startTime;
@@ -175,7 +178,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('CDN invalidation error:', error);
+    logger.error('CDN invalidation error:', error);
 
     if (error instanceof z.ZodError) {
       return new Response(

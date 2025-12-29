@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
     const { data: proofs, count, error } = await query;
 
     if (error) {
-      console.error('Proofs query error:', error);
+      logger.error('Proofs query error:', error);
       return NextResponse.json({ error: 'Kanıtlar yüklenemedi' }, { status: 500 });
     }
 
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Proofs GET error:', error);
+    logger.error('Proofs GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -163,7 +164,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('Proof update error:', updateError);
+      logger.error('Proof update error:', updateError);
       return NextResponse.json({ error: 'Kanıt güncellenemedi' }, { status: 500 });
     }
 
@@ -181,7 +182,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ proof: updated, message: 'İşlem başarılı' });
   } catch (error) {
-    console.error('Proofs PUT error:', error);
+    logger.error('Proofs PUT error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }

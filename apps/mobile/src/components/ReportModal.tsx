@@ -124,7 +124,12 @@ export const ReportModal: React.FC<ReportModalProps> = ({
       >
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top || 16 }]}>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={styles.closeButton}
+            accessibilityLabel="Close report modal"
+            accessibilityRole="button"
+          >
             <Ionicons name="close" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={styles.title}>{getTitle()}</Text>
@@ -148,6 +153,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 ]}
                 onPress={() => setSelectedReason(value)}
                 activeOpacity={0.7}
+                accessibilityLabel={`Select report reason: ${label}`}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: selectedReason === value }}
               >
                 <View style={styles.reasonContent}>
                   <View style={styles.reasonHeader}>
@@ -211,6 +219,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             onPress={handleSubmit}
             disabled={loading || !selectedReason}
             activeOpacity={0.8}
+            accessibilityLabel={loading ? 'Submitting report' : 'Submit report'}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: loading || !selectedReason }}
           >
             {loading ? (
               <ActivityIndicator color={COLORS.utility.white} size="small" />

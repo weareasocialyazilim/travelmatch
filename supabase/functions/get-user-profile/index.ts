@@ -1,3 +1,6 @@
+import { Logger } from '..//_shared/logger.ts';
+const logger = new Logger();
+
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
@@ -116,7 +119,7 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    console.error('[Get Profile] Error:', error);
+    logger.error('[Get Profile] Error:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to fetch profile' }),
       {

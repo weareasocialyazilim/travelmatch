@@ -7,3 +7,4 @@ export * from './validation';
 export * from './formatters';
 export * from './date';
 export * from './currency';
+export * from './logger';

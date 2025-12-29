@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * VIP Users API
  *
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
     const { data: users, count, error } = await query;
 
     if (error) {
-      console.error('VIP users query error:', error);
+      logger.error('VIP users query error:', error);
       return NextResponse.json(
         { error: 'VIP kullanıcıları yüklenemedi' },
         { status: 500 }
@@ -90,7 +91,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('VIP users GET error:', error);
+    logger.error('VIP users GET error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
@@ -187,7 +188,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Add VIP error:', error);
+      logger.error('Add VIP error:', error);
       return NextResponse.json(
         { error: 'VIP statüsü eklenemedi: ' + error.message },
         { status: 500 }
@@ -196,7 +197,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('VIP users POST error:', error);
+    logger.error('VIP users POST error:', error);
     return NextResponse.json({ error: 'Bir hata oluştu' }, { status: 500 });
   }
 }
