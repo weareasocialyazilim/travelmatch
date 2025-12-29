@@ -158,7 +158,96 @@ serve(async (req: Request) => {
       );
     }
 
-    // Check payment limits
+    // Get client context for compliance checks
+    const clientIp =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      req.headers.get('x-real-ip') ||
+      '0.0.0.0';
+    const deviceId = req.headers.get('x-device-id') || '';
+    const userAgent = req.headers.get('user-agent') || '';
+
+    // ==========================================================================
+    // COMPLIANCE CHECK: User limits + AML + Fraud (all-in-one)
+    // ==========================================================================
+    const currency = body.currency === 'USD' ? 'USD' :
+                     body.currency === 'EUR' ? 'EUR' : 'TRY';
+
+    const { data: complianceCheck, error: complianceError } = await adminClient.rpc(
+      'check_transaction_compliance',
+      {
+        p_user_id: giverId,
+        p_amount: body.baseAmount,
+        p_currency: currency,
+        p_transaction_type: 'send',
+        p_recipient_id: body.receiverId,
+        p_metadata: {
+          moment_id: body.momentId,
+          ip_address: clientIp,
+          device_id: deviceId,
+          user_agent: userAgent,
+        },
+      }
+    );
+
+    if (complianceError) {
+      console.error('Compliance check error:', complianceError);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Compliance check failed',
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Block if compliance check fails
+    if (!complianceCheck?.allowed) {
+      const blockReasons = complianceCheck?.block_reasons || ['Transaction not allowed'];
+
+      // Log security event
+      await adminClient.from('security_logs').insert({
+        user_id: giverId,
+        event_type: 'payment_blocked',
+        event_status: 'blocked',
+        event_details: {
+          compliance_check: complianceCheck,
+          block_reasons: blockReasons,
+        },
+        ip_address: clientIp,
+        user_agent: userAgent,
+      });
+
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: blockReasons[0],
+          errors: blockReasons,
+          kyc_required: complianceCheck?.requires_kyc || false,
+          risk_level: complianceCheck?.risk_level || 'unknown',
+        }),
+        {
+          status: complianceCheck?.requires_kyc ? 403 : 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // If requires manual review, still allow but flag
+    if (complianceCheck?.requires_review) {
+      console.log('Transaction flagged for review:', {
+        userId: giverId,
+        amount: body.baseAmount,
+        currency,
+        riskScore: complianceCheck.risk_score,
+      });
+    }
+
+    // ==========================================================================
+    // Legacy check_payment_limits (backup - will be removed after testing)
+    // ==========================================================================
     const { data: limitCheck } = await adminClient.rpc('check_payment_limits', {
       p_user_id: giverId,
       p_amount: body.baseAmount,
@@ -179,13 +268,7 @@ serve(async (req: Request) => {
       );
     }
 
-    // Check fraud signals
-    const clientIp =
-      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      req.headers.get('x-real-ip') ||
-      '0.0.0.0';
-    const deviceId = req.headers.get('x-device-id') || '';
-
+    // Legacy check_fraud_signals (backup - will be removed after testing)
     const { data: fraudCheck } = await adminClient.rpc('check_fraud_signals', {
       p_user_id: giverId,
       p_amount: body.baseAmount,
@@ -201,7 +284,7 @@ serve(async (req: Request) => {
         event_status: 'blocked',
         event_details: { fraud_check: fraudCheck },
         ip_address: clientIp,
-        user_agent: req.headers.get('user-agent'),
+        user_agent: userAgent,
       });
 
       return new Response(
