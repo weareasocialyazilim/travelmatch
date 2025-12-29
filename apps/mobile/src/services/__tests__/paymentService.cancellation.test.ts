@@ -125,7 +125,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Cancel During Processing', () => {
-    it.skip('should cancel payment while processing', async () => {
+    it('should cancel payment while processing', async () => {
       const mockTransaction = {
         id: 'tx-123',
         user_id: 'user-123',
@@ -137,12 +137,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      (mockTransactionsService.update ).mockResolvedValue({
+      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
         data: { ...mockTransaction, status: 'cancelled' },
         error: null,
       });
@@ -156,14 +156,19 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       });
 
-      // Cancel after 500ms (during processing)
-      await jest.advanceTimersByTimeAsync(500);
+      // Cancel after 500ms (during processing) - advance multiple times to trigger interval check
+      await jest.advanceTimersByTimeAsync(100); // First interval check
+      await jest.advanceTimersByTimeAsync(100); // Second interval check
+      await jest.advanceTimersByTimeAsync(100); // Third interval check
+      await jest.advanceTimersByTimeAsync(100); // Fourth interval check
+      await jest.advanceTimersByTimeAsync(100); // Fifth interval check (500ms total)
+
       cancellablePayment.cancel();
 
-      // Advance to complete processing time
-      await jest.advanceTimersByTimeAsync(2000);
+      // Advance to trigger the next interval check which will detect cancellation
+      await jest.advanceTimersByTimeAsync(100);
 
-      await expect(paymentPromise).rejects.toThrow('Payment cancelled');
+      await expect(paymentPromise).rejects.toThrow(/cancelled/);
 
       // Verify transaction marked as cancelled
       expect(mockTransactionsService.update).toHaveBeenCalledWith({
@@ -332,7 +337,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Cleanup on Cancellation', () => {
-    it.skip('should clean up resources when payment is cancelled', async () => {
+    it('should clean up resources when payment is cancelled', async () => {
       const mockTransaction = {
         id: 'tx-123',
         user_id: 'user-123',
@@ -344,12 +349,12 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      (mockTransactionsService.update ).mockResolvedValue({
+      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
         data: { ...mockTransaction, status: 'cancelled' },
         error: null,
       });
@@ -363,14 +368,21 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Gift sent',
       });
 
-      await jest.advanceTimersByTimeAsync(500);
+      // Advance time in small increments to trigger interval checks
+      for (let i = 0; i < 5; i++) {
+        await jest.advanceTimersByTimeAsync(100);
+      }
+
       cancellablePayment.cancel();
-      await jest.advanceTimersByTimeAsync(2000);
+
+      // Advance to trigger cancellation detection
+      await jest.advanceTimersByTimeAsync(100);
 
       try {
         await paymentPromise;
-      } catch (error: any) {
-        expect(error.message).toContain('cancelled');
+      } catch (error: unknown) {
+        const errMessage = error instanceof Error ? error.message : String(error);
+        expect(errMessage).toMatch(/cancelled/i);
       }
 
       // Verify cleanup
@@ -416,7 +428,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Concurrent Cancellations', () => {
-    it.skip('should handle multiple concurrent cancellations', async () => {
+    it('should handle multiple concurrent cancellations', async () => {
       const mockTransaction1 = {
         id: 'tx-1',
         user_id: 'user-123',
@@ -439,11 +451,11 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       };
 
-      (mockTransactionsService.create )
+      (mockTransactionsService.create as jest.Mock)
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
-      (mockTransactionsService.update )
+      (mockTransactionsService.update as jest.Mock)
         .mockResolvedValueOnce({ data: { ...mockTransaction1, status: 'cancelled' }, error: null })
         .mockResolvedValueOnce({ data: { ...mockTransaction2, status: 'cancelled' }, error: null });
 
@@ -464,19 +476,25 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       });
 
-      // Cancel both
-      await jest.advanceTimersByTimeAsync(500);
+      // Advance time in small increments
+      for (let i = 0; i < 5; i++) {
+        await jest.advanceTimersByTimeAsync(100);
+      }
+
+      // Cancel both payments
       payment1.cancel();
       payment2.cancel();
-      await jest.advanceTimersByTimeAsync(2000);
 
-      await expect(promise1).rejects.toThrow('cancelled');
-      await expect(promise2).rejects.toThrow('cancelled');
+      // Advance to trigger cancellation detection
+      await jest.advanceTimersByTimeAsync(100);
+
+      await expect(promise1).rejects.toThrow(/cancelled/i);
+      await expect(promise2).rejects.toThrow(/cancelled/i);
 
       expect(mockTransactionsService.update).toHaveBeenCalledTimes(2);
     });
 
-    it.skip('should cancel only specific payment in concurrent scenario', async () => {
+    it('should cancel only specific payment in concurrent scenario', async () => {
       const mockTransaction1 = {
         id: 'tx-1',
         user_id: 'user-123',
@@ -499,11 +517,11 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       };
 
-      (mockTransactionsService.create )
+      (mockTransactionsService.create as jest.Mock)
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
-      (mockTransactionsService.update ).mockResolvedValue({
+      (mockTransactionsService.update as jest.Mock).mockResolvedValue({
         data: { ...mockTransaction1, status: 'cancelled' },
         error: null,
       });
@@ -525,13 +543,22 @@ describe('PaymentService - Payment Cancellation', () => {
         description: 'Payment 2',
       });
 
-      // Cancel only payment1
-      await jest.advanceTimersByTimeAsync(500);
-      payment1.cancel();
-      await jest.advanceTimersByTimeAsync(2000);
+      // Advance time in small increments
+      for (let i = 0; i < 5; i++) {
+        await jest.advanceTimersByTimeAsync(100);
+      }
 
-      await expect(promise1).rejects.toThrow('cancelled');
-      
+      // Cancel only payment1
+      payment1.cancel();
+
+      // Advance to trigger cancellation detection for payment1 and let payment2 complete
+      await jest.advanceTimersByTimeAsync(100);
+
+      await expect(promise1).rejects.toThrow(/cancelled/i);
+
+      // Complete the remaining time for payment2
+      await jest.advanceTimersByTimeAsync(1500);
+
       const result2 = await promise2;
       expect(result2.transaction.status).toBe('completed');
 
