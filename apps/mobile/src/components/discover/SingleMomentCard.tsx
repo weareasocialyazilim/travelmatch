@@ -1,79 +1,91 @@
 // Single Moment Card - Full width card for single column view
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import type { MomentCardProps } from './types';
 
-export const SingleMomentCard: React.FC<MomentCardProps> = ({
-  item,
-  onPress,
-}) => (
-  <TouchableOpacity
-    style={styles.singleCard}
-    onPress={() => onPress(item)}
-    activeOpacity={0.95}
-  >
-    {/* Image */}
-    <Image source={{ uri: item.imageUrl }} style={styles.singleImage} />
+export const SingleMomentCard: React.FC<MomentCardProps> = memo(
+  ({ item, onPress }) => {
+    const creatorName = item.user?.name || 'Anonim';
+    const locationName = item.location?.city || 'Bilinmiyor';
 
-    {/* Content */}
-    <View style={styles.singleContent}>
-      {/* Creator Row */}
-      <View style={styles.creatorRow}>
+    return (
+      <TouchableOpacity
+        style={styles.singleCard}
+        onPress={() => onPress(item)}
+        activeOpacity={0.95}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.title}, ${creatorName} tarafından, ${locationName} konumunda, ${item.price} dolar`}
+        accessibilityHint="Detayları görmek için dokunun"
+      >
+        {/* Image */}
         <Image
-          source={{
-            uri: item.user?.avatar || 'https://via.placeholder.com/40',
-          }}
-          style={styles.creatorAvatar}
+          source={{ uri: item.imageUrl }}
+          style={styles.singleImage}
+          accessibilityLabel={`${item.title} fotoğrafı`}
         />
-        <View style={styles.creatorInfo}>
-          <View style={styles.creatorNameRow}>
-            <Text style={styles.creatorName}>
-              {item.user?.name || 'Anonymous'}
-            </Text>
-            {item.user?.isVerified && (
-              <MaterialCommunityIcons
-                name="check-decagram"
-                size={14}
-                color={COLORS.mint}
-              />
-            )}
+
+        {/* Content */}
+        <View style={styles.singleContent}>
+          {/* Creator Row */}
+          <View style={styles.creatorRow}>
+            <Image
+              source={{
+                uri: item.user?.avatar || 'https://via.placeholder.com/40',
+              }}
+              style={styles.creatorAvatar}
+              accessibilityLabel={`${creatorName} profil fotoğrafı`}
+            />
+            <View style={styles.creatorInfo}>
+              <View style={styles.creatorNameRow}>
+                <Text style={styles.creatorName}>{creatorName}</Text>
+                {item.user?.isVerified && (
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={14}
+                    color={COLORS.mint}
+                    accessibilityLabel="Doğrulanmış kullanıcı"
+                  />
+                )}
+              </View>
+            </View>
           </View>
+
+          {/* Title */}
+          <Text style={styles.singleTitle} numberOfLines={2}>
+            {item.title}
+          </Text>
+
+          {/* Story Description */}
+          {item.story && (
+            <Text style={styles.storyDescription} numberOfLines={2}>
+              {item.story}
+            </Text>
+          )}
+
+          {/* Location & Distance */}
+          <View style={styles.locationDistanceRow}>
+            <MaterialCommunityIcons
+              name="map-marker-outline"
+              size={14}
+              color={COLORS.text.secondary}
+            />
+            <Text style={styles.locationText}>{locationName}</Text>
+            <Text style={styles.dotSeparator}>•</Text>
+            <Text style={styles.distanceText}>{item.distance || '?'} km uzakta</Text>
+          </View>
+
+          {/* Price */}
+          <Text style={styles.priceValue}>${item.price}</Text>
         </View>
-      </View>
-
-      {/* Title */}
-      <Text style={styles.singleTitle} numberOfLines={2}>
-        {item.title}
-      </Text>
-
-      {/* Story Description */}
-      {item.story && (
-        <Text style={styles.storyDescription} numberOfLines={2}>
-          {item.story}
-        </Text>
-      )}
-
-      {/* Location & Distance */}
-      <View style={styles.locationDistanceRow}>
-        <MaterialCommunityIcons
-          name="map-marker-outline"
-          size={14}
-          color={COLORS.text.secondary}
-        />
-        <Text style={styles.locationText}>
-          {item.location?.city || 'Unknown'}
-        </Text>
-        <Text style={styles.dotSeparator}>•</Text>
-        <Text style={styles.distanceText}>{item.distance || '?'} km away</Text>
-      </View>
-
-      {/* Price */}
-      <Text style={styles.priceValue}>${item.price}</Text>
-    </View>
-  </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  },
+  (prevProps, nextProps) => prevProps.item.id === nextProps.item.id,
 );
+
+SingleMomentCard.displayName = 'SingleMomentCard';
 
 const styles = StyleSheet.create({
   singleCard: {
@@ -102,9 +114,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   creatorAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     marginRight: 10,
     backgroundColor: COLORS.bg.primary,
   },

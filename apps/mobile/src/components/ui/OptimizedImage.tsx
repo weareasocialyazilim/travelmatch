@@ -116,7 +116,9 @@ export const OptimizedImage = memo<OptimizedImageProps>(
       setIsLoading(false);
       setHasError(true);
       onError?.(error);
-      console.error('OptimizedImage load error:', error);
+      if (__DEV__) {
+        console.error('OptimizedImage load error:', error);
+      }
     };
 
     // Show error state

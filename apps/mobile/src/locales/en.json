@@ -382,5 +382,74 @@
     "subtitle": "Connect Through Travel Moments",
     "shortDescription": "Connect with travelers. Share moments. Gift experiences. Travel differently.",
     "keywords": "travel,experiences,local guide,tourism,gifts,moments,discover,adventure,trip,vacation,explore"
+  },
+  "discover": {
+    "title": "Discover",
+    "searchPlaceholder": "Search moments...",
+    "categories": {
+      "all": "All",
+      "coffee": "Coffee",
+      "food": "Food",
+      "culture": "Culture",
+      "tours": "Tours",
+      "nightlife": "Nightlife",
+      "shopping": "Shopping",
+      "music": "Music",
+      "gifts": "Gifts"
+    },
+    "sort": {
+      "nearest": "Nearest",
+      "newest": "Newest",
+      "priceAsc": "Price ↑",
+      "priceDesc": "Price ↓"
+    },
+    "filters": {
+      "title": "Filters",
+      "priceRange": "Price Range",
+      "distance": "Distance",
+      "apply": "Apply Filters",
+      "reset": "Reset"
+    },
+    "noResults": "No moments found",
+    "kmAway": "km away"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version",
+    "build": "Build",
+    "buildDate": "Build Date",
+    "copyright": "© 2024 TravelMatch Inc."
+  },
+  "notifications": {
+    "settings": {
+      "title": "Notification Settings",
+      "giftsAndProofs": "Gifts & Proofs",
+      "whenSomeoneGifts": "When someone gifts my moment",
+      "proofUpdates": "Proof verification updates",
+      "messages": "Messages",
+      "newChatMessages": "New chat messages",
+      "messageRequests": "Message requests",
+      "discovery": "Discovery",
+      "nearbyMoments": "Nearby moments",
+      "recommendations": "Personalized recommendations",
+      "appUpdates": "App Updates",
+      "newFeatures": "New features and updates"
+    }
+  },
+  "report": {
+    "title": "Report User",
+    "whatsTheIssue": "What's the issue?",
+    "reasons": {
+      "scam": "Scam or payment issue",
+      "harassment": "Hate, threats or harassment",
+      "fakeIdentity": "Fake identity or fake trip",
+      "inappropriateMessages": "Inappropriate messages",
+      "other": "Other"
+    },
+    "addDetails": "Add details (optional)",
+    "detailsPlaceholder": "Please provide more information...",
+    "sendReport": "Send Report",
+    "reportSubmitted": "Report Submitted",
+    "thankYou": "Thank you for reporting. We will review this."
   }
 }

@@ -382,5 +382,74 @@
     "subtitle": "Seyahat Anlarıyla Bağlan",
     "shortDescription": "Gezginlerle tanış. Anları paylaş. Deneyimleri hediye et. Farklı seyahat et.",
     "keywords": "seyahat,deneyim,yerel rehber,turizm,hediye,anlar,keşfet,macera,gezi,tatil,gezinti"
+  },
+  "discover": {
+    "title": "Keşfet",
+    "searchPlaceholder": "Anları ara...",
+    "categories": {
+      "all": "Tümü",
+      "coffee": "Kahve",
+      "food": "Yemek",
+      "culture": "Kültür",
+      "tours": "Turlar",
+      "nightlife": "Gece Hayatı",
+      "shopping": "Alışveriş",
+      "music": "Müzik",
+      "gifts": "Hediyeler"
+    },
+    "sort": {
+      "nearest": "En Yakın",
+      "newest": "En Yeni",
+      "priceAsc": "Fiyat ↑",
+      "priceDesc": "Fiyat ↓"
+    },
+    "filters": {
+      "title": "Filtreler",
+      "priceRange": "Fiyat Aralığı",
+      "distance": "Mesafe",
+      "apply": "Filtre Uygula",
+      "reset": "Sıfırla"
+    },
+    "noResults": "Hiç an bulunamadı",
+    "kmAway": "km uzakta"
+  },
+  "about": {
+    "title": "Hakkında",
+    "version": "Sürüm",
+    "build": "Yapı",
+    "buildDate": "Yapı Tarihi",
+    "copyright": "© 2024 TravelMatch Inc."
+  },
+  "notifications": {
+    "settings": {
+      "title": "Bildirim Ayarları",
+      "giftsAndProofs": "Hediyeler ve Kanıtlar",
+      "whenSomeoneGifts": "Biri anımı hediye ettiğinde",
+      "proofUpdates": "Kanıt doğrulama güncellemeleri",
+      "messages": "Mesajlar",
+      "newChatMessages": "Yeni sohbet mesajları",
+      "messageRequests": "Mesaj istekleri",
+      "discovery": "Keşif",
+      "nearbyMoments": "Yakındaki anlar",
+      "recommendations": "Kişiselleştirilmiş öneriler",
+      "appUpdates": "Uygulama Güncellemeleri",
+      "newFeatures": "Yeni özellikler ve güncellemeler"
+    }
+  },
+  "report": {
+    "title": "Kullanıcıyı Şikayet Et",
+    "whatsTheIssue": "Sorun nedir?",
+    "reasons": {
+      "scam": "Dolandırıcılık veya ödeme sorunu",
+      "harassment": "Nefret, tehdit veya taciz",
+      "fakeIdentity": "Sahte kimlik veya sahte gezi",
+      "inappropriateMessages": "Uygunsuz mesajlar",
+      "other": "Diğer"
+    },
+    "addDetails": "Detay ekle (isteğe bağlı)",
+    "detailsPlaceholder": "Lütfen daha fazla bilgi verin...",
+    "sendReport": "Rapor Gönder",
+    "reportSubmitted": "Rapor Gönderildi",
+    "thankYou": "Bildirdiğiniz için teşekkür ederiz. İnceleyeceğiz."
   }
 }
