@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,19 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
+import { TRUST_NOTES_UI } from '@/constants/trustNotesRules';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
+import { getRecentTrustNotes, type TrustNote } from '@/services/trustNotesService';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -35,6 +38,10 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
   const { userId } = route.params;
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
   const [showReportSheet, setShowReportSheet] = useState(false);
+
+  // Trust Notes state
+  const [trustNotes, setTrustNotes] = useState<TrustNote[]>([]);
+  const [trustNotesLoading, setTrustNotesLoading] = useState(true);
 
   // Mock user data based on userId - Only PUBLIC info shown
   const getUserData = (id: string) => {
@@ -72,6 +79,21 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
   };
 
   const user = getUserData(userId);
+
+  // Fetch trust notes for this user
+  useEffect(() => {
+    const fetchTrustNotes = async () => {
+      setTrustNotesLoading(true);
+      try {
+        const notes = await getRecentTrustNotes(userId, 5);
+        setTrustNotes(notes);
+      } finally {
+        setTrustNotesLoading(false);
+      }
+    };
+
+    fetchTrustNotes();
+  }, [userId]);
 
   // Mock moments data (simplified for profile view, not full Moment type)
   interface ProfileMoment {
@@ -275,6 +297,69 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
                 color={COLORS.feedback.warning}
               />
               <Text style={styles.badgeText}>Fast responder</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Trust Notes Section */}
+        <View style={styles.trustNotesSection}>
+          <View style={styles.trustNotesHeader}>
+            <MaterialCommunityIcons
+              name="heart-outline"
+              size={20}
+              color={COLORS.coral}
+            />
+            <Text style={styles.trustNotesTitle}>Güven Notları</Text>
+            {trustNotes.length > 0 && (
+              <View style={styles.trustNotesCount}>
+                <Text style={styles.trustNotesCountText}>{trustNotes.length}</Text>
+              </View>
+            )}
+          </View>
+
+          {trustNotesLoading ? (
+            <View style={styles.trustNotesLoading}>
+              <ActivityIndicator size="small" color={COLORS.brand.primary} />
+            </View>
+          ) : trustNotes.length === 0 ? (
+            <View style={styles.trustNotesEmpty}>
+              <Text style={styles.trustNotesEmptyTitle}>
+                {TRUST_NOTES_UI.emptyState.title}
+              </Text>
+              <Text style={styles.trustNotesEmptyDescription}>
+                {TRUST_NOTES_UI.emptyState.description}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.trustNotesList}>
+              {trustNotes.map((note) => (
+                <View key={note.id} style={styles.trustNoteCard}>
+                  <View style={styles.trustNoteHeader}>
+                    <Image
+                      source={{
+                        uri: note.writerAvatar || 'https://via.placeholder.com/32',
+                      }}
+                      style={styles.trustNoteAvatar}
+                    />
+                    <View style={styles.trustNoteHeaderInfo}>
+                      <Text style={styles.trustNoteAuthor}>{note.writerName}</Text>
+                      {note.momentTitle && (
+                        <Text style={styles.trustNoteMoment} numberOfLines={1}>
+                          {note.momentTitle}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                  <Text style={styles.trustNoteText}>{note.note}</Text>
+                  <Text style={styles.trustNoteDate}>
+                    {new Date(note.createdAt).toLocaleDateString('tr-TR', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </Text>
+                </View>
+              ))}
             </View>
           )}
         </View>
@@ -638,5 +723,100 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
     color: COLORS.text.primary,
+  },
+  // Trust Notes Styles
+  trustNotesSection: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    backgroundColor: COLORS.bg.secondary,
+    borderRadius: 16,
+    padding: 16,
+  },
+  trustNotesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  trustNotesTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  trustNotesCount: {
+    backgroundColor: COLORS.coral + '20',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  trustNotesCountText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.coral,
+  },
+  trustNotesLoading: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  trustNotesEmpty: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  trustNotesEmptyTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text.secondary,
+    marginBottom: 4,
+  },
+  trustNotesEmptyDescription: {
+    fontSize: 13,
+    color: COLORS.text.tertiary,
+    textAlign: 'center',
+  },
+  trustNotesList: {
+    gap: 12,
+  },
+  trustNoteCard: {
+    backgroundColor: COLORS.bg.primary,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
+  },
+  trustNoteHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  trustNoteAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  trustNoteHeaderInfo: {
+    flex: 1,
+  },
+  trustNoteAuthor: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  trustNoteMoment: {
+    fontSize: 12,
+    color: COLORS.text.secondary,
+    marginTop: 1,
+  },
+  trustNoteText: {
+    fontSize: 14,
+    color: COLORS.text.primary,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  trustNoteDate: {
+    fontSize: 11,
+    color: COLORS.text.tertiary,
   },
 });
