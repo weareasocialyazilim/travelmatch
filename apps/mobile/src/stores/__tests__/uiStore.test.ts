@@ -276,39 +276,41 @@ describe('uiStore', () => {
   });
 
   describe('persistence', () => {
-    it.skip('should persist theme to AsyncStorage', async () => {
+    it('should persist theme to AsyncStorage', async () => {
       const { result } = renderHook(() => useUIStore());
 
       act(() => {
         result.current.setTheme('dark');
       });
 
-      await waitFor(async () => {
-        const stored = await AsyncStorage.getItem('ui-storage');
-        expect(stored).toBeTruthy();
-        
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          expect(parsed.state.theme).toBe('dark');
-        }
-      });
+      // Wait for zustand persist middleware to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = await AsyncStorage.getItem('ui-storage');
+      expect(stored).toBeTruthy();
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        expect(parsed.state.theme).toBe('dark');
+      }
     });
 
-    it.skip('should persist language to AsyncStorage', async () => {
+    it('should persist language to AsyncStorage', async () => {
       const { result } = renderHook(() => useUIStore());
 
       act(() => {
         result.current.setLanguage('en');
       });
 
-      await waitFor(async () => {
-        const stored = await AsyncStorage.getItem('ui-storage');
-        
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          expect(parsed.state.language).toBe('en');
-        }
-      });
+      // Wait for zustand persist middleware to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = await AsyncStorage.getItem('ui-storage');
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        expect(parsed.state.language).toBe('en');
+      }
     });
 
     it('should persist onboarding completion to AsyncStorage', async () => {

@@ -557,7 +557,7 @@ describe('searchStore', () => {
   });
 
   describe('persistence', () => {
-    it.skip('should persist search history to AsyncStorage', async () => {
+    it('should persist search history to AsyncStorage', async () => {
       const { result } = renderHook(() => useSearchStore());
 
       act(() => {
@@ -565,32 +565,34 @@ describe('searchStore', () => {
         result.current.addToHistory('restaurants');
       });
 
-      await waitFor(async () => {
-        const stored = await AsyncStorage.getItem('search-storage');
-        expect(stored).toBeTruthy();
-        
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          expect(parsed.state.searchHistory).toEqual(['restaurants', 'coffee']);
-        }
-      });
+      // Wait for zustand persist middleware to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = await AsyncStorage.getItem('search-storage');
+      expect(stored).toBeTruthy();
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        expect(parsed.state.searchHistory).toEqual(['restaurants', 'coffee']);
+      }
     });
 
-    it.skip('should persist filters to AsyncStorage', async () => {
+    it('should persist filters to AsyncStorage', async () => {
       const { result } = renderHook(() => useSearchStore());
 
       act(() => {
         result.current.setFilters({ category: 'food', minPrice: 10 });
       });
 
-      await waitFor(async () => {
-        const stored = await AsyncStorage.getItem('search-storage');
-        
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          expect(parsed.state.filters).toEqual({ category: 'food', minPrice: 10 });
-        }
-      });
+      // Wait for zustand persist middleware to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = await AsyncStorage.getItem('search-storage');
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        expect(parsed.state.filters).toEqual({ category: 'food', minPrice: 10 });
+      }
     });
 
     it('should persist sort option to AsyncStorage', async () => {
