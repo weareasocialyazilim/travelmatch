@@ -29,6 +29,9 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
+import { supabase } from '@/config/supabase';
+import { uploadFile } from '@/services/supabaseStorageService';
+import { useAuth } from '@/context/AuthContext';
 
 type IconName = React.ComponentProps<typeof Icon>['name'];
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
@@ -81,11 +84,16 @@ type ProofFlowScreenProps = StackScreenProps<RootStackParamList, 'ProofFlow'>;
 
 export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
   navigation,
+  route,
 }) => {
   const { showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<ProofStep>('type');
   const [loading, setLoading] = useState(false);
+
+  // Get escrow/gift context from route params
+  const { escrowId, giftId, momentId, momentTitle: routeMomentTitle, senderId } = route.params || {};
 
   const {
     control,
@@ -139,48 +147,36 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     }
   }, [photos, setValue, showToast]);
 
-  const handleGallerySelect = useCallback(async () => {
-    try {
-      // Use PROOF_PHOTO config for maximum quality
-      const assets = await launchGallery('PROOF_PHOTO', false);
-      if (assets.length > 0) {
-        setValue('photos', [...photos, assets[0].uri]);
-      }
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('permission')) {
-        Alert.alert(
-          'Permission Required',
-          'Gallery permission is needed to select photos',
-        );
-      } else {
-        showToast('Failed to select photo', 'error');
-      }
-    }
-  }, [photos, setValue, showToast]);
+  // SECURITY: Gallery selection disabled for proof photos
+  // Only live camera capture is allowed to prevent fraud
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _handleGallerySelect = useCallback(async () => {
+    // Disabled for security - keeping for potential admin override
+    showToast('Güvenlik nedeniyle galeriden seçim yapılamaz', 'info');
+  }, [showToast]);
 
   const handleAddPhoto = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ['Cancel', 'Take Photo', 'Choose from Gallery'],
-          cancelButtonIndex: 0,
-        },
-        (buttonIndex) => {
-          if (buttonIndex === 1) void handleCameraCapture();
-          if (buttonIndex === 2) void handleGallerySelect();
-        },
+    // If max photos reached, show warning
+    if (photos.length >= 3) {
+      showToast('En fazla 3 fotoğraf ekleyebilirsiniz', 'info');
+      return;
+    }
+
+    // Show security explanation on first use
+    if (photos.length === 0) {
+      Alert.alert(
+        '📸 Anlık Fotoğraf Gerekli',
+        'Güvenlik nedeniyle kanıt fotoğrafları sadece kamera ile çekilebilir. Galeriden seçim yapılamaz.',
+        [
+          { text: 'Anladım', onPress: () => void handleCameraCapture() },
+          { text: 'Vazgeç', style: 'cancel' },
+        ],
       );
     } else {
-      Alert.alert('Add Photo', 'Select proof photo', [
-        { text: 'Take Photo', onPress: () => void handleCameraCapture() },
-        {
-          text: 'Choose from Gallery',
-          onPress: () => void handleGallerySelect(),
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+      // Direct camera launch for subsequent photos
+      void handleCameraCapture();
     }
-  }, [handleCameraCapture, handleGallerySelect]);
+  }, [handleCameraCapture, photos.length, showToast]);
 
   const handleAddTicket = async () => {
     try {
@@ -281,13 +277,110 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     );
   };
 
-  const onSubmit = (_data: ProofInput) => {
+  const onSubmit = async (data: ProofInput) => {
+    if (!user?.id) {
+      showToast('Lütfen giriş yapın', 'error');
+      return;
+    }
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // 1. Upload all photos to Supabase Storage
+      const uploadedPhotoUrls: string[] = [];
+      for (const photoUri of data.photos) {
+        const result = await uploadFile('proofs', photoUri, user.id);
+        if (result.error) {
+          throw new Error(`Fotoğraf yüklenemedi: ${result.error.message}`);
+        }
+        if (result.url) {
+          uploadedPhotoUrls.push(result.url);
+        }
+      }
+
+      // 2. Upload ticket if exists
+      let ticketUrl: string | null = null;
+      if (data.ticket) {
+        const ticketResult = await uploadFile('proofs', data.ticket, user.id, {
+          fileName: `${user.id}/ticket-${Date.now()}.pdf`,
+        });
+        if (ticketResult.url) {
+          ticketUrl = ticketResult.url;
+        }
+      }
+
+      // 3. Create proof_verifications record
+      const { data: proofRecord, error: proofError } = await supabase
+        .from('proof_verifications')
+        .insert({
+          user_id: user.id,
+          escrow_id: escrowId || null,
+          moment_id: momentId || null,
+          photo_urls: uploadedPhotoUrls,
+          ticket_url: ticketUrl,
+          location: data.location ? {
+            lat: data.location.lat,
+            lng: data.location.lng,
+            name: data.location.name,
+          } : null,
+          title: data.title,
+          description: data.description,
+          proof_type: data.type,
+          status: 'pending_review',
+          submitted_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (proofError) {
+        throw new Error(`Kanıt kaydedilemedi: ${proofError.message}`);
+      }
+
+      // 4. Update escrow_transactions if escrowId exists
+      if (escrowId) {
+        const { error: escrowError } = await supabase
+          .from('escrow_transactions')
+          .update({
+            proof_submitted: true,
+            proof_verification_date: new Date().toISOString(),
+          })
+          .eq('id', escrowId);
+
+        if (escrowError) {
+          logger.warn('Failed to update escrow', escrowError);
+        }
+      }
+
+      // 5. Send notification to the gift sender
+      if (senderId) {
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .insert({
+            user_id: senderId,
+            type: 'proof_submitted',
+            title: 'Kanıt yüklendi! 📸',
+            body: `Hediyeniz için kanıt yüklendi. Onayınız bekleniyor.`,
+            data: {
+              proof_id: proofRecord?.id,
+              escrow_id: escrowId,
+              gift_id: giftId,
+            },
+          });
+
+        if (notifError) {
+          logger.warn('Failed to send notification', notifError);
+        }
+      }
+
+      // 6. Navigate to success
       setLoading(false);
       navigation.navigate('Success', { type: 'proof_uploaded' });
-    }, 2000);
+
+    } catch (error) {
+      setLoading(false);
+      const message = error instanceof Error ? error.message : 'Kanıt yüklenirken hata oluştu';
+      showToast(message, 'error');
+      logger.error('Proof upload failed', error as Error);
+    }
   };
 
   const renderTypeSelection = () => (

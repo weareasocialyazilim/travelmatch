@@ -6,4 +6,6 @@ export { ReviewsSection } from './ReviewsSection';
 export { RequestsSection } from './RequestsSection';
 export { SummarySection } from './SummarySection';
 export { ActionBar } from './ActionBar';
+export { ContributorSlotsSection } from './ContributorSlotsSection';
+export type { Contributor } from './ContributorSlotsSection';
 export * from './types';

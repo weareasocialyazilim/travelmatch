@@ -77,8 +77,26 @@ export type RootStackParamList = {
   ProofHistory: { momentId: string };
 
   // Proof System
-  ProofFlow: undefined;
+  ProofFlow: {
+    escrowId?: string;       // Escrow transaction ID
+    giftId?: string;         // Gift ID
+    momentId?: string;       // Moment being proven
+    momentTitle?: string;    // Moment title for display
+    senderId?: string;       // Gift sender's user ID (for notifications)
+  };
   ProofDetail: { proofId: string };
+  ProofReview: {
+    escrowId: string;
+    giftId: string;
+    receiverId: string;
+    receiverName: string;
+    receiverAvatar?: string;
+    momentTitle: string;
+    amount: number;
+    proofPhotos: string[];
+    proofDescription?: string;
+    proofSubmittedAt: string;
+  };
 
   // Approval & Matching
   ReceiverApproval: {
@@ -112,6 +130,7 @@ export type RootStackParamList = {
   };
   GestureReceived: {
     gestureId: string;
+    senderId: string;  // User ID of the gift sender
     momentTitle: string;
     amount: number;
     senderName?: string;
@@ -182,6 +201,8 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   PaymentsKYC: undefined;
+  KVKKAydinlatma: undefined;
+  MesafeliSatis: undefined;
 
   // Withdraw
   Withdraw: undefined;
@@ -222,6 +243,19 @@ export type RootStackParamList = {
   LinkNotFound: { message?: string };
   SessionExpired: undefined;
   PaymentFailed: { transactionId?: string; error?: string };
+
+  // PayTR WebView for secure payment
+  PayTRWebView: {
+    iframeToken: string;
+    merchantOid: string;
+    amount: number;
+    currency: 'TRY' | 'EUR' | 'USD';
+    giftId?: string;
+    isTestMode?: boolean;
+  };
+
+  // Currency Selection
+  CurrencySelection: undefined;
 
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
