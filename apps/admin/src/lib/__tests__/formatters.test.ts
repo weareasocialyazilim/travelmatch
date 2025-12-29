@@ -16,12 +16,9 @@ import {
   formatCurrency,
   formatNumber,
   formatPercentage,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  formatDate as _formatDate,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  formatDateTime as _formatDateTime,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  formatRelativeTime as _formatRelativeTime,
+  formatDate,
+  formatDateTime,
+  formatRelativeTime,
   formatFileSize,
   formatPhoneNumber,
   truncate,
@@ -125,8 +122,9 @@ describe('Admin Formatters', () => {
 
   describe('formatDateTime', () => {
     it('should format date and time correctly', () => {
-      // Test with a fixed date and time
-      const result = formatDateTime('2024-01-15T14:30:00Z');
+      // Test with a Date object to avoid timezone issues
+      const date = new Date(2024, 0, 15, 14, 30, 0);
+      const result = formatDateTime(date);
       // Should include date and time
       expect(result).toMatch(/15.*2024.*\d{1,2}:\d{2}/);
     });
