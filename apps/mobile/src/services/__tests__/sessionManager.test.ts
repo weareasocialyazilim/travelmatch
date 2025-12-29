@@ -4,7 +4,12 @@
  * Target Coverage: 90%+
  */
 
-import { sessionManager, SessionData, SessionTokens, SessionState } from '../sessionManager';
+import {
+  sessionManager,
+  SessionData,
+  SessionTokens,
+  SessionState,
+} from '../sessionManager';
 import type { User } from '@/types';
 
 // Mock dependencies
@@ -57,7 +62,11 @@ jest.mock('@/utils/logger', () => ({
 // Import mocked modules
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { secureStorage, AUTH_STORAGE_KEYS, StorageKeys } from '@/utils/secureStorage';
+import {
+  secureStorage,
+  AUTH_STORAGE_KEYS,
+  StorageKeys,
+} from '@/utils/secureStorage';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 
@@ -115,12 +124,18 @@ describe('SessionManager', () => {
       const state = await sessionManager.initialize();
 
       expect(state).toBe('invalid');
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] Initializing...');
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] No stored session found');
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] Initializing...',
+      );
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] No stored session found',
+      );
     });
 
     it('should return valid when session is valid', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockUser));
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify(mockUser),
+      );
       (secureStorage.getItem as jest.Mock)
         .mockResolvedValueOnce(mockTokens.accessToken)
         .mockResolvedValueOnce(mockTokens.refreshToken)
@@ -135,11 +150,15 @@ describe('SessionManager', () => {
         refreshToken: mockTokens.refreshToken,
         expiresAt: mockTokens.expiresAt,
       });
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] Valid session restored');
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] Valid session restored',
+      );
     });
 
     it('should return expired when token is expired', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockUser));
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify(mockUser),
+      );
       (secureStorage.getItem as jest.Mock)
         .mockResolvedValueOnce(mockExpiredTokens.accessToken)
         .mockResolvedValueOnce(mockExpiredTokens.refreshToken)
@@ -148,7 +167,9 @@ describe('SessionManager', () => {
       const state = await sessionManager.initialize();
 
       expect(state).toBe('expired');
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] Session expired, needs refresh');
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] Session expired, needs refresh',
+      );
     });
 
     it('should return unknown on error', async () => {
@@ -158,11 +179,16 @@ describe('SessionManager', () => {
       const state = await sessionManager.initialize();
 
       expect(state).toBe('unknown');
-      expect(logger.error).toHaveBeenCalledWith('[SessionManager] Initialize failed:', error);
+      expect(logger.error).toHaveBeenCalledWith(
+        '[SessionManager] Initialize failed:',
+        error,
+      );
     });
 
     it('should return invalid when missing access token', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockUser));
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify(mockUser),
+      );
       (secureStorage.getItem as jest.Mock)
         .mockResolvedValueOnce(null) // No access token
         .mockResolvedValueOnce(mockTokens.refreshToken)
@@ -174,7 +200,9 @@ describe('SessionManager', () => {
     });
 
     it('should return invalid when missing refresh token', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockUser));
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify(mockUser),
+      );
       (secureStorage.getItem as jest.Mock)
         .mockResolvedValueOnce(mockTokens.accessToken)
         .mockResolvedValueOnce(null) // No refresh token
@@ -198,23 +226,25 @@ describe('SessionManager', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         StorageKeys.PUBLIC.USER_PROFILE,
-        JSON.stringify(mockUser)
+        JSON.stringify(mockUser),
       );
       expect(secureStorage.setItem).toHaveBeenCalledWith(
         AUTH_STORAGE_KEYS.ACCESS_TOKEN,
-        mockTokens.accessToken
+        mockTokens.accessToken,
       );
       expect(secureStorage.setItem).toHaveBeenCalledWith(
         AUTH_STORAGE_KEYS.REFRESH_TOKEN,
-        mockTokens.refreshToken
+        mockTokens.refreshToken,
       );
       expect(secureStorage.setItem).toHaveBeenCalledWith(
         AUTH_STORAGE_KEYS.TOKEN_EXPIRES_AT,
-        mockTokens.expiresAt.toString()
+        mockTokens.expiresAt.toString(),
       );
       expect(sessionManager.getUser()).toEqual(mockUser);
       expect(sessionManager.getTokens()).toEqual(mockTokens);
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] Session saved successfully');
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] Session saved successfully',
+      );
     });
 
     it('should emit session_created event', async () => {
@@ -226,18 +256,26 @@ describe('SessionManager', () => {
 
       await sessionManager.saveSession(mockSessionData);
 
-      expect(listener).toHaveBeenCalledWith('session_created', expect.objectContaining({
-        user: mockUser,
-        tokens: mockTokens,
-      }));
+      expect(listener).toHaveBeenCalledWith(
+        'session_created',
+        expect.objectContaining({
+          user: mockUser,
+          tokens: mockTokens,
+        }),
+      );
     });
 
     it('should throw error on storage failure', async () => {
       const error = new Error('Storage full');
       (AsyncStorage.setItem as jest.Mock).mockRejectedValue(error);
 
-      await expect(sessionManager.saveSession(mockSessionData)).rejects.toThrow('Failed to save session');
-      expect(logger.error).toHaveBeenCalledWith('[SessionManager] Save session failed:', error);
+      await expect(sessionManager.saveSession(mockSessionData)).rejects.toThrow(
+        'Failed to save session',
+      );
+      expect(logger.error).toHaveBeenCalledWith(
+        '[SessionManager] Save session failed:',
+        error,
+      );
     });
   });
 
@@ -249,7 +287,9 @@ describe('SessionManager', () => {
       const token = await sessionManager.getValidToken();
 
       expect(token).toBeNull();
-      expect(logger.warn).toHaveBeenCalledWith('[SessionManager] No tokens available');
+      expect(logger.warn).toHaveBeenCalledWith(
+        '[SessionManager] No tokens available',
+      );
     });
 
     it('should return token when still valid', async () => {
@@ -287,7 +327,9 @@ describe('SessionManager', () => {
       const token = await sessionManager.getValidToken();
 
       expect(token).toBe('new-access-token');
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] Token expiring soon, refreshing...');
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] Token expiring soon, refreshing...',
+      );
     });
   });
 
@@ -316,7 +358,9 @@ describe('SessionManager', () => {
       const token = await sessionManager.getValidToken();
 
       expect(token).toBe('new-access-token');
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] Token refreshed successfully');
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] Token refreshed successfully',
+      );
     });
 
     it('should return current token when offline', async () => {
@@ -328,7 +372,9 @@ describe('SessionManager', () => {
       const token = await sessionManager.getValidToken();
 
       expect(token).toBe(mockExpiredTokens.accessToken);
-      expect(logger.warn).toHaveBeenCalledWith('[SessionManager] Offline, cannot refresh token');
+      expect(logger.warn).toHaveBeenCalledWith(
+        '[SessionManager] Offline, cannot refresh token',
+      );
     });
 
     it('should clear session on refresh failure', async () => {
@@ -345,9 +391,15 @@ describe('SessionManager', () => {
       const token = await sessionManager.getValidToken();
 
       expect(token).toBeNull();
-      expect(listener).toHaveBeenCalledWith('refresh_failed', expect.any(Object));
-      expect(listener).toHaveBeenCalledWith('session_expired');
-      expect(logger.error).toHaveBeenCalledWith('[SessionManager] Refresh failed:', expect.anything());
+      expect(listener).toHaveBeenCalledWith(
+        'refresh_failed',
+        expect.any(Object),
+      );
+      expect(listener).toHaveBeenCalledWith('session_expired', undefined);
+      expect(logger.error).toHaveBeenCalledWith(
+        '[SessionManager] Refresh failed:',
+        expect.anything(),
+      );
     });
 
     it('should deduplicate concurrent refresh calls', async () => {
@@ -359,10 +411,17 @@ describe('SessionManager', () => {
 
       // Simulate slow refresh
       (supabase.auth.refreshSession as jest.Mock).mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve({
-          data: { session: newSession },
-          error: null,
-        }), 100))
+        () =>
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  data: { session: newSession },
+                  error: null,
+                }),
+              100,
+            ),
+          ),
       );
       (secureStorage.setItem as jest.Mock).mockResolvedValue(undefined);
 
@@ -391,7 +450,10 @@ describe('SessionManager', () => {
       const token = await sessionManager.getValidToken();
 
       expect(token).toBeNull();
-      expect(logger.error).toHaveBeenCalledWith('[SessionManager] Refresh exception:', error);
+      expect(logger.error).toHaveBeenCalledWith(
+        '[SessionManager] Refresh exception:',
+        error,
+      );
     });
   });
 
@@ -410,7 +472,9 @@ describe('SessionManager', () => {
 
       await sessionManager.clearSession();
 
-      expect(AsyncStorage.removeItem).toHaveBeenCalledWith(StorageKeys.PUBLIC.USER_PROFILE);
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
+        StorageKeys.PUBLIC.USER_PROFILE,
+      );
       expect(secureStorage.deleteItems).toHaveBeenCalledWith([
         AUTH_STORAGE_KEYS.ACCESS_TOKEN,
         AUTH_STORAGE_KEYS.REFRESH_TOKEN,
@@ -418,7 +482,9 @@ describe('SessionManager', () => {
       ]);
       expect(sessionManager.getUser()).toBeNull();
       expect(sessionManager.getTokens()).toBeNull();
-      expect(logger.info).toHaveBeenCalledWith('[SessionManager] Session cleared');
+      expect(logger.info).toHaveBeenCalledWith(
+        '[SessionManager] Session cleared',
+      );
     });
 
     it('should emit session_cleared event', async () => {
@@ -430,17 +496,22 @@ describe('SessionManager', () => {
 
       await sessionManager.clearSession();
 
-      expect(listener).toHaveBeenCalledWith('session_cleared');
+      expect(listener).toHaveBeenCalledWith('session_cleared', undefined);
     });
 
     it('should clear memory even on storage error', async () => {
-      (AsyncStorage.removeItem as jest.Mock).mockRejectedValue(new Error('Storage error'));
+      (AsyncStorage.removeItem as jest.Mock).mockRejectedValue(
+        new Error('Storage error'),
+      );
 
       await sessionManager.clearSession();
 
       expect(sessionManager.getUser()).toBeNull();
       expect(sessionManager.getTokens()).toBeNull();
-      expect(logger.error).toHaveBeenCalledWith('[SessionManager] Clear session failed:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        '[SessionManager] Clear session failed:',
+        expect.any(Error),
+      );
     });
   });
 
@@ -528,7 +599,7 @@ describe('SessionManager', () => {
       expect(sessionManager.getUser()?.name).toBe('Updated Name');
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         StorageKeys.PUBLIC.USER_PROFILE,
-        expect.stringContaining('Updated Name')
+        expect.stringContaining('Updated Name'),
       );
       expect(logger.info).toHaveBeenCalledWith('[SessionManager] User updated');
     });
@@ -536,7 +607,9 @@ describe('SessionManager', () => {
     it('should throw error when no active session', async () => {
       (sessionManager as any).user = null;
 
-      await expect(sessionManager.updateUser({ name: 'Test' })).rejects.toThrow('No active session');
+      await expect(sessionManager.updateUser({ name: 'Test' })).rejects.toThrow(
+        'No active session',
+      );
     });
 
     it('should preserve existing user fields', async () => {
@@ -605,7 +678,10 @@ describe('SessionManager', () => {
 
       expect(errorListener).toHaveBeenCalled();
       expect(normalListener).toHaveBeenCalled();
-      expect(logger.error).toHaveBeenCalledWith('[SessionManager] Listener error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        '[SessionManager] Listener error:',
+        expect.any(Error),
+      );
     });
   });
 

@@ -10,7 +10,8 @@ export const STORE_METADATA = {
   // App Identity
   appName: 'TravelMatch',
   subtitle: 'Connect Through Travel Moments',
-  shortDescription: 'Connect with travelers. Share moments. Gift experiences. Travel differently.',
+  shortDescription:
+    'Connect with travelers. Share moments. Gift experiences. Travel differently.',
 
   // Store IDs
   storeIds: {
@@ -65,19 +66,22 @@ export const STORE_METADATA = {
   },
 
   // Keywords (iOS - 100 chars max)
-  keywords: 'travel,experiences,local guide,tourism,gifts,moments,discover,adventure,trip,vacation,explore',
+  keywords:
+    'travel,experiences,local guide,tourism,gifts,moments,discover,adventure,trip,vacation,explore',
 
   // Feature List for Marketing
   features: [
     {
       emoji: '🌍',
       title: 'Discover Moments',
-      description: 'Browse unique travel experiences shared by locals and travelers.',
+      description:
+        'Browse unique travel experiences shared by locals and travelers.',
     },
     {
       emoji: '💝',
       title: 'Gift Experiences',
-      description: 'Send gifts to moment creators with secure escrow protection.',
+      description:
+        'Send gifts to moment creators with secure escrow protection.',
     },
     {
       emoji: '💬',
@@ -110,7 +114,13 @@ export const STORE_METADATA = {
       'iPad Pro 12.9"': { width: 2048, height: 2732, required: false },
     },
     android: {
-      phone: { minWidth: 320, maxWidth: 3840, aspectRatio: '16:9 or 9:16', min: 2, max: 8 },
+      phone: {
+        minWidth: 320,
+        maxWidth: 3840,
+        aspectRatio: '16:9 or 9:16',
+        min: 2,
+        max: 8,
+      },
       tablet7: { minWidth: 320, maxWidth: 3840, required: false },
       tablet10: { minWidth: 320, maxWidth: 3840, required: false },
     },
@@ -137,8 +147,18 @@ export const STORE_METADATA = {
       { type: 'Email', purpose: 'Account, Communication', shared: false },
       { type: 'Phone', purpose: 'Verification', shared: false, optional: true },
       { type: 'Location', purpose: 'App Functionality', shared: false },
-      { type: 'Photos', purpose: 'User Content', shared: true, note: 'Within app only' },
-      { type: 'Payment Info', purpose: 'Purchases', shared: true, processor: 'Stripe' },
+      {
+        type: 'Photos',
+        purpose: 'User Content',
+        shared: true,
+        note: 'Within app only',
+      },
+      {
+        type: 'Payment Info',
+        purpose: 'Purchases',
+        shared: true,
+        processor: 'Stripe',
+      },
       { type: 'Messages', purpose: 'App Functionality', shared: false },
     ],
     securityPractices: [
@@ -157,9 +177,10 @@ export const STORE_METADATA = {
   },
 
   // Version History Template
-  versionHistoryTemplate: (version: string, changes: string[]) => `
+  versionHistoryTemplate: (version: string, changes: string[]) =>
+    `
 Version ${version}
-${changes.map(change => `• ${change}`).join('\n')}
+${changes.map((change) => `• ${change}`).join('\n')}
 `.trim(),
 
   // Current Version Release Notes
@@ -178,14 +199,18 @@ ${changes.map(change => `• ${change}`).join('\n')}
 
 // Helper to generate full description
 export const generateFullDescription = (): string => {
-  const { shortDescription, features } = STORE_METADATA;
+  const { features } = STORE_METADATA;
 
   return `${STORE_METADATA.appName} connects travelers through unique experiences. Share your travel moments, discover local guides, and create unforgettable memories.
 
 KEY FEATURES:
 
-${features.map(f => `${f.emoji} ${f.title}
-${f.description}`).join('\n\n')}
+${features
+  .map(
+    (f) => `${f.emoji} ${f.title}
+${f.description}`,
+  )
+  .join('\n\n')}
 
 WHY TRAVELMATCH?
 We believe the best travel experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, TravelMatch brings people together.
@@ -196,7 +221,7 @@ Download now and start your journey!`;
 // Helper to generate release notes
 export const generateReleaseNotes = (): string => {
   const { version, changes } = STORE_METADATA.currentVersion;
-  return STORE_METADATA.versionHistoryTemplate(version, changes);
+  return STORE_METADATA.versionHistoryTemplate(version, [...changes]);
 };
 
 export default STORE_METADATA;

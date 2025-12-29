@@ -22,8 +22,6 @@ import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp, NavigationProp } from '@react-navigation/native';
 
-type _IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-
 type DisputeFlowRouteProp = RouteProp<RootStackParamList, 'DisputeFlow'>;
 
 export const DisputeFlowScreen: React.FC = () => {
@@ -35,20 +33,15 @@ export const DisputeFlowScreen: React.FC = () => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    formState,
-    watch,
-    setValue,
-  } = useForm<DisputeInput>({
-    resolver: zodResolver(disputeSchema),
-    mode: 'onChange',
-    defaultValues: {
-      reason: '',
-      evidence: [],
-    },
-  });
+  const { control, handleSubmit, formState, watch, setValue } =
+    useForm<DisputeInput>({
+      resolver: zodResolver(disputeSchema),
+      mode: 'onChange',
+      defaultValues: {
+        reason: '',
+        evidence: [],
+      },
+    });
 
   const reason = watch('reason');
   const evidence = watch('evidence') || [];
@@ -82,14 +75,16 @@ export const DisputeFlowScreen: React.FC = () => {
   };
 
   const handleRemoveFile = (index: number) => {
-    setValue('evidence', evidence.filter((_, i) => i !== index));
+    setValue(
+      'evidence',
+      evidence.filter((_, i) => i !== index),
+    );
   };
 
   const onSubmit = async (formData: DisputeInput) => {
     setLoading(true);
     try {
-      const _table =
-        type === 'transaction' ? 'transaction_disputes' : 'proof_disputes';
+      // Determine the foreign key based on dispute type
       const foreignKey = type === 'transaction' ? 'transaction_id' : 'proof_id';
 
       // In a real app, you would upload files to storage first and get URLs
@@ -138,7 +133,10 @@ export const DisputeFlowScreen: React.FC = () => {
       <Controller
         control={control}
         name="reason"
-        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
           <>
             <TextInput
               style={[styles.textArea, error && styles.inputError]}

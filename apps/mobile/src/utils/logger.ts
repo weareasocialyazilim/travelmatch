@@ -279,7 +279,7 @@ class Logger {
     // Avoid replacing values that are already redacted (e.g. [JWT_REDACTED])
     sanitized = sanitized.replace(
       /\b(password|token|secret|api[_-]?key|apikey)\b\s*[:=]\s*(?!\[[^\]]+\])([^\s,;]+)/gi,
-      (m, p, v) => {
+      (_m, p, v) => {
         // Preserve specific redaction types when value matches known patterns
         const jwtRe = /^eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*/;
         const keyRe = /^[a-zA-Z0-9_]{32,}$/;
@@ -384,7 +384,7 @@ class Logger {
     // that call flushRemoteLogs() without awaiting still observe breadcrumbs)
     try {
       // Try synchronous require (works in Jest where modules are mocked)
-       
+
       // @ts-ignore
       const Sentry = require('@sentry/react-native');
       logs.forEach((log) => {
@@ -417,7 +417,6 @@ class Logger {
     const isJest = this.isJestEnv();
     if (this.shouldLog('debug')) {
       if (this.config.jsonFormat && (!__DEV__ || isJest)) {
-         
         const glConsole = (globalThis as any).console || console;
         if (glConsole.info)
           glConsole.info(this.formatJSON('debug', message, args));
@@ -441,8 +440,8 @@ class Logger {
           sanitizedArgs.length === 1
             ? sanitizedArgs[0]
             : sanitizedArgs.length
-            ? sanitizedArgs
-            : undefined;
+              ? sanitizedArgs
+              : undefined;
         // Call console via globalThis to ensure test spies receive the call
         if (glConsole.info) {
           if (typeof secondArg !== 'undefined') glConsole.info(out, secondArg);
@@ -462,8 +461,8 @@ class Logger {
           sanitizedArgs.length === 1
             ? sanitizedArgs[0]
             : sanitizedArgs.length
-            ? sanitizedArgs
-            : undefined;
+              ? sanitizedArgs
+              : undefined;
         // Always pass sanitized args as the second parameter when present so tests
         // can inspect structured data. Preserve child prefix visibility inside
         // the formatted output string itself.
@@ -606,6 +605,7 @@ class Logger {
       // @ts-ignore
       return (this as any).__isDefault ? 0 : undefined;
     }
+    return undefined;
   }
 
   /**

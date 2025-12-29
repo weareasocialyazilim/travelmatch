@@ -11,7 +11,6 @@ import { encryptionService } from './encryptionService';
 import {
   conversationsService,
   messagesService as dbMessagesService,
-  usersService,
 } from './supabaseDbService';
 import type { MessageType, MessageStatus } from '../types/message.types';
 
@@ -275,7 +274,10 @@ export const messageService = {
           try {
             queue = JSON.parse(queueJson);
           } catch (parseError) {
-            logger.warn('[Message] Corrupted queue data, resetting queue', parseError);
+            logger.warn(
+              '[Message] Corrupted queue data, resetting queue',
+              parseError,
+            );
             queue = [];
           }
         }
@@ -353,7 +355,7 @@ export const messageService = {
 
       // Batch fetch: Collect all unique sender IDs for encrypted messages
       const encryptedMsgs = data.filter(
-        (msg) => (msg as { nonce?: string }).nonce && msg.type === 'text'
+        (msg) => (msg as { nonce?: string }).nonce && msg.type === 'text',
       );
       const senderIds = [...new Set(encryptedMsgs.map((msg) => msg.sender_id))];
 
@@ -362,11 +364,13 @@ export const messageService = {
       if (senderIds.length > 0) {
         const { data: senders } = await supabase
           .from('users')
-          .select('id, public_key')
+          .select('id')
           .in('id', senderIds);
 
         if (senders) {
-          senderMap = new Map(senders.map((s) => [s.id, s as UserWithEncryption]));
+          senderMap = new Map(
+            senders.map((s) => [s.id, { id: s.id } as UserWithEncryption]),
+          );
         }
       }
 

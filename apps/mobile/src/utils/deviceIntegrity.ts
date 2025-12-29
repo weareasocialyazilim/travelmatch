@@ -78,8 +78,10 @@ const ANDROID_ROOT_PATHS = [
 
 /**
  * Suspicious package names that indicate tampering tools
+ * Note: Package detection requires native module implementation
+ * Exported for potential use in native security modules
  */
-const SUSPICIOUS_PACKAGES = [
+export const SUSPICIOUS_PACKAGES = [
   'com.koushikdutta.superuser',
   'com.noshufou.android.su',
   'com.noshufou.android.su.elite',
@@ -282,19 +284,21 @@ export type CompromisedDeviceAction = 'warn' | 'restrict' | 'block';
  */
 export function handleCompromisedDevice(
   action: CompromisedDeviceAction,
-  result: IntegrityCheckResult,
+  _result: IntegrityCheckResult,
 ): {
+  allowed: boolean;
   shouldProceed: boolean;
   message?: string;
 } {
   switch (action) {
     case 'warn':
       // Just log, allow operation
-      return { shouldProceed: true };
+      return { allowed: true, shouldProceed: true };
 
     case 'restrict':
       // Allow but with restrictions
       return {
+        allowed: true,
         shouldProceed: true,
         message:
           'Cihazınız değiştirilmiş olabilir. Bazı özellikler kısıtlanabilir.',
@@ -303,13 +307,13 @@ export function handleCompromisedDevice(
     case 'block':
       // Block operation entirely
       return {
+        allowed: false,
         shouldProceed: false,
-        message:
-          'Güvenlik nedeniyle bu işlem bu cihazda gerçekleştirilemez.',
+        message: 'Güvenlik nedeniyle bu işlem bu cihazda gerçekleştirilemez.',
       };
 
     default:
-      return { shouldProceed: true };
+      return { allowed: true, shouldProceed: true };
   }
 }
 

@@ -247,6 +247,33 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
     }, 200);
   }, []);
 
+  // Render item function for FlashList - must be defined at component level
+  const renderSuggestionItem = useCallback(
+    ({ item }: { item: City }) => (
+      <TouchableOpacity
+        style={styles.suggestionItem}
+        onPress={() => handleSelectCity(item)}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        accessibilityRole="button"
+        accessibilityLabel={`Select ${item.fullName}`}
+      >
+        <MaterialCommunityIcons
+          name="city"
+          size={20}
+          color={COLORS.text.secondary}
+          style={styles.suggestionIcon}
+        />
+        <View style={styles.suggestionText}>
+          <Text style={styles.cityName}>{item.name}</Text>
+          {item.country && (
+            <Text style={styles.countryName}>{item.country}</Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    ),
+    [handleSelectCity],
+  );
+
   return (
     <View style={styles.container}>
       <View style={[styles.inputContainer, error && styles.inputError]}>
@@ -266,7 +293,9 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
           autoCapitalize="words"
           autoCorrect={false}
         />
-        {isLoading && <ActivityIndicator size="small" color={COLORS.brand.primary} />}
+        {isLoading && (
+          <ActivityIndicator size="small" color={COLORS.brand.primary} />
+        )}
         {query.length > 0 && !isLoading && (
           <TouchableOpacity
             onPress={() => {
@@ -294,28 +323,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
             keyExtractor={(item) => item.id}
             keyboardShouldPersistTaps="handled"
             estimatedItemSize={56}
-            renderItem={useCallback(({ item }: { item: City }) => (
-              <TouchableOpacity
-                style={styles.suggestionItem}
-                onPress={() => handleSelectCity(item)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                accessibilityRole="button"
-                accessibilityLabel={`Select ${item.fullName}`}
-              >
-                <MaterialCommunityIcons
-                  name="city"
-                  size={20}
-                  color={COLORS.text.secondary}
-                  style={styles.suggestionIcon}
-                />
-                <View style={styles.suggestionText}>
-                  <Text style={styles.cityName}>{item.name}</Text>
-                  {item.country && (
-                    <Text style={styles.countryName}>{item.country}</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ), [handleSelectCity])}
+            renderItem={renderSuggestionItem}
           />
         </View>
       )}

@@ -8,8 +8,6 @@ import {
   Dimensions,
   Alert,
   Linking,
-  Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SocialButton } from '@/components';
@@ -22,7 +20,9 @@ const { height: _SCREEN_HEIGHT } = Dimensions.get('window');
 export const WelcomeScreen: React.FC<{
   navigation: { navigate: (route: string) => void };
 }> = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState<'apple' | 'google' | 'facebook' | null>(null);
+  const [isLoading, setIsLoading] = useState<
+    'apple' | 'google' | 'facebook' | null
+  >(null);
 
   const handleCreateAccount = () => {
     navigation.navigate('Register');
@@ -40,49 +40,52 @@ export const WelcomeScreen: React.FC<{
     navigation.navigate('PrivacyPolicy');
   };
 
-  const handleSocialSignIn = useCallback(async (provider: 'apple' | 'google' | 'facebook') => {
-    if (isLoading) return;
+  const handleSocialSignIn = useCallback(
+    async (provider: 'apple' | 'google' | 'facebook') => {
+      if (isLoading) return;
 
-    setIsLoading(provider);
-    logger.debug(`[Auth] ${provider} sign in initiated from Welcome screen`);
+      setIsLoading(provider);
+      logger.debug(`[Auth] ${provider} sign in initiated from Welcome screen`);
 
-    try {
-      const { url, error } = await signInWithOAuth(provider);
+      try {
+        const { url, error } = await signInWithOAuth(provider);
 
-      if (error) {
-        logger.error(`[Auth] ${provider} OAuth error:`, error);
+        if (error) {
+          logger.error(`[Auth] ${provider} OAuth error:`, error);
+          Alert.alert(
+            'Sign In Error',
+            `Unable to sign in with ${provider}. Please try again or use email.`,
+            [{ text: 'OK' }],
+          );
+          return;
+        }
+
+        if (url) {
+          // Open OAuth URL in browser - user will be redirected back to app
+          const canOpen = await Linking.canOpenURL(url);
+          if (canOpen) {
+            await Linking.openURL(url);
+          } else {
+            Alert.alert(
+              'Browser Required',
+              'Please ensure you have a web browser installed.',
+              [{ text: 'OK' }],
+            );
+          }
+        }
+      } catch (err) {
+        logger.error(`[Auth] ${provider} sign in exception:`, err);
         Alert.alert(
           'Sign In Error',
-          `Unable to sign in with ${provider}. Please try again or use email.`,
-          [{ text: 'OK' }]
+          'Something went wrong. Please try again.',
+          [{ text: 'OK' }],
         );
-        return;
+      } finally {
+        setIsLoading(null);
       }
-
-      if (url) {
-        // Open OAuth URL in browser - user will be redirected back to app
-        const canOpen = await Linking.canOpenURL(url);
-        if (canOpen) {
-          await Linking.openURL(url);
-        } else {
-          Alert.alert(
-            'Browser Required',
-            'Please ensure you have a web browser installed.',
-            [{ text: 'OK' }]
-          );
-        }
-      }
-    } catch (err) {
-      logger.error(`[Auth] ${provider} sign in exception:`, err);
-      Alert.alert(
-        'Sign In Error',
-        'Something went wrong. Please try again.',
-        [{ text: 'OK' }]
-      );
-    } finally {
-      setIsLoading(null);
-    }
-  }, [isLoading]);
+    },
+    [isLoading],
+  );
 
   const handleAppleSignIn = useCallback(() => {
     handleSocialSignIn('apple');

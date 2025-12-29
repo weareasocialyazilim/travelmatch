@@ -20,6 +20,11 @@
 
 // @ts-nocheck - Complex React Navigation mocks
 
+// Mock expo/virtual/env first (ES module issue)
+jest.mock('expo/virtual/env', () => ({
+  env: process.env,
+}));
+
 import { Linking } from 'react-native';
 import { NavigationContainerRef } from '@react-navigation/native';
 import {

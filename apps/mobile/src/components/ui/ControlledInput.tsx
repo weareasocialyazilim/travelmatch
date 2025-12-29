@@ -11,11 +11,10 @@ import { Input } from './Input';
 import { PasswordInput } from './PasswordInput';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
-interface ControlledInputProps<T extends FieldValues>
-  extends Omit<
-    TextInputProps,
-    'value' | 'onChangeText' | 'onChange' | 'onBlur'
-  > {
+interface ControlledInputProps<T extends FieldValues> extends Omit<
+  TextInputProps,
+  'value' | 'onChangeText' | 'onChange' | 'onBlur'
+> {
   name: Path<T>;
   control: Control<T>;
   label?: string;
@@ -29,7 +28,6 @@ interface ControlledInputProps<T extends FieldValues>
 }
 
 interface InputWithValidationProps {
-   
   InputComponent: React.ComponentType<any>;
   onChange: (text: string) => void;
   onBlur: () => void;
@@ -74,9 +72,9 @@ function InputWithValidation({
     if (touched && error) {
       const timer = setTimeout(() => setShowError(true), 300);
       return () => clearTimeout(timer);
-    } else {
-      setShowError(false);
     }
+    setShowError(false);
+    return undefined;
   }, [touched, error]);
 
   const handleBlur = () => {

@@ -629,7 +629,7 @@ jest.mock('react-native', () => {
           ({
             window: { width: 375, height: 667, scale: 2, fontScale: 1 },
             screen: { width: 375, height: 667, scale: 2, fontScale: 1 },
-          }[dim]),
+          })[dim],
       ),
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
@@ -739,6 +739,24 @@ jest.mock('react-native', () => {
       addEventListener: jest.fn(() => ({ remove: jest.fn() })),
       removeEventListener: jest.fn(),
       exitApp: jest.fn(),
+    },
+
+    // AccessibilityInfo
+    AccessibilityInfo: {
+      isReduceMotionEnabled: jest.fn(() => Promise.resolve(false)),
+      isScreenReaderEnabled: jest.fn(() => Promise.resolve(false)),
+      isReduceTransparencyEnabled: jest.fn(() => Promise.resolve(false)),
+      isBoldTextEnabled: jest.fn(() => Promise.resolve(false)),
+      isGrayscaleEnabled: jest.fn(() => Promise.resolve(false)),
+      isInvertColorsEnabled: jest.fn(() => Promise.resolve(false)),
+      isAccessibilityServiceEnabled: jest.fn(() => Promise.resolve(false)),
+      addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+      removeEventListener: jest.fn(),
+      announceForAccessibility: jest.fn(),
+      announceForAccessibilityWithOptions: jest.fn(),
+      setAccessibilityFocus: jest.fn(),
+      sendAccessibilityEvent: jest.fn(),
+      getRecommendedTimeoutMillis: jest.fn(() => Promise.resolve(5000)),
     },
 
     // PermissionsAndroid

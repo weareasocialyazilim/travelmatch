@@ -70,8 +70,11 @@ jest.mock('../../../../context/ToastContext', () => ({
 let mockBiometricState = {
   biometricAvailable: false,
   biometricEnabled: false,
+  hasCredentials: false,
   biometricTypeName: 'Face ID',
   authenticateForAppLaunch: mockAuthenticateForAppLaunch,
+  getCredentials: jest.fn(),
+  saveCredentials: jest.fn(),
 };
 
 jest.mock('../../../../context/BiometricAuthContext', () => ({
@@ -139,8 +142,11 @@ describe('LoginScreen', () => {
     mockBiometricState = {
       biometricAvailable: false,
       biometricEnabled: false,
+      hasCredentials: false,
       biometricTypeName: 'Face ID',
       authenticateForAppLaunch: mockAuthenticateForAppLaunch,
+      getCredentials: jest.fn(),
+      saveCredentials: jest.fn(),
     };
   });
 
@@ -164,12 +170,15 @@ describe('LoginScreen', () => {
       expect(queryByTestId('biometric-login-button')).toBeNull();
     });
 
-    it('should render biometric button when available and enabled', () => {
+    it('should render biometric button when available, enabled, and has credentials', () => {
       mockBiometricState = {
         biometricAvailable: true,
         biometricEnabled: true,
+        hasCredentials: true,
         biometricTypeName: 'Face ID',
         authenticateForAppLaunch: mockAuthenticateForAppLaunch,
+        getCredentials: jest.fn(),
+        saveCredentials: jest.fn(),
       };
 
       const { getByTestId } = render(<LoginScreen />);

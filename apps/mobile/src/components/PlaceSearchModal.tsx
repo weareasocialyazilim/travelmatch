@@ -3,7 +3,7 @@
  * Uses Mapbox Geocoding API to search for places (POIs, venues, addresses)
  * Returns a Place object with name and address for CreateMoment flow
  */
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -66,16 +66,66 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
 
   // Fallback places for when Mapbox is not available
   const FALLBACK_PLACES: PlaceResult[] = [
-    { id: 'taksim', name: 'Taksim Square', address: 'Istanbul, Turkey', category: 'landmark' },
-    { id: 'galata', name: 'Galata Tower', address: 'Istanbul, Turkey', category: 'landmark' },
-    { id: 'hagia', name: 'Hagia Sophia', address: 'Istanbul, Turkey', category: 'landmark' },
-    { id: 'blue', name: 'Blue Mosque', address: 'Istanbul, Turkey', category: 'landmark' },
-    { id: 'grand', name: 'Grand Bazaar', address: 'Istanbul, Turkey', category: 'market' },
-    { id: 'eiffel', name: 'Eiffel Tower', address: 'Paris, France', category: 'landmark' },
-    { id: 'colosseum', name: 'Colosseum', address: 'Rome, Italy', category: 'landmark' },
-    { id: 'times', name: 'Times Square', address: 'New York, United States', category: 'landmark' },
-    { id: 'central', name: 'Central Park', address: 'New York, United States', category: 'park' },
-    { id: 'bigben', name: 'Big Ben', address: 'London, United Kingdom', category: 'landmark' },
+    {
+      id: 'taksim',
+      name: 'Taksim Square',
+      address: 'Istanbul, Turkey',
+      category: 'landmark',
+    },
+    {
+      id: 'galata',
+      name: 'Galata Tower',
+      address: 'Istanbul, Turkey',
+      category: 'landmark',
+    },
+    {
+      id: 'hagia',
+      name: 'Hagia Sophia',
+      address: 'Istanbul, Turkey',
+      category: 'landmark',
+    },
+    {
+      id: 'blue',
+      name: 'Blue Mosque',
+      address: 'Istanbul, Turkey',
+      category: 'landmark',
+    },
+    {
+      id: 'grand',
+      name: 'Grand Bazaar',
+      address: 'Istanbul, Turkey',
+      category: 'market',
+    },
+    {
+      id: 'eiffel',
+      name: 'Eiffel Tower',
+      address: 'Paris, France',
+      category: 'landmark',
+    },
+    {
+      id: 'colosseum',
+      name: 'Colosseum',
+      address: 'Rome, Italy',
+      category: 'landmark',
+    },
+    {
+      id: 'times',
+      name: 'Times Square',
+      address: 'New York, United States',
+      category: 'landmark',
+    },
+    {
+      id: 'central',
+      name: 'Central Park',
+      address: 'New York, United States',
+      category: 'park',
+    },
+    {
+      id: 'bigben',
+      name: 'Big Ben',
+      address: 'London, United Kingdom',
+      category: 'landmark',
+    },
   ];
 
   const searchPlaces = useCallback(async (searchQuery: string) => {
@@ -86,7 +136,9 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
 
     // Use fallback search if Mapbox token is not configured
     if (!MAPBOX_ACCESS_TOKEN) {
-      logger.warn('PlaceSearchModal: Mapbox token not configured, using fallback places');
+      logger.warn(
+        'PlaceSearchModal: Mapbox token not configured, using fallback places',
+      );
       const filtered = FALLBACK_PLACES.filter(
         (place) =>
           place.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -115,8 +167,8 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
       const places: PlaceResult[] =
         data.features?.map((feature: MapboxFeature) => {
           // Extract city/region and country from context
-          const cityContext = feature.context?.find((c) =>
-            c.id.startsWith('place') || c.id.startsWith('region'),
+          const cityContext = feature.context?.find(
+            (c) => c.id.startsWith('place') || c.id.startsWith('region'),
           );
           const countryContext = feature.context?.find((c) =>
             c.id.startsWith('country'),
@@ -187,15 +239,22 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
     onClose();
   }, [onClose]);
 
-  const getCategoryIcon = (category?: string): keyof typeof MaterialCommunityIcons.glyphMap => {
+  const getCategoryIcon = (
+    category?: string,
+  ): keyof typeof MaterialCommunityIcons.glyphMap => {
     if (!category) return 'map-marker';
-    if (category.includes('restaurant') || category.includes('food')) return 'silverware-fork-knife';
-    if (category.includes('cafe') || category.includes('coffee')) return 'coffee';
-    if (category.includes('hotel') || category.includes('lodging')) return 'bed';
+    if (category.includes('restaurant') || category.includes('food'))
+      return 'silverware-fork-knife';
+    if (category.includes('cafe') || category.includes('coffee'))
+      return 'coffee';
+    if (category.includes('hotel') || category.includes('lodging'))
+      return 'bed';
     if (category.includes('park') || category.includes('garden')) return 'tree';
     if (category.includes('museum')) return 'bank';
-    if (category.includes('bar') || category.includes('nightlife')) return 'glass-cocktail';
-    if (category.includes('shop') || category.includes('store')) return 'shopping';
+    if (category.includes('bar') || category.includes('nightlife'))
+      return 'glass-cocktail';
+    if (category.includes('shop') || category.includes('store'))
+      return 'shopping';
     if (category.includes('beach')) return 'beach';
     if (category.includes('airport')) return 'airplane';
     return 'map-marker';
@@ -235,7 +294,7 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
         />
       </TouchableOpacity>
     ),
-    [handleSelectPlace, getCategoryIcon]
+    [handleSelectPlace, getCategoryIcon],
   );
 
   return (
@@ -253,7 +312,11 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
             style={styles.closeButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
+            <MaterialCommunityIcons
+              name="close"
+              size={24}
+              color={COLORS.text.primary}
+            />
           </TouchableOpacity>
           <Text style={styles.title}>Search Place</Text>
           <View style={styles.closeButton} />
@@ -277,7 +340,9 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
               autoCorrect={false}
               autoFocus
             />
-            {isLoading && <ActivityIndicator size="small" color={COLORS.brand.primary} />}
+            {isLoading && (
+              <ActivityIndicator size="small" color={COLORS.brand.primary} />
+            )}
             {query.length > 0 && !isLoading && (
               <TouchableOpacity
                 onPress={() => {

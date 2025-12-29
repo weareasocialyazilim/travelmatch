@@ -32,9 +32,9 @@ interface UserInteraction {
 }
 
 /**
- * Activity Pattern
+ * Activity Pattern - exported for potential external use
  */
-interface _ActivityPattern {
+export interface ActivityPattern {
   mostActiveHour: number; // 0-23
   mostActiveDays: number[]; // 0-6 (Sunday-Saturday)
   avgSessionDuration: number; // minutes
@@ -130,13 +130,6 @@ class PersonalizationService {
       // Fallback to returning all moments
       return moments.slice(0, limit);
     }
-  }
-
-  /**
-   * Update user profile based on booking
-   */
-  private updateProfileFromBooking(_momentId: string, _price: number) {
-    // Placeholder for profile update logic
   }
 }
 

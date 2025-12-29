@@ -34,7 +34,8 @@ type IconName = React.ComponentProps<typeof Icon>['name'];
 type ProofStep = 'type' | 'upload' | 'details' | 'verify';
 type ProofType = 'micro-kindness' | 'verified-experience' | 'community-proof';
 
-interface _ProofUpload {
+// ProofUpload interface for future implementation
+export interface ProofUpload {
   type: ProofType;
   photos: string[];
   ticket?: string;
@@ -128,7 +129,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       }
     } catch (error) {
       if (error instanceof Error && error.message.includes('permission')) {
-        Alert.alert('Permission Required', 'Camera permission is needed to take photos');
+        Alert.alert(
+          'Permission Required',
+          'Camera permission is needed to take photos',
+        );
       } else {
         showToast('Failed to capture photo', 'error');
       }
@@ -144,7 +148,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       }
     } catch (error) {
       if (error instanceof Error && error.message.includes('permission')) {
-        Alert.alert('Permission Required', 'Gallery permission is needed to select photos');
+        Alert.alert(
+          'Permission Required',
+          'Gallery permission is needed to select photos',
+        );
       } else {
         showToast('Failed to select photo', 'error');
       }
@@ -166,7 +173,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
     } else {
       Alert.alert('Add Photo', 'Select proof photo', [
         { text: 'Take Photo', onPress: () => void handleCameraCapture() },
-        { text: 'Choose from Gallery', onPress: () => void handleGallerySelect() },
+        {
+          text: 'Choose from Gallery',
+          onPress: () => void handleGallerySelect(),
+        },
         { text: 'Cancel', style: 'cancel' },
       ]);
     }
@@ -336,7 +346,11 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
                 style={styles.removePhoto}
                 onPress={() => handleRemovePhoto(photo)}
               >
-                <Icon name="close-circle" size={24} color={COLORS.feedback.error} />
+                <Icon
+                  name="close-circle"
+                  size={24}
+                  color={COLORS.feedback.error}
+                />
               </TouchableOpacity>
             </View>
           ))}

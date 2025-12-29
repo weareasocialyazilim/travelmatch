@@ -129,9 +129,7 @@ class SubscriptionManager {
       const filterStr = config.filter || '';
 
       // Subscribe to postgres changes
-      const _postgresChanges = (
-        channel as unknown as { on: (...args: unknown[]) => unknown }
-      ).on(
+      (channel as unknown as { on: (...args: unknown[]) => unknown }).on(
         'postgres_changes',
         {
           event: config.event || '*',

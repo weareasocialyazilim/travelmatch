@@ -79,7 +79,7 @@ export function isCloudflareImagesEnabled(): boolean {
  * ```
  */
 export async function uploadToCloudflare(
-  imageUri: string,
+  _imageUri: string,
   _options: ImageUploadOptions = {},
 ): Promise<CloudflareUploadResult> {
   throw new Error(
@@ -101,7 +101,6 @@ export function getCloudflareImageURL(
     return '';
   }
 
-  const _dimensions = ImageSizes[size];
   const variant = `${size}`;
 
   // Build URL with transformations

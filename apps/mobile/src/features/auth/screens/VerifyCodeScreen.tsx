@@ -36,9 +36,13 @@ export const VerifyCodeScreen: React.FC = () => {
 
   useEffect(() => {
     if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      const timer = setTimeout(
+        () => setResendCooldown(resendCooldown - 1),
+        1000,
+      );
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [resendCooldown]);
 
   const handleCodeChange = (text: string, index: number) => {
@@ -60,7 +64,10 @@ export const VerifyCodeScreen: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: { nativeEvent: { key: string } }, index: number) => {
+  const handleKeyPress = (
+    e: { nativeEvent: { key: string } },
+    index: number,
+  ) => {
     if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -126,14 +133,22 @@ export const VerifyCodeScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           {...a11y.button('Go back')}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text.primary}
+          />
         </TouchableOpacity>
       </View>
 
       {/* Content */}
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="shield-check-outline" size={48} color={COLORS.brand.primary} />
+          <MaterialCommunityIcons
+            name="shield-check-outline"
+            size={48}
+            color={COLORS.brand.primary}
+          />
         </View>
 
         <Text style={styles.title}>Verify Code</Text>
@@ -167,7 +182,10 @@ export const VerifyCodeScreen: React.FC = () => {
           {resendCooldown > 0 ? (
             <Text style={styles.cooldownText}>Resend in {resendCooldown}s</Text>
           ) : (
-            <TouchableOpacity onPress={handleResend} {...a11y.button('Resend code')}>
+            <TouchableOpacity
+              onPress={handleResend}
+              {...a11y.button('Resend code')}
+            >
               <Text style={styles.resendLink}>Resend Code</Text>
             </TouchableOpacity>
           )}
@@ -175,20 +193,32 @@ export const VerifyCodeScreen: React.FC = () => {
 
         {/* Verify Button */}
         <TouchableOpacity
-          style={[styles.verifyButton, (!isCodeComplete || isLoading) && styles.verifyButtonDisabled]}
+          style={[
+            styles.verifyButton,
+            (!isCodeComplete || isLoading) && styles.verifyButtonDisabled,
+          ]}
           onPress={() => handleVerify()}
           disabled={!isCodeComplete || isLoading}
           activeOpacity={0.8}
-          {...a11y.button('Verify code', undefined, !isCodeComplete || isLoading)}
+          {...a11y.button(
+            'Verify code',
+            undefined,
+            !isCodeComplete || isLoading,
+          )}
         >
           <Text style={styles.verifyButtonText}>Verify Code</Text>
         </TouchableOpacity>
 
         {/* Help Text */}
         <View style={styles.helpContainer}>
-          <MaterialCommunityIcons name="information-outline" size={18} color={COLORS.text.secondary} />
+          <MaterialCommunityIcons
+            name="information-outline"
+            size={18}
+            color={COLORS.text.secondary}
+          />
           <Text style={styles.helpText}>
-            If you're having trouble receiving the code, check your spam folder or try requesting a new code.
+            If you're having trouble receiving the code, check your spam folder
+            or try requesting a new code.
           </Text>
         </View>
       </View>

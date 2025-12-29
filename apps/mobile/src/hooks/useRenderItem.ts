@@ -21,7 +21,9 @@ type RenderItemInfo<T> = {
   index: number;
 };
 
-type RenderItemFunction<T> = (info: RenderItemInfo<T>) => React.ReactElement | null;
+type RenderItemFunction<T> = (
+  info: RenderItemInfo<T>,
+) => React.ReactElement | null;
 
 /**
  * Memoizes a renderItem function for use with FlashList/FlatList.
@@ -32,12 +34,11 @@ type RenderItemFunction<T> = (info: RenderItemInfo<T>) => React.ReactElement | n
  */
 export function useRenderItem<T>(
   renderFn: (item: T, index: number) => React.ReactElement | null,
-  deps: DependencyList
+  deps: DependencyList,
 ): RenderItemFunction<T> {
   return useCallback(
     ({ item, index }: RenderItemInfo<T>) => renderFn(item, index),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    deps
+    deps,
   );
 }
 
@@ -46,13 +47,9 @@ export function useRenderItem<T>(
  */
 export function useRenderItemSimple<T>(
   renderFn: (item: T) => React.ReactElement | null,
-  deps: DependencyList
+  deps: DependencyList,
 ): RenderItemFunction<T> {
-  return useCallback(
-    ({ item }: RenderItemInfo<T>) => renderFn(item),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    deps
-  );
+  return useCallback(({ item }: RenderItemInfo<T>) => renderFn(item), deps);
 }
 
 export default useRenderItem;

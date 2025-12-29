@@ -150,7 +150,7 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
 
     for (let i = 0; i < 30; i++) {
       const left = Math.random() * SCREEN_WIDTH;
-      const _delay = Math.random() * 500;
+      // Animation delay for future use
       const size = 6 + Math.random() * 8;
       const color =
         confettiColors[Math.floor(Math.random() * confettiColors.length)];

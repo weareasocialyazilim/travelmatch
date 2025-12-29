@@ -38,7 +38,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
   // Enable screenshot protection for this sensitive screen
   useScreenSecurity();
 
-  const { control, handleSubmit, formState, watch } = useForm<WithdrawInput>({
+  const { control, handleSubmit, formState } = useForm<WithdrawInput>({
     resolver: zodResolver(withdrawSchema),
     mode: 'onChange',
     defaultValues: {
@@ -46,8 +46,6 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
       note: '',
     },
   });
-
-  const _amount = watch('amount');
 
   const onSubmit = async (data: WithdrawInput) => {
     // Check if biometric is enabled and verify before proceeding

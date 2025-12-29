@@ -78,7 +78,7 @@ export const useSubscription = <
 
     logger.info('useSubscription', `Subscribing to ${config.table} (${id})`);
 
-    const _unsubscribe = subscriptionManager.subscribe(id, {
+    subscriptionManager.subscribe(id, {
       ...config,
       onStatusChange: (newStatus) => {
         setStatus(newStatus);

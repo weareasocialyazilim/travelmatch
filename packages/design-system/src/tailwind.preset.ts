@@ -8,7 +8,7 @@ import type { Config } from 'tailwindcss';
  */
 
 const preset: Partial<Config> = {
-  darkMode: ['class'],
+  darkMode: 'class',
   theme: {
     container: {
       center: true,
@@ -170,13 +170,7 @@ const preset: Partial<Config> = {
           'Arial',
           'sans-serif',
         ],
-        mono: [
-          'SF Mono',
-          'Fira Code',
-          'Fira Mono',
-          'Roboto Mono',
-          'monospace',
-        ],
+        mono: ['SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'monospace'],
       },
 
       fontSize: {

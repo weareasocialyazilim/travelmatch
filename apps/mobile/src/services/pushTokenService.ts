@@ -98,7 +98,7 @@ export const registerPushToken = async (token: string): Promise<void> => {
  * Update push token preferences
  */
 export const updatePushTokenPreferences = async (
-  token: string,
+  _token: string,
   preferences: PushTokenPreferences,
 ): Promise<void> => {
   try {

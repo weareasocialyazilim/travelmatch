@@ -49,8 +49,7 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
             ? user.location
             : user && (user.location as any)?.city) ||
           '';
-    const _resolvedVerified =
-      typeof isVerified === 'boolean' ? isVerified : !!user?.kyc;
+    // isVerified is now handled via direct prop or user?.kyc when needed
     const resolvedTrust =
       typeof trustScore === 'number'
         ? trustScore

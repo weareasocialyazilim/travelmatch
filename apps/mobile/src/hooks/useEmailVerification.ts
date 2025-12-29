@@ -40,9 +40,13 @@ export const useEmailVerification = (): EmailVerificationState => {
   // Countdown timer for resend cooldown
   useEffect(() => {
     if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      const timer = setTimeout(
+        () => setResendCooldown(resendCooldown - 1),
+        1000,
+      );
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [resendCooldown]);
 
   /**
@@ -53,7 +57,10 @@ export const useEmailVerification = (): EmailVerificationState => {
       setIsLoading(true);
       setError(null);
 
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      const {
+        data: { user: currentUser },
+        error: userError,
+      } = await supabase.auth.getUser();
 
       if (userError) {
         logger.error('[EmailVerification] Error getting user:', userError);
@@ -84,9 +91,15 @@ export const useEmailVerification = (): EmailVerificationState => {
   /**
    * Send verification email
    */
-  const sendVerificationEmail = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
+  const sendVerificationEmail = useCallback(async (): Promise<{
+    success: boolean;
+    error?: string;
+  }> => {
     if (resendCooldown > 0) {
-      return { success: false, error: `Lütfen ${resendCooldown} saniye bekleyin` };
+      return {
+        success: false,
+        error: `Lütfen ${resendCooldown} saniye bekleyin`,
+      };
     }
 
     try {

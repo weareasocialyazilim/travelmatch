@@ -16,7 +16,6 @@
  * - Future-proof
  */
 
-import { Platform } from 'react-native';
 import { logger } from '../utils/logger';
 
 // Web API types for TypeScript
@@ -28,8 +27,8 @@ declare global {
   }
 }
 
-// Platform check - these APIs only work on web
-const _isWeb = Platform.OS === 'web';
+// Platform check - these APIs work best on web
+// Note: Native implementations may vary
 
 // ============================================
 // COMPRESSION API (replaces pako)

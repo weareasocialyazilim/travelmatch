@@ -80,6 +80,46 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
 
   const showSuggestions = isFocused && searchHistory.length > 0 && !localQuery;
 
+  // Render item function for FlashList - must be defined at component level
+  const renderHistoryItem = useCallback(
+    ({ item }: { item: string }) => (
+      <View style={styles.suggestionRow}>
+        <TouchableOpacity
+          style={styles.suggestionButton}
+          onPress={() => handleSuggestionPress(item)}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          accessibilityRole="button"
+          accessibilityLabel={`Search for ${item}`}
+        >
+          <MaterialCommunityIcons
+            name="history"
+            size={20}
+            color={COLORS.text.secondary}
+            style={styles.suggestionIcon}
+          />
+          <Text style={[styles.suggestionText, { color: COLORS.text.primary }]}>
+            {item}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => removeFromHistory(item)}
+          style={styles.deleteButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityRole="button"
+          accessibilityLabel={`Remove ${item} from history`}
+        >
+          <MaterialCommunityIcons
+            name="close"
+            size={18}
+            color={COLORS.text.secondary}
+          />
+        </TouchableOpacity>
+      </View>
+    ),
+    [handleSuggestionPress, removeFromHistory],
+  );
+
   return (
     <View style={styles.container}>
       {/* Search Input */}
@@ -88,7 +128,9 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
           styles.searchBar,
           {
             backgroundColor: COLORS.utility.white,
-            borderColor: isFocused ? COLORS.brand.primary : COLORS.border.default,
+            borderColor: isFocused
+              ? COLORS.brand.primary
+              : COLORS.border.default,
           },
         ]}
       >
@@ -131,11 +173,16 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
         <View
           style={[
             styles.suggestions,
-            { backgroundColor: COLORS.utility.white, borderColor: COLORS.border.default },
+            {
+              backgroundColor: COLORS.utility.white,
+              borderColor: COLORS.border.default,
+            },
           ]}
         >
           <View style={styles.suggestionsHeader}>
-            <Text style={[styles.suggestionsTitle, { color: COLORS.text.primary }]}>
+            <Text
+              style={[styles.suggestionsTitle, { color: COLORS.text.primary }]}
+            >
               {t('common.search')} History
             </Text>
             <TouchableOpacity onPress={clearHistory}>
@@ -149,41 +196,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
             data={searchHistory}
             keyExtractor={(item, index) => `${item}-${index}`}
             estimatedItemSize={48}
-            renderItem={useCallback(({ item }: { item: string }) => (
-              <View style={styles.suggestionRow}>
-                <TouchableOpacity
-                  style={styles.suggestionButton}
-                  onPress={() => handleSuggestionPress(item)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Search for ${item}`}
-                >
-                  <MaterialCommunityIcons
-                    name="history"
-                    size={20}
-                    color={COLORS.text.secondary}
-                    style={styles.suggestionIcon}
-                  />
-                  <Text style={[styles.suggestionText, { color: COLORS.text.primary }]}>
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => removeFromHistory(item)}
-                  style={styles.deleteButton}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Remove ${item} from history`}
-                >
-                  <MaterialCommunityIcons
-                    name="close"
-                    size={18}
-                    color={COLORS.text.secondary}
-                  />
-                </TouchableOpacity>
-              </View>
-            ), [handleSuggestionPress, removeFromHistory])}
+            renderItem={renderHistoryItem}
             contentContainerStyle={styles.suggestionsList}
             keyboardShouldPersistTaps="handled"
           />

@@ -13,7 +13,11 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
+<<<<<<< Updated upstream
     'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo|expo-blur|expo/virtual|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid)/)',
+=======
+    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo|expo-blur|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid)/)',
+>>>>>>> Stashed changes
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
@@ -22,11 +26,14 @@ module.exports = {
     '^@/components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
     // Handle relative paths that babel module-resolver may produce (any number of ../)
     '^(\\.\\./)+components/BottomNav$': '<rootDir>/__mocks__/components/BottomNav.js',
+<<<<<<< Updated upstream
     // Mock expo virtual env module (ES module that Jest can't handle)
     '^expo/virtual/env$': '<rootDir>/__mocks__/expo-virtual-env.js',
     // Shared mocks in tests/__mocks__/ to avoid duplication across packages
     '^react-native$': '<rootDir>/../../tests/__mocks__/react-native.js',
     '^react-native-reanimated$': '<rootDir>/../../tests/__mocks__/react-native-reanimated.js',
+=======
+>>>>>>> Stashed changes
     // Now spread the preset (contains generic @/ mappings)
     ...jestExpoPreset.moduleNameMapper,
     // Explicit mappings for commonly mocked modules (needed for jest.mock hoisting)

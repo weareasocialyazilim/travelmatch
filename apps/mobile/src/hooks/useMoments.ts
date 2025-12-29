@@ -147,7 +147,6 @@ const DEFAULT_PAGE_SIZE = 20;
 const mapToMoment = (row: MomentRow): Moment => {
   // Extract user data from the optimized join
   const userData = row.users || row.user || {};
-  const _categoryData = row.categories || {};
 
   return {
     id: row.id,

@@ -21,64 +21,59 @@ interface UseRequireEmailVerificationResult {
   isLoading: boolean;
 }
 
-export const useRequireEmailVerification = (): UseRequireEmailVerificationResult => {
-  const { isEmailVerified, isLoading, checkVerification } = useEmailVerification();
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [pendingAction, setPendingAction] = useState<(() => unknown) | null>(null);
+export const useRequireEmailVerification =
+  (): UseRequireEmailVerificationResult => {
+    const { isEmailVerified, isLoading, checkVerification } =
+      useEmailVerification();
+    const [showVerificationModal, setShowVerificationModal] = useState(false);
+    const [_pendingAction, setPendingAction] = useState<(() => unknown) | null>(
+      null,
+    );
 
-  const closeVerificationModal = useCallback(() => {
-    setShowVerificationModal(false);
-    setPendingAction(null);
-  }, []);
+    const closeVerificationModal = useCallback(() => {
+      setShowVerificationModal(false);
+      setPendingAction(null);
+    }, []);
 
-  /**
-   * Wraps an action to require email verification before execution.
-   * If email is not verified, shows modal and waits for verification.
-   * Returns null if verification is cancelled.
-   */
-  const requireVerification = useCallback(
-    async <T,>(action: () => Promise<T> | T): Promise<T | null> => {
-      // First, re-check verification status
-      const verified = await checkVerification();
+    /**
+     * Wraps an action to require email verification before execution.
+     * If email is not verified, shows modal and waits for verification.
+     * Returns null if verification is cancelled.
+     */
+    const requireVerification = useCallback(
+      async <T>(action: () => Promise<T> | T): Promise<T | null> => {
+        // First, re-check verification status
+        const verified = await checkVerification();
 
-      if (verified) {
-        // Email is verified, execute action immediately
-        return action();
-      }
+        if (verified) {
+          // Email is verified, execute action immediately
+          return action();
+        }
 
-      // Email not verified, show modal and wait
-      return new Promise<T | null>((resolve) => {
-        setPendingAction(() => async () => {
-          try {
-            const result = await action();
-            resolve(result);
-          } catch (error) {
-            resolve(null);
-            throw error;
-          }
+        // Email not verified, show modal and wait
+        return new Promise<T | null>((resolve) => {
+          setPendingAction(() => async () => {
+            try {
+              const result = await action();
+              resolve(result);
+            } catch (error) {
+              resolve(null);
+              throw error;
+            }
+          });
+          setShowVerificationModal(true);
         });
-        setShowVerificationModal(true);
+      },
+      [checkVerification, closeVerificationModal],
+    );
 
-        // If modal is closed without verification, resolve with null
-        const originalClose = closeVerificationModal;
-        const handleClose = () => {
-          originalClose();
-          resolve(null);
-        };
-        // Update close handler to resolve promise
-        setShowVerificationModal(true);
-      });
-    },
-    [checkVerification, closeVerificationModal]
-  );
-
-  return {
-    showVerificationModal,
-    closeVerificationModal,
-    requireVerification,
-    isEmailVerified,
-    isLoading,
+    return {
+      showVerificationModal,
+      closeVerificationModal,
+      requireVerification,
+      isEmailVerified,
+      isLoading,
+    };
   };
-};
 
 export default useRequireEmailVerification;

@@ -132,17 +132,6 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
     }
   };
 
-  const _saveHiddenIds = async (ids: string[]) => {
-    try {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.HIDDEN_REQUESTS,
-        JSON.stringify(ids),
-      );
-    } catch (error) {
-      logger.error('Error saving hidden IDs:', error);
-    }
-  };
-
   // Computed values
   const filteredRequests = useMemo(() => {
     return requests.filter((item) => !hiddenRequestIds.includes(item.id));
@@ -209,7 +198,10 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
     );
   };
 
-  const handleUploadProof = (item: RequestItem, onNavigate?: (requestId: string) => void) => {
+  const handleUploadProof = (
+    item: RequestItem,
+    onNavigate?: (requestId: string) => void,
+  ) => {
     logger.info('Upload proof for:', item.id);
     if (onNavigate) {
       onNavigate(item.id);

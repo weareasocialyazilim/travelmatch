@@ -22,9 +22,20 @@ config.resolver.nodeModulesPaths = [
 // 3. Keep hierarchical lookup enabled for Expo compatibility (SDK 54+)
 config.resolver.disableHierarchicalLookup = false;
 
+<<<<<<< Updated upstream
 // 4. Handle path alias resolution for @/ imports
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   // Handle expo/AppEntry - redirect to our custom index.ts
+=======
+// 3.5 Add extra node modules path for @/ alias resolution
+config.resolver.extraNodeModules = {
+  '@': path.resolve(projectRoot, 'src'),
+};
+
+// 4. Redirect expo/AppEntry and handle @/ path aliases
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Handle expo/AppEntry redirect
+>>>>>>> Stashed changes
   if (moduleName === 'expo/AppEntry' || moduleName === './node_modules/expo/AppEntry') {
     return {
       filePath: path.resolve(projectRoot, 'index.ts'),
@@ -32,6 +43,7 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     };
   }
 
+<<<<<<< Updated upstream
   // Handle @/ path aliases - resolve to apps/mobile/src/
   if (moduleName.startsWith('@/')) {
     const aliasedPath = moduleName.replace('@/', '');
@@ -64,6 +76,12 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
         };
       }
     }
+=======
+  // Handle @/ path alias - resolve to src/ directory
+  if (moduleName.startsWith('@/')) {
+    const resolvedPath = moduleName.replace('@/', path.resolve(projectRoot, 'src') + '/');
+    return context.resolveRequest(context, resolvedPath, platform);
+>>>>>>> Stashed changes
   }
 
   // Fallback to default resolution

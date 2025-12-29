@@ -58,7 +58,8 @@ const clientEnvSchema = z.object({
  * These should NEVER be prefixed with EXPO_PUBLIC_
  * Access via Edge Functions only
  */
-const _serverEnvSchema = z.object({
+// Server-side schema - exported for documentation purposes
+export const serverEnvSchema = z.object({
   // Supabase Admin (NEVER expose to client)
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
 

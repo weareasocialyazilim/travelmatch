@@ -60,18 +60,6 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-// Mock Linking
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-  return {
-    ...RN,
-    Linking: {
-      addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-      getInitialURL: jest.fn().mockResolvedValue(null),
-    },
-  };
-});
-
 // Mock supabaseAuthService
 const mockLoginFn = jest.fn();
 const mockLogoutFn = jest.fn();
@@ -264,7 +252,7 @@ describe('useAuth', () => {
 
   describe('Token Refresh & Expiration', () => {
     const mockRefreshSession = jest.requireMock(
-      '../../services/supabaseAuthService'
+      '../../services/supabaseAuthService',
     ).refreshSession;
 
     beforeEach(() => {
@@ -294,7 +282,7 @@ describe('useAuth', () => {
         () => {
           expect(result.current.authState).not.toBe('loading');
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
 
       // Auth context should be defined even with expired token
@@ -333,7 +321,7 @@ describe('useAuth', () => {
         () => {
           expect(result.current.authState).not.toBe('loading');
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
 
       // The hook should be ready to handle refresh
@@ -342,7 +330,7 @@ describe('useAuth', () => {
 
     it('should handle refresh failure and redirect to login', async () => {
       mockRefreshSession.mockRejectedValueOnce(
-        new Error('Invalid refresh token')
+        new Error('Invalid refresh token'),
       );
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -351,7 +339,7 @@ describe('useAuth', () => {
         () => {
           expect(result.current.authState).not.toBe('loading');
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
 
       // When refresh fails, user should be unauthenticated
@@ -377,7 +365,7 @@ describe('useAuth', () => {
         () => {
           expect(result.current.authState).not.toBe('loading');
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
 
       // Verify the refreshUser function exists for handling 401s
@@ -396,7 +384,7 @@ describe('useAuth', () => {
         () => {
           expect(result.current.authState).toBe('unauthenticated');
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
 
       // User should be logged out when refresh fails
@@ -411,9 +399,9 @@ describe('useAuth', () => {
         expires_at: Date.now() + 3600000,
       };
 
-      jest.requireMock('../../services/supabaseAuthService').getSession.mockResolvedValueOnce(
-        storedSession
-      );
+      jest
+        .requireMock('../../services/supabaseAuthService')
+        .getSession.mockResolvedValueOnce(storedSession);
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -421,7 +409,7 @@ describe('useAuth', () => {
         () => {
           expect(result.current.authState).not.toBe('loading');
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
 
       // Session restoration should be handled

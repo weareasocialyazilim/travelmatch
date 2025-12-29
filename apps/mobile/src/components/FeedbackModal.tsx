@@ -28,7 +28,11 @@ import { useHaptics } from '../hooks/useHaptics';
 import { analytics } from '../services/analytics';
 import { feedbackSchema, type FeedbackInput } from '../utils/forms';
 import { canSubmitForm } from '../utils/forms/helpers';
+<<<<<<< Updated upstream
 import { COLORS, primitives } from '../constants/colors';
+=======
+import { COLORS } from '../constants/colors';
+>>>>>>> Stashed changes
 
 interface FeedbackModalProps {
   visible: boolean;

@@ -143,7 +143,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   // Refs for Supabase channels and handlers
   const presenceChannelRef = useRef<RealtimeChannel | null>(null);
   const notificationChannelRef = useRef<RealtimeChannel | null>(null);
-  const _typingChannelUnsubscribeRef = useRef<(() => void) | null>(null);
   const handlersRef = useRef<EventHandlers>(new Map());
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const typingDebounceRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
