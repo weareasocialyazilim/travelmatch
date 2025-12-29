@@ -75,7 +75,7 @@ export const TIMINGS = {
  * Button press scale animation
  * Usage: <Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
  */
-export const useScalePressAnimation = (
+export const usePressAnimation = (
   scaleValue: number = 0.97,
   springConfig = SPRINGS.snappy
 ) => {
@@ -345,7 +345,7 @@ export const useRotation = (degrees: number = 360, duration: number = 1000) => {
 /**
  * Shake animation (for errors)
  */
-export const useShakeAnimation = () => {
+export const useShake = () => {
   const translateX = useSharedValue(0);
 
   const shake = useCallback(() => {
