@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Admin Header V2
+ * TravelMatch Admin Header
  * "Cinematic Travel + Trust Jewelry" Design
  */
 
