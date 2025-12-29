@@ -19,7 +19,7 @@ TravelMatch is a **production-ready social travel platform** built with enterpri
 | Web Landing | Next.js 16 | ⚠️ 20% Complete |
 | Database | Supabase PostgreSQL 15.1 | ✅ 100% Complete |
 | Edge Functions | Deno + TypeScript | ✅ 33+ Functions |
-| Payments | Stripe + PayTR | ✅ Full Integration |
+| Payments | PayTR | ✅ Full Integration |
 
 ### Key Strengths
 
