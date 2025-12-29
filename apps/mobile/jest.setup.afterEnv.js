@@ -802,6 +802,7 @@ jest.mock('react-native-safe-area-context', () => {
 // a `navigation` prop through the render helper (testUtils sets global.__TEST_NAVIGATION__)
 try {
   jest.mock('@react-navigation/native', () => {
+    const React = require('react');
     const actual = jest.requireActual('@react-navigation/native');
     return {
       ...actual,
@@ -812,7 +813,17 @@ try {
           goBack: jest.fn(),
           replace: jest.fn(),
           dispatch: jest.fn(),
+          setOptions: jest.fn(),
+          addListener: jest.fn(() => jest.fn()),
         };
+      },
+      // Mock NavigationContainer to avoid native module issues in tests
+      NavigationContainer: ({ children }) => {
+        return React.createElement(React.Fragment, null, children);
+      },
+      // Ensure ServerContainer doesn't cause issues
+      ServerContainer: ({ children }) => {
+        return React.createElement(React.Fragment, null, children);
       },
     };
   });

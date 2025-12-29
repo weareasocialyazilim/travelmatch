@@ -83,7 +83,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // ============================================
   android: {
     package: 'com.travelmatch.app',
-    versionCode: 24, // Must match iOS buildNumber for consistency
+    versionCode: 1,
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#FFFBF5',
@@ -206,7 +206,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
         // Native SDK v11 with New Architecture support
         RNMapboxMapsVersion: '11.17.0',
-<<<<<<< Updated upstream
       },
     ],
     [
@@ -236,8 +235,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'TravelMatch needs access to your photos to share travel moments.',
         cameraPermission:
           'TravelMatch needs camera access to capture travel moments.',
-=======
->>>>>>> Stashed changes
       },
     ],
   ],
