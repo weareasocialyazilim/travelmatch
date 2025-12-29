@@ -72,31 +72,9 @@ const config: Config = {
           DEFAULT: 'hsl(var(--warning))',
           foreground: 'hsl(var(--warning-foreground))',
         },
-        // Admin sidebar colors
-        sidebar: {
-          DEFAULT: 'hsl(var(--sidebar))',
-          dark: 'hsl(var(--sidebar-dark))',
-          border: 'hsl(var(--sidebar-border))',
-          active: 'hsl(var(--sidebar-active))',
-          'active-border': 'hsl(var(--sidebar-active-border))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          'foreground-muted': 'hsl(var(--sidebar-foreground-muted))',
-        },
-        // System status colors
-        status: {
-          healthy: '#10B981',
-          degraded: '#F59E0B',
-          down: '#EF4444',
-          maintenance: '#3B82F6',
-        },
-        // Chart colors for data visualization
-        chart: {
-          1: '#F59E0B', // Primary (Amber)
-          2: '#EC4899', // Secondary (Magenta)
-          3: '#14B8A6', // Accent (Seafoam/Teal)
-          4: '#10B981', // Trust (Emerald)
-          5: '#3B82F6', // Info (Blue)
-          6: '#8B5CF6', // Purple
+        trust: {
+          DEFAULT: 'hsl(var(--trust))',
+          foreground: 'hsl(var(--trust-foreground))',
         },
       },
       borderRadius: {
@@ -107,23 +85,6 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
-      },
-      // Admin-specific spacing
-      spacing: {
-        'sidebar': '260px',
-        'sidebar-collapsed': '64px',
-        'header': '56px',
-        'page-gutter': '24px',
-      },
-      maxWidth: {
-        'admin-content': '1400px',
-      },
-      // Admin-specific shadows
-      boxShadow: {
-        'stat-card': '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
-        'stat-card-hover': '0 4px 12px rgba(0, 0, 0, 0.1)',
-        'sidebar-active': 'inset 3px 0 0 0 hsl(var(--sidebar-active-border))',
-        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
       },
       keyframes: {
         'accordion-down': {
@@ -154,14 +115,6 @@ const config: Config = {
           from: { backgroundPosition: '200% 0' },
           to: { backgroundPosition: '-200% 0' },
         },
-        'pulse-subtle': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.8' },
-        },
-        'slide-in-left': {
-          from: { transform: 'translateX(-100%)', opacity: '0' },
-          to: { transform: 'translateX(0)', opacity: '1' },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -171,8 +124,6 @@ const config: Config = {
         'slide-in-right': 'slide-in-right 0.3s ease-out',
         'slide-out-right': 'slide-out-right 0.3s ease-out',
         shimmer: 'shimmer 2s linear infinite',
-        'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite',
-        'slide-in-left': 'slide-in-left 0.3s ease-out',
       },
     },
   },
