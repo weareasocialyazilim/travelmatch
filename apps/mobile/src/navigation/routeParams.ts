@@ -244,6 +244,19 @@ export type RootStackParamList = {
   SessionExpired: undefined;
   PaymentFailed: { transactionId?: string; error?: string };
 
+  // PayTR WebView for secure payment
+  PayTRWebView: {
+    iframeToken: string;
+    merchantOid: string;
+    amount: number;
+    currency: 'TRY' | 'EUR' | 'USD';
+    giftId?: string;
+    isTestMode?: boolean;
+  };
+
+  // Currency Selection
+  CurrencySelection: undefined;
+
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
   DeletedMoments: undefined;

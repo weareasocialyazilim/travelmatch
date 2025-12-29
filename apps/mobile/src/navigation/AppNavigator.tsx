@@ -164,6 +164,7 @@ import {
   SuccessConfirmationScreen,
   PaymentFailedScreen,
   ProofReviewScreen,
+  PayTRWebViewScreen,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -563,6 +564,10 @@ const AppNavigator = () => {
             <Stack.Screen
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
+            />
+            <Stack.Screen
+              name="PayTRWebView"
+              component={PayTRWebViewScreen}
             />
 
             {/* Footer Pages */}
