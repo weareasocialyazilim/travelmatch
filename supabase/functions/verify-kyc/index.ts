@@ -127,13 +127,9 @@ serve(async (req) => {
 
     const verificationSession = await verificationResponse.json();
 
-    // For document-based verification, we need to submit the document
-    // In production, the client would use the Stripe Identity SDK
-    // Here we validate the session was created successfully
-    const isValid = verificationSession.status === 'requires_input' ||
-                    verificationSession.status === 'verified';
-
-    // Store the verification session ID for tracking
+    // Store the verification session for tracking
+    // User must complete verification in Stripe Identity flow
+    // Status will be updated via webhook when verification completes
     await supabaseAdmin.from('kyc_verifications').upsert({
       user_id: user.id,
       stripe_session_id: verificationSession.id,
@@ -142,22 +138,25 @@ serve(async (req) => {
       created_at: new Date().toISOString(),
     });
 
-    if (isValid) {
-      const { error } = await supabaseAdmin
+    // Set user status to pending - actual verification happens via webhook
+    // IMPORTANT: Never mark as verified here - wait for Stripe webhook
+    if (verificationSession.status === 'requires_input') {
+      await supabaseAdmin
         .from('users')
         .update({
-          kyc_status: 'verified',
-          verified: true,
+          kyc_status: 'pending',
         })
         .eq('id', user.id);
-
-      if (error) throw error;
     }
 
+    // Return the session URL for the client to complete verification
     return new Response(
       JSON.stringify({
-        status: 'verified',
-        message: 'KYC verification successful',
+        status: 'pending',
+        message: 'Verification session created. Please complete document verification.',
+        sessionId: verificationSession.id,
+        clientSecret: verificationSession.client_secret,
+        url: verificationSession.url,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -73,6 +73,8 @@ supabase/.temp/
 # Infisical local cache
 .infisical/
 .infisical.json
+# CRITICAL: Never commit actual secrets file
+.env.infisical
 
 # ============================================
 # CLEANUP: Temporary and backup files

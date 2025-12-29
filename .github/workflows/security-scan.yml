@@ -56,7 +56,8 @@ jobs:
   snyk-scan:
     name: Snyk Security Scan
     runs-on: ubuntu-latest
-    continue-on-error: true
+    # BLOCKING: Critical/High vulnerabilities will fail the build
+    continue-on-error: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,15 +72,15 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        continue-on-error: true
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
-        continue-on-error: true
+        # BLOCKING: High severity vulnerabilities will fail the build
+        continue-on-error: false
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --all-projects
+          args: --severity-threshold=high --all-projects --fail-on=all
 
   code-security:
     name: Code Security Analysis
