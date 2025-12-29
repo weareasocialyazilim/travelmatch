@@ -77,7 +77,7 @@ export const TIMINGS = {
  */
 export const usePressAnimation = (
   scaleValue: number = 0.97,
-  springConfig = SPRINGS.snappy
+  springConfig = SPRINGS.snappy,
 ) => {
   const scale = useSharedValue(1);
 
@@ -140,7 +140,7 @@ export const useFadeIn = (delay: number = 0, duration: number = 300) => {
   useEffect(() => {
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration, easing: Easing.out(Easing.ease) })
+      withTiming(1, { duration, easing: Easing.out(Easing.ease) }),
     );
   }, [opacity, delay, duration]);
 
@@ -184,8 +184,8 @@ export const useBounceIn = (delay: number = 0, fromScale: number = 0.8) => {
       delay,
       withSequence(
         withTiming(1.05, TIMINGS.fast),
-        withSpring(1, SPRINGS.bouncy)
-      )
+        withSpring(1, SPRINGS.bouncy),
+      ),
     );
   }, [opacity, scale, delay, fromScale]);
 
@@ -228,7 +228,7 @@ export const useStaggeredItem = (index: number, staggerDelay: number = 50) => {
 export const usePulse = (
   minScale: number = 1,
   maxScale: number = 1.05,
-  duration: number = 1500
+  duration: number = 1500,
 ) => {
   const scale = useSharedValue(minScale);
 
@@ -236,10 +236,10 @@ export const usePulse = (
     scale.value = withRepeat(
       withSequence(
         withTiming(maxScale, { duration }),
-        withTiming(minScale, { duration })
+        withTiming(minScale, { duration }),
       ),
       -1,
-      false
+      false,
     );
   }, [scale, minScale, maxScale, duration]);
 
@@ -263,19 +263,19 @@ export const useBreathing = (duration: number = 2000) => {
     scale.value = withRepeat(
       withSequence(
         withTiming(1.03, { duration, easing }),
-        withTiming(1, { duration, easing })
+        withTiming(1, { duration, easing }),
       ),
       -1,
-      false
+      false,
     );
 
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.85, { duration, easing }),
-        withTiming(1, { duration, easing })
+        withTiming(1, { duration, easing }),
       ),
       -1,
-      false
+      false,
     );
   }, [scale, opacity, duration]);
 
@@ -303,10 +303,10 @@ export const useFloating = (amplitude: number = 5, duration: number = 3000) => {
         withTiming(amplitude, {
           duration: duration / 2,
           easing: Easing.inOut(Easing.ease),
-        })
+        }),
       ),
       -1,
-      true
+      true,
     );
   }, [translateY, amplitude, duration]);
 
@@ -327,7 +327,7 @@ export const useRotation = (degrees: number = 360, duration: number = 1000) => {
     rotation.value = withRepeat(
       withTiming(degrees, { duration, easing: Easing.linear }),
       -1,
-      false
+      false,
     );
   }, [rotation, degrees, duration]);
 
@@ -354,7 +354,7 @@ export const useShake = () => {
       withTiming(8, { duration: 100 }),
       withTiming(-6, { duration: 100 }),
       withTiming(6, { duration: 100 }),
-      withTiming(0, { duration: 50 })
+      withTiming(0, { duration: 50 }),
     );
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
   }, [translateX]);
@@ -376,7 +376,7 @@ export const useSuccessBounce = () => {
     scale.value = withSequence(
       withSpring(1.2, SPRINGS.celebration),
       withSpring(0.9, SPRINGS.snappy),
-      withSpring(1, SPRINGS.bouncy)
+      withSpring(1, SPRINGS.bouncy),
     );
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, [scale]);
@@ -398,14 +398,14 @@ export const useSuccessBounce = () => {
 export const useParallax = (
   scrollY: SharedValue<number>,
   inputRange: [number, number],
-  outputRange: [number, number]
+  outputRange: [number, number],
 ) => {
   const animatedStyle = useAnimatedStyle(() => {
     const translateY = interpolate(
       scrollY.value,
       inputRange,
       outputRange,
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     return {
@@ -422,21 +422,21 @@ export const useParallax = (
 export const useHeaderCollapse = (
   scrollY: SharedValue<number>,
   expandedHeight: number,
-  collapsedHeight: number
+  collapsedHeight: number,
 ) => {
   const animatedStyle = useAnimatedStyle(() => {
     const height = interpolate(
       scrollY.value,
       [0, expandedHeight - collapsedHeight],
       [expandedHeight, collapsedHeight],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     const opacity = interpolate(
       scrollY.value,
       [0, (expandedHeight - collapsedHeight) / 2],
       [1, 0],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     return {
@@ -470,7 +470,7 @@ export const useAnimatedValue = (value: number, config = TIMINGS.default) => {
  */
 export const useProgress = (
   progress: number, // 0-1
-  duration: number = 500
+  duration: number = 500,
 ) => {
   const animatedProgress = useSharedValue(0);
 
@@ -484,3 +484,45 @@ export const useProgress = (
 
   return { animatedProgress, animatedStyle };
 };
+
+/**
+ * Floating animation (for badges, notifications, etc.)
+ */
+export const useFloatingAnimation = (
+  amplitude: number = 5,
+  duration: number = 3000,
+) => {
+  return useFloating(amplitude, duration);
+};
+
+/**
+ * Skeleton loading pulse animation
+ */
+export const useSkeletonAnimation = () => {
+  return usePulse();
+};
+
+/**
+ * Get spring configuration
+ */
+export const getSpringConfig = (preset: keyof typeof SPRINGS = 'default') => {
+  return SPRINGS[preset];
+};
+
+/**
+ * Get timing configuration
+ */
+export const getTimingConfig = (preset: keyof typeof TIMINGS = 'default') => {
+  return TIMINGS[preset];
+};
+
+/**
+ * Create staggered delays for list items
+ */
+export const createStaggerDelays = (count: number, delay: number = 50) => {
+  return Array.from({ length: count }, (_, i) => i * delay);
+};
+
+// Type exports
+export type SpringConfig = (typeof SPRINGS)[keyof typeof SPRINGS];
+export type TimingConfig = (typeof TIMINGS)[keyof typeof TIMINGS];

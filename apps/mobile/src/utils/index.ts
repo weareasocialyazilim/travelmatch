@@ -23,10 +23,6 @@ export {
   useCleanSpark,
   useSheetAnimation,
   useCardEntrance,
-  useFABAnimation,
-  useSkeletonPulse,
-  getSpringConfig,
-  createStaggeredDelay,
   // omitting useShake to avoid duplicate
 } from './motion';
 
@@ -89,4 +85,7 @@ export {
   guardSensitiveOperation,
   logIntegrityEvent,
 } from './deviceIntegrity';
-export type { IntegrityCheckResult, CompromisedDeviceAction } from './deviceIntegrity';
+export type {
+  IntegrityCheckResult,
+  CompromisedDeviceAction,
+} from './deviceIntegrity';

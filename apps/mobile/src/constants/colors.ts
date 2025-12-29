@@ -201,10 +201,16 @@ export const COLORS = {
   coral: '#FF6B6B', // Legacy
 
   // ─────────────────────────────────────────────
-  // Trust (Güvenilirlik) - "Jewelry" aesthetic
+  // Trust (Güvenilirlik) - "Jewelry" aesthetic (with nested object)
   // Trust score, verified badges, proof status
   // ─────────────────────────────────────────────
-  trust: primitives.emerald[500],
+  trust: {
+    primary: primitives.emerald[500],
+    light: primitives.emerald[400],
+    dark: primitives.emerald[600],
+    muted: 'rgba(16, 185, 129, 0.15)',
+    surface: primitives.emerald[50],
+  },
   trustLight: primitives.emerald[400],
   trustDark: primitives.emerald[600],
   trustMuted: 'rgba(16, 185, 129, 0.15)',
@@ -250,9 +256,16 @@ export const COLORS = {
   infoDark: primitives.blue[600],
 
   // ─────────────────────────────────────────────
-  // Text
+  // Text (with nested object for backward compatibility)
   // ─────────────────────────────────────────────
-  text: primitives.stone[900],
+  text: {
+    primary: primitives.stone[900],
+    secondary: primitives.stone[500],
+    tertiary: primitives.stone[400],
+    muted: primitives.stone[400],
+    disabled: primitives.stone[300],
+    inverse: '#FFFFFF',
+  },
   textPrimary: primitives.stone[900],
   textSecondary: primitives.stone[500],
   textTertiary: primitives.stone[400],
@@ -265,6 +278,43 @@ export const COLORS = {
   textOnDark: '#FFFFFF',
   textOnDarkSecondary: 'rgba(255, 255, 255, 0.72)',
   textOnDarkMuted: 'rgba(255, 255, 255, 0.48)',
+
+  // ─────────────────────────────────────────────
+  // Brand (nested for backward compatibility)
+  // ─────────────────────────────────────────────
+  brand: {
+    primary: primitives.amber[500],
+    secondary: primitives.magenta[500],
+    accent: primitives.seafoam[500],
+  },
+
+  // ─────────────────────────────────────────────
+  // Feedback (nested for backward compatibility)
+  // ─────────────────────────────────────────────
+  feedback: {
+    success: primitives.emerald[500],
+    error: primitives.red[500],
+    warning: primitives.amber[500],
+    info: primitives.blue[500],
+  },
+
+  // ─────────────────────────────────────────────
+  // Utility (nested for backward compatibility)
+  // ─────────────────────────────────────────────
+  utility: {
+    white: primitives.white,
+    black: primitives.black,
+    transparent: 'transparent',
+  },
+
+  // ─────────────────────────────────────────────
+  // Background (with nested bg for backward compatibility)
+  // ─────────────────────────────────────────────
+  bg: {
+    primary: '#FFFCF8',
+    secondary: '#FFF9F2',
+    tertiary: '#FFF5E8',
+  },
 
   // ─────────────────────────────────────────────
   // Background - "Cinematic" gradient-ready
@@ -514,8 +564,16 @@ export const GRADIENTS = {
   aurora: [primitives.purple[500], primitives.magenta[500]] as const,
 
   // Card overlays
-  cardOverlay: ['transparent', 'rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.75)'] as const,
-  cardOverlayLight: ['transparent', 'rgba(0, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.5)'] as const,
+  cardOverlay: [
+    'transparent',
+    'rgba(0, 0, 0, 0.4)',
+    'rgba(0, 0, 0, 0.75)',
+  ] as const,
+  cardOverlayLight: [
+    'transparent',
+    'rgba(0, 0, 0, 0.2)',
+    'rgba(0, 0, 0, 0.5)',
+  ] as const,
   heroLight: ['transparent', 'rgba(0, 0, 0, 0.5)'] as const,
 
   // Glass

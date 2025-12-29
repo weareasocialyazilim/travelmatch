@@ -19,8 +19,6 @@ import {
   withDelay,
   withRepeat,
   Easing,
-  SharedValue,
-  runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
@@ -57,7 +55,6 @@ export const SPRING = {
   },
 } as const;
 
-
 // ═══════════════════════════════════════════════════
 // TIMING
 // ═══════════════════════════════════════════════════
@@ -74,7 +71,6 @@ export const TIMING = {
   easeInOut: Easing.bezier(0.42, 0, 0.58, 1),
 } as const;
 
-
 // ═══════════════════════════════════════════════════
 // HAPTICS - "Satisfaction" feedback
 // ═══════════════════════════════════════════════════
@@ -82,12 +78,14 @@ export const HAPTIC = {
   light: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
   medium: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
   heavy: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy),
-  success: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
-  error: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error),
-  warning: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
+  success: () =>
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
+  error: () =>
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error),
+  warning: () =>
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
   selection: () => Haptics.selectionAsync(),
 } as const;
-
 
 // ═══════════════════════════════════════════════════
 // HOOKS
@@ -123,7 +121,10 @@ export const useFadeSlideUp = (delay = 0, translateY = 20) => {
   const translate = useSharedValue(translateY);
 
   useEffect(() => {
-    opacity.value = withDelay(delay, withTiming(1, { duration: TIMING.default }));
+    opacity.value = withDelay(
+      delay,
+      withTiming(1, { duration: TIMING.default }),
+    );
     translate.value = withDelay(delay, withSpring(0, SPRING.gentle));
   }, [delay, translateY]);
 
@@ -144,7 +145,10 @@ export const useStaggeredItem = (index: number, staggerDelay = 50) => {
 
   useEffect(() => {
     const delay = index * staggerDelay;
-    opacity.value = withDelay(delay, withTiming(1, { duration: TIMING.default }));
+    opacity.value = withDelay(
+      delay,
+      withTiming(1, { duration: TIMING.default }),
+    );
     translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
   }, [index, staggerDelay]);
 
@@ -166,10 +170,10 @@ export const usePulse = (minScale = 1, maxScale = 1.03, duration = 2000) => {
     scale.value = withRepeat(
       withSequence(
         withTiming(maxScale, { duration }),
-        withTiming(minScale, { duration })
+        withTiming(minScale, { duration }),
       ),
       -1,
-      false
+      false,
     );
   }, [minScale, maxScale, duration]);
 
@@ -191,10 +195,10 @@ export const useShimmer = (enabled = true) => {
       opacity.value = withRepeat(
         withSequence(
           withTiming(1, { duration: 800 }),
-          withTiming(0.5, { duration: 800 })
+          withTiming(0.5, { duration: 800 }),
         ),
         -1,
-        true
+        true,
       );
     }
   }, [enabled]);
@@ -218,7 +222,7 @@ export const useShake = () => {
       withTiming(8, { duration: 100 }),
       withTiming(-6, { duration: 100 }),
       withTiming(6, { duration: 100 }),
-      withTiming(0, { duration: 50 })
+      withTiming(0, { duration: 50 }),
     );
     HAPTIC.error();
   }, []);
@@ -240,7 +244,7 @@ export const useSuccessBounce = () => {
     scale.value = withSequence(
       withSpring(1.15, SPRING.bouncy),
       withSpring(0.95, SPRING.snappy),
-      withSpring(1, SPRING.default)
+      withSpring(1, SPRING.default),
     );
     HAPTIC.success();
   }, []);
@@ -262,11 +266,11 @@ export const useCleanSpark = () => {
   const spark = useCallback(() => {
     scale.value = withSequence(
       withTiming(1.2, { duration: 150 }),
-      withSpring(1, SPRING.bouncy)
+      withSpring(1, SPRING.bouncy),
     );
     sparkOpacity.value = withSequence(
       withTiming(1, { duration: 100 }),
-      withDelay(400, withTiming(0, { duration: 200 }))
+      withDelay(400, withTiming(0, { duration: 200 })),
     );
     HAPTIC.success();
   }, []);
@@ -321,15 +325,15 @@ export const useCardEntrance = (index: number) => {
   useEffect(() => {
     const delay = index * 50;
     translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
-    opacity.value = withDelay(delay, withTiming(1, { duration: TIMING.default }));
+    opacity.value = withDelay(
+      delay,
+      withTiming(1, { duration: TIMING.default }),
+    );
     scale.value = withDelay(delay, withSpring(1, SPRING.gentle));
   }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
     opacity: opacity.value,
   }));
 

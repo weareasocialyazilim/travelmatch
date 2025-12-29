@@ -1,5 +1,22 @@
 import { TextStyle, Platform, PixelRatio } from 'react-native';
-import { LIGHT_COLORS, DARK_COLORS } from './colors';
+import { COLORS } from '../constants/colors';
+
+// Light and dark mode colors
+const LIGHT_COLORS = {
+  text: {
+    primary: COLORS.text.primary,
+    secondary: COLORS.text.secondary,
+    tertiary: COLORS.text.tertiary,
+  },
+};
+
+const DARK_COLORS = {
+  text: {
+    primary: COLORS.textOnDark,
+    secondary: COLORS.textOnDarkSecondary,
+    tertiary: COLORS.textOnDarkMuted,
+  },
+};
 
 /**
  * Typography Scale
