@@ -3,7 +3,6 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-<<<<<<< Updated upstream
       // Module resolver for path aliases - MUST come before reanimated
       [
         'module-resolver',
@@ -29,8 +28,6 @@ module.exports = function (api) {
         },
       ],
       // Reanimated MUST be last
-=======
->>>>>>> Stashed changes
       'react-native-reanimated/plugin',
     ],
     // Exclude node_modules from root babel config processing
