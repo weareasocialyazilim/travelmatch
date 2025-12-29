@@ -1,279 +1,414 @@
 /**
- * BottomNav Component - iOS 26.3 Redesigned
+ * TravelMatch Awwwards Design System 2026 - Bottom Navigation
  *
- * Glass effect bottom navigation with updated icons for gift-moment concept.
- * Part of iOS 26.3 design system for TravelMatch.
+ * Premium navigation with:
+ * - Glassmorphism background
+ * - Animated active indicator
+ * - Floating create button with gradient
+ * - Spring animations on tap
+ *
+ * Designed for Awwwards Best UI nomination
  */
+
 import React, { memo, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS, GRADIENTS } from '../constants/colors';
-import { useHaptics } from '../hooks/useHaptics';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Reanimated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+
+import { COLORS, GRADIENTS, PALETTE } from '../constants/colors';
+import { TYPE_SCALE } from '../theme/typography';
+import { SPRINGS } from '../hooks/useAnimations';
 import type { RootStackParamList } from '../navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// ============================================
+// TYPES
+// ============================================
 interface BottomNavProps {
   activeTab: 'Discover' | 'Requests' | 'Create' | 'Messages' | 'Profile';
   requestsBadge?: number;
   messagesBadge?: number;
 }
 
+type TabName = 'Discover' | 'Requests' | 'Messages' | 'Profile';
+
+interface TabConfig {
+  name: TabName;
+  label: string;
+  icon: string;
+  iconActive: string;
+  screen: keyof RootStackParamList;
+}
+
+// ============================================
+// TAB CONFIGURATION
+// ============================================
+const TABS: TabConfig[] = [
+  {
+    name: 'Discover',
+    label: 'Dilekler',
+    icon: 'gift-outline',
+    iconActive: 'gift',
+    screen: 'Discover',
+  },
+  {
+    name: 'Requests',
+    label: 'Hediyeler',
+    icon: 'heart-outline',
+    iconActive: 'heart',
+    screen: 'Requests',
+  },
+  {
+    name: 'Messages',
+    label: 'Mesajlar',
+    icon: 'chat-outline',
+    iconActive: 'chat',
+    screen: 'Messages',
+  },
+  {
+    name: 'Profile',
+    label: 'Profil',
+    icon: 'account-outline',
+    iconActive: 'account',
+    screen: 'Profile',
+  },
+];
+
+// ============================================
+// TAB ITEM COMPONENT
+// ============================================
+interface TabItemProps {
+  tab: TabConfig;
+  isActive: boolean;
+  badge?: number;
+  onPress: () => void;
+}
+
+const TabItem: React.FC<TabItemProps> = memo(({ tab, isActive, badge, onPress }) => {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(0.9, SPRINGS.snappy);
+  }, []);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, SPRINGS.bouncy);
+  }, []);
+
+  const handlePress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  }, [onPress]);
+
+  return (
+    <Pressable
+      testID={`nav-${tab.name.toLowerCase()}-tab`}
+      onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={styles.navItem}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: isActive }}
+      accessibilityLabel={`${tab.label} tab`}
+    >
+      <Reanimated.View style={[styles.navItemContent, animatedStyle]}>
+        <View style={styles.iconContainer}>
+          <MaterialCommunityIcons
+            name={isActive ? tab.iconActive : tab.icon}
+            size={24}
+            color={isActive ? COLORS.interactive.primary : COLORS.text.muted}
+          />
+          {badge && badge > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {badge > 9 ? '9+' : badge}
+              </Text>
+            </View>
+          )}
+        </View>
+        <Text style={isActive ? styles.navTextActive : styles.navText}>
+          {tab.label}
+        </Text>
+        {isActive && <View style={styles.activeIndicator} />}
+      </Reanimated.View>
+    </Pressable>
+  );
+});
+
+// ============================================
+// CREATE BUTTON COMPONENT
+// ============================================
+interface CreateButtonProps {
+  onPress: () => void;
+}
+
+const CreateButton: React.FC<CreateButtonProps> = memo(({ onPress }) => {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(0.9, SPRINGS.snappy);
+  }, []);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, SPRINGS.bouncy);
+  }, []);
+
+  const handlePress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onPress();
+  }, [onPress]);
+
+  return (
+    <Pressable
+      testID="nav-create-tab"
+      onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={styles.createButtonWrapper}
+      accessibilityRole="button"
+      accessibilityLabel="Yeni dilek oluştur"
+    >
+      <Reanimated.View style={animatedStyle}>
+        <LinearGradient
+          colors={GRADIENTS.gift}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.createButton}
+        >
+          <MaterialCommunityIcons
+            name="plus"
+            size={28}
+            color={PALETTE.white}
+          />
+        </LinearGradient>
+      </Reanimated.View>
+    </Pressable>
+  );
+});
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
 const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
   activeTab,
   requestsBadge = 0,
   messagesBadge = 0,
 }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { impact } = useHaptics();
+  const insets = useSafeAreaInsets();
 
-  // Memoize tab press handler
   const handleTabPress = useCallback(
     (screen: keyof RootStackParamList) => {
-      void impact('light');
       navigation.navigate(screen as never);
     },
-    [navigation, impact],
+    [navigation],
   );
 
-  // Memoize badge display text
-  const requestsBadgeText = useMemo(
-    () => (requestsBadge > 9 ? '9+' : requestsBadge),
-    [requestsBadge],
-  );
+  const handleCreatePress = useCallback(() => {
+    navigation.navigate('CreateMoment' as never);
+  }, [navigation]);
 
-  const messagesBadgeText = useMemo(
-    () => (messagesBadge > 9 ? '9+' : messagesBadge),
-    [messagesBadge],
-  );
+  const getBadge = useCallback((tabName: TabName): number | undefined => {
+    switch (tabName) {
+      case 'Requests':
+        return requestsBadge;
+      case 'Messages':
+        return messagesBadge;
+      default:
+        return undefined;
+    }
+  }, [requestsBadge, messagesBadge]);
 
-  // Use BlurView on iOS, fallback to solid background on Android
-  const NavContainer = Platform.OS === 'ios' ? BlurView : View;
-  const containerProps = Platform.OS === 'ios'
-    ? { intensity: 90, tint: 'light' as const }
-    : {};
+  // Split tabs for left and right of create button
+  const leftTabs = TABS.slice(0, 2);
+  const rightTabs = TABS.slice(2);
 
   return (
-    <View style={styles.bottomNav}>
-      <NavContainer {...containerProps} style={styles.navContent}>
-        {/* Wishes Tab (renamed from Discover) */}
-        <TouchableOpacity
-          testID="nav-discover-tab"
-          style={styles.navItem}
-          onPress={() => handleTabPress('Discover')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'Discover' }}
-          accessibilityLabel="Wishes tab"
-          accessibilityHint="Browse wishes and gift moments"
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+      {Platform.OS === 'ios' ? (
+        <BlurView
+          intensity={80}
+          tint="light"
+          style={styles.blurContainer}
         >
-          <MaterialCommunityIcons
-            name={activeTab === 'Discover' ? 'gift' : 'gift-outline'}
-            size={24}
-            color={
-              activeTab === 'Discover' ? COLORS.brand.primary : COLORS.text.secondary
-            }
-          />
-          <Text
-            style={
-              activeTab === 'Discover' ? styles.navTextActive : styles.navText
-            }
-          >
-            Wishes
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.navContent}>
+            {leftTabs.map((tab) => (
+              <TabItem
+                key={tab.name}
+                tab={tab}
+                isActive={activeTab === tab.name}
+                badge={getBadge(tab.name)}
+                onPress={() => handleTabPress(tab.screen)}
+              />
+            ))}
 
-        {/* Gifts Tab (renamed from Requests) */}
-        <TouchableOpacity
-          testID="nav-requests-tab"
-          style={styles.navItem}
-          onPress={() => handleTabPress('Requests')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'Requests' }}
-          accessibilityLabel="Gifts tab"
-          accessibilityHint="View your gifts"
-        >
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              name={activeTab === 'Requests' ? 'heart' : 'heart-outline'}
-              size={24}
-              color={
-                activeTab === 'Requests' ? COLORS.brand.primary : COLORS.text.secondary
-              }
-            />
-            {requestsBadge > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{requestsBadgeText}</Text>
-              </View>
-            )}
+            <CreateButton onPress={handleCreatePress} />
+
+            {rightTabs.map((tab) => (
+              <TabItem
+                key={tab.name}
+                tab={tab}
+                isActive={activeTab === tab.name}
+                badge={getBadge(tab.name)}
+                onPress={() => handleTabPress(tab.screen)}
+              />
+            ))}
           </View>
-          <Text
-            style={
-              activeTab === 'Requests' ? styles.navTextActive : styles.navText
-            }
-          >
-            Gifts
-          </Text>
-        </TouchableOpacity>
+        </BlurView>
+      ) : (
+        <View style={[styles.blurContainer, styles.androidBackground]}>
+          <View style={styles.navContent}>
+            {leftTabs.map((tab) => (
+              <TabItem
+                key={tab.name}
+                tab={tab}
+                isActive={activeTab === tab.name}
+                badge={getBadge(tab.name)}
+                onPress={() => handleTabPress(tab.screen)}
+              />
+            ))}
 
-        {/* Create/+ Tab with gradient */}
-        <TouchableOpacity
-          testID="nav-create-tab"
-          style={styles.navItem}
-          onPress={() => handleTabPress('CreateMoment')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'Create' }}
-          accessibilityLabel="Create wish"
-          accessibilityHint="Create a new wish"
-        >
-          <LinearGradient
-            colors={GRADIENTS.giftButton}
-            style={styles.createButton}
-          >
-            <MaterialCommunityIcons name="plus" size={28} color={COLORS.utility.white} />
-          </LinearGradient>
-        </TouchableOpacity>
+            <CreateButton onPress={handleCreatePress} />
 
-        {/* Messages Tab */}
-        <TouchableOpacity
-          testID="nav-messages-tab"
-          style={styles.navItem}
-          onPress={() => handleTabPress('Messages')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'Messages' }}
-          accessibilityLabel="Messages tab"
-          accessibilityHint="View your conversations"
-        >
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              name={activeTab === 'Messages' ? 'chat' : 'chat-outline'}
-              size={24}
-              color={
-                activeTab === 'Messages' ? COLORS.brand.primary : COLORS.text.secondary
-              }
-            />
-            {messagesBadge > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{messagesBadgeText}</Text>
-              </View>
-            )}
+            {rightTabs.map((tab) => (
+              <TabItem
+                key={tab.name}
+                tab={tab}
+                isActive={activeTab === tab.name}
+                badge={getBadge(tab.name)}
+                onPress={() => handleTabPress(tab.screen)}
+              />
+            ))}
           </View>
-          <Text
-            style={
-              activeTab === 'Messages' ? styles.navTextActive : styles.navText
-            }
-          >
-            Chat
-          </Text>
-        </TouchableOpacity>
-
-        {/* Profile Tab */}
-        <TouchableOpacity
-          testID="nav-profile-tab"
-          style={styles.navItem}
-          onPress={() => handleTabPress('Profile')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'Profile' }}
-          accessibilityLabel="Profile tab"
-          accessibilityHint="Navigate to Profile screen"
-        >
-          <MaterialCommunityIcons
-            name={activeTab === 'Profile' ? 'account' : 'account-outline'}
-            size={24}
-            color={
-              activeTab === 'Profile' ? COLORS.brand.primary : COLORS.text.secondary
-            }
-          />
-          <Text
-            style={
-              activeTab === 'Profile' ? styles.navTextActive : styles.navText
-            }
-          >
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </NavContainer>
+        </View>
+      )}
     </View>
   );
 });
 
+// ============================================
+// STYLES
+// ============================================
 const styles = StyleSheet.create({
-  badge: {
-    alignItems: 'center',
-    backgroundColor: COLORS.feedback.error,
-    borderRadius: 9,
-    height: 18,
-    justifyContent: 'center',
-    minWidth: 18,
-    paddingHorizontal: 4,
-    position: 'absolute',
-    right: -8,
-    top: -4,
-  },
-  badgeText: {
-    color: COLORS.utility.white,
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  bottomNav: {
+  container: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  blurContainer: {
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border.light,
     overflow: 'hidden',
+  },
+  androidBackground: {
+    backgroundColor: 'rgba(255,255,255,0.95)',
   },
   navContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingTop: 12,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.2)',
-    backgroundColor: Platform.OS === 'android' ? COLORS.surface.glassBackground : 'transparent',
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingHorizontal: 8,
   },
-  createButton: {
+  navItem: {
+    flex: 1,
     alignItems: 'center',
-    borderRadius: 24,
-    height: 48,
     justifyContent: 'center',
-    marginTop: -16,
-    shadowColor: COLORS.brand.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    width: 48,
-    elevation: 6,
+    paddingVertical: 4,
+    minHeight: 56,
+  },
+  navItemContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
   iconContainer: {
     position: 'relative',
+    marginBottom: 2,
   },
-  navItem: {
+  badge: {
+    position: 'absolute',
+    top: -6,
+    right: -10,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: COLORS.feedback.error,
     alignItems: 'center',
-    gap: 2,
-    minHeight: 44,
-    minWidth: 60,
     justifyContent: 'center',
-    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    ...TYPE_SCALE.body.caption,
+    color: PALETTE.white,
+    fontSize: 10,
+    fontWeight: '700',
   },
   navText: {
-    color: COLORS.text.secondary,
+    ...TYPE_SCALE.body.caption,
+    color: COLORS.text.muted,
+    fontSize: 10,
+    marginTop: 2,
+  },
+  navTextActive: {
+    ...TYPE_SCALE.body.caption,
+    color: COLORS.interactive.primary,
     fontSize: 10,
     fontWeight: '600',
     marginTop: 2,
   },
-  navTextActive: {
-    color: COLORS.brand.primary,
-    fontSize: 10,
-    fontWeight: '700',
-    marginTop: 2,
+  activeIndicator: {
+    position: 'absolute',
+    bottom: -8,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.interactive.primary,
+  },
+  createButtonWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -24,
+  },
+  createButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: PALETTE.primary[500],
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 12,
   },
 });
 

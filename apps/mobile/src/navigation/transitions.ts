@@ -1,5 +1,5 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Navigation Transitions V2
+ * TravelMatch Awwwards Design System 2026 - Navigation Transitions
  *
  * Premium page transitions for Awwwards-level polish:
  * - Modal slide from bottom
@@ -13,15 +13,13 @@
 import {
   StackCardInterpolationProps,
   StackCardStyleInterpolator,
-  TransitionSpecs as _TransitionSpecs,
-  TransitionPresets as _TransitionPresets,
 } from '@react-navigation/stack';
 import { Easing } from 'react-native-reanimated';
 
 // ============================================
 // TRANSITION SPECS
 // ============================================
-export const TRANSITION_SPECS_V2 = {
+export const TRANSITION_SPECS = {
   /**
    * Spring-based open transition
    */
@@ -219,8 +217,8 @@ export const TRANSITIONS = {
     gestureEnabled: true,
     gestureDirection: 'horizontal' as const,
     transitionSpec: {
-      open: TRANSITION_SPECS_V2.springOpen,
-      close: TRANSITION_SPECS_V2.springClose,
+      open: TRANSITION_SPECS.springOpen,
+      close: TRANSITION_SPECS.springClose,
     },
     cardStyleInterpolator: forHorizontalSlide,
     headerMode: 'screen' as const,
@@ -233,8 +231,8 @@ export const TRANSITIONS = {
     gestureEnabled: false,
     cardStyleInterpolator: forFade,
     transitionSpec: {
-      open: TRANSITION_SPECS_V2.timingOpen,
-      close: TRANSITION_SPECS_V2.timingClose,
+      open: TRANSITION_SPECS.timingOpen,
+      close: TRANSITION_SPECS.timingClose,
     },
   },
 
@@ -246,8 +244,8 @@ export const TRANSITIONS = {
     gestureDirection: 'horizontal' as const,
     cardStyleInterpolator: forScaleFade,
     transitionSpec: {
-      open: TRANSITION_SPECS_V2.timingOpen,
-      close: TRANSITION_SPECS_V2.timingClose,
+      open: TRANSITION_SPECS.timingOpen,
+      close: TRANSITION_SPECS.timingClose,
     },
   },
 
@@ -259,8 +257,8 @@ export const TRANSITIONS = {
     gestureDirection: 'vertical' as const,
     cardStyleInterpolator: forModalPresentation,
     transitionSpec: {
-      open: TRANSITION_SPECS_V2.modalOpen,
-      close: TRANSITION_SPECS_V2.modalClose,
+      open: TRANSITION_SPECS.modalOpen,
+      close: TRANSITION_SPECS.modalClose,
     },
     presentation: 'modal' as const,
   },
@@ -273,8 +271,8 @@ export const TRANSITIONS = {
     gestureDirection: 'vertical' as const,
     cardStyleInterpolator: forSlideUpFade,
     transitionSpec: {
-      open: TRANSITION_SPECS_V2.springOpen,
-      close: TRANSITION_SPECS_V2.timingClose,
+      open: TRANSITION_SPECS.springOpen,
+      close: TRANSITION_SPECS.timingClose,
     },
     presentation: 'transparentModal' as const,
     cardOverlayEnabled: true,
@@ -341,6 +339,7 @@ export const DEFAULT_NAVIGATOR_OPTIONS = {
 export const MODAL_NAVIGATOR_OPTIONS = {
   screenOptions: {
     headerShown: false,
+    presentation: 'modal' as const,
     ...TRANSITIONS.modalSlideFromBottom,
   },
 };

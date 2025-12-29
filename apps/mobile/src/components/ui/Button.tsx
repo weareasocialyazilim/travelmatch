@@ -1,17 +1,45 @@
-import React, { memo, useMemo } from 'react';
+/**
+ * TravelMatch Awwwards Design System 2026 - Button Component
+ *
+ * Premium button with:
+ * - Gradient fills for primary variant
+ * - Glassmorphism for secondary
+ * - Spring animations on press
+ * - Haptic feedback
+ * - Full accessibility support
+ *
+ * Designed for Awwwards Best UI nomination
+ */
+
+import React, { memo, useMemo, useCallback } from 'react';
 import type { ViewStyle, TextStyle } from 'react-native';
 import {
-  TouchableOpacity,
+  Pressable,
   Text,
   StyleSheet,
   ActivityIndicator,
   View,
+  Platform,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, primitives } from '../../constants/colors';
+import Reanimated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+
+import { COLORS, GRADIENTS, PALETTE } from '../../constants/colors';
+import { TYPE_SCALE } from '../../theme/typography';
+import { SPRINGS } from '../../hooks/useAnimations';
 import { a11yProps } from '../../utils/accessibility';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+// ============================================
+// TYPES
+// ============================================
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'glass';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
@@ -28,8 +56,44 @@ interface ButtonProps {
   textStyle?: TextStyle;
   accessibilityHint?: string;
   accessibilityLabel?: string;
+  haptic?: boolean;
 }
 
+// ============================================
+// SIZE CONFIGS
+// ============================================
+const SIZE_CONFIG = {
+  sm: {
+    height: 40,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    iconSize: 16,
+    borderRadius: 20,
+  },
+  md: {
+    height: 52,
+    paddingHorizontal: 24,
+    fontSize: 16,
+    iconSize: 20,
+    borderRadius: 26,
+  },
+  lg: {
+    height: 60,
+    paddingHorizontal: 32,
+    fontSize: 18,
+    iconSize: 24,
+    borderRadius: 30,
+  },
+} as const;
+
+// ============================================
+// ANIMATED PRESSABLE
+// ============================================
+const AnimatedPressable = Reanimated.createAnimatedComponent(Pressable);
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
 export const Button: React.FC<ButtonProps> = memo(
   ({
     title,
@@ -45,121 +109,107 @@ export const Button: React.FC<ButtonProps> = memo(
     textStyle,
     accessibilityHint,
     accessibilityLabel,
+    haptic = true,
   }) => {
-    // Memoize variant styles
-    const variantStyles = useMemo((): ViewStyle => {
+    const scale = useSharedValue(1);
+    const sizeConfig = SIZE_CONFIG[size];
+
+    // Animated style for press feedback
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
+
+    // Press handlers
+    const handlePressIn = useCallback(() => {
+      scale.value = withSpring(0.97, SPRINGS.snappy);
+    }, []);
+
+    const handlePressOut = useCallback(() => {
+      scale.value = withSpring(1, SPRINGS.bouncy);
+    }, []);
+
+    const handlePress = useCallback(() => {
+      if (haptic) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+      onPress();
+    }, [onPress, haptic]);
+
+    // Get text color
+    const textColor = useMemo((): string => {
+      if (disabled) return COLORS.text.muted;
+
+      switch (variant) {
+        case 'primary':
+        case 'danger':
+          return PALETTE.white;
+        case 'secondary':
+          return COLORS.text.primary;
+        case 'outline':
+        case 'ghost':
+          return COLORS.interactive.primary;
+        case 'glass':
+          return PALETTE.white;
+        default:
+          return COLORS.text.primary;
+      }
+    }, [variant, disabled]);
+
+    // Get button styles
+    const buttonStyles = useMemo((): ViewStyle => {
+      const base: ViewStyle = {
+        height: sizeConfig.height,
+        paddingHorizontal: sizeConfig.paddingHorizontal,
+        borderRadius: sizeConfig.borderRadius,
+      };
+
       if (disabled) {
         return {
-          backgroundColor: primitives.stone[300],
-          borderWidth: 0,
+          ...base,
+          backgroundColor: COLORS.bg.tertiary,
+          opacity: 0.6,
         };
       }
 
       switch (variant) {
         case 'primary':
           return {
-            backgroundColor: COLORS.brand.primary,
-            borderWidth: 0,
+            ...base,
+            overflow: 'hidden',
           };
         case 'secondary':
           return {
-            backgroundColor: COLORS.primaryMuted,
-            borderWidth: 0,
+            ...base,
+            backgroundColor: COLORS.bg.secondary,
           };
         case 'outline':
           return {
-            backgroundColor: COLORS.utility.transparent,
+            ...base,
+            backgroundColor: 'transparent',
             borderWidth: 2,
-            borderColor: COLORS.brand.primary,
+            borderColor: COLORS.interactive.primary,
           };
         case 'ghost':
           return {
-            backgroundColor: COLORS.utility.transparent,
-            borderWidth: 0,
+            ...base,
+            backgroundColor: 'transparent',
           };
         case 'danger':
           return {
+            ...base,
             backgroundColor: COLORS.feedback.error,
-            borderWidth: 0,
+          };
+        case 'glass':
+          return {
+            ...base,
+            overflow: 'hidden',
           };
         default:
-          return {};
+          return base;
       }
-    }, [variant, disabled]);
+    }, [variant, disabled, sizeConfig]);
 
-    // Memoize size styles
-    const sizeStyles = useMemo((): ViewStyle => {
-      switch (size) {
-        case 'sm':
-          return { height: 36, paddingHorizontal: 12 };
-        case 'md':
-          return { height: 48, paddingHorizontal: 20 };
-        case 'lg':
-          return { height: 56, paddingHorizontal: 24 };
-        default:
-          return { height: 48, paddingHorizontal: 20 };
-      }
-    }, [size]);
-
-    // Memoize text color
-    const textColor = useMemo((): string => {
-      if (disabled) return primitives.stone[400];
-
-      switch (variant) {
-        case 'primary':
-          return COLORS.text.primary;
-        case 'danger':
-          return COLORS.utility.white;
-        case 'secondary':
-        case 'outline':
-        case 'ghost':
-          return COLORS.text.primary;
-        default:
-          return COLORS.text.primary;
-      }
-    }, [variant, disabled]);
-
-    // Memoize text size
-    const textSize = useMemo((): number => {
-      switch (size) {
-        case 'sm':
-          return 14;
-        case 'md':
-          return 16;
-        case 'lg':
-          return 18;
-        default:
-          return 16;
-      }
-    }, [size]);
-
-    // Memoize icon size
-    const iconSize = useMemo((): number => {
-      switch (size) {
-        case 'sm':
-          return 16;
-        case 'md':
-          return 20;
-        case 'lg':
-          return 24;
-        default:
-          return 20;
-      }
-    }, [size]);
-
-    // Memoize hitSlop
-    const hitSlop = useMemo(() => {
-      switch (size) {
-        case 'sm':
-          return { top: 4, bottom: 4, left: 8, right: 8 }; // 36 + 8 = 44pt
-        case 'md':
-        case 'lg':
-        default:
-          return { top: 8, bottom: 8, left: 8, right: 8 }; // Default padding
-      }
-    }, [size]);
-
-    // Memoize accessibility props
+    // Accessibility props
     const a11y = useMemo(
       () =>
         a11yProps.button(
@@ -170,32 +220,17 @@ export const Button: React.FC<ButtonProps> = memo(
       [accessibilityLabel, title, accessibilityHint, loading, disabled],
     );
 
-    return (
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={disabled || loading}
-        hitSlop={hitSlop}
-        {...a11y}
-        activeOpacity={0.7}
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel || title}
-        accessibilityState={{ disabled: disabled || loading }}
-        style={[
-          styles.base,
-          variantStyles,
-          sizeStyles,
-          fullWidth && styles.fullWidth,
-          style,
-        ]}
-      >
+    // Render content
+    const renderContent = () => (
+      <View style={styles.content}>
         {loading ? (
           <ActivityIndicator color={textColor} size="small" />
         ) : (
-          <View style={styles.content}>
+          <>
             {icon && iconPosition === 'left' && (
               <MaterialCommunityIcons
                 name={icon}
-                size={iconSize}
+                size={sizeConfig.iconSize}
                 color={textColor}
                 style={styles.iconLeft}
               />
@@ -203,7 +238,10 @@ export const Button: React.FC<ButtonProps> = memo(
             <Text
               style={[
                 styles.text,
-                { color: textColor, fontSize: textSize },
+                {
+                  color: textColor,
+                  fontSize: sizeConfig.fontSize,
+                },
                 textStyle,
               ]}
             >
@@ -212,14 +250,98 @@ export const Button: React.FC<ButtonProps> = memo(
             {icon && iconPosition === 'right' && (
               <MaterialCommunityIcons
                 name={icon}
-                size={iconSize}
+                size={sizeConfig.iconSize}
                 color={textColor}
                 style={styles.iconRight}
               />
             )}
-          </View>
+          </>
         )}
-      </TouchableOpacity>
+      </View>
+    );
+
+    // Render with gradient for primary
+    if (variant === 'primary' && !disabled) {
+      return (
+        <AnimatedPressable
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          disabled={disabled || loading}
+          {...a11y}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel || title}
+          accessibilityState={{ disabled: disabled || loading }}
+          style={[
+            animatedStyle,
+            buttonStyles,
+            fullWidth && styles.fullWidth,
+            style,
+          ]}
+        >
+          <LinearGradient
+            colors={GRADIENTS.gift}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientFill}
+          >
+            {renderContent()}
+          </LinearGradient>
+        </AnimatedPressable>
+      );
+    }
+
+    // Render with glass effect
+    if (variant === 'glass' && !disabled) {
+      return (
+        <AnimatedPressable
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          disabled={disabled || loading}
+          {...a11y}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel || title}
+          accessibilityState={{ disabled: disabled || loading }}
+          style={[
+            animatedStyle,
+            buttonStyles,
+            fullWidth && styles.fullWidth,
+            style,
+          ]}
+        >
+          <BlurView
+            intensity={Platform.OS === 'ios' ? 20 : 80}
+            tint="light"
+            style={styles.glassFill}
+          >
+            {renderContent()}
+          </BlurView>
+        </AnimatedPressable>
+      );
+    }
+
+    // Default render
+    return (
+      <AnimatedPressable
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled || loading}
+        {...a11y}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || title}
+        accessibilityState={{ disabled: disabled || loading }}
+        style={[
+          animatedStyle,
+          styles.base,
+          buttonStyles,
+          fullWidth && styles.fullWidth,
+          style,
+        ]}
+      >
+        {renderContent()}
+      </AnimatedPressable>
     );
   },
   (prevProps, nextProps) =>
@@ -235,12 +357,14 @@ export const Button: React.FC<ButtonProps> = memo(
 
 Button.displayName = 'Button';
 
+// ============================================
+// STYLES
+// ============================================
 const styles = StyleSheet.create({
   base: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 9999,
   },
   fullWidth: {
     width: '100%',
@@ -251,13 +375,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontWeight: '700',
+    ...TYPE_SCALE.label.large,
+    fontWeight: '600',
   },
   iconLeft: {
     marginRight: 8,
   },
   iconRight: {
     marginLeft: 8,
+  },
+  gradientFill: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  glassFill: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
 });
 
