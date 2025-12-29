@@ -21,9 +21,9 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors-ultimate';
-import { TYPOGRAPHY } from '@/constants/typography-ultimate';
-import { RADIUS, SPACING, SIZES } from '@/constants/spacing-ultimate';
+import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
+import { TYPOGRAPHY } from '@/theme/typography';
+import { RADIUS, SPACING, SIZES } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
 import { TMTrustRing } from './TMTrustRing';
 

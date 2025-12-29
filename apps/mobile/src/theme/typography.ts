@@ -260,6 +260,25 @@ export const createTypography = (isDark = false) => {
       minContrastRatio: 4.5,
     } as TypographyStyle,
 
+    captionSmall: {
+      fontSize: FONT_SIZES.xs,
+      fontWeight: FONT_WEIGHTS.regular,
+      lineHeight: 16,
+      letterSpacing: 0.2,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+
+    // Score and stat styles for trust/numeric displays
+    score: {
+      fontSize: 14,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: 18,
+      fontVariant: ['tabular-nums'] as const,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+
     label: {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.medium,
@@ -274,6 +293,24 @@ export const createTypography = (isDark = false) => {
       fontWeight: FONT_WEIGHTS.medium,
       lineHeight: FONT_SIZES.base * LINE_HEIGHTS.normal,
       color: colors.text,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+
+    labelSmall: {
+      fontSize: FONT_SIZES.sm,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.normal,
+      letterSpacing: LETTER_SPACINGS.wide,
+      accessibilityRole: 'text' as const,
+      minContrastRatio: 4.5,
+    } as TypographyStyle,
+
+    labelXSmall: {
+      fontSize: 11,
+      fontWeight: FONT_WEIGHTS.semibold,
+      lineHeight: 14,
+      letterSpacing: LETTER_SPACINGS.wide,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
