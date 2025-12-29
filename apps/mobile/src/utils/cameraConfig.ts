@@ -28,7 +28,7 @@ export const CAMERA_QUALITY = {
 export const ASPECT_RATIOS = {
   /** Standard photo ratio */
   PHOTO_4_3: [4, 3] as [number, number],
-  /** Wide/cinematic ratio for moments */
+  /** Wide/cinematic ratio */
   WIDE_16_9: [16, 9] as [number, number],
   /** Square for profile photos */
   SQUARE_1_1: [1, 1] as [number, number],
@@ -36,6 +36,10 @@ export const ASPECT_RATIOS = {
   PORTRAIT_9_16: [9, 16] as [number, number],
   /** Document ratio */
   DOCUMENT_3_2: [3, 2] as [number, number],
+  /** Portrait 4:5 - 2025/2026 standard for feed posts (Instagram-like) */
+  PORTRAIT_4_5: [4, 5] as [number, number],
+  /** Cover ratio 3:1 */
+  COVER_3_1: [3, 1] as [number, number],
 } as const;
 
 /**
@@ -66,11 +70,19 @@ export const CAMERA_CONFIGS: Record<string, CameraConfig> = {
     exif: false,
   },
 
-  /** Moment photo - high quality, wide aspect */
+  /** Moment photo - high quality, 4:5 portrait (2025/2026 standard) */
   MOMENT_PHOTO: {
     quality: CAMERA_QUALITY.HIGH,
-    aspect: ASPECT_RATIOS.WIDE_16_9,
+    aspect: ASPECT_RATIOS.PORTRAIT_4_5,
     allowsEditing: true,
+    exif: true,
+  },
+
+  /** Moment photo free aspect - for carousel/multiple selection */
+  MOMENT_PHOTO_FREE: {
+    quality: CAMERA_QUALITY.HIGH,
+    aspect: undefined,
+    allowsEditing: false,
     exif: true,
   },
 
@@ -78,8 +90,16 @@ export const CAMERA_CONFIGS: Record<string, CameraConfig> = {
   PROOF_PHOTO: {
     quality: CAMERA_QUALITY.MAXIMUM,
     aspect: ASPECT_RATIOS.PHOTO_4_3,
-    allowsEditing: true,
+    allowsEditing: false, // Preserve original for verification
     exif: true,
+  },
+
+  /** Cover photo - 3:1 wide ratio for profile cover */
+  COVER_PHOTO: {
+    quality: CAMERA_QUALITY.HIGH,
+    aspect: ASPECT_RATIOS.COVER_3_1,
+    allowsEditing: true,
+    exif: false,
   },
 
   /** KYC Document - maximum quality, document ratio */
@@ -306,6 +326,9 @@ export const DEFAULT_CAMERA_FACING: Record<string, CameraFacing> = {
   PROFILE_PHOTO: 'front',
   KYC_SELFIE: 'front',
   MOMENT_PHOTO: 'back',
+  MOMENT_PHOTO_FREE: 'back',
   PROOF_PHOTO: 'back',
+  COVER_PHOTO: 'back',
   KYC_DOCUMENT: 'back',
+  CHAT_ATTACHMENT: 'back',
 };
