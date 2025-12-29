@@ -88,9 +88,20 @@ const MomentDetailScreen: React.FC = () => {
 
   const [reviews, setReviews] = useState<Review[]>([]);
 
-  // Fetch data
+  // Helper to check if ID is a valid UUID (not mock story ID like 's2-1')
+  const isValidUUID = useCallback((id: string) => {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(id);
+  }, []);
+
+  // Fetch data - only if moment ID is a valid UUID (not mock story data)
   useEffect(() => {
     const fetchReviews = async () => {
+      // Skip API call for mock story IDs (like 's2-1', 's3-1')
+      if (!isValidUUID(moment.id)) {
+        return;
+      }
       try {
         const { reviews: apiReviews } = await reviewService.getReviews({
           momentId: moment.id,
@@ -109,10 +120,11 @@ const MomentDetailScreen: React.FC = () => {
     };
 
     fetchReviews();
-  }, [moment.id]);
+  }, [moment.id, isValidUUID]);
 
   useEffect(() => {
-    if (isOwner) {
+    // Skip API call for mock story IDs
+    if (isOwner && isValidUUID(moment.id)) {
       const fetchRequests = async () => {
         try {
           const { requests } = await requestService.getReceivedRequests({
@@ -132,7 +144,7 @@ const MomentDetailScreen: React.FC = () => {
       };
       fetchRequests();
     }
-  }, [isOwner, moment.id]);
+  }, [isOwner, moment.id, isValidUUID]);
 
   // Animation
   const scrollY = useRef(new Animated.Value(0)).current;

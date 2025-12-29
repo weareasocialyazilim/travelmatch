@@ -125,7 +125,8 @@ export function getImageUrl(
   imageId: string,
   variant: ImageVariant = 'medium',
 ): string {
-  if (!imageId) return '';
+  // Return empty if no imageId or no account hash configured
+  if (!imageId || !CLOUDFLARE_ACCOUNT_HASH) return '';
   return `https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_HASH}/${imageId}/${variant}`;
 }
 
@@ -276,9 +277,8 @@ export async function optimizeBeforeUpload(
   quality = 0.8,
 ): Promise<Blob> {
   // For React Native with expo-image-manipulator
-  const { manipulateAsync, SaveFormat } = await import(
-    'expo-image-manipulator'
-  );
+  const { manipulateAsync, SaveFormat } =
+    await import('expo-image-manipulator');
 
   const manipulated = await manipulateAsync(
     imageUri,

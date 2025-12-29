@@ -60,7 +60,7 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
       scrollY.value,
       [0, 100],
       [140 + insets.top, 100 + insets.top],
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
     return { height };
   });
@@ -71,13 +71,13 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
       scrollY.value,
       [0, 50],
       [1, 0],
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
     const translateY = interpolate(
       scrollY.value,
       [0, 50],
       [0, -20],
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
     return { opacity, transform: [{ translateY }] };
   });
@@ -88,15 +88,16 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
       scrollY.value,
       [40, 80],
       [0, 1],
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
     return { opacity };
   });
 
   const HeaderBackground = Platform.OS === 'ios' ? BlurView : View;
-  const headerBgProps = Platform.OS === 'ios'
-    ? { intensity: 90, tint: 'light' as const }
-    : { style: { backgroundColor: COLORS.surface.glassBackground } };
+  const headerBgProps =
+    Platform.OS === 'ios'
+      ? { intensity: 90, tint: 'light' as const }
+      : { style: { backgroundColor: COLORS.surface.glassBackground } };
 
   return (
     <Animated.View style={[styles.animatedHeader, headerStyle]}>
@@ -160,11 +161,9 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
  */
 export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
   location,
-  viewMode,
   activeFiltersCount,
   onLocationPress,
   onFilterPress,
-  onViewModeToggle,
 }) => (
   <View style={styles.header}>
     {/* Location Selector */}
@@ -173,7 +172,11 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
       onPress={onLocationPress}
       activeOpacity={0.7}
     >
-      <MaterialCommunityIcons name="map-marker" size={18} color={COLORS.brand.primary} />
+      <MaterialCommunityIcons
+        name="map-marker"
+        size={18}
+        color={COLORS.brand.primary}
+      />
       <Text style={styles.locationText} numberOfLines={1}>
         {location}
       </Text>
@@ -203,19 +206,6 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
           </View>
         )}
       </TouchableOpacity>
-
-      {/* View Toggle */}
-      <TouchableOpacity
-        style={styles.controlButton}
-        onPress={onViewModeToggle}
-        activeOpacity={0.7}
-      >
-        <MaterialCommunityIcons
-          name={viewMode === 'single' ? 'view-grid' : 'view-agenda'}
-          size={22}
-          color={COLORS.text.primary}
-        />
-      </TouchableOpacity>
     </View>
   </View>
 );
@@ -243,7 +233,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.text.primary,
     marginLeft: 6,
-    flex: 1,
+    marginRight: 2,
+    flexShrink: 1,
   },
   headerControls: {
     flexDirection: 'row',
@@ -326,7 +317,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   locationButton: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.utility.white,
@@ -339,13 +329,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    maxWidth: '70%',
   },
   locationButtonText: {
-    flex: 1,
-    marginHorizontal: 8,
+    marginLeft: 8,
+    marginRight: 4,
     fontSize: 15,
     color: COLORS.text.primary,
     fontWeight: '500',
+    flexShrink: 1,
   },
   searchButton: {
     width: 48,
