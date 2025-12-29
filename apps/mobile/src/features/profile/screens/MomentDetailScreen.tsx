@@ -13,11 +13,14 @@ import {
   ReviewsSection,
   SummarySection,
   ActionBar,
+  ContributorSlotsSection,
 } from '@/components/moment-detail';
+import type { Contributor } from '@/components/moment-detail';
 import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
 import { COLORS } from '@/constants/colors';
 import { VALUES } from '@/constants/values';
 import { useMoments } from '../hooks';
+import { supabase } from '@/lib/supabase';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { requestService } from '@/services/requestService';
 import { reviewService } from '@/services/reviewService';
@@ -88,6 +91,11 @@ const MomentDetailScreen: React.FC = () => {
 
   const [reviews, setReviews] = useState<Review[]>([]);
 
+  // Contributor slots state
+  const [contributors, setContributors] = useState<Contributor[]>([]);
+  const [contributorCount, setContributorCount] = useState(0);
+  const [maxContributors, setMaxContributors] = useState<number | null>(null);
+
   // Fetch data
   useEffect(() => {
     const fetchReviews = async () => {
@@ -110,6 +118,51 @@ const MomentDetailScreen: React.FC = () => {
 
     fetchReviews();
   }, [moment.id]);
+
+  // Fetch contributors for 100+ TL moments
+  useEffect(() => {
+    const fetchContributors = async () => {
+      if (moment.price < 100) {
+        setMaxContributors(null);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.rpc('get_moment_contributors', {
+          p_moment_id: moment.id,
+        });
+
+        if (error) {
+          console.error('Failed to fetch contributors:', error);
+          return;
+        }
+
+        if (data?.success) {
+          setMaxContributors(data.maxContributors);
+          setContributorCount(data.currentCount || 0);
+          setContributors(
+            (data.contributors || []).map(
+              (c: {
+                userId: string;
+                name: string;
+                avatar?: string;
+                isAnonymous?: boolean;
+              }) => ({
+                userId: c.userId,
+                name: c.name,
+                avatar: c.avatar,
+                isAnonymous: c.isAnonymous,
+              }),
+            ),
+          );
+        }
+      } catch {
+        // Silent fail
+      }
+    };
+
+    fetchContributors();
+  }, [moment.id, moment.price]);
 
   useEffect(() => {
     if (isOwner) {
@@ -336,6 +389,16 @@ const MomentDetailScreen: React.FC = () => {
           <View style={styles.content}>
             {/* Host Info */}
             <HostSection user={momentUser} navigation={navigation} />
+
+            {/* Contributor Slots (100+ TL moments only) */}
+            {!isOwner && moment.price >= 100 && (
+              <ContributorSlotsSection
+                price={moment.price}
+                contributors={contributors}
+                currentCount={contributorCount}
+                maxContributors={maxContributors}
+              />
+            )}
 
             {/* Moment Info */}
             <MomentInfo
