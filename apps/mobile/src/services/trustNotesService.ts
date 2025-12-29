@@ -1,10 +1,18 @@
 /**
  * Trust Notes Service
  * Handles thank-you notes from gift receivers to gift senders
+ *
+ * Philosophy: One-way gratitude system (not reviews)
+ * Only gift receiver → gift sender
  */
 
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
+import {
+  validateNoteContent,
+  hasWarningWords,
+  TRUST_NOTES_CONTENT,
+} from '@/constants/trustNotesRules';
 
 export interface TrustNote {
   id: string;
@@ -32,16 +40,16 @@ export interface CreateTrustNoteParams {
  */
 export const createTrustNote = async (
   params: CreateTrustNoteParams
-): Promise<{ success: boolean; noteId?: string; error?: string }> => {
+): Promise<{ success: boolean; noteId?: string; error?: string; flagged?: boolean }> => {
   try {
-    // Validate note length
-    if (params.note.length < 10) {
-      return { success: false, error: 'Not en az 10 karakter olmalı' };
+    // Validate note content using rules
+    const validation = validateNoteContent(params.note);
+    if (!validation.valid) {
+      return { success: false, error: validation.error };
     }
 
-    if (params.note.length > 280) {
-      return { success: false, error: 'Not 280 karakteri geçemez' };
-    }
+    // Check for warning words (flag for review but don't block)
+    const flagged = hasWarningWords(params.note);
 
     const { data, error } = await supabase.rpc('create_trust_note', {
       p_receiver_id: params.receiverId,
@@ -53,11 +61,23 @@ export const createTrustNote = async (
 
     if (error) throw error;
 
-    logger.info('[TrustNotes] Note created', { noteId: data?.noteId });
+    logger.info('[TrustNotes] Note created', {
+      noteId: data?.noteId,
+      flagged,
+    });
+
+    // If flagged, log for admin review
+    if (flagged) {
+      logger.warn('[TrustNotes] Note flagged for review', {
+        noteId: data?.noteId,
+        reason: 'warning_words_detected',
+      });
+    }
 
     return {
       success: true,
-      noteId: data?.noteId
+      noteId: data?.noteId,
+      flagged,
     };
   } catch (error) {
     logger.error('[TrustNotes] Failed to create note', error as Error);
