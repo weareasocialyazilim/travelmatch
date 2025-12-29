@@ -1,19 +1,14 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Animation Hooks
+ * TravelMatch Awwwards Design System - Animation Hooks
  *
- * Comprehensive animation system for Awwwards-level micro-interactions
- * Built on react-native-reanimated for 60fps performance
- *
- * Features:
- * - Spring configurations for natural motion
- * - Pre-built animation patterns
- * - Haptic feedback integration
- * - Accessibility (reduce motion) support
+ * Pre-built animation patterns for consistent micro-interactions
+ * Uses react-native-reanimated 3
  */
 
 import { useCallback, useEffect } from 'react';
 import {
   useSharedValue,
+  useAnimatedStyle,
   withSpring,
   withTiming,
   withSequence,
@@ -22,438 +17,78 @@ import {
   Easing,
   interpolate,
   Extrapolation,
-  runOnJS,
-  useAnimatedStyle,
   SharedValue,
-  cancelAnimation,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { useReduceMotion } from './useReduceMotion';
 
 // ============================================
 // 1. SPRING CONFIGURATIONS
 // ============================================
 export const SPRINGS = {
-  /**
-   * Gentle - Smooth, subtle movements
-   * Best for: background elements, subtle transitions
-   */
-  gentle: {
-    damping: 20,
-    stiffness: 150,
-    mass: 1,
-  },
+  /** Gentle, slow spring for subtle movements */
+  gentle: { damping: 20, stiffness: 150, mass: 1 },
 
-  /**
-   * Bouncy - Playful, energetic movements
-   * Best for: buttons, cards, interactive elements
-   */
-  bouncy: {
-    damping: 10,
-    stiffness: 200,
-    mass: 1,
-  },
+  /** Standard spring for most animations */
+  default: { damping: 15, stiffness: 200, mass: 1 },
 
-  /**
-   * Snappy - Quick, responsive movements
-   * Best for: immediate feedback, micro-interactions
-   */
-  snappy: {
-    damping: 15,
-    stiffness: 300,
-    mass: 0.8,
-  },
+  /** Bouncy spring for playful interactions */
+  bouncy: { damping: 10, stiffness: 200, mass: 1 },
 
-  /**
-   * Slow - Deliberate, smooth movements
-   * Best for: page transitions, modals
-   */
-  slow: {
-    damping: 25,
-    stiffness: 100,
-    mass: 1.2,
-  },
+  /** Quick, snappy spring for fast responses */
+  snappy: { damping: 15, stiffness: 300, mass: 0.8 },
 
-  /**
-   * Wobbly - Extra bounce effect
-   * Best for: celebration, success states
-   */
-  wobbly: {
-    damping: 8,
-    stiffness: 180,
-    mass: 1,
-  },
+  /** Slow, heavy spring for dramatic effect */
+  slow: { damping: 25, stiffness: 100, mass: 1.2 },
 
-  /**
-   * Stiff - Minimal overshoot
-   * Best for: precise movements, sliders
-   */
-  stiff: {
-    damping: 30,
-    stiffness: 400,
-    mass: 1,
-  },
+  /** Extra bouncy for celebrations */
+  celebration: { damping: 8, stiffness: 250, mass: 0.9 },
 } as const;
 
 // ============================================
 // 2. TIMING CONFIGURATIONS
 // ============================================
 export const TIMINGS = {
-  /**
-   * Fast - Quick transitions
-   */
-  fast: {
-    duration: 150,
-    easing: Easing.out(Easing.ease),
-  },
+  /** Very fast timing (100ms) */
+  instant: { duration: 100, easing: Easing.out(Easing.ease) },
 
-  /**
-   * Medium - Standard transitions
-   */
-  medium: {
-    duration: 300,
-    easing: Easing.inOut(Easing.ease),
-  },
+  /** Fast timing (150ms) */
+  fast: { duration: 150, easing: Easing.out(Easing.ease) },
 
-  /**
-   * Slow - Deliberate transitions
-   */
-  slow: {
-    duration: 500,
-    easing: Easing.inOut(Easing.ease),
-  },
+  /** Standard timing (250ms) */
+  default: { duration: 250, easing: Easing.inOut(Easing.ease) },
 
-  /**
-   * Entrance - Elements appearing
-   */
-  entrance: {
-    duration: 400,
-    easing: Easing.out(Easing.back(1.5)),
-  },
+  /** Medium timing (350ms) */
+  medium: { duration: 350, easing: Easing.inOut(Easing.ease) },
 
-  /**
-   * Exit - Elements disappearing
-   */
-  exit: {
-    duration: 250,
-    easing: Easing.in(Easing.ease),
-  },
+  /** Slow timing (500ms) */
+  slow: { duration: 500, easing: Easing.inOut(Easing.ease) },
 
-  /**
-   * Pulse - Looping animations
-   */
-  pulse: {
-    duration: 1500,
-    easing: Easing.inOut(Easing.ease),
-  },
+  /** Very slow timing (800ms) */
+  verySlow: { duration: 800, easing: Easing.inOut(Easing.ease) },
 } as const;
 
 // ============================================
-// 3. ANIMATION HOOKS
+// 3. PRESS ANIMATIONS
 // ============================================
 
 /**
- * Main animation hook with all patterns
+ * Button press scale animation
+ * Usage: <Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
  */
-export const useAnimations = () => {
-  const reduceMotion = useReduceMotion();
-
-  // ----------------------------------------
-  // Button Press Animation
-  // ----------------------------------------
-  const buttonPress = useCallback(
-    (scale: SharedValue<number>, options?: { haptic?: boolean }) => {
-      'worklet';
-      const { haptic = true } = options || {};
-
-      if (haptic) {
-        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
-      }
-
-      scale.value = withSequence(
-        withTiming(0.95, TIMINGS.fast),
-        withSpring(1, SPRINGS.bouncy)
-      );
-    },
-    []
-  );
-
-  // ----------------------------------------
-  // Bounce In Animation
-  // ----------------------------------------
-  const bounceIn = useCallback(
-    (
-      scale: SharedValue<number>,
-      opacity: SharedValue<number>,
-      delay = 0
-    ) => {
-      'worklet';
-      if (reduceMotion) {
-        scale.value = 1;
-        opacity.value = 1;
-        return;
-      }
-
-      opacity.value = withDelay(delay, withTiming(1, TIMINGS.medium));
-      scale.value = withDelay(
-        delay,
-        withSequence(
-          withTiming(1.1, TIMINGS.fast),
-          withSpring(1, SPRINGS.bouncy)
-        )
-      );
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Fade Slide In Animation
-  // ----------------------------------------
-  const fadeSlideIn = useCallback(
-    (
-      translateY: SharedValue<number>,
-      opacity: SharedValue<number>,
-      delay = 0
-    ) => {
-      'worklet';
-      if (reduceMotion) {
-        translateY.value = 0;
-        opacity.value = 1;
-        return;
-      }
-
-      translateY.value = withDelay(delay, withSpring(0, SPRINGS.gentle));
-      opacity.value = withDelay(delay, withTiming(1, TIMINGS.medium));
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Pulse Animation (for CTAs)
-  // ----------------------------------------
-  const pulse = useCallback(
-    (scale: SharedValue<number>) => {
-      'worklet';
-      if (reduceMotion) return;
-
-      scale.value = withRepeat(
-        withSequence(
-          withTiming(1.05, TIMINGS.pulse),
-          withTiming(1, TIMINGS.pulse)
-        ),
-        -1, // Infinite
-        false
-      );
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Stop Pulse Animation
-  // ----------------------------------------
-  const stopPulse = useCallback((scale: SharedValue<number>) => {
-    'worklet';
-    cancelAnimation(scale);
-    scale.value = withSpring(1, SPRINGS.gentle);
-  }, []);
-
-  // ----------------------------------------
-  // Shake Animation (for errors)
-  // ----------------------------------------
-  const shake = useCallback(
-    (translateX: SharedValue<number>, options?: { haptic?: boolean }) => {
-      'worklet';
-      const { haptic = true } = options || {};
-
-      if (haptic) {
-        runOnJS(Haptics.notificationAsync)(
-          Haptics.NotificationFeedbackType.Error
-        );
-      }
-
-      if (reduceMotion) {
-        translateX.value = 0;
-        return;
-      }
-
-      translateX.value = withSequence(
-        withTiming(-8, { duration: 50 }),
-        withTiming(8, { duration: 100 }),
-        withTiming(-6, { duration: 100 }),
-        withTiming(6, { duration: 100 }),
-        withTiming(0, { duration: 50 })
-      );
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Breathing Animation (for logos)
-  // ----------------------------------------
-  const breathe = useCallback(
-    (scale: SharedValue<number>) => {
-      'worklet';
-      if (reduceMotion) return;
-
-      scale.value = withRepeat(
-        withSequence(
-          withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        false
-      );
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Glow Pulse Animation
-  // ----------------------------------------
-  const glowPulse = useCallback(
-    (opacity: SharedValue<number>) => {
-      'worklet';
-      if (reduceMotion) {
-        opacity.value = 0.6;
-        return;
-      }
-
-      opacity.value = withRepeat(
-        withSequence(
-          withTiming(0.8, { duration: 1500 }),
-          withTiming(0.4, { duration: 1500 })
-        ),
-        -1,
-        false
-      );
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Staggered List Animation
-  // ----------------------------------------
-  const staggerIn = useCallback(
-    (
-      items: Array<{
-        opacity: SharedValue<number>;
-        translateY: SharedValue<number>;
-      }>,
-      staggerDelay = 50
-    ) => {
-      items.forEach((item, index) => {
-        const delay = index * staggerDelay;
-
-        if (reduceMotion) {
-          item.opacity.value = 1;
-          item.translateY.value = 0;
-          return;
-        }
-
-        item.opacity.value = withDelay(delay, withTiming(1, TIMINGS.medium));
-        item.translateY.value = withDelay(
-          delay,
-          withSpring(0, SPRINGS.gentle)
-        );
-      });
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Card Flip Animation
-  // ----------------------------------------
-  const flipCard = useCallback(
-    (rotateY: SharedValue<number>, isFlipped: boolean) => {
-      'worklet';
-      if (reduceMotion) {
-        rotateY.value = isFlipped ? 180 : 0;
-        return;
-      }
-
-      rotateY.value = withSpring(isFlipped ? 180 : 0, SPRINGS.slow);
-    },
-    [reduceMotion]
-  );
-
-  // ----------------------------------------
-  // Celebration Animation
-  // ----------------------------------------
-  const celebrate = useCallback(
-    (
-      scale: SharedValue<number>,
-      rotation: SharedValue<number>
-    ) => {
-      'worklet';
-      runOnJS(Haptics.notificationAsync)(
-        Haptics.NotificationFeedbackType.Success
-      );
-
-      if (reduceMotion) {
-        scale.value = 1;
-        rotation.value = 0;
-        return;
-      }
-
-      scale.value = withSequence(
-        withSpring(1.2, SPRINGS.wobbly),
-        withSpring(0.9, SPRINGS.wobbly),
-        withSpring(1, SPRINGS.bouncy)
-      );
-
-      rotation.value = withSequence(
-        withTiming(-10, { duration: 100 }),
-        withTiming(10, { duration: 100 }),
-        withTiming(-5, { duration: 100 }),
-        withTiming(0, { duration: 100 })
-      );
-    },
-    [reduceMotion]
-  );
-
-  return {
-    buttonPress,
-    bounceIn,
-    fadeSlideIn,
-    pulse,
-    stopPulse,
-    shake,
-    breathe,
-    glowPulse,
-    staggerIn,
-    flipCard,
-    celebrate,
-    reduceMotion,
-  };
-};
-
-// ============================================
-// 4. SPECIALIZED HOOKS
-// ============================================
-
-/**
- * Hook for button press animations
- */
-export const usePressAnimation = (options?: {
-  scaleDown?: number;
-  haptic?: boolean;
-}) => {
-  const { scaleDown = 0.97, haptic = true } = options || {};
+export const usePressAnimation = (
+  scaleValue: number = 0.97,
+  springConfig = SPRINGS.snappy
+) => {
   const scale = useSharedValue(1);
-  const reduceMotion = useReduceMotion();
 
-  const handlePressIn = useCallback(() => {
-    if (reduceMotion) return;
+  const onPressIn = useCallback(() => {
+    scale.value = withSpring(scaleValue, springConfig);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, [scale, scaleValue, springConfig]);
 
-    if (haptic) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    scale.value = withSpring(scaleDown, SPRINGS.snappy);
-  }, [scaleDown, haptic, reduceMotion]);
-
-  const handlePressOut = useCallback(() => {
+  const onPressOut = useCallback(() => {
     scale.value = withSpring(1, SPRINGS.bouncy);
-  }, []);
+  }, [scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -461,108 +96,219 @@ export const usePressAnimation = (options?: {
 
   return {
     scale,
-    handlePressIn,
-    handlePressOut,
+    onPressIn,
+    onPressOut,
     animatedStyle,
   };
 };
 
 /**
- * Hook for entrance animations
+ * Button press with scale + opacity
  */
-export const useEntranceAnimation = (options?: {
-  delay?: number;
-  from?: 'bottom' | 'top' | 'left' | 'right' | 'scale';
-  distance?: number;
-}) => {
-  const { delay = 0, from = 'bottom', distance = 20 } = options || {};
+export const usePressOpacityAnimation = () => {
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  const onPressIn = useCallback(() => {
+    scale.value = withSpring(0.97, SPRINGS.snappy);
+    opacity.value = withTiming(0.7, TIMINGS.fast);
+  }, [scale, opacity]);
+
+  const onPressOut = useCallback(() => {
+    scale.value = withSpring(1, SPRINGS.bouncy);
+    opacity.value = withTiming(1, TIMINGS.fast);
+  }, [scale, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  return { onPressIn, onPressOut, animatedStyle };
+};
+
+// ============================================
+// 4. ENTRANCE ANIMATIONS
+// ============================================
+
+/**
+ * Fade in animation
+ */
+export const useFadeIn = (delay: number = 0, duration: number = 300) => {
   const opacity = useSharedValue(0);
-  const translateX = useSharedValue(from === 'left' ? -distance : from === 'right' ? distance : 0);
-  const translateY = useSharedValue(from === 'bottom' ? distance : from === 'top' ? -distance : 0);
-  const scale = useSharedValue(from === 'scale' ? 0.9 : 1);
-  const reduceMotion = useReduceMotion();
 
   useEffect(() => {
-    if (reduceMotion) {
-      opacity.value = 1;
-      translateX.value = 0;
-      translateY.value = 0;
-      scale.value = 1;
-      return;
-    }
-
-    opacity.value = withDelay(delay, withTiming(1, TIMINGS.medium));
-    translateX.value = withDelay(delay, withSpring(0, SPRINGS.gentle));
-    translateY.value = withDelay(delay, withSpring(0, SPRINGS.gentle));
-    if (from === 'scale') {
-      scale.value = withDelay(delay, withSpring(1, SPRINGS.bouncy));
-    }
-  }, [delay, from, reduceMotion]);
+    opacity.value = withDelay(
+      delay,
+      withTiming(1, { duration, easing: Easing.out(Easing.ease) })
+    );
+  }, [opacity, delay, duration]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
   }));
 
-  return { animatedStyle };
+  return { opacity, animatedStyle };
 };
 
 /**
- * Hook for parallax scrolling effect
+ * Fade + slide up animation
  */
-export const useParallax = (scrollY: SharedValue<number>, options?: {
-  inputRange?: [number, number];
-  outputRange?: [number, number];
-}) => {
-  const { inputRange = [-200, 200], outputRange = [20, -20] } = options || {};
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: interpolate(
-          scrollY.value,
-          inputRange,
-          outputRange,
-          Extrapolation.CLAMP
-        ),
-      },
-    ],
-  }));
-
-  return { animatedStyle };
-};
-
-/**
- * Hook for floating/levitating animation
- */
-export const useFloatingAnimation = (options?: {
-  distance?: number;
-  duration?: number;
-}) => {
-  const { distance = 8, duration = 2000 } = options || {};
-  const translateY = useSharedValue(0);
-  const reduceMotion = useReduceMotion();
+export const useFadeSlideUp = (delay: number = 0, translateY: number = 20) => {
+  const opacity = useSharedValue(0);
+  const translate = useSharedValue(translateY);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    opacity.value = withDelay(delay, withTiming(1, TIMINGS.medium));
+    translate.value = withDelay(delay, withSpring(0, SPRINGS.gentle));
+  }, [opacity, translate, delay, translateY]);
 
-    translateY.value = withRepeat(
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translate.value }],
+  }));
+
+  return { animatedStyle };
+};
+
+/**
+ * Scale bounce in animation
+ */
+export const useBounceIn = (delay: number = 0, fromScale: number = 0.8) => {
+  const scale = useSharedValue(fromScale);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    opacity.value = withDelay(delay, withTiming(1, TIMINGS.fast));
+    scale.value = withDelay(
+      delay,
       withSequence(
-        withTiming(-distance, { duration, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration, easing: Easing.inOut(Easing.ease) })
+        withTiming(1.05, TIMINGS.fast),
+        withSpring(1, SPRINGS.bouncy)
+      )
+    );
+  }, [opacity, scale, delay, fromScale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+  }));
+
+  return { animatedStyle };
+};
+
+/**
+ * Staggered list item animation
+ */
+export const useStaggeredItem = (index: number, staggerDelay: number = 50) => {
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(15);
+
+  useEffect(() => {
+    const delay = index * staggerDelay;
+    opacity.value = withDelay(delay, withTiming(1, TIMINGS.medium));
+    translateY.value = withDelay(delay, withSpring(0, SPRINGS.gentle));
+  }, [opacity, translateY, index, staggerDelay]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return { animatedStyle };
+};
+
+// ============================================
+// 5. CONTINUOUS ANIMATIONS
+// ============================================
+
+/**
+ * Pulse animation (for CTAs, notifications)
+ */
+export const usePulse = (
+  minScale: number = 1,
+  maxScale: number = 1.05,
+  duration: number = 1500
+) => {
+  const scale = useSharedValue(minScale);
+
+  useEffect(() => {
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(maxScale, { duration }),
+        withTiming(minScale, { duration })
+      ),
+      -1,
+      false
+    );
+  }, [scale, minScale, maxScale, duration]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return { scale, animatedStyle };
+};
+
+/**
+ * Breathing animation (for avatars, logos)
+ */
+export const useBreathing = (duration: number = 2000) => {
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  useEffect(() => {
+    const easing = Easing.inOut(Easing.ease);
+
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1.03, { duration, easing }),
+        withTiming(1, { duration, easing })
       ),
       -1,
       false
     );
 
-    return () => {
-      cancelAnimation(translateY);
-    };
-  }, [distance, duration, reduceMotion]);
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(0.85, { duration, easing }),
+        withTiming(1, { duration, easing })
+      ),
+      -1,
+      false
+    );
+  }, [scale, opacity, duration]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  return { animatedStyle };
+};
+
+/**
+ * Floating animation (subtle up/down movement)
+ */
+export const useFloating = (amplitude: number = 5, duration: number = 3000) => {
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    translateY.value = withRepeat(
+      withSequence(
+        withTiming(-amplitude, {
+          duration: duration / 2,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(amplitude, {
+          duration: duration / 2,
+          easing: Easing.inOut(Easing.ease),
+        })
+      ),
+      -1,
+      true
+    );
+  }, [translateY, amplitude, duration]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -572,79 +318,169 @@ export const useFloatingAnimation = (options?: {
 };
 
 /**
- * Hook for skeleton loading animation
+ * Rotation animation
  */
-export const useSkeletonAnimation = () => {
-  const shimmer = useSharedValue(0);
-  const reduceMotion = useReduceMotion();
+export const useRotation = (degrees: number = 360, duration: number = 1000) => {
+  const rotation = useSharedValue(0);
 
   useEffect(() => {
-    if (reduceMotion) {
-      shimmer.value = 0.5;
-      return;
-    }
-
-    shimmer.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 1000, easing: Easing.inOut(Easing.ease) })
-      ),
+    rotation.value = withRepeat(
+      withTiming(degrees, { duration, easing: Easing.linear }),
       -1,
       false
     );
-
-    return () => {
-      cancelAnimation(shimmer);
-    };
-  }, [reduceMotion]);
+  }, [rotation, degrees, duration]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(shimmer.value, [0, 1], [0.6, 1]),
+    transform: [{ rotate: `${rotation.value}deg` }],
   }));
+
+  return { rotation, animatedStyle };
+};
+
+// ============================================
+// 6. FEEDBACK ANIMATIONS
+// ============================================
+
+/**
+ * Shake animation (for errors)
+ */
+export const useShake = () => {
+  const translateX = useSharedValue(0);
+
+  const shake = useCallback(() => {
+    translateX.value = withSequence(
+      withTiming(-8, { duration: 50 }),
+      withTiming(8, { duration: 100 }),
+      withTiming(-6, { duration: 100 }),
+      withTiming(6, { duration: 100 }),
+      withTiming(0, { duration: 50 })
+    );
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+  }, [translateX]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
+  return { shake, animatedStyle };
+};
+
+/**
+ * Success bounce animation
+ */
+export const useSuccessBounce = () => {
+  const scale = useSharedValue(1);
+
+  const bounce = useCallback(() => {
+    scale.value = withSequence(
+      withSpring(1.2, SPRINGS.celebration),
+      withSpring(0.9, SPRINGS.snappy),
+      withSpring(1, SPRINGS.bouncy)
+    );
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [scale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return { bounce, animatedStyle };
+};
+
+// ============================================
+// 7. SCROLL-BASED ANIMATIONS
+// ============================================
+
+/**
+ * Parallax effect based on scroll position
+ */
+export const useParallax = (
+  scrollY: SharedValue<number>,
+  inputRange: [number, number],
+  outputRange: [number, number]
+) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      inputRange,
+      outputRange,
+      Extrapolation.CLAMP
+    );
+
+    return {
+      transform: [{ translateY }],
+    };
+  });
+
+  return { animatedStyle };
+};
+
+/**
+ * Header collapse animation
+ */
+export const useHeaderCollapse = (
+  scrollY: SharedValue<number>,
+  expandedHeight: number,
+  collapsedHeight: number
+) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    const height = interpolate(
+      scrollY.value,
+      [0, expandedHeight - collapsedHeight],
+      [expandedHeight, collapsedHeight],
+      Extrapolation.CLAMP
+    );
+
+    const opacity = interpolate(
+      scrollY.value,
+      [0, (expandedHeight - collapsedHeight) / 2],
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+
+    return {
+      height,
+      opacity,
+    };
+  });
 
   return { animatedStyle };
 };
 
 // ============================================
-// 5. UTILITY FUNCTIONS
+// 8. UTILITY HOOKS
 // ============================================
 
 /**
- * Create staggered delay array
+ * Animate value change
  */
-export const createStaggerDelays = (count: number, baseDelay = 50): number[] => {
-  return Array.from({ length: count }, (_, i) => i * baseDelay);
+export const useAnimatedValue = (value: number, config = TIMINGS.default) => {
+  const animatedValue = useSharedValue(value);
+
+  useEffect(() => {
+    animatedValue.value = withTiming(value, config);
+  }, [animatedValue, value, config]);
+
+  return animatedValue;
 };
 
 /**
- * Get spring config based on motion preference
+ * Progress bar animation
  */
-export const getSpringConfig = (
-  config: keyof typeof SPRINGS,
-  reduceMotion: boolean
+export const useProgress = (
+  progress: number, // 0-1
+  duration: number = 500
 ) => {
-  if (reduceMotion) {
-    return { damping: 100, stiffness: 500, mass: 1 };
-  }
-  return SPRINGS[config];
+  const animatedProgress = useSharedValue(0);
+
+  useEffect(() => {
+    animatedProgress.value = withTiming(progress, { duration });
+  }, [animatedProgress, progress, duration]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    width: `${animatedProgress.value * 100}%`,
+  }));
+
+  return { animatedProgress, animatedStyle };
 };
-
-/**
- * Get timing config based on motion preference
- */
-export const getTimingConfig = (
-  config: keyof typeof TIMINGS,
-  reduceMotion: boolean
-) => {
-  if (reduceMotion) {
-    return { duration: 0, easing: Easing.linear };
-  }
-  return TIMINGS[config];
-};
-
-// Export types
-export type SpringConfig = keyof typeof SPRINGS;
-export type TimingConfig = keyof typeof TIMINGS;
-
-// Default export
-export default useAnimations;
