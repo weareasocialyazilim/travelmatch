@@ -326,5 +326,61 @@
     "search": "Ara",
     "send": "Gönder",
     "go": "Git"
+  },
+  "legal": {
+    "privacyPolicy": "Gizlilik Politikası",
+    "termsOfService": "Kullanım Şartları",
+    "refundPolicy": "İade Politikası",
+    "dataPrivacy": "Veri Gizliliği",
+    "lastUpdated": "Son Güncelleme",
+    "iUnderstand": "Anladım",
+    "iAccept": "Kabul Ediyorum",
+    "sections": {
+      "dataCollection": "Topladığımız Veriler",
+      "locationUse": "Konum Kullanımı",
+      "photosAndProof": "Fotoğraflar ve Kanıt Verileri",
+      "paymentsAndSecurity": "Ödemeler ve Güvenlik",
+      "dataRetention": "Veri Saklama",
+      "userRights": "Haklarınız",
+      "deletingData": "Verilerinizi Silme",
+      "contactUs": "Bize Ulaşın"
+    }
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "account": "Hesap",
+    "editProfile": "Profili Düzenle",
+    "changePassword": "Şifre Değiştir",
+    "notifications": "Bildirimler",
+    "pushNotifications": "Push Bildirimleri",
+    "emailNotifications": "E-posta Bildirimleri",
+    "privacy": "Gizlilik",
+    "dataPrivacy": "Veri ve Gizlilik",
+    "blockedUsers": "Engellenen Kullanıcılar",
+    "security": "Güvenlik",
+    "biometricLogin": "Biyometrik Giriş",
+    "twoFactorAuth": "İki Faktörlü Doğrulama",
+    "preferences": "Tercihler",
+    "language": "Dil",
+    "theme": "Tema",
+    "themeLight": "Açık",
+    "themeDark": "Koyu",
+    "themeSystem": "Sistem",
+    "about": "Hakkında",
+    "version": "Sürüm",
+    "rateApp": "Uygulamayı Puanla",
+    "shareApp": "Uygulamayı Paylaş",
+    "helpCenter": "Yardım Merkezi",
+    "contactSupport": "Destek ile İletişim",
+    "legal": "Yasal",
+    "logout": "Çıkış Yap",
+    "deleteAccount": "Hesabı Sil",
+    "deleteAccountWarning": "Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir."
+  },
+  "store": {
+    "appName": "TravelMatch",
+    "subtitle": "Seyahat Anlarıyla Bağlan",
+    "shortDescription": "Gezginlerle tanış. Anları paylaş. Deneyimleri hediye et. Farklı seyahat et.",
+    "keywords": "seyahat,deneyim,yerel rehber,turizm,hediye,anlar,keşfet,macera,gezi,tatil,gezinti"
   }
 }
