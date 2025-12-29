@@ -9,6 +9,8 @@ import {
   Dimensions,
   Modal,
   Platform,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -23,6 +25,7 @@ import { COLORS, primitives } from '../constants/colors';
 import { VALUES } from '../constants/values';
 import { ConfirmGiftModal } from './ConfirmGiftModal';
 import { useScreenSecurity } from '../hooks/useScreenSecurity';
+import { useComplianceCheck } from '../hooks/useComplianceCheck';
 import { formatCurrency } from '../utils/currencyFormatter';
 import type { CurrencyCode } from '../constants/currencies';
 import type { MomentData } from '../types';
@@ -84,6 +87,11 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethod>('apple-pay');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [complianceWarning, setComplianceWarning] = useState<string | null>(null);
+
+  // Compliance check hook
+  const { isChecking, checkSendLimit, checkContribution, checkCompliance } =
+    useComplianceCheck();
 
   // Reanimated shared values for 60fps animations
   const translateY = useSharedValue(SHEET_HEIGHT);
@@ -146,8 +154,91 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
 
   if (!moment) return null;
 
-  const handleGift = () => {
-    setShowConfirmModal(true);
+  const handleGift = async () => {
+    setComplianceWarning(null);
+
+    try {
+      const currency = (moment.currency as CurrencyCode) || 'TRY';
+      const amount = moment.price ?? 0;
+
+      // 1. Check user send limits
+      const limitResult = await checkSendLimit(amount, currency);
+
+      if (!limitResult.allowed) {
+        if (limitResult.promptKyc) {
+          Alert.alert(
+            'Kimlik Doğrulama Gerekli',
+            limitResult.message,
+            [
+              { text: 'İptal', style: 'cancel' },
+              { text: 'Doğrula', onPress: () => {
+                // Navigate to KYC screen
+                closeSheet();
+                // TODO: Navigate to KYC
+              }},
+            ]
+          );
+          return;
+        }
+
+        if (limitResult.promptUpgrade) {
+          Alert.alert(
+            'Limit Aşıldı',
+            `${limitResult.message}\n\nLimitlerinizi artırmak için planınızı yükseltin.`,
+            [
+              { text: 'İptal', style: 'cancel' },
+              { text: 'Planları Gör', onPress: () => {
+                closeSheet();
+                // TODO: Navigate to subscription plans
+              }},
+            ]
+          );
+          return;
+        }
+
+        Alert.alert('İşlem Yapılamıyor', limitResult.message);
+        return;
+      }
+
+      // 2. Check moment contribution limit
+      const contributionResult = await checkContribution(moment.id, amount);
+
+      if (!contributionResult.allowed) {
+        Alert.alert(
+          'Katkı Limiti',
+          contributionResult.message,
+          [{ text: 'Tamam' }]
+        );
+        return;
+      }
+
+      // 3. Full AML/Fraud compliance check
+      const complianceResult = await checkCompliance(
+        amount,
+        currency,
+        moment.user?.id
+      );
+
+      if (!complianceResult.allowed) {
+        const reason = complianceResult.blockReasons.join('\n');
+        Alert.alert('İşlem Engelllendi', reason);
+        return;
+      }
+
+      // Show warnings if any
+      if (complianceResult.warnings.length > 0) {
+        setComplianceWarning(complianceResult.warnings[0]);
+      }
+
+      // All checks passed, show confirmation modal
+      setShowConfirmModal(true);
+    } catch (error) {
+      console.error('Compliance check failed:', error);
+      Alert.alert(
+        'Hata',
+        'İşlem kontrolü yapılırken bir hata oluştu. Lütfen tekrar deneyin.'
+      );
+    }
   };
 
   const handleConfirmGift = () => {
@@ -391,16 +482,33 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
             </View>
           </View>
 
+          {/* Compliance Warning */}
+          {complianceWarning && (
+            <View style={styles.warningNotice}>
+              <MaterialCommunityIcons
+                name="alert-circle"
+                size={18}
+                color={COLORS.feedback.warning}
+              />
+              <Text style={styles.warningText}>{complianceWarning}</Text>
+            </View>
+          )}
+
           {/* CTA Section */}
           <View style={styles.ctaSection}>
             <TouchableOpacity
-              style={styles.ctaButton}
+              style={[styles.ctaButton, isChecking && styles.ctaButtonDisabled]}
               onPress={handleGift}
               activeOpacity={0.8}
+              disabled={isChecking}
             >
-              <Text style={styles.ctaButtonText}>
-                Send • {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
-              </Text>
+              {isChecking ? (
+                <ActivityIndicator color={COLORS.utility.white} />
+              ) : (
+                <Text style={styles.ctaButtonText}>
+                  Send • {formatCurrency(moment.price ?? 0, (moment.currency as CurrencyCode) || 'TRY')}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -594,14 +702,34 @@ const styles = StyleSheet.create({
   paymentMethodTextSelected: {
     color: COLORS.text.primary,
   },
+  warningNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.feedback.warningLight || '#FFF3CD',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    gap: 8,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 13,
+    color: COLORS.feedback.warning || '#856404',
+    lineHeight: 18,
+  },
   ctaSection: {
     paddingVertical: 20,
   },
   ctaButton: {
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: COLORS.buttonDark,
     borderRadius: 999,
     paddingVertical: 18,
+    minHeight: 56,
+  },
+  ctaButtonDisabled: {
+    opacity: 0.7,
   },
   ctaButtonText: {
     color: COLORS.utility.white,
