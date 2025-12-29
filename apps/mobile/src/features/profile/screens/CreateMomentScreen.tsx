@@ -46,6 +46,7 @@ import { useMoments } from '../hooks';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
 
 // Import sub-components
 
@@ -460,4 +461,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateMomentScreen;
+export default withErrorBoundary(CreateMomentScreen);

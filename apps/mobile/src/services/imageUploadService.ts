@@ -115,19 +115,55 @@ export async function uploadImage(
 }
 
 /**
- * Upload multiple images concurrently
+ * Result of a batch upload operation
+ */
+export interface BatchUploadResult {
+  /** Successfully uploaded images */
+  successful: ImageUploadResult[];
+  /** Failed upload URIs with their errors */
+  failed: Array<{ uri: string; error: Error }>;
+  /** Total count of images attempted */
+  total: number;
+}
+
+/**
+ * Upload multiple images concurrently with resilient error handling
+ * Uses Promise.allSettled to ensure partial failures don't lose successful uploads
  */
 export async function uploadImages(
   imageUris: string[],
   options: ImageUploadOptions = {}
-): Promise<ImageUploadResult[]> {
-  try {
-    const uploads = imageUris.map(uri => uploadImage(uri, options));
-    return await Promise.all(uploads);
-  } catch (error) {
-    logger.error('Batch image upload failed:', error);
-    throw error;
-  }
+): Promise<BatchUploadResult> {
+  const uploads = imageUris.map((uri) => uploadImage(uri, options));
+  const results = await Promise.allSettled(uploads);
+
+  const successful: ImageUploadResult[] = [];
+  const failed: Array<{ uri: string; error: Error }> = [];
+
+  results.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      successful.push(result.value);
+    } else {
+      failed.push({
+        uri: imageUris[index],
+        error:
+          result.reason instanceof Error
+            ? result.reason
+            : new Error(String(result.reason)),
+      });
+      logger.warn(`Image upload failed for ${imageUris[index]}:`, result.reason);
+    }
+  });
+
+  logger.info(
+    `Batch upload complete: ${successful.length}/${imageUris.length} successful`,
+  );
+
+  return {
+    successful,
+    failed,
+    total: imageUris.length,
+  };
 }
 
 /**

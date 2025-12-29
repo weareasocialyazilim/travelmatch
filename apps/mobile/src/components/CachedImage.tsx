@@ -71,6 +71,10 @@ export interface CachedImageProps extends Omit<
   onRetry?: () => void;
   containerStyle?: ViewStyle;
   networkTimeout?: number;
+  /** Accessibility label for the image (required for screen readers) */
+  accessibilityLabel?: string;
+  /** Accessibility hint for additional context */
+  accessibilityHint?: string;
 }
 
 // ============================================================================

@@ -7,6 +7,7 @@ import { Alert, Linking, Platform } from 'react-native';
 import * as Application from 'expo-application';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from './logger';
+import { STORE_METADATA } from '../config/storeMetadata';
 
 const UPDATE_CHECK_KEY = '@app_update_last_check';
 const UPDATE_SKIP_KEY = '@app_update_skipped_version';
@@ -114,13 +115,12 @@ async function skipVersion(version: string): Promise<void> {
  * Get store URL based on platform
  */
 export function getStoreUrl(): string {
-  const appStoreId = '123456789'; // Replace with actual App Store ID
-  const playStoreId = 'com.travelmatch.app'; // Replace with actual package name
+  const { storeIds } = STORE_METADATA;
 
   if (Platform.OS === 'ios') {
-    return `https://apps.apple.com/app/id${appStoreId}`;
+    return `https://apps.apple.com/app/id${storeIds.ios.appStoreId}`;
   }
-  return `https://play.google.com/store/apps/details?id=${playStoreId}`;
+  return `https://play.google.com/store/apps/details?id=${storeIds.android.packageName}`;
 }
 
 /**
@@ -138,28 +138,72 @@ export async function openStore(): Promise<void> {
 }
 
 /**
- * Fetch latest version info from server
- * Replace with your actual API endpoint
+ * Fetch latest version info from server using Supabase Edge Function
+ * Gracefully handles missing endpoint (returns null, app continues normally)
  */
 async function fetchVersionInfo(): Promise<VersionInfo | null> {
   try {
-    // TODO: Replace with actual version check endpoint
-    const response = await fetch('https://api.travelmatch.app/v1/version', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Platform': Platform.OS,
-        'X-Current-Version': getCurrentVersion(),
-      },
-    });
+    // Import supabase config dynamically to avoid circular dependency
+    const { SUPABASE_EDGE_URL, isSupabaseConfigured } = await import(
+      '../config/supabase'
+    );
 
-    if (!response.ok) {
-      throw new Error(`Version check failed: ${response.status}`);
+    // Skip version check if Supabase is not configured
+    if (!isSupabaseConfigured()) {
+      logger.debug('Version check skipped: Supabase not configured');
+      return null;
     }
 
-    return await response.json();
+    const currentVersion = getCurrentVersion();
+    const storeUrl = getStoreUrl();
+
+    // Call Supabase Edge Function for version check
+    const response = await fetch(
+      `${SUPABASE_EDGE_URL}/functions/v1/version-check`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Platform': Platform.OS,
+          'X-App-Version': currentVersion,
+        },
+        body: JSON.stringify({
+          platform: Platform.OS,
+          currentVersion,
+          bundleId:
+            Platform.OS === 'ios'
+              ? STORE_METADATA.storeIds.ios.bundleId
+              : STORE_METADATA.storeIds.android.packageName,
+        }),
+      },
+    );
+
+    // If endpoint doesn't exist (404) or other server error, silently continue
+    // This allows the app to work before the version check endpoint is deployed
+    if (!response.ok) {
+      if (response.status === 404) {
+        logger.debug('Version check endpoint not available yet');
+      } else {
+        logger.warn(`Version check returned status ${response.status}`);
+      }
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Map the response to our VersionInfo format
+    return {
+      currentVersion,
+      latestVersion: data.latestVersion || currentVersion,
+      updateRequired: data.updateRequired || false,
+      updateAvailable: data.updateAvailable || false,
+      releaseNotes: data.releaseNotes,
+      storeUrl,
+    };
   } catch (error) {
-    logger.error('Failed to fetch version info:', error);
+    // Network errors, parse errors, etc - silently continue
+    // The app should work even if version check fails
+    logger.debug('Version check unavailable:', error);
     return null;
   }
 }

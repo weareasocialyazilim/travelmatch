@@ -142,7 +142,20 @@ export function useImageUpload() {
 }
 
 /**
- * Multiple images upload
+ * Result of batch image upload
+ */
+interface MultiUploadResult {
+  /** Successfully uploaded URLs */
+  successful: string[];
+  /** Failed uploads with their original image index */
+  failed: Array<{ index: number; error: Error }>;
+  /** Total images attempted */
+  total: number;
+}
+
+/**
+ * Multiple images upload with resilient error handling
+ * Uses Promise.allSettled so partial failures don't lose successful uploads
  */
 export function useMultiImageUpload() {
   const [uploads, setUploads] = useState<Map<string, UploadState>>(new Map());
@@ -152,9 +165,12 @@ export function useMultiImageUpload() {
       images: ImageAsset[],
       uploadUrl: string,
       _options?: UploadOptions,
-    ): Promise<string[]> => {
+    ): Promise<MultiUploadResult> => {
+      const keys: string[] = [];
+
       const uploadPromises = images.map(async (image, index) => {
         const key = `${index}_${Date.now()}`;
+        keys[index] = key;
 
         setUploads((prev) => {
           const next = new Map(prev);
@@ -167,60 +183,76 @@ export function useMultiImageUpload() {
           return next;
         });
 
-        try {
-          const formData = new FormData();
-          const fileExtension = image.uri.split('.').pop() ?? 'jpg';
-          const fileName =
-            image.fileName ?? `image_${Date.now()}_${index}.${fileExtension}`;
+        const formData = new FormData();
+        const fileExtension = image.uri.split('.').pop() ?? 'jpg';
+        const fileName =
+          image.fileName ?? `image_${Date.now()}_${index}.${fileExtension}`;
 
-          formData.append('file', {
-            uri: image.uri,
-            name: fileName,
-            type: image.mimeType ?? `image/${fileExtension}`,
-          } as unknown as Blob);
+        formData.append('file', {
+          uri: image.uri,
+          name: fileName,
+          type: image.mimeType ?? `image/${fileExtension}`,
+        } as unknown as Blob);
 
-          const response = await uploadWithProgress<CloudinaryResponse>(
-            uploadUrl,
-            formData,
-            {
-              headers: { 'Content-Type': 'multipart/form-data' },
-              onUploadProgress: (progressEvent: UploadProgressEvent) => {
-                const { loaded, total, percentage } = progressEvent;
+        const response = await uploadWithProgress<CloudinaryResponse>(
+          uploadUrl,
+          formData,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: (progressEvent: UploadProgressEvent) => {
+              const { loaded, total, percentage } = progressEvent;
 
-                setUploads((prev) => {
-                  const next = new Map(prev);
-                  const current = next.get(key);
-                  if (current) {
-                    next.set(key, {
-                      ...current,
-                      progress: { loaded, total, percentage },
-                    });
-                  }
-                  return next;
-                });
-              },
+              setUploads((prev) => {
+                const next = new Map(prev);
+                const current = next.get(key);
+                if (current) {
+                  next.set(key, {
+                    ...current,
+                    progress: { loaded, total, percentage },
+                  });
+                }
+                return next;
+              });
             },
-          );
+          },
+        );
 
-          const uploadedUrl =
-            response.data.url ?? response.data.secure_url ?? '';
+        const uploadedUrl = response.data.url ?? response.data.secure_url ?? '';
 
-          setUploads((prev) => {
-            const next = new Map(prev);
-            next.set(key, {
-              isUploading: false,
-              progress: { loaded: 100, total: 100, percentage: 100 },
-              error: null,
-              uploadedUrl,
-            });
-            return next;
+        setUploads((prev) => {
+          const next = new Map(prev);
+          next.set(key, {
+            isUploading: false,
+            progress: { loaded: 100, total: 100, percentage: 100 },
+            error: null,
+            uploadedUrl,
           });
+          return next;
+        });
 
-          return uploadedUrl;
-        } catch (error) {
+        return uploadedUrl;
+      });
+
+      // Use Promise.allSettled for resilient uploads
+      const results = await Promise.allSettled(uploadPromises);
+
+      const successful: string[] = [];
+      const failed: Array<{ index: number; error: Error }> = [];
+
+      results.forEach((result, index) => {
+        const key = keys[index];
+
+        if (result.status === 'fulfilled') {
+          successful.push(result.value);
+        } else {
           const errorObj =
-            error instanceof Error ? error : new Error('Upload failed');
+            result.reason instanceof Error
+              ? result.reason
+              : new Error('Upload failed');
 
+          failed.push({ index, error: errorObj });
+
+          // Update state for failed uploads
           setUploads((prev) => {
             const next = new Map(prev);
             next.set(key, {
@@ -231,13 +263,14 @@ export function useMultiImageUpload() {
             });
             return next;
           });
-
-          throw errorObj;
         }
       });
 
-      const results = await Promise.all(uploadPromises);
-      return results.filter((url): url is string => url !== undefined);
+      return {
+        successful,
+        failed,
+        total: images.length,
+      };
     },
     [],
   );

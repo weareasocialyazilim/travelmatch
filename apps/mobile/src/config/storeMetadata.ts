@@ -12,6 +12,18 @@ export const STORE_METADATA = {
   subtitle: 'Connect Through Travel Moments',
   shortDescription: 'Connect with travelers. Share moments. Gift experiences. Travel differently.',
 
+  // Store IDs
+  storeIds: {
+    ios: {
+      appStoreId: '6740496053',
+      bundleId: 'com.travelmatch.app',
+      teamId: 'ZWCGM5V955',
+    },
+    android: {
+      packageName: 'com.travelmatch.app',
+    },
+  },
+
   // URLs
   urls: {
     website: 'https://travelmatch.app',
