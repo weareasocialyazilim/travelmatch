@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Image,
   StyleSheet,
@@ -6,17 +6,24 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Alert,
+  Linking,
+  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SocialButton } from '@/components';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
+import { signInWithOAuth } from '@/services/supabaseAuthService';
 
 const { height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
 export const WelcomeScreen: React.FC<{
   navigation: { navigate: (route: string) => void };
 }> = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState<'apple' | 'google' | 'facebook' | null>(null);
+
   const handleCreateAccount = () => {
     navigation.navigate('Register');
   };
@@ -33,17 +40,61 @@ export const WelcomeScreen: React.FC<{
     navigation.navigate('PrivacyPolicy');
   };
 
-  const handleAppleSignIn = () => {
-    logger.debug('[Auth] Apple sign in initiated from Welcome screen');
-    // TODO: Implement Apple Sign In with Supabase
-    navigation.navigate('Register');
-  };
+  const handleSocialSignIn = useCallback(async (provider: 'apple' | 'google' | 'facebook') => {
+    if (isLoading) return;
 
-  const handleGoogleSignIn = () => {
-    logger.debug('[Auth] Google sign in initiated from Welcome screen');
-    // TODO: Implement Google Sign In with Supabase
-    navigation.navigate('Register');
-  };
+    setIsLoading(provider);
+    logger.debug(`[Auth] ${provider} sign in initiated from Welcome screen`);
+
+    try {
+      const { url, error } = await signInWithOAuth(provider);
+
+      if (error) {
+        logger.error(`[Auth] ${provider} OAuth error:`, error);
+        Alert.alert(
+          'Sign In Error',
+          `Unable to sign in with ${provider}. Please try again or use email.`,
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
+      if (url) {
+        // Open OAuth URL in browser - user will be redirected back to app
+        const canOpen = await Linking.canOpenURL(url);
+        if (canOpen) {
+          await Linking.openURL(url);
+        } else {
+          Alert.alert(
+            'Browser Required',
+            'Please ensure you have a web browser installed.',
+            [{ text: 'OK' }]
+          );
+        }
+      }
+    } catch (err) {
+      logger.error(`[Auth] ${provider} sign in exception:`, err);
+      Alert.alert(
+        'Sign In Error',
+        'Something went wrong. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setIsLoading(null);
+    }
+  }, [isLoading]);
+
+  const handleAppleSignIn = useCallback(() => {
+    handleSocialSignIn('apple');
+  }, [handleSocialSignIn]);
+
+  const handleGoogleSignIn = useCallback(() => {
+    handleSocialSignIn('google');
+  }, [handleSocialSignIn]);
+
+  const handleFacebookSignIn = useCallback(() => {
+    handleSocialSignIn('facebook');
+  }, [handleSocialSignIn]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -79,21 +130,30 @@ export const WelcomeScreen: React.FC<{
                 size="icon"
                 onPress={handleAppleSignIn}
                 useProviderColors
+                disabled={isLoading !== null}
+                loading={isLoading === 'apple'}
+                accessibilityLabel="Sign in with Apple"
+                accessibilityHint="Opens Apple sign in in your browser"
               />
               <SocialButton
                 provider="google"
                 size="icon"
                 onPress={handleGoogleSignIn}
                 useProviderColors
+                disabled={isLoading !== null}
+                loading={isLoading === 'google'}
+                accessibilityLabel="Sign in with Google"
+                accessibilityHint="Opens Google sign in in your browser"
               />
               <SocialButton
                 provider="facebook"
                 size="icon"
-                onPress={() => {
-                  logger.debug('[Auth] Facebook sign in initiated from Welcome screen');
-                  navigation.navigate('Register');
-                }}
+                onPress={handleFacebookSignIn}
                 useProviderColors
+                disabled={isLoading !== null}
+                loading={isLoading === 'facebook'}
+                accessibilityLabel="Sign in with Facebook"
+                accessibilityHint="Opens Facebook sign in in your browser"
               />
             </View>
 
