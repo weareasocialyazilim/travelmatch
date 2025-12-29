@@ -83,7 +83,7 @@ function TrustRing({ score, size = 44 }: { score: number; size?: number }) {
   );
 }
 
-export default function LandingPage() {
+export default function Home() {
   return (
     <div className="min-h-screen bg-cream dark:bg-stone-950">
       {/* HERO SECTION */}
