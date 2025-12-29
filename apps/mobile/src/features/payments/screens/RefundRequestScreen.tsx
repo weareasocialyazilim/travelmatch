@@ -53,7 +53,7 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
   const { showConfirmation: _showConfirmation } = useConfirmation();
   const { transactionId } = route.params;
 
-  const { control, handleSubmit, formState, watch, setValue } =
+  const { control, handleSubmit, formState, setValue } =
     useForm<RefundRequestInput>({
       resolver: zodResolver(refundRequestSchema),
       mode: 'onChange',
@@ -64,8 +64,6 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
       },
     });
 
-  const _reason = watch('reason');
-  const _description = watch('description');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (_data: RefundRequestInput) => {
@@ -238,7 +236,11 @@ export const RefundRequestScreen: React.FC<RefundRequestScreenProps> = ({
           style={styles.policyLink}
           onPress={() => navigation.navigate('RefundPolicy')}
         >
-          <Icon name="file-document-outline" size={20} color={COLORS.brand.secondary} />
+          <Icon
+            name="file-document-outline"
+            size={20}
+            color={COLORS.brand.secondary}
+          />
           <Text style={styles.policyLinkText}>View Refund Policy</Text>
           <Icon name="chevron-right" size={20} color={COLORS.brand.secondary} />
         </TouchableOpacity>

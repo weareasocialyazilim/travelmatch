@@ -12,7 +12,8 @@
 import { MMKV } from 'react-native-mmkv';
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
-import { PersistQueryClientProvider as _PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+// PersistQueryClientProvider exported for use in App.tsx
+export { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import NetInfo from '@react-native-community/netinfo';
 import { logger } from '../utils/logger';
 
@@ -21,7 +22,7 @@ import { logger } from '../utils/logger';
 import * as Application from 'expo-application';
 import * as Crypto from 'expo-crypto';
 
-async function _generateEncryptionKey(): Promise<string> {
+export async function generateEncryptionKey(): Promise<string> {
   // Combine device-specific identifiers for a unique key
   // Note: These are async calls in newer expo versions
   let deviceId = 'default';
@@ -159,19 +160,19 @@ export const queryClient = new QueryClient({
     onError: (error, query) => {
       logger.error('[Cache] Query error', { queryKey: query.queryKey, error });
     },
-    onSuccess: (data, query) => {
+    onSuccess: (_data, query) => {
       logger.debug('[Cache] Query success', { queryKey: query.queryKey });
     },
   }),
 
   mutationCache: new MutationCache({
-    onError: (error, variables, context, mutation) => {
+    onError: (error, _variables, _context, mutation) => {
       logger.error('[Cache] Mutation error', {
         mutationKey: mutation.options.mutationKey,
         error,
       });
     },
-    onSuccess: (data, variables, context, mutation) => {
+    onSuccess: (_data, _variables, _context, mutation) => {
       logger.debug('[Cache] Mutation success', {
         mutationKey: mutation.options.mutationKey,
       });

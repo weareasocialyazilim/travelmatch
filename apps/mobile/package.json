@@ -46,8 +46,13 @@
     "@react-navigation/bottom-tabs": "^7.9.0",
     "@react-navigation/native": "^7.1.26",
     "@react-navigation/stack": "^7.6.13",
+<<<<<<< Updated upstream
     "@rnmapbox/maps": "10.2.10",
     "@sentry/react-native": "~7.8.0",
+=======
+    "@rnmapbox/maps": "^10.2.10",
+    "@sentry/react-native": "~7.2.0",
+>>>>>>> Stashed changes
     "@shopify/flash-list": "^2.2.0",
     "@supabase/supabase-js": "^2.88.0",
     "@travelmatch/design-system": "workspace:*",
@@ -101,6 +106,7 @@
     "@babel/plugin-transform-export-namespace-from": "^7.27.1",
     "@eslint/js": "^9.39.2",
     "@storybook/react-native": "^10.1.1",
+    "storybook": "^10.1.10",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/pako": "^2.0.4",
@@ -124,7 +130,10 @@
     "lucide-react-native": "^0.561.0",
     "prettier": "^3.7.4",
     "react-test-renderer": "19.1.0",
+<<<<<<< Updated upstream
     "storybook": "^10.1.10",
+=======
+>>>>>>> Stashed changes
     "ts-jest": "^29.4.6",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.50.0"

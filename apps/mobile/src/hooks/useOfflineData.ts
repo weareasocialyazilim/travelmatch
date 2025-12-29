@@ -198,7 +198,7 @@ export function useOfflineMutation<
             // also queue the action for later processing. Set queued state
             // synchronously so callers observe it immediately.
             setIsQueued(true);
-            const _id = await offlineSyncQueue.add(offlineActionType, params);
+            await offlineSyncQueue.add(offlineActionType, params);
             onSuccess?.();
             return null;
           }

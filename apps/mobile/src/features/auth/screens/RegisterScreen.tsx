@@ -114,7 +114,7 @@ export const RegisterScreen: React.FC = () => {
     }
   };
 
-  const handleDateChange = (event: any, date?: Date) => {
+  const handleDateChange = (_event: any, date?: Date) => {
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
     }

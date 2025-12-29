@@ -10,7 +10,8 @@ import { logger } from '../utils/logger';
 
 // Type assertion for File and Paths from expo-file-system SDK 54
 // These are new APIs that may not be in the type definitions yet
-interface ExpoFileSystemExtended {
+// Exported for potential use in other file operation modules
+export interface ExpoFileSystemExtended {
   File: new (path: string) => {
     readAsStringAsync: () => Promise<string>;
     downloadFromUrlAsync: (url: string) => Promise<void>;
@@ -20,11 +21,6 @@ interface ExpoFileSystemExtended {
     document: string;
   };
 }
-
-const FileSystemExtended = FileSystem as typeof FileSystem &
-  ExpoFileSystemExtended;
-const _File = FileSystemExtended.File;
-const _Paths = FileSystemExtended.Paths;
 
 // ArrayBuffer to Base64 conversion
 const encode = (buffer: ArrayBuffer): string => {

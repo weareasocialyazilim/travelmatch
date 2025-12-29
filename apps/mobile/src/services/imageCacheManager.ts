@@ -668,7 +668,7 @@ try {
 };
 
 (imageCacheManager as any).prefetchResponsiveVariants = async function (
-  uri: string,
+  _uri: string,
   cloudflareId?: string,
 ) {
   if (!cloudflareId) return;

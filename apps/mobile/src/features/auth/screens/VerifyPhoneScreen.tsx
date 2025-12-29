@@ -29,7 +29,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { email, phone, fullName } = route.params;
+  const { email: _email, phone, fullName: _fullName } = route.params;
   const { showToast } = useToast();
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [loading, setLoading] = useState(false);
@@ -50,6 +50,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
       );
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [resendCooldown]);
 
   const sendSmsCode = async () => {

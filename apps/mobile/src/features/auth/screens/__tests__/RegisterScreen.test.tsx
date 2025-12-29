@@ -85,6 +85,35 @@ jest.mock('../../../../utils/forms/helpers', () => ({
 }));
 
 jest.mock('../../../../constants/colors', () => ({
+  SHADOWS: {
+    card: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
+      elevation: 3,
+    },
+    modal: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 16,
+      elevation: 8,
+    },
+  },
+  primitives: {
+    stone: {
+      50: '#FAFAF9',
+      100: '#F5F5F4',
+      200: '#E7E5E4',
+      300: '#D6D3D1',
+      400: '#A8A29E',
+      500: '#78716C',
+    },
+    sand: {
+      200: '#E7E5E4',
+    },
+  },
   COLORS: {
     bg: {
       primary: '#FFFCF7',
@@ -107,6 +136,10 @@ jest.mock('../../../../constants/colors', () => ({
       error: '#EF4444',
       success: '#22C55E',
     },
+    trust: {
+      primary: '#10B981',
+      secondary: '#059669',
+    },
     utility: {
       white: '#FFFFFF',
     },
@@ -124,6 +157,22 @@ jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
+// Mock expo-localization to avoid ES module issue
+jest.mock('expo-localization', () => ({
+  getLocales: () => [{ languageCode: 'en', languageTag: 'en-US' }],
+  locale: 'en-US',
+}));
+
+// Mock I18nContext
+jest.mock('../../../../context/I18nContext', () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    setLanguage: jest.fn(),
+  }),
+  I18nProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Import component after all mocks

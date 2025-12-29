@@ -52,7 +52,7 @@ const DEFAULT_CONFIG: CircuitBreakerConfig = {
  */
 export class CircuitBreakerError extends Error {
   public readonly state: CircuitState;
-  public readonly name: string;
+  public override readonly name: string;
 
   constructor(circuitName: string, state: CircuitState) {
     super(`Circuit breaker "${circuitName}" is ${state}`);
@@ -231,7 +231,7 @@ export class CircuitBreaker {
   shouldTrip(error: Error): boolean {
     // Don't trip on client errors (4xx)
     // @ts-expect-error - status may exist on error object
-     
+
     const status: number | undefined = error.status || error.statusCode;
     if (status && status >= 400 && status < 500) {
       return false;

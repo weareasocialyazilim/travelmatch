@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
   Platform,
-   
   ActionSheetIOS,
   Alert,
 } from 'react-native';
@@ -78,7 +77,6 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     });
 
   const interests = watch('interests');
-  const _bio = watch('bio');
 
   const pickImage = async (useCamera: boolean) => {
     try {

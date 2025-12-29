@@ -206,6 +206,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
         // Native SDK v11 with New Architecture support
         RNMapboxMapsVersion: '11.17.0',
+<<<<<<< Updated upstream
       },
     ],
     [
@@ -235,6 +236,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'TravelMatch needs access to your photos to share travel moments.',
         cameraPermission:
           'TravelMatch needs camera access to capture travel moments.',
+=======
+>>>>>>> Stashed changes
       },
     ],
   ],

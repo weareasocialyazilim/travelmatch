@@ -5,11 +5,8 @@
 
 import { colors, type Colors } from './colors';
 import {
-  SPACING,
   spacing,
-  RADIUS,
   radius,
-  radii,
   SIZES,
   BORDER,
   shadows,
@@ -18,21 +15,14 @@ import {
   type Sizes,
   type Border,
   type Shadows,
-  type SpacingKey,
-  type RadiusKey,
-  type SizeKey,
-  type BorderKey,
 } from './spacing';
 import { typography, type Typography } from './typography';
 
 export { colors, type Colors } from './colors';
 export { typography, type Typography } from './typography';
 export {
-  SPACING,
   spacing,
-  RADIUS,
   radius,
-  radii,
   SIZES,
   BORDER,
   shadows,
@@ -41,10 +31,6 @@ export {
   type Sizes,
   type Border,
   type Shadows,
-  type SpacingKey,
-  type RadiusKey,
-  type SizeKey,
-  type BorderKey,
 } from './spacing';
 
 // Combined theme type

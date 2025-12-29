@@ -37,7 +37,7 @@ const getPasswordStrength = (password: string): StrengthResult => {
   // Complexity checks
   if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
   if (/\d/.test(password)) score += 1;
-  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+  if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) score += 1;
 
   // Cap at 4
   score = Math.min(score, 4);
@@ -47,18 +47,36 @@ const getPasswordStrength = (password: string): StrengthResult => {
     1: { labelKey: 'passwordStrength.weak', color: '#FF6B6B' },
     2: { labelKey: 'passwordStrength.fair', color: COLORS.feedback.warning },
     3: { labelKey: 'passwordStrength.strong', color: '#4ECDC4' },
-    4: { labelKey: 'passwordStrength.veryStrong', color: COLORS.feedback.success },
+    4: {
+      labelKey: 'passwordStrength.veryStrong',
+      color: COLORS.feedback.success,
+    },
   };
 
   return { score, ...strengthMap[score] };
 };
 
 const getRequirements = (password: string): Requirement[] => [
-  { labelKey: 'passwordStrength.requirements.minLength', met: password.length >= 8 },
-  { labelKey: 'passwordStrength.requirements.uppercase', met: /[A-Z]/.test(password) },
-  { labelKey: 'passwordStrength.requirements.lowercase', met: /[a-z]/.test(password) },
-  { labelKey: 'passwordStrength.requirements.number', met: /\d/.test(password) },
-  { labelKey: 'passwordStrength.requirements.special', met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) },
+  {
+    labelKey: 'passwordStrength.requirements.minLength',
+    met: password.length >= 8,
+  },
+  {
+    labelKey: 'passwordStrength.requirements.uppercase',
+    met: /[A-Z]/.test(password),
+  },
+  {
+    labelKey: 'passwordStrength.requirements.lowercase',
+    met: /[a-z]/.test(password),
+  },
+  {
+    labelKey: 'passwordStrength.requirements.number',
+    met: /\d/.test(password),
+  },
+  {
+    labelKey: 'passwordStrength.requirements.special',
+    met: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
+  },
 ];
 
 export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
@@ -87,7 +105,9 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
       {/* Strength Bar */}
       <View style={styles.barContainer}>
         <View style={styles.barBackground}>
-          <Animated.View style={[styles.barFill, barWidthStyle, barColorStyle]} />
+          <Animated.View
+            style={[styles.barFill, barWidthStyle, barColorStyle]}
+          />
         </View>
         {strength.labelKey && (
           <Text style={[styles.label, { color: strength.color }]}>

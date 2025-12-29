@@ -56,7 +56,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     ref={null}
     style={
       {
-        "color": "#1F2937",
+        "color": "#1C1917",
         "fontSize": 22,
         "fontWeight": "700",
         "marginBottom": 4,
@@ -78,7 +78,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     }
   >
     <RCTText
-      color="#6B7280"
+      color="#78716C"
       name="map-marker"
       ref={null}
       size={16}
@@ -90,7 +90,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 14,
         }
       }
@@ -114,7 +114,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgba(16, 185, 129, 0.12)",
+        "backgroundColor": "rgba(16, 185, 129, 0.15)",
         "borderRadius": 20,
         "flexDirection": "row",
         "gap": 6,
@@ -237,7 +237,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     ref={null}
     style={
       {
-        "color": "#1F2937",
+        "color": "#1C1917",
         "fontSize": 22,
         "fontWeight": "700",
         "marginBottom": 4,
@@ -259,7 +259,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     }
   >
     <RCTText
-      color="#6B7280"
+      color="#78716C"
       name="map-marker"
       ref={null}
       size={16}
@@ -271,7 +271,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       ref={null}
       style={
         {
-          "color": "#6B7280",
+          "color": "#78716C",
           "fontSize": 14,
         }
       }
@@ -295,7 +295,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgba(16, 185, 129, 0.12)",
+        "backgroundColor": "rgba(16, 185, 129, 0.15)",
         "borderRadius": 20,
         "flexDirection": "row",
         "gap": 6,

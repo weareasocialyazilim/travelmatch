@@ -128,6 +128,9 @@ describe('PaymentService - Webhook Failures', () => {
 
   describe('Webhook Timeout', () => {
     it('should timeout webhook processing after specified timeout', async () => {
+      // Use real timers for this test - fake timers don't work well with Promise.race patterns
+      jest.useRealTimers();
+
       const webhookEvent: WebhookEvent = {
         id: 'evt_123',
         type: 'payment_intent.succeeded',
@@ -140,15 +143,13 @@ describe('PaymentService - Webhook Failures', () => {
         },
       };
 
-      // Webhook with short timeout (50ms) while processing takes 100ms
-      const webhookPromise = handleWebhook(webhookEvent, 50);
-
-      // Advance time past the timeout but before processing completes
-      await jest.advanceTimersByTimeAsync(60);
-
-      await expect(webhookPromise).rejects.toThrow(
+      // Webhook with very short timeout (10ms) while processing takes 100ms
+      await expect(handleWebhook(webhookEvent, 10)).rejects.toThrow(
         'Webhook processing timeout',
       );
+
+      // Restore fake timers for other tests
+      jest.useFakeTimers();
     });
 
     it('should complete webhook processing before timeout', async () => {
@@ -310,7 +311,9 @@ describe('PaymentService - Webhook Failures', () => {
           } catch (error: unknown) {
             const errorMessage =
               error instanceof Error ? error.message : 'Unknown error';
-            mockLogger.warn(`Webhook attempt ${retry + 1} failed: ${errorMessage}`);
+            mockLogger.warn(
+              `Webhook attempt ${retry + 1} failed: ${errorMessage}`,
+            );
 
             if (retry < maxRetries) {
               const delay = 100 * Math.pow(2, retry); // 100, 200, 400ms
@@ -350,6 +353,9 @@ describe('PaymentService - Webhook Failures', () => {
     });
 
     it('should throw after max retries exceeded', async () => {
+      // Use real timers for this test - fake timers don't work well with Promise.race patterns
+      jest.useRealTimers();
+
       let attempts = 0;
 
       async function handleWebhookWithRetry(
@@ -362,7 +368,8 @@ describe('PaymentService - Webhook Failures', () => {
             return await processAttempt();
           } catch (error: unknown) {
             if (retry < maxRetries) {
-              const delay = 50 * Math.pow(2, retry);
+              // Use very short delays for testing
+              const delay = 1;
               await new Promise((resolve) => setTimeout(resolve, delay));
             } else {
               throw error;
@@ -377,14 +384,13 @@ describe('PaymentService - Webhook Failures', () => {
         throw new Error('Persistent failure');
       });
 
-      const resultPromise = handleWebhookWithRetry(mockProcess, 2);
-
-      // Advance through retry delays: 50ms, 100ms
-      await jest.advanceTimersByTimeAsync(50);
-      await jest.advanceTimersByTimeAsync(100);
-
-      await expect(resultPromise).rejects.toThrow('Persistent failure');
+      await expect(handleWebhookWithRetry(mockProcess, 2)).rejects.toThrow(
+        'Persistent failure',
+      );
       expect(attempts).toBe(3); // Initial + 2 retries
+
+      // Restore fake timers for other tests
+      jest.useFakeTimers();
     });
   });
 

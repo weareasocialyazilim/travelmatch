@@ -34,10 +34,6 @@ import { useToast } from '@/context/ToastContext';
 
 type MomentDetailRouteProp = RouteProp<RootStackParamList, 'MomentDetail'>;
 
-const HEADER_MAX_HEIGHT = 400;
-const HEADER_MIN_HEIGHT = 200;
-const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
-
 const MomentDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<MomentDetailRouteProp>();
@@ -141,17 +137,8 @@ const MomentDetailScreen: React.FC = () => {
   // Animation
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const _headerHeight = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
-    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
-    extrapolate: 'clamp',
-  });
-
-  const _imageOpacity = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-    outputRange: [1, 0.8, 0.5],
-    extrapolate: 'clamp',
-  });
+  // Header animations for potential future use
+  // Scroll-based transformations
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],

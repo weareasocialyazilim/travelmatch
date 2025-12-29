@@ -58,7 +58,7 @@ export class ErrorBoundary extends Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     const { onError, level = 'component' } = this.props;
 
     // Update state with error info
@@ -222,7 +222,7 @@ export class ErrorBoundary extends Component<
     }
   };
 
-  render(): ReactNode {
+  override render(): ReactNode {
     const { hasError, error } = this.state;
     const { children, fallback } = this.props;
 
