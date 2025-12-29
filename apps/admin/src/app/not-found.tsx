@@ -1,7 +1,15 @@
+'use client';
+
 import Link from 'next/link';
 import { FileQuestion, Home, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function NotFound() {
   return (
@@ -27,7 +35,11 @@ export default function NotFound() {
                 Ana Sayfa
               </Link>
             </Button>
-            <Button variant="outline" onClick={() => window.history.back()} className="flex-1">
+            <Button
+              variant="outline"
+              onClick={() => window.history.back()}
+              className="flex-1"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Geri Dön
             </Button>
