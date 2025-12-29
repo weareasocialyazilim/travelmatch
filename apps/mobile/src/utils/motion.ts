@@ -7,11 +7,6 @@
  * 1. Same physics everywhere (button, sheet, card)
  * 2. Haptics for "satisfaction" not "clicks"
  * 3. Shared element transitions for continuity
- *
- * Note: This module complements the existing animations.ts and haptics.ts
- * - Use SPRING configs for physics-based animations
- * - Use TIMING for duration-based animations
- * - Use HAPTIC for haptic feedback (wraps haptics.ts)
  */
 
 import { useCallback, useEffect } from 'react';
@@ -24,14 +19,10 @@ import {
   withDelay,
   withRepeat,
   Easing,
-  SharedValue as _SharedValue,
-  runOnJS as _runOnJS,
+  SharedValue,
+  runOnJS,
 } from 'react-native-reanimated';
-import {
-  triggerHaptic as _triggerHaptic,
-  HapticType,
-  smartHaptic,
-} from './haptics';
+import * as Haptics from 'expo-haptics';
 
 // ═══════════════════════════════════════════════════
 // SPRING CONFIGS - "Unified Physics"
@@ -66,7 +57,6 @@ export const SPRING = {
   },
 } as const;
 
-export type SpringType = keyof typeof SPRING;
 
 // ═══════════════════════════════════════════════════
 // TIMING
@@ -84,19 +74,20 @@ export const TIMING = {
   easeInOut: Easing.bezier(0.42, 0, 0.58, 1),
 } as const;
 
+
 // ═══════════════════════════════════════════════════
 // HAPTICS - "Satisfaction" feedback
-// Wraps existing haptics.ts for convenience
 // ═══════════════════════════════════════════════════
 export const HAPTIC = {
-  light: () => smartHaptic(HapticType.LIGHT),
-  medium: () => smartHaptic(HapticType.MEDIUM),
-  heavy: () => smartHaptic(HapticType.HEAVY),
-  success: () => smartHaptic(HapticType.SUCCESS),
-  error: () => smartHaptic(HapticType.ERROR),
-  warning: () => smartHaptic(HapticType.WARNING),
-  selection: () => smartHaptic(HapticType.SELECTION),
+  light: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+  medium: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
+  heavy: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy),
+  success: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
+  error: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error),
+  warning: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
+  selection: () => Haptics.selectionAsync(),
 } as const;
+
 
 // ═══════════════════════════════════════════════════
 // HOOKS
@@ -104,14 +95,13 @@ export const HAPTIC = {
 
 /**
  * Press animation for buttons/cards
- * Enhanced version with haptic feedback
  */
 export const usePressAnimation = (scaleValue = 0.96) => {
   const scale = useSharedValue(1);
 
   const onPressIn = useCallback(() => {
     scale.value = withSpring(scaleValue, SPRING.snappy);
-    void HAPTIC.light();
+    HAPTIC.light();
   }, [scale, scaleValue]);
 
   const onPressOut = useCallback(() => {
@@ -133,19 +123,16 @@ export const useFadeSlideUp = (delay = 0, translateY = 20) => {
   const translate = useSharedValue(translateY);
 
   useEffect(() => {
-    opacity.value = withDelay(
-      delay,
-      withTiming(1, { duration: TIMING.default }),
-    );
+    opacity.value = withDelay(delay, withTiming(1, { duration: TIMING.default }));
     translate.value = withDelay(delay, withSpring(0, SPRING.gentle));
-  }, [delay, opacity, translate, translateY]);
+  }, [delay, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
     transform: [{ translateY: translate.value }],
   }));
 
-  return { opacity, translate, animatedStyle };
+  return { animatedStyle };
 };
 
 /**
@@ -157,19 +144,16 @@ export const useStaggeredItem = (index: number, staggerDelay = 50) => {
 
   useEffect(() => {
     const delay = index * staggerDelay;
-    opacity.value = withDelay(
-      delay,
-      withTiming(1, { duration: TIMING.default }),
-    );
+    opacity.value = withDelay(delay, withTiming(1, { duration: TIMING.default }));
     translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
-  }, [index, opacity, staggerDelay, translateY]);
+  }, [index, staggerDelay]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
     transform: [{ translateY: translateY.value }],
   }));
 
-  return { opacity, translateY, animatedStyle };
+  return { animatedStyle };
 };
 
 /**
@@ -182,12 +166,12 @@ export const usePulse = (minScale = 1, maxScale = 1.03, duration = 2000) => {
     scale.value = withRepeat(
       withSequence(
         withTiming(maxScale, { duration }),
-        withTiming(minScale, { duration }),
+        withTiming(minScale, { duration })
       ),
       -1,
-      false,
+      false
     );
-  }, [duration, maxScale, minScale, scale]);
+  }, [minScale, maxScale, duration]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -207,24 +191,23 @@ export const useShimmer = (enabled = true) => {
       opacity.value = withRepeat(
         withSequence(
           withTiming(1, { duration: 800 }),
-          withTiming(0.5, { duration: 800 }),
+          withTiming(0.5, { duration: 800 })
         ),
         -1,
-        true,
+        true
       );
     }
-  }, [enabled, opacity]);
+  }, [enabled]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
   }));
 
-  return { opacity, animatedStyle };
+  return { animatedStyle };
 };
 
 /**
  * Shake animation for errors
- * Enhanced version with haptic feedback
  */
 export const useShake = () => {
   const translateX = useSharedValue(0);
@@ -235,16 +218,16 @@ export const useShake = () => {
       withTiming(8, { duration: 100 }),
       withTiming(-6, { duration: 100 }),
       withTiming(6, { duration: 100 }),
-      withTiming(0, { duration: 50 }),
+      withTiming(0, { duration: 50 })
     );
-    void HAPTIC.error();
-  }, [translateX]);
+    HAPTIC.error();
+  }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }));
 
-  return { translateX, shake, animatedStyle };
+  return { shake, animatedStyle };
 };
 
 /**
@@ -257,16 +240,16 @@ export const useSuccessBounce = () => {
     scale.value = withSequence(
       withSpring(1.15, SPRING.bouncy),
       withSpring(0.95, SPRING.snappy),
-      withSpring(1, SPRING.default),
+      withSpring(1, SPRING.default)
     );
-    void HAPTIC.success();
-  }, [scale]);
+    HAPTIC.success();
+  }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
-  return { scale, bounce, animatedStyle };
+  return { bounce, animatedStyle };
 };
 
 /**
@@ -279,14 +262,14 @@ export const useCleanSpark = () => {
   const spark = useCallback(() => {
     scale.value = withSequence(
       withTiming(1.2, { duration: 150 }),
-      withSpring(1, SPRING.bouncy),
+      withSpring(1, SPRING.bouncy)
     );
     sparkOpacity.value = withSequence(
       withTiming(1, { duration: 100 }),
-      withDelay(400, withTiming(0, { duration: 200 })),
+      withDelay(400, withTiming(0, { duration: 200 }))
     );
-    void HAPTIC.success();
-  }, [scale, sparkOpacity]);
+    HAPTIC.success();
+  }, []);
 
   const scaleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -296,129 +279,59 @@ export const useCleanSpark = () => {
     opacity: sparkOpacity.value,
   }));
 
-  return { scale, sparkOpacity, spark, scaleStyle, sparkStyle };
+  return { spark, scaleStyle, sparkStyle };
 };
 
 /**
  * Sheet slide up (bottom sheets)
  */
-export const useSheetAnimation = (initialTranslateY = 500) => {
-  const translateY = useSharedValue(initialTranslateY);
-  const backdropOpacity = useSharedValue(0);
+export const useSheetAnimation = () => {
+  const translateY = useSharedValue(500);
+  const opacity = useSharedValue(0);
 
   const open = useCallback(() => {
     translateY.value = withSpring(0, SPRING.gentle);
-    backdropOpacity.value = withTiming(1, { duration: TIMING.fast });
-  }, [backdropOpacity, translateY]);
+    opacity.value = withTiming(1, { duration: TIMING.fast });
+  }, []);
 
   const close = useCallback(() => {
-    translateY.value = withSpring(initialTranslateY, SPRING.gentle);
-    backdropOpacity.value = withTiming(0, { duration: TIMING.fast });
-  }, [backdropOpacity, initialTranslateY, translateY]);
+    translateY.value = withSpring(500, SPRING.gentle);
+    opacity.value = withTiming(0, { duration: TIMING.fast });
+  }, []);
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
 
   const backdropStyle = useAnimatedStyle(() => ({
-    opacity: backdropOpacity.value,
+    opacity: opacity.value,
   }));
 
-  return {
-    translateY,
-    backdropOpacity,
-    open,
-    close,
-    sheetStyle,
-    backdropStyle,
-  };
+  return { open, close, sheetStyle, backdropStyle };
 };
 
 /**
  * Card entrance for grids/lists
  */
-export const useCardEntrance = (index: number, staggerDelay = 50) => {
+export const useCardEntrance = (index: number) => {
   const translateY = useSharedValue(30);
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.95);
 
   useEffect(() => {
-    const delay = index * staggerDelay;
+    const delay = index * 50;
     translateY.value = withDelay(delay, withSpring(0, SPRING.gentle));
-    opacity.value = withDelay(
-      delay,
-      withTiming(1, { duration: TIMING.default }),
-    );
+    opacity.value = withDelay(delay, withTiming(1, { duration: TIMING.default }));
     scale.value = withDelay(delay, withSpring(1, SPRING.gentle));
-  }, [index, opacity, scale, staggerDelay, translateY]);
+  }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }, { scale: scale.value }],
+    transform: [
+      { translateY: translateY.value },
+      { scale: scale.value },
+    ],
     opacity: opacity.value,
   }));
 
-  return { translateY, opacity, scale, animatedStyle };
+  return { animatedStyle };
 };
-
-/**
- * Floating action button animation
- */
-export const useFABAnimation = () => {
-  const scale = useSharedValue(0);
-  const rotation = useSharedValue(0);
-
-  const show = useCallback(() => {
-    scale.value = withSpring(1, SPRING.bouncy);
-    rotation.value = withSpring(0, SPRING.default);
-  }, [rotation, scale]);
-
-  const hide = useCallback(() => {
-    scale.value = withSpring(0, SPRING.snappy);
-    rotation.value = withTiming(-90, { duration: TIMING.fast });
-  }, [rotation, scale]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }, { rotate: `${rotation.value}deg` }],
-  }));
-
-  return { scale, rotation, show, hide, animatedStyle };
-};
-
-/**
- * Loading skeleton pulse
- */
-export const useSkeletonPulse = () => {
-  const opacity = useSharedValue(0.3);
-
-  useEffect(() => {
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 800, easing: TIMING.easeInOut }),
-        withTiming(0.3, { duration: 800, easing: TIMING.easeInOut }),
-      ),
-      -1,
-      false,
-    );
-  }, [opacity]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
-  return { opacity, animatedStyle };
-};
-
-// ═══════════════════════════════════════════════════
-// UTILITY FUNCTIONS
-// ═══════════════════════════════════════════════════
-
-/**
- * Get spring config by type
- */
-export const getSpringConfig = (type: SpringType = 'default') => SPRING[type];
-
-/**
- * Create delayed animation sequence
- */
-export const createStaggeredDelay = (index: number, baseDelay = 50) =>
-  index * baseDelay;
