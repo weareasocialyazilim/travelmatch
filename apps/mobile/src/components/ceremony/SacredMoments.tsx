@@ -17,7 +17,7 @@
  * ```
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -70,7 +70,7 @@ interface SacredMomentsProps {
   testID?: string;
 }
 
-export const SacredMoments: React.FC<SacredMomentsProps> = ({
+export const SacredMoments = memo<SacredMomentsProps>(({
   children,
   enabled = true,
   onScreenshotAttempt,
@@ -111,11 +111,14 @@ export const SacredMoments: React.FC<SacredMomentsProps> = ({
     blurIntensity.value = withTiming(95, { duration: CEREMONY_TIMING.blurTransition });
 
     // Auto-unblur after delay
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       blurIntensity.value = withTiming(0, { duration: CEREMONY_TIMING.blurTransition });
       setIsBlurred(false);
     }, CEREMONY_TIMING.unblurDelay);
-  }, [onScreenshotAttempt]);
+
+    // Return cleanup function for use by caller if needed
+    return () => clearTimeout(timer);
+  }, [onScreenshotAttempt, blurIntensity]);
 
   const blurAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(blurIntensity.value, [0, 95], [0, 1]),
@@ -208,7 +211,9 @@ export const SacredMoments: React.FC<SacredMomentsProps> = ({
       )}
     </View>
   );
-};
+});
+
+SacredMoments.displayName = 'SacredMoments';
 
 const styles = StyleSheet.create({
   container: {

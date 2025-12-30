@@ -16,14 +16,14 @@
  * ```
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
 } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -132,7 +132,7 @@ interface ChecklistItemData {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════
 
-export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
+export const MomentAuthenticator = memo<MomentAuthenticatorProps>(({
   proofId,
   mediaUrls,
   location,
@@ -289,7 +289,19 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
 
   // Run authentication on mount
   useEffect(() => {
-    startAuthentication();
+    let isMounted = true;
+
+    const runAuth = async () => {
+      if (isMounted) {
+        await startAuthentication();
+      }
+    };
+
+    runAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, [proofId]);
 
   // Progress bar animated style
@@ -437,7 +449,9 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
       <View style={styles.content}>{renderPhaseContent()}</View>
     </View>
   );
-};
+});
+
+MomentAuthenticator.displayName = 'MomentAuthenticator';
 
 // ═══════════════════════════════════════════════════
 // SCANNING OVERLAY COMPONENT
@@ -449,7 +463,7 @@ interface ScanningOverlayProps {
   isScanning: boolean;
 }
 
-const ScanningOverlay: React.FC<ScanningOverlayProps> = ({
+const ScanningOverlay = memo<ScanningOverlayProps>(({
   imageUri,
   scanLineStyle,
   isScanning,
@@ -467,6 +481,10 @@ const ScanningOverlay: React.FC<ScanningOverlayProps> = ({
         true
       );
     }
+    return () => {
+      // Reset animation on cleanup
+      pulseOpacity.value = 0.2;
+    };
   }, [isScanning, pulseOpacity]);
 
   const pulseStyle = useAnimatedStyle(() => ({
@@ -475,7 +493,7 @@ const ScanningOverlay: React.FC<ScanningOverlayProps> = ({
 
   return (
     <View style={styles.scanContainer}>
-      <Image source={{ uri: imageUri }} style={styles.scanImage} />
+      <Image source={{ uri: imageUri }} style={styles.scanImage} contentFit="cover" transition={200} />
 
       {/* Pulsing overlay */}
       {isScanning && (
@@ -515,7 +533,9 @@ const ScanningOverlay: React.FC<ScanningOverlayProps> = ({
       )}
     </View>
   );
-};
+});
+
+ScanningOverlay.displayName = 'ScanningOverlay';
 
 // ═══════════════════════════════════════════════════
 // CORNER BRACKET COMPONENT
@@ -525,7 +545,7 @@ interface CornerBracketProps {
   position: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 }
 
-const CornerBracket: React.FC<CornerBracketProps> = ({ position }) => {
+const CornerBracket = memo<CornerBracketProps>(({ position }) => {
   const positionStyles = {
     topLeft: { top: 0, left: 0 },
     topRight: { top: 0, right: 0, transform: [{ rotate: '90deg' }] },
@@ -539,7 +559,9 @@ const CornerBracket: React.FC<CornerBracketProps> = ({ position }) => {
       <View style={styles.bracketV} />
     </View>
   );
-};
+});
+
+CornerBracket.displayName = 'CornerBracket';
 
 // ═══════════════════════════════════════════════════
 // ANALYZING VIEW COMPONENT
@@ -551,7 +573,7 @@ interface AnalyzingViewProps {
   location?: { lat: number; lng: number; name: string };
 }
 
-const AnalyzingView: React.FC<AnalyzingViewProps> = ({
+const AnalyzingView = memo<AnalyzingViewProps>(({
   checklistItems,
   expectedMoment,
   location,
@@ -579,7 +601,9 @@ const AnalyzingView: React.FC<AnalyzingViewProps> = ({
       ))}
     </View>
   </Animated.View>
-);
+));
+
+AnalyzingView.displayName = 'AnalyzingView';
 
 // ═══════════════════════════════════════════════════
 // CHECKLIST ITEM COMPONENT
@@ -592,7 +616,7 @@ interface ChecklistItemProps {
   delay: number;
 }
 
-const ChecklistItem: React.FC<ChecklistItemProps> = ({
+const ChecklistItem = memo<ChecklistItemProps>(({
   id,
   label,
   checked,
@@ -603,6 +627,9 @@ const ChecklistItem: React.FC<ChecklistItemProps> = ({
 
   useEffect(() => {
     opacity.value = withDelay(delay, withTiming(1, { duration: 300 }));
+    return () => {
+      opacity.value = 0;
+    };
   }, [delay, opacity]);
 
   useEffect(() => {
@@ -610,6 +637,9 @@ const ChecklistItem: React.FC<ChecklistItemProps> = ({
       checkScale.value = withSpring(1, { damping: 8 });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+    return () => {
+      checkScale.value = 0;
+    };
   }, [checked, checkScale]);
 
   const containerStyle = useAnimatedStyle(() => ({
@@ -646,13 +676,15 @@ const ChecklistItem: React.FC<ChecklistItemProps> = ({
       </Text>
     </Animated.View>
   );
-};
+});
+
+ChecklistItem.displayName = 'ChecklistItem';
 
 // ═══════════════════════════════════════════════════
 // VERIFYING VIEW COMPONENT
 // ═══════════════════════════════════════════════════
 
-const VerifyingView: React.FC = () => {
+const VerifyingView = memo(() => {
   const pulseScale = useSharedValue(1);
 
   useEffect(() => {
@@ -664,6 +696,9 @@ const VerifyingView: React.FC = () => {
       -1,
       true
     );
+    return () => {
+      pulseScale.value = 1;
+    };
   }, [pulseScale]);
 
   const pulseStyle = useAnimatedStyle(() => ({
@@ -687,7 +722,9 @@ const VerifyingView: React.FC = () => {
       <Text style={styles.verifyingText}>Son doğrulama yapılıyor...</Text>
     </View>
   );
-};
+});
+
+VerifyingView.displayName = 'VerifyingView';
 
 // ═══════════════════════════════════════════════════
 // SUCCESS VIEW COMPONENT
@@ -697,7 +734,7 @@ interface SuccessViewProps {
   confidence?: number;
 }
 
-const SuccessView: React.FC<SuccessViewProps> = ({ confidence }) => {
+const SuccessView = memo<SuccessViewProps>(({ confidence }) => {
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, []);
@@ -719,7 +756,9 @@ const SuccessView: React.FC<SuccessViewProps> = ({ confidence }) => {
       )}
     </Animated.View>
   );
-};
+});
+
+SuccessView.displayName = 'SuccessView';
 
 // ═══════════════════════════════════════════════════
 // REJECTION VIEW COMPONENT
@@ -731,7 +770,7 @@ interface RejectionViewProps {
   onRetry: () => void;
 }
 
-const RejectionView: React.FC<RejectionViewProps> = ({
+const RejectionView = memo<RejectionViewProps>(({
   reasons,
   suggestions,
   onRetry,
@@ -777,7 +816,9 @@ const RejectionView: React.FC<RejectionViewProps> = ({
       <Text style={styles.retryText}>Tekrar Dene</Text>
     </TouchableOpacity>
   </Animated.View>
-);
+));
+
+RejectionView.displayName = 'RejectionView';
 
 // ═══════════════════════════════════════════════════
 // NEEDS REVIEW VIEW COMPONENT
@@ -788,7 +829,7 @@ interface NeedsReviewViewProps {
   onRequestManualReview?: () => void;
 }
 
-const NeedsReviewView: React.FC<NeedsReviewViewProps> = ({
+const NeedsReviewView = memo<NeedsReviewViewProps>(({
   reasons,
   onRequestManualReview,
 }) => (
@@ -827,7 +868,9 @@ const NeedsReviewView: React.FC<NeedsReviewViewProps> = ({
       </TouchableOpacity>
     )}
   </Animated.View>
-);
+));
+
+NeedsReviewView.displayName = 'NeedsReviewView';
 
 // ═══════════════════════════════════════════════════
 // UTILITY FUNCTION
