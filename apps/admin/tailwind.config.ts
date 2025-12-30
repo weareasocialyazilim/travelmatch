@@ -1,6 +1,15 @@
 import type { Config } from 'tailwindcss';
+// @ts-ignore - design-system exports preset but types aren't built
+import designSystemPreset from '../../packages/design-system/src/tailwind.preset';
+
+/**
+ * TravelMatch Admin Panel - Tailwind Config
+ * Extends the shared design system preset for brand consistency
+ * "Sunset Proof Palette" - Amber primary, Magenta secondary
+ */
 
 const config: Config = {
+  presets: [designSystemPreset as Config],
   darkMode: ['class'],
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -17,6 +26,7 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // shadcn/ui CSS variable-based colors (for component compatibility)
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -50,19 +60,20 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // TravelMatch brand colors
+        // TravelMatch brand colors - Sunset Proof Palette (Amber)
+        // Aligned with packages/design-system/src/tokens/colors.ts
         travelmatch: {
-          50: '#fdf4f3',
-          100: '#fce7e4',
-          200: '#fad3ce',
-          300: '#f5b4ab',
-          400: '#ed897b',
-          500: '#e16652',
-          600: '#cd4933',
-          700: '#ac3a27',
-          800: '#8e3324',
-          900: '#763024',
-          950: '#40150f',
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: '#F59E0B',
+          600: '#D97706',
+          700: '#B45309',
+          800: '#92400E',
+          900: '#78350F',
+          950: '#451A03',
         },
         success: {
           DEFAULT: 'hsl(var(--success))',
