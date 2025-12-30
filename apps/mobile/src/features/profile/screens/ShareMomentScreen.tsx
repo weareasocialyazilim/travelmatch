@@ -241,8 +241,7 @@ export const ShareMomentScreen: React.FC = () => {
         <View style={styles.previewCard}>
           <Image
             source={{
-              uri:
-                displayMoment.images?.[0] || 'https://via.placeholder.com/400',
+              uri: displayMoment.images?.[0] || '',
             }}
             style={styles.previewImage}
           />

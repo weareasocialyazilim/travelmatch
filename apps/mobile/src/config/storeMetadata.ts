@@ -106,11 +106,12 @@ export const STORE_METADATA = {
   ],
 
   // Screenshots Requirements
+  // Dimensions per Apple App Store requirements (Dec 2025)
   screenshotRequirements: {
     ios: {
-      'iPhone 6.7"': { width: 1290, height: 2796, required: true },
-      'iPhone 6.5"': { width: 1284, height: 2778, required: true },
-      'iPhone 5.5"': { width: 1242, height: 2208, required: true },
+      'iPhone 6.7"': { width: 1290, height: 2796, required: true }, // iPhone 15 Pro Max
+      'iPhone 6.5"': { width: 1242, height: 2688, required: true }, // iPhone 11 Pro Max
+      'iPhone 5.5"': { width: 1242, height: 2208, required: true }, // iPhone 8 Plus
       'iPad Pro 12.9"': { width: 2048, height: 2732, required: false },
     },
     android: {

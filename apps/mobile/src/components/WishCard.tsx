@@ -145,8 +145,7 @@ export const WishCard: React.FC<WishCardProps> = memo(
                   >
                     <OptimizedImage
                       source={{
-                        uri:
-                          wish.user.avatar || 'https://via.placeholder.com/40',
+                        uri: wish.user.avatar || '',
                       }}
                       style={styles.avatar}
                       contentFit="cover"

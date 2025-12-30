@@ -174,7 +174,7 @@ const MessagesScreen: React.FC = () => {
         <View style={styles.avatarContainer}>
           <Image
             source={{
-              uri: item.participantAvatar || 'https://via.placeholder.com/100',
+              uri: item.participantAvatar || '',
             }}
             style={styles.avatar}
             accessibilityLabel={`${item.participantName || 'User'}'s avatar`}

@@ -58,7 +58,7 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = memo(
 
     // Memoize avatar source
     const avatarSource = useMemo(
-      () => ({ uri: senderAvatar || 'https://via.placeholder.com/40' }),
+      () => ({ uri: senderAvatar || '' }),
       [senderAvatar],
     );
 

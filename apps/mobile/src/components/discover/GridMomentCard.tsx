@@ -36,7 +36,7 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
             <View style={styles.gridCreatorRow}>
               <OptimizedImage
                 source={{
-                  uri: item.user?.avatar || 'https://via.placeholder.com/24',
+                  uri: item.user?.avatar || '',
                 }}
                 style={styles.gridAvatar}
                 contentFit="cover"

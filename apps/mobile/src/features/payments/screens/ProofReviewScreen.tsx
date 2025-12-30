@@ -234,7 +234,7 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
         <View style={styles.receiverCard}>
           <Image
             source={{
-              uri: receiverAvatar || 'https://via.placeholder.com/100',
+              uri: receiverAvatar || '',
             }}
             style={styles.receiverAvatar}
           />

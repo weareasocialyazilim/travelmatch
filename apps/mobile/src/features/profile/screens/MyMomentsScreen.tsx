@@ -59,8 +59,8 @@ const MyMomentsScreen: React.FC = () => {
       id: moment.id,
       title: moment.title,
       story: moment.description || `Experience ${moment.title}`,
-      imageUrl: moment.images?.[0] || 'https://via.placeholder.com/150',
-      image: moment.images?.[0] || 'https://via.placeholder.com/150',
+      imageUrl: moment.images?.[0] || '',
+      image: moment.images?.[0] || '',
       price: moment.pricePerGuest,
       status: moment.status,
       location: {
