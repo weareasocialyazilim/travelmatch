@@ -43,7 +43,7 @@ import type {
 } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
-import { PALETTE } from '../../../constants/colors';
+import { PALETTE, COLORS, primitives } from '../../../constants/colors';
 import { TYPE_SCALE } from '../../../theme/typography';
 import { SPRINGS, TIMINGS } from '../../../hooks/useAnimations';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -80,7 +80,7 @@ const SLIDES: OnboardingSlideData[] = [
     id: '1',
     emoji: '\u2615', // Coffee emoji
     emojiSize: 120,
-    gradientColors: ['#F97316', '#FB923C', '#0C0A09'] as const,
+    gradientColors: [COLORS.orange, COLORS.orangeBright, primitives.stone[950]] as const,
     floatingElements: [
       { emoji: '\u2728', position: { top: 15, left: 10 }, scale: 1.2, rotation: -15 },
       { emoji: '\u{1F9E1}', position: { top: 25, left: 80 }, scale: 0.8, rotation: 10 },
@@ -91,7 +91,7 @@ const SLIDES: OnboardingSlideData[] = [
     id: '2',
     emoji: '\u{1F31F}', // Star emoji
     emojiSize: 100,
-    gradientColors: ['#A855F7', '#C084FC', '#0C0A09'] as const,
+    gradientColors: [primitives.purple[500], primitives.purple[400], primitives.stone[950]] as const,
     floatingElements: [
       { emoji: '\u{1F4AB}', position: { top: 20, left: 15 }, scale: 1, rotation: 20 },
       { emoji: '\u2B50', position: { top: 35, left: 75 }, scale: 1.1, rotation: -10 },
@@ -102,7 +102,7 @@ const SLIDES: OnboardingSlideData[] = [
     id: '3',
     emoji: '\u{1F381}', // Gift emoji
     emojiSize: 110,
-    gradientColors: ['#F43F5E', '#FB7185', '#0C0A09'] as const,
+    gradientColors: [primitives.magenta[500], primitives.magenta[400], primitives.stone[950]] as const,
     floatingElements: [
       { emoji: '\u{1F49D}', position: { top: 18, left: 20 }, scale: 0.9, rotation: -12 },
       { emoji: '\u{1F389}', position: { top: 40, left: 78 }, scale: 1, rotation: 15 },
@@ -113,7 +113,7 @@ const SLIDES: OnboardingSlideData[] = [
     id: '4',
     emoji: '\u{1F510}', // Lock emoji
     emojiSize: 100,
-    gradientColors: ['#10B981', '#34D399', '#0C0A09'] as const,
+    gradientColors: [primitives.emerald[500], primitives.emerald[400], primitives.stone[950]] as const,
     floatingElements: [
       { emoji: '\u{1F6E1}', position: { top: 22, left: 12 }, scale: 1.1, rotation: 8 },
       { emoji: '\u2713', position: { top: 38, left: 82 }, scale: 0.9, rotation: -5 },
@@ -124,7 +124,7 @@ const SLIDES: OnboardingSlideData[] = [
     id: '5',
     emoji: '\u{1F680}', // Rocket emoji
     emojiSize: 120,
-    gradientColors: ['#3B82F6', '#60A5FA', '#0C0A09'] as const,
+    gradientColors: [primitives.blue[500], primitives.blue[400], primitives.stone[950]] as const,
     floatingElements: [
       { emoji: '\u{1F30D}', position: { top: 20, left: 15 }, scale: 1.2, rotation: -10 },
       { emoji: '\u2764', position: { top: 45, left: 80 }, scale: 1, rotation: 15 },
@@ -369,7 +369,14 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         </View>
 
         {/* CTA Button */}
-        <Pressable onPress={handleNext} style={styles.ctaButton}>
+        <Pressable
+          onPress={handleNext}
+          style={styles.ctaButton}
+          accessible={true}
+          accessibilityLabel={currentIndex === SLIDES.length - 1 ? 'Başla' : 'Devam et'}
+          accessibilityRole="button"
+          accessibilityHint={currentIndex === SLIDES.length - 1 ? 'Uygulamaya başlar' : 'Bir sonraki ekrana geçer'}
+        >
           <LinearGradient
             colors={['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)']}
             style={styles.ctaGradient}
@@ -393,7 +400,14 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
         {/* Skip Link */}
         {currentIndex < SLIDES.length - 1 && (
-          <Pressable style={styles.skipLink} onPress={handleSkip}>
+          <Pressable
+            style={styles.skipLink}
+            onPress={handleSkip}
+            accessible={true}
+            accessibilityLabel="Tanıtımı atla"
+            accessibilityRole="button"
+            accessibilityHint="Tanıtımı atlayarak hoş geldiniz ekranına gider"
+          >
             <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
           </Pressable>
         )}
