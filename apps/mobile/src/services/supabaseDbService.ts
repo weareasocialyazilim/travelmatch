@@ -88,16 +88,23 @@ export const usersService = {
 
     try {
       // SECURITY: Explicit column selection for user data
-      // Include aggregate counts for moments, followers, following and reviews
+      // Use correct column names matching database schema
       const { data, error } = await supabase
         .from('users')
         .select(
           `
-          id, email, name, avatar_url, bio, location, public_key, created_at, updated_at,
-          moments_count:moments!user_id(count),
-          followers_count:follows!following_id(count),
-          following_count:follows!follower_id(count),
-          reviews_count:reviews!reviewed_user_id(count)
+          id,
+          email,
+          full_name,
+          avatar_url,
+          location,
+          public_key,
+          kyc_status,
+          verified,
+          rating,
+          review_count,
+          created_at,
+          updated_at
         `,
         )
         .eq('id', id)
@@ -1502,12 +1509,14 @@ export const transactionsService = {
           const authRes = await supabase.auth.getUser();
           user = authRes?.data?.user ?? null;
         }
-      } catch {
+      } catch (authError) {
         // If auth lookup fails (e.g., not mocked), proceed without user enforcement
+        logger.warn('[DB] Auth lookup failed for transaction get', { authError });
         user = null;
       }
 
       // SECURITY: Explicit column selection - never use select('*')
+      // Note: sender_id/receiver_id removed - these columns don't exist in transactions table
       const { data, error } = await supabase
         .from('transactions')
         .select(
@@ -1521,8 +1530,6 @@ export const transactionsService = {
           created_at,
           metadata,
           moment_id,
-          sender_id,
-          receiver_id,
           user_id
         `,
         )

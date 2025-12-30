@@ -57,6 +57,9 @@ function isValidPayTRSource(req: Request): boolean {
 // MAIN HANDLER
 // =============================================================================
 
+// Maximum age for webhook timestamp (5 minutes) - prevents replay attacks
+const MAX_WEBHOOK_AGE_SECONDS = 300;
+
 serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -95,6 +98,34 @@ serve(async (req: Request) => {
       card_brand: formData.get('card_brand') as string,
       card_bank: formData.get('card_bank') as string,
     };
+
+    // SECURITY: Timestamp verification to prevent replay attacks
+    // Extract timestamp from merchant_oid (format: USERID_GIFTID_TIMESTAMP)
+    const oidParts = payload.merchant_oid?.split('_') || [];
+    const webhookTimestamp = oidParts.length >= 3 ? parseInt(oidParts[oidParts.length - 1], 10) : 0;
+    const now = Math.floor(Date.now() / 1000);
+
+    if (webhookTimestamp > 0 && Math.abs(now - webhookTimestamp) > MAX_WEBHOOK_AGE_SECONDS) {
+      logger.error('PayTR Webhook timestamp expired - possible replay attack', {
+        merchant_oid: payload.merchant_oid,
+        webhookTimestamp,
+        now,
+        age: Math.abs(now - webhookTimestamp),
+      });
+
+      // Log security event
+      await adminClient.from('security_logs').insert({
+        event_type: 'webhook_replay_attempt',
+        event_status: 'failure',
+        event_details: {
+          merchant_oid: payload.merchant_oid,
+          age_seconds: Math.abs(now - webhookTimestamp),
+        },
+        ip_address: req.headers.get('x-forwarded-for') || null,
+      });
+
+      return new Response('Timestamp expired', { status: 400, headers: corsHeaders });
+    }
 
     logger.info('PayTR Webhook received:', {
       merchant_oid: payload.merchant_oid,
