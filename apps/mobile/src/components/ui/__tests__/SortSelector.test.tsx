@@ -38,7 +38,7 @@ describe('SortSelector Component', () => {
 
   describe('Basic Rendering', () => {
     it('renders when visible is true', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -47,7 +47,7 @@ describe('SortSelector Component', () => {
     });
 
     it('does not render content when visible is false', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { queryByText } = render(
         <SortSelector visible={false} onClose={onClose} />,
       );
@@ -57,7 +57,7 @@ describe('SortSelector Component', () => {
     });
 
     it('renders all sort options', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -70,7 +70,7 @@ describe('SortSelector Component', () => {
     });
 
     it('renders with required props only', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -85,7 +85,7 @@ describe('SortSelector Component', () => {
 
   describe('Selected State', () => {
     it('shows recent as selected by default', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       mockUseSearchStore.mockReturnValue({
         sortBy: 'recent',
         setSortBy: mockSetSortBy,
@@ -100,7 +100,7 @@ describe('SortSelector Component', () => {
     });
 
     it('shows popular as selected when sortBy is popular', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       mockUseSearchStore.mockReturnValue({
         sortBy: 'popular',
         setSortBy: mockSetSortBy,
@@ -114,7 +114,7 @@ describe('SortSelector Component', () => {
     });
 
     it('shows price-low as selected', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       mockUseSearchStore.mockReturnValue({
         sortBy: 'price-low',
         setSortBy: mockSetSortBy,
@@ -128,7 +128,7 @@ describe('SortSelector Component', () => {
     });
 
     it('shows price-high as selected', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       mockUseSearchStore.mockReturnValue({
         sortBy: 'price-high',
         setSortBy: mockSetSortBy,
@@ -142,7 +142,7 @@ describe('SortSelector Component', () => {
     });
 
     it('shows rating as selected', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       mockUseSearchStore.mockReturnValue({
         sortBy: 'rating',
         setSortBy: mockSetSortBy,
@@ -162,7 +162,7 @@ describe('SortSelector Component', () => {
 
   describe('Selection', () => {
     it('calls setSortBy when option selected', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -173,8 +173,8 @@ describe('SortSelector Component', () => {
     });
 
     it('calls onSelect callback when option selected', () => {
-      const onClose = jest.fn();
-      const onSelect = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
@@ -185,7 +185,7 @@ describe('SortSelector Component', () => {
     });
 
     it('calls onClose after selection', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -196,7 +196,7 @@ describe('SortSelector Component', () => {
     });
 
     it('selects recent option', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -207,7 +207,7 @@ describe('SortSelector Component', () => {
     });
 
     it('selects price-low option', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -218,7 +218,7 @@ describe('SortSelector Component', () => {
     });
 
     it('selects price-high option', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -229,7 +229,7 @@ describe('SortSelector Component', () => {
     });
 
     it('selects rating option', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -246,7 +246,7 @@ describe('SortSelector Component', () => {
 
   describe('Modal Behavior', () => {
     it('calls onClose when overlay pressed', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { UNSAFE_root } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -263,7 +263,7 @@ describe('SortSelector Component', () => {
     });
 
     it('calls onClose on modal request close', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { UNSAFE_root } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -278,7 +278,7 @@ describe('SortSelector Component', () => {
     });
 
     it('renders with transparent background', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { UNSAFE_root } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -288,7 +288,7 @@ describe('SortSelector Component', () => {
     });
 
     it('uses fade animation', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { UNSAFE_root } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -304,7 +304,7 @@ describe('SortSelector Component', () => {
 
   describe('Callbacks', () => {
     it('works without onSelect callback', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -315,8 +315,8 @@ describe('SortSelector Component', () => {
     });
 
     it('calls all handlers in correct order', () => {
-      const onClose = jest.fn();
-      const onSelect = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
@@ -329,8 +329,8 @@ describe('SortSelector Component', () => {
     });
 
     it('passes correct value to onSelect', () => {
-      const onClose = jest.fn();
-      const onSelect = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
@@ -347,7 +347,7 @@ describe('SortSelector Component', () => {
 
   describe('Multiple Selections', () => {
     it('handles selecting same option twice', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText, rerender } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -366,7 +366,7 @@ describe('SortSelector Component', () => {
     });
 
     it('handles changing selection', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText, rerender } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -396,7 +396,7 @@ describe('SortSelector Component', () => {
 
   describe('Visual State', () => {
     it('renders title', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -405,7 +405,7 @@ describe('SortSelector Component', () => {
     });
 
     it('renders all option labels', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -424,7 +424,7 @@ describe('SortSelector Component', () => {
     });
 
     it('renders icons for all options', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { UNSAFE_root } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -444,7 +444,7 @@ describe('SortSelector Component', () => {
 
   describe('Edge Cases', () => {
     it('handles rapid selection changes', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -459,7 +459,7 @@ describe('SortSelector Component', () => {
     });
 
     it('handles visibility toggle', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText, rerender } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -473,7 +473,7 @@ describe('SortSelector Component', () => {
     });
 
     it('maintains selected state across visibility changes', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       mockUseSearchStore.mockReturnValue({
         sortBy: 'popular',
         setSortBy: mockSetSortBy,
@@ -498,8 +498,8 @@ describe('SortSelector Component', () => {
 
   describe('Integration', () => {
     it('works with all sort options in sequence', () => {
-      const onClose = jest.fn();
-      const onSelect = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText, rerender } = render(
         <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
@@ -530,7 +530,7 @@ describe('SortSelector Component', () => {
     });
 
     it('integrates with store updates', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText, rerender } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -555,7 +555,7 @@ describe('SortSelector Component', () => {
 
   describe('Real-World Use Cases', () => {
     it('renders search results sort menu', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );
@@ -566,8 +566,8 @@ describe('SortSelector Component', () => {
     });
 
     it('handles user sorting by price', () => {
-      const onClose = jest.fn();
-      const onSelect = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
@@ -580,8 +580,8 @@ describe('SortSelector Component', () => {
     });
 
     it('handles user sorting by rating', () => {
-      const onClose = jest.fn();
-      const onSelect = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SortSelector visible={true} onClose={onClose} onSelect={onSelect} />,
       );
@@ -594,7 +594,7 @@ describe('SortSelector Component', () => {
     });
 
     it('closes on overlay tap (dismissal)', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { UNSAFE_root } = render(
         <SortSelector visible={true} onClose={onClose} />,
       );

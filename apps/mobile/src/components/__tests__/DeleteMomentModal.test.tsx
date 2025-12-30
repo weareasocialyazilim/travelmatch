@@ -8,8 +8,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { DeleteMomentModal } from '../DeleteMomentModal';
 
 describe('DeleteMomentModal', () => {
-  const mockOnCancel = jest.fn();
-  const mockOnDelete = jest.fn();
+  const mockOnCancel = jest.fn() as jest.Mock;
+  const mockOnDelete = jest.fn() as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -231,8 +231,8 @@ describe('DeleteMomentModal', () => {
 
   describe('Edge Cases', () => {
     it('works with different callback functions', () => {
-      const customOnCancel = jest.fn();
-      const customOnDelete = jest.fn();
+      const customOnCancel = jest.fn() as jest.Mock;
+      const customOnDelete = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <DeleteMomentModal

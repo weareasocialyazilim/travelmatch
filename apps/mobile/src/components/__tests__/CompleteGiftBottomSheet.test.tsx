@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { CompleteGiftBottomSheet } from '../CompleteGiftBottomSheet';
 
 describe('CompleteGiftBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnComplete = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnComplete = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

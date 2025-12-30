@@ -465,7 +465,7 @@ describe('ControlledInput', () => {
     });
 
     it('should handle empty submit', async () => {
-      const onSubmit = jest.fn();
+      const onSubmit = jest.fn() as jest.Mock;
       const { getByTestId } = render(<TestForm onSubmit={onSubmit} />);
 
       const emailInput = getByTestId('email-input');
@@ -504,7 +504,7 @@ describe('ControlledInput', () => {
 
   describe('Performance', () => {
     it('should not cause unnecessary re-renders', () => {
-      const onSubmit = jest.fn();
+      const onSubmit = jest.fn() as jest.Mock;
       const { rerender } = render(<TestForm onSubmit={onSubmit} />);
 
       // Re-render with same props

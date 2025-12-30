@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { AddCardBottomSheet } from '../AddCardBottomSheet';
 
 describe('AddCardBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnAddCard = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnAddCard = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

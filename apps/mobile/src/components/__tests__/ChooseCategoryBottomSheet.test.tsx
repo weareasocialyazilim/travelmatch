@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { ChooseCategoryBottomSheet } from '../ChooseCategoryBottomSheet';
 
 describe('ChooseCategoryBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSelectCategory = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnSelectCategory = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

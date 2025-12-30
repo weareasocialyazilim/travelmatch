@@ -17,11 +17,11 @@ jest.mock('../../theme/typography', () => ({
 }));
 
 describe('PendingTransactionsModal', () => {
-  const mockOnResumePayment = jest.fn();
-  const mockOnResumeUpload = jest.fn();
-  const mockOnDismissPayment = jest.fn();
-  const mockOnDismissUpload = jest.fn();
-  const mockOnClose = jest.fn();
+  const mockOnResumePayment = jest.fn() as jest.Mock;
+  const mockOnResumeUpload = jest.fn() as jest.Mock;
+  const mockOnDismissPayment = jest.fn() as jest.Mock;
+  const mockOnDismissUpload = jest.fn() as jest.Mock;
+  const mockOnClose = jest.fn() as jest.Mock;
 
   const samplePayment: PendingPayment = {
     id: 'payment-1',

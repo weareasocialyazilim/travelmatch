@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { AddBankAccountBottomSheet } from '../AddBankAccountBottomSheet';
 
 describe('AddBankAccountBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSave = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnSave = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,
@@ -77,7 +77,7 @@ describe('AddBankAccountBottomSheet', () => {
       const MaterialCommunityIcons = require('@expo/vector-icons').MaterialCommunityIcons;
       const icons = UNSAFE_queryAllByType(MaterialCommunityIcons);
       
-      const lockIcon = icons.find((icon) => icon.props.name === 'lock');
+      const lockIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'lock');
       expect(lockIcon).toBeTruthy();
     });
 

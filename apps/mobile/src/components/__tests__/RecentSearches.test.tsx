@@ -6,9 +6,9 @@ import { RecentSearches } from '../RecentSearches';
 
 describe('RecentSearches', () => {
   const mockItems = ['coffee shops in Paris', 'best restaurants', 'museums'];
-  const mockOnSelect = jest.fn();
-  const mockOnRemove = jest.fn();
-  const mockOnClearAll = jest.fn();
+  const mockOnSelect = jest.fn() as jest.Mock;
+  const mockOnRemove = jest.fn() as jest.Mock;
+  const mockOnClearAll = jest.fn() as jest.Mock;
 
   const defaultProps = {
     items: mockItems,

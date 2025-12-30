@@ -20,9 +20,9 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 describe('BlockConfirmation', () => {
-  const mockOnClose = jest.fn();
-  const mockOnBlocked = jest.fn();
-  const mockShowToast = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnBlocked = jest.fn() as jest.Mock;
+  const mockShowToast = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

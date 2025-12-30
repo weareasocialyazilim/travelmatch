@@ -26,7 +26,7 @@ describe('FilterPill', () => {
     icon: 'coffee',
   };
 
-  const mockOnPress = jest.fn();
+  const mockOnPress = jest.fn() as jest.Mock;
 
   const defaultProps = {
     filter: mockFilter,

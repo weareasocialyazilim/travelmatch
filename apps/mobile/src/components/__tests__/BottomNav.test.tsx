@@ -13,7 +13,7 @@ import { render, fireEvent } from '@testing-library/react-native';
 import BottomNav from '../BottomNav';
 
 // Mock navigation
-const mockNavigate = jest.fn();
+const mockNavigate = jest.fn() as jest.Mock;
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockNavigate,

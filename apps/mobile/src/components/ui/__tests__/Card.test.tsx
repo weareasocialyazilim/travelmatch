@@ -133,7 +133,7 @@ describe('Card Component', () => {
     });
 
     it('prevents interaction when disabled', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Card testID="disabled-interact-card" onPress={onPress} disabled>
           <Text>Disabled</Text>

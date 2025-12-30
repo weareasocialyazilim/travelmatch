@@ -143,7 +143,7 @@ describe.skip('Button Component - Enhanced Tests', () => {
 
   describe('Interactions', () => {
     it('should call onPress when pressed', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <Button title="Press Me" onPress={onPress} />
       );
@@ -153,7 +153,7 @@ describe.skip('Button Component - Enhanced Tests', () => {
     });
 
     it('should not call onPress when disabled', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <Button title="Disabled" onPress={onPress} disabled />
       );
@@ -163,7 +163,7 @@ describe.skip('Button Component - Enhanced Tests', () => {
     });
 
     it('should not call onPress when loading', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByRole } = render(
         <Button title="Loading" onPress={onPress} loading />
       );
@@ -348,7 +348,7 @@ describe.skip('Button Component - Enhanced Tests', () => {
     });
 
     it('should handle rapid presses', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <Button title="Rapid" onPress={onPress} />
       );

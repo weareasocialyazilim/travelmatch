@@ -17,8 +17,8 @@ jest.mock('../ui/GenericBottomSheet', () => ({
 }));
 
 describe('LanguageSelectionBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnLanguageChange = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnLanguageChange = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

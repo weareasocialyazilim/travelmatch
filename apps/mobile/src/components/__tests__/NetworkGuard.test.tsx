@@ -96,7 +96,7 @@ describe('NetworkGuard', () => {
     });
 
     it('should use network refresh as default retry', () => {
-      const mockRefresh = jest.fn();
+      const mockRefresh = jest.fn() as jest.Mock;
       mockUseNetworkStatus.mockReturnValue({
         isConnected: false,
         refresh: mockRefresh,
@@ -113,8 +113,8 @@ describe('NetworkGuard', () => {
     });
 
     it('should use custom onRetry when provided', () => {
-      const mockRefresh = jest.fn();
-      const mockCustomRetry = jest.fn();
+      const mockRefresh = jest.fn() as jest.Mock;
+      const mockCustomRetry = jest.fn() as jest.Mock;
 
       mockUseNetworkStatus.mockReturnValue({
         isConnected: false,
