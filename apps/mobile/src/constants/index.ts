@@ -32,3 +32,4 @@ export * from './values';
 export * from './imageDimensions';
 export * from './proofSecurity';
 export * from './trustNotesRules';
+export * from './ceremony';
