@@ -115,7 +115,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T10:00:00Z',
       };
 
-      mockSupabase.from('moments').insert.mockReturnValue({
+      (mockSupabase.from('moments').insert as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockCreatedMoment,
@@ -152,7 +152,7 @@ describe('Moment Creation Flow Integration', () => {
       }));
 
       // Mock uploadImages to return the uploaded images
-      uploadImages.mockResolvedValue(mockUploadedImages);
+      (uploadImages as jest.Mock).mockResolvedValue(mockUploadedImages);
 
       const uploadedImages = await uploadImages(imageUris);
 
@@ -173,7 +173,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T10:05:00Z',
       };
 
-      mockSupabase.from('moments').update.mockReturnValue({
+      (mockSupabase.from('moments').update as jest.Mock).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -202,7 +202,7 @@ describe('Moment Creation Flow Integration', () => {
         price: -10, // Invalid: negative price
       };
 
-      mockSupabase.from('moments').insert.mockReturnValue({
+      (mockSupabase.from('moments').insert as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: null,
@@ -248,7 +248,7 @@ describe('Moment Creation Flow Integration', () => {
       }));
 
       // Mock uploadImages
-      uploadImages.mockResolvedValue(mockResults);
+      (uploadImages as jest.Mock).mockResolvedValue(mockResults);
 
       // Act: Upload all images
       const results = await uploadImages(imageUris);
@@ -269,7 +269,7 @@ describe('Moment Creation Flow Integration', () => {
         'file:///path/to/corrupted.jpg', // This will fail
       ];
 
-      uploadImages.mockRejectedValue(
+      (uploadImages as jest.Mock).mockRejectedValue(
         new Error('File corrupted or invalid format'),
       );
 
@@ -301,7 +301,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T09:00:00Z',
       };
 
-      mockSupabase.from('moments').insert.mockReturnValue({
+      (mockSupabase.from('moments').insert as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockDraft,
@@ -329,7 +329,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T09:30:00Z',
       };
 
-      mockSupabase.from('moments').update.mockReturnValue({
+      (mockSupabase.from('moments').update as jest.Mock).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -357,7 +357,7 @@ describe('Moment Creation Flow Integration', () => {
         updated_at: '2024-01-15T10:00:00Z',
       };
 
-      mockSupabase.from('moments').update.mockReturnValue({
+      (mockSupabase.from('moments').update as jest.Mock).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -390,7 +390,7 @@ describe('Moment Creation Flow Integration', () => {
         images: [], // Missing required images
       };
 
-      mockSupabase.from('moments').update.mockReturnValue({
+      (mockSupabase.from('moments').update as jest.Mock).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -434,7 +434,7 @@ describe('Moment Creation Flow Integration', () => {
         created_at: '2024-01-15T08:00:00Z',
       };
 
-      mockSupabase.from('moments').insert.mockReturnValue({
+      (mockSupabase.from('moments').insert as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: mockMoment,
@@ -449,7 +449,7 @@ describe('Moment Creation Flow Integration', () => {
       expect(moment).toBeDefined();
 
       // Act: Upload fails
-      uploadImage.mockRejectedValue(new Error('Upload rate limit exceeded'));
+      (uploadImage as jest.Mock).mockRejectedValue(new Error('Upload rate limit exceeded'));
 
       // Assert: Should handle error gracefully
       await expect(
@@ -465,7 +465,7 @@ describe('Moment Creation Flow Integration', () => {
       const draftId = 'moment-draft-456';
 
       // Act: Network error during publish
-      mockSupabase.from('moments').update.mockReturnValue({
+      (mockSupabase.from('moments').update as jest.Mock).mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({

@@ -11,7 +11,7 @@ import {
 import { MomentGridCard } from '../../../../components/discover/cards/MomentGridCard';
 
 describe('MomentGridCard Component', () => {
-  const mockOnPress = jest.fn();
+  const mockOnPress = jest.fn() as jest.Mock;
 
   afterEach(() => {
     jest.clearAllMocks();

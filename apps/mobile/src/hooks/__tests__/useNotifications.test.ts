@@ -80,12 +80,12 @@ describe('useNotifications Hook', () => {
     jest.clearAllMocks();
 
     // Default mock implementations
-    notificationService.getNotifications.mockResolvedValue({
+    (notificationService.getNotifications as jest.Mock).mockResolvedValue({
       notifications: mockNotifications,
       unreadCount: 2,
     });
 
-    notificationService.getPreferences.mockResolvedValue({
+    (notificationService.getPreferences as jest.Mock).mockResolvedValue({
       preferences: mockPreferences,
     });
   });
@@ -122,7 +122,7 @@ describe('useNotifications Hook', () => {
 
     it('should handle loading errors', async () => {
       const errorMessage = 'Network error';
-      notificationService.getNotifications.mockRejectedValue(
+      (notificationService.getNotifications as jest.Mock).mockRejectedValue(
         new Error(errorMessage),
       );
 
@@ -141,7 +141,7 @@ describe('useNotifications Hook', () => {
       const originalDev = global.__DEV__;
       (global as unknown as Record<string, unknown>).__DEV__ = true;
 
-      notificationService.getPreferences.mockRejectedValue(
+      (notificationService.getPreferences as jest.Mock).mockRejectedValue(
         new Error('Preferences fetch failed'),
       );
 
@@ -170,7 +170,7 @@ describe('useNotifications Hook', () => {
       jest.clearAllMocks();
 
       const updatedNotifications = [mockNotifications[0]];
-      notificationService.getNotifications.mockResolvedValue({
+      (notificationService.getNotifications as jest.Mock).mockResolvedValue({
         notifications: updatedNotifications,
         unreadCount: 1,
       });
@@ -196,7 +196,7 @@ describe('useNotifications Hook', () => {
       });
 
       // Load more to increment page
-      notificationService.getNotifications.mockResolvedValue({
+      (notificationService.getNotifications as jest.Mock).mockResolvedValue({
         notifications: [mockNotifications[0]],
         unreadCount: 1,
       });
@@ -242,7 +242,7 @@ describe('useNotifications Hook', () => {
       });
 
       // Return less than page size
-      notificationService.getNotifications.mockResolvedValue({
+      (notificationService.getNotifications as jest.Mock).mockResolvedValue({
         notifications: [mockNotifications[0]],
         unreadCount: 2,
       });
@@ -274,7 +274,7 @@ describe('useNotifications Hook', () => {
 
     it('should not load more when hasMore is false', async () => {
       // Return less than page size initially
-      notificationService.getNotifications.mockResolvedValue({
+      (notificationService.getNotifications as jest.Mock).mockResolvedValue({
         notifications: [mockNotifications[0]],
         unreadCount: 1,
       });
@@ -349,7 +349,7 @@ describe('useNotifications Hook', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      notificationService.markAsRead.mockRejectedValue(
+      (notificationService.markAsRead as jest.Mock).mockRejectedValue(
         new Error('Mark read failed'),
       );
 
@@ -393,7 +393,7 @@ describe('useNotifications Hook', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      notificationService.markAllAsRead.mockRejectedValue(
+      (notificationService.markAllAsRead as jest.Mock).mockRejectedValue(
         new Error('Mark all failed'),
       );
 
@@ -468,7 +468,7 @@ describe('useNotifications Hook', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      notificationService.deleteNotification.mockRejectedValue(
+      (notificationService.deleteNotification as jest.Mock).mockRejectedValue(
         new Error('Delete failed'),
       );
 
@@ -508,7 +508,7 @@ describe('useNotifications Hook', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      notificationService.clearAll.mockRejectedValue(new Error('Clear failed'));
+      (notificationService.clearAll as jest.Mock).mockRejectedValue(new Error('Clear failed'));
 
       await act(async () => {
         await result.current.clearAll();
@@ -625,7 +625,7 @@ describe('useNotifications Hook', () => {
         ...updatePayload,
       };
 
-      notificationService.updatePreferences.mockResolvedValue({
+      (notificationService.updatePreferences as jest.Mock).mockResolvedValue({
         preferences: updatedPreferences,
       });
 
@@ -646,7 +646,7 @@ describe('useNotifications Hook', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      notificationService.updatePreferences.mockRejectedValue(
+      (notificationService.updatePreferences as jest.Mock).mockRejectedValue(
         new Error('Update failed'),
       );
 
@@ -672,7 +672,7 @@ describe('useNotifications Hook', () => {
       expect(result.current.unreadCount).toBe(2);
 
       // Refresh with different unread count
-      notificationService.getNotifications.mockResolvedValue({
+      (notificationService.getNotifications as jest.Mock).mockResolvedValue({
         notifications: mockNotifications,
         unreadCount: 5,
       });
