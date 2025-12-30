@@ -3,7 +3,7 @@
  * Bottom sheet for selecting user's preferred currency
  */
 
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,39 @@ interface CurrencySelectorProps {
   onSelect?: (code: CurrencyCode) => void;
 }
 
+// Memoized currency item component for list performance
+interface CurrencyItemProps {
+  item: (typeof CURRENCIES)[keyof typeof CURRENCIES];
+  isSelected: boolean;
+  onSelect: (code: CurrencyCode) => void;
+}
+
+const CurrencyItem = memo<CurrencyItemProps>(({ item, isSelected, onSelect }) => (
+  <TouchableOpacity
+    style={[styles.item, isSelected && styles.itemSelected]}
+    onPress={() => onSelect(item.code as CurrencyCode)}
+    activeOpacity={0.7}
+  >
+    <View style={styles.currencyInfo}>
+      <Text style={styles.symbol}>{item.symbol}</Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.code}>{item.code}</Text>
+        <Text style={styles.name}>{item.nameTr}</Text>
+      </View>
+    </View>
+
+    {isSelected && (
+      <MaterialCommunityIcons
+        name="check-circle"
+        size={24}
+        color={COLORS.brand.primary}
+      />
+    )}
+  </TouchableOpacity>
+));
+
+CurrencyItem.displayName = 'CurrencyItem';
+
 export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
   visible,
   onClose,
@@ -32,34 +65,26 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
 
   const currencies = Object.values(CURRENCIES);
 
-  const handleSelect = async (code: CurrencyCode) => {
+  const handleSelect = useCallback(async (code: CurrencyCode) => {
     await setUserCurrency(code);
     onSelect?.(code);
     onClose();
-  };
+  }, [setUserCurrency, onSelect, onClose]);
 
-  const renderItem = ({ item }: { item: (typeof currencies)[0] }) => (
-    <TouchableOpacity
-      style={[styles.item, userCurrency === item.code && styles.itemSelected]}
-      onPress={() => handleSelect(item.code as CurrencyCode)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.currencyInfo}>
-        <Text style={styles.symbol}>{item.symbol}</Text>
-        <View style={styles.textContainer}>
-          <Text style={styles.code}>{item.code}</Text>
-          <Text style={styles.name}>{item.nameTr}</Text>
-        </View>
-      </View>
+  const renderItem = useCallback(
+    ({ item }: { item: (typeof currencies)[0] }) => (
+      <CurrencyItem
+        item={item}
+        isSelected={userCurrency === item.code}
+        onSelect={handleSelect}
+      />
+    ),
+    [userCurrency, handleSelect]
+  );
 
-      {userCurrency === item.code && (
-        <MaterialCommunityIcons
-          name="check-circle"
-          size={24}
-          color={COLORS.brand.primary}
-        />
-      )}
-    </TouchableOpacity>
+  const keyExtractor = useCallback(
+    (item: (typeof currencies)[0]) => item.code,
+    []
   );
 
   return (
@@ -81,10 +106,18 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
 
           <FlatList
             data={currencies}
-            keyExtractor={(item) => item.code}
+            keyExtractor={keyExtractor}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
+            getItemLayout={(_, index) => ({
+              length: 72, // item height (padding + content)
+              offset: 72 * index,
+              index,
+            })}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={10}
+            windowSize={5}
           />
         </View>
       </View>
