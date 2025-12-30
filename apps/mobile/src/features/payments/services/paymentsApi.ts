@@ -79,7 +79,14 @@ export const paymentsApi = {
    * Transaction detayı
    */
   getTransactionById: async (transactionId: string) => {
+    // Get current user for ownership verification
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     // SECURITY: Explicit column selection - never use select('*')
+    // Note: sender_id/receiver_id removed - these columns don't exist in transactions table
     const { data, error } = await supabase
       .from('transactions')
       .select(
@@ -93,14 +100,16 @@ export const paymentsApi = {
         created_at,
         metadata,
         moment_id,
-        sender_id,
-        receiver_id
+        user_id
       `,
       )
       .eq('id', transactionId)
-      .single();
+      .eq('user_id', user.id) // SECURITY: Add ownership check (defense in depth beyond RLS)
+      .maybeSingle(); // Use maybeSingle to handle not found gracefully
 
     if (error) throw error;
+    if (!data) throw new Error('Transaction not found');
+
     return data;
   },
 
@@ -218,51 +227,91 @@ export const paymentsApi = {
     if (!user) throw new Error('User not authenticated');
 
     // Upload documents to storage
-    const documentUrls: string[] = [];
+    // SECURITY: Store paths, not URLs. Use signed URLs only when needed for viewing.
+    const documentPaths: string[] = [];
+    const uploadedPaths: string[] = []; // Track for cleanup on failure
 
     const frontImage = documents.get('front') as File;
     const backImage = documents.get('back') as File;
     const selfie = documents.get('selfie') as File;
 
-    for (const [key, file] of [
-      ['front', frontImage],
-      ['back', backImage],
-      ['selfie', selfie],
-    ]) {
-      if (file && file instanceof File) {
-        const fileName = `${user.id}-${key}-${Date.now()}.${file.name
-          .split('.')
-          .pop()}`;
-        const filePath = `kyc/${fileName}`;
+    try {
+      for (const [key, file] of [
+        ['front', frontImage],
+        ['back', backImage],
+        ['selfie', selfie],
+      ]) {
+        if (file && file instanceof File) {
+          // Validate file type for security
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+          if (!allowedTypes.includes(file.type)) {
+            throw new Error(`Invalid file type for ${key}. Allowed: JPEG, PNG, WebP`);
+          }
 
-        const { error: uploadError } = await supabase.storage
-          .from('kyc-documents')
-          .upload(filePath, file);
+          // Validate file size (max 10MB)
+          const maxSize = 10 * 1024 * 1024;
+          if (file.size > maxSize) {
+            throw new Error(`File ${key} is too large. Maximum size: 10MB`);
+          }
 
-        if (uploadError) throw uploadError;
+          const fileName = `${user.id}-${key}-${Date.now()}.${file.name
+            .split('.')
+            .pop()}`;
+          const filePath = `kyc/${user.id}/${fileName}`;
 
-        const { data } = supabase.storage
-          .from('kyc-documents')
-          .getPublicUrl(filePath);
+          const { error: uploadError } = await supabase.storage
+            .from('kyc-documents')
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: false,
+            });
 
-        documentUrls.push(data.publicUrl);
+          if (uploadError) throw uploadError;
+
+          uploadedPaths.push(filePath);
+          // Store file path, not public URL (SECURITY: KYC docs should never be public)
+          documentPaths.push(filePath);
+        }
       }
+
+      // Create KYC record with paths (not URLs)
+      const { data, error } = await supabase
+        .from('kyc_verifications')
+        .insert({
+          user_id: user.id,
+          document_type: documents.get('documentType') as string,
+          document_paths: documentPaths, // Store paths, not public URLs
+          status: 'pending',
+          verification_type: 'document',
+          submitted_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) {
+        // Cleanup uploaded files if database insert fails
+        await Promise.all(
+          uploadedPaths.map((path) =>
+            supabase.storage.from('kyc-documents').remove([path])
+          )
+        );
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      // Cleanup any uploaded files on error
+      if (uploadedPaths.length > 0) {
+        await Promise.all(
+          uploadedPaths.map((path) =>
+            supabase.storage.from('kyc-documents').remove([path]).catch(() => {
+              // Ignore cleanup errors, log for investigation
+            })
+          )
+        );
+      }
+      throw error;
     }
-
-    // Create KYC record
-    const { data, error } = await supabase
-      .from('kyc_verifications')
-      .insert({
-        user_id: user.id,
-        document_type: documents.get('documentType'),
-        document_urls: documentUrls,
-        status: 'pending',
-      } as any)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
   },
 
   /**

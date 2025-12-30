@@ -445,12 +445,14 @@ export const usePayments = (): UsePaymentsReturn => {
   }, []);
 
   // Initial load
+  // Note: Using stable callback references in the dependency array
+  // These callbacks are memoized with useCallback and have stable identities
   useEffect(() => {
     refreshBalance();
     refreshPaymentMethods();
     loadTransactions();
     fetchWithdrawalLimits();
-  }, []);
+  }, [refreshBalance, refreshPaymentMethods, loadTransactions, fetchWithdrawalLimits]);
 
   return {
     // Wallet
