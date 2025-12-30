@@ -118,30 +118,35 @@ describe('FormComponents', () => {
       expect(input).toBeTruthy();
     });
 
-    // Skip: This test has flaky rendering/unmount timing issues
-    it.skip('should show character count when maxLength set', () => {
+    it('should show character count when maxLength set', () => {
       const { getByText } = render(
         <FormInput value="Hello" maxLength={100} onChangeText={() => {}} />,
       );
       expect(getByText('5/100')).toBeTruthy();
     });
 
-    // Skip: This test has flaky rendering/unmount timing issues
-    it.skip('should update character count on input', () => {
-      const { getByText, getByTestId } = render(
+    it('should update character count on input', async () => {
+      const onChangeText = jest.fn() as jest.Mock;
+      const { getByText, rerender } = render(
         <FormInput
           value="Hello"
           maxLength={100}
-          onChangeText={() => {}}
-          testID="text-input"
+          onChangeText={onChangeText}
         />,
       );
 
       expect(getByText('5/100')).toBeTruthy();
 
-      fireEvent.changeText(getByTestId('text-input'), 'Hello World');
+      // Rerender with new value to simulate controlled input
+      rerender(
+        <FormInput
+          value="Hello World"
+          maxLength={100}
+          onChangeText={onChangeText}
+        />,
+      );
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(getByText('11/100')).toBeTruthy();
       });
     });
