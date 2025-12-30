@@ -14,6 +14,7 @@ export { MomentAuthenticator } from './MomentAuthenticator';
 export { SacredMoments, GiftVault } from './SacredMoments';
 export { ThankYouCardCreator } from './ThankYouCardCreator';
 export { MemoryCard } from './MemoryCard';
+export { CeremonyProgress } from './CeremonyProgress';
 
 // Main flow orchestrator
 export { ProofCeremonyFlow } from './ProofCeremonyFlow';
