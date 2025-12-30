@@ -91,10 +91,15 @@ export const isValidUsername = (username: string): boolean => {
 
 /**
  * Validate URL
+ * @param url - The URL to validate
+ * @param requireHttps - Whether to require HTTPS protocol (default: true for security)
  */
-export const isValidUrl = (url: string): boolean => {
+export const isValidUrl = (url: string, requireHttps = true): boolean => {
   try {
-    new URL(url);
+    const parsed = new URL(url);
+    if (requireHttps && parsed.protocol !== 'https:') {
+      return false;
+    }
     return true;
   } catch {
     return false;
@@ -151,10 +156,16 @@ export const checkRateLimit = (
 };
 
 /**
- * Generate a random ID (for client-side use only)
+ * Generate a cryptographically secure random ID
+ * Uses crypto.getRandomValues() for secure randomness
  */
 export const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  const hex = Array.from(array)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  return `${Date.now()}-${hex}`;
 };
 
 /**
@@ -186,15 +197,13 @@ export const generateTotpSecret = (length = 20): string => {
   // Generate cryptographically secure random bytes
   const randomValues = new Uint8Array(length);
 
-  // Use crypto.getRandomValues for secure random generation
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    crypto.getRandomValues(randomValues);
-  } else {
-    // Fallback for environments without crypto API
-    for (let i = 0; i < length; i++) {
-      randomValues[i] = Math.floor(Math.random() * 256);
-    }
+  // Require crypto.getRandomValues - fail if not available (security requirement)
+  if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
+    throw new Error(
+      'Cryptographically secure random generation not available. Cannot generate TOTP secret.',
+    );
   }
+  crypto.getRandomValues(randomValues);
 
   // Encode to Base32
   let result = '';
