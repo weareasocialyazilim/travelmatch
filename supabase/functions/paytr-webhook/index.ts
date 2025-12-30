@@ -23,13 +23,35 @@ import {
 
 // =============================================================================
 // CORS HEADERS
+// PayTR webhooks are server-to-server, restrictive CORS is appropriate
 // =============================================================================
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Origin': 'https://www.paytr.com',
+  'Access-Control-Allow-Headers': 'content-type',
 };
+
+// PayTR IP ranges for additional validation (can be verified with PayTR support)
+const PAYTR_IP_RANGES = [
+  '193.140.', // PayTR primary range
+  '185.87.222.', // PayTR secondary range
+];
+
+/**
+ * Validate that request originates from PayTR infrastructure
+ */
+function isValidPayTRSource(req: Request): boolean {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  const clientIP = forwardedFor?.split(',')[0]?.trim();
+
+  if (!clientIP) {
+    // Allow if we can't determine IP (edge function behind proxy)
+    return true;
+  }
+
+  // Check if IP is from PayTR range
+  return PAYTR_IP_RANGES.some(range => clientIP.startsWith(range));
+}
 
 // =============================================================================
 // MAIN HANDLER
@@ -39,6 +61,14 @@ serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+
+  // Validate request source (log but don't block for now - verify IP ranges with PayTR first)
+  if (!isValidPayTRSource(req)) {
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+    logger.warn('PayTR Webhook from unexpected IP', { clientIP });
+    // Note: Uncomment the following to enforce IP restriction after verifying with PayTR:
+    // return new Response('Forbidden', { status: 403, headers: corsHeaders });
   }
 
   const adminClient = createAdminClient();

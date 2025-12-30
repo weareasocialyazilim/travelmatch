@@ -192,6 +192,36 @@ serve(async (req) => {
       return toHttpResponse(error, corsHeaders);
     }
 
+    // Check for replay attack - ensure code hasn't been used in the time window
+    const adminClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    const { data: isReplay } = await adminClient.rpc('check_totp_replay', {
+      p_user_id: user.id,
+      p_code: code,
+    });
+
+    if (isReplay) {
+      logger.warn('[2FA Verify] Replay attack detected', { userId: user.id });
+      const error = createErrorResponse(
+        'Code already used. Please wait for a new code.',
+        ErrorCode.INVALID_INPUT,
+      );
+      return toHttpResponse(error, corsHeaders);
+    }
+
+    // Record TOTP usage to prevent replay
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+    const userAgent = req.headers.get('user-agent');
+    await adminClient.rpc('record_totp_usage', {
+      p_user_id: user.id,
+      p_code: code,
+      p_ip_address: ipAddress || null,
+      p_user_agent: userAgent || null,
+    });
+
     // Enable 2FA for user
     const { error: updateError } = await supabaseClient.auth.updateUser({
       data: {
