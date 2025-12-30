@@ -24,6 +24,8 @@ import {
   StatusBar,
   Image,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Animated, {
   FadeIn,
@@ -31,22 +33,29 @@ import Animated, {
   SlideInRight,
   SlideOutLeft,
   ZoomIn,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 
 import { SunsetClock } from './SunsetClock';
 import { MomentAuthenticator, type AuthenticationResult } from './MomentAuthenticator';
 import { ThankYouCardCreator } from './ThankYouCardCreator';
 import { MemoryCard } from './MemoryCard';
 import { SacredMoments } from './SacredMoments';
+import { CeremonyProgress } from './CeremonyProgress';
 import {
   CEREMONY_COLORS,
   CEREMONY_STEP_ORDER,
   CEREMONY_STEP_LABELS,
+  CEREMONY_TIMING,
   type CeremonyStep,
 } from '@/constants/ceremony';
 import { COLORS, GRADIENTS } from '@/constants/colors';
@@ -107,43 +116,44 @@ export const ProofCeremonyFlow: React.FC<ProofCeremonyFlowProps> = ({
   const [memoryCardUrl, setMemoryCardUrl] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Step transition animation values
+  const stepOpacity = useSharedValue(1);
+  const stepTranslateX = useSharedValue(0);
+
   const currentStepIndex = CEREMONY_STEP_ORDER.indexOf(step);
 
-  const handleNext = useCallback((nextStep: CeremonyStep) => {
+  // Animated step transition
+  const transitionToStep = useCallback((newStep: CeremonyStep) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setStep(nextStep);
-  }, []);
+
+    // Fade out current
+    stepOpacity.value = withTiming(0, { duration: 200 });
+    stepTranslateX.value = withTiming(-50, { duration: 200 });
+
+    setTimeout(() => {
+      setStep(newStep);
+      // Fade in new
+      stepTranslateX.value = 50;
+      stepOpacity.value = withTiming(1, { duration: 300 });
+      stepTranslateX.value = withTiming(0, { duration: 300 });
+    }, 200);
+  }, [stepOpacity, stepTranslateX]);
+
+  const stepAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: stepOpacity.value,
+    transform: [{ translateX: stepTranslateX.value }],
+  }));
+
+  const handleNext = useCallback((nextStep: CeremonyStep) => {
+    transitionToStep(nextStep);
+  }, [transitionToStep]);
 
   const handleBack = useCallback(() => {
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
-      setStep(CEREMONY_STEP_ORDER[prevIndex]);
+      transitionToStep(CEREMONY_STEP_ORDER[prevIndex]);
     }
-  }, [currentStepIndex]);
-
-  const handleCapture = async () => {
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.8,
-        allowsMultipleSelection: true,
-        selectionLimit: 5,
-      });
-
-      if (!result.canceled && result.assets.length > 0) {
-        const photos = result.assets.map((asset) => asset.uri);
-        setProofData({
-          id: `proof_${Date.now()}`,
-          photos,
-          // In real app, get location from device
-          location: undefined,
-        });
-        handleNext('authenticate');
-      }
-    } catch (error) {
-      console.error('Camera error:', error);
-    }
-  };
+  }, [currentStepIndex, transitionToStep]);
 
   const handleAuthResult = useCallback(
     (result: AuthenticationResult) => {
@@ -202,7 +212,10 @@ export const ProofCeremonyFlow: React.FC<ProofCeremonyFlowProps> = ({
           <CaptureStep
             momentTitle={gift.momentTitle}
             deadline={gift.escrowUntil}
-            onCapture={handleCapture}
+            onCapture={(data) => {
+              setProofData(data);
+              transitionToStep('authenticate');
+            }}
             onBack={handleBack}
           />
         );
@@ -235,6 +248,8 @@ export const ProofCeremonyFlow: React.FC<ProofCeremonyFlowProps> = ({
           <CelebrationStep
             gift={gift}
             proofPhotos={proofData.photos}
+            authResult={authResult}
+            thankYouCardUrl={thankYouCardUrl}
             onComplete={handleCelebrationComplete}
           />
         ) : null;
@@ -260,35 +275,24 @@ export const ProofCeremonyFlow: React.FC<ProofCeremonyFlowProps> = ({
         />
       )}
 
-      {/* Header with progress */}
+      {/* Progress indicator - always visible except celebrate */}
       {step !== 'celebrate' && (
-        <View style={styles.header}>
-          {/* Progress dots */}
-          <View style={styles.progress}>
-            {CEREMONY_STEP_ORDER.map((s, index) => (
-              <View
-                key={s}
-                style={[
-                  styles.progressDot,
-                  index <= currentStepIndex && styles.progressDotActive,
-                  index === currentStepIndex && styles.progressDotCurrent,
-                ]}
-              />
-            ))}
-          </View>
+        <CeremonyProgress currentStep={step} />
+      )}
 
-          {/* Sunset clock (compact) */}
-          <SunsetClock deadline={gift.escrowUntil} size="compact" />
+      {/* Compact Sunset clock - visible on intro and capture */}
+      {(step === 'intro' || step === 'capture') && (
+        <View style={styles.clockContainer}>
+          <SunsetClock
+            deadline={gift.escrowUntil}
+            size="compact"
+            enableHaptics
+          />
         </View>
       )}
 
-      {/* Step content */}
-      <Animated.View
-        key={step}
-        entering={SlideInRight}
-        exiting={SlideOutLeft}
-        style={styles.content}
-      >
+      {/* Step content with animation */}
+      <Animated.View style={[styles.content, stepAnimatedStyle]}>
         {renderStep()}
       </Animated.View>
     </SafeAreaView>
@@ -375,7 +379,7 @@ const IntroStep: React.FC<IntroStepProps> = ({ gift, onStart, onCancel }) => (
 interface CaptureStepProps {
   momentTitle: string;
   deadline: Date;
-  onCapture: () => void;
+  onCapture: (data: ProofData) => void;
   onBack: () => void;
 }
 
@@ -384,115 +388,271 @@ const CaptureStep: React.FC<CaptureStepProps> = ({
   deadline,
   onCapture,
   onBack,
-}) => (
-  <View style={styles.captureContainer}>
-    <View style={styles.captureHeader}>
-      <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
-      </TouchableOpacity>
-      <Text style={styles.captureTitle}>Fotoğraf Çek</Text>
-      <View style={styles.backButton} />
-    </View>
+}) => {
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [location, setLocation] = useState<ProofData['location'] | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
-    <View style={styles.captureContent}>
-      <View style={styles.cameraPreview}>
-        <MaterialCommunityIcons
-          name="camera"
-          size={64}
-          color={COLORS.textMuted}
-        />
-        <Text style={styles.previewText}>Kamera burada açılacak</Text>
+  const capturePhoto = async () => {
+    setIsCapturing(true);
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets.length > 0) {
+        setPhotos(prev => [...prev, result.assets[0].uri]);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }
+    } catch (error) {
+      console.error('Camera error:', error);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const getLocation = async () => {
+    setIsGettingLocation(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Konum İzni', 'Konum izni verilmedi');
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({});
+      const [address] = await Location.reverseGeocodeAsync({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      });
+
+      setLocation({
+        lat: loc.coords.latitude,
+        lng: loc.coords.longitude,
+        name: `${address?.city || ''}, ${address?.country || ''}`.trim() || 'Konum alındı',
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Location error:', error);
+      Alert.alert('Hata', 'Konum alınamadı');
+    } finally {
+      setIsGettingLocation(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (photos.length === 0) {
+      Alert.alert('Fotoğraf Gerekli', 'En az bir fotoğraf ekleyin');
+      return;
+    }
+
+    const proofId = `proof_${Date.now()}`;
+
+    onCapture({
+      id: proofId,
+      photos,
+      location: location || undefined,
+    });
+  };
+
+  return (
+    <ScrollView style={styles.captureContainer} contentContainerStyle={styles.captureScrollContent}>
+      {/* Header */}
+      <View style={styles.captureHeader}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+        </TouchableOpacity>
+        <Text style={styles.captureTitle}>Anınızı Yakalayın</Text>
+        <View style={styles.backButton} />
       </View>
 
-      <View style={styles.captureInfo}>
-        <Text style={styles.captureInfoTitle}>{momentTitle}</Text>
-        <Text style={styles.captureInfoText}>
-          Deneyimini kanıtlayan bir fotoğraf çek. En fazla 5 fotoğraf
-          yükleyebilirsin.
-        </Text>
+      {/* Moment info */}
+      <Text style={styles.momentReminder}>{momentTitle}</Text>
+
+      {/* Photo grid */}
+      <View style={styles.photoGrid}>
+        {photos.map((photo, index) => (
+          <View key={index} style={styles.photoItem}>
+            <Image source={{ uri: photo }} style={styles.photoImage} />
+            <TouchableOpacity
+              style={styles.removePhoto}
+              onPress={() => removePhoto(index)}
+            >
+              <MaterialCommunityIcons name="close-circle" size={24} color={COLORS.error} />
+            </TouchableOpacity>
+          </View>
+        ))}
+
+        {photos.length < 3 && (
+          <TouchableOpacity
+            style={styles.addPhotoButton}
+            onPress={capturePhoto}
+            disabled={isCapturing}
+          >
+            {isCapturing ? (
+              <ActivityIndicator color={COLORS.primary} />
+            ) : (
+              <>
+                <MaterialCommunityIcons name="camera-plus" size={32} color={COLORS.primary} />
+                <Text style={styles.addPhotoText}>
+                  {photos.length === 0 ? 'Fotoğraf Çek' : 'Ekle'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
       </View>
 
-      <View style={styles.captureTips}>
-        <View style={styles.tipItem}>
-          <MaterialCommunityIcons
-            name="check-circle"
-            size={16}
-            color={COLORS.success}
-          />
-          <Text style={styles.tipText}>Konum bilgisi otomatik eklenir</Text>
-        </View>
-        <View style={styles.tipItem}>
-          <MaterialCommunityIcons
-            name="check-circle"
-            size={16}
-            color={COLORS.success}
-          />
-          <Text style={styles.tipText}>AI ile otomatik doğrulama</Text>
-        </View>
+      {/* Photo requirements */}
+      <View style={styles.requirementsBox}>
+        <Text style={styles.requirementsTitle}>📸 İpuçları</Text>
+        <Text style={styles.requirementItem}>• Deneyimi açıkça gösteren fotoğraf</Text>
+        <Text style={styles.requirementItem}>• Konum/mekan görünür olmalı</Text>
+        <Text style={styles.requirementItem}>• Galeri fotoğrafı kabul edilmez</Text>
       </View>
-    </View>
 
-    <TouchableOpacity style={styles.captureButton} onPress={onCapture}>
-      <LinearGradient
-        colors={GRADIENTS.gift}
-        style={styles.captureButtonGradient}
+      {/* Location */}
+      <TouchableOpacity
+        style={styles.locationButton}
+        onPress={getLocation}
+        disabled={isGettingLocation}
       >
-        <MaterialCommunityIcons name="camera" size={32} color={COLORS.white} />
-      </LinearGradient>
-    </TouchableOpacity>
-  </View>
-);
+        {isGettingLocation ? (
+          <ActivityIndicator size="small" color={COLORS.primary} />
+        ) : (
+          <MaterialCommunityIcons
+            name={location ? 'map-marker-check' : 'map-marker-plus'}
+            size={24}
+            color={location ? COLORS.success : COLORS.textSecondary}
+          />
+        )}
+        <Text style={[styles.locationText, location && styles.locationSet]}>
+          {location ? location.name : 'Konum Ekle (Önerilen)'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Submit button */}
+      <TouchableOpacity
+        onPress={handleSubmit}
+        disabled={photos.length === 0}
+        style={styles.submitButton}
+      >
+        <LinearGradient
+          colors={photos.length > 0 ? GRADIENTS.gift : ['#D1D5DB', '#9CA3AF']}
+          style={styles.submitGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.submitText}>Doğrulamaya Gönder</Text>
+          <MaterialCommunityIcons name="arrow-right" size={20} color={COLORS.white} />
+        </LinearGradient>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+};
 
 // Celebration Step Component
 interface CelebrationStepProps {
   gift: Gift;
   proofPhotos: string[];
+  authResult: AuthenticationResult | null;
+  thankYouCardUrl: string | null;
   onComplete: (memoryCardUrl?: string) => void;
 }
 
 const CelebrationStep: React.FC<CelebrationStepProps> = ({
   gift,
   proofPhotos,
+  authResult,
+  thankYouCardUrl,
   onComplete,
 }) => {
   const [showCard, setShowCard] = useState(false);
+  const scaleAnim = useSharedValue(0);
+
+  const isPendingReview = authResult?.status === 'pending_review' || authResult?.status === 'needs_review';
 
   React.useEffect(() => {
+    // Celebration haptic
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    // Scale in animation
+    scaleAnim.value = withSpring(1, { damping: 8, stiffness: 100 });
+
     // Show card after confetti
     const timer = setTimeout(() => setShowCard(true), 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAnim.value }],
+  }));
 
   return (
     <ScrollView
       style={styles.celebrationContainer}
       contentContainerStyle={styles.celebrationContent}
     >
-      {/* Success message */}
-      <Animated.View entering={ZoomIn} style={styles.successIcon}>
-        <LinearGradient colors={GRADIENTS.trust} style={styles.successIconCircle}>
-          <MaterialCommunityIcons name="check" size={48} color={COLORS.white} />
+      {/* Success icon */}
+      <Animated.View style={[styles.successIcon, iconAnimatedStyle]}>
+        <LinearGradient
+          colors={isPendingReview ? GRADIENTS.trust : GRADIENTS.gift}
+          style={styles.successIconCircle}
+        >
+          <MaterialCommunityIcons
+            name={isPendingReview ? 'clock-check-outline' : 'check'}
+            size={56}
+            color={COLORS.white}
+          />
         </LinearGradient>
       </Animated.View>
 
+      {/* Title */}
       <Animated.View entering={FadeIn.delay(500)}>
-        <Text style={styles.successTitle}>Harika! 🎉</Text>
+        <Text style={styles.successTitle}>
+          {isPendingReview ? 'İncelemeye Alındı!' : 'Harika! 🎉'}
+        </Text>
         <Text style={styles.successSubtitle}>
-          Deneyimin onaylandı ve {gift.giverName}'a haber verildi!
+          {isPendingReview
+            ? 'Kanıtınız 24 saat içinde incelenecek'
+            : `Deneyimin onaylandı ve ${gift.giverName}'a haber verildi!`
+          }
         </Text>
       </Animated.View>
 
-      {/* Transfer info */}
-      <Animated.View entering={FadeIn.delay(800)} style={styles.transferInfo}>
-        <MaterialCommunityIcons
-          name="bank-transfer"
-          size={24}
-          color={COLORS.success}
-        />
-        <Text style={styles.transferText}>
-          {gift.currency} {gift.amount} hesabına aktarılıyor
-        </Text>
-      </Animated.View>
+      {/* Money transfer info - only show if not pending review */}
+      {!isPendingReview && (
+        <Animated.View entering={FadeIn.delay(800)} style={styles.transferInfo}>
+          <MaterialCommunityIcons
+            name="bank-transfer"
+            size={24}
+            color={COLORS.success}
+          />
+          <View style={styles.transferTextContainer}>
+            <Text style={styles.transferAmount}>
+              {gift.currency} {gift.amount.toLocaleString()}
+            </Text>
+            <Text style={styles.transferStatus}>Hesabına aktarılıyor</Text>
+          </View>
+        </Animated.View>
+      )}
+
+      {/* Thank you card sent confirmation */}
+      {thankYouCardUrl && (
+        <Animated.View entering={FadeIn.delay(1000)} style={styles.thankYouSent}>
+          <MaterialCommunityIcons name="card-account-mail" size={20} color={COLORS.secondary} />
+          <Text style={styles.thankYouSentText}>
+            Teşekkür kartınız {gift.giverName}'a gönderildi
+          </Text>
+        </Animated.View>
+      )}
 
       {/* Memory card */}
       {showCard && (
@@ -765,6 +925,33 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.success,
   },
+  transferTextContainer: {
+    flex: 1,
+  },
+  transferAmount: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.success,
+  },
+  transferStatus: {
+    fontSize: 12,
+    color: COLORS.success,
+    opacity: 0.8,
+  },
+  thankYouSent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+    padding: SPACING.md,
+    borderRadius: 12,
+    gap: SPACING.sm,
+    marginVertical: SPACING.sm,
+  },
+  thankYouSentText: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.secondary,
+  },
   completeButton: {
     backgroundColor: COLORS.surfaceMuted,
     paddingVertical: SPACING.md,
@@ -776,6 +963,111 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.text,
+  },
+
+  // Clock container
+  clockContainer: {
+    alignItems: 'flex-end',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.sm,
+  },
+
+  // New Capture styles
+  captureScrollContent: {
+    paddingBottom: SPACING.xl,
+  },
+  momentReminder: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: SPACING.lg,
+  },
+  photoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+    marginBottom: SPACING.lg,
+  },
+  photoItem: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  photoImage: {
+    width: '100%',
+    height: '100%',
+  },
+  removePhoto: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+  },
+  addPhotoButton: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primaryMuted,
+  },
+  addPhotoText: {
+    fontSize: 12,
+    color: COLORS.primary,
+    marginTop: SPACING.xxs,
+  },
+  requirementsBox: {
+    backgroundColor: COLORS.surfaceMuted,
+    padding: SPACING.md,
+    borderRadius: 12,
+    marginBottom: SPACING.lg,
+  },
+  requirementsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
+  },
+  requirementItem: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xxs,
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: SPACING.md,
+    backgroundColor: COLORS.surfaceMuted,
+    borderRadius: 12,
+    gap: SPACING.sm,
+    marginBottom: SPACING.lg,
+  },
+  locationSet: {
+    color: COLORS.success,
+    fontWeight: '500',
+  },
+  submitButton: {
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  submitGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    paddingVertical: SPACING.md,
+  },
+  submitText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.white,
   },
 });
 
