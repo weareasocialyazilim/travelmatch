@@ -5,6 +5,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { REQUIREMENTS, INITIAL_VERIFICATION_DATA } from './constants';
 import { KYCHeader } from './KYCHeader';
 import { kycStyles } from './styles';
@@ -24,6 +26,7 @@ const KYCIntroScreen: React.FC = () => {
   };
 
   return (
+    <NetworkGuard offlineMessage="Kimlik doğrulama için internet bağlantısı gerekli.">
     <SafeAreaView style={kycStyles.container}>
       <View style={kycStyles.content}>
         <KYCHeader title="Identity Verification" />
@@ -74,7 +77,12 @@ const KYCIntroScreen: React.FC = () => {
         </View>
       </View>
     </SafeAreaView>
+    </NetworkGuard>
   );
 };
 
-export default KYCIntroScreen;
+// Wrap with ErrorBoundary for critical KYC functionality
+export default withErrorBoundary(KYCIntroScreen, {
+  fallbackType: 'generic',
+  displayName: 'KYCIntroScreen',
+});
