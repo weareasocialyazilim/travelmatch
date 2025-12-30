@@ -325,8 +325,7 @@ describe('favoritesStore', () => {
   });
 
   describe('persistence', () => {
-    // Skip flaky persistence tests - AsyncStorage timing issues in test environment
-    it.skip('should persist favorites to AsyncStorage', async () => {
+    it('should persist favorites to AsyncStorage', async () => {
       const { result } = renderHook(() => useFavoritesStore());
 
       act(() => {
@@ -334,16 +333,15 @@ describe('favoritesStore', () => {
         result.current.addFavorite('moment-2');
       });
 
-      // Wait for zustand persist middleware to complete
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const stored = await AsyncStorage.getItem('favorites-storage');
-      expect(stored).toBeTruthy();
-
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        expect(parsed.state.favoriteIds).toEqual(['moment-1', 'moment-2']);
-      }
+      // Wait for zustand persist middleware to complete using waitFor
+      await waitFor(async () => {
+        const stored = await AsyncStorage.getItem('favorites-storage');
+        expect(stored).toBeTruthy();
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          expect(parsed.state.favoriteIds).toEqual(['moment-1', 'moment-2']);
+        }
+      }, { timeout: 500 });
     });
 
     it('should persist after removal', async () => {
