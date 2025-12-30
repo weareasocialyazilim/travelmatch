@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
             <li>Name and email address</li>
             <li>Profile photo</li>
             <li>Location data (with your permission)</li>
-            <li>Payment information (processed securely via Stripe)</li>
+            <li>Payment information (processed securely via PayTR)</li>
           </ul>
           <h3 className="text-xl font-medium mb-2">Usage Data</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-2">
