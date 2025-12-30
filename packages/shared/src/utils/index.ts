@@ -8,3 +8,4 @@ export * from './formatters';
 export * from './date';
 export * from './currency';
 export * from './logger';
+export * from './adapters';

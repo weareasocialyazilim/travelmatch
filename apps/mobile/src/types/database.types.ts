@@ -1242,6 +1242,9 @@ export type Database = {
         Row: {
           avatar_url: string | null;
           balance: number | null;
+          ban_reason: string | null;
+          banned_at: string | null;
+          banned_by: string | null;
           bio: string | null;
           created_at: string | null;
           currency: string | null;
@@ -1252,6 +1255,8 @@ export type Database = {
           gender: string | null;
           id: string;
           interests: string[] | null;
+          is_banned: boolean | null;
+          is_suspended: boolean | null;
           kyc_status: string | null;
           languages: string[] | null;
           last_seen_at: string | null;
@@ -1261,14 +1266,23 @@ export type Database = {
           privacy_settings: Json | null;
           push_token: string | null;
           rating: number | null;
+          reinstated_at: string | null;
           review_count: number | null;
+          status: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted' | null;
           stripe_customer_id: string | null;
+          suspended_at: string | null;
+          suspended_by: string | null;
+          suspension_ends_at: string | null;
+          suspension_reason: string | null;
           updated_at: string | null;
           verified: boolean | null;
         };
         Insert: {
           avatar_url?: string | null;
           balance?: number | null;
+          ban_reason?: string | null;
+          banned_at?: string | null;
+          banned_by?: string | null;
           bio?: string | null;
           created_at?: string | null;
           currency?: string | null;
@@ -1279,6 +1293,8 @@ export type Database = {
           gender?: string | null;
           id?: string;
           interests?: string[] | null;
+          is_banned?: boolean | null;
+          is_suspended?: boolean | null;
           kyc_status?: string | null;
           languages?: string[] | null;
           last_seen_at?: string | null;
@@ -1288,14 +1304,23 @@ export type Database = {
           privacy_settings?: Json | null;
           push_token?: string | null;
           rating?: number | null;
+          reinstated_at?: string | null;
           review_count?: number | null;
+          status?: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted' | null;
           stripe_customer_id?: string | null;
+          suspended_at?: string | null;
+          suspended_by?: string | null;
+          suspension_ends_at?: string | null;
+          suspension_reason?: string | null;
           updated_at?: string | null;
           verified?: boolean | null;
         };
         Update: {
           avatar_url?: string | null;
           balance?: number | null;
+          ban_reason?: string | null;
+          banned_at?: string | null;
+          banned_by?: string | null;
           bio?: string | null;
           created_at?: string | null;
           currency?: string | null;
@@ -1306,6 +1331,8 @@ export type Database = {
           gender?: string | null;
           id?: string;
           interests?: string[] | null;
+          is_banned?: boolean | null;
+          is_suspended?: boolean | null;
           kyc_status?: string | null;
           languages?: string[] | null;
           last_seen_at?: string | null;
@@ -1315,8 +1342,14 @@ export type Database = {
           privacy_settings?: Json | null;
           push_token?: string | null;
           rating?: number | null;
+          reinstated_at?: string | null;
           review_count?: number | null;
+          status?: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted' | null;
           stripe_customer_id?: string | null;
+          suspended_at?: string | null;
+          suspended_by?: string | null;
+          suspension_ends_at?: string | null;
+          suspension_reason?: string | null;
           updated_at?: string | null;
           verified?: boolean | null;
         };

@@ -34,6 +34,10 @@ export type RealtimeEventType =
   | 'moment:comment'
   | 'user:online'
   | 'user:offline'
+  | 'user:banned'
+  | 'user:suspended'
+  | 'user:reinstated'
+  | 'user:status_changed'
   | 'payment:completed'
   | 'payment:failed';
 
@@ -71,6 +75,16 @@ export interface UserStatusEvent {
   userId: string;
   isOnline: boolean;
   lastSeen?: string;
+}
+
+export interface UserAccountStatusEvent {
+  userId: string;
+  status: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted';
+  isBanned: boolean;
+  isSuspended: boolean;
+  banReason?: string;
+  suspensionReason?: string;
+  suspensionEndsAt?: string;
 }
 
 export interface PaymentEvent {
@@ -143,6 +157,7 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   // Refs for Supabase channels and handlers
   const presenceChannelRef = useRef<RealtimeChannel | null>(null);
   const notificationChannelRef = useRef<RealtimeChannel | null>(null);
+  const userStatusChannelRef = useRef<RealtimeChannel | null>(null);
   const handlersRef = useRef<EventHandlers>(new Map());
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const typingDebounceRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
@@ -289,6 +304,115 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   /**
+   * Subscribe to user account status changes (ban/suspend)
+   * This is critical for immediately showing banned/suspended state
+   */
+  const subscribeToUserStatus = useCallback(() => {
+    if (!user || userStatusChannelRef.current) return;
+
+    logger.info('RealtimeContext', 'Subscribing to user status changes');
+
+    const channel = supabase.channel(`user-status:${user.id}`);
+
+    channel
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          const newData = payload.new as {
+            id: string;
+            status?: string;
+            is_banned?: boolean;
+            is_suspended?: boolean;
+            ban_reason?: string;
+            suspension_reason?: string;
+            suspension_ends_at?: string;
+          };
+          const oldData = payload.old as {
+            is_banned?: boolean;
+            is_suspended?: boolean;
+          };
+
+          logger.info('RealtimeContext', 'User status changed:', newData);
+
+          // Emit specific events based on what changed
+          if (newData.is_banned && !oldData.is_banned) {
+            logger.warn('RealtimeContext', 'User has been BANNED');
+            emit('user:banned', {
+              userId: newData.id,
+              status: 'banned',
+              isBanned: true,
+              isSuspended: false,
+              banReason: newData.ban_reason,
+            } as UserAccountStatusEvent);
+          } else if (!newData.is_banned && oldData.is_banned) {
+            logger.info('RealtimeContext', 'User has been REINSTATED from ban');
+            emit('user:reinstated', {
+              userId: newData.id,
+              status: 'active',
+              isBanned: false,
+              isSuspended: false,
+            } as UserAccountStatusEvent);
+          }
+
+          if (newData.is_suspended && !oldData.is_suspended) {
+            logger.warn('RealtimeContext', 'User has been SUSPENDED');
+            emit('user:suspended', {
+              userId: newData.id,
+              status: 'suspended',
+              isBanned: false,
+              isSuspended: true,
+              suspensionReason: newData.suspension_reason,
+              suspensionEndsAt: newData.suspension_ends_at,
+            } as UserAccountStatusEvent);
+          } else if (!newData.is_suspended && oldData.is_suspended) {
+            logger.info('RealtimeContext', 'User has been REINSTATED from suspension');
+            emit('user:reinstated', {
+              userId: newData.id,
+              status: 'active',
+              isBanned: false,
+              isSuspended: false,
+            } as UserAccountStatusEvent);
+          }
+
+          // Always emit generic status change event
+          emit('user:status_changed', {
+            userId: newData.id,
+            status: newData.status || 'active',
+            isBanned: newData.is_banned || false,
+            isSuspended: newData.is_suspended || false,
+            banReason: newData.ban_reason,
+            suspensionReason: newData.suspension_reason,
+            suspensionEndsAt: newData.suspension_ends_at,
+          } as UserAccountStatusEvent);
+        },
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          logger.info('RealtimeContext', 'Subscribed to user status changes');
+        }
+      });
+
+    userStatusChannelRef.current = channel;
+  }, [user, emit]);
+
+  /**
+   * Unsubscribe from user status changes
+   */
+  const unsubscribeFromUserStatus = useCallback(() => {
+    if (userStatusChannelRef.current) {
+      logger.info('RealtimeContext', 'Unsubscribing from user status');
+      supabase.removeChannel(userStatusChannelRef.current);
+      userStatusChannelRef.current = null;
+    }
+  }, []);
+
+  /**
    * Connect to Supabase Realtime
    */
   const connect = useCallback(async () => {
@@ -307,13 +431,16 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       // Auto-subscribe to notifications
       subscribeToNotifications();
 
+      // Subscribe to user status changes (ban/suspend detection)
+      subscribeToUserStatus();
+
       setConnectionState('connected');
       logger.info('RealtimeContext', 'Connected to Supabase Realtime');
     } catch (error) {
       logger.error('RealtimeContext', 'Failed to connect:', error);
       setConnectionState('disconnected');
     }
-  }, [isAuthenticated, user, setupPresence, subscribeToNotifications]);
+  }, [isAuthenticated, user, setupPresence, subscribeToNotifications, subscribeToUserStatus]);
 
   /**
    * Disconnect from Supabase Realtime
@@ -329,6 +456,11 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     if (notificationChannelRef.current) {
       supabase.removeChannel(notificationChannelRef.current);
       notificationChannelRef.current = null;
+    }
+
+    if (userStatusChannelRef.current) {
+      supabase.removeChannel(userStatusChannelRef.current);
+      userStatusChannelRef.current = null;
     }
 
     setConnectionState('disconnected');
