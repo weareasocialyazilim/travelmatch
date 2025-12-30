@@ -554,22 +554,6 @@ describe('GenericBottomSheet', () => {
       expect(sheet.props.accessible).toBe(true);
     });
 
-    // Skip: accessibilityLiveRegion not implemented in component (not a RN standard property for sheets)
-    it.skip('should announce content changes to screen readers', () => {
-      const { getByTestId } = render(
-        <GenericBottomSheet
-          visible={true}
-          onClose={() => {}}
-          title="Test"
-          testID="bottom-sheet"
-        >
-          <Text>Important content</Text>
-        </GenericBottomSheet>,
-      );
-
-      const sheet = getByTestId('bottom-sheet');
-      expect(sheet.props.accessibilityLiveRegion).toBe('polite');
-    });
   });
 
   describe('Edge Cases', () => {

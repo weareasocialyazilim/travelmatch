@@ -1,8 +1,18 @@
-// Skip: This test file has dependency on @travelmatch/design-system which requires build
-// TODO: Fix when design-system is properly bundled for Jest
-describe('AccessibleVideoPlayer (skipped - design-system dependency)', () => {
-  it.skip('all tests skipped due to design-system mock issue', () => {
-    // Placeholder - the actual tests require @travelmatch/design-system to be properly built
-    // and available in the Jest test environment. This file is skipped until that is resolved.
+/**
+ * AccessibleVideoPlayer Tests
+ *
+ * SKIPPED: Requires @travelmatch/design-system to be bundled for Jest.
+ * Enable these tests when the design-system package is properly configured
+ * for the test environment.
+ *
+ * Tests to implement:
+ * - Video playback controls
+ * - Accessibility features (captions, screen reader support)
+ * - Loading and error states
+ */
+
+describe.skip('AccessibleVideoPlayer', () => {
+  it('placeholder - enable when design-system is available', () => {
+    expect(true).toBe(true);
   });
 });
