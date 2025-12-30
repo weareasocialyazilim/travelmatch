@@ -33,6 +33,12 @@ export type { TrustScoreCircleProps, TrustFactor } from './TrustScoreCircle';
 // Performance Optimized
 export { OptimizedImage } from './OptimizedImage';
 
+// Dashboard Components
+export { DashboardStatCard } from './DashboardStatCard';
+export { AlertCard, AlertBadge } from './AlertCard';
+export { ProgressBar, SegmentedProgress, CircularProgress } from './ProgressBar';
+export { FilterPanel, FilterChips } from './FilterPanel';
+
 // Bottom Sheets
 export {
   GenericBottomSheet,
