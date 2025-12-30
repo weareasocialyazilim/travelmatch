@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 22,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
   },
   keyboardView: {
     flex: 1,

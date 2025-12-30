@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.base,
   },
   card: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: RADIUS.card,
     overflow: 'hidden',
     borderWidth: 1,
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     ...TYPOGRAPHY.labelSmall,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   primaryButton: {
     borderRadius: RADIUS.button,

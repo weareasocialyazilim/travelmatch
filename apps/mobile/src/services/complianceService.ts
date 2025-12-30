@@ -102,12 +102,13 @@ export const checkUserLimits = async (
   }
 
   try {
-    const { data, error } = await supabase.rpc('check_user_limits', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('check_user_limits', {
       p_user_id: userId,
       p_category: category,
       p_amount: amount ?? null,
       p_currency: currency,
-    });
+    }) as { data: LimitCheckResult | null; error: Error | null };
 
     if (error) {
       logger.error('check_user_limits RPC error', error);
@@ -126,18 +127,18 @@ export const checkUserLimits = async (
     }
 
     return {
-      allowed: data.allowed ?? true,
-      plan_id: data.plan_id ?? 'passport',
-      user_type: data.user_type ?? 'standard',
-      kyc_status: data.kyc_status ?? 'none',
-      kyc_required: data.kyc_required ?? false,
-      kyc_reason: data.kyc_reason ?? null,
-      block_reason: data.block_reason ?? null,
-      warnings: data.warnings ?? [],
-      upgrade_available: data.upgrade_available ?? true,
+      allowed: data?.allowed ?? true,
+      plan_id: data?.plan_id ?? 'passport',
+      user_type: data?.user_type ?? 'standard',
+      kyc_status: data?.kyc_status ?? 'none',
+      kyc_required: data?.kyc_required ?? false,
+      kyc_reason: data?.kyc_reason ?? null,
+      block_reason: data?.block_reason ?? null,
+      warnings: data?.warnings ?? [],
+      upgrade_available: data?.upgrade_available ?? true,
     };
   } catch (err) {
-    logger.error('check_user_limits unexpected error', err);
+    logger.error('check_user_limits unexpected error', err as Error);
     return {
       allowed: true,
       plan_id: 'passport',
@@ -177,11 +178,12 @@ export const checkMomentContributionLimit = async (
   }
 
   try {
-    const { data, error } = await supabase.rpc('check_moment_contribution_limit', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('check_moment_contribution_limit', {
       p_moment_id: momentId,
       p_user_id: userId,
       p_amount: amount,
-    });
+    }) as { data: ContributionLimitResult | null; error: Error | null };
 
     if (error) {
       logger.error('check_moment_contribution_limit RPC error', error);
@@ -194,17 +196,17 @@ export const checkMomentContributionLimit = async (
     }
 
     return {
-      allowed: data.allowed ?? true,
-      reason: data.reason,
-      current_count: data.current_count ?? 0,
-      current_total: data.current_total ?? 0,
-      max_count: data.max_count,
-      max_total: data.max_total,
-      remaining_count: data.remaining_count,
-      remaining_amount: data.remaining ?? data.remaining_amount,
+      allowed: data?.allowed ?? true,
+      reason: data?.reason,
+      current_count: data?.current_count ?? 0,
+      current_total: data?.current_total ?? 0,
+      max_count: data?.max_count,
+      max_total: data?.max_total,
+      remaining_count: data?.remaining_count,
+      remaining_amount: data?.remaining_amount,
     };
   } catch (err) {
-    logger.error('check_moment_contribution_limit unexpected error', err);
+    logger.error('check_moment_contribution_limit unexpected error', err as Error);
     return {
       allowed: true,
       current_count: 0,
@@ -237,9 +239,10 @@ export const checkMomentCreationLimit =
     }
 
     try {
-      const { data, error } = await supabase.rpc('check_moment_creation_limit', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.rpc as any)('check_moment_creation_limit', {
         p_user_id: userId,
-      });
+      }) as { data: MomentCreationLimitResult | null; error: Error | null };
 
       if (error) {
         logger.error('check_moment_creation_limit RPC error', error);
@@ -255,16 +258,16 @@ export const checkMomentCreationLimit =
       }
 
       return {
-        allowed: data.allowed ?? true,
-        reason: data.reason,
-        daily_count: data.daily_count ?? 0,
-        daily_limit: data.daily_limit,
-        monthly_count: data.monthly_count ?? 0,
-        monthly_limit: data.monthly_limit,
-        plan_id: data.plan_id ?? 'passport',
+        allowed: data?.allowed ?? true,
+        reason: data?.reason,
+        daily_count: data?.daily_count ?? 0,
+        daily_limit: data?.daily_limit ?? null,
+        monthly_count: data?.monthly_count ?? 0,
+        monthly_limit: data?.monthly_limit ?? null,
+        plan_id: data?.plan_id ?? 'passport',
       };
     } catch (err) {
-      logger.error('check_moment_creation_limit unexpected error', err);
+      logger.error('check_moment_creation_limit unexpected error', err as Error);
       return {
         allowed: true,
         daily_count: 0,

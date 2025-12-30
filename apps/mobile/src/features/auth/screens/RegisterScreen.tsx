@@ -881,7 +881,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   backButton: {
     padding: 8,
@@ -932,10 +932,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 52,
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
     paddingHorizontal: 14,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
   },
   inputIcon: {
     marginRight: 10,
@@ -979,9 +979,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 52,
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     overflow: 'hidden',
   },
   countryCodeBox: {
@@ -990,7 +990,7 @@ const styles = StyleSheet.create({
     backgroundColor: primitives.stone[100],
     justifyContent: 'center',
     borderRightWidth: 1,
-    borderRightColor: COLORS.border,
+    borderRightColor: COLORS.border.default,
   },
   countryCodeText: {
     fontSize: 16,
@@ -1015,9 +1015,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.default,
     borderRadius: 12,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     gap: 12,
   },
   genderOptionSelected: {
@@ -1070,7 +1070,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   modalTitle: {
     fontSize: 17,

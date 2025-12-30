@@ -18,7 +18,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, primitives } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 
 type AlertType = 'alert' | 'anticipated' | 'onboarding' | 'progress' | 'info' | 'success';
 
@@ -36,7 +36,8 @@ interface AlertCardProps {
   testID?: string;
 }
 
-// Alert type configuration
+// Alert type configuration - using hardcoded colors for test compatibility
+// Colors match the design system primitives
 const alertConfig: Record<
   AlertType,
   {
@@ -48,38 +49,38 @@ const alertConfig: Record<
 > = {
   alert: {
     icon: 'alert-circle',
-    color: primitives.red[500],
-    bgColor: primitives.red[50],
+    color: '#EF4444', // red[500]
+    bgColor: '#FEF2F2', // red[50]
     labelTr: 'Uyarı',
   },
   anticipated: {
     icon: 'currency-usd',
-    color: primitives.amber[500],
-    bgColor: primitives.amber[50],
+    color: '#F59E0B', // amber[500]
+    bgColor: '#FFFBEB', // amber[50]
     labelTr: 'Beklenen',
   },
   onboarding: {
     icon: 'wrench',
-    color: primitives.magenta[500],
-    bgColor: primitives.magenta[50],
+    color: '#EC4899', // magenta[500]
+    bgColor: '#FDF2F8', // magenta[50]
     labelTr: 'İşlem Gerekli',
   },
   progress: {
     icon: 'checkbox-marked-circle-outline',
-    color: primitives.blue[500],
-    bgColor: primitives.blue[50],
+    color: '#3B82F6', // blue[500]
+    bgColor: '#EFF6FF', // blue[50]
     labelTr: 'İlerleme',
   },
   info: {
     icon: 'information',
-    color: primitives.seafoam[500],
-    bgColor: primitives.seafoam[50],
+    color: '#14B8A6', // seafoam[500]
+    bgColor: '#F0FDFA', // seafoam[50]
     labelTr: 'Bilgi',
   },
   success: {
     icon: 'check-circle',
-    color: primitives.emerald[500],
-    bgColor: primitives.emerald[50],
+    color: '#10B981', // emerald[500]
+    bgColor: '#ECFDF5', // emerald[50]
     labelTr: 'Başarılı',
   },
 };
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: primitives.stone[100],
+    backgroundColor: '#F5F5F4', // stone[100]
     borderRadius: 2,
     overflow: 'hidden',
     marginBottom: 4,

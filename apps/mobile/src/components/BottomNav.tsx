@@ -22,6 +22,9 @@ import {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
+
+type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, {
@@ -53,8 +56,8 @@ type TabName = 'Discover' | 'Requests' | 'Messages' | 'Profile';
 interface TabConfig {
   name: TabName;
   label: string;
-  icon: string;
-  iconActive: string;
+  icon: IconName;
+  iconActive: IconName;
   screen: keyof RootStackParamList;
 }
 
@@ -138,7 +141,7 @@ const TabItem: React.FC<TabItemProps> = memo(({ tab, isActive, badge, onPress })
           <MaterialCommunityIcons
             name={isActive ? tab.iconActive : tab.icon}
             size={24}
-            color={isActive ? COLORS.interactive.primary : COLORS.text.muted}
+            color={isActive ? COLORS.brand.primary : COLORS.text.muted}
           />
           {badge && badge > 0 && (
             <View style={styles.badge}>
@@ -380,7 +383,7 @@ const styles = StyleSheet.create({
   },
   navTextActive: {
     ...TYPE_SCALE.body.caption,
-    color: COLORS.interactive.primary,
+    color: COLORS.brand.primary,
     fontSize: 10,
     fontWeight: '600',
     marginTop: 2,
@@ -391,7 +394,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.interactive.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   createButtonWrapper: {
     alignItems: 'center',
@@ -404,7 +407,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: PALETTE.primary[500],
+    shadowColor: '#F59E0B', // amber[500] - primary color
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
