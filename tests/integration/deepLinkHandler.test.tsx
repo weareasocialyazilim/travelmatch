@@ -18,8 +18,6 @@
  * - UTM tracking
  */
 
-// @ts-nocheck - Complex React Navigation mocks
-
 // Mock expo/virtual/env first (ES module issue)
 jest.mock('expo/virtual/env', () => ({
   env: process.env,
@@ -38,27 +36,27 @@ import { sessionManager } from '../../apps/mobile/src/services/sessionManager';
 // Mock dependencies
 jest.mock('react-native', () => ({
   Linking: {
-    getInitialURL: jest.fn(),
-    addEventListener: jest.fn(),
+    getInitialURL: jest.fn() as jest.Mock,
+    addEventListener: jest.fn() as jest.Mock,
   },
 }));
 
 jest.mock('../../apps/mobile/src/utils/logger', () => ({
   logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: jest.fn() as jest.Mock,
+    warn: jest.fn() as jest.Mock,
+    error: jest.fn() as jest.Mock,
   },
 }));
 
 jest.mock('../../apps/mobile/src/services/sessionManager', () => ({
   sessionManager: {
-    getValidToken: jest.fn(),
+    getValidToken: jest.fn() as jest.Mock,
   },
 }));
 
 // Mock global fetch
-global.fetch = jest.fn();
+global.fetch = jest.fn() as jest.Mock;
 
 describe('DeepLinkHandler', () => {
   let mockNavigation: NavigationContainerRef<any>;
@@ -68,11 +66,11 @@ describe('DeepLinkHandler', () => {
 
     // Mock navigation
     mockNavigation = {
-      navigate: jest.fn(),
-      isReady: jest.fn(() => true),
-      reset: jest.fn(),
-      goBack: jest.fn(),
-      canGoBack: jest.fn(() => true),
+      navigate: jest.fn() as jest.Mock,
+      isReady: jest.fn(() => true) as jest.Mock,
+      reset: jest.fn() as jest.Mock,
+      goBack: jest.fn() as jest.Mock,
+      canGoBack: jest.fn(() => true) as jest.Mock,
     } as any;
 
     deepLinkHandler.setNavigation(mockNavigation);
@@ -83,7 +81,7 @@ describe('DeepLinkHandler', () => {
     // Default Linking mocks
     (Linking.getInitialURL as jest.Mock).mockResolvedValue(null);
     (Linking.addEventListener as jest.Mock).mockReturnValue({
-      remove: jest.fn(),
+      remove: jest.fn() as jest.Mock,
     });
 
     // Default fetch mock (resource exists)
@@ -676,7 +674,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should listen to URL changes', () => {
-      const mockRemove = jest.fn();
+      const mockRemove = jest.fn() as jest.Mock;
       (Linking.addEventListener as jest.Mock).mockReturnValueOnce({
         remove: mockRemove,
       });
@@ -696,9 +694,9 @@ describe('DeepLinkHandler', () => {
       let urlListener: (event: { url: string }) => void = () => {};
 
       (Linking.addEventListener as jest.Mock).mockImplementationOnce(
-        (event, callback) => {
+        (event: string, callback: (event: { url: string }) => void) => {
           urlListener = callback;
-          return { remove: jest.fn() };
+          return { remove: jest.fn() as jest.Mock };
         },
       );
 

@@ -9,7 +9,7 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions, Platform } from 'react-native';
 import { Skeleton } from './Skeleton';
-import { COLORS } from '@travelmatch/shared';
+import { COLORS } from '../../constants/colors';
 
 const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
   Dimensions.get('window');
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray100,
+    borderBottomColor: COLORS.gray[100],
   },
   listItemContent: {
     flex: 1,

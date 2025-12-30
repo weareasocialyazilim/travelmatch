@@ -12,10 +12,11 @@ jest.mock('expo-linear-gradient', () => ({
 jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => {
   const React = require('react');
   const { View, Text } = require('react-native');
+
   const MockIcon = React.forwardRef(
-    ({ name, size, color, ...props }: any, ref: any) => (
-      <View {...props} testID={`icon-${name}`} ref={ref}>
-        <Text>{name}</Text>
+    (props: { name: string; size?: number; color?: string; testID?: string }, ref: React.Ref<typeof View>) => (
+      <View testID={props.testID || `icon-${props.name}`} ref={ref}>
+        <Text>{props.name}</Text>
       </View>
     ),
   );
@@ -31,7 +32,7 @@ jest.mock('@expo/vector-icons', () => {
 });
 
 describe('ThankYouModal', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
   const defaultProps = {
     visible: true,
     onClose: mockOnClose,
@@ -301,7 +302,7 @@ describe('ThankYouModal', () => {
   describe('Edge Cases', () => {
     it('handles undefined onClose gracefully', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} onClose={undefined} />,
+        <ThankYouModal {...defaultProps} onClose={undefined as unknown as () => void} />,
       );
 
       expect(() => fireEvent.press(getByText('Continue'))).not.toThrow();

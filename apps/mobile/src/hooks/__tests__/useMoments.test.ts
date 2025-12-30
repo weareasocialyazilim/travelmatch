@@ -47,7 +47,7 @@ jest.mock('@/services/supabaseDbService', () => ({
 jest.mock('@/utils/logger');
 
 describe.skip('useMoments', () => {
-  const mockMoment: any = {
+  const mockMoment = {
     id: 'moment-1',
     title: 'Coffee in Paris',
     description: 'Enjoy a coffee',
@@ -81,11 +81,11 @@ describe.skip('useMoments', () => {
     jest.clearAllMocks();
 
     // Default mock responses
-    supabase.auth.getUser.mockResolvedValue({
+    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
       data: { user: mockUser },
     });
 
-    momentsService.listWithCursor.mockResolvedValue({
+    (momentsService.listWithCursor as jest.Mock).mockResolvedValue({
       data: [mockMoment],
       meta: {
         next_cursor: null,
@@ -131,7 +131,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should handle loading errors', async () => {
-      momentsService.listWithCursor.mockResolvedValue({
+      (momentsService.listWithCursor as jest.Mock).mockResolvedValue({
         data: [],
         meta: { next_cursor: null, has_more: false, count: 0 },
         error: new Error('Network error'),
@@ -149,7 +149,7 @@ describe.skip('useMoments', () => {
 
   describe('pagination', () => {
     it('should indicate more data available', async () => {
-      momentsService.listWithCursor.mockResolvedValue({
+      (momentsService.listWithCursor as jest.Mock).mockResolvedValue({
         data: [mockMoment],
         meta: { next_cursor: 'cursor-1', has_more: true, count: 1 },
         error: null,
@@ -165,7 +165,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should load more moments when available', async () => {
-      momentsService.listWithCursor
+      (momentsService.listWithCursor as jest.Mock)
         .mockResolvedValueOnce({
           data: [mockMoment],
           meta: { next_cursor: 'cursor-1', has_more: true, count: 1 },
@@ -195,7 +195,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should not load more when hasMore is false', async () => {
-      momentsService.listWithCursor.mockResolvedValue({
+      (momentsService.listWithCursor as jest.Mock).mockResolvedValue({
         data: [mockMoment],
         meta: { next_cursor: null, has_more: false, count: 1 },
         error: null,
@@ -218,7 +218,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should pass cursor when loading more', async () => {
-      momentsService.listWithCursor
+      (momentsService.listWithCursor as jest.Mock)
         .mockResolvedValueOnce({
           data: [mockMoment],
           meta: { next_cursor: 'cursor-abc', has_more: true, count: 1 },
@@ -415,7 +415,7 @@ describe.skip('useMoments', () => {
         expect(result.current.moments).toHaveLength(1);
       });
 
-      momentsService.listWithCursor.mockResolvedValue({
+      (momentsService.listWithCursor as jest.Mock).mockResolvedValue({
         data: [
           mockMoment,
           { ...mockMoment, id: 'moment-2', title: 'New Moment' },
@@ -456,7 +456,7 @@ describe.skip('useMoments', () => {
 
   describe('getMoment', () => {
     it('should fetch single moment by ID', async () => {
-      momentsService.getById.mockResolvedValue({
+      (momentsService.getById as jest.Mock).mockResolvedValue({
         data: mockMoment,
         error: null,
       });
@@ -474,14 +474,14 @@ describe.skip('useMoments', () => {
     });
 
     it('should return null if moment not found', async () => {
-      momentsService.getById.mockResolvedValue({
+      (momentsService.getById as jest.Mock).mockResolvedValue({
         data: null,
         error: null,
       });
 
       const { result } = renderHook(() => useMoments());
 
-      let moment: Moment | null = 'not-null' as unknown as Moment;
+      let moment: Moment | null;
       await act(async () => {
         moment = await result.current.getMoment('non-existent');
       });
@@ -490,14 +490,14 @@ describe.skip('useMoments', () => {
     });
 
     it('should handle errors when fetching moment', async () => {
-      momentsService.getById.mockResolvedValue({
+      (momentsService.getById as jest.Mock).mockResolvedValue({
         data: null,
         error: new Error('Not found'),
       });
 
       const { result } = renderHook(() => useMoments());
 
-      let moment: Moment | null = 'not-null' as unknown as Moment;
+      let moment: Moment | null;
       await act(async () => {
         moment = await result.current.getMoment('moment-1');
       });
@@ -528,7 +528,7 @@ describe.skip('useMoments', () => {
         title: createData.title,
       };
 
-      momentsService.create.mockResolvedValue({
+      (momentsService.create as jest.Mock).mockResolvedValue({
         data: createdMoment,
         error: null,
       });
@@ -558,7 +558,7 @@ describe.skip('useMoments', () => {
         title: createData.title,
       };
 
-      momentsService.create.mockResolvedValue({
+      (momentsService.create as jest.Mock).mockResolvedValue({
         data: createdMoment,
         error: null,
       });
@@ -578,13 +578,13 @@ describe.skip('useMoments', () => {
     });
 
     it('should require authentication', async () => {
-      supabase.auth.getUser.mockResolvedValue({
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
       });
 
       const { result } = renderHook(() => useMoments());
 
-      let moment: Moment | null = 'not-null' as unknown as Moment;
+      let moment: Moment | null;
       await act(async () => {
         moment = await result.current.createMoment(createData);
       });
@@ -594,14 +594,14 @@ describe.skip('useMoments', () => {
     });
 
     it('should handle creation errors', async () => {
-      momentsService.create.mockResolvedValue({
+      (momentsService.create as jest.Mock).mockResolvedValue({
         data: null,
         error: new Error('Creation failed'),
       });
 
       const { result } = renderHook(() => useMoments());
 
-      let moment: Moment | null = 'not-null' as unknown as Moment;
+      let moment: Moment | null;
       await act(async () => {
         moment = await result.current.createMoment(createData);
       });
@@ -624,7 +624,7 @@ describe.skip('useMoments', () => {
         price: updates.pricePerGuest,
       };
 
-      momentsService.update.mockResolvedValue({
+      (momentsService.update as jest.Mock).mockResolvedValue({
         data: updatedMoment,
         error: null,
       });
@@ -649,7 +649,7 @@ describe.skip('useMoments', () => {
 
     it('should update moment in myMoments list', async () => {
       // Setup myMoments first
-      momentsService.list.mockResolvedValue({
+      (momentsService.list as jest.Mock).mockResolvedValue({
         data: [mockMoment],
         error: null,
       });
@@ -667,7 +667,7 @@ describe.skip('useMoments', () => {
         title: 'Updated',
       };
 
-      momentsService.update.mockResolvedValue({
+      (momentsService.update as jest.Mock).mockResolvedValue({
         data: updatedMoment,
         error: null,
       });
@@ -685,7 +685,7 @@ describe.skip('useMoments', () => {
         description: 'New description',
       };
 
-      momentsService.update.mockResolvedValue({
+      (momentsService.update as jest.Mock).mockResolvedValue({
         data: updatedMoment,
         error: null,
       });
@@ -703,14 +703,14 @@ describe.skip('useMoments', () => {
     });
 
     it('should handle update errors', async () => {
-      momentsService.update.mockResolvedValue({
+      (momentsService.update as jest.Mock).mockResolvedValue({
         data: null,
         error: new Error('Update failed'),
       });
 
       const { result } = renderHook(() => useMoments());
 
-      let moment: Moment | null = 'not-null' as unknown as Moment;
+      let moment: Moment | null;
       await act(async () => {
         moment = await result.current.updateMoment('moment-1', {
           title: 'Updated',
@@ -724,7 +724,7 @@ describe.skip('useMoments', () => {
 
   describe('deleteMoment', () => {
     it('should delete moment', async () => {
-      momentsService.delete.mockResolvedValue({
+      (momentsService.delete as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -753,7 +753,7 @@ describe.skip('useMoments', () => {
 
       expect(result.current.myMoments).toHaveLength(2);
 
-      momentsService.delete.mockResolvedValue({
+      (momentsService.delete as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -766,7 +766,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should handle deletion errors', async () => {
-      momentsService.delete.mockResolvedValue({
+      (momentsService.delete as jest.Mock).mockResolvedValue({
         error: new Error('Delete failed'),
       });
 
@@ -784,7 +784,7 @@ describe.skip('useMoments', () => {
 
   describe('pauseMoment', () => {
     it('should pause moment', async () => {
-      momentsService.pause.mockResolvedValue({
+      (momentsService.pause as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -800,7 +800,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should update status in myMoments', async () => {
-      momentsService.list.mockResolvedValue({
+      (momentsService.list as jest.Mock).mockResolvedValue({
         data: [mockMoment],
         error: null,
       });
@@ -811,7 +811,7 @@ describe.skip('useMoments', () => {
         await result.current.loadMyMoments();
       });
 
-      momentsService.pause.mockResolvedValue({
+      (momentsService.pause as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -825,7 +825,7 @@ describe.skip('useMoments', () => {
 
   describe('activateMoment', () => {
     it('should activate moment', async () => {
-      momentsService.activate.mockResolvedValue({
+      (momentsService.activate as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -854,7 +854,7 @@ describe.skip('useMoments', () => {
 
       expect(result.current.myMoments[0].status).toBe('paused');
 
-      momentsService.activate.mockResolvedValue({
+      (momentsService.activate as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -868,7 +868,7 @@ describe.skip('useMoments', () => {
 
   describe('saveMoment', () => {
     it('should save moment to favorites', async () => {
-      momentsService.save.mockResolvedValue({
+      (momentsService.save as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -888,7 +888,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should require authentication', async () => {
-      supabase.auth.getUser.mockResolvedValue({
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
       });
 
@@ -906,7 +906,7 @@ describe.skip('useMoments', () => {
 
   describe('unsaveMoment', () => {
     it('should unsave moment', async () => {
-      momentsService.unsave.mockResolvedValue({
+      (momentsService.unsave as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -925,7 +925,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should remove from savedMoments list', async () => {
-      momentsService.getSaved.mockResolvedValue({
+      (momentsService.getSaved as jest.Mock).mockResolvedValue({
         data: [mockMoment, { ...mockMoment, id: 'moment-2' }],
         error: null,
       });
@@ -938,7 +938,7 @@ describe.skip('useMoments', () => {
 
       expect(result.current.savedMoments).toHaveLength(2);
 
-      momentsService.unsave.mockResolvedValue({
+      (momentsService.unsave as jest.Mock).mockResolvedValue({
         error: null,
       });
 
@@ -971,12 +971,12 @@ describe.skip('useMoments', () => {
     });
 
     it('should show loading state', async () => {
-      let resolvePromise;
+      let resolvePromise: (value: unknown) => void;
       const promise = new Promise((resolve) => {
         resolvePromise = resolve;
       });
 
-      momentsService.list.mockReturnValue(promise);
+      (momentsService.list as jest.Mock).mockReturnValue(promise);
 
       const { result } = renderHook(() => useMoments());
 
@@ -995,7 +995,7 @@ describe.skip('useMoments', () => {
     });
 
     it('should require authentication', async () => {
-      supabase.auth.getUser.mockResolvedValue({
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
       });
 
@@ -1028,12 +1028,12 @@ describe.skip('useMoments', () => {
     });
 
     it('should show loading state', async () => {
-      let resolvePromise;
+      let resolvePromise: (value: unknown) => void;
       const promise = new Promise((resolve) => {
         resolvePromise = resolve;
       });
 
-      momentsService.getSaved.mockReturnValue(promise);
+      (momentsService.getSaved as jest.Mock).mockReturnValue(promise);
 
       const { result } = renderHook(() => useMoments());
 
@@ -1054,7 +1054,7 @@ describe.skip('useMoments', () => {
 
   describe('memory leak prevention', () => {
     it('should not update state after unmount', async () => {
-      momentsService.list.mockImplementation(
+      (momentsService.list as jest.Mock).mockImplementation(
         () =>
           new Promise((resolve) => {
             setTimeout(() => {

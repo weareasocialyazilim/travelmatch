@@ -10,7 +10,7 @@ import { useNetwork } from '../../hooks/useNetwork';
 // Mock useNetwork hook
 jest.mock('../../hooks/useNetwork');
 
-const mockUseNetwork = useNetwork ;
+const mockUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;
 
 describe('OfflineBanner', () => {
   beforeEach(() => {
@@ -83,7 +83,7 @@ describe('OfflineBanner', () => {
 
     it('should call onRetry when retry button pressed and connection restored', async () => {
       const mockCheckConnection = jest.fn().mockResolvedValue(true);
-      const mockOnRetry = jest.fn();
+      const mockOnRetry = jest.fn() as jest.Mock;
       
       mockUseNetwork.mockReturnValue({
         isOffline: true,
@@ -107,7 +107,7 @@ describe('OfflineBanner', () => {
 
     it('should not call onRetry when connection check fails', async () => {
       const mockCheckConnection = jest.fn().mockResolvedValue(false);
-      const mockOnRetry = jest.fn();
+      const mockOnRetry = jest.fn() as jest.Mock;
       
       mockUseNetwork.mockReturnValue({
         isOffline: true,

@@ -147,7 +147,7 @@ export const Button: React.FC<ButtonProps> = memo(
           return COLORS.text.primary;
         case 'outline':
         case 'ghost':
-          return COLORS.interactive.primary;
+          return COLORS.brand.primary;
         case 'glass':
           return PALETTE.white;
         default:
@@ -187,7 +187,7 @@ export const Button: React.FC<ButtonProps> = memo(
             ...base,
             backgroundColor: 'transparent',
             borderWidth: 2,
-            borderColor: COLORS.interactive.primary,
+            borderColor: COLORS.brand.primary,
           };
         case 'ghost':
           return {

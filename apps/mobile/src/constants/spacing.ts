@@ -292,8 +292,27 @@ export const HIT_SLOP = {
   large: { top: 12, right: 12, bottom: 12, left: 12 },
 } as const;
 
+// ═══════════════════════════════════════════════════════════════════
+// BORDER - Border width values
+// ═══════════════════════════════════════════════════════════════════
+export const BORDER = {
+  none: 0,
+  hairline: 0.5,
+  thin: 1,
+  default: 1,
+  medium: 1.5,
+  thick: 2,
+  heavy: 3,
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════
+// radii - Alias for RADIUS for backwards compatibility
+// ═══════════════════════════════════════════════════════════════════
+export const radii = RADIUS;
+
 // Type exports for TypeScript
 export type SpacingKey = keyof typeof SPACING;
 export type SpacingValue = (typeof SPACING)[SpacingKey];
 export type RadiusKey = keyof typeof RADIUS;
 export type SizeKey = keyof typeof SIZES;
+export type BorderKey = keyof typeof BORDER;

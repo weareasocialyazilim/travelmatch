@@ -48,7 +48,7 @@ describe('FormComponents', () => {
       const views = UNSAFE_getAllByType(View);
       
       // Check if custom style is applied
-      const styledView = views.find((view) => {
+      const styledView = views.find((view: { props: { style?: unknown } }) => {
         const style = JSON.stringify(view.props.style);
         return style.includes('20');
       });
@@ -163,11 +163,11 @@ describe('FormComponents', () => {
   });
 
   describe('FormInput', () => {
-    const mockOnChangeText = jest.fn();
-    const mockOnBlur = jest.fn();
-    const mockOnFocus = jest.fn();
-    const mockOnSubmitEditing = jest.fn();
-    const mockOnRightIconPress = jest.fn();
+    const mockOnChangeText = jest.fn() as jest.Mock;
+    const mockOnBlur = jest.fn() as jest.Mock;
+    const mockOnFocus = jest.fn() as jest.Mock;
+    const mockOnSubmitEditing = jest.fn() as jest.Mock;
+    const mockOnRightIconPress = jest.fn() as jest.Mock;
 
     beforeEach(() => {
       jest.clearAllMocks();
@@ -328,8 +328,8 @@ describe('FormComponents', () => {
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-        
-        const errorIcon = icons.find((icon) => icon.props.name === 'alert-circle');
+
+        const errorIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'alert-circle');
         expect(errorIcon).toBeTruthy();
         expect(errorIcon?.props.size).toBe(14);
       });
@@ -361,8 +361,8 @@ describe('FormComponents', () => {
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-        
-        const eyeIcon = icons.find((icon) => 
+
+        const eyeIcon = icons.find((icon: { props: { name: string } }) =>
           icon.props.name === 'eye-outline' || icon.props.name === 'eye-off-outline'
         );
         expect(eyeIcon).toBeTruthy();
@@ -398,8 +398,8 @@ describe('FormComponents', () => {
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-        
-        const leftIcon = icons.find((icon) => icon.props.name === 'email');
+
+        const leftIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'email');
         expect(leftIcon).toBeTruthy();
       });
 
@@ -415,8 +415,8 @@ describe('FormComponents', () => {
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-        
-        const rightIcon = icons.find((icon) => icon.props.name === 'close');
+
+        const rightIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'close');
         expect(rightIcon).toBeTruthy();
       });
 
@@ -432,9 +432,9 @@ describe('FormComponents', () => {
 
         const { TouchableOpacity } = require('react-native');
         const buttons = UNSAFE_getAllByType(TouchableOpacity);
-        
+
         // Find the button with the close icon
-        const rightIconButton = buttons.find((btn) => !btn.props.disabled);
+        const rightIconButton = buttons.find((btn: { props: { disabled?: boolean } }) => !btn.props.disabled);
         if (rightIconButton) {
           fireEvent.press(rightIconButton);
           expect(mockOnRightIconPress).toHaveBeenCalled();
@@ -453,9 +453,9 @@ describe('FormComponents', () => {
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-        
+
         // Should only have eye icon, not close icon
-        const closeIcon = icons.find((icon) => icon.props.name === 'close');
+        const closeIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'close');
         expect(closeIcon).toBeFalsy();
       });
     });
@@ -737,8 +737,8 @@ describe('FormComponents', () => {
 
         const { View } = require('react-native');
         const views = UNSAFE_getAllByType(View);
-        
-        const styledView = views.find((view) => {
+
+        const styledView = views.find((view: { props: { style?: unknown } }) => {
           const style = JSON.stringify(view.props.style);
           return style.includes('32');
         });

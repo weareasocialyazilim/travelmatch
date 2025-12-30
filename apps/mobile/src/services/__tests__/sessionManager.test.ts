@@ -251,7 +251,7 @@ describe('SessionManager', () => {
       (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
       (secureStorage.setItem as jest.Mock).mockResolvedValue(undefined);
 
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       sessionManager.addListener(listener);
 
       await sessionManager.saveSession(mockSessionData);
@@ -385,7 +385,7 @@ describe('SessionManager', () => {
       (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
       (secureStorage.deleteItems as jest.Mock).mockResolvedValue(undefined);
 
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       sessionManager.addListener(listener);
 
       const token = await sessionManager.getValidToken();
@@ -491,7 +491,7 @@ describe('SessionManager', () => {
       (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
       (secureStorage.deleteItems as jest.Mock).mockResolvedValue(undefined);
 
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       sessionManager.addListener(listener);
 
       await sessionManager.clearSession();
@@ -629,7 +629,7 @@ describe('SessionManager', () => {
   // ========================================
   describe('addListener', () => {
     it('should add and invoke listener', async () => {
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       sessionManager.addListener(listener);
 
       (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
@@ -641,14 +641,14 @@ describe('SessionManager', () => {
     });
 
     it('should return unsubscribe function', () => {
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       const unsubscribe = sessionManager.addListener(listener);
 
       expect(typeof unsubscribe).toBe('function');
     });
 
     it('should unsubscribe when unsubscribe is called', async () => {
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       const unsubscribe = sessionManager.addListener(listener);
 
       unsubscribe();
@@ -665,7 +665,7 @@ describe('SessionManager', () => {
       const errorListener = jest.fn().mockImplementation(() => {
         throw new Error('Listener error');
       });
-      const normalListener = jest.fn();
+      const normalListener = jest.fn() as jest.Mock;
 
       sessionManager.addListener(errorListener);
       sessionManager.addListener(normalListener);

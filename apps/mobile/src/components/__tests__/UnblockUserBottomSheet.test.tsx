@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { UnblockUserBottomSheet } from '../UnblockUserBottomSheet';
 
 describe('UnblockUserBottomSheet', () => {
-  const mockOnUnblock = jest.fn();
-  const mockOnCancel = jest.fn();
+  const mockOnUnblock = jest.fn() as jest.Mock;
+  const mockOnCancel = jest.fn() as jest.Mock;
   const defaultProps = {
     visible: true,
     userName: 'Alex',

@@ -309,7 +309,7 @@ const ProfileScreen: React.FC = () => {
             location={userData.location}
             isVerified={userData.isVerified}
             trustScore={userData.trustScore}
-            onAvatarPress={handleEditProfile}
+            onEditPress={handleEditProfile}
             onTrustGardenPress={handleTrustGarden}
           />
 

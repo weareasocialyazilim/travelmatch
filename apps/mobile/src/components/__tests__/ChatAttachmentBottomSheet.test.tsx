@@ -3,9 +3,9 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { ChatAttachmentBottomSheet } from '../ChatAttachmentBottomSheet';
 
 describe('ChatAttachmentBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnPhotoVideo = jest.fn();
-  const mockOnGift = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnPhotoVideo = jest.fn() as jest.Mock;
+  const mockOnGift = jest.fn() as jest.Mock;
   const defaultProps = {
     visible: true,
     onClose: mockOnClose,

@@ -160,7 +160,7 @@ describe('Payment Flow Integration', () => {
   describe('Scenario 2: Add Payment Method and Make Payment', () => {
     it('should add card → verify it exists → use for payment', async () => {
       // Setup mocks for functions.invoke (addCard)
-      (mockSupabase ).functions = {
+      (mockSupabase as any).functions = {
         invoke: jest.fn().mockResolvedValue({
           data: {
             id: 'card_new123',

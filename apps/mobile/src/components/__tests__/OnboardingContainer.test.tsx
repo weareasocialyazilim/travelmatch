@@ -15,7 +15,7 @@ jest.mock('../../features/auth/screens/OnboardingScreen', () => ({
 }));
 
 // Mock UIStore
-const mockIsOnboardingCompleted = jest.fn();
+const mockIsOnboardingCompleted = jest.fn() as jest.Mock;
 jest.mock('../../stores/uiStore', () => ({
   useUIStore: (selector: any) => {
     const state = {

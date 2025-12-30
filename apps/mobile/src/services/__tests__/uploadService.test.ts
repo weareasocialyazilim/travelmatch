@@ -44,7 +44,7 @@ describe('uploadService - Basic Functionality', () => {
     jest.clearAllMocks();
 
     // Mock auth
-    supabase.auth.getUser.mockResolvedValue({
+    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -58,7 +58,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    supabase.from.mockReturnValue({
+    (supabase.from as jest.Mock).mockReturnValue({
       select: mockSelect,
       insert: jest.fn().mockResolvedValue({ error: null }),
     });
@@ -71,10 +71,10 @@ describe('uploadService - Basic Functionality', () => {
         size: 1024 * 1024, // 1MB
         type: 'image/jpeg',
       }),
-    }) as unknown as { blob: () => Promise<{ size: number; type: string }> };
+    }) as jest.Mock;
 
     // Mock FileSystem (still needed for some functions)
-    FileSystem.getInfoAsync.mockResolvedValue({
+    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
       exists: true,
       size: 1024 * 1024,
       uri: 'file:///tmp/test.jpg',
@@ -94,7 +94,7 @@ describe('uploadService - Basic Functionality', () => {
   });
 
   it('should reject upload when not authenticated', async () => {
-    supabase.auth.getUser.mockResolvedValue({
+    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
       data: { user: null },
       error: null,
     });
@@ -106,7 +106,7 @@ describe('uploadService - Basic Functionality', () => {
 
   it('should check rate limits before upload', async () => {
     const storageService = require('@/services/supabaseStorageService');
-    storageService.uploadFile.mockResolvedValue({
+    (storageService.uploadFile as jest.Mock).mockResolvedValue({
       url: 'https://example.com/test.jpg',
       path: 'test.jpg',
       error: null,
@@ -128,7 +128,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    supabase.from.mockReturnValue({
+    (supabase.from as jest.Mock).mockReturnValue({
       select: mockSelect,
       insert: jest.fn().mockResolvedValue({ error: null }),
     });
@@ -150,7 +150,7 @@ describe('uploadService - Basic Functionality', () => {
       error: null,
     });
 
-    supabase.from.mockReturnValue({
+    (supabase.from as jest.Mock).mockReturnValue({
       select: mockSelect,
       insert: mockInsert,
     });
@@ -158,7 +158,7 @@ describe('uploadService - Basic Functionality', () => {
     mockEq.mockReturnValue({ gte: mockGte });
 
     const storageService = require('@/services/supabaseStorageService');
-    storageService.uploadFile.mockResolvedValue({
+    (storageService.uploadFile as jest.Mock).mockResolvedValue({
       url: 'https://example.com/test.jpg',
       path: 'test.jpg',
       error: null,
@@ -172,7 +172,7 @@ describe('uploadService - Basic Functionality', () => {
   });
 
   it('should handle file not found', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('File not found'));
+    (global.fetch as jest.Mock) = jest.fn().mockRejectedValue(new Error('File not found'));
 
     await expect(
       uploadService.uploadImage('file:///tmp/missing.jpg', {
@@ -182,12 +182,12 @@ describe('uploadService - Basic Functionality', () => {
   });
 
   it('should reject files over size limit', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    (global.fetch as jest.Mock) = jest.fn().mockResolvedValue({
       blob: jest.fn().mockResolvedValue({
         size: 5 * 1024 * 1024, // 5MB - over 2MB avatar limit
         type: 'image/jpeg',
       }),
-    }) as unknown as { blob: () => Promise<{ size: number; type: string }> };
+    }) as jest.Mock;
 
     await expect(
       uploadService.uploadImage('file:///tmp/large.jpg', { folder: 'avatars' }),
@@ -197,7 +197,7 @@ describe('uploadService - Basic Functionality', () => {
   it('should upload multiple images', async () => {
     const storageService = require('@/services/supabaseStorageService');
     let count = 0;
-    storageService.uploadFile.mockImplementation(() => {
+    (storageService.uploadFile as jest.Mock).mockImplementation(() => {
       count++;
       return Promise.resolve({
         url: `https://example.com/test-${count}.jpg`,
@@ -223,7 +223,7 @@ describe('uploadService - Basic Functionality', () => {
 
   it('should log errors appropriately', async () => {
     const storageService = require('@/services/supabaseStorageService');
-    storageService.uploadFile.mockResolvedValue({
+    (storageService.uploadFile as jest.Mock).mockResolvedValue({
       url: null,
       path: null,
       error: new Error('Upload failed'),

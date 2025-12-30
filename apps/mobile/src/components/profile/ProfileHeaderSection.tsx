@@ -17,7 +17,6 @@ import {
   StyleSheet,
   Pressable,
   Image,
-  Dimensions,
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -36,11 +35,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
 
-import { COLORS, GRADIENTS, PALETTE, getTrustRingColors, getTrustLevel } from '../../constants/colors';
+import { COLORS, GRADIENTS, PALETTE, getTrustRingColors } from '../../constants/colors';
+import { useTranslation } from '../../hooks/useTranslation';
 import { TYPE_SCALE } from '../../theme/typography';
 import { SPRINGS } from '../../hooks/useAnimations';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ============================================
 // TYPES
@@ -69,7 +67,6 @@ interface ProfileHeaderSectionProps {
   exchangesCount?: number;
   responseRate?: number;
   onEditPress?: () => void;
-  onAvatarPress?: () => void;
   onTrustGardenPress?: () => void;
   onSettingsPress?: () => void;
 }
@@ -246,12 +243,12 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     exchangesCount,
     responseRate,
     onEditPress,
-    onAvatarPress,
     onTrustGardenPress,
     onSettingsPress,
   }) => {
     const insets = useSafeAreaInsets();
     const editButtonScale = useSharedValue(1);
+    const { t } = useTranslation();
 
     // Normalize values to support both `user` shape and individual props
     const resolvedAvatar = avatarUrl || user?.avatar || '';
@@ -373,9 +370,9 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
 
         {/* Stats Row - Glass Cards */}
         <View style={styles.statsRow}>
-          <StatCard value={resolvedMoments} label="Dilekler" />
-          <StatCard value={resolvedExchanges} label="Hediyeler" />
-          <StatCard value={`${resolvedResponse}%`} label="Yanıt" />
+          <StatCard value={resolvedMoments} label={t('trust.stats.moments')} />
+          <StatCard value={resolvedExchanges} label={t('trust.stats.gifts')} />
+          <StatCard value={`${resolvedResponse}%`} label={t('trust.stats.response')} />
         </View>
 
         {/* Edit Button - Floating */}

@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import RequestMoreProofBottomSheet from '../RequestMoreProofBottomSheet';
 
 describe('RequestMoreProofBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSend = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnSend = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

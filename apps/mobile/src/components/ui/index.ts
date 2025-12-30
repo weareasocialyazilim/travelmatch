@@ -21,9 +21,23 @@ export { TMPill, TMCategoryChip } from './TMPill';
 export { PasswordInput } from './PasswordInput';
 export { ControlledInput } from './ControlledInput';
 export { PasswordStrengthMeter } from './PasswordStrengthMeter';
+export { FormStepIndicator } from './FormStepIndicator';
+export type { FormStep } from './FormStepIndicator';
+export { OTPInput } from './OTPInput';
+export type { OTPInputProps } from './OTPInput';
+
+// Trust Score Components
+export { TrustScoreCircle, TrustScoreRingCompact } from './TrustScoreCircle';
+export type { TrustScoreCircleProps, TrustFactor } from './TrustScoreCircle';
 
 // Performance Optimized
 export { OptimizedImage } from './OptimizedImage';
+
+// Dashboard Components
+export { DashboardStatCard } from './DashboardStatCard';
+export { AlertCard, AlertBadge } from './AlertCard';
+export { ProgressBar, SegmentedProgress, CircularProgress } from './ProgressBar';
+export { FilterPanel, FilterChips } from './FilterPanel';
 
 // Bottom Sheets
 export {

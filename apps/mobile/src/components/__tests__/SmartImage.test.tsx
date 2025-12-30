@@ -195,7 +195,7 @@ describe('SmartImage', () => {
 
   describe('Callbacks', () => {
     it('calls onLoadStart when loading starts', () => {
-      const mockOnLoadStart = jest.fn();
+      const mockOnLoadStart = jest.fn() as jest.Mock;
       const { UNSAFE_getByType } = render(
         <SmartImage uri={mockUri} onLoadStart={mockOnLoadStart} />,
       );
@@ -209,7 +209,7 @@ describe('SmartImage', () => {
     });
 
     it('calls onLoadEnd when loading completes', () => {
-      const mockOnLoadEnd = jest.fn();
+      const mockOnLoadEnd = jest.fn() as jest.Mock;
       const { UNSAFE_getByType } = render(
         <SmartImage uri={mockUri} onLoadEnd={mockOnLoadEnd} />,
       );
@@ -223,7 +223,7 @@ describe('SmartImage', () => {
     });
 
     it('calls onError when image fails', () => {
-      const mockOnError = jest.fn();
+      const mockOnError = jest.fn() as jest.Mock;
       const { UNSAFE_getByType } = render(
         <SmartImage uri={mockUri} onError={mockOnError} />,
       );
@@ -237,7 +237,7 @@ describe('SmartImage', () => {
     });
 
     it('does not call onError on fallback retry', () => {
-      const mockOnError = jest.fn();
+      const mockOnError = jest.fn() as jest.Mock;
       const { UNSAFE_getByType } = render(
         <SmartImage
           uri={mockUri}

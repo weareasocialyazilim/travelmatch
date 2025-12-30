@@ -30,8 +30,8 @@ import { Platform } from 'react-native';
 import { NotificationPermissionModal } from '../NotificationPermissionModal';
 
 describe('NotificationPermissionModal', () => {
-  const mockOnClose = jest.fn();
-  const mockOnAllow = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnAllow = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

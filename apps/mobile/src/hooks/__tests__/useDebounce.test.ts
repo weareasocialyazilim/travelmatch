@@ -126,7 +126,7 @@ describe('useDebounce Hook', () => {
 
   describe('useDebouncedCallback', () => {
     it('delays callback execution', () => {
-      const callback = jest.fn();
+      const callback = jest.fn() as jest.Mock;
       const { result } = renderHook(() => 
         useDebouncedCallback(callback, 500)
       );
@@ -146,7 +146,7 @@ describe('useDebounce Hook', () => {
     });
 
     it('cancels previous call on rapid invocations', () => {
-      const callback = jest.fn();
+      const callback = jest.fn() as jest.Mock;
       const { result } = renderHook(() => 
         useDebouncedCallback(callback, 500)
       );
@@ -178,7 +178,7 @@ describe('useDebounce Hook', () => {
     });
 
     it('handles multiple arguments', () => {
-      const callback = jest.fn();
+      const callback = jest.fn() as jest.Mock;
       const { result } = renderHook(() => 
         useDebouncedCallback(callback, 500)
       );
@@ -220,7 +220,7 @@ describe('useDebounce Hook', () => {
     });
 
     it('cleans up timeout on unmount', () => {
-      const callback = jest.fn();
+      const callback = jest.fn() as jest.Mock;
       const { result, unmount } = renderHook(() => 
         useDebouncedCallback(callback, 500)
       );
@@ -240,7 +240,7 @@ describe('useDebounce Hook', () => {
     });
 
     it('handles zero delay', () => {
-      const callback = jest.fn();
+      const callback = jest.fn() as jest.Mock;
       const { result } = renderHook(() => 
         useDebouncedCallback(callback, 0)
       );
@@ -257,7 +257,7 @@ describe('useDebounce Hook', () => {
     });
 
     it('returns stable function reference', () => {
-      const callback = jest.fn();
+      const callback = jest.fn() as jest.Mock;
       const { result, rerender } = renderHook(() => 
         useDebouncedCallback(callback, 500)
       );
@@ -274,7 +274,7 @@ describe('useDebounce Hook', () => {
 
   describe('Real-world Scenarios', () => {
     it('search input debouncing', () => {
-      const searchApi = jest.fn();
+      const searchApi = jest.fn() as jest.Mock;
       const { result, rerender } = renderHook(
         ({ query }) => useDebounce(query, 300),
         { initialProps: { query: '' } }
@@ -298,7 +298,7 @@ describe('useDebounce Hook', () => {
     });
 
     it('window resize debouncing', () => {
-      const handleResize = jest.fn();
+      const handleResize = jest.fn() as jest.Mock;
       const { result } = renderHook(() => 
         useDebouncedCallback(handleResize, 200)
       );

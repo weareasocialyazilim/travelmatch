@@ -118,30 +118,35 @@ describe('FormComponents', () => {
       expect(input).toBeTruthy();
     });
 
-    // Skip: This test has flaky rendering/unmount timing issues
-    it.skip('should show character count when maxLength set', () => {
+    it('should show character count when maxLength set', () => {
       const { getByText } = render(
         <FormInput value="Hello" maxLength={100} onChangeText={() => {}} />,
       );
       expect(getByText('5/100')).toBeTruthy();
     });
 
-    // Skip: This test has flaky rendering/unmount timing issues
-    it.skip('should update character count on input', () => {
-      const { getByText, getByTestId } = render(
+    it('should update character count on input', async () => {
+      const onChangeText = jest.fn() as jest.Mock;
+      const { getByText, rerender } = render(
         <FormInput
           value="Hello"
           maxLength={100}
-          onChangeText={() => {}}
-          testID="text-input"
+          onChangeText={onChangeText}
         />,
       );
 
       expect(getByText('5/100')).toBeTruthy();
 
-      fireEvent.changeText(getByTestId('text-input'), 'Hello World');
+      // Rerender with new value to simulate controlled input
+      rerender(
+        <FormInput
+          value="Hello World"
+          maxLength={100}
+          onChangeText={onChangeText}
+        />,
+      );
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(getByText('11/100')).toBeTruthy();
       });
     });
@@ -149,7 +154,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - User Interactions', () => {
     it('should call onChangeText when text changes', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput value="" onChangeText={onChangeText} testID="email-input" />,
       );
@@ -159,7 +164,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onFocus when input receives focus', () => {
-      const onFocus = jest.fn();
+      const onFocus = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -174,7 +179,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onBlur when input loses focus', () => {
-      const onBlur = jest.fn();
+      const onBlur = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -189,7 +194,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onRightIconPress when right icon pressed', () => {
-      const onRightIconPress = jest.fn();
+      const onRightIconPress = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -206,7 +211,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onSubmitEditing when return key pressed', () => {
-      const onSubmitEditing = jest.fn();
+      const onSubmitEditing = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -365,7 +370,7 @@ describe('FormComponents', () => {
     });
 
     it('should set editable to false when disabled', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value="Disabled"
@@ -657,7 +662,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - Performance', () => {
     it('should not re-render when props dont change', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { rerender } = render(
         <FormInput
           value="test"

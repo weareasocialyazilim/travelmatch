@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, PALETTE } from '../../constants/colors';
+import { COLORS } from '../../constants/colors';
 
 export interface Contributor {
   userId: string;
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   badgeFull: {
-    backgroundColor: PALETTE.rose[400] + '20',
+    backgroundColor: '#FB7185' + '20', // rose[400]
   },
   badgeText: {
     fontSize: 12,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     color: COLORS.mint,
   },
   badgeTextFull: {
-    color: PALETTE.rose[400],
+    color: '#FB7185', // rose[400]
   },
   slotsRow: {
     flexDirection: 'row',

@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { ConfirmGiftModal } from '../ConfirmGiftModal';
 
 describe('ConfirmGiftModal', () => {
-  const mockOnCancel = jest.fn();
-  const mockOnConfirm = jest.fn();
+  const mockOnCancel = jest.fn() as jest.Mock;
+  const mockOnConfirm = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

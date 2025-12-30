@@ -47,7 +47,7 @@ describe('Integration Tests: Moments Flow', () => {
         },
       ];
 
-      (supabase.from ).mockReturnValue({
+      (supabase.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           order: jest.fn().mockReturnValue({
             limit: jest.fn().mockReturnValue({
@@ -61,7 +61,7 @@ describe('Integration Tests: Moments Flow', () => {
       });
 
       // Render hook with QueryClient provider
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }): JSX.Element => (
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>
@@ -97,7 +97,7 @@ describe('Integration Tests: Moments Flow', () => {
       };
 
       // Mock create response
-      (supabase.from ).mockReturnValue({
+      (supabase.from as jest.Mock).mockReturnValue({
         insert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
@@ -108,7 +108,7 @@ describe('Integration Tests: Moments Flow', () => {
         }),
       });
 
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }): JSX.Element => (
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>
@@ -127,7 +127,7 @@ describe('Integration Tests: Moments Flow', () => {
 
     it('should handle API errors gracefully', async () => {
       // Mock error response
-      (supabase.from ).mockReturnValue({
+      (supabase.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           order: jest.fn().mockReturnValue({
             limit: jest.fn().mockReturnValue({
@@ -140,7 +140,7 @@ describe('Integration Tests: Moments Flow', () => {
         }),
       });
 
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }): JSX.Element => (
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>
@@ -162,7 +162,7 @@ describe('Integration Tests: Moments Flow', () => {
     it('should invalidate cache after mutation', async () => {
       const mockMoments = [{ id: '1', title: 'Test' }];
 
-      (supabase.from ).mockReturnValue({
+      (supabase.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           order: jest.fn().mockReturnValue({
             limit: jest.fn().mockReturnValue({
@@ -185,7 +185,7 @@ describe('Integration Tests: Moments Flow', () => {
         }),
       });
 
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }): JSX.Element => (
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>

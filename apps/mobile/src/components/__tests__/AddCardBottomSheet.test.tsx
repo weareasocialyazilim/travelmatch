@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { AddCardBottomSheet } from '../AddCardBottomSheet';
 
 describe('AddCardBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnAddCard = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnAddCard = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,
@@ -12,7 +12,7 @@ describe('AddCardBottomSheet', () => {
     onAddCard: mockOnAddCard,
   };
 
-  const getInputs = (component: any) => {
+  const getInputs = (component: ReturnType<typeof render>) => {
     const TextInput = require('react-native').TextInput;
     const inputs = component.UNSAFE_getAllByType(TextInput);
     return {
@@ -84,7 +84,7 @@ describe('AddCardBottomSheet', () => {
       const MaterialCommunityIcons = require('@expo/vector-icons').MaterialCommunityIcons;
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       
-      const lockIcon = icons.find((icon: any) => icon.props.name === 'lock');
+      const lockIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'lock');
       expect(lockIcon).toBeTruthy();
     });
 
@@ -94,7 +94,7 @@ describe('AddCardBottomSheet', () => {
       const MaterialCommunityIcons = require('@expo/vector-icons').MaterialCommunityIcons;
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       
-      const cardIcon = icons.find((icon: any) => icon.props.name === 'credit-card');
+      const cardIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'credit-card');
       expect(cardIcon).toBeTruthy();
     });
 
@@ -104,7 +104,7 @@ describe('AddCardBottomSheet', () => {
       const MaterialCommunityIcons = require('@expo/vector-icons').MaterialCommunityIcons;
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       
-      const helpIcon = icons.find((icon: any) => icon.props.name === 'help-circle-outline');
+      const helpIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'help-circle-outline');
       expect(helpIcon).toBeTruthy();
     });
 
@@ -130,7 +130,7 @@ describe('AddCardBottomSheet', () => {
       const MaterialCommunityIcons = require('@expo/vector-icons').MaterialCommunityIcons;
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       
-      const closeIcon = icons.find((icon: any) => icon.props.name === 'close');
+      const closeIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'close');
       expect(closeIcon).toBeTruthy();
     });
 
@@ -248,16 +248,73 @@ describe('AddCardBottomSheet', () => {
   });
 
   describe('Form Validation', () => {
-    it.skip('Add card button is disabled when card number is empty', () => {
-      // Testing disabled state requires checking TouchableOpacity disabled prop
+    it('Add card button is disabled when card number is empty', () => {
+      const component = render(<AddCardBottomSheet {...defaultProps} />);
+      const { expiryInput, cvvInput } = getInputs(component);
+
+      fireEvent.changeText(expiryInput, '12/25');
+      fireEvent.changeText(cvvInput, '123');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const addButton = touchables.find((t: { props: { disabled?: boolean; children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Add card') && t.props.disabled !== undefined;
+      });
+
+      expect(addButton?.props.disabled).toBe(true);
     });
 
-    it.skip('Add card button is disabled when expiry is empty', () => {
-      // Testing disabled state requires checking TouchableOpacity disabled prop
+    it('Add card button is disabled when expiry is empty', () => {
+      const component = render(<AddCardBottomSheet {...defaultProps} />);
+      const { cardNumberInput, cvvInput } = getInputs(component);
+
+      fireEvent.changeText(cardNumberInput, '4242424242424242');
+      fireEvent.changeText(cvvInput, '123');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const addButton = touchables.find((t: { props: { disabled?: boolean; children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Add card') && t.props.disabled !== undefined;
+      });
+
+      expect(addButton?.props.disabled).toBe(true);
     });
 
-    it.skip('Add card button is disabled when CVV is empty', () => {
-      // Testing disabled state requires checking TouchableOpacity disabled prop
+    it('Add card button is disabled when CVV is empty', () => {
+      const component = render(<AddCardBottomSheet {...defaultProps} />);
+      const { cardNumberInput, expiryInput } = getInputs(component);
+
+      fireEvent.changeText(cardNumberInput, '4242424242424242');
+      fireEvent.changeText(expiryInput, '12/25');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const addButton = touchables.find((t: { props: { disabled?: boolean; children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Add card') && t.props.disabled !== undefined;
+      });
+
+      expect(addButton?.props.disabled).toBe(true);
+    });
+
+    it('Add card button is enabled when all fields are filled', () => {
+      const component = render(<AddCardBottomSheet {...defaultProps} />);
+      const { cardNumberInput, expiryInput, cvvInput } = getInputs(component);
+
+      fireEvent.changeText(cardNumberInput, '4242424242424242');
+      fireEvent.changeText(expiryInput, '12/25');
+      fireEvent.changeText(cvvInput, '123');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const addButton = touchables.find((t: { props: { disabled?: boolean; children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Add card') && t.props.disabled !== undefined;
+      });
+
+      expect(addButton?.props.disabled).toBe(false);
     });
   });
 

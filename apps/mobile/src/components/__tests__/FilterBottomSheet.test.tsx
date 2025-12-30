@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { FilterBottomSheet } from '../FilterBottomSheet';
 
 describe('FilterBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnApply = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnApply = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

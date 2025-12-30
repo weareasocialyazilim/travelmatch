@@ -23,7 +23,7 @@ jest.mock('@hookform/resolvers/zod', () => ({
 }));
 
 jest.mock('../../utils/forms/helpers', () => ({
-  canSubmitForm: ({ formState }: any) => formState.isValid !== false,
+  canSubmitForm: ({ formState }: { formState: { isValid?: boolean } }) => formState.isValid !== false,
 }));
 
 jest.mock('../../utils/forms', () => ({
@@ -31,8 +31,8 @@ jest.mock('../../utils/forms', () => ({
 }));
 
 describe('FeedbackModal', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSubmit = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnSubmit = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

@@ -61,7 +61,7 @@ describe('useAsync Hook', () => {
     });
 
     it('calls onSuccess callback', async () => {
-      const onSuccess = jest.fn();
+      const onSuccess = jest.fn() as jest.Mock;
       const asyncFn = jest.fn().mockResolvedValue('data');
       const { result } = renderHook(() => 
         useAsync(asyncFn, { onSuccess })
@@ -110,7 +110,7 @@ describe('useAsync Hook', () => {
 
     it('calls onError callback', async () => {
       const error = new Error('Test error');
-      const onError = jest.fn();
+      const onError = jest.fn() as jest.Mock;
       const asyncFn = jest.fn().mockRejectedValue(error);
       const { result } = renderHook(() => 
         useAsync(asyncFn, { onError })

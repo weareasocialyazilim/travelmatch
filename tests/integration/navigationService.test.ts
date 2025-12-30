@@ -1,8 +1,8 @@
 /**
  * Navigation Service Tests
- * 
+ *
  * Tests for global navigation reference management
- * 
+ *
  * Coverage:
  * - Navigation ref initialization
  * - Imperative navigation (navigate, reset, goBack)
@@ -11,19 +11,17 @@
  * - Concurrent navigation requests
  */
 
-// @ts-nocheck - React Navigation mock types
-
 import { navigationRef, navigate, resetNavigation, goBack } from '../../apps/mobile/src/services/navigationService';
 
 // Mock @react-navigation/native
 jest.mock('@react-navigation/native', () => ({
   createNavigationContainerRef: jest.fn(() => ({
-    isReady: jest.fn(),
-    navigate: jest.fn(),
-    reset: jest.fn(),
-    goBack: jest.fn(),
-    canGoBack: jest.fn(),
-  })),
+    isReady: jest.fn() as jest.Mock,
+    navigate: jest.fn() as jest.Mock,
+    reset: jest.fn() as jest.Mock,
+    goBack: jest.fn() as jest.Mock,
+    canGoBack: jest.fn() as jest.Mock,
+  })) as jest.Mock,
 }));
 
 describe('Navigation Service', () => {
@@ -31,8 +29,8 @@ describe('Navigation Service', () => {
     jest.clearAllMocks();
 
     // Reset navigation ref state
-    (navigationRef.isReady ).mockReturnValue(true);
-    (navigationRef.canGoBack ).mockReturnValue(true);
+    (navigationRef.isReady as jest.Mock).mockReturnValue(true);
+    (navigationRef.canGoBack as jest.Mock).mockReturnValue(true);
   });
 
   // ===========================
@@ -54,7 +52,7 @@ describe('Navigation Service', () => {
     });
 
     it('should not navigate when not ready', () => {
-      (navigationRef.isReady ).mockReturnValue(false);
+      (navigationRef.isReady as jest.Mock).mockReturnValue(false);
 
       navigate('ProfileDetail', { userId: '123' });
 
@@ -98,7 +96,7 @@ describe('Navigation Service', () => {
     });
 
     it('should not reset when not ready', () => {
-      (navigationRef.isReady ).mockReturnValue(false);
+      (navigationRef.isReady as jest.Mock).mockReturnValue(false);
 
       resetNavigation('Home');
 
@@ -126,7 +124,7 @@ describe('Navigation Service', () => {
 
   describe('goBack()', () => {
     it('should go back when possible', () => {
-      (navigationRef.canGoBack ).mockReturnValue(true);
+      (navigationRef.canGoBack as jest.Mock).mockReturnValue(true);
 
       goBack();
 
@@ -136,7 +134,7 @@ describe('Navigation Service', () => {
     });
 
     it('should not go back when cannot go back', () => {
-      (navigationRef.canGoBack ).mockReturnValue(false);
+      (navigationRef.canGoBack as jest.Mock).mockReturnValue(false);
 
       goBack();
 
@@ -144,7 +142,7 @@ describe('Navigation Service', () => {
     });
 
     it('should not go back when not ready', () => {
-      (navigationRef.isReady ).mockReturnValue(false);
+      (navigationRef.isReady as jest.Mock).mockReturnValue(false);
 
       goBack();
 
@@ -166,11 +164,11 @@ describe('Navigation Service', () => {
     });
 
     it('should allow checking readiness', () => {
-      (navigationRef.isReady ).mockReturnValue(true);
+      (navigationRef.isReady as jest.Mock).mockReturnValue(true);
 
       expect(navigationRef.isReady()).toBe(true);
 
-      (navigationRef.isReady ).mockReturnValue(false);
+      (navigationRef.isReady as jest.Mock).mockReturnValue(false);
 
       expect(navigationRef.isReady()).toBe(false);
     });
@@ -203,24 +201,24 @@ describe('Navigation Service', () => {
 
     it('should handle navigation state transitions', () => {
       // Not ready
-      (navigationRef.isReady ).mockReturnValue(false);
+      (navigationRef.isReady as jest.Mock).mockReturnValue(false);
       navigate('Home');
       expect(navigationRef.navigate).not.toHaveBeenCalled();
 
       // Becomes ready
-      (navigationRef.isReady ).mockReturnValue(true);
+      (navigationRef.isReady as jest.Mock).mockReturnValue(true);
       navigate('Home');
       expect(navigationRef.navigate).toHaveBeenCalledTimes(1);
     });
 
     it('should handle canGoBack state changes', () => {
       // Can go back
-      (navigationRef.canGoBack ).mockReturnValue(true);
+      (navigationRef.canGoBack as jest.Mock).mockReturnValue(true);
       goBack();
       expect(navigationRef.goBack).toHaveBeenCalledTimes(1);
 
       // Cannot go back
-      (navigationRef.canGoBack ).mockReturnValue(false);
+      (navigationRef.canGoBack as jest.Mock).mockReturnValue(false);
       goBack();
       expect(navigationRef.goBack).toHaveBeenCalledTimes(1); // Still 1, not called again
     });
