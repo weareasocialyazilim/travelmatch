@@ -582,8 +582,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   dotActive: {
-    backgroundColor: COLORS.primary,
-    width: 16,
+    backgroundColor: CEREMONY_COLORS.passport.coverGold,
+    width: 24,
+  },
+  activeDot: {
+    backgroundColor: CEREMONY_COLORS.passport.coverGold,
+    width: 24,
   },
   navigation: {
     flexDirection: 'row',
@@ -820,6 +824,39 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     marginTop: SPACING.xxs,
     textAlign: 'center',
+  },
+
+  // New passport book styles
+  book: {
+    width: 300,
+    height: 420,
+    backgroundColor: CEREMONY_COLORS.passport.cover,
+    borderRadius: 8,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  stampCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+  },
+  unverifiedStamp: {
+    borderColor: '#D1D5DB',
+    borderStyle: 'dashed',
+  },
+  pageIndicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingBottom: 16,
+    gap: 8,
   },
 });
 
