@@ -1,7 +1,6 @@
-// @ts-nocheck
 /**
  * Performance Benchmarks
- * 
+ *
  * Tests application performance metrics including:
  * - App launch time
  * - Screen time-to-interactive (TTI)
@@ -25,23 +24,24 @@ const MockScreen = ({ testID }: { testID: string }) => {
 };
 
 const DiscoverScreen = () => MockScreen({ testID: 'discover-screen' });
-const ChatScreen = () => MockScreen({ testID: 'chat-screen' });
+const ChatScreen = ({ route }: { route?: { params?: Record<string, any> } }) => MockScreen({ testID: 'chat-screen' });
 const ProfileScreen = () => MockScreen({ testID: 'profile-screen' });
 
 // Mock hooks for performance testing
-const useMoments = jest.fn(() => ({
+const useMoments = jest.fn((params?: { limit?: number; momentId?: string }) => ({
   moments: [],
   isLoading: false,
   error: null,
   fetchMoments: jest.fn(),
-}));
+})) as jest.Mock;
 
 const useMessages = jest.fn(() => ({
   messages: [],
+  conversations: [],
   isLoading: false,
   error: null,
   sendMessage: jest.fn(),
-}));
+})) as jest.Mock;
 
 // Performance targets
 const PERFORMANCE_TARGETS = {

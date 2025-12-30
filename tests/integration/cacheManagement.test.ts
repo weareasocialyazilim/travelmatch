@@ -1,7 +1,6 @@
-// @ts-nocheck
 /**
  * Cache Management Tests
- * 
+ *
  * Tests caching strategies including:
  * - Cache eviction policies (LRU, TTL)
  * - Cache size limit enforcement
@@ -478,7 +477,7 @@ describe('Cache Management Tests', () => {
 
     it('should use cache tags for grouped invalidation', () => {
       interface TaggedEntry {
-        data;
+        data: any;
         tags: string[];
       }
       

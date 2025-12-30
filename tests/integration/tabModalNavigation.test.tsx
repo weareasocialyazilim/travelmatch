@@ -1,8 +1,8 @@
 /**
  * Tab and Modal Navigation Tests
- * 
+ *
  * Tests for tab navigation flows and modal stack management
- * 
+ *
  * Coverage:
  * - Tab switching and state preservation
  * - Tab navigation listeners
@@ -14,20 +14,39 @@
  * - Deep link navigation to specific tabs
  */
 
-// @ts-nocheck - React Navigation and Testing Library types
-
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  MainTabs: undefined;
+  ProfileModal: { userId: string };
+  EditProfileModal: undefined;
+};
+
+type TabParamList = {
+  Home: undefined;
+  Profile: undefined;
+  Messages: undefined;
+  Settings: undefined;
+};
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MainTabs'>;
+type MessagesScreenNavigationProp = StackNavigationProp<TabParamList, 'Messages'>;
+type SettingsScreenNavigationProp = StackNavigationProp<TabParamList, 'Settings'>;
+type ProfileModalScreenRouteProp = RouteProp<RootStackParamList, 'ProfileModal'>;
+type ProfileModalScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProfileModal'>;
+type EditProfileModalScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditProfileModal'>;
+
+const Tab = createBottomTabNavigator<TabParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
 
 // Mock screens for testing
-function HomeScreen({ navigation }: any) {
+function HomeScreen({ navigation }: { navigation: HomeScreenNavigationProp }) {
   return (
     <View>
       <Text>Home Screen</Text>
@@ -49,7 +68,7 @@ function ProfileScreen() {
   );
 }
 
-function MessagesScreen({ navigation }: any) {
+function MessagesScreen({ navigation }: { navigation: MessagesScreenNavigationProp }) {
   return (
     <View>
       <Text>Messages Screen</Text>
@@ -63,7 +82,7 @@ function MessagesScreen({ navigation }: any) {
   );
 }
 
-function SettingsScreen({ navigation }: any) {
+function SettingsScreen({ navigation }: { navigation: SettingsScreenNavigationProp }) {
   return (
     <View>
       <Text>Settings Screen</Text>
@@ -77,7 +96,13 @@ function SettingsScreen({ navigation }: any) {
   );
 }
 
-function ProfileModalScreen({ route, navigation }: any) {
+function ProfileModalScreen({
+  route,
+  navigation,
+}: {
+  route: ProfileModalScreenRouteProp;
+  navigation: ProfileModalScreenNavigationProp;
+}) {
   const { userId } = route.params || {};
   return (
     <View>
@@ -99,7 +124,11 @@ function ProfileModalScreen({ route, navigation }: any) {
   );
 }
 
-function EditProfileModalScreen({ navigation }: any) {
+function EditProfileModalScreen({
+  navigation,
+}: {
+  navigation: EditProfileModalScreenNavigationProp;
+}) {
   return (
     <View>
       <Text>Edit Profile Modal</Text>

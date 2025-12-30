@@ -87,7 +87,7 @@ describe('Button', () => {
 
   describe('Interactions', () => {
     it('calls onClick when clicked', () => {
-      const handleClick = jest.fn();
+      const handleClick = jest.fn() as jest.Mock;
       render(<Button onClick={handleClick}>Click me</Button>);
 
       fireEvent.click(screen.getByRole('button'));
@@ -95,7 +95,7 @@ describe('Button', () => {
     });
 
     it('does not call onClick when disabled', () => {
-      const handleClick = jest.fn();
+      const handleClick = jest.fn() as jest.Mock;
       render(
         <Button onClick={handleClick} disabled>
           Disabled
@@ -123,7 +123,7 @@ describe('Button', () => {
     });
 
     it('disables button when loading', () => {
-      const handleClick = jest.fn();
+      const handleClick = jest.fn() as jest.Mock;
       render(
         <Button onClick={handleClick} loading>
           Loading
@@ -147,7 +147,7 @@ describe('Button', () => {
     });
 
     it('forwards ref correctly', () => {
-      const ref = jest.fn();
+      const ref = jest.fn() as jest.Mock;
       render(<Button ref={ref}>Ref</Button>);
       expect(ref).toHaveBeenCalled();
     });
