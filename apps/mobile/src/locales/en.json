@@ -58,6 +58,8 @@
   "navigation": {
     "home": "Home",
     "explore": "Explore",
+    "discover": "Moments",
+    "requests": "Gifts",
     "moments": "Moments",
     "messages": "Messages",
     "profile": "Profile",
@@ -65,7 +67,12 @@
     "notifications": "Notifications",
     "favorites": "Favorites",
     "bookings": "Bookings",
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "createMoment": "Create new moment",
+    "discoverTab": "Moments tab",
+    "requestsTab": "Gifts tab",
+    "messagesTab": "Messages tab",
+    "profileTab": "Profile tab"
   },
   "moments": {
     "createMoment": "Create Moment",
