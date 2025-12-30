@@ -13,7 +13,7 @@ describe('AddBankAccountBottomSheet', () => {
   };
 
   // Helper function to get inputs
-  const getInputs = (component: any) => {
+  const getInputs = (component: ReturnType<typeof render>) => {
     const TextInput = require('react-native').TextInput;
     const inputs = component.UNSAFE_getAllByType(TextInput);
     return {

@@ -23,7 +23,7 @@ jest.mock('@hookform/resolvers/zod', () => ({
 }));
 
 jest.mock('../../utils/forms/helpers', () => ({
-  canSubmitForm: ({ formState }: any) => formState.isValid !== false,
+  canSubmitForm: ({ formState }: { formState: { isValid?: boolean } }) => formState.isValid !== false,
 }));
 
 jest.mock('../../utils/forms', () => ({

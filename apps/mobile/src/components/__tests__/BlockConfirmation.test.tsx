@@ -33,8 +33,8 @@ describe('BlockConfirmation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useToast ).mockReturnValue({ showToast: mockShowToast });
-    (moderationService.blockUser ).mockResolvedValue(undefined);
+    (useToast as jest.Mock).mockReturnValue({ showToast: mockShowToast });
+    (moderationService.blockUser as jest.Mock).mockResolvedValue(undefined);
   });
 
   describe('Rendering', () => {
@@ -139,7 +139,7 @@ describe('BlockConfirmation', () => {
       const blockPromise = new Promise<void>((resolve) => {
         resolveBlock = resolve;
       });
-      (moderationService.blockUser ).mockReturnValue(blockPromise);
+      (moderationService.blockUser as jest.Mock).mockReturnValue(blockPromise);
 
       const { getByText, UNSAFE_getByType } = render(<BlockConfirmation {...defaultProps} />);
 
@@ -194,12 +194,12 @@ describe('BlockConfirmation', () => {
     it('executes full success flow in correct order', async () => {
       const callOrder: string[] = [];
       
-      (moderationService.blockUser ).mockImplementation(() => {
+      (moderationService.blockUser as jest.Mock).mockImplementation(() => {
         callOrder.push('blockUser');
         return Promise.resolve();
       });
-      
-      (useToast ).mockReturnValue({
+
+      (useToast as jest.Mock).mockReturnValue({
         showToast: () => callOrder.push('showToast'),
       });
       
@@ -221,7 +221,7 @@ describe('BlockConfirmation', () => {
   describe('Async Block Operation - Error', () => {
     it('shows error toast when block fails', async () => {
       const error = new Error('Network error');
-      (moderationService.blockUser ).mockRejectedValue(error);
+      (moderationService.blockUser as jest.Mock).mockRejectedValue(error);
 
       const { getByText } = render(<BlockConfirmation {...defaultProps} />);
       
@@ -236,7 +236,7 @@ describe('BlockConfirmation', () => {
     });
 
     it('does not call onBlocked when block fails', async () => {
-      (moderationService.blockUser ).mockRejectedValue(new Error('Error'));
+      (moderationService.blockUser as jest.Mock).mockRejectedValue(new Error('Error'));
 
       const { getByText } = render(
         <BlockConfirmation {...defaultProps} onBlocked={mockOnBlocked} />
@@ -252,7 +252,7 @@ describe('BlockConfirmation', () => {
     });
 
     it('does not call onClose when block fails', async () => {
-      (moderationService.blockUser ).mockRejectedValue(new Error('Error'));
+      (moderationService.blockUser as jest.Mock).mockRejectedValue(new Error('Error'));
 
       const { getByText } = render(<BlockConfirmation {...defaultProps} />);
       
@@ -266,7 +266,7 @@ describe('BlockConfirmation', () => {
     });
 
     it('re-enables buttons after error', async () => {
-      (moderationService.blockUser ).mockRejectedValue(new Error('Error'));
+      (moderationService.blockUser as jest.Mock).mockRejectedValue(new Error('Error'));
 
       const { getByText } = render(<BlockConfirmation {...defaultProps} />);
       
@@ -378,7 +378,7 @@ describe('BlockConfirmation', () => {
       const blockPromise = new Promise<void>((resolve) => {
         resolveBlock = resolve;
       });
-      (moderationService.blockUser ).mockReturnValue(blockPromise);
+      (moderationService.blockUser as jest.Mock).mockReturnValue(blockPromise);
 
       const { getByText } = render(<BlockConfirmation {...defaultProps} />);
       
@@ -415,7 +415,7 @@ describe('BlockConfirmation', () => {
       const { UNSAFE_getAllByType } = render(<BlockConfirmation {...defaultProps} />);
       
       const icons = UNSAFE_getAllByType(require('@expo/vector-icons').Ionicons);
-      const checkmarkIcons = icons.filter((icon: any) => icon.props.name === 'checkmark-circle');
+      const checkmarkIcons = icons.filter((icon: { props: { name: string } }) => icon.props.name === 'checkmark-circle');
       
       // Should have 4 checkmark icons (one for each consequence)
       expect(checkmarkIcons.length).toBeGreaterThanOrEqual(4);

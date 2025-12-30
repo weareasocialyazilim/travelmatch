@@ -38,9 +38,9 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase ;
-const mockTransactionsService = transactionsService ;
-const mockLogger = logger ;
+const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
+const mockLogger = logger as jest.Mocked<typeof logger>;
 
 // Simulated idempotency helper (would be in paymentService in production)
 const pendingPayments = new Map<string, Promise<any>>();
@@ -51,7 +51,7 @@ async function processPaymentWithIdempotency(
     currency: string;
     paymentMethodId: string;
     description?: string;
-    metadata?;
+    metadata?: Record<string, unknown>;
     idempotencyKey?: string;
   }
 ): Promise<any> {

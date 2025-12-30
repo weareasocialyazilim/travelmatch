@@ -91,7 +91,7 @@ describe('BottomNav', () => {
       const buttons = UNSAFE_queryAllByType(TouchableOpacity);
       // Filter by accessibilityRole='tab'
       const tabs = buttons.filter(
-        (btn) => btn.props.accessibilityRole === 'tab',
+        (btn: { props: { accessibilityRole?: string } }) => btn.props.accessibilityRole === 'tab',
       );
       expect(tabs.length).toBe(5);
     });

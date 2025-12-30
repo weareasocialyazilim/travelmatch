@@ -61,9 +61,9 @@ jest.mock('../../utils/logger', () => ({
 }));
 
 // Mock supabaseAuthService
-const mockLoginFn = jest.fn();
-const mockLogoutFn = jest.fn();
-const mockRegisterFn = jest.fn();
+const mockLoginFn = jest.fn() as jest.Mock;
+const mockLogoutFn = jest.fn() as jest.Mock;
+const mockRegisterFn = jest.fn() as jest.Mock;
 
 jest.mock('../../services/supabaseAuthService', () => ({
   login: (credentials: { email: string; password: string }) =>

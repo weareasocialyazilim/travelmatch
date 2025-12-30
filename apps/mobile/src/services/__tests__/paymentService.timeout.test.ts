@@ -37,8 +37,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase ;
-const mockTransactionsService = transactionsService ;
+const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
 
 describe('PaymentService - Timeout Edge Cases', () => {
   const mockUser = { id: 'user-123', email: 'test@example.com' };

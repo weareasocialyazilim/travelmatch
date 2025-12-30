@@ -45,11 +45,11 @@ describe.skip('Button Component - Enhanced Tests', () => {
 
     it('should render with left icon', () => {
       const { getByText, UNSAFE_getByType } = render(
-        <Button 
-          title="Send" 
-          onPress={jest.fn()} 
-          icon="send" 
-          iconPosition="left" 
+        <Button
+          title="Send"
+          onPress={jest.fn() as jest.Mock}
+          icon="send"
+          iconPosition="left"
         />
       );
       expect(getByText('Send')).toBeTruthy();
@@ -59,11 +59,11 @@ describe.skip('Button Component - Enhanced Tests', () => {
 
     it('should render with right icon', () => {
       const { getByText, UNSAFE_getByType } = render(
-        <Button 
-          title="Next" 
-          onPress={jest.fn()} 
-          icon="arrow-right" 
-          iconPosition="right" 
+        <Button
+          title="Next"
+          onPress={jest.fn() as jest.Mock}
+          icon="arrow-right"
+          iconPosition="right"
         />
       );
       expect(getByText('Next')).toBeTruthy();

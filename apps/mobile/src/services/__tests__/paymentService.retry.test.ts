@@ -38,9 +38,9 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase ;
-const mockTransactionsService = transactionsService ;
-const mockLogger = logger ;
+const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
+const mockLogger = logger as jest.Mocked<typeof logger>;
 
 // Helper function to simulate retry logic (would be in paymentService in production)
 async function processPaymentWithRetry(

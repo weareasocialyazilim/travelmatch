@@ -75,7 +75,7 @@ describe('CachedImage - Network Scenarios', () => {
           }),
       );
 
-      const onLoadEnd = jest.fn();
+      const onLoadEnd = jest.fn() as jest.Mock;
 
       render(
         <CachedImage
@@ -100,7 +100,7 @@ describe('CachedImage - Network Scenarios', () => {
         () => new Promise(() => {}), // Never resolves
       );
 
-      const onError = jest.fn();
+      const onError = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <CachedImage
@@ -123,7 +123,7 @@ describe('CachedImage - Network Scenarios', () => {
         () => new Promise(() => {}), // Never resolves
       );
 
-      const onError = jest.fn();
+      const onError = jest.fn() as jest.Mock;
 
       render(
         <CachedImage
@@ -231,7 +231,7 @@ describe('CachedImage - Network Scenarios', () => {
         new Error('Network error'),
       );
 
-      const onRetry = jest.fn();
+      const onRetry = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <CachedImage
@@ -585,8 +585,8 @@ describe('CachedImage - Network Scenarios', () => {
         'file:///cache/image.jpg',
       );
 
-      const onLoadStart = jest.fn();
-      const onLoadEnd = jest.fn();
+      const onLoadStart = jest.fn() as jest.Mock;
+      const onLoadEnd = jest.fn() as jest.Mock;
 
       const { getByText, queryByText } = render(
         <CachedImage
@@ -612,8 +612,8 @@ describe('CachedImage - Network Scenarios', () => {
         new Error('Load failed'),
       );
 
-      const onLoadStart = jest.fn();
-      const onError = jest.fn();
+      const onLoadStart = jest.fn() as jest.Mock;
+      const onError = jest.fn() as jest.Mock;
 
       const { getByText, queryByText } = render(
         <CachedImage

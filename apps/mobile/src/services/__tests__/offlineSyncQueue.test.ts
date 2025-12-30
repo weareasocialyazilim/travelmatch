@@ -33,8 +33,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockAsyncStorage = AsyncStorage ;
-const mockNetInfo = NetInfo ;
+const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
+const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
 // Logger is mocked globally
 
 describe('OfflineSyncQueue', () => {

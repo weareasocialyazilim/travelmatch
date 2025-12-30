@@ -166,10 +166,10 @@ describe('StatsRow Component', () => {
     it.skip('only re-renders when counts change', () => {
       let renderCount = 0;
 
-      const TestComponent = ({ moments, exchanges, response }: any) => {
+      const TestComponent = ({ moments, exchanges, response }: { moments: number; exchanges: number; response: number }) => {
         renderCount++;
         return (
-          <StatsRow 
+          <StatsRow
             momentsCount={moments}
             exchangesCount={exchanges}
             responseRate={response}
@@ -187,7 +187,7 @@ describe('StatsRow Component', () => {
       rerender(
         <TestComponent moments={10} exchanges={20} response={0.8} />
       );
-      
+
       // Should not re-render
       expect(renderCount).toBe(initial);
 
@@ -195,7 +195,7 @@ describe('StatsRow Component', () => {
       rerender(
         <TestComponent moments={11} exchanges={20} response={0.8} />
       );
-      
+
       // Should re-render
       expect(renderCount).toBe(initial + 1);
     });
