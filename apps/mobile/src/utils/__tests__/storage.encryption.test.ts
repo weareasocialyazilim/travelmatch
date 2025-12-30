@@ -271,7 +271,7 @@ describe('Migration from Unencrypted Storage', () => {
     const items = await mockAsyncStorage.multiGet(keys);
 
     const migratedData: Record<string, string> = {};
-    items.forEach(([key, value]: [string, string | null]) => {
+    items.forEach(([key, value]: [string, string | null]): void => {
       if (value) migratedData[key] = value;
     });
 

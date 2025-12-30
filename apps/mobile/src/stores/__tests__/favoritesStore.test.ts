@@ -436,7 +436,7 @@ describe('favoritesStore', () => {
 
       act(() => {
         ['moment-1', 'moment-2', 'moment-3', 'moment-4', 'moment-5'].forEach(
-          (id) => result.current.addFavorite(id),
+          (id: string) => result.current.addFavorite(id),
         );
       });
 
@@ -448,10 +448,10 @@ describe('favoritesStore', () => {
 
       act(() => {
         ['moment-1', 'moment-2', 'moment-3', 'moment-4', 'moment-5'].forEach(
-          (id) => result.current.addFavorite(id),
+          (id: string) => result.current.addFavorite(id),
         );
 
-        ['moment-2', 'moment-4'].forEach((id) =>
+        ['moment-2', 'moment-4'].forEach((id: string) =>
           result.current.removeFavorite(id),
         );
       });
@@ -467,12 +467,12 @@ describe('favoritesStore', () => {
       const { result } = renderHook(() => useFavoritesStore());
 
       act(() => {
-        ['moment-1', 'moment-2', 'moment-3'].forEach((id) =>
+        ['moment-1', 'moment-2', 'moment-3'].forEach((id: string) =>
           result.current.addFavorite(id),
         );
       });
 
-      const checks = ['moment-1', 'moment-2', 'moment-4'].map((id) =>
+      const checks = ['moment-1', 'moment-2', 'moment-4'].map((id: string) =>
         result.current.isFavorite(id),
       );
 
