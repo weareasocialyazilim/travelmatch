@@ -23,8 +23,8 @@ export default function ProofCeremonyPage() {
             <a href="/download" className="px-8 py-4 bg-amber-500 text-white font-semibold rounded-full hover:bg-amber-600 transition">
               Hemen Dene
             </a>
-            <a href="#demo" className="px-8 py-4 border-2 border-gray-300 font-semibold rounded-full hover:border-gray-400 transition">
-              Demo İzle
+            <a href="#features" className="px-8 py-4 border-2 border-gray-300 font-semibold rounded-full hover:border-gray-400 transition">
+              Özellikleri Gör
             </a>
           </div>
         </div>
@@ -44,7 +44,7 @@ export default function ProofCeremonyPage() {
       />
 
       {/* Detailed Features */}
-      <section className="py-24">
+      <section id="features" className="py-24">
         <div className="container mx-auto px-4">
           {/* Sunset Clock detail */}
           <div className="grid md:grid-cols-2 gap-12 items-center mb-24">

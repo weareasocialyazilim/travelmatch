@@ -62,7 +62,7 @@ export default function TermsOfServicePage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">5. Payments and Gifts</h2>
           <ul className="list-disc list-inside text-gray-700 space-y-2">
-            <li>All payments are processed securely through Stripe</li>
+            <li>All payments are processed securely through PayTR</li>
             <li>Gifts are voluntary and non-refundable once sent</li>
             <li>We charge a platform fee on transactions</li>
             <li>Withdrawals are subject to identity verification</li>
