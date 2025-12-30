@@ -7,13 +7,13 @@ import { Linking } from 'react-native';
 jest.mock('@/utils/logger');
 jest.mock('@/hooks/useScreenPerformance', () => ({
   useScreenPerformance: () => ({
-    trackMount: jest.fn(),
-    trackInteraction: jest.fn(),
+    trackMount: jest.fn() as jest.Mock,
+    trackInteraction: jest.fn() as jest.Mock,
   }),
 }));
 jest.mock('@/context/ConfirmationContext', () => ({
   useConfirmation: () => ({
-    showConfirmation: jest.fn().mockResolvedValue(true),
+    showConfirmation: jest.fn().mockResolvedValue(true) as jest.Mock,
   }),
 }));
 

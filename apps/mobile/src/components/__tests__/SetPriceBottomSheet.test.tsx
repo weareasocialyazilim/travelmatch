@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { SetPriceBottomSheet } from '../SetPriceBottomSheet';
 
 describe('SetPriceBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSetPrice = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnSetPrice = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

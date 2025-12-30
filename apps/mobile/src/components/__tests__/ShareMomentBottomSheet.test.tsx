@@ -11,7 +11,7 @@ import {
 import { ShareMomentBottomSheet } from '../ShareMomentBottomSheet';
 
 // Mock the toast context
-const mockShowToast = jest.fn();
+const mockShowToast = jest.fn() as jest.Mock;
 jest.mock('../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: mockShowToast,
@@ -26,7 +26,7 @@ jest.mock('../../utils/logger', () => ({
 }));
 
 describe('ShareMomentBottomSheet', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
   const defaultProps = {
     visible: true,
     onClose: mockOnClose,

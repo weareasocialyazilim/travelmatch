@@ -17,7 +17,7 @@ jest.mock('../../utils/logger', () => ({
 }));
 
 // Mock clipboard
-const mockWriteText = jest.fn();
+const mockWriteText = jest.fn() as jest.Mock;
 Object.defineProperty(global, 'navigator', {
   value: {
     clipboard: {
@@ -28,8 +28,8 @@ Object.defineProperty(global, 'navigator', {
 });
 
 describe('ShareProofModal', () => {
-  const mockOnClose = jest.fn();
-  const mockOnShare = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnShare = jest.fn() as jest.Mock;
   const mockProofUrl = 'https://example.com/proof/12345';
 
   beforeEach(() => {
@@ -361,8 +361,8 @@ describe('ShareProofModal', () => {
     });
 
     it('works with different callback functions', () => {
-      const customOnClose = jest.fn();
-      const customOnShare = jest.fn();
+      const customOnClose = jest.fn() as jest.Mock;
+      const customOnShare = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <ShareProofModal

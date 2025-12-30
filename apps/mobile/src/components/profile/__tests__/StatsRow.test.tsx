@@ -102,20 +102,6 @@ describe('StatsRow Component', () => {
       expect(mockHandlers.onExchangesPress).toHaveBeenCalledTimes(1);
     });
 
-    // TODO: Component doesn't have onResponsePress handler - response rate is not clickable
-    it.skip('calls onResponsePress when response rate is clicked', () => {
-      const { getByText } = render(
-        <StatsRow 
-          momentsCount={0}
-          exchangesCount={0}
-          responseRate={95}
-          {...mockHandlers}
-        />
-      );
-      
-      fireEvent.press(getByText('95%'));
-      expect(mockHandlers.onResponsePress).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe('Formatting', () => {
@@ -147,10 +133,9 @@ describe('StatsRow Component', () => {
       expect(getByText('0%')).toBeTruthy();
     });
 
-    // TODO: Component doesn't convert decimal to percentage - expects integer
-    it.skip('rounds response rate to whole number', () => {
+    it('displays response rate as percentage', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={0}
           exchangesCount={0}
           responseRate={88}
@@ -161,45 +146,6 @@ describe('StatsRow Component', () => {
     });
   });
 
-  describe('Memoization', () => {
-    // TODO: This test tracks wrapper component renders, not StatsRow memo behavior
-    it.skip('only re-renders when counts change', () => {
-      let renderCount = 0;
-
-      const TestComponent = ({ moments, exchanges, response }: any) => {
-        renderCount++;
-        return (
-          <StatsRow 
-            momentsCount={moments}
-            exchangesCount={exchanges}
-            responseRate={response}
-            {...mockHandlers}
-          />
-        );
-      };
-
-      const { rerender } = render(
-        <TestComponent moments={10} exchanges={20} response={0.8} />
-      );
-      const initial = renderCount;
-
-      // Re-render with same values
-      rerender(
-        <TestComponent moments={10} exchanges={20} response={0.8} />
-      );
-      
-      // Should not re-render
-      expect(renderCount).toBe(initial);
-
-      // Re-render with different values
-      rerender(
-        <TestComponent moments={11} exchanges={20} response={0.8} />
-      );
-      
-      // Should re-render
-      expect(renderCount).toBe(initial + 1);
-    });
-  });
 
   describe('Accessibility', () => {
     it('has accessible labels for each stat', () => {

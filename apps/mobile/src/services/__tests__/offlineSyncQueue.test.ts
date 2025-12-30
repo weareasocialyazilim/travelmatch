@@ -33,8 +33,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockAsyncStorage = AsyncStorage ;
-const mockNetInfo = NetInfo ;
+const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
+const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
 // Logger is mocked globally
 
 describe('OfflineSyncQueue', () => {
@@ -524,7 +524,7 @@ describe('OfflineSyncQueue', () => {
 
   describe('Queue Listeners', () => {
     it('should notify listeners on queue changes', async () => {
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
 
       const unsubscribe = offlineSyncQueue.subscribe(listener);
 
@@ -548,7 +548,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should stop notifying after unsubscribe', async () => {
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
 
       const unsubscribe = offlineSyncQueue.subscribe(listener);
       unsubscribe();

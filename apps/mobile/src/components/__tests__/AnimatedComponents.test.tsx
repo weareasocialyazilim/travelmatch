@@ -49,7 +49,7 @@ describe('AnimatedComponents', () => {
     });
 
     it('calls onPress when pressed', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <AnimatedButton onPress={onPress}>
           <Text>Press</Text>
@@ -83,7 +83,7 @@ describe('AnimatedComponents', () => {
     });
 
     it('is disabled when disabled prop is true', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <AnimatedButton onPress={onPress} disabled>
           <Text>Disabled</Text>
@@ -326,7 +326,7 @@ describe('AnimatedComponents', () => {
     });
 
     it('calls onPress when pressed', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <ScaleOnPress onPress={onPress}>
           <Text>Press Me</Text>
@@ -612,7 +612,7 @@ describe('AnimatedComponents', () => {
     });
 
     it('calls onComplete after animation', async () => {
-      const onComplete = jest.fn();
+      const onComplete = jest.fn() as jest.Mock;
       render(<SuccessAnimation visible={true} onComplete={onComplete} />);
 
       await waitFor(() => {
@@ -621,7 +621,7 @@ describe('AnimatedComponents', () => {
     });
 
     it('does not call onComplete when not visible', () => {
-      const onComplete = jest.fn();
+      const onComplete = jest.fn() as jest.Mock;
       render(<SuccessAnimation visible={false} onComplete={onComplete} />);
       
       expect(onComplete).not.toHaveBeenCalled();
@@ -655,7 +655,7 @@ describe('AnimatedComponents', () => {
 
   describe('Edge Cases', () => {
     it('AnimatedButton handles rapid presses', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <AnimatedButton onPress={onPress}>
           <Text>Rapid</Text>

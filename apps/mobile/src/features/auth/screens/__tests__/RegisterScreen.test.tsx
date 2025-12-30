@@ -28,10 +28,10 @@ jest.mock('react-hook-form', () => ({
     control: {},
     handleSubmit: (fn: (data: unknown) => void) => fn,
     formState: { errors: {}, isValid: true, isSubmitting: false },
-    watch: jest.fn(() => ''),
-    setValue: jest.fn(),
-    reset: jest.fn(),
-    trigger: jest.fn(),
+    watch: jest.fn(() => '') as jest.Mock,
+    setValue: jest.fn() as jest.Mock,
+    reset: jest.fn() as jest.Mock,
+    trigger: jest.fn() as jest.Mock,
   }),
   Controller: ({
     render: renderProp,
@@ -42,24 +42,24 @@ jest.mock('react-hook-form', () => ({
     }) => React.ReactNode;
   }) =>
     renderProp({
-      field: { onChange: jest.fn(), onBlur: jest.fn(), value: '' },
+      field: { onChange: jest.fn() as jest.Mock, onBlur: jest.fn() as jest.Mock, value: '' },
       fieldState: { error: null },
     }),
 }));
 
 // Mock @hookform/resolvers/zod
 jest.mock('@hookform/resolvers/zod', () => ({
-  zodResolver: () => jest.fn(),
+  zodResolver: () => jest.fn() as jest.Mock,
 }));
 
 // Mock context and hooks
-const mockRegister = jest.fn();
+const mockRegister = jest.fn() as jest.Mock;
 
 jest.mock('../../../../context/AuthContext', () => ({
   useAuth: () => ({
     register: mockRegister,
-    login: jest.fn(),
-    logout: jest.fn(),
+    login: jest.fn() as jest.Mock,
+    logout: jest.fn() as jest.Mock,
     user: null,
     loading: false,
   }),
@@ -67,11 +67,11 @@ jest.mock('../../../../context/AuthContext', () => ({
 
 jest.mock('../../../../context/ToastContext', () => ({
   useToast: () => ({
-    showToast: jest.fn(),
-    success: jest.fn(),
-    error: jest.fn(),
-    warning: jest.fn(),
-    info: jest.fn(),
+    showToast: jest.fn() as jest.Mock,
+    success: jest.fn() as jest.Mock,
+    error: jest.fn() as jest.Mock,
+    warning: jest.fn() as jest.Mock,
+    info: jest.fn() as jest.Mock,
   }),
   ToastProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -170,7 +170,7 @@ jest.mock('../../../../context/I18nContext', () => ({
   useI18n: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: jest.fn() as jest.Mock,
   }),
   I18nProvider: ({ children }: { children: React.ReactNode }) => children,
 }));

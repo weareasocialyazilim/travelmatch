@@ -17,7 +17,6 @@ import {
   StyleSheet,
   Pressable,
   Share,
-  Dimensions,
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -42,8 +41,6 @@ import { TYPE_SCALE } from '../theme/typography';
 import { SPRINGS } from '../hooks/useAnimations';
 import { useToast } from '@/context/ToastContext';
 import type { Moment } from '../types';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ============================================
 // TYPES
@@ -294,7 +291,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginBottom: 16,
     overflow: 'hidden',
-    shadowColor: PALETTE.black,
+    shadowColor: '#000000', // black
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
     shadowRadius: 24,

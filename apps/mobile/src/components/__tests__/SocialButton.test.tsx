@@ -3,7 +3,7 @@ import { render, fireEvent } from '@testing-library/react-native';
 import SocialButton from '../SocialButton';
 
 describe('SocialButton', () => {
-  const mockOnPress = jest.fn();
+  const mockOnPress = jest.fn() as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();

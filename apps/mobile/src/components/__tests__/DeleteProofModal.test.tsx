@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { DeleteProofModal } from '../DeleteProofModal';
 
 describe('DeleteProofModal', () => {
-  const mockOnCancel = jest.fn();
-  const mockOnDelete = jest.fn();
+  const mockOnCancel = jest.fn() as jest.Mock;
+  const mockOnDelete = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

@@ -20,7 +20,15 @@ jest.mock('../Input', () => {
       autoCapitalize,
       autoCorrect,
       ...props
-    }: any) =>
+    }: {
+      leftIcon?: string;
+      rightIcon?: string;
+      onRightIconPress?: () => void;
+      secureTextEntry?: boolean;
+      autoCapitalize?: string;
+      autoCorrect?: boolean;
+      [key: string]: unknown;
+    }) =>
       React.createElement(
         RN.View,
         { testID: 'input-container' },
@@ -197,7 +205,7 @@ describe('PasswordInput Component', () => {
 
   describe('Event Handlers', () => {
     it('calls onChangeText when text changes', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <PasswordInput onChangeText={onChangeText} />
       );
@@ -207,7 +215,7 @@ describe('PasswordInput Component', () => {
     });
 
     it('calls onBlur when input loses focus', () => {
-      const onBlur = jest.fn();
+      const onBlur = jest.fn() as jest.Mock;
       const { getByTestId } = render(<PasswordInput onBlur={onBlur} />);
 
       fireEvent(getByTestId('text-input'), 'blur');
@@ -215,7 +223,7 @@ describe('PasswordInput Component', () => {
     });
 
     it('calls onFocus when input gains focus', () => {
-      const onFocus = jest.fn();
+      const onFocus = jest.fn() as jest.Mock;
       const { getByTestId } = render(<PasswordInput onFocus={onFocus} />);
 
       fireEvent(getByTestId('text-input'), 'focus');
@@ -223,7 +231,7 @@ describe('PasswordInput Component', () => {
     });
 
     it('calls onSubmitEditing when submitted', () => {
-      const onSubmitEditing = jest.fn();
+      const onSubmitEditing = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <PasswordInput onSubmitEditing={onSubmitEditing} />
       );
@@ -239,7 +247,7 @@ describe('PasswordInput Component', () => {
 
   describe('Combinations', () => {
     it('renders with all props', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <PasswordInput
           label="Password"
@@ -389,7 +397,7 @@ describe('PasswordInput Component', () => {
 
   describe('Real-World Use Cases', () => {
     it('renders login password field', () => {
-      const handleChange = jest.fn();
+      const handleChange = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <PasswordInput
           label="Password"
@@ -468,8 +476,8 @@ describe('PasswordInput Component', () => {
 
   describe('Integration', () => {
     it('works in a complete form', () => {
-      const handlePasswordChange = jest.fn();
-      const handleSubmit = jest.fn();
+      const handlePasswordChange = jest.fn() as jest.Mock;
+      const handleSubmit = jest.fn() as jest.Mock;
 
       const { getByTestId } = render(
         <PasswordInput

@@ -77,10 +77,10 @@ import { useAuth } from '../../apps/mobile/src/context/AuthContext';
 import { realtimeChannelManager } from '../../apps/mobile/src/services/realtimeChannelManager';
 
 describe('RealtimeContext', () => {
-  let mockChannel;
-  let presenceSyncHandler: Function;
-  let presenceJoinHandler: Function;
-  let presenceLeaveHandler: Function;
+  let mockChannel: any;
+  let presenceSyncHandler: (() => void) | undefined;
+  let presenceJoinHandler: ((data: any) => void) | undefined;
+  let presenceLeaveHandler: ((data: any) => void) | undefined;
 
   const mockUser = {
     id: 'user-123',
@@ -91,14 +91,14 @@ describe('RealtimeContext', () => {
     jest.clearAllMocks();
 
     // Mock auth
-    useAuth.mockReturnValue({
+    (useAuth as jest.Mock).mockReturnValue({
       user: mockUser,
       isAuthenticated: true,
     });
 
     // Mock channel
     mockChannel = {
-      on: jest.fn((type, config, handler) => {
+      on: jest.fn((type: string, config: any, handler: any) => {
         if (type === 'presence') {
           if (config.event === 'sync') presenceSyncHandler = handler;
           if (config.event === 'join') presenceJoinHandler = handler;
@@ -106,7 +106,7 @@ describe('RealtimeContext', () => {
         }
         return mockChannel;
       }),
-      subscribe: jest.fn((callback) => {
+      subscribe: jest.fn((callback?: (status: string) => void) => {
         if (callback) callback('SUBSCRIBED');
         return mockChannel;
       }),
@@ -117,8 +117,8 @@ describe('RealtimeContext', () => {
       untrack: jest.fn().mockResolvedValue('ok'),
     };
 
-    supabase.channel.mockReturnValue(mockChannel);
-    supabase.removeChannel.mockImplementation(() => {});
+    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
+    (supabase.removeChannel as jest.Mock).mockImplementation(() => {});
   });
 
   // ===========================
@@ -128,12 +128,12 @@ describe('RealtimeContext', () => {
   describe('Context Initialization', () => {
     it('should initialize with disconnected state', () => {
       // Mock unauthenticated user for this test
-      useAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         user: null,
         isAuthenticated: false,
       });
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -144,7 +144,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should setup presence channel when authenticated', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -165,12 +165,12 @@ describe('RealtimeContext', () => {
     });
 
     it('should not setup presence when not authenticated', () => {
-      useAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         user: null,
         isAuthenticated: false,
       });
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -180,7 +180,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should transition to connected state after subscription', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -205,7 +205,7 @@ describe('RealtimeContext', () => {
         'user-3': [{ user_id: 'user-3' }],
       });
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -216,7 +216,7 @@ describe('RealtimeContext', () => {
       });
 
       act(() => {
-        presenceSyncHandler();
+        presenceSyncHandler?.();
       });
 
       await waitFor(() => {
@@ -227,7 +227,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should add user on presence join', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -238,7 +238,7 @@ describe('RealtimeContext', () => {
       });
 
       act(() => {
-        presenceJoinHandler({ key: 'user-new' });
+        presenceJoinHandler?.({ key: 'user-new' });
       });
 
       await waitFor(() => {
@@ -251,7 +251,7 @@ describe('RealtimeContext', () => {
         'user-1': [{ user_id: 'user-1' }],
       });
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -263,12 +263,12 @@ describe('RealtimeContext', () => {
 
       // Sync first
       act(() => {
-        presenceSyncHandler();
+        presenceSyncHandler?.();
       });
 
       // User leaves
       act(() => {
-        presenceLeaveHandler({ key: 'user-1' });
+        presenceLeaveHandler?.({ key: 'user-1' });
       });
 
       await waitFor(() => {
@@ -279,7 +279,7 @@ describe('RealtimeContext', () => {
     it('should emit user:online event on join', async () => {
       const handler = jest.fn();
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -294,7 +294,7 @@ describe('RealtimeContext', () => {
       });
 
       act(() => {
-        presenceJoinHandler({ key: 'user-456' });
+        presenceJoinHandler?.({ key: 'user-456' });
       });
 
       await waitFor(() => {
@@ -307,7 +307,7 @@ describe('RealtimeContext', () => {
     it('should emit user:offline event on leave', async () => {
       const handler = jest.fn();
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -322,7 +322,7 @@ describe('RealtimeContext', () => {
       });
 
       act(() => {
-        presenceLeaveHandler({ key: 'user-789' });
+        presenceLeaveHandler?.({ key: 'user-789' });
       });
 
       await waitFor(() => {
@@ -345,7 +345,7 @@ describe('RealtimeContext', () => {
     it('should subscribe to events', async () => {
       const handler = jest.fn();
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -366,13 +366,13 @@ describe('RealtimeContext', () => {
     it('should unsubscribe from events', async () => {
       const handler = jest.fn();
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
       const { result } = renderHook(() => useRealtime(), { wrapper });
 
-      let unsubscribe: Function;
+      let unsubscribe: (() => void) | undefined;
 
       await waitFor(() => {
         expect(result.current).toBeDefined();
@@ -383,7 +383,7 @@ describe('RealtimeContext', () => {
       });
 
       act(() => {
-        unsubscribe();
+        unsubscribe?.();
       });
 
       // Handler should be removed (would need internal state check)
@@ -394,7 +394,7 @@ describe('RealtimeContext', () => {
       const handler2 = jest.fn();
       const handler3 = jest.fn();
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -420,7 +420,7 @@ describe('RealtimeContext', () => {
       });
       const normalHandler = jest.fn();
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -445,7 +445,7 @@ describe('RealtimeContext', () => {
 
   describe('Typing Indicators', () => {
     it('should send typing start event', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -470,7 +470,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should send typing stop event', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -494,7 +494,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should track typing users with useTypingIndicator hook', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -514,7 +514,7 @@ describe('RealtimeContext', () => {
 
   describe('Connection Management', () => {
     it('should connect manually', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -534,7 +534,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should disconnect manually', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -556,7 +556,7 @@ describe('RealtimeContext', () => {
     it('should reconnect after disconnection', async () => {
       jest.useFakeTimers();
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -587,11 +587,11 @@ describe('RealtimeContext', () => {
     });
 
     it('should handle connection errors', async () => {
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: (status: string) => void) => {
         callback('CHANNEL_ERROR');
       });
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -610,7 +610,7 @@ describe('RealtimeContext', () => {
 
   describe('App State Transitions', () => {
     it('should disconnect when app goes to background', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -622,7 +622,7 @@ describe('RealtimeContext', () => {
 
       // Simulate app going to background
       act(() => {
-        const listener = AppState.addEventListener.mock.calls[0][1];
+        const listener = (AppState.addEventListener as jest.Mock).mock.calls[0][1] as (state: string) => void;
         listener('background');
       });
 
@@ -631,7 +631,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should reconnect when app returns to foreground', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -639,7 +639,7 @@ describe('RealtimeContext', () => {
 
       // Simulate app returning to foreground
       act(() => {
-        const listener = AppState.addEventListener.mock.calls[0][1];
+        const listener = (AppState.addEventListener as jest.Mock).mock.calls[0][1] as (state: string) => void;
         listener('active');
       });
 
@@ -656,7 +656,7 @@ describe('RealtimeContext', () => {
 
   describe('Edge Cases', () => {
     it('should cleanup on unmount', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -672,7 +672,7 @@ describe('RealtimeContext', () => {
     });
 
     it('should handle rapid connect/disconnect', async () => {
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 
@@ -694,12 +694,12 @@ describe('RealtimeContext', () => {
     });
 
     it('should handle missing user ID in presence', async () => {
-      useAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         user: { id: null },
         isAuthenticated: true,
       });
 
-      const wrapper = ({ children }) => (
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
         <RealtimeProvider>{children}</RealtimeProvider>
       );
 

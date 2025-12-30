@@ -47,16 +47,14 @@ jest.mock('react-native-safe-area-context', () => {
 jest.mock('@expo/vector-icons', () => ({
   MaterialCommunityIcons: ({
     name,
-    _size,
-    _color,
   }: {
     name: string;
-    _size: number;
-    _color: string;
+    size?: number;
+    color?: string;
   }) => {
-     
+
     const ReactMock = require('react');
-     
+
     const { Text } = require('react-native');
     return ReactMock.createElement(Text, { testID: `icon-${name}` }, name);
   },
@@ -68,9 +66,9 @@ const mockNavigation: {
   goBack: jest.Mock;
   reset: jest.Mock;
 } = {
-  navigate: jest.fn(),
-  goBack: jest.fn(),
-  reset: jest.fn(),
+  navigate: jest.fn() as jest.Mock,
+  goBack: jest.fn() as jest.Mock,
+  reset: jest.fn() as jest.Mock,
 };
 
 const mockRoute = {

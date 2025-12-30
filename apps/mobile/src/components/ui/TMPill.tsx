@@ -116,17 +116,17 @@ export const TMPill: React.FC<TMPillProps> = ({
       case 'selected':
         return COLORS.white;
       case 'outlined':
-        return COLORS.text;
+        return COLORS.text.primary;
       case 'muted':
         return COLORS.textSecondary;
       default:
-        return COLORS.text;
+        return COLORS.text.primary;
     }
   };
 
   const getBorderColor = (): string => {
     if (effectiveVariant === 'outlined') {
-      return disabled ? COLORS.borderLight : COLORS.border;
+      return disabled ? COLORS.borderLight : COLORS.border.default;
     }
     return 'transparent';
   };

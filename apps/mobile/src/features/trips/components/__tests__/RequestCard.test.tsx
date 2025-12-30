@@ -5,7 +5,7 @@ import { RequestCard } from '@/features/trips/components/RequestCard';
 import { COLORS } from '@/constants/colors';
 
 // Mock navigation
-const mockNavigate = jest.fn();
+const mockNavigate = jest.fn() as jest.Mock;
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
@@ -36,8 +36,8 @@ describe('RequestCard', () => {
     proofUploaded: false,
   };
 
-  const mockOnAccept = jest.fn();
-  const mockOnDecline = jest.fn();
+  const mockOnAccept = jest.fn() as jest.Mock;
+  const mockOnDecline = jest.fn() as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();

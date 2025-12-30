@@ -24,7 +24,7 @@ import { logger } from '@/utils/logger';
 // Mock logger
 jest.mock('@/utils/logger');
 
-const mockLogger = logger ;
+const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('usePagination', () => {
   interface TestItem {
@@ -68,7 +68,7 @@ describe('usePagination', () => {
     });
 
     it('should not auto-load when autoLoad is false', async () => {
-      const fetcher: PaginationFetcher<TestItem> = jest.fn();
+      const fetcher: PaginationFetcher<TestItem> = jest.fn() as jest.Mock;
 
       const { result } = renderHook(() =>
         usePagination(fetcher, { autoLoad: false })

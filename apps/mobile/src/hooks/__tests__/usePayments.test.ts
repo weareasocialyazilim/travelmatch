@@ -38,8 +38,8 @@ jest.mock('@/services/paymentService', () => ({
 
 import { paymentService } from '@/services/paymentService';
 
-const mockPaymentService = paymentService ;
-const mockLogger = logger ;
+const mockPaymentService = paymentService as jest.Mocked<typeof paymentService>;
+const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('usePayments', () => {
   beforeEach(() => {

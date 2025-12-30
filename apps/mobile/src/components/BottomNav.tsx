@@ -10,18 +10,20 @@
  * Designed for Awwwards Best UI nomination
  */
 
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   View,
   Text,
   Pressable,
   StyleSheet,
   Platform,
-  Dimensions,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
+
+type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, {
@@ -34,10 +36,9 @@ import * as Haptics from 'expo-haptics';
 import { COLORS, GRADIENTS, PALETTE } from '../constants/colors';
 import { TYPE_SCALE } from '../theme/typography';
 import { SPRINGS } from '../hooks/useAnimations';
+import { useTranslation } from '../hooks/useTranslation';
 import type { RootStackParamList } from '../navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ============================================
 // TYPES
@@ -52,40 +53,45 @@ type TabName = 'Discover' | 'Requests' | 'Messages' | 'Profile';
 
 interface TabConfig {
   name: TabName;
-  label: string;
-  icon: string;
-  iconActive: string;
+  labelKey: string; // i18n translation key
+  accessibilityKey: string; // i18n translation key for accessibility
+  icon: IconName;
+  iconActive: IconName;
   screen: keyof RootStackParamList;
 }
 
 // ============================================
-// TAB CONFIGURATION
+// TAB CONFIGURATION (with translation keys)
 // ============================================
-const TABS: TabConfig[] = [
+const TAB_CONFIGS: Omit<TabConfig, 'label'>[] = [
   {
     name: 'Discover',
-    label: 'Dilekler',
+    labelKey: 'navigation.discover',
+    accessibilityKey: 'navigation.discoverTab',
     icon: 'gift-outline',
     iconActive: 'gift',
     screen: 'Discover',
   },
   {
     name: 'Requests',
-    label: 'Hediyeler',
+    labelKey: 'navigation.requests',
+    accessibilityKey: 'navigation.requestsTab',
     icon: 'heart-outline',
     iconActive: 'heart',
     screen: 'Requests',
   },
   {
     name: 'Messages',
-    label: 'Mesajlar',
+    labelKey: 'navigation.messages',
+    accessibilityKey: 'navigation.messagesTab',
     icon: 'chat-outline',
     iconActive: 'chat',
     screen: 'Messages',
   },
   {
     name: 'Profile',
-    label: 'Profil',
+    labelKey: 'navigation.profile',
+    accessibilityKey: 'navigation.profileTab',
     icon: 'account-outline',
     iconActive: 'account',
     screen: 'Profile',
@@ -96,13 +102,15 @@ const TABS: TabConfig[] = [
 // TAB ITEM COMPONENT
 // ============================================
 interface TabItemProps {
-  tab: TabConfig;
+  tab: Omit<TabConfig, 'label'>;
+  label: string;
+  accessibilityLabel: string;
   isActive: boolean;
   badge?: number;
   onPress: () => void;
 }
 
-const TabItem: React.FC<TabItemProps> = memo(({ tab, isActive, badge, onPress }) => {
+const TabItem: React.FC<TabItemProps> = memo(({ tab, label, accessibilityLabel, isActive, badge, onPress }) => {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -131,14 +139,14 @@ const TabItem: React.FC<TabItemProps> = memo(({ tab, isActive, badge, onPress })
       style={styles.navItem}
       accessibilityRole="tab"
       accessibilityState={{ selected: isActive }}
-      accessibilityLabel={`${tab.label} tab`}
+      accessibilityLabel={accessibilityLabel}
     >
       <Reanimated.View style={[styles.navItemContent, animatedStyle]}>
         <View style={styles.iconContainer}>
           <MaterialCommunityIcons
             name={isActive ? tab.iconActive : tab.icon}
             size={24}
-            color={isActive ? COLORS.interactive.primary : COLORS.text.muted}
+            color={isActive ? COLORS.brand.primary : COLORS.text.muted}
           />
           {badge && badge > 0 && (
             <View style={styles.badge}>
@@ -149,7 +157,7 @@ const TabItem: React.FC<TabItemProps> = memo(({ tab, isActive, badge, onPress })
           )}
         </View>
         <Text style={isActive ? styles.navTextActive : styles.navText}>
-          {tab.label}
+          {label}
         </Text>
         {isActive && <View style={styles.activeIndicator} />}
       </Reanimated.View>
@@ -162,9 +170,10 @@ const TabItem: React.FC<TabItemProps> = memo(({ tab, isActive, badge, onPress })
 // ============================================
 interface CreateButtonProps {
   onPress: () => void;
+  accessibilityLabel: string;
 }
 
-const CreateButton: React.FC<CreateButtonProps> = memo(({ onPress }) => {
+const CreateButton: React.FC<CreateButtonProps> = memo(({ onPress, accessibilityLabel }) => {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -192,7 +201,7 @@ const CreateButton: React.FC<CreateButtonProps> = memo(({ onPress }) => {
       onPressOut={handlePressOut}
       style={styles.createButtonWrapper}
       accessibilityRole="button"
-      accessibilityLabel="Yeni dilek oluştur"
+      accessibilityLabel={accessibilityLabel}
     >
       <Reanimated.View style={animatedStyle}>
         <LinearGradient
@@ -222,6 +231,7 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
 }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const handleTabPress = useCallback(
     (screen: keyof RootStackParamList) => {
@@ -246,8 +256,24 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
   }, [requestsBadge, messagesBadge]);
 
   // Split tabs for left and right of create button
-  const leftTabs = TABS.slice(0, 2);
-  const rightTabs = TABS.slice(2);
+  const leftTabs = TAB_CONFIGS.slice(0, 2);
+  const rightTabs = TAB_CONFIGS.slice(2);
+
+  // Get translated create button label
+  const createLabel = t('navigation.createMoment');
+
+  // Render tab with translations
+  const renderTab = (tab: (typeof TAB_CONFIGS)[0]) => (
+    <TabItem
+      key={tab.name}
+      tab={tab}
+      label={t(tab.labelKey)}
+      accessibilityLabel={t(tab.accessibilityKey)}
+      isActive={activeTab === tab.name}
+      badge={getBadge(tab.name)}
+      onPress={() => handleTabPress(tab.screen)}
+    />
+  );
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
@@ -258,53 +284,17 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
           style={styles.blurContainer}
         >
           <View style={styles.navContent}>
-            {leftTabs.map((tab) => (
-              <TabItem
-                key={tab.name}
-                tab={tab}
-                isActive={activeTab === tab.name}
-                badge={getBadge(tab.name)}
-                onPress={() => handleTabPress(tab.screen)}
-              />
-            ))}
-
-            <CreateButton onPress={handleCreatePress} />
-
-            {rightTabs.map((tab) => (
-              <TabItem
-                key={tab.name}
-                tab={tab}
-                isActive={activeTab === tab.name}
-                badge={getBadge(tab.name)}
-                onPress={() => handleTabPress(tab.screen)}
-              />
-            ))}
+            {leftTabs.map(renderTab)}
+            <CreateButton onPress={handleCreatePress} accessibilityLabel={createLabel} />
+            {rightTabs.map(renderTab)}
           </View>
         </BlurView>
       ) : (
         <View style={[styles.blurContainer, styles.androidBackground]}>
           <View style={styles.navContent}>
-            {leftTabs.map((tab) => (
-              <TabItem
-                key={tab.name}
-                tab={tab}
-                isActive={activeTab === tab.name}
-                badge={getBadge(tab.name)}
-                onPress={() => handleTabPress(tab.screen)}
-              />
-            ))}
-
-            <CreateButton onPress={handleCreatePress} />
-
-            {rightTabs.map((tab) => (
-              <TabItem
-                key={tab.name}
-                tab={tab}
-                isActive={activeTab === tab.name}
-                badge={getBadge(tab.name)}
-                onPress={() => handleTabPress(tab.screen)}
-              />
-            ))}
+            {leftTabs.map(renderTab)}
+            <CreateButton onPress={handleCreatePress} accessibilityLabel={createLabel} />
+            {rightTabs.map(renderTab)}
           </View>
         </View>
       )}
@@ -380,7 +370,7 @@ const styles = StyleSheet.create({
   },
   navTextActive: {
     ...TYPE_SCALE.body.caption,
-    color: COLORS.interactive.primary,
+    color: COLORS.brand.primary,
     fontSize: 10,
     fontWeight: '600',
     marginTop: 2,
@@ -391,7 +381,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.interactive.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   createButtonWrapper: {
     alignItems: 'center',
@@ -404,7 +394,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: PALETTE.primary[500],
+    shadowColor: '#F59E0B', // amber[500] - primary color
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,

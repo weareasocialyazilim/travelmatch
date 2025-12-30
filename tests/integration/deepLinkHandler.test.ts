@@ -18,8 +18,6 @@
  * - UTM tracking
  */
 
-// @ts-nocheck - Complex React Navigation mocks
-
 // Mock expo/virtual/env first (ES module issue)
 jest.mock('expo/virtual/env', () => ({
   env: process.env,
@@ -38,27 +36,27 @@ import { sessionManager } from '../../apps/mobile/src/services/sessionManager';
 // Mock dependencies
 jest.mock('react-native', () => ({
   Linking: {
-    getInitialURL: jest.fn(),
-    addEventListener: jest.fn(),
+    getInitialURL: jest.fn() as jest.Mock,
+    addEventListener: jest.fn() as jest.Mock,
   },
 }));
 
 jest.mock('../../apps/mobile/src/utils/logger', () => ({
   logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: jest.fn() as jest.Mock,
+    warn: jest.fn() as jest.Mock,
+    error: jest.fn() as jest.Mock,
   },
 }));
 
 jest.mock('../../apps/mobile/src/services/sessionManager', () => ({
   sessionManager: {
-    getValidToken: jest.fn(),
+    getValidToken: jest.fn() as jest.Mock,
   },
 }));
 
 // Mock global fetch
-global.fetch = jest.fn();
+global.fetch = jest.fn() as jest.Mock;
 
 describe('DeepLinkHandler', () => {
   let mockNavigation: any;
@@ -68,26 +66,26 @@ describe('DeepLinkHandler', () => {
 
     // Mock navigation
     mockNavigation = {
-      navigate: jest.fn(),
-      isReady: jest.fn(() => true),
-      reset: jest.fn(),
-      goBack: jest.fn(),
-      canGoBack: jest.fn(() => true),
+      navigate: jest.fn() as jest.Mock,
+      isReady: jest.fn(() => true) as jest.Mock,
+      reset: jest.fn() as jest.Mock,
+      goBack: jest.fn() as jest.Mock,
+      canGoBack: jest.fn(() => true) as jest.Mock,
     } as any;
 
     deepLinkHandler.setNavigation(mockNavigation);
 
     // Default sessionManager mock
-    sessionManager.getValidToken.mockResolvedValue('mock-token');
+    (sessionManager.getValidToken as jest.Mock).mockResolvedValue('mock-token');
 
     // Default Linking mocks
     (Linking.getInitialURL as jest.Mock).mockResolvedValue(null);
     (Linking.addEventListener as jest.Mock).mockReturnValue({
-      remove: jest.fn(),
+      remove: jest.fn() as jest.Mock,
     });
 
     // Default fetch mock (resource exists)
-    global.fetch.mockResolvedValue({
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       status: 200,
     });
@@ -267,7 +265,7 @@ describe('DeepLinkHandler', () => {
       const url =
         'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
 
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         status: 200,
       });
@@ -294,7 +292,7 @@ describe('DeepLinkHandler', () => {
       const url =
         'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
 
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -312,7 +310,7 @@ describe('DeepLinkHandler', () => {
       const url =
         'https://travelmatch.app/gift/456e7890-e89b-12d3-a456-426614174222';
 
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 410,
       });
@@ -332,7 +330,7 @@ describe('DeepLinkHandler', () => {
       const url =
         'https://travelmatch.app/trip/123e4567-e89b-12d3-a456-426614174000';
 
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 401,
       });
@@ -350,7 +348,7 @@ describe('DeepLinkHandler', () => {
       const url =
         'https://travelmatch.app/chat/987fcdeb-51a2-43f1-b456-426614174111';
 
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 403,
       });
@@ -364,7 +362,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should skip existence check for public resources without token', async () => {
-      sessionManager.getValidToken.mockResolvedValueOnce(null);
+      (sessionManager.getValidToken as jest.Mock).mockResolvedValueOnce(null);
 
       const url =
         'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
@@ -472,7 +470,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should navigate to error screen on 404', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -497,7 +495,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should navigate to expired screen on 410', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 410,
       });
@@ -644,7 +642,7 @@ describe('DeepLinkHandler', () => {
       const initialURL =
         'https://travelmatch.app/moment/987fcdeb-51a2-43f1-b456-426614174111';
 
-      Linking.getInitialURL.mockResolvedValueOnce(initialURL);
+      (Linking.getInitialURL as jest.Mock).mockResolvedValueOnce(initialURL);
 
       const unsubscribe = deepLinkHandler.initialize();
 
@@ -661,7 +659,7 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should handle no initial URL', async () => {
-      Linking.getInitialURL.mockResolvedValueOnce(null);
+      (Linking.getInitialURL as jest.Mock).mockResolvedValueOnce(null);
 
       const unsubscribe = deepLinkHandler.initialize();
 
@@ -674,8 +672,8 @@ describe('DeepLinkHandler', () => {
     });
 
     it('should listen to URL changes', () => {
-      const mockRemove = jest.fn();
-      Linking.addEventListener.mockReturnValueOnce({ remove: mockRemove });
+      const mockRemove = jest.fn() as jest.Mock;
+      (Linking.addEventListener as jest.Mock).mockReturnValueOnce({ remove: mockRemove });
 
       const unsubscribe = deepLinkHandler.initialize();
 
@@ -691,9 +689,9 @@ describe('DeepLinkHandler', () => {
     it('should handle URL events when app in background', async () => {
       let urlListener: (event: { url: string }) => void = () => {};
 
-      Linking.addEventListener.mockImplementationOnce((event, callback) => {
+      (Linking.addEventListener as jest.Mock).mockImplementationOnce((event: string, callback: (event: { url: string }) => void) => {
         urlListener = callback;
-        return { remove: jest.fn() };
+        return { remove: jest.fn() as jest.Mock };
       });
 
       deepLinkHandler.initialize();
@@ -714,7 +712,7 @@ describe('DeepLinkHandler', () => {
     it('should navigate to error screen on failed initial URL', async () => {
       const invalidURL = 'https://travelmatch.app/invalid-path';
 
-      Linking.getInitialURL.mockResolvedValueOnce(invalidURL);
+      (Linking.getInitialURL as jest.Mock).mockResolvedValueOnce(invalidURL);
 
       deepLinkHandler.initialize();
 

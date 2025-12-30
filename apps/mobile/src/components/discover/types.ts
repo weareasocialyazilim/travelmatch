@@ -13,6 +13,12 @@ export interface Story {
   distance: string;
   price: number;
   time: string;
+  // Social interactions (Reels-style)
+  likeCount?: number;
+  commentCount?: number;
+  shareCount?: number;
+  isLiked?: boolean;
+  isSaved?: boolean;
 }
 
 export interface UserStory {

@@ -27,6 +27,7 @@ import { TrustRing } from './TrustRing';
 import { KYCBadge, KYCLevel } from './KYCBadge';
 import { GiftButton } from './GiftButton';
 import { COLORS } from '../constants/colors';
+import { useTranslation } from '../hooks/useTranslation';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 32;
@@ -72,6 +73,7 @@ interface WishCardProps {
 export const WishCard: React.FC<WishCardProps> = memo(
   ({ wish, onGift, onPress, onSave, isSaved = false }) => {
     const scale = useSharedValue(1);
+    const { t } = useTranslation();
 
     const cardAnimatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: scale.value }],
@@ -199,7 +201,7 @@ export const WishCard: React.FC<WishCardProps> = memo(
           {/* Bottom Section */}
           <View style={styles.bottomSection}>
             <View style={styles.priceTag}>
-              <Text style={styles.priceLabel}>yaklaşık</Text>
+              <Text style={styles.priceLabel}>{t('wishCard.approximately')}</Text>
               <Text style={styles.priceValue}>
                 {wish.currency || '₺'}
                 {wish.price}

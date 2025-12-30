@@ -8,6 +8,10 @@ const LIGHT_COLORS = {
     secondary: COLORS.text.secondary,
     tertiary: COLORS.text.tertiary,
   },
+  primary: COLORS.primary,
+  surface: COLORS.surface.base,
+  error: COLORS.error,
+  success: COLORS.success,
 };
 
 const DARK_COLORS = {
@@ -16,6 +20,10 @@ const DARK_COLORS = {
     secondary: COLORS.textOnDarkSecondary,
     tertiary: COLORS.textOnDarkMuted,
   },
+  primary: COLORS.primary,
+  surface: COLORS.surfaceDark,
+  error: COLORS.error,
+  success: COLORS.success,
 };
 
 /**
@@ -24,16 +32,17 @@ const DARK_COLORS = {
  * Follows WCAG 2.1 Level AA accessibility guidelines
  */
 export const FONT_SIZES = {
-  xs: 12,
-  sm: 13,
-  base: 15,
-  md: 16,
-  lg: 17,
-  xl: 20,
-  '2xl': 24,
-  '3xl': 28,
-  '4xl': 32,
-  '5xl': 36,
+  xs: 12,      // Caption, small labels
+  sm: 13,      // Small body text
+  body: 14,    // Standard body text (from design reference)
+  base: 15,    // Base/default
+  md: 16,      // Subheadline, button text
+  lg: 17,      // h4 headers
+  xl: 20,      // h3 headers
+  '2xl': 24,   // Headline (h1/h2)
+  '3xl': 28,   // Display 3
+  '4xl': 32,   // Display 2
+  '5xl': 36,   // Display 1
 } as const;
 
 export const FONT_WEIGHTS = {
@@ -139,7 +148,7 @@ export const createTypography = (isDark = false) => {
       fontWeight: FONT_WEIGHTS.extrabold,
       lineHeight: FONT_SIZES['5xl'] * LINE_HEIGHTS.tight,
       letterSpacing: LETTER_SPACINGS.tighter,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 7, // WCAG AAA for large text
     } as TypographyStyle,
@@ -149,7 +158,7 @@ export const createTypography = (isDark = false) => {
       fontWeight: FONT_WEIGHTS.extrabold,
       lineHeight: FONT_SIZES['4xl'] * LINE_HEIGHTS.tight,
       letterSpacing: LETTER_SPACINGS.tighter,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
@@ -159,7 +168,7 @@ export const createTypography = (isDark = false) => {
       fontWeight: FONT_WEIGHTS.bold,
       lineHeight: FONT_SIZES['3xl'] * LINE_HEIGHTS.tight,
       letterSpacing: LETTER_SPACINGS.tight,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
@@ -170,7 +179,7 @@ export const createTypography = (isDark = false) => {
       fontWeight: FONT_WEIGHTS.bold,
       lineHeight: FONT_SIZES['3xl'] * LINE_HEIGHTS.tight,
       letterSpacing: LETTER_SPACINGS.tight,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
@@ -180,7 +189,7 @@ export const createTypography = (isDark = false) => {
       fontWeight: FONT_WEIGHTS.bold,
       lineHeight: FONT_SIZES['2xl'] * LINE_HEIGHTS.normal,
       letterSpacing: LETTER_SPACINGS.tight,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
@@ -189,7 +198,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.xl,
       fontWeight: FONT_WEIGHTS.semibold,
       lineHeight: FONT_SIZES.xl * LINE_HEIGHTS.normal,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 7,
     } as TypographyStyle,
@@ -198,7 +207,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.lg,
       fontWeight: FONT_WEIGHTS.semibold,
       lineHeight: FONT_SIZES.lg * LINE_HEIGHTS.normal,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 4.5, // WCAG AA for normal text
     } as TypographyStyle,
@@ -207,7 +216,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.md,
       fontWeight: FONT_WEIGHTS.semibold,
       lineHeight: FONT_SIZES.md * LINE_HEIGHTS.normal,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -216,7 +225,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.base,
       fontWeight: FONT_WEIGHTS.semibold,
       lineHeight: FONT_SIZES.base * LINE_HEIGHTS.normal,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'header' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -226,7 +235,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.base,
       fontWeight: FONT_WEIGHTS.regular,
       lineHeight: FONT_SIZES.base * LINE_HEIGHTS.relaxed, // 1.75 for better readability
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -235,7 +244,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.md,
       fontWeight: FONT_WEIGHTS.regular,
       lineHeight: FONT_SIZES.md * LINE_HEIGHTS.relaxed,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -244,7 +253,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.regular,
       lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.relaxed, // Increased for accessibility
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -253,7 +262,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.base,
       fontWeight: FONT_WEIGHTS.medium,
       lineHeight: FONT_SIZES.base * LINE_HEIGHTS.relaxed,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -263,7 +272,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.xs,
       fontWeight: FONT_WEIGHTS.regular,
       lineHeight: FONT_SIZES.xs * LINE_HEIGHTS.relaxed, // Improved readability
-      color: colors.textTertiary,
+      color: colors.text.tertiary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -272,7 +281,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.xs,
       fontWeight: FONT_WEIGHTS.medium,
       lineHeight: FONT_SIZES.xs * LINE_HEIGHTS.normal,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -300,7 +309,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.sm,
       fontWeight: FONT_WEIGHTS.medium,
       lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.normal,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -309,7 +318,7 @@ export const createTypography = (isDark = false) => {
       fontSize: FONT_SIZES.base,
       fontWeight: FONT_WEIGHTS.medium,
       lineHeight: FONT_SIZES.base * LINE_HEIGHTS.normal,
-      color: colors.text,
+      color: colors.text.primary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -388,7 +397,7 @@ export const createTypography = (isDark = false) => {
       lineHeight: FONT_SIZES.xs * LINE_HEIGHTS.normal,
       letterSpacing: LETTER_SPACINGS.wider,
       textTransform: 'uppercase' as const,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
     } as TypographyStyle,
@@ -398,7 +407,7 @@ export const createTypography = (isDark = false) => {
       fontWeight: FONT_WEIGHTS.regular,
       fontFamily: FONT_FAMILIES.mono,
       lineHeight: FONT_SIZES.sm * LINE_HEIGHTS.relaxed,
-      color: colors.text,
+      color: colors.text.primary,
       backgroundColor: colors.surface,
       accessibilityRole: 'text' as const,
       minContrastRatio: 4.5,
@@ -493,6 +502,62 @@ export const TypographyAccessibility = {
     height: 44,
   },
 };
+
+/**
+ * TYPE_SCALE - Backwards compatibility export with nested structure
+ */
+export const TYPE_SCALE = {
+  label: {
+    large: TYPOGRAPHY.labelLarge,
+    small: TYPOGRAPHY.labelSmall,
+    xsmall: TYPOGRAPHY.labelXSmall,
+    default: TYPOGRAPHY.label,
+  },
+  body: {
+    large: TYPOGRAPHY.bodyLarge,
+    small: TYPOGRAPHY.bodySmall,
+    medium: TYPOGRAPHY.bodyMedium,
+    default: TYPOGRAPHY.body,
+    base: TYPOGRAPHY.body,
+    caption: TYPOGRAPHY.caption, // Alias for backward compatibility
+  },
+  heading: {
+    h1: TYPOGRAPHY.h1,
+    h2: TYPOGRAPHY.h2,
+    h3: TYPOGRAPHY.h3,
+    h4: TYPOGRAPHY.h4,
+    h5: TYPOGRAPHY.h5,
+    h6: TYPOGRAPHY.h6,
+  },
+  display: {
+    1: TYPOGRAPHY.display1,
+    2: TYPOGRAPHY.display2,
+    3: TYPOGRAPHY.display3,
+    h1: TYPOGRAPHY.display1,
+    h2: TYPOGRAPHY.display2,
+    h3: TYPOGRAPHY.display3,
+  },
+  button: {
+    large: TYPOGRAPHY.buttonLarge,
+    small: TYPOGRAPHY.buttonSmall,
+    default: TYPOGRAPHY.button,
+  },
+  caption: {
+    default: TYPOGRAPHY.caption,
+    medium: TYPOGRAPHY.captionMedium,
+    small: TYPOGRAPHY.captionSmall,
+  },
+  price: {
+    large: TYPOGRAPHY.price,
+    small: TYPOGRAPHY.priceSmall,
+  },
+  // Mono-spaced typography for numbers and prices
+  mono: {
+    price: TYPOGRAPHY.price,
+    priceSmall: TYPOGRAPHY.priceSmall,
+    score: TYPOGRAPHY.score,
+  },
+} as const;
 
 /**
  * Export type for TypeScript support

@@ -13,7 +13,7 @@ import {
 import { MomentSingleCard } from '../../../../components/discover/cards/MomentSingleCard';
 
 describe('MomentSingleCard Component', () => {
-  const mockOnPress = jest.fn();
+  const mockOnPress = jest.fn() as jest.Mock;
 
   afterEach(() => {
     jest.clearAllMocks();

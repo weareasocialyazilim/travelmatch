@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { CompleteGiftBottomSheet } from '../CompleteGiftBottomSheet';
 
 describe('CompleteGiftBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnComplete = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnComplete = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,
@@ -17,28 +17,28 @@ describe('CompleteGiftBottomSheet', () => {
     jest.clearAllMocks();
   });
 
-  const getCardNumberInput = (component: any) => {
+  const getCardNumberInput = (component: ReturnType<typeof render>) => {
     const { TextInput } = require('react-native');
     const inputs = component.UNSAFE_queryAllByType(TextInput);
-    return inputs.find((input: any) => input.props.placeholder === 'Card number');
+    return inputs.find((input: { props: { placeholder?: string } }) => input.props.placeholder === 'Card number');
   };
 
-  const getExpiryInput = (component: any) => {
+  const getExpiryInput = (component: ReturnType<typeof render>) => {
     const { TextInput } = require('react-native');
     const inputs = component.UNSAFE_queryAllByType(TextInput);
-    return inputs.find((input: any) => input.props.placeholder === 'Expiry');
+    return inputs.find((input: { props: { placeholder?: string } }) => input.props.placeholder === 'Expiry');
   };
 
-  const getCvcInput = (component: any) => {
+  const getCvcInput = (component: ReturnType<typeof render>) => {
     const { TextInput } = require('react-native');
     const inputs = component.UNSAFE_queryAllByType(TextInput);
-    return inputs.find((input: any) => input.props.placeholder === 'CVC');
+    return inputs.find((input: { props: { placeholder?: string } }) => input.props.placeholder === 'CVC');
   };
 
-  const getNameInput = (component: any) => {
+  const getNameInput = (component: ReturnType<typeof render>) => {
     const { TextInput } = require('react-native');
     const inputs = component.UNSAFE_queryAllByType(TextInput);
-    return inputs.find((input: any) => input.props.placeholder === 'Name on card');
+    return inputs.find((input: { props: { placeholder?: string } }) => input.props.placeholder === 'Name on card');
   };
 
   describe('Rendering', () => {

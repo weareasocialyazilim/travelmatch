@@ -10,14 +10,18 @@ import { TransactionHistoryScreen } from '@/screens/TransactionHistoryScreen';
 
 // Mock navigation
 const mockNavigation = {
-  navigate: jest.fn(),
-  goBack: jest.fn(),
-  setOptions: jest.fn(),
-} as any;
+  navigate: jest.fn() as jest.Mock,
+  goBack: jest.fn() as jest.Mock,
+  setOptions: jest.fn() as jest.Mock,
+} as {
+  navigate: jest.Mock;
+  goBack: jest.Mock;
+  setOptions: jest.Mock;
+};
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => mockNavigation,
-  useFocusEffect: jest.fn(),
+  useFocusEffect: jest.fn() as jest.Mock,
 }));
 
 describe('TransactionHistoryScreen', () => {

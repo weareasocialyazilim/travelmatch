@@ -9,8 +9,8 @@ describe('ActiveFilters', () => {
     { key: 'timing', label: 'When', value: 'Today' },
   ];
 
-  const mockOnRemove = jest.fn();
-  const mockOnClearAll = jest.fn();
+  const mockOnRemove = jest.fn() as jest.Mock;
+  const mockOnClearAll = jest.fn() as jest.Mock;
 
   const defaultProps = {
     filters: mockFilters,

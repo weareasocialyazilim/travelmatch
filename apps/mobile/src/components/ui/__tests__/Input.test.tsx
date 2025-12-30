@@ -45,7 +45,7 @@ describe('Input Component', () => {
 
   describe('Text Input', () => {
     it('accepts text input', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Input
           placeholder="Type here"
@@ -61,7 +61,7 @@ describe('Input Component', () => {
     });
 
     it('calls onChangeText handler', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Input
           placeholder="Type"
@@ -75,7 +75,7 @@ describe('Input Component', () => {
     });
 
     it('handles focus event', () => {
-      const onFocus = jest.fn();
+      const onFocus = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Input placeholder="Focus me" onFocus={onFocus} testID="focus-input" />,
       );
@@ -85,7 +85,7 @@ describe('Input Component', () => {
     });
 
     it('handles blur event', () => {
-      const onBlur = jest.fn();
+      const onBlur = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Input placeholder="Blur me" onBlur={onBlur} testID="blur-input" />,
       );
@@ -146,7 +146,7 @@ describe('Input Component', () => {
     });
 
     it('calls onRightIconPress when right icon is pressed', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Input
           placeholder="Clear"
@@ -228,7 +228,7 @@ describe('Input Component', () => {
     });
 
     it('does not accept input when disabled', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Input
           placeholder="Disabled"
@@ -273,23 +273,6 @@ describe('Input Component', () => {
       );
       const error = getByText('Password is required');
       expect(error).toBeTruthy();
-    });
-  });
-
-  // TODO: Component doesn't support multiline prop - feature needs to be added
-  describe.skip('Multiline', () => {
-    it('renders multiline text area', () => {
-      const { getByTestId } = render(
-        <Input
-          placeholder="Description"
-          multiline
-          numberOfLines={4}
-          testID="multiline-input"
-        />,
-      );
-      const input = getByTestId('multiline-input');
-      expect(input.props.multiline).toBe(true);
-      expect(input.props.numberOfLines).toBe(4);
     });
   });
 

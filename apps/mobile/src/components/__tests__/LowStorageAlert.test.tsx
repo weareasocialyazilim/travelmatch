@@ -14,8 +14,8 @@ beforeAll(() => {
 });
 
 describe('LowStorageAlert', () => {
-  const mockOnDismiss = jest.fn();
-  const mockOnOpenSettings = jest.fn();
+  const mockOnDismiss = jest.fn() as jest.Mock;
+  const mockOnOpenSettings = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

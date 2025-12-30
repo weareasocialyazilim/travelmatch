@@ -655,8 +655,8 @@ describe('supabaseAuthService', () => {
   // ========================================
   describe('onAuthStateChange', () => {
     it('should register auth state change listener', () => {
-      const mockCallback = jest.fn();
-      const mockUnsubscribe = jest.fn();
+      const mockCallback = jest.fn() as jest.Mock;
+      const mockUnsubscribe = jest.fn() as jest.Mock;
 
       (auth.onAuthStateChange ).mockImplementation((callback) => {
         // Simulate auth state change
@@ -672,7 +672,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle SIGNED_OUT event', () => {
-      const mockCallback = jest.fn();
+      const mockCallback = jest.fn() as jest.Mock;
 
       (auth.onAuthStateChange ).mockImplementation((callback) => {
         callback('SIGNED_OUT', null);
@@ -685,7 +685,7 @@ describe('supabaseAuthService', () => {
     });
 
     it('should handle TOKEN_REFRESHED event', () => {
-      const mockCallback = jest.fn();
+      const mockCallback = jest.fn() as jest.Mock;
 
       (auth.onAuthStateChange ).mockImplementation((callback) => {
         callback('TOKEN_REFRESHED', mockSession);

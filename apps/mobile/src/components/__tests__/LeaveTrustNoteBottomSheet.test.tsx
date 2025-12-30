@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { LeaveTrustNoteBottomSheet } from '../LeaveTrustNoteBottomSheet';
 
 describe('LeaveTrustNoteBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSubmit = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnSubmit = jest.fn() as jest.Mock;
   const defaultProps = {
     visible: true,
     onClose: mockOnClose,
@@ -71,7 +71,7 @@ describe('LeaveTrustNoteBottomSheet', () => {
   });
 
   describe('Text Input', () => {
-    const getTextInput = (component: any) => {
+    const getTextInput = (component: ReturnType<typeof render>) => {
       const { TextInput } = require('react-native');
       return component.UNSAFE_getByType(TextInput);
     };
@@ -106,7 +106,7 @@ describe('LeaveTrustNoteBottomSheet', () => {
   });
 
   describe('Submit Functionality', () => {
-    const getTextInput = (component: any) => {
+    const getTextInput = (component: ReturnType<typeof render>) => {
       const { TextInput } = require('react-native');
       return component.UNSAFE_getByType(TextInput);
     };
@@ -201,7 +201,7 @@ describe('LeaveTrustNoteBottomSheet', () => {
   });
 
   describe('Edge Cases', () => {
-    const getTextInput = (component: any) => {
+    const getTextInput = (component: ReturnType<typeof render>) => {
       const { TextInput } = require('react-native');
       return component.UNSAFE_getByType(TextInput);
     };

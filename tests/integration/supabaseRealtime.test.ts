@@ -17,35 +17,39 @@
  * - Error handling
  */
 
-// @ts-nocheck - Supabase realtime mock types
-
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '../../apps/mobile/src/config/supabase';
 
 // Mock Supabase
 jest.mock('../../apps/mobile/src/config/supabase', () => ({
   supabase: {
-    channel: jest.fn(),
-    removeChannel: jest.fn(),
+    channel: jest.fn() as jest.Mock,
+    removeChannel: jest.fn() as jest.Mock,
   },
 }));
 
 describe('Supabase Realtime Subscriptions', () => {
-  let mockChannel;
+  let mockChannel: {
+    on: jest.Mock;
+    subscribe: jest.Mock;
+    unsubscribe: jest.Mock;
+    presenceState: jest.Mock;
+    send: jest.Mock;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     // Mock channel implementation
     mockChannel = {
-      on: jest.fn().mockReturnThis(),
-      subscribe: jest.fn(),
-      unsubscribe: jest.fn(),
-      presenceState: jest.fn(() => ({})),
-      send: jest.fn(),
+      on: jest.fn().mockReturnThis() as jest.Mock,
+      subscribe: jest.fn() as jest.Mock,
+      unsubscribe: jest.fn() as jest.Mock,
+      presenceState: jest.fn(() => ({})) as jest.Mock,
+      send: jest.fn() as jest.Mock,
     };
 
-    supabase.channel.mockReturnValue(mockChannel);
+    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
   });
 
   // ===========================
@@ -115,8 +119,8 @@ describe('Supabase Realtime Subscriptions', () => {
     });
 
     it('should handle subscription callback', (done) => {
-      mockChannel.subscribe.mockImplementation((callback: Function) => {
-        callback('SUBSCRIBED');
+      mockChannel.subscribe.mockImplementation((callback?: (status: string) => void) => {
+        if (callback) callback('SUBSCRIBED');
       });
 
       const channel = supabase.channel('test-channel');
@@ -128,8 +132,8 @@ describe('Supabase Realtime Subscriptions', () => {
     });
 
     it('should handle channel errors', (done) => {
-      mockChannel.subscribe.mockImplementation((callback: Function) => {
-        callback('CHANNEL_ERROR');
+      mockChannel.subscribe.mockImplementation((callback?: (status: string) => void) => {
+        if (callback) callback('CHANNEL_ERROR');
       });
 
       const channel = supabase.channel('test-channel');
@@ -448,8 +452,8 @@ describe('Supabase Realtime Subscriptions', () => {
     });
 
     it('should transition to subscribed state', (done) => {
-      mockChannel.subscribe.mockImplementation((callback: Function) => {
-        callback('SUBSCRIBED');
+      mockChannel.subscribe.mockImplementation((callback?: (status: string) => void) => {
+        if (callback) callback('SUBSCRIBED');
       });
 
       const channel = supabase.channel('test');
@@ -461,8 +465,8 @@ describe('Supabase Realtime Subscriptions', () => {
     });
 
     it('should handle subscription timeout', (done) => {
-      mockChannel.subscribe.mockImplementation((callback: Function) => {
-        callback('TIMED_OUT');
+      mockChannel.subscribe.mockImplementation((callback?: (status: string) => void) => {
+        if (callback) callback('TIMED_OUT');
       });
 
       const channel = supabase.channel('test');
@@ -474,8 +478,8 @@ describe('Supabase Realtime Subscriptions', () => {
     });
 
     it('should handle channel errors', (done) => {
-      mockChannel.subscribe.mockImplementation((callback: Function) => {
-        callback('CHANNEL_ERROR');
+      mockChannel.subscribe.mockImplementation((callback?: (status: string) => void) => {
+        if (callback) callback('CHANNEL_ERROR');
       });
 
       const channel = supabase.channel('test');

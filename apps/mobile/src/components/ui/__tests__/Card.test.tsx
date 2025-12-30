@@ -31,7 +31,7 @@ describe('Card Component', () => {
 
     it('renders with onPress (interactive)', () => {
       const { getByText } = render(
-        <Card onPress={jest.fn()}>
+        <Card onPress={jest.fn() as jest.Mock}>
           <Text>Pressable Card</Text>
         </Card>,
       );
@@ -41,7 +41,7 @@ describe('Card Component', () => {
 
   describe('Interactions', () => {
     it('calls onPress when pressed', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByText } = render(
         <Card onPress={onPress}>
           <Text>Click Me</Text>
@@ -53,7 +53,7 @@ describe('Card Component', () => {
     });
 
     it('does not call onPress when disabled', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Card testID="disabled-card" onPress={onPress} disabled>
           <Text>Disabled Card</Text>
@@ -110,9 +110,9 @@ describe('Card Component', () => {
             .reduce(
               (
                 acc: Record<string, unknown>,
-                s: Record<string, unknown> | null | undefined,
-              ) => ({ ...acc, ...s }),
-              {},
+                s: Record<string, unknown> | null | undefined
+              ): Record<string, unknown> => ({ ...acc, ...s }),
+              {} as Record<string, unknown>
             )
         : card.props.style;
       expect(styles.marginTop).toBe(20);
@@ -133,7 +133,7 @@ describe('Card Component', () => {
     });
 
     it('prevents interaction when disabled', () => {
-      const onPress = jest.fn();
+      const onPress = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <Card testID="disabled-interact-card" onPress={onPress} disabled>
           <Text>Disabled</Text>
@@ -148,7 +148,7 @@ describe('Card Component', () => {
   describe('Accessibility', () => {
     it('has button role when pressable', () => {
       const { getByTestId } = render(
-        <Card testID="pressable-card" onPress={jest.fn()}>
+        <Card testID="pressable-card" onPress={jest.fn() as jest.Mock}>
           <Text>Pressable</Text>
         </Card>,
       );
@@ -158,7 +158,7 @@ describe('Card Component', () => {
 
     it('announces disabled state', () => {
       const { getByTestId } = render(
-        <Card testID="disabled-card" onPress={jest.fn()} disabled>
+        <Card testID="disabled-card" onPress={jest.fn() as jest.Mock} disabled>
           <Text>Disabled</Text>
         </Card>,
       );
@@ -170,7 +170,7 @@ describe('Card Component', () => {
 
     it('has custom accessibility label', () => {
       const { getByLabelText } = render(
-        <Card onPress={jest.fn()} accessibilityLabel="Product card">
+        <Card onPress={jest.fn() as jest.Mock} accessibilityLabel="Product card">
           <Text>Product</Text>
         </Card>,
       );
@@ -190,7 +190,7 @@ describe('Card Component', () => {
 
     it('matches snapshot for pressable card', () => {
       const { toJSON } = render(
-        <Card onPress={jest.fn()}>
+        <Card onPress={jest.fn() as jest.Mock}>
           <Text>Pressable Card</Text>
         </Card>,
       );
@@ -199,7 +199,7 @@ describe('Card Component', () => {
 
     it('matches snapshot for disabled card', () => {
       const { toJSON } = render(
-        <Card onPress={jest.fn()} disabled>
+        <Card onPress={jest.fn() as jest.Mock} disabled>
           <Text>Disabled Card</Text>
         </Card>,
       );

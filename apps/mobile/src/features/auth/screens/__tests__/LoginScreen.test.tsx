@@ -20,9 +20,9 @@ jest.mock('react-hook-form', () => ({
     control: {},
     handleSubmit: (fn: (data: unknown) => void) => fn,
     formState: { errors: {}, isValid: true, isSubmitting: false },
-    watch: jest.fn(),
-    setValue: jest.fn(),
-    reset: jest.fn(),
+    watch: jest.fn() as jest.Mock,
+    setValue: jest.fn() as jest.Mock,
+    reset: jest.fn() as jest.Mock,
   }),
   Controller: ({
     render: renderProp,
@@ -33,25 +33,25 @@ jest.mock('react-hook-form', () => ({
     }) => React.ReactNode;
   }) =>
     renderProp({
-      field: { onChange: jest.fn(), onBlur: jest.fn(), value: '' },
+      field: { onChange: jest.fn() as jest.Mock, onBlur: jest.fn() as jest.Mock, value: '' },
       fieldState: { error: null },
     }),
 }));
 
 // Mock @hookform/resolvers/zod
 jest.mock('@hookform/resolvers/zod', () => ({
-  zodResolver: () => jest.fn(),
+  zodResolver: () => jest.fn() as jest.Mock,
 }));
 
 // Mock context and hooks
-const mockLogin = jest.fn();
-const mockShowToast = jest.fn();
-const mockAuthenticateForAppLaunch = jest.fn();
+const mockLogin = jest.fn() as jest.Mock;
+const mockShowToast = jest.fn() as jest.Mock;
+const mockAuthenticateForAppLaunch = jest.fn() as jest.Mock;
 
 jest.mock('../../../../context/AuthContext', () => ({
   useAuth: () => ({
     login: mockLogin,
-    logout: jest.fn(),
+    logout: jest.fn() as jest.Mock,
     user: null,
     loading: false,
   }),
@@ -60,10 +60,10 @@ jest.mock('../../../../context/AuthContext', () => ({
 jest.mock('../../../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: mockShowToast,
-    success: jest.fn(),
-    error: jest.fn(),
-    warning: jest.fn(),
-    info: jest.fn(),
+    success: jest.fn() as jest.Mock,
+    error: jest.fn() as jest.Mock,
+    warning: jest.fn() as jest.Mock,
+    info: jest.fn() as jest.Mock,
   }),
 }));
 
@@ -73,8 +73,8 @@ let mockBiometricState = {
   hasCredentials: false,
   biometricTypeName: 'Face ID',
   authenticateForAppLaunch: mockAuthenticateForAppLaunch,
-  getCredentials: jest.fn(),
-  saveCredentials: jest.fn(),
+  getCredentials: jest.fn() as jest.Mock,
+  saveCredentials: jest.fn() as jest.Mock,
 };
 
 jest.mock('../../../../context/BiometricAuthContext', () => ({
@@ -145,8 +145,8 @@ describe('LoginScreen', () => {
       hasCredentials: false,
       biometricTypeName: 'Face ID',
       authenticateForAppLaunch: mockAuthenticateForAppLaunch,
-      getCredentials: jest.fn(),
-      saveCredentials: jest.fn(),
+      getCredentials: jest.fn() as jest.Mock,
+      saveCredentials: jest.fn() as jest.Mock,
     };
   });
 
@@ -177,8 +177,8 @@ describe('LoginScreen', () => {
         hasCredentials: true,
         biometricTypeName: 'Face ID',
         authenticateForAppLaunch: mockAuthenticateForAppLaunch,
-        getCredentials: jest.fn(),
-        saveCredentials: jest.fn(),
+        getCredentials: jest.fn() as jest.Mock,
+        saveCredentials: jest.fn() as jest.Mock,
       };
 
       const { getByTestId } = render(<LoginScreen />);

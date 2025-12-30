@@ -9,8 +9,8 @@ jest.mock('lucide-react-native', () => ({
 }));
 
 describe('DeleteMomentDialog', () => {
-  const mockOnClose = jest.fn();
-  const mockOnConfirm = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnConfirm = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

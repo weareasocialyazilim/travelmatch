@@ -28,7 +28,7 @@ jest.mock('../../services/imageCacheManager', () => {
 
 // Import after mock
 import imageCacheManager from '../../services/imageCacheManager';
-const mockImageCacheManager = imageCacheManager ;
+const mockImageCacheManager = imageCacheManager as jest.Mocked<typeof imageCacheManager>;
 
 describe('CachedImage', () => {
   const mockImageUri = 'https://example.com/image.jpg';
@@ -129,7 +129,7 @@ describe('CachedImage', () => {
     });
 
     it('should handle successful image load', async () => {
-      const onLoadEnd = jest.fn();
+      const onLoadEnd = jest.fn() as jest.Mock;
 
       render(
         <CachedImage
@@ -146,7 +146,7 @@ describe('CachedImage', () => {
 
   describe('Error Handling', () => {
     it('should handle image load error', async () => {
-      const onError = jest.fn();
+      const onError = jest.fn() as jest.Mock;
       mockImageCacheManager.getImage.mockRejectedValue(new Error('Load failed'));
 
       render(
@@ -213,7 +213,7 @@ describe('CachedImage', () => {
     });
 
     it('should call onRetry callback', async () => {
-      const onRetry = jest.fn();
+      const onRetry = jest.fn() as jest.Mock;
       mockImageCacheManager.getImage.mockRejectedValue(new Error('Load failed'));
 
       render(
@@ -243,7 +243,7 @@ describe('CachedImage', () => {
     });
 
     it('should call onLoadStart', async () => {
-      const onLoadStart = jest.fn();
+      const onLoadStart = jest.fn() as jest.Mock;
 
       render(
         <CachedImage
