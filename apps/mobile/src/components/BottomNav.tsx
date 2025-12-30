@@ -10,7 +10,7 @@
  * Designed for Awwwards Best UI nomination
  */
 
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   View,
   Text,
