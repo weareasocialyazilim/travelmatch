@@ -38,7 +38,7 @@ import {
   getAvatarImageProps,
   IMAGE_VARIANTS_BY_CONTEXT,
 } from '../utils/cloudflareImageHelpers';
-import { COLORS, GRADIENTS, PALETTE } from '../constants/colors';
+import { COLORS, GRADIENTS, PALETTE, primitives } from '../constants/colors';
 import { TYPE_SCALE } from '../theme/typography';
 import { SPRINGS } from '../hooks/useAnimations';
 import { useToast } from '@/context/ToastContext';
@@ -89,9 +89,9 @@ const BADGE_CONFIGS: Record<BadgeType, BadgeConfig> = {
   trending: {
     label: 'Trend',
     icon: 'trending-up',
-    backgroundColor: 'rgba(139, 92, 246, 0.12)',
-    textColor: '#8B5CF6',
-    borderColor: '#A78BFA',
+    backgroundColor: COLORS.purpleTransparent,
+    textColor: primitives.purple[500],
+    borderColor: primitives.purple[400],
   },
   verified: {
     label: 'Onaylı',

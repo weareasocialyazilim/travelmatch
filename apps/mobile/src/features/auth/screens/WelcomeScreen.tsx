@@ -123,6 +123,8 @@ interface AnimatedButtonProps {
   onPress: () => void;
   variant: 'apple' | 'google' | 'primary' | 'secondary';
   delay?: number;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({
@@ -130,6 +132,8 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   onPress,
   variant,
   delay = 0,
+  accessibilityLabel,
+  accessibilityHint,
 }) => {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
@@ -186,6 +190,10 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[styles.button, getButtonStyle()]}
+        accessible={true}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
+        accessibilityRole="button"
       >
         {children}
       </Pressable>
@@ -278,12 +286,24 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
         {/* Action Section */}
         <View style={styles.actionSection}>
           {/* Social Logins */}
-          <AnimatedButton variant="apple" onPress={handleAppleLogin} delay={600}>
+          <AnimatedButton
+            variant="apple"
+            onPress={handleAppleLogin}
+            delay={600}
+            accessibilityLabel="Apple ile devam et"
+            accessibilityHint="Apple hesabınızla giriş yaparsınız"
+          >
             <MaterialCommunityIcons name="apple" size={22} color={PALETTE.white} />
             <Text style={styles.socialButtonText}>{t('welcome.continueWithApple')}</Text>
           </AnimatedButton>
 
-          <AnimatedButton variant="google" onPress={handleGoogleLogin} delay={700}>
+          <AnimatedButton
+            variant="google"
+            onPress={handleGoogleLogin}
+            delay={700}
+            accessibilityLabel="Google ile devam et"
+            accessibilityHint="Google hesabınızla giriş yaparsınız"
+          >
             <MaterialCommunityIcons name="google" size={22} color={PALETTE.white} />
             <Text style={styles.socialButtonText}>{t('welcome.continueWithGoogle')}</Text>
           </AnimatedButton>
@@ -296,7 +316,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
           </View>
 
           {/* Email Options */}
-          <AnimatedButton variant="primary" onPress={handleCreateAccount} delay={800}>
+          <AnimatedButton
+            variant="primary"
+            onPress={handleCreateAccount}
+            delay={800}
+            accessibilityLabel="Hesap oluştur"
+            accessibilityHint="Yeni bir hesap oluşturmak için kayıt sayfasına gider"
+          >
             <LinearGradient
               colors={GRADIENTS.gift}
               start={{ x: 0, y: 0 }}
@@ -307,7 +333,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             </LinearGradient>
           </AnimatedButton>
 
-          <AnimatedButton variant="secondary" onPress={handleLogin} delay={900}>
+          <AnimatedButton
+            variant="secondary"
+            onPress={handleLogin}
+            delay={900}
+            accessibilityLabel="Giriş yap"
+            accessibilityHint="Mevcut hesabınızla giriş sayfasına gider"
+          >
             <Text style={styles.secondaryButtonText}>{t('welcome.login')}</Text>
           </AnimatedButton>
         </View>
@@ -380,7 +412,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#F59E0B', // amber[500] - primary color
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.25,
     shadowRadius: 24,
@@ -415,7 +447,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   googleButton: {
-    backgroundColor: '#4285F4',
+    backgroundColor: COLORS.google,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
