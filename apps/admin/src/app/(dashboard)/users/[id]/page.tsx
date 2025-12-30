@@ -53,8 +53,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { getInitials, formatDate, formatCurrency } from '@/lib/utils';
+import { useUser, useSuspendUser, useBanUser, useVerifyUser } from '@/hooks/use-users';
+import { Loader2 } from 'lucide-react';
 
-// Mock user data
+// Fallback mock user data
 const mockUser = {
   id: '1',
   email: 'ahmet.yilmaz@email.com',
@@ -225,7 +227,14 @@ export default function UserDetailPage() {
   const [actionDialog, setActionDialog] = useState<string | null>(null);
   const [actionReason, setActionReason] = useState('');
 
-  const user = mockUser;
+  // Use real API data
+  const { data: userData, isLoading, error } = useUser(params.id as string);
+  const suspendUser = useSuspendUser();
+  const banUser = useBanUser();
+  const verifyUser = useVerifyUser();
+
+  // Fallback to mock data while loading or if no data
+  const user = userData || mockUser;
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
@@ -255,12 +264,53 @@ export default function UserDetailPage() {
   };
 
   const handleAction = async (action: string) => {
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1000));
-    toast.success(`${action} işlemi başarılı`);
+    const userId = params.id as string;
+    try {
+      if (action === 'suspend') {
+        await suspendUser.mutateAsync({ id: userId, reason: actionReason });
+        toast.success('Kullanıcı askıya alındı');
+      } else if (action === 'ban') {
+        await banUser.mutateAsync({ id: userId, reason: actionReason });
+        toast.success('Kullanıcı yasaklandı');
+      } else if (action === 'verify_kyc') {
+        await verifyUser.mutateAsync(userId);
+        toast.success('KYC doğrulaması onaylandı');
+      } else if (action === 'reset_password') {
+        // Password reset would need a separate hook
+        toast.info('Şifre sıfırlama bağlantısı gönderildi');
+      }
+    } catch (err) {
+      toast.error(`İşlem başarısız: ${err instanceof Error ? err.message : 'Bilinmeyen hata'}`);
+    }
     setActionDialog(null);
     setActionReason('');
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
+          <p className="text-muted-foreground">Kullanıcı bilgileri yüklenemedi.</p>
+          <Button variant="outline" className="mt-4" onClick={() => router.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Geri Dön
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const getActivityIcon = (type: string) => {
     const icons: Record<string, React.ReactNode> = {

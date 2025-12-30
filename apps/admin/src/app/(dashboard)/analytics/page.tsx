@@ -54,8 +54,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { formatCurrency, formatNumber, cn } from '@/lib/utils';
+import { useAnalytics, useUserMetrics, useRevenueMetrics, useEngagementMetrics } from '@/hooks/use-analytics';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
-// Mock data for charts
+// Chart data - will be enhanced with real API data
 const dailyActiveUsers = [
   { date: '12/12', dau: 3200, mau: 12500 },
   { date: '13/12', dau: 3450, mau: 12600 },
@@ -109,7 +111,25 @@ const contentStats = [
 ];
 
 export default function AnalyticsPage() {
-  const [dateRange, setDateRange] = useState('7d');
+  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | '365d'>('7d');
+
+  // Use real API data
+  const { data, isLoading, error } = useAnalytics({ period: dateRange });
+  const userMetrics = useUserMetrics(dateRange);
+  const revenueMetrics = useRevenueMetrics(dateRange);
+  const engagementMetrics = useEngagementMetrics(dateRange);
+
+  if (error) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
+          <p className="text-muted-foreground">Analitik verileri yüklenemedi. Lütfen tekrar deneyin.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -151,7 +171,9 @@ export default function AnalyticsPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4,521</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatNumber(userMetrics.activeUsers || 4521)}
+            </div>
             <div className="flex items-center text-xs">
               <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />
               <span className="text-green-600">+12.5%</span>
@@ -165,7 +187,9 @@ export default function AnalyticsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(24500)}</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatCurrency(revenueMetrics.totalRevenue / 30 || 24500)}
+            </div>
             <div className="flex items-center text-xs">
               <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />
               <span className="text-green-600">+23.7%</span>

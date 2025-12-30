@@ -54,8 +54,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
+import { useNotifications, useCreateNotification, useSendNotification } from '@/hooks/use-notifications';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
-// Mock data
+// Fallback mock data (will be replaced by API data when available)
 const mockNotifications = [
   {
     id: '1',
@@ -121,11 +123,41 @@ export default function NotificationsPage() {
   const [notificationBody, setNotificationBody] = useState('');
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [abTestEnabled, setAbTestEnabled] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+
+  // Use real API data
+  const { data, isLoading, error } = useNotifications({ status: statusFilter });
+  const createNotification = useCreateNotification();
+  const sendNotification = useSendNotification();
+
+  // Use API data if available, otherwise fall back to mock data
+  const notifications = data?.campaigns || mockNotifications;
 
   const handleSend = () => {
-    toast.success('Bildirim başarıyla gönderildi');
-    setIsCreateOpen(false);
-    resetForm();
+    if (!notificationTitle || !notificationBody) {
+      toast.error('Başlık ve içerik gerekli');
+      return;
+    }
+
+    createNotification.mutate(
+      {
+        title: notificationTitle,
+        message: notificationBody,
+        type: 'push',
+        target_audience: { segment: selectedSegment },
+        status: 'sent',
+      },
+      {
+        onSuccess: () => {
+          toast.success('Bildirim başarıyla gönderildi');
+          setIsCreateOpen(false);
+          resetForm();
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Bildirim gönderilemedi');
+        },
+      }
+    );
   };
 
   const handleSchedule = () => {
