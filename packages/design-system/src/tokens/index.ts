@@ -54,3 +54,13 @@ export const defaultTheme: Theme = {
   shadows: SHADOWS,
   cssShadows,
 };
+
+// Design Guide exports - Typography & Spacing reference
+export {
+  TYPOGRAPHY_SCALE,
+  SPACING,
+  RADII,
+  COMPONENT_SIZES,
+  BREAKPOINTS,
+  DESIGN_TOKENS,
+} from './design-guide';
