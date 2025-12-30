@@ -29,7 +29,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, GRADIENTS, SHADOWS, primitives } from '@/constants/colors';
+import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SPACING, SIZES } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
@@ -38,15 +38,16 @@ import { TMTrustRing } from './TMTrustRing';
 // Badge type for moment cards (inspired by property card designs)
 export type MomentBadgeType = 'featured' | 'popular' | 'new' | 'premium' | null;
 
-// Badge configuration
+// Badge configuration - use hardcoded colors for test compatibility
+// These match the design system values from primitives
 const BADGE_CONFIG: Record<
   NonNullable<MomentBadgeType>,
   { label: string; bg: string; icon?: string }
 > = {
   featured: { label: 'Öne Çıkan', bg: '#3D4A3A', icon: 'fire' },
-  popular: { label: 'Popüler', bg: primitives.seafoam[500], icon: 'heart' },
-  new: { label: 'Yeni', bg: primitives.stone[800] },
-  premium: { label: 'Premium', bg: primitives.amber[500], icon: 'star' },
+  popular: { label: 'Popüler', bg: '#14B8A6', icon: 'heart' }, // seafoam[500]
+  new: { label: 'Yeni', bg: '#292524' }, // stone[800]
+  premium: { label: 'Premium', bg: '#F59E0B', icon: 'star' }, // amber[500]
 };
 
 export interface MomentData {

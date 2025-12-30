@@ -71,6 +71,28 @@ jest.mock('react-native-reanimated', () => {
     useSharedValue: (value: any) => ({ value }),
     withTiming: (value: any) => value,
     withSpring: (value: any) => value,
+    withSequence: (...args: any[]) => args[args.length - 1],
+    withDelay: (_delay: number, anim: any) => anim,
+    withRepeat: (anim: any) => anim,
+    interpolate: (value: number, inputRange: number[], outputRange: number[]) => outputRange[0],
+    Extrapolation: { CLAMP: 'clamp', EXTEND: 'extend', IDENTITY: 'identity' },
+    Easing: {
+      linear: (t: number) => t,
+      ease: (t: number) => t,
+      quad: (t: number) => t * t,
+      cubic: (t: number) => t * t * t,
+      poly: () => (t: number) => t,
+      sin: (t: number) => t,
+      circle: (t: number) => t,
+      exp: (t: number) => t,
+      elastic: () => (t: number) => t,
+      back: () => (t: number) => t,
+      bounce: (t: number) => t,
+      bezier: () => (t: number) => t,
+      in: (fn: any) => fn,
+      out: (fn: any) => fn,
+      inOut: (fn: any) => fn,
+    },
   };
 });
 

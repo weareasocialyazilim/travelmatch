@@ -13,17 +13,10 @@ jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => {
   const React = require('react');
   const { View, Text } = require('react-native');
 
-  interface MockIconProps {
-    name: string;
-    size?: number;
-    color?: string;
-    [key: string]: unknown;
-  }
-
   const MockIcon = React.forwardRef(
-    ({ name, size, color, ...props }: MockIconProps, ref: React.Ref<View>) => (
-      <View {...props} testID={`icon-${name}`} ref={ref}>
-        <Text>{name}</Text>
+    (props: { name: string; size?: number; color?: string; testID?: string }, ref: React.Ref<typeof View>) => (
+      <View testID={props.testID || `icon-${props.name}`} ref={ref}>
+        <Text>{props.name}</Text>
       </View>
     ),
   );
