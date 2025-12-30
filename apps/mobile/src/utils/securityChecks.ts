@@ -289,17 +289,23 @@ export async function runSecurityAudit(): Promise<SecurityCheckResult> {
   const allIssues: SecurityIssue[] = [];
 
   // 1. Check environment variables
-  console.log('🔍 Checking environment variables...');
+  if (__DEV__) {
+    console.log('🔍 Checking environment variables...');
+  }
   const envIssues = checkEnvironmentVariables();
   allIssues.push(...envIssues);
 
   // 2. Check AsyncStorage
-  console.log('🔍 Checking AsyncStorage...');
+  if (__DEV__) {
+    console.log('🔍 Checking AsyncStorage...');
+  }
   const storageIssues = await checkAsyncStorageUsage();
   allIssues.push(...storageIssues);
 
   // 3. Check logging patterns
-  console.log('🔍 Monitoring console logs...');
+  if (__DEV__) {
+    console.log('🔍 Monitoring console logs...');
+  }
   const loggingIssues = checkLoggingPatterns();
   allIssues.push(...loggingIssues);
 
@@ -313,26 +319,28 @@ export async function runSecurityAudit(): Promise<SecurityCheckResult> {
     timestamp: new Date().toISOString(),
   };
 
-  // Print summary
-  console.log('\n🛡️ Security Audit Summary');
-  console.log('─────────────────────────');
-  console.log(`✅ Passed: ${result.passed ? 'YES' : 'NO'}`);
-  console.log(`🚨 Critical: ${criticalCount}`);
-  console.log(`🔒 High: ${highCount}`);
-  console.log(`⚠️ Medium: ${allIssues.filter(i => i.severity === 'medium').length}`);
-  console.log(`ℹ️ Low: ${allIssues.filter(i => i.severity === 'low').length}`);
+  // Print summary (only in development)
+  if (__DEV__) {
+    console.log('\n🛡️ Security Audit Summary');
+    console.log('─────────────────────────');
+    console.log(`✅ Passed: ${result.passed ? 'YES' : 'NO'}`);
+    console.log(`🚨 Critical: ${criticalCount}`);
+    console.log(`🔒 High: ${highCount}`);
+    console.log(`⚠️ Medium: ${allIssues.filter(i => i.severity === 'medium').length}`);
+    console.log(`ℹ️ Low: ${allIssues.filter(i => i.severity === 'low').length}`);
 
-  if (allIssues.length > 0) {
-    console.log('\n📋 Issues Found:');
-    allIssues.forEach((issue, i) => {
-      console.log(`\n${i + 1}. [${issue.severity.toUpperCase()}] ${issue.category}`);
-      console.log(`   ${issue.message}`);
-      if (issue.fix) {
-        console.log(`   💡 Fix: ${issue.fix}`);
-      }
-    });
-  } else {
-    console.log('\n✨ No security issues found!');
+    if (allIssues.length > 0) {
+      console.log('\n📋 Issues Found:');
+      allIssues.forEach((issue, i) => {
+        console.log(`\n${i + 1}. [${issue.severity.toUpperCase()}] ${issue.category}`);
+        console.log(`   ${issue.message}`);
+        if (issue.fix) {
+          console.log(`   💡 Fix: ${issue.fix}`);
+        }
+      });
+    } else {
+      console.log('\n✨ No security issues found!');
+    }
   }
 
   return result;

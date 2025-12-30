@@ -21,17 +21,17 @@
  * ```
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   ActivityIndicator,
-  Image,
   Alert,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { Image } from 'expo-image';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -83,12 +83,12 @@ const formatDate = (date: Date): string => {
   }).format(date);
 };
 
-// Vault Feature Component
-const VaultFeature: React.FC<{
+// Vault Feature Component - memoized for performance
+const VaultFeature = memo<{
   icon: string;
   text: string;
   available: boolean;
-}> = ({ icon, text, available }) => (
+}>(({ icon, text, available }) => (
   <View style={[styles.featureItem, !available && styles.featureItemDisabled]}>
     <MaterialCommunityIcons
       name={icon as any}
@@ -108,7 +108,64 @@ const VaultFeature: React.FC<{
       />
     )}
   </View>
-);
+));
+
+VaultFeature.displayName = 'VaultFeature';
+
+// Experience Card Component - memoized for FlashList performance
+interface ExperienceCardProps {
+  item: Experience;
+  onExperienceSelect: (id: string) => void;
+}
+
+const ExperienceCard = memo<ExperienceCardProps>(({ item, onExperienceSelect }) => (
+  <SacredMoments enabled vaultMode showShareOption={item.isShared}>
+    <TouchableOpacity
+      style={styles.experienceCard}
+      onPress={() => onExperienceSelect(item.id)}
+      activeOpacity={0.8}
+    >
+      {item.proofUrls[0] ? (
+        <Image
+          source={{ uri: item.proofUrls[0] }}
+          style={styles.experienceImage}
+          contentFit="cover"
+          transition={200}
+        />
+      ) : (
+        <View style={[styles.experienceImage, styles.experiencePlaceholder]}>
+          <MaterialCommunityIcons
+            name="image"
+            size={32}
+            color={COLORS.textMuted}
+          />
+        </View>
+      )}
+      <View style={styles.experienceOverlay}>
+        <Text style={styles.experienceTitle} numberOfLines={1}>
+          {item.momentTitle}
+        </Text>
+        <Text style={styles.experienceGiver}>
+          {item.giverName}'dan
+        </Text>
+        <Text style={styles.experienceDate}>
+          {formatDate(item.completedAt)}
+        </Text>
+      </View>
+      {item.isShared && (
+        <View style={styles.sharedBadge}>
+          <MaterialCommunityIcons
+            name="earth"
+            size={12}
+            color={COLORS.white}
+          />
+        </View>
+      )}
+    </TouchableOpacity>
+  </SacredMoments>
+));
+
+ExperienceCard.displayName = 'ExperienceCard';
 
 export const GiftVault: React.FC<GiftVaultProps> = ({
   experiences,
@@ -191,7 +248,9 @@ export const GiftVault: React.FC<GiftVaultProps> = ({
         setTimeout(() => setIsUnlocked(true), 300);
       }
     } catch (error) {
-      console.error('Authentication error:', error);
+      if (__DEV__) {
+        console.error('Authentication error:', error);
+      }
       setIsAuthenticating(false);
     }
   };
@@ -201,51 +260,16 @@ export const GiftVault: React.FC<GiftVaultProps> = ({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  // Render experience card
-  const renderExperienceCard = ({ item }: { item: Experience }) => (
-    <SacredMoments enabled vaultMode showShareOption={item.isShared}>
-      <TouchableOpacity
-        style={styles.experienceCard}
-        onPress={() => onExperienceSelect(item.id)}
-        activeOpacity={0.8}
-      >
-        {item.proofUrls[0] ? (
-          <Image
-            source={{ uri: item.proofUrls[0] }}
-            style={styles.experienceImage}
-          />
-        ) : (
-          <View style={[styles.experienceImage, styles.experiencePlaceholder]}>
-            <MaterialCommunityIcons
-              name="image"
-              size={32}
-              color={COLORS.textMuted}
-            />
-          </View>
-        )}
-        <View style={styles.experienceOverlay}>
-          <Text style={styles.experienceTitle} numberOfLines={1}>
-            {item.momentTitle}
-          </Text>
-          <Text style={styles.experienceGiver}>
-            {item.giverName}'dan
-          </Text>
-          <Text style={styles.experienceDate}>
-            {formatDate(item.completedAt)}
-          </Text>
-        </View>
-        {item.isShared && (
-          <View style={styles.sharedBadge}>
-            <MaterialCommunityIcons
-              name="earth"
-              size={12}
-              color={COLORS.white}
-            />
-          </View>
-        )}
-      </TouchableOpacity>
-    </SacredMoments>
+  // Memoized render function for FlashList
+  const renderExperienceCard = useCallback(
+    ({ item }: { item: Experience }) => (
+      <ExperienceCard item={item} onExperienceSelect={onExperienceSelect} />
+    ),
+    [onExperienceSelect]
   );
+
+  // Key extractor for FlashList
+  const keyExtractor = useCallback((item: Experience) => item.id, []);
 
   // Locked state
   if (!isUnlocked) {
@@ -357,14 +381,15 @@ export const GiftVault: React.FC<GiftVaultProps> = ({
       </View>
 
       {experiences.length > 0 ? (
-        <FlatList
+        <FlashList
           data={experiences}
-          keyExtractor={(item) => item.id}
+          keyExtractor={keyExtractor}
           numColumns={2}
           contentContainerStyle={styles.experienceGrid}
-          columnWrapperStyle={styles.experienceRow}
           renderItem={renderExperienceCard}
           showsVerticalScrollIndicator={false}
+          estimatedItemSize={180}
+          removeClippedSubviews={true}
         />
       ) : (
         <Animated.View entering={FadeIn} style={styles.emptyVault}>
