@@ -360,16 +360,17 @@ export const messageService = {
       const senderIds = [...new Set(encryptedMsgs.map((msg) => msg.sender_id))];
 
       // Single batch query for all senders (fixes N+1 pattern)
+      // Include public_key for message decryption
       let senderMap = new Map<string, UserWithEncryption>();
       if (senderIds.length > 0) {
         const { data: senders } = await supabase
           .from('users')
-          .select('id')
+          .select('id, public_key')
           .in('id', senderIds);
 
         if (senders) {
           senderMap = new Map(
-            senders.map((s) => [s.id, { id: s.id } as UserWithEncryption]),
+            senders.map((s) => [s.id, { id: s.id, public_key: s.public_key } as UserWithEncryption]),
           );
         }
       }
