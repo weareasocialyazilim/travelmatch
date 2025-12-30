@@ -27,7 +27,6 @@ const mockNavigate = jest.fn();
 
 // Extend global type for test navigation
 declare global {
-  // eslint-disable-next-line no-var
   var __TEST_NAVIGATION__:
     | {
         navigate: jest.Mock;
@@ -56,7 +55,6 @@ afterAll(() => {
   global.__TEST_NAVIGATION__ = undefined;
 });
 
-// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('BottomNav', () => {
   beforeEach(() => {
     jest.clearAllMocks();
