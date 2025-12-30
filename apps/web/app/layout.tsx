@@ -70,6 +70,65 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://travelmatch.app/#organization",
+      name: "TravelMatch",
+      url: "https://travelmatch.app",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://travelmatch.app/og-image.svg",
+        width: 1200,
+        height: 630,
+      },
+      sameAs: [
+        "https://instagram.com/travelmatchapp",
+        "https://tiktok.com/@travelmatchapp",
+        "https://x.com/travelmatchapp",
+      ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "hello@travelmatch.app",
+        contactType: "customer service",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://travelmatch.app/#website",
+      url: "https://travelmatch.app",
+      name: "TravelMatch",
+      description:
+        "The first platform where you can gift real travel experiences and see verified proof when they happen.",
+      publisher: {
+        "@id": "https://travelmatch.app/#organization",
+      },
+      inLanguage: ["en-US", "tr-TR"],
+    },
+    {
+      "@type": "MobileApplication",
+      "@id": "https://travelmatch.app/#app",
+      name: "TravelMatch",
+      operatingSystem: ["iOS", "Android"],
+      applicationCategory: "TravelApplication",
+      description:
+        "Gift real travel experiences and see verified proof when they happen. Build trust through authentic moments.",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.8",
+        ratingCount: "10000",
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -77,6 +136,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
