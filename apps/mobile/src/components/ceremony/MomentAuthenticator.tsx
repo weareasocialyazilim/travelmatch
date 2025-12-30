@@ -17,7 +17,13 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -47,10 +53,26 @@ import {
 } from '@/constants/ceremony';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { SPACING } from '@/constants/spacing';
+import { supabase } from '@/config/supabase';
+
+// ═══════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════
 
 export interface AuthenticationResult {
   status: 'pending' | 'analyzing' | 'verified' | 'rejected' | 'needs_review';
   confidence?: number;
+  reasons?: string[];
+  suggestions?: string[];
+}
+
+interface VerifyProofResponse {
+  verified: boolean;
+  needsReview: boolean;
+  confidence: number;
+  locationMatch: boolean;
+  dateMatch: boolean;
+  sceneValid: boolean;
   reasons?: string[];
   suggestions?: string[];
 }
@@ -78,9 +100,37 @@ interface MomentAuthenticatorProps {
   onCancel?: () => void;
   /** Manual review request */
   onRequestManualReview?: () => void;
+  /** Retry callback */
+  onRetry?: () => void;
   /** Test ID */
   testID?: string;
 }
+
+// ═══════════════════════════════════════════════════
+// PHASE CONFIG
+// ═══════════════════════════════════════════════════
+
+const PHASE_CONFIG: Record<AuthPhase, { progress: [number, number]; message: string; icon: string }> = {
+  uploading: { progress: [0, 20], message: 'Fotoğraflar yükleniyor...', icon: 'cloud-upload' },
+  scanning: { progress: [20, 50], message: '📸 Görüntü taranıyor...', icon: 'scan-helper' },
+  analyzing: { progress: [50, 80], message: '🔍 AI anınızı analiz ediyor...', icon: 'brain' },
+  verifying: { progress: [80, 95], message: '🔐 Doğrulama tamamlanıyor...', icon: 'shield-check' },
+  complete: { progress: [95, 100], message: 'Tamamlandı!', icon: 'check-circle' },
+};
+
+// ═══════════════════════════════════════════════════
+// CHECKLIST ITEM INTERFACE
+// ═══════════════════════════════════════════════════
+
+interface ChecklistItemData {
+  id: string;
+  label: string;
+  checked: boolean;
+}
+
+// ═══════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════
 
 export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
   proofId,
@@ -90,81 +140,156 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
   onResult,
   onCancel,
   onRequestManualReview,
+  onRetry,
   testID,
 }) => {
   const [phase, setPhase] = useState<AuthPhase>('uploading');
   const [result, setResult] = useState<AuthenticationResult | null>(null);
-  const [checkedItems, setCheckedItems] = useState<string[]>([]);
+  const [checklistItems, setChecklistItems] = useState<ChecklistItemData[]>([
+    { id: 'upload', label: 'Fotoğraflar yüklendi', checked: false },
+    { id: 'location', label: 'Konum kontrol edildi', checked: false },
+    { id: 'date', label: 'Tarih doğrulandı', checked: false },
+    { id: 'scene', label: 'Sahne analiz edildi', checked: false },
+  ]);
   const [showConfetti, setShowConfetti] = useState(false);
 
   const progress = useSharedValue(0);
   const scanLine = useSharedValue(0);
 
-  // Simulate authentication process
-  useEffect(() => {
-    const runAuthentication = async () => {
-      // Phase 1: Uploading
+  // Update checklist item
+  const updateChecklist = useCallback((id: string, checked: boolean) => {
+    setChecklistItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, checked } : item))
+    );
+  }, []);
+
+  // Simulate progress animation
+  const simulateProgress = useCallback(
+    async (from: number, to: number, duration: number) => {
+      progress.value = withTiming(to / 100, { duration });
+      await delay(duration);
+    },
+    [progress]
+  );
+
+  // Call verification API
+  const callVerificationAPI = useCallback(async (): Promise<VerifyProofResponse> => {
+    const { data, error } = await supabase.functions.invoke('verify-proof', {
+      body: {
+        proofId,
+        location,
+        momentId: expectedMoment.id,
+      },
+    });
+
+    if (error) throw error;
+
+    // Transform response to expected format
+    const verification = data?.verification || data;
+    return {
+      verified: verification?.verified ?? false,
+      needsReview: verification?.status === 'needs_review',
+      confidence: verification?.confidence ?? 0,
+      locationMatch: verification?.locationMatch ?? verification?.detected_location ? true : false,
+      dateMatch: verification?.dateMatch ?? true,
+      sceneValid: verification?.sceneValid ?? verification?.verified ?? false,
+      reasons: verification?.red_flags || verification?.reasons || [],
+      suggestions: verification?.suggestions || [],
+    };
+  }, [proofId, location, expectedMoment.id]);
+
+  // Start authentication flow
+  const startAuthentication = useCallback(async () => {
+    try {
+      // Phase 1: Upload
       setPhase('uploading');
-      progress.value = withTiming(AUTH_PHASE_PROGRESS.uploading / 100, {
-        duration: 1000,
-      });
-      await delay(1200);
+      await simulateProgress(0, 20, 2000);
+      updateChecklist('upload', true);
 
       // Phase 2: Scanning
       setPhase('scanning');
-      progress.value = withTiming(AUTH_PHASE_PROGRESS.scanning / 100, {
-        duration: 800,
-      });
-
-      // Start scan animation
       scanLine.value = withRepeat(
         withTiming(1, { duration: CEREMONY_TIMING.scanLineSpeed, easing: Easing.linear }),
         3,
         false
       );
-      await delay(2500);
+      await simulateProgress(20, 50, 3000);
 
-      // Phase 3: Analyzing
+      // Phase 3: Call AI verification
       setPhase('analyzing');
-      progress.value = withTiming(AUTH_PHASE_PROGRESS.analyzing / 100, {
-        duration: 1000,
-      });
+      let apiResult: VerifyProofResponse;
 
-      // Checklist animation
-      for (const item of AUTH_CHECKLIST_ITEMS) {
-        await delay(CEREMONY_TIMING.checklistItemDelay);
-        setCheckedItems((prev) => [...prev, item.id]);
+      try {
+        apiResult = await callVerificationAPI();
+      } catch (apiError) {
+        // If API fails, reject
+        onResult({
+          status: 'rejected',
+          reasons: ['Bir hata oluştu. Lütfen tekrar deneyin.'],
+        });
+        return;
       }
+
+      // Update checklist based on result
+      updateChecklist('location', apiResult.locationMatch);
       await delay(500);
+      updateChecklist('date', apiResult.dateMatch);
+      await delay(500);
+      updateChecklist('scene', apiResult.sceneValid);
 
       // Phase 4: Verifying
       setPhase('verifying');
-      progress.value = withTiming(AUTH_PHASE_PROGRESS.verifying / 100, {
-        duration: 800,
-      });
-      await delay(1000);
+      await simulateProgress(80, 95, 1500);
 
-      // Phase 5: Complete - simulate result
+      // Phase 5: Complete
       setPhase('complete');
       progress.value = withTiming(1, { duration: 500 });
 
-      // Simulate successful verification (in real app, this comes from API)
-      const mockResult: AuthenticationResult = {
-        status: 'verified',
-        confidence: 0.92,
-      };
-
-      setResult(mockResult);
-
-      if (mockResult.status === 'verified') {
+      // Determine final result
+      let finalResult: AuthenticationResult;
+      if (apiResult.verified) {
+        finalResult = {
+          status: 'verified',
+          confidence: apiResult.confidence,
+        };
         setShowConfetti(true);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else if (apiResult.needsReview) {
+        finalResult = {
+          status: 'needs_review',
+          reasons: apiResult.reasons,
+        };
+      } else {
+        finalResult = {
+          status: 'rejected',
+          reasons: apiResult.reasons,
+          suggestions: apiResult.suggestions,
+        };
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
 
-      onResult(mockResult);
-    };
+      setResult(finalResult);
+      onResult(finalResult);
+    } catch (error) {
+      const errorResult: AuthenticationResult = {
+        status: 'rejected',
+        reasons: ['Bir hata oluştu'],
+      };
+      setResult(errorResult);
+      onResult(errorResult);
+    }
+  }, [
+    simulateProgress,
+    updateChecklist,
+    callVerificationAPI,
+    onResult,
+    progress,
+    scanLine,
+  ]);
 
-    runAuthentication();
+  // Run authentication on mount
+  useEffect(() => {
+    startAuthentication();
   }, [proofId]);
 
   // Progress bar animated style
@@ -176,6 +301,15 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
   const scanLineStyle = useAnimatedStyle(() => ({
     top: `${scanLine.value * 100}%`,
   }));
+
+  // Handle retry
+  const handleRetry = useCallback(() => {
+    if (onRetry) {
+      onRetry();
+    } else if (onCancel) {
+      onCancel();
+    }
+  }, [onRetry, onCancel]);
 
   const renderPhaseContent = () => {
     switch (phase) {
@@ -192,7 +326,7 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
       case 'analyzing':
         return (
           <AnalyzingView
-            checkedItems={checkedItems}
+            checklistItems={checklistItems}
             expectedMoment={expectedMoment}
             location={location}
           />
@@ -202,12 +336,25 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
         return <VerifyingView />;
 
       case 'complete':
-        return (
-          <ResultView
-            result={result}
-            onRequestManualReview={onRequestManualReview}
-          />
-        );
+        if (result?.status === 'verified') {
+          return <SuccessView confidence={result.confidence} />;
+        } else if (result?.status === 'rejected') {
+          return (
+            <RejectionView
+              reasons={result.reasons || []}
+              suggestions={result.suggestions || []}
+              onRetry={handleRetry}
+            />
+          );
+        } else if (result?.status === 'needs_review') {
+          return (
+            <NeedsReviewView
+              reasons={result.reasons || []}
+              onRequestManualReview={onRequestManualReview}
+            />
+          );
+        }
+        return null;
 
       default:
         return null;
@@ -234,20 +381,39 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
 
       {/* Header */}
       <View style={styles.header}>
-        <MaterialCommunityIcons
-          name={
-            phase === 'complete' && result?.status === 'verified'
-              ? 'shield-check'
-              : 'shield-search'
-          }
-          size={32}
-          color={
-            phase === 'complete' && result?.status === 'verified'
-              ? COLORS.success
-              : COLORS.primary
-          }
-        />
-        <Text style={styles.phaseTitle}>{AUTH_PHASE_MESSAGES[phase]}</Text>
+        {onCancel && (
+          <TouchableOpacity
+            onPress={onCancel}
+            style={styles.cancelButton}
+            testID="cancel-button"
+            accessibilityLabel="İptal"
+            accessibilityRole="button"
+          >
+            <MaterialCommunityIcons
+              name="close"
+              size={24}
+              color={COLORS.textSecondary}
+            />
+          </TouchableOpacity>
+        )}
+        <View style={styles.headerContent}>
+          <MaterialCommunityIcons
+            name={
+              phase === 'complete' && result?.status === 'verified'
+                ? 'shield-check'
+                : 'shield-search'
+            }
+            size={32}
+            color={
+              phase === 'complete' && result?.status === 'verified'
+                ? COLORS.success
+                : COLORS.primary
+            }
+          />
+          <Text style={styles.phaseTitle}>{AUTH_PHASE_MESSAGES[phase]}</Text>
+        </View>
+        {/* Spacer for centering */}
+        {onCancel && <View style={styles.headerSpacer} />}
       </View>
 
       {/* Progress bar */}
@@ -273,53 +439,93 @@ export const MomentAuthenticator: React.FC<MomentAuthenticatorProps> = ({
   );
 };
 
-// Scanning Overlay Component
-const ScanningOverlay: React.FC<{
+// ═══════════════════════════════════════════════════
+// SCANNING OVERLAY COMPONENT
+// ═══════════════════════════════════════════════════
+
+interface ScanningOverlayProps {
   imageUri: string;
-  scanLineStyle: any;
+  scanLineStyle: ReturnType<typeof useAnimatedStyle>;
   isScanning: boolean;
-}> = ({ imageUri, scanLineStyle, isScanning }) => (
-  <View style={styles.scanContainer}>
-    <Image source={{ uri: imageUri }} style={styles.scanImage} />
+}
 
-    {/* Scanning line */}
-    {isScanning && (
-      <Animated.View style={[styles.scanLine, scanLineStyle]}>
-        <LinearGradient
-          colors={['transparent', CEREMONY_COLORS.authenticator.scanning, 'transparent']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.scanLineGradient}
-        />
-      </Animated.View>
-    )}
+const ScanningOverlay: React.FC<ScanningOverlayProps> = ({
+  imageUri,
+  scanLineStyle,
+  isScanning,
+}) => {
+  const pulseOpacity = useSharedValue(0.2);
 
-    {/* Corner brackets */}
-    <View style={styles.cornerBrackets}>
-      <CornerBracket position="topLeft" />
-      <CornerBracket position="topRight" />
-      <CornerBracket position="bottomLeft" />
-      <CornerBracket position="bottomRight" />
-    </View>
+  useEffect(() => {
+    if (isScanning) {
+      pulseOpacity.value = withRepeat(
+        withSequence(
+          withTiming(0.4, { duration: 1000 }),
+          withTiming(0.2, { duration: 1000 })
+        ),
+        -1,
+        true
+      );
+    }
+  }, [isScanning, pulseOpacity]);
 
-    {/* Scanning indicator */}
-    {isScanning && (
-      <View style={styles.scanIndicator}>
-        <MaterialCommunityIcons
-          name="qrcode-scan"
-          size={24}
-          color={CEREMONY_COLORS.authenticator.scanning}
-        />
-        <Text style={styles.scanText}>Taranıyor...</Text>
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: pulseOpacity.value,
+  }));
+
+  return (
+    <View style={styles.scanContainer}>
+      <Image source={{ uri: imageUri }} style={styles.scanImage} />
+
+      {/* Pulsing overlay */}
+      {isScanning && (
+        <Animated.View style={[styles.pulseOverlay, pulseStyle]} />
+      )}
+
+      {/* Scanning line */}
+      {isScanning && (
+        <Animated.View style={[styles.scanLine, scanLineStyle]}>
+          <LinearGradient
+            colors={['transparent', CEREMONY_COLORS.authenticator.scanning, 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.scanLineGradient}
+          />
+        </Animated.View>
+      )}
+
+      {/* Corner brackets */}
+      <View style={styles.cornerBrackets}>
+        <CornerBracket position="topLeft" />
+        <CornerBracket position="topRight" />
+        <CornerBracket position="bottomLeft" />
+        <CornerBracket position="bottomRight" />
       </View>
-    )}
-  </View>
-);
 
-// Corner Bracket Component
-const CornerBracket: React.FC<{
+      {/* Scanning indicator */}
+      {isScanning && (
+        <View style={styles.scanIndicator}>
+          <MaterialCommunityIcons
+            name="qrcode-scan"
+            size={24}
+            color={CEREMONY_COLORS.authenticator.scanning}
+          />
+          <Text style={styles.scanText}>Taranıyor...</Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
+// ═══════════════════════════════════════════════════
+// CORNER BRACKET COMPONENT
+// ═══════════════════════════════════════════════════
+
+interface CornerBracketProps {
   position: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
-}> = ({ position }) => {
+}
+
+const CornerBracket: React.FC<CornerBracketProps> = ({ position }) => {
   const positionStyles = {
     topLeft: { top: 0, left: 0 },
     topRight: { top: 0, right: 0, transform: [{ rotate: '90deg' }] },
@@ -335,12 +541,21 @@ const CornerBracket: React.FC<{
   );
 };
 
-// Analyzing View Component
-const AnalyzingView: React.FC<{
-  checkedItems: string[];
+// ═══════════════════════════════════════════════════
+// ANALYZING VIEW COMPONENT
+// ═══════════════════════════════════════════════════
+
+interface AnalyzingViewProps {
+  checklistItems: ChecklistItemData[];
   expectedMoment: { id: string; title: string; location?: string };
   location?: { lat: number; lng: number; name: string };
-}> = ({ checkedItems, expectedMoment, location }) => (
+}
+
+const AnalyzingView: React.FC<AnalyzingViewProps> = ({
+  checklistItems,
+  expectedMoment,
+  location,
+}) => (
   <Animated.View entering={FadeIn} style={styles.analyzingContainer}>
     {/* Moment info */}
     <View style={styles.momentInfo}>
@@ -353,12 +568,12 @@ const AnalyzingView: React.FC<{
 
     {/* Checklist */}
     <View style={styles.checklist}>
-      {AUTH_CHECKLIST_ITEMS.map((item, index) => (
+      {checklistItems.map((item, index) => (
         <ChecklistItem
           key={item.id}
+          id={item.id}
           label={item.label}
-          icon={item.icon}
-          checked={checkedItems.includes(item.id)}
+          checked={item.checked}
           delay={index * CEREMONY_TIMING.checklistItemDelay}
         />
       ))}
@@ -366,21 +581,41 @@ const AnalyzingView: React.FC<{
   </Animated.View>
 );
 
-// Checklist Item Component
-const ChecklistItem: React.FC<{
+// ═══════════════════════════════════════════════════
+// CHECKLIST ITEM COMPONENT
+// ═══════════════════════════════════════════════════
+
+interface ChecklistItemProps {
+  id: string;
   label: string;
-  icon: string;
   checked: boolean;
   delay: number;
-}> = ({ label, icon, checked, delay }) => {
+}
+
+const ChecklistItem: React.FC<ChecklistItemProps> = ({
+  id,
+  label,
+  checked,
+  delay,
+}) => {
+  const opacity = useSharedValue(0);
   const checkScale = useSharedValue(0);
 
   useEffect(() => {
+    opacity.value = withDelay(delay, withTiming(1, { duration: 300 }));
+  }, [delay, opacity]);
+
+  useEffect(() => {
     if (checked) {
-      checkScale.value = withDelay(100, withSpring(1, { damping: 12 }));
+      checkScale.value = withSpring(1, { damping: 8 });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-  }, [checked]);
+  }, [checked, checkScale]);
+
+  const containerStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateX: interpolate(opacity.value, [0, 1], [20, 0]) }],
+  }));
 
   const checkStyle = useAnimatedStyle(() => ({
     transform: [{ scale: checkScale.value }],
@@ -388,32 +623,35 @@ const ChecklistItem: React.FC<{
   }));
 
   return (
-    <Animated.View
-      entering={FadeInDown.delay(delay)}
-      style={styles.checklistItem}
-    >
-      <MaterialCommunityIcons
-        name={icon as any}
-        size={20}
-        color={checked ? COLORS.success : COLORS.textMuted}
-      />
+    <Animated.View style={[styles.checklistItem, containerStyle]}>
+      <Animated.View style={checkStyle}>
+        {checked ? (
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={20}
+            color={COLORS.success}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name="circle-outline"
+            size={20}
+            color={COLORS.textMuted}
+          />
+        )}
+      </Animated.View>
       <Text
         style={[styles.checklistLabel, checked && styles.checklistLabelChecked]}
       >
         {label}
       </Text>
-      <Animated.View style={checkStyle}>
-        <MaterialCommunityIcons
-          name="check-circle"
-          size={20}
-          color={COLORS.success}
-        />
-      </Animated.View>
     </Animated.View>
   );
 };
 
-// Verifying View Component
+// ═══════════════════════════════════════════════════
+// VERIFYING VIEW COMPONENT
+// ═══════════════════════════════════════════════════
+
 const VerifyingView: React.FC = () => {
   const pulseScale = useSharedValue(1);
 
@@ -426,7 +664,7 @@ const VerifyingView: React.FC = () => {
       -1,
       true
     );
-  }, []);
+  }, [pulseScale]);
 
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulseScale.value }],
@@ -451,86 +689,155 @@ const VerifyingView: React.FC = () => {
   );
 };
 
-// Result View Component
-const ResultView: React.FC<{
-  result: AuthenticationResult | null;
-  onRequestManualReview?: () => void;
-}> = ({ result, onRequestManualReview }) => {
-  if (!result) return null;
+// ═══════════════════════════════════════════════════
+// SUCCESS VIEW COMPONENT
+// ═══════════════════════════════════════════════════
 
-  const isSuccess = result.status === 'verified';
-  const needsReview = result.status === 'needs_review';
-  const isRejected = result.status === 'rejected';
+interface SuccessViewProps {
+  confidence?: number;
+}
+
+const SuccessView: React.FC<SuccessViewProps> = ({ confidence }) => {
+  useEffect(() => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, []);
 
   return (
-    <Animated.View entering={ZoomIn} style={styles.resultContainer}>
-      {/* Success */}
-      {isSuccess && (
-        <>
-          <LinearGradient
-            colors={GRADIENTS.trust}
-            style={styles.resultIconSuccess}
-          >
-            <MaterialCommunityIcons
-              name="check"
-              size={48}
-              color={COLORS.white}
-            />
-          </LinearGradient>
-          <Text style={styles.resultTitle}>Anınız Onaylandı!</Text>
-          {result.confidence && (
-            <Text style={styles.resultConfidence}>
-              Güven: {(result.confidence * 100).toFixed(0)}%
-            </Text>
-          )}
-        </>
-      )}
+    <Animated.View entering={ZoomIn.springify()} style={styles.resultContainer}>
+      <LinearGradient colors={GRADIENTS.gift} style={styles.successIcon}>
+        <MaterialCommunityIcons name="check" size={48} color="white" />
+      </LinearGradient>
 
-      {/* Needs Review */}
-      {needsReview && (
-        <>
-          <View style={styles.resultIconReview}>
-            <MaterialCommunityIcons
-              name="account-clock"
-              size={48}
-              color={CEREMONY_COLORS.authenticator.needsReview}
-            />
-          </View>
-          <Text style={styles.resultTitle}>Manuel İnceleme Gerekiyor</Text>
-          <Text style={styles.resultMessage}>
-            24 saat içinde sonuçlanacak
-          </Text>
-        </>
-      )}
-
-      {/* Rejected */}
-      {isRejected && (
-        <>
-          <View style={styles.resultIconRejected}>
-            <MaterialCommunityIcons
-              name="close"
-              size={48}
-              color={CEREMONY_COLORS.authenticator.rejected}
-            />
-          </View>
-          <Text style={styles.resultTitle}>Doğrulanamadı</Text>
-          {result.suggestions && result.suggestions.length > 0 && (
-            <View style={styles.suggestions}>
-              {result.suggestions.map((suggestion, i) => (
-                <Text key={i} style={styles.suggestionText}>
-                  • {suggestion}
-                </Text>
-              ))}
-            </View>
-          )}
-        </>
+      <Text style={styles.successTitle}>✨ Anınız Onaylandı!</Text>
+      <Text style={styles.successSubtitle}>
+        Deneyiminiz başarıyla doğrulandı
+      </Text>
+      {confidence !== undefined && (
+        <Text style={styles.confidenceText}>
+          Güven: {(confidence * 100).toFixed(0)}%
+        </Text>
       )}
     </Animated.View>
   );
 };
 
-// Utility function
+// ═══════════════════════════════════════════════════
+// REJECTION VIEW COMPONENT
+// ═══════════════════════════════════════════════════
+
+interface RejectionViewProps {
+  reasons: string[];
+  suggestions: string[];
+  onRetry: () => void;
+}
+
+const RejectionView: React.FC<RejectionViewProps> = ({
+  reasons,
+  suggestions,
+  onRetry,
+}) => (
+  <Animated.View entering={ZoomIn} style={styles.resultContainer}>
+    <View style={styles.rejectionIcon}>
+      <MaterialCommunityIcons
+        name="alert-circle"
+        size={48}
+        color={CEREMONY_COLORS.authenticator.rejected}
+      />
+    </View>
+
+    <Text style={styles.rejectionTitle}>Doğrulanamadı</Text>
+
+    {reasons.length > 0 && (
+      <View style={styles.reasonsContainer}>
+        {reasons.map((reason, i) => (
+          <Text key={i} style={styles.reasonText}>
+            • {reason}
+          </Text>
+        ))}
+      </View>
+    )}
+
+    {suggestions.length > 0 && (
+      <View style={styles.suggestionsBox}>
+        <Text style={styles.suggestionsTitle}>💡 Öneriler:</Text>
+        {suggestions.map((suggestion, i) => (
+          <Text key={i} style={styles.suggestionText}>
+            {suggestion}
+          </Text>
+        ))}
+      </View>
+    )}
+
+    <TouchableOpacity
+      style={styles.retryButton}
+      onPress={onRetry}
+      testID="retry-button"
+    >
+      <MaterialCommunityIcons name="camera" size={20} color="white" />
+      <Text style={styles.retryText}>Tekrar Dene</Text>
+    </TouchableOpacity>
+  </Animated.View>
+);
+
+// ═══════════════════════════════════════════════════
+// NEEDS REVIEW VIEW COMPONENT
+// ═══════════════════════════════════════════════════
+
+interface NeedsReviewViewProps {
+  reasons: string[];
+  onRequestManualReview?: () => void;
+}
+
+const NeedsReviewView: React.FC<NeedsReviewViewProps> = ({
+  reasons,
+  onRequestManualReview,
+}) => (
+  <Animated.View entering={ZoomIn} style={styles.resultContainer}>
+    <View style={styles.reviewIcon}>
+      <MaterialCommunityIcons
+        name="account-clock"
+        size={48}
+        color={CEREMONY_COLORS.authenticator.needsReview}
+      />
+    </View>
+
+    <Text style={styles.reviewTitle}>Manuel İnceleme Gerekiyor</Text>
+    <Text style={styles.reviewMessage}>
+      24 saat içinde sonuçlanacak
+    </Text>
+
+    {reasons.length > 0 && (
+      <View style={styles.reasonsContainer}>
+        {reasons.map((reason, i) => (
+          <Text key={i} style={styles.reviewReasonText}>
+            • {reason}
+          </Text>
+        ))}
+      </View>
+    )}
+
+    {onRequestManualReview && (
+      <TouchableOpacity
+        style={styles.manualReviewButton}
+        onPress={onRequestManualReview}
+        testID="manual-review-button"
+      >
+        <MaterialCommunityIcons name="account-check" size={20} color="white" />
+        <Text style={styles.manualReviewText}>Manuel İnceleme İste</Text>
+      </TouchableOpacity>
+    )}
+  </Animated.View>
+);
+
+// ═══════════════════════════════════════════════════
+// UTILITY FUNCTION
+// ═══════════════════════════════════════════════════
+
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ═══════════════════════════════════════════════════
+// STYLES
+// ═══════════════════════════════════════════════════
 
 const styles = StyleSheet.create({
   container: {
@@ -538,8 +845,24 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
   },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SPACING.lg,
+  },
+  headerContent: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  cancelButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   phaseTitle: {
     fontSize: 18,
@@ -589,6 +912,10 @@ const styles = StyleSheet.create({
   scanImage: {
     width: '100%',
     height: '100%',
+  },
+  pulseOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: CEREMONY_COLORS.authenticator.scanning,
   },
   scanLine: {
     position: 'absolute',
@@ -712,14 +1039,94 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  resultIconSuccess: {
+
+  // Success
+  successIcon: {
     width: 100,
     height: 100,
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  resultIconReview: {
+  successTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginTop: SPACING.lg,
+  },
+  successSubtitle: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+  },
+  confidenceText: {
+    fontSize: 14,
+    color: COLORS.success,
+    marginTop: SPACING.sm,
+  },
+
+  // Rejection
+  rejectionIcon: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rejectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginTop: SPACING.lg,
+  },
+  reasonsContainer: {
+    marginTop: SPACING.md,
+    alignSelf: 'stretch',
+    paddingHorizontal: SPACING.lg,
+  },
+  reasonText: {
+    fontSize: 14,
+    color: CEREMONY_COLORS.authenticator.rejected,
+    marginVertical: 2,
+  },
+  suggestionsBox: {
+    marginTop: SPACING.md,
+    padding: SPACING.md,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderRadius: 12,
+    alignSelf: 'stretch',
+    marginHorizontal: SPACING.lg,
+  },
+  suggestionsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: SPACING.xs,
+  },
+  suggestionText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginVertical: 2,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: 12,
+    marginTop: SPACING.xl,
+    gap: SPACING.xs,
+  },
+  retryText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+
+  // Needs Review
+  reviewIcon: {
     width: 100,
     height: 100,
     borderRadius: 50,
@@ -727,41 +1134,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  resultIconRejected: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  resultTitle: {
+  reviewTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: COLORS.text,
     marginTop: SPACING.lg,
   },
-  resultConfidence: {
-    fontSize: 14,
-    color: COLORS.success,
-    marginTop: SPACING.xs,
-  },
-  resultMessage: {
+  reviewMessage: {
     fontSize: 14,
     color: COLORS.textSecondary,
     marginTop: SPACING.xs,
     textAlign: 'center',
   },
-  suggestions: {
-    marginTop: SPACING.md,
-    padding: SPACING.md,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderRadius: 12,
-  },
-  suggestionText: {
-    fontSize: 13,
-    color: COLORS.error,
+  reviewReasonText: {
+    fontSize: 14,
+    color: CEREMONY_COLORS.authenticator.needsReview,
     marginVertical: 2,
+  },
+  manualReviewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: CEREMONY_COLORS.authenticator.needsReview,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: 12,
+    marginTop: SPACING.xl,
+    gap: SPACING.xs,
+  },
+  manualReviewText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.white,
   },
 });
 
