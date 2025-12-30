@@ -260,6 +260,8 @@ export const COLORS = {
   // ─────────────────────────────────────────────
   text: {
     primary: primitives.stone[900],
+    primaryMuted: primitives.stone[400], // For secondary emphasis text
+    primaryWhite80: 'rgba(255, 255, 255, 0.8)', // White text with 80% opacity
     secondary: primitives.stone[500],
     tertiary: primitives.stone[400],
     muted: primitives.stone[400],
@@ -284,7 +286,11 @@ export const COLORS = {
   // ─────────────────────────────────────────────
   brand: {
     primary: primitives.amber[500],
+    primaryLight: primitives.amber[400],
+    primaryDark: primitives.amber[600],
     secondary: primitives.magenta[500],
+    secondaryLight: primitives.magenta[400],
+    secondaryTransparent: 'rgba(236, 72, 153, 0.12)',
     accent: primitives.seafoam[500],
   },
 
@@ -293,9 +299,13 @@ export const COLORS = {
   // ─────────────────────────────────────────────
   feedback: {
     success: primitives.emerald[500],
+    successLight: primitives.emerald[400],
     error: primitives.red[500],
+    errorLight: primitives.red[400],
     warning: primitives.amber[500],
+    warningLight: primitives.amber[400],
     info: primitives.blue[500],
+    infoLight: primitives.blue[400],
   },
 
   // ─────────────────────────────────────────────
@@ -312,6 +322,8 @@ export const COLORS = {
   // ─────────────────────────────────────────────
   bg: {
     primary: '#FFFCF8',
+    primaryLight: '#FFFFFF', // Lighter variant for cancel buttons, cards
+    primaryDark: '#F5F0E8', // Darker variant for pressed states
     secondary: '#FFF9F2',
     tertiary: '#FFF5E8',
   },
@@ -329,9 +341,19 @@ export const COLORS = {
   backgroundDarkTertiary: '#292524',
 
   // ─────────────────────────────────────────────
-  // Surface - "Soft glass" cards
+  // Surface - "Soft glass" cards (nested for component compatibility)
   // ─────────────────────────────────────────────
-  surface: '#FFFFFF',
+  surface: {
+    base: '#FFFFFF',
+    baseLight: primitives.white,
+    light: primitives.white,
+    muted: primitives.stone[50],
+    subtle: primitives.stone[100],
+    dark: '#1A2F23',
+    glassBackground: 'rgba(255, 252, 248, 0.78)',
+    glassBorder: 'rgba(255, 255, 255, 0.2)',
+  },
+  // Flat surface aliases for backwards compatibility
   surfaceLight: primitives.white,
   surfaceMuted: primitives.stone[50],
   surfaceSubtle: primitives.stone[100],
@@ -345,9 +367,16 @@ export const COLORS = {
   glassDarkBorder: 'rgba(255, 255, 255, 0.08)',
 
   // ─────────────────────────────────────────────
-  // Border - "Hairline" aesthetic
+  // Border - "Hairline" aesthetic (nested for component compatibility)
   // ─────────────────────────────────────────────
-  border: primitives.stone[200],
+  border: {
+    default: primitives.stone[200],
+    light: primitives.stone[100],
+    strong: primitives.stone[300],
+    focus: primitives.amber[500],
+    dark: '#2D4A3A',
+  },
+  // Flat border aliases for backwards compatibility
   borderLight: primitives.stone[100],
   borderStrong: primitives.stone[300],
   borderFocus: primitives.amber[500],
@@ -358,9 +387,17 @@ export const COLORS = {
   hairlineLight: 'rgba(255, 255, 255, 0.1)',
 
   // ─────────────────────────────────────────────
-  // Overlay
+  // Overlay (nested for component compatibility)
   // ─────────────────────────────────────────────
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: {
+    default: 'rgba(0, 0, 0, 0.5)',
+    light: 'rgba(0, 0, 0, 0.3)',
+    medium: 'rgba(0, 0, 0, 0.5)',
+    heavy: 'rgba(0, 0, 0, 0.7)',
+    dark: 'rgba(0, 0, 0, 0.7)',
+    backdrop: 'rgba(0, 0, 0, 0.4)',
+  },
+  // Flat overlay aliases
   overlayLight: 'rgba(0, 0, 0, 0.3)',
   overlayDark: 'rgba(0, 0, 0, 0.7)',
   backdrop: 'rgba(0, 0, 0, 0.4)',
@@ -499,6 +536,7 @@ export const COLORS = {
   errorTransparent10: 'rgba(239, 68, 68, 0.1)',
   errorTransparent20: 'rgba(239, 68, 68, 0.2)',
   tealTransparent20: 'rgba(0, 128, 128, 0.2)',
+  trustTransparent20: 'rgba(16, 185, 129, 0.2)', // Trust green with 20% opacity
   warningTransparent20: 'rgba(245, 158, 11, 0.2)',
   successTransparent33: 'rgba(16, 185, 129, 0.33)',
   infoTransparent33: 'rgba(59, 130, 246, 0.33)',
@@ -695,9 +733,8 @@ export const CARD_SHADOW_HEAVY = SHADOWS.elevated;
 export { primitives };
 
 // PALETTE export for backwards compatibility
+// Note: primitives already includes white and black, so we just spread it
 export const PALETTE = {
-  white: primitives.white,
-  black: primitives.black,
   ...primitives,
 } as const;
 
@@ -705,3 +742,27 @@ export const PALETTE = {
 export type ColorKey = keyof typeof COLORS;
 export type GradientKey = keyof typeof GRADIENTS;
 export type ShadowKey = keyof typeof SHADOWS;
+
+// Trust level types and helper functions
+export type TrustLevel = 'low' | 'medium' | 'high' | 'platinum';
+
+export const getTrustLevel = (score: number): TrustLevel => {
+  if (score >= 90) return 'platinum';
+  if (score >= 70) return 'high';
+  if (score >= 50) return 'medium';
+  return 'low';
+};
+
+export const getTrustRingColors = (score: number): [string, string] => {
+  const level = getTrustLevel(score);
+  switch (level) {
+    case 'platinum':
+      return [COLORS.trustPlatinum, COLORS.trustGold];
+    case 'high':
+      return [COLORS.trustGold, primitives.amber[400]];
+    case 'medium':
+      return [primitives.amber[400], primitives.amber[500]];
+    default:
+      return [COLORS.trustLow, primitives.red[400]];
+  }
+};

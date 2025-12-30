@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: PALETTE.primary[500],
+    shadowColor: '#F59E0B', // amber[500] - primary color
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.25,
     shadowRadius: 24,
@@ -444,14 +444,14 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     borderWidth: 2,
-    borderColor: COLORS.interactive.primary,
+    borderColor: COLORS.brand.primary,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryButtonText: {
     ...TYPE_SCALE.label.large,
-    color: COLORS.interactive.primary,
+    color: COLORS.brand.primary,
   },
   divider: {
     flexDirection: 'row',
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   footerLink: {
-    color: COLORS.interactive.primary,
+    color: COLORS.brand.primary,
   },
 });
 

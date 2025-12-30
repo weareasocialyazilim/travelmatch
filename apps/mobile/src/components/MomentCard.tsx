@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginBottom: 16,
     overflow: 'hidden',
-    shadowColor: PALETTE.black,
+    shadowColor: '#000000', // black
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
     shadowRadius: 24,

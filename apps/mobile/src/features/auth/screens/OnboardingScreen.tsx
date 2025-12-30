@@ -33,6 +33,7 @@ import Reanimated, {
   interpolate,
   Extrapolation,
   Easing,
+  SharedValue,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -151,7 +152,7 @@ interface FloatingElementProps {
   position: { top: number; left: number };
   scale: number;
   rotation: number;
-  slideProgress: Reanimated.SharedValue<number>;
+  slideProgress: SharedValue<number>;
   index: number;
 }
 

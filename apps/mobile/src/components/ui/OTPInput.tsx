@@ -235,7 +235,7 @@ const OTPDigitInput = React.forwardRef<TextInput, OTPDigitInputProps>(
       if (isError) return COLORS.feedback.error;
       if (isFocused) return COLORS.primary;
       if (isFilled) return COLORS.feedback.success;
-      return COLORS.border;
+      return COLORS.border.default;
     };
 
     const getBackgroundColor = () => {

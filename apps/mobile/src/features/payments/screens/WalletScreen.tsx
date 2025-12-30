@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: COLORS.border.default,
   },
   headerButton: {
     width: 44,
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 22,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
   },
   headerTitle: {
     ...TYPOGRAPHY.h4,
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 16,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: COLORS.black,
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
 
   // Transactions Section
   transactionsSection: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 20,
     padding: 20,
     shadowColor: COLORS.black,
