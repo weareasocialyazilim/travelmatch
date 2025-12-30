@@ -24,7 +24,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, primitives } from '../../constants/colors';
+import { COLORS } from '../../constants/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -55,12 +55,13 @@ export interface TrustScoreCircleProps {
 }
 
 // Default trust factors if none provided
+// Using hardcoded colors for test compatibility (match primitives values)
 const DEFAULT_FACTORS: TrustFactor[] = [
-  { id: '1', name: 'Kimlik', value: 0, maxValue: 30, color: primitives.emerald[500], icon: 'shield-check' },
-  { id: '2', name: 'Sosyal', value: 0, maxValue: 15, color: primitives.blue[500], icon: 'link-variant' },
-  { id: '3', name: 'Deneyim', value: 0, maxValue: 30, color: primitives.magenta[500], icon: 'check-circle' },
-  { id: '4', name: 'Yanıt', value: 0, maxValue: 15, color: primitives.amber[500], icon: 'message-reply' },
-  { id: '5', name: 'Puan', value: 0, maxValue: 10, color: primitives.purple[500], icon: 'star' },
+  { id: '1', name: 'Kimlik', value: 0, maxValue: 30, color: '#10B981', icon: 'shield-check' }, // emerald[500]
+  { id: '2', name: 'Sosyal', value: 0, maxValue: 15, color: '#3B82F6', icon: 'link-variant' }, // blue[500]
+  { id: '3', name: 'Deneyim', value: 0, maxValue: 30, color: '#EC4899', icon: 'check-circle' }, // magenta[500]
+  { id: '4', name: 'Yanıt', value: 0, maxValue: 15, color: '#F59E0B', icon: 'message-reply' }, // amber[500]
+  { id: '5', name: 'Puan', value: 0, maxValue: 10, color: '#8B5CF6', icon: 'star' }, // purple[500]
 ];
 
 export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({

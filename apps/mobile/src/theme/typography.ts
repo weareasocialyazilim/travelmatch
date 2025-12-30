@@ -496,6 +496,58 @@ export const TypographyAccessibility = {
 };
 
 /**
+ * TYPE_SCALE - Backwards compatibility export with nested structure
+ */
+export const TYPE_SCALE = {
+  label: {
+    large: TYPOGRAPHY.labelLarge,
+    small: TYPOGRAPHY.labelSmall,
+    xsmall: TYPOGRAPHY.labelXSmall,
+    default: TYPOGRAPHY.label,
+  },
+  body: {
+    large: TYPOGRAPHY.bodyLarge,
+    small: TYPOGRAPHY.bodySmall,
+    medium: TYPOGRAPHY.bodyMedium,
+    default: TYPOGRAPHY.body,
+    caption: TYPOGRAPHY.caption, // Alias for backward compatibility
+  },
+  heading: {
+    h1: TYPOGRAPHY.h1,
+    h2: TYPOGRAPHY.h2,
+    h3: TYPOGRAPHY.h3,
+    h4: TYPOGRAPHY.h4,
+    h5: TYPOGRAPHY.h5,
+    h6: TYPOGRAPHY.h6,
+  },
+  display: {
+    1: TYPOGRAPHY.display1,
+    2: TYPOGRAPHY.display2,
+    3: TYPOGRAPHY.display3,
+  },
+  button: {
+    large: TYPOGRAPHY.buttonLarge,
+    small: TYPOGRAPHY.buttonSmall,
+    default: TYPOGRAPHY.button,
+  },
+  caption: {
+    default: TYPOGRAPHY.caption,
+    medium: TYPOGRAPHY.captionMedium,
+    small: TYPOGRAPHY.captionSmall,
+  },
+  price: {
+    large: TYPOGRAPHY.price,
+    small: TYPOGRAPHY.priceSmall,
+  },
+  // Mono-spaced typography for numbers and prices
+  mono: {
+    price: TYPOGRAPHY.price,
+    priceSmall: TYPOGRAPHY.priceSmall,
+    score: TYPOGRAPHY.score,
+  },
+} as const;
+
+/**
  * Export type for TypeScript support
  */
 export type TypographyVariant = keyof ReturnType<typeof createTypography>;

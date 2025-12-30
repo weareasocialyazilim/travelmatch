@@ -694,6 +694,13 @@ export const CARD_SHADOW_HEAVY = SHADOWS.elevated;
 // Export primitives for advanced use cases
 export { primitives };
 
+// PALETTE export for backwards compatibility
+export const PALETTE = {
+  white: primitives.white,
+  black: primitives.black,
+  ...primitives,
+} as const;
+
 // Type exports for TypeScript
 export type ColorKey = keyof typeof COLORS;
 export type GradientKey = keyof typeof GRADIENTS;
