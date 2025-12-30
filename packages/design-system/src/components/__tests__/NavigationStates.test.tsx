@@ -67,7 +67,7 @@ describe.skip('NavigationStates', () => {
 
     it('should render action button with custom label', () => {
       const actionLabel = 'Click Me';
-      const onAction = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <EmptyState actionLabel={actionLabel} onAction={onAction} />,
@@ -80,8 +80,8 @@ describe.skip('NavigationStates', () => {
     });
 
     it('should render secondary action button', () => {
-      const primaryAction = jest.fn();
-      const secondaryAction = jest.fn();
+      const primaryAction = jest.fn() as jest.Mock;
+      const secondaryAction = jest.fn() as jest.Mock;
 
       const { getByTestId } = render(
         <EmptyState
@@ -144,7 +144,7 @@ describe.skip('NavigationStates', () => {
     });
 
     it('should call retry callback', () => {
-      const onRetry = jest.fn();
+      const onRetry = jest.fn() as jest.Mock;
 
       const { getByText } = render(<OfflineState onRetry={onRetry} />);
 
@@ -199,7 +199,7 @@ describe.skip('NavigationStates', () => {
     });
 
     it('should call retry callback', () => {
-      const onRetry = jest.fn();
+      const onRetry = jest.fn() as jest.Mock;
 
       const { getByText } = render(<ErrorState onRetry={onRetry} />);
 
@@ -208,7 +208,7 @@ describe.skip('NavigationStates', () => {
     });
 
     it('should call report callback', () => {
-      const onReport = jest.fn();
+      const onReport = jest.fn() as jest.Mock;
 
       const { getByText } = render(<ErrorState onReport={onReport} />);
 
@@ -243,8 +243,8 @@ describe.skip('NavigationStates', () => {
     });
 
     it('should handle both retry and report actions', () => {
-      const onRetry = jest.fn();
-      const onReport = jest.fn();
+      const onRetry = jest.fn() as jest.Mock;
+      const onReport = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <ErrorState onRetry={onRetry} onReport={onReport} />,
@@ -372,7 +372,7 @@ describe.skip('NavigationStates', () => {
     });
 
     it('should handle rapid action button clicks', () => {
-      const onAction = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <EmptyState actionLabel="Click" onAction={onAction} />,
@@ -411,7 +411,7 @@ describe.skip('NavigationStates', () => {
 
   describe('Integration', () => {
     it('should work with navigation', () => {
-      const mockNavigate = jest.fn();
+      const mockNavigate = jest.fn() as jest.Mock;
 
       const { getByText } = render(
         <EmptyState
@@ -431,7 +431,7 @@ describe.skip('NavigationStates', () => {
     });
 
     it('should work with retry logic', async () => {
-      const mockRetry = jest.fn().mockResolvedValue(true);
+      const mockRetry = jest.fn().mockResolvedValue(true) as jest.Mock;
 
       const { getByText } = render(<ErrorState onRetry={mockRetry} />);
 

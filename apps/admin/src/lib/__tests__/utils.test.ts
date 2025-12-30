@@ -196,7 +196,7 @@ describe('Utils', () => {
     });
 
     it('debounces function calls', () => {
-      const fn = jest.fn();
+      const fn = jest.fn() as jest.Mock;
       const debouncedFn = debounce(fn, 100);
 
       debouncedFn();
@@ -211,7 +211,7 @@ describe('Utils', () => {
     });
 
     it('passes arguments to debounced function', () => {
-      const fn = jest.fn();
+      const fn = jest.fn() as jest.Mock;
       const debouncedFn = debounce(fn, 100);
 
       debouncedFn('arg1', 'arg2');

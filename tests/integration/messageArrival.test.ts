@@ -16,56 +16,56 @@
  * - Notification triggers
  */
 
-// @ts-nocheck - React hooks and realtime mocks
-
 import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { useMessages } from '../../apps/mobile/src/hooks/useMessages';
 import { supabase } from '../../apps/mobile/src/config/supabase';
 
+type PayloadCallback = (payload: { new?: any; old?: any }) => void;
+
 // Mock dependencies
 jest.mock('../../apps/mobile/src/config/supabase', () => ({
   supabase: {
-    channel: jest.fn(),
-    removeChannel: jest.fn(),
+    channel: jest.fn() as jest.Mock,
+    removeChannel: jest.fn() as jest.Mock,
   },
 }));
 jest.mock('../../apps/mobile/src/utils/logger');
 jest.mock('../../apps/mobile/src/services/messageService', () => ({
   messageService: {
-    getConversations: jest.fn().mockResolvedValue({ conversations: [] }),
-    getMessages: jest.fn().mockResolvedValue({ messages: [], hasMore: false }),
-    markAsRead: jest.fn().mockResolvedValue(undefined),
-    sendMessage: jest.fn().mockResolvedValue({ id: 'msg-1' }),
+    getConversations: jest.fn().mockResolvedValue({ conversations: [] }) as jest.Mock,
+    getMessages: jest.fn().mockResolvedValue({ messages: [], hasMore: false }) as jest.Mock,
+    markAsRead: jest.fn().mockResolvedValue(undefined) as jest.Mock,
+    sendMessage: jest.fn().mockResolvedValue({ id: 'msg-1' }) as jest.Mock,
   },
 }));
 
 // Create mock storage for callbacks per table - must be defined before mock
 const mockTableCallbacks: {
   [tableName: string]: {
-    onInsert?: Function;
-    onUpdate?: Function;
-    onDelete?: Function;
-    onChange?: Function;
+    onInsert?: PayloadCallback;
+    onUpdate?: PayloadCallback;
+    onDelete?: PayloadCallback;
+    onChange?: PayloadCallback;
   };
 } = {};
 
 // Mock unsubscribe must be defined inline in the mock factory to avoid hoisting issues
 jest.mock('../../apps/mobile/src/services/realtimeChannelManager', () => {
-  const mockUnsubscribe = jest.fn();
+  const mockUnsubscribe = jest.fn() as jest.Mock;
   return {
     realtimeChannelManager: {
-      subscribe: jest.fn().mockReturnValue({ unsubscribe: mockUnsubscribe }),
-      subscribeToTable: jest.fn(),
-      unsubscribe: jest.fn(),
-      getChannel: jest.fn(),
+      subscribe: jest.fn().mockReturnValue({ unsubscribe: mockUnsubscribe }) as jest.Mock,
+      subscribeToTable: jest.fn() as jest.Mock,
+      unsubscribe: jest.fn() as jest.Mock,
+      getChannel: jest.fn() as jest.Mock,
     },
   };
 });
 jest.mock('../../apps/mobile/src/utils/errorHandler', () => ({
   ErrorHandler: {
-    handle: jest.fn().mockReturnValue({ userMessage: 'Error' }),
+    handle: jest.fn().mockReturnValue({ userMessage: 'Error' }) as jest.Mock,
   },
-  retryWithErrorHandling: jest.fn((fn) => fn()),
+  retryWithErrorHandling: jest.fn((fn: () => any) => fn()) as jest.Mock,
 }));
 
 import { realtimeChannelManager } from '../../apps/mobile/src/services/realtimeChannelManager';
@@ -74,9 +74,13 @@ import { realtimeChannelManager } from '../../apps/mobile/src/services/realtimeC
 // The useMessages hook now uses realtimeChannelManager.subscribeToTable
 // Real-time tests are covered in apps/mobile/src/hooks/__tests__/useMessages.test.ts (also skipped pending rework)
 describe.skip('Message Arrival Handling', () => {
-  let mockChannel;
-  let insertHandler: Function;
-  let updateHandler: Function;
+  let mockChannel: {
+    on: jest.Mock;
+    subscribe: jest.Mock;
+    unsubscribe: jest.Mock;
+  };
+  let insertHandler: PayloadCallback;
+  let updateHandler: PayloadCallback;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -87,38 +91,38 @@ describe.skip('Message Arrival Handling', () => {
 
     // Mock channel with handlers (for backwards compatibility)
     mockChannel = {
-      on: jest.fn((type, config, handler) => {
+      on: jest.fn((type: string, config: { event?: string }, handler: PayloadCallback) => {
         if (config.event === 'INSERT') {
           insertHandler = handler;
         } else if (config.event === 'UPDATE') {
           updateHandler = handler;
         }
         return mockChannel;
-      }),
-      subscribe: jest.fn((callback) => {
+      }) as jest.Mock,
+      subscribe: jest.fn((callback?: (status: string) => void) => {
         if (callback) callback('SUBSCRIBED');
         return mockChannel;
-      }),
-      unsubscribe: jest.fn(),
+      }) as jest.Mock,
+      unsubscribe: jest.fn() as jest.Mock,
     };
 
-    supabase.channel.mockReturnValue(mockChannel);
-    supabase.removeChannel.mockImplementation(() => {});
+    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
+    (supabase.removeChannel as jest.Mock).mockImplementation(() => {});
 
     // Set up handlers that delegate to stored callbacks
-    insertHandler = (payload: any) => {
+    insertHandler = (payload: { new?: any; old?: any }) => {
       // Try messages table first, then conversations
       const callbacks =
         mockTableCallbacks['messages'] || mockTableCallbacks['conversations'];
       if (callbacks?.onInsert) {
-        callbacks.onInsert({ new: payload.new, eventType: 'INSERT' });
+        callbacks.onInsert({ new: payload.new });
       }
     };
-    updateHandler = (payload: any) => {
+    updateHandler = (payload: { new?: any; old?: any }) => {
       const callbacks =
         mockTableCallbacks['messages'] || mockTableCallbacks['conversations'];
       if (callbacks?.onUpdate) {
-        callbacks.onUpdate({ new: payload.new, eventType: 'UPDATE' });
+        callbacks.onUpdate({ new: payload.new });
       }
     };
   });
@@ -396,15 +400,15 @@ describe.skip('Message Arrival Handling', () => {
   // ===========================
 
   describe('Typing Indicators', () => {
-    let broadcastHandler: Function;
+    let broadcastHandler: (payload: { payload: { userId: string; isTyping: boolean } }) => void;
 
     beforeEach(() => {
-      mockChannel.on = jest.fn((type, config, handler) => {
+      mockChannel.on = jest.fn((type: string, config: { event?: string }, handler: (payload: any) => void) => {
         if (type === 'broadcast' && config.event === 'typing') {
           broadcastHandler = handler;
         }
         return mockChannel;
-      });
+      }) as jest.Mock;
     });
 
     it('should show typing indicator when user starts typing', async () => {
@@ -724,8 +728,8 @@ describe.skip('Message Arrival Handling', () => {
     });
 
     it('should handle subscription errors gracefully', async () => {
-      mockChannel.subscribe.mockImplementation((callback: Function) => {
-        callback('CHANNEL_ERROR');
+      mockChannel.subscribe.mockImplementation((callback?: (status: string) => void) => {
+        if (callback) callback('CHANNEL_ERROR');
       });
 
       const { result } = renderHook(() => useMessages('conv-123'));

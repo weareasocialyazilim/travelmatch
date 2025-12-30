@@ -1,8 +1,8 @@
 /**
  * Navigation State Persistence Tests
- * 
+ *
  * Tests for navigation state management and restoration
- * 
+ *
  * Coverage:
  * - State persistence to AsyncStorage
  * - State restoration on app restart
@@ -13,25 +13,23 @@
  * - State versioning
  */
 
-// @ts-nocheck - AsyncStorage and Jest mock types
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainerRef } from '@react-navigation/native';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: jest.fn() as jest.Mock,
+  setItem: jest.fn() as jest.Mock,
+  removeItem: jest.fn() as jest.Mock,
+  clear: jest.fn() as jest.Mock,
 }));
 
 // Mock navigation
 const mockNavigation = {
-  isReady: jest.fn(() => true),
-  getCurrentRoute: jest.fn(),
-  getRootState: jest.fn(),
-  resetRoot: jest.fn(),
+  isReady: jest.fn(() => true) as jest.Mock,
+  getCurrentRoute: jest.fn() as jest.Mock,
+  getRootState: jest.fn() as jest.Mock,
+  resetRoot: jest.fn() as jest.Mock,
 } as unknown as NavigationContainerRef<any>;
 
 /**
@@ -540,7 +538,7 @@ describe('Navigation State Persistence', () => {
       };
 
       // Mock old key exists
-      (AsyncStorage.getItem )
+      (AsyncStorage.getItem as jest.Mock)
         .mockResolvedValueOnce(null) // New key doesn't exist
         .mockResolvedValueOnce(JSON.stringify(oldState)); // Old key exists
 
