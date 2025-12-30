@@ -28,7 +28,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { COLORS, primitives } from '../../constants/colors';
+import { COLORS } from '../../constants/colors';
 
 export interface OTPInputProps {
   /** Number of OTP digits */
