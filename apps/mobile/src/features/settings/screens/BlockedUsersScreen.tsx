@@ -45,13 +45,13 @@ const MOCK_BLOCKED_USERS: BlockedUser[] = isDev
         id: '1',
         name: 'John Doe',
         role: 'Traveler / Local',
-        avatarUrl: 'https://via.placeholder.com/48',
+        avatarUrl: '',
       },
       {
         id: '2',
         name: 'Jane Smith',
         role: 'Traveler',
-        avatarUrl: 'https://via.placeholder.com/48',
+        avatarUrl: '',
       },
     ]
   : [];

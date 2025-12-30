@@ -295,7 +295,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                   {...getAvatarImageProps(
                     moment.user || {},
                     IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                    'https://via.placeholder.com/150',
+                    '',
                   )}
                   style={styles.userAvatar}
                   accessibilityLabel={`${moment.user?.name || 'User'}'s avatar`}

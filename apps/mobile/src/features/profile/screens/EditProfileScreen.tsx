@@ -37,10 +37,7 @@ const EditProfileScreen = () => {
   // Original profile data from auth context
   const originalProfile = useMemo(() => {
     return {
-      avatarUrl:
-        user?.profilePhoto ||
-        user?.avatarUrl ||
-        'https://via.placeholder.com/150',
+      avatarUrl: user?.profilePhoto || user?.avatarUrl || '',
       name: user?.name || '',
       username: user?.username || '',
       bio: user?.bio || '',

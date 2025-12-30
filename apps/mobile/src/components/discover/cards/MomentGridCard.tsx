@@ -18,8 +18,7 @@ interface MomentGridCardProps {
 
 const MomentGridCard: React.FC<MomentGridCardProps> = memo(
   ({ moment, index, onPress }) => {
-    const imageUrl =
-      moment.image || moment.images?.[0] || 'https://via.placeholder.com/400';
+    const imageUrl = moment.image || moment.images?.[0] || '';
     const hostName = moment.hostName || 'Anonymous';
     const price = moment.price ?? moment.pricePerGuest ?? 0;
     const locationCity =
@@ -67,7 +66,7 @@ const MomentGridCard: React.FC<MomentGridCardProps> = memo(
                 {...getAvatarImageProps(
                   hostUser,
                   IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
-                  'https://via.placeholder.com/24',
+                  '',
                 )}
                 contentFit="cover"
                 style={styles.gridAvatar}

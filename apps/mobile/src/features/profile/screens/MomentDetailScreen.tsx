@@ -75,7 +75,7 @@ const MomentDetailScreen: React.FC = () => {
     avatar:
       userSource?.avatar ||
       (userSource as { photoUrl?: string })?.photoUrl ||
-      'https://via.placeholder.com/150',
+      '',
     type: userSource?.type || 'traveler',
     isVerified: userSource?.isVerified || false,
     location: userSource?.location || 'Unknown',
@@ -361,7 +361,7 @@ const MomentDetailScreen: React.FC = () => {
         },
         user: {
           name: momentUser.name,
-          avatar: momentUser.avatar || 'https://via.placeholder.com/150',
+          avatar: momentUser.avatar || '',
           type: (momentUser.type as 'traveler' | 'local') || 'traveler',
           location:
             typeof momentUser.location === 'string'
