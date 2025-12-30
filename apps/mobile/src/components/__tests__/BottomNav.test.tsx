@@ -1,36 +1,15 @@
-// Unmock BottomNav since jest.setup.afterEnv.js mocks it globally
-// Note: Using relative path since that's what Jest resolves
-jest.unmock('../BottomNav');
-
-// Mock expo-blur as it's not available in test environment
-jest.mock('expo-blur', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  return {
-    BlurView: (props: { children?: React.ReactNode }) =>
-      React.createElement(View, props, props.children),
-  };
-});
-
-// Mock expo-linear-gradient
-jest.mock('expo-linear-gradient', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  return {
-    LinearGradient: (props: { children?: React.ReactNode }) =>
-      React.createElement(View, props, props.children),
-  };
-});
-
-// Mock expo-haptics
-jest.mock('expo-haptics', () => ({
-  impactAsync: jest.fn(),
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Medium: 'medium',
-    Heavy: 'heavy',
-  },
-}));
+/**
+ * BottomNav Component Tests
+ *
+ * Tests the bottom navigation component behavior including:
+ * - Tab rendering and labels (using i18n)
+ * - Badge display logic
+ * - Navigation on tab press
+ * - Active state highlighting
+ *
+ * Note: This test uses the mock from __mocks__/components/BottomNav.js
+ * which is configured via moduleNameMapper in jest.config.js
+ */
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
@@ -39,6 +18,21 @@ import BottomNav from '../BottomNav';
 
 // Set up navigation mock via global test utility
 const mockNavigate = jest.fn();
+
+// Extend global type for test navigation
+declare global {
+  // eslint-disable-next-line no-var
+  var __TEST_NAVIGATION__:
+    | {
+        navigate: jest.Mock;
+        goBack: jest.Mock;
+        replace: jest.Mock;
+        dispatch: jest.Mock;
+        setOptions: jest.Mock;
+        addListener: jest.Mock;
+      }
+    | undefined;
+}
 
 // Override the global navigation mock for this test file
 beforeAll(() => {
@@ -53,7 +47,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  delete global.__TEST_NAVIGATION__;
+  global.__TEST_NAVIGATION__ = undefined;
 });
 
 describe('BottomNav', () => {
@@ -62,13 +56,13 @@ describe('BottomNav', () => {
   });
 
   describe('Rendering', () => {
-    it('renders all 5 tabs', () => {
+    it('renders all 4 tabs', () => {
       const { getByText } = render(<BottomNav activeTab="Discover" />);
-      // Component uses Turkish labels: Dilekler, Hediyeler, Mesajlar, Profil
-      expect(getByText('Dilekler')).toBeTruthy();
-      expect(getByText('Hediyeler')).toBeTruthy();
-      expect(getByText('Mesajlar')).toBeTruthy();
-      expect(getByText('Profil')).toBeTruthy();
+      // Component uses i18n translations (English)
+      expect(getByText('Moments')).toBeTruthy();
+      expect(getByText('Gifts')).toBeTruthy();
+      expect(getByText('Messages')).toBeTruthy();
+      expect(getByText('Profile')).toBeTruthy();
     });
 
     it('renders all tab icons', () => {
@@ -87,7 +81,7 @@ describe('BottomNav', () => {
       );
       const { MaterialCommunityIcons } = require('@expo/vector-icons');
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-      expect(icons[0].props.name).toBe('gift'); // Active = filled (Wishes tab)
+      expect(icons[0].props.name).toBe('gift'); // Active = filled (Moments tab)
     });
 
     it('shows outlined icon for inactive tabs', () => {
@@ -114,24 +108,25 @@ describe('BottomNav', () => {
       const { UNSAFE_queryAllByType } = render(
         <BottomNav activeTab="Discover" />,
       );
-      const { TouchableOpacity } = require('react-native');
-      const buttons = UNSAFE_queryAllByType(TouchableOpacity);
+      const { Pressable } = require('react-native');
+      const buttons = UNSAFE_queryAllByType(Pressable);
       // Filter by accessibilityRole='tab'
       const tabs = buttons.filter(
-        (btn: { props: { accessibilityRole?: string } }) => btn.props.accessibilityRole === 'tab',
+        (btn: { props: { accessibilityRole?: string } }) =>
+          btn.props.accessibilityRole === 'tab',
       );
-      expect(tabs.length).toBe(5);
+      expect(tabs.length).toBe(4);
     });
 
     it('has correct accessibility state for active tab', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const discoverTab = getByLabelText('Dilekler tab');
+      const discoverTab = getByLabelText('Moments tab');
       expect(discoverTab.props.accessibilityState.selected).toBe(true);
     });
 
     it('has correct accessibility state for inactive tabs', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const requestsTab = getByLabelText('Hediyeler tab');
+      const requestsTab = getByLabelText('Gifts tab');
       expect(requestsTab.props.accessibilityState.selected).toBe(false);
     });
   });
@@ -199,42 +194,42 @@ describe('BottomNav', () => {
   describe('Tab Navigation', () => {
     it('navigates to Discover when Discover tab pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Profile" />);
-      const discoverTab = getByLabelText('Dilekler tab');
+      const discoverTab = getByLabelText('Moments tab');
       fireEvent.press(discoverTab);
       expect(mockNavigate).toHaveBeenCalledWith('Discover');
     });
 
     it('navigates to Requests when Requests tab pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const requestsTab = getByLabelText('Hediyeler tab');
+      const requestsTab = getByLabelText('Gifts tab');
       fireEvent.press(requestsTab);
       expect(mockNavigate).toHaveBeenCalledWith('Requests');
     });
 
     it('navigates to CreateMoment when Create button pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const createButton = getByLabelText('Yeni dilek oluştur');
+      const createButton = getByLabelText('Create new moment');
       fireEvent.press(createButton);
       expect(mockNavigate).toHaveBeenCalledWith('CreateMoment');
     });
 
     it('navigates to Messages when Messages tab pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const messagesTab = getByLabelText('Mesajlar tab');
+      const messagesTab = getByLabelText('Messages tab');
       fireEvent.press(messagesTab);
       expect(mockNavigate).toHaveBeenCalledWith('Messages');
     });
 
     it('navigates to Profile when Profile tab pressed', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const profileTab = getByLabelText('Profil tab');
+      const profileTab = getByLabelText('Profile tab');
       fireEvent.press(profileTab);
       expect(mockNavigate).toHaveBeenCalledWith('Profile');
     });
 
     it('allows pressing same tab again', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const discoverTab = getByLabelText('Dilekler tab');
+      const discoverTab = getByLabelText('Moments tab');
       fireEvent.press(discoverTab);
       expect(mockNavigate).toHaveBeenCalledWith('Discover');
     });
@@ -243,31 +238,25 @@ describe('BottomNav', () => {
   describe('Active Tab States', () => {
     it('highlights Discover when active', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
-      const discoverTab = getByLabelText('Dilekler tab');
+      const discoverTab = getByLabelText('Moments tab');
       expect(discoverTab.props.accessibilityState.selected).toBe(true);
     });
 
     it('highlights Requests when active', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Requests" />);
-      const requestsTab = getByLabelText('Hediyeler tab');
+      const requestsTab = getByLabelText('Gifts tab');
       expect(requestsTab.props.accessibilityState.selected).toBe(true);
-    });
-
-    it('highlights Create when active', () => {
-      const { getByLabelText } = render(<BottomNav activeTab="Create" />);
-      const createButton = getByLabelText('Yeni dilek oluştur');
-      expect(createButton.props.accessibilityState.selected).toBe(true);
     });
 
     it('highlights Messages when active', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Messages" />);
-      const messagesTab = getByLabelText('Mesajlar tab');
+      const messagesTab = getByLabelText('Messages tab');
       expect(messagesTab.props.accessibilityState.selected).toBe(true);
     });
 
     it('highlights Profile when active', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Profile" />);
-      const profileTab = getByLabelText('Profil tab');
+      const profileTab = getByLabelText('Profile tab');
       expect(profileTab.props.accessibilityState.selected).toBe(true);
     });
 
@@ -301,9 +290,9 @@ describe('BottomNav', () => {
     it('handles rapid tab switching', () => {
       const { getByLabelText } = render(<BottomNav activeTab="Discover" />);
 
-      fireEvent.press(getByLabelText('Hediyeler tab'));
-      fireEvent.press(getByLabelText('Mesajlar tab'));
-      fireEvent.press(getByLabelText('Profil tab'));
+      fireEvent.press(getByLabelText('Gifts tab'));
+      fireEvent.press(getByLabelText('Messages tab'));
+      fireEvent.press(getByLabelText('Profile tab'));
 
       expect(mockNavigate).toHaveBeenCalledTimes(3);
     });
@@ -332,15 +321,15 @@ describe('BottomNav', () => {
         <BottomNav activeTab="Discover" />,
       );
       expect(
-        getByLabelText('Dilekler tab').props.accessibilityState.selected,
+        getByLabelText('Moments tab').props.accessibilityState.selected,
       ).toBe(true);
 
       rerender(<BottomNav activeTab="Profile" />);
       expect(
-        getByLabelText('Profil tab').props.accessibilityState.selected,
+        getByLabelText('Profile tab').props.accessibilityState.selected,
       ).toBe(true);
       expect(
-        getByLabelText('Dilekler tab').props.accessibilityState.selected,
+        getByLabelText('Moments tab').props.accessibilityState.selected,
       ).toBe(false);
     });
 

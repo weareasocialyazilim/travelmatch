@@ -58,6 +58,8 @@
   "navigation": {
     "home": "Ana Sayfa",
     "explore": "Keşfet",
+    "discover": "Anlar",
+    "requests": "Hediyeler",
     "moments": "Anlar",
     "messages": "Mesajlar",
     "profile": "Profil",
@@ -65,7 +67,12 @@
     "notifications": "Bildirimler",
     "favorites": "Favoriler",
     "bookings": "Rezervasyonlar",
-    "wallet": "Cüzdan"
+    "wallet": "Cüzdan",
+    "createMoment": "Yeni an oluştur",
+    "discoverTab": "Anlar sekmesi",
+    "requestsTab": "Hediyeler sekmesi",
+    "messagesTab": "Mesajlar sekmesi",
+    "profileTab": "Profil sekmesi"
   },
   "moments": {
     "createMoment": "An Oluştur",
