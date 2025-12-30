@@ -1,16 +1,38 @@
+/**
+ * Badge Component - Status and Feature Badges
+ *
+ * Implements UX best practices:
+ * - Clear visual hierarchy with consistent sizing
+ * - Color-coded variants for different statuses
+ * - Support for moment card badges (Featured, Popular, New)
+ * - Kanban-style status badges (Interview, Approved, Rejected)
+ */
+
 import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '../../constants/colors';
 
+// Standard variants + Moment card variants + Kanban status variants
 type BadgeVariant =
   | 'default'
   | 'success'
   | 'warning'
   | 'error'
   | 'info'
-  | 'primary';
+  | 'primary'
+  // Moment card badges
+  | 'featured'      // "Öne Çıkan" - Hot choice
+  | 'popular'       // "Popüler" - Guests Favorite
+  | 'new'           // "Yeni" - Newly listed
+  | 'premium'       // "Premium" - Prime Pick
+  // Kanban status badges
+  | 'interview'     // Mülakat
+  | 'approved'      // Onaylandı
+  | 'rejected'      // Reddedildi
+  | 'pending';      // Beklemede
+
 type BadgeSize = 'sm' | 'md' | 'lg';
 
 interface BadgeProps {
@@ -33,19 +55,46 @@ export const Badge = memo<BadgeProps>(function Badge({
   // Memoize variant styles
   const variantStyles = useMemo((): { bg: string; text: string } => {
     switch (variant) {
+      // Standard variants
       case 'success':
-        return { bg: COLORS.mintTransparent, text: COLORS.feedback.success };
+        return { bg: primitives.emerald[50], text: primitives.emerald[600] };
       case 'warning':
-        return { bg: COLORS.softOrangeTransparent, text: COLORS.orange };
+        return { bg: primitives.amber[50], text: primitives.amber[600] };
       case 'error':
-        return {
-          bg: COLORS.brand.secondaryTransparent,
-          text: COLORS.feedback.error,
-        };
+        return { bg: primitives.red[50], text: primitives.red[600] };
       case 'info':
-        return { bg: 'rgba(59, 130, 246, 0.1)', text: COLORS.feedback.info };
+        return { bg: primitives.blue[50], text: primitives.blue[600] };
       case 'primary':
-        return { bg: COLORS.primaryMuted, text: COLORS.brand.primary };
+        return { bg: primitives.amber[50], text: primitives.amber[600] };
+
+      // Moment card badges (from design images)
+      case 'featured':
+        // "Öne Çıkan" - olive/dark green like "Hot choice"
+        return { bg: '#3D4A3A', text: COLORS.white };
+      case 'popular':
+        // "Popüler" - teal/seafoam like "Guests Favorite"
+        return { bg: primitives.seafoam[500], text: COLORS.white };
+      case 'new':
+        // "Yeni" - dark/charcoal like "Newly listed"
+        return { bg: primitives.stone[800], text: COLORS.white };
+      case 'premium':
+        // "Premium" - amber/gold like "Prime Pick"
+        return { bg: primitives.amber[500], text: COLORS.white };
+
+      // Kanban status badges (from Workhub design)
+      case 'interview':
+        // Blue for interview status
+        return { bg: primitives.blue[500], text: COLORS.white };
+      case 'approved':
+        // Green for approved
+        return { bg: primitives.emerald[500], text: COLORS.white };
+      case 'rejected':
+        // Red for rejected
+        return { bg: primitives.red[500], text: COLORS.white };
+      case 'pending':
+        // Amber for pending
+        return { bg: primitives.amber[500], text: COLORS.white };
+
       default:
         return { bg: primitives.stone[100], text: primitives.stone[600] };
     }

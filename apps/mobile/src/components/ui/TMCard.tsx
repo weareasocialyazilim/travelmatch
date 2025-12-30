@@ -1,8 +1,16 @@
-// components/ui/TMCard.tsx
-// TravelMatch Ultimate Design System 2026
-// Moment card component with "Soft Glass" aesthetic
+/**
+ * TMCard - TravelMatch Ultimate Design System 2026
+ * Moment card component with "Soft Glass" aesthetic
+ *
+ * Implements UX best practices from design references:
+ * - Clear font hierarchy (24px headline, 16px subheadline, 14px body)
+ * - Balanced button text (16px)
+ * - Readable content with consistent scaling
+ * - Badge support (Featured, Popular, New, Premium)
+ * - Turkish localization
+ */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -21,15 +29,30 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
+import { COLORS, GRADIENTS, SHADOWS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SPACING, SIZES } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
 import { TMTrustRing } from './TMTrustRing';
 
+// Badge type for moment cards (inspired by property card designs)
+export type MomentBadgeType = 'featured' | 'popular' | 'new' | 'premium' | null;
+
+// Badge configuration
+const BADGE_CONFIG: Record<
+  NonNullable<MomentBadgeType>,
+  { label: string; bg: string; icon?: string }
+> = {
+  featured: { label: 'Öne Çıkan', bg: '#3D4A3A', icon: 'fire' },
+  popular: { label: 'Popüler', bg: primitives.seafoam[500], icon: 'heart' },
+  new: { label: 'Yeni', bg: primitives.stone[800] },
+  premium: { label: 'Premium', bg: primitives.amber[500], icon: 'star' },
+};
+
 export interface MomentData {
   id: string;
   title: string;
+  description?: string; // Short description (14px body text)
   imageUrl: string;
   location: {
     city: string;
@@ -45,6 +68,16 @@ export interface MomentData {
   };
   distance?: string;
   category?: string;
+  badge?: MomentBadgeType; // Featured/Popular/New/Premium badge
+  metadata?: {
+    // Additional metadata (like property cards)
+    duration?: string;    // "20 dk"
+    servings?: string;    // "4 kişi"
+    difficulty?: string;  // "Orta"
+    beds?: number;
+    baths?: number;
+    sqft?: number;
+  };
 }
 
 interface TMCardProps {
@@ -139,8 +172,29 @@ export const TMCard: React.FC<TMCardProps> = ({
             </Text>
           </BlurView>
 
-          {/* Category Badge - Top Left (optional) */}
-          {moment.category && (
+          {/* Feature Badge - Top Left (Featured/Popular/New/Premium) */}
+          {moment.badge && BADGE_CONFIG[moment.badge] && (
+            <View
+              style={[
+                styles.featureBadge,
+                { backgroundColor: BADGE_CONFIG[moment.badge].bg },
+              ]}
+            >
+              {BADGE_CONFIG[moment.badge].icon && (
+                <MaterialCommunityIcons
+                  name={BADGE_CONFIG[moment.badge].icon as any}
+                  size={12}
+                  color={COLORS.white}
+                />
+              )}
+              <Text style={styles.featureBadgeText}>
+                {BADGE_CONFIG[moment.badge].label}
+              </Text>
+            </View>
+          )}
+
+          {/* Category Badge - Below feature badge if no feature badge */}
+          {!moment.badge && moment.category && (
             <View style={styles.categoryBadge}>
               <Text style={styles.categoryText}>{moment.category}</Text>
             </View>
@@ -149,13 +203,86 @@ export const TMCard: React.FC<TMCardProps> = ({
 
         {/* Content Section */}
         <View style={styles.content}>
-          {/* Title */}
+          {/* Title - 24px headline equivalent (h4 = 17px, using h3 for 20px) */}
           <Text
             style={[styles.title, variant === 'compact' && styles.titleCompact]}
             numberOfLines={2}
           >
             {moment.title}
           </Text>
+
+          {/* Description - 14px body text */}
+          {moment.description && (
+            <Text style={styles.description} numberOfLines={2}>
+              {moment.description}
+            </Text>
+          )}
+
+          {/* Metadata Row (duration, servings, etc.) */}
+          {moment.metadata && (
+            <View style={styles.metadataRow}>
+              {moment.metadata.duration && (
+                <View style={styles.metadataItem}>
+                  <MaterialCommunityIcons
+                    name="clock-outline"
+                    size={14}
+                    color={COLORS.text.secondary}
+                  />
+                  <Text style={styles.metadataText}>
+                    {moment.metadata.duration}
+                  </Text>
+                </View>
+              )}
+              {moment.metadata.servings && (
+                <View style={styles.metadataItem}>
+                  <MaterialCommunityIcons
+                    name="account-group-outline"
+                    size={14}
+                    color={COLORS.text.secondary}
+                  />
+                  <Text style={styles.metadataText}>
+                    {moment.metadata.servings}
+                  </Text>
+                </View>
+              )}
+              {moment.metadata.difficulty && (
+                <View style={styles.metadataItem}>
+                  <MaterialCommunityIcons
+                    name="signal"
+                    size={14}
+                    color={COLORS.text.secondary}
+                  />
+                  <Text style={styles.metadataText}>
+                    {moment.metadata.difficulty}
+                  </Text>
+                </View>
+              )}
+              {moment.metadata.beds && (
+                <View style={styles.metadataItem}>
+                  <MaterialCommunityIcons
+                    name="bed-outline"
+                    size={14}
+                    color={COLORS.text.secondary}
+                  />
+                  <Text style={styles.metadataText}>
+                    {moment.metadata.beds}
+                  </Text>
+                </View>
+              )}
+              {moment.metadata.baths && (
+                <View style={styles.metadataItem}>
+                  <MaterialCommunityIcons
+                    name="shower"
+                    size={14}
+                    color={COLORS.text.secondary}
+                  />
+                  <Text style={styles.metadataText}>
+                    {moment.metadata.baths}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* User Info */}
           <View style={styles.userRow}>
@@ -164,7 +291,7 @@ export const TMCard: React.FC<TMCardProps> = ({
               <MaterialCommunityIcons
                 name="check-decagram"
                 size={14}
-                color={COLORS.trust}
+                color={COLORS.trust.primary}
               />
             )}
           </View>
@@ -174,17 +301,17 @@ export const TMCard: React.FC<TMCardProps> = ({
             <View style={styles.actionRow}>
               {/* Price */}
               <View style={styles.priceContainer}>
-                <Text style={styles.priceLabel}>Gift for</Text>
+                <Text style={styles.priceLabel}>Hediye için</Text>
                 <Text style={styles.price}>
                   {currency}
                   {moment.price}
                 </Text>
               </View>
 
-              {/* CTA Buttons */}
+              {/* CTA Buttons - 16px balanced text */}
               <View style={styles.buttons}>
                 <Pressable style={styles.secondaryButton} onPress={onPress}>
-                  <Text style={styles.secondaryButtonText}>View</Text>
+                  <Text style={styles.secondaryButtonText}>Görüntüle</Text>
                 </Pressable>
 
                 {onGiftPress && (
@@ -203,7 +330,7 @@ export const TMCard: React.FC<TMCardProps> = ({
                         size={16}
                         color={COLORS.white}
                       />
-                      <Text style={styles.primaryButtonText}>Send gift</Text>
+                      <Text style={styles.primaryButtonText}>Hediye Gönder</Text>
                     </LinearGradient>
                   </Pressable>
                 )}
@@ -264,6 +391,24 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.captionSmall,
     color: COLORS.white,
   },
+  // Feature badge (Featured/Popular/New/Premium)
+  featureBadge: {
+    position: 'absolute',
+    top: SPACING.sm,
+    left: SPACING.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 6,
+    borderRadius: RADIUS.chip,
+  },
+  featureBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.white,
+    letterSpacing: 0.3,
+  },
   categoryBadge: {
     position: 'absolute',
     top: SPACING.sm,
@@ -282,11 +427,36 @@ const styles = StyleSheet.create({
   },
   title: {
     ...TYPOGRAPHY.h4,
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.xs,
   },
   titleCompact: {
     ...TYPOGRAPHY.label,
+  },
+  // Description - 14px body text for readability
+  description: {
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    color: COLORS.text.secondary,
+    marginBottom: SPACING.sm,
+  },
+  // Metadata row (duration, servings, etc.)
+  metadataRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.md,
+    marginBottom: SPACING.sm,
+  },
+  metadataItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metadataText: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: COLORS.text.secondary,
   },
   userRow: {
     flexDirection: 'row',
