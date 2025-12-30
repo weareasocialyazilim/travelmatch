@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { useBiometric } from '@/context/BiometricAuthContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { useScreenSecurity } from '@/hooks/useScreenSecurity';
@@ -453,10 +454,12 @@ const styles = StyleSheet.create({
   },
 });
 
-// Wrap with ScreenErrorBoundary for critical withdrawal functionality
+// Wrap with ScreenErrorBoundary and NetworkGuard for critical withdrawal functionality
 const WithdrawScreenWithErrorBoundary = (props: WithdrawScreenProps) => (
   <ScreenErrorBoundary>
-    <WithdrawScreen {...props} />
+    <NetworkGuard offlineMessage="Para çekme işlemi için internet bağlantısı gerekli.">
+      <WithdrawScreen {...props} />
+    </NetworkGuard>
   </ScreenErrorBoundary>
 );
 

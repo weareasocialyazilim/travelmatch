@@ -17,6 +17,7 @@ import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
 import { paymentService } from '@/services/paymentService';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Transaction } from '@/services/paymentService';
@@ -518,12 +519,14 @@ const styles = StyleSheet.create({
   },
 });
 
-// Wrap with ScreenErrorBoundary for critical transaction functionality
+// Wrap with ScreenErrorBoundary and NetworkGuard for critical transaction functionality
 const TransactionDetailScreenWithErrorBoundary = (
   props: TransactionDetailScreenProps,
 ) => (
   <ScreenErrorBoundary>
-    <TransactionDetailScreen {...props} />
+    <NetworkGuard offlineMessage="İşlem detaylarını görmek için internet bağlantısı gerekli.">
+      <TransactionDetailScreen {...props} />
+    </NetworkGuard>
   </ScreenErrorBoundary>
 );
 

@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { NEXT_STEPS } from './constants';
 import { kycStyles } from './styles';
 
@@ -87,4 +88,8 @@ const KYCPendingScreen: React.FC = () => {
   );
 };
 
-export default KYCPendingScreen;
+// Wrap with ErrorBoundary for critical KYC functionality
+export default withErrorBoundary(KYCPendingScreen, {
+  fallbackType: 'generic',
+  displayName: 'KYCPendingScreen',
+});
