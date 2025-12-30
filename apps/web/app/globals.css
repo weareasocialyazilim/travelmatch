@@ -129,6 +129,94 @@
   }
 }
 
+@layer components {
+  /* ═══════════════════════════════════════════
+     BUTTONS
+     ═══════════════════════════════════════════ */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-4
+           bg-gradient-hero text-white font-semibold rounded-2xl
+           shadow-button hover:shadow-lg hover:scale-[1.02]
+           transition-all duration-200 ease-out;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-4
+           bg-white text-stone-900 font-semibold rounded-2xl
+           border border-stone-200 hover:border-stone-300
+           hover:shadow-card transition-all duration-200 ease-out;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-4
+           bg-transparent text-stone-900 dark:text-white font-semibold rounded-2xl
+           border-2 border-stone-300 dark:border-white/30
+           hover:bg-stone-100 dark:hover:bg-white/10
+           transition-all duration-200 ease-out;
+  }
+
+  /* ═══════════════════════════════════════════
+     LAYOUT
+     ═══════════════════════════════════════════ */
+  .section-container {
+    @apply max-w-7xl mx-auto px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-16 lg:py-28;
+  }
+
+  /* ═══════════════════════════════════════════
+     TYPOGRAPHY
+     ═══════════════════════════════════════════ */
+  .heading-hero {
+    @apply text-hero-mobile lg:text-hero text-stone-900 dark:text-white;
+  }
+
+  .heading-display {
+    @apply text-display-mobile lg:text-display text-stone-900 dark:text-white;
+  }
+
+  /* ═══════════════════════════════════════════
+     CARDS
+     ═══════════════════════════════════════════ */
+  .card-base {
+    @apply bg-white dark:bg-stone-800 rounded-3xl shadow-card
+           border border-stone-100 dark:border-stone-700;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-2 shadow-card-hover;
+  }
+
+  /* Combined hover lift effect */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-card-hover;
+  }
+
+  /* ═══════════════════════════════════════════
+     BADGES
+     ═══════════════════════════════════════════ */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-trust {
+    @apply bg-trust/10 text-trust font-semibold px-2.5 py-1 rounded-lg;
+  }
+
+  /* ═══════════════════════════════════════════
+     TRUST GLOW
+     ═══════════════════════════════════════════ */
+  .trust-glow {
+    @apply shadow-trust-glow;
+  }
+}
+
 @layer utilities {
   /* ═══════════════════════════════════════════
      GLASS EFFECTS
@@ -186,6 +274,15 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* ═══════════════════════════════════════════
+     ANIMATION DELAYS
+     ═══════════════════════════════════════════ */
+  .animation-delay-100 { animation-delay: 0.1s; }
+  .animation-delay-200 { animation-delay: 0.2s; }
+  .animation-delay-300 { animation-delay: 0.3s; }
+  .animation-delay-400 { animation-delay: 0.4s; }
+  .animation-delay-500 { animation-delay: 0.5s; }
 }
 
 /* ═══════════════════════════════════════════

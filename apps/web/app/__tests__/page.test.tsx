@@ -15,6 +15,18 @@ jest.mock('next/link', () => {
   return MockLink;
 });
 
+// Mock Navbar component
+jest.mock('@/components/shared/Navbar', () => ({
+  Navbar: () => <nav data-testid="navbar">Navbar</nav>,
+}));
+
+// Mock TrustRing component
+jest.mock('@/components/ui/TrustRing', () => ({
+  TrustRing: ({ score }: { score: number }) => (
+    <div data-testid="trust-ring">{score}</div>
+  ),
+}));
+
 describe('Home Page', () => {
   beforeEach(() => {
     render(<Home />);
@@ -53,17 +65,20 @@ describe('Home Page', () => {
   });
 
   describe('Features Section', () => {
-    it('renders Trust Score feature', () => {
-      const elements = screen.getAllByText('Trust Score');
-      expect(elements.length).toBeGreaterThan(0);
+    it('renders Gift Experiences feature', () => {
+      expect(screen.getByText('Gift Experiences')).toBeInTheDocument();
     });
 
-    it('renders Gift Moments feature', () => {
-      expect(screen.getByText('Gift Moments')).toBeInTheDocument();
+    it('renders See the Proof feature', () => {
+      expect(screen.getByText('See the Proof')).toBeInTheDocument();
     });
 
-    it('renders Proof System feature', () => {
-      expect(screen.getByText('Proof System')).toBeInTheDocument();
+    it('renders Build Trust feature', () => {
+      expect(screen.getByText('Build Trust')).toBeInTheDocument();
+    });
+
+    it('renders section heading', () => {
+      expect(screen.getByText(/Why/i)).toBeInTheDocument();
     });
   });
 
@@ -73,20 +88,32 @@ describe('Home Page', () => {
       expect(screen.getByText('Works')).toBeInTheDocument();
     });
 
-    it('renders Create a Moment step', () => {
-      expect(screen.getByText('Create a Moment')).toBeInTheDocument();
+    it('renders Discover step', () => {
+      expect(screen.getByText('Discover')).toBeInTheDocument();
     });
 
-    it('renders Get Discovered step', () => {
-      expect(screen.getByText('Get Discovered')).toBeInTheDocument();
+    it('renders Gift step', () => {
+      expect(screen.getByText('Gift')).toBeInTheDocument();
     });
 
-    it('renders Receive a Gift step', () => {
-      expect(screen.getByText('Receive a Gift')).toBeInTheDocument();
+    it('renders Experience step', () => {
+      expect(screen.getByText('Experience')).toBeInTheDocument();
     });
 
-    it('renders Upload Proof step', () => {
-      expect(screen.getByText('Upload Proof')).toBeInTheDocument();
+    it('renders Prove step', () => {
+      expect(screen.getByText('Prove')).toBeInTheDocument();
+    });
+  });
+
+  describe('Trust Section', () => {
+    it('renders Trust System badge', () => {
+      expect(screen.getByText('Trust System')).toBeInTheDocument();
+    });
+
+    it('renders trust score verification features', () => {
+      expect(screen.getByText('Verified identity')).toBeInTheDocument();
+      expect(screen.getByText('AI proof verification')).toBeInTheDocument();
+      expect(screen.getByText('Community ratings')).toBeInTheDocument();
     });
   });
 
@@ -121,10 +148,6 @@ describe('Home Page', () => {
       expect(screen.getByText('Safety')).toBeInTheDocument();
     });
 
-    it('renders Community link', () => {
-      expect(screen.getByText('Community')).toBeInTheDocument();
-    });
-
     it('renders Contact link', () => {
       expect(screen.getByText('Contact')).toBeInTheDocument();
     });
@@ -153,6 +176,14 @@ describe('Home Page', () => {
     it('has correct href for partner link', () => {
       const partnerLink = screen.getByText('Partner with Us').closest('a');
       expect(partnerLink).toHaveAttribute('href', '/partner');
+    });
+  });
+
+  describe('No Testimonials', () => {
+    it('does not render testimonials section', () => {
+      // Verify testimonials section is not present
+      expect(screen.queryByText(/Loved by travelers/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/testimonial/i)).not.toBeInTheDocument();
     });
   });
 });
