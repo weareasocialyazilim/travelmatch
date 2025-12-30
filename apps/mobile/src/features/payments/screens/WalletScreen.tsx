@@ -31,6 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { useToast } from '@/context/ToastContext';
 import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -251,6 +252,10 @@ const WalletScreen = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <NetworkGuard
+        offlineMessage="Cüzdan bilgilerinizi görmek için internet bağlantısı gerekli."
+        onRetry={onRefresh}
+      >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -459,6 +464,7 @@ const WalletScreen = () => {
 
       {/* Bottom Navigation */}
       <BottomNav activeTab="Profile" />
+      </NetworkGuard>
     </SafeAreaView>
   );
 };
