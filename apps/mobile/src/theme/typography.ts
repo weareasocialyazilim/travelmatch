@@ -30,6 +30,13 @@ const DARK_COLORS = {
  * Typography Scale
  * Based on 8px grid system with modular scale (1.25 ratio)
  * Follows WCAG 2.1 Level AA accessibility guidelines
+ *
+ * TravelMatch "Cinematic Trust Jewelry" Typography:
+ * - Hero: 40px (Splash, Onboarding)
+ * - Display: 34px (Section titles)
+ * - Headings: 28px → 15px
+ * - Body: 17px → 13px
+ * - Caption: 13px → 11px
  */
 export const FONT_SIZES = {
   xs: 12,      // Caption, small labels
@@ -37,12 +44,13 @@ export const FONT_SIZES = {
   body: 14,    // Standard body text (from design reference)
   base: 15,    // Base/default
   md: 16,      // Subheadline, button text
-  lg: 17,      // h4 headers
+  lg: 17,      // h4 headers, bodyLarge
   xl: 20,      // h3 headers
-  '2xl': 24,   // Headline (h1/h2)
-  '3xl': 28,   // Display 3
-  '4xl': 32,   // Display 2
-  '5xl': 36,   // Display 1
+  '2xl': 24,   // Headline (h2)
+  '3xl': 28,   // h1
+  '4xl': 32,   // heroSmall
+  '5xl': 34,   // display
+  '6xl': 40,   // hero (largest)
 } as const;
 
 export const FONT_WEIGHTS = {
@@ -142,7 +150,54 @@ export const createTypography = (isDark = false) => {
   const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
 
   return {
-    // Display styles (largest) - for hero sections, landing pages
+    // ═══════════════════════════════════════════════════
+    // HERO - Splash, Onboarding (40px)
+    // "Cinematic Trust Jewelry" signature typography
+    // ═══════════════════════════════════════════════════
+    hero: {
+      fontSize: 40,
+      fontWeight: FONT_WEIGHTS.extrabold,
+      lineHeight: 44,
+      letterSpacing: -1.2,
+      color: colors.text.primary,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+
+    heroSmall: {
+      fontSize: 32,
+      fontWeight: FONT_WEIGHTS.extrabold,
+      lineHeight: 36,
+      letterSpacing: -0.8,
+      color: colors.text.primary,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+
+    // ═══════════════════════════════════════════════════
+    // DISPLAY - Section Titles (34px)
+    // ═══════════════════════════════════════════════════
+    display: {
+      fontSize: 34,
+      fontWeight: FONT_WEIGHTS.bold,
+      lineHeight: 38,
+      letterSpacing: -0.8,
+      color: colors.text.primary,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+
+    displaySmall: {
+      fontSize: 28,
+      fontWeight: FONT_WEIGHTS.bold,
+      lineHeight: 32,
+      letterSpacing: -0.5,
+      color: colors.text.primary,
+      accessibilityRole: 'header' as const,
+      minContrastRatio: 7,
+    } as TypographyStyle,
+
+    // Legacy display styles for backwards compatibility
     display1: {
       fontSize: FONT_SIZES['5xl'],
       fontWeight: FONT_WEIGHTS.extrabold,
@@ -504,23 +559,28 @@ export const TypographyAccessibility = {
 };
 
 /**
- * TYPE_SCALE - Backwards compatibility export with nested structure
+ * TYPE_SCALE - Comprehensive typography scale export
+ * TravelMatch "Cinematic Trust Jewelry" Design System
  */
 export const TYPE_SCALE = {
-  label: {
-    large: TYPOGRAPHY.labelLarge,
-    small: TYPOGRAPHY.labelSmall,
-    xsmall: TYPOGRAPHY.labelXSmall,
-    default: TYPOGRAPHY.label,
+  // Hero styles - Splash, Onboarding
+  hero: {
+    default: TYPOGRAPHY.hero,
+    small: TYPOGRAPHY.heroSmall,
   },
-  body: {
-    large: TYPOGRAPHY.bodyLarge,
-    small: TYPOGRAPHY.bodySmall,
-    medium: TYPOGRAPHY.bodyMedium,
-    default: TYPOGRAPHY.body,
-    base: TYPOGRAPHY.body,
-    caption: TYPOGRAPHY.caption, // Alias for backward compatibility
+  // Display styles - Section titles
+  display: {
+    default: TYPOGRAPHY.display,
+    small: TYPOGRAPHY.displaySmall,
+    // Legacy aliases
+    1: TYPOGRAPHY.display1,
+    2: TYPOGRAPHY.display2,
+    3: TYPOGRAPHY.display3,
+    h1: TYPOGRAPHY.display1,
+    h2: TYPOGRAPHY.display2,
+    h3: TYPOGRAPHY.display3,
   },
+  // Heading hierarchy
   heading: {
     h1: TYPOGRAPHY.h1,
     h2: TYPOGRAPHY.h2,
@@ -529,24 +589,35 @@ export const TYPE_SCALE = {
     h5: TYPOGRAPHY.h5,
     h6: TYPOGRAPHY.h6,
   },
-  display: {
-    1: TYPOGRAPHY.display1,
-    2: TYPOGRAPHY.display2,
-    3: TYPOGRAPHY.display3,
-    h1: TYPOGRAPHY.display1,
-    h2: TYPOGRAPHY.display2,
-    h3: TYPOGRAPHY.display3,
+  // Body text
+  body: {
+    large: TYPOGRAPHY.bodyLarge,
+    small: TYPOGRAPHY.bodySmall,
+    medium: TYPOGRAPHY.bodyMedium,
+    default: TYPOGRAPHY.body,
+    base: TYPOGRAPHY.body,
+    caption: TYPOGRAPHY.caption,
   },
+  // Labels
+  label: {
+    large: TYPOGRAPHY.labelLarge,
+    small: TYPOGRAPHY.labelSmall,
+    xsmall: TYPOGRAPHY.labelXSmall,
+    default: TYPOGRAPHY.label,
+  },
+  // Buttons
   button: {
     large: TYPOGRAPHY.buttonLarge,
     small: TYPOGRAPHY.buttonSmall,
     default: TYPOGRAPHY.button,
   },
+  // Captions
   caption: {
     default: TYPOGRAPHY.caption,
     medium: TYPOGRAPHY.captionMedium,
     small: TYPOGRAPHY.captionSmall,
   },
+  // Price/Stats - Tabular nums
   price: {
     large: TYPOGRAPHY.price,
     small: TYPOGRAPHY.priceSmall,
