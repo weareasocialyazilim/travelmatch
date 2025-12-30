@@ -1,5 +1,19 @@
 export type Role = 'Traveler' | 'Local';
+
+/**
+ * @deprecated Use KYCStatusNew for new code. Legacy status kept for backward compatibility.
+ */
 export type KYCStatus = 'Unverified' | 'Pending' | 'Verified';
+
+/**
+ * Unified KYC status matching database schema
+ */
+export type KYCStatusNew = 'not_started' | 'pending' | 'verified' | 'rejected';
+
+/**
+ * User account status
+ */
+export type UserAccountStatus = 'active' | 'suspended' | 'banned' | 'pending' | 'deleted';
 
 export interface UserLocation {
   lat: number;
@@ -22,7 +36,38 @@ export interface User {
   bio?: string;
   role: Role;
   type?: 'traveler' | 'local';
+  /**
+   * @deprecated Use kycStatus for new code
+   */
   kyc: KYCStatus;
+  /**
+   * Unified KYC status matching database schema
+   */
+  kycStatus?: KYCStatusNew;
+  /**
+   * User account status (active, suspended, banned, etc.)
+   */
+  status?: UserAccountStatus;
+  /**
+   * Whether user is banned
+   */
+  isBanned?: boolean;
+  /**
+   * Whether user is suspended
+   */
+  isSuspended?: boolean;
+  /**
+   * Reason for ban (if banned)
+   */
+  banReason?: string;
+  /**
+   * Reason for suspension (if suspended)
+   */
+  suspensionReason?: string;
+  /**
+   * When suspension ends (if suspended)
+   */
+  suspensionEndsAt?: string;
   location: UserLocation | string;
   trustScore?: number | null;
   isVerified?: boolean | null;

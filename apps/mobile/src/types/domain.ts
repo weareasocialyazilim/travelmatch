@@ -66,8 +66,22 @@ export interface Proof {
 
 // ========== Transaction Types ==========
 export type TransactionType = 'gift' | 'withdrawal' | 'refund' | 'deposit';
+/**
+ * @deprecated Use TransactionStatusUnified for new code
+ */
 export type TransactionStatus =
   | 'pending'
+  | 'completed'
+  | 'failed'
+  | 'cancelled'
+  | 'refunded';
+
+/**
+ * Unified transaction status matching all platforms
+ */
+export type TransactionStatusUnified =
+  | 'pending'
+  | 'processing'
   | 'completed'
   | 'failed'
   | 'cancelled'
@@ -148,6 +162,17 @@ export interface GiverSlot {
 }
 
 // ========== Moment Types ==========
+
+/**
+ * Moment lifecycle status (owner-controlled)
+ */
+export type MomentLifecycleStatus = 'draft' | 'active' | 'full' | 'paused' | 'completed' | 'cancelled' | 'deleted';
+
+/**
+ * Moment moderation status (admin-controlled)
+ */
+export type MomentModerationStatus = 'pending_review' | 'approved' | 'rejected' | 'flagged';
+
 export interface MomentLocation {
   name?: string;
   city: string;
@@ -187,7 +212,22 @@ export interface Moment {
   place?: string;
   giftCount?: number;
   distance?: string;
+  /**
+   * @deprecated Use lifecycleStatus for new code
+   */
   status?: 'active' | 'pending' | 'completed' | 'paused' | 'draft' | 'deleted'; // Owner view status
+  /**
+   * Moment lifecycle status (owner-controlled)
+   */
+  lifecycleStatus?: MomentLifecycleStatus;
+  /**
+   * Moment moderation status (admin-controlled)
+   */
+  moderationStatus?: MomentModerationStatus;
+  /**
+   * Reason for moderation action (if rejected/flagged)
+   */
+  moderationNotes?: string;
   date?: string; // Display date for moment
   completedDate?: string; // For completed moments
   rating?: number; // Rating for completed moments
