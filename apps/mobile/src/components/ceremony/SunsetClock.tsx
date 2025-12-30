@@ -109,7 +109,7 @@ const formatTimeRemaining = (deadline: Date): string => {
     return `${days} gün ${hours} saat`;
   }
   if (hours > 0) {
-    return `${hours} saat ${minutes} dk`;
+    return `${hours} saat ${minutes} dakika`;
   }
   return `${minutes} dakika`;
 };
@@ -158,8 +158,10 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
 
         // Haptic feedback on phase change
         if (enableHaptics) {
-          if (newPhase === 'urgent' || newPhase === 'twilight') {
+          if (newPhase === 'warning') {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          } else if (newPhase === 'urgent' || newPhase === 'twilight') {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
           } else if (newPhase === 'expired') {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
             onExpire?.();
@@ -181,6 +183,17 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
 
     return () => clearInterval(interval);
   }, [deadline, enableHaptics, onExpire]);
+
+  // Twilight pulse haptic - every 30 seconds in last hour
+  useEffect(() => {
+    if (!enableHaptics || phase !== 'twilight') return;
+
+    const pulseInterval = setInterval(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }, 30000); // Every 30 seconds
+
+    return () => clearInterval(pulseInterval);
+  }, [phase, enableHaptics]);
 
   // Sun glow animation
   useEffect(() => {
