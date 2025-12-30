@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -31,21 +32,10 @@ import {
   AdminLineChart,
   CHART_COLORS,
 } from '@/components/common/admin-chart';
-import { formatCurrency } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
+import { useStats } from '@/hooks/use-stats';
 
-// Mock data - Enhanced with sparklines
-const overviewStats = {
-  totalUsers: 125000,
-  userGrowth: 8.5,
-  activeUsers: 45000,
-  activeGrowth: 12.3,
-  totalRevenue: 4850000,
-  revenueGrowth: 15.2,
-  totalMoments: 89000,
-  momentGrowth: 22.4,
-};
-
+// Chart data - will be replaced with real API data in future
 const userActivityData = [
   { date: '12 Ara', users: 3200, newUsers: 180 },
   { date: '13 Ara', users: 3450, newUsers: 195 },
@@ -155,6 +145,9 @@ const generateSparkline = (trend: 'up' | 'down' | 'stable') => {
 };
 
 export default function DashboardPage() {
+  // Use real API data for stats
+  const { data: stats, isLoading, error } = useStats();
+
   const getStatusIcon = (
     status: 'healthy' | 'degraded' | 'down' | 'maintenance',
   ) => {
@@ -191,6 +184,18 @@ export default function DashboardPage() {
     }
   };
 
+  if (error) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
+          <p className="text-muted-foreground">İstatistikler yüklenemedi. Lütfen tekrar deneyin.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-content space-y-6">
       {/* Header */}
@@ -201,22 +206,22 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Key Metrics - Using new StatCard */}
+      {/* Key Metrics - Using real data from API */}
       <div className="dashboard-grid">
         <StatCard
           title="Toplam Kullanıcı"
-          value={overviewStats.totalUsers.toLocaleString('tr-TR')}
+          value={isLoading ? '...' : (stats?.totalUsers || stats?.total_users || 0).toLocaleString('tr-TR')}
           icon={Users}
-          change={overviewStats.userGrowth}
+          change={stats?.userGrowth || 0}
           changeLabel="son 30 gün"
           href="/users"
           sparkline={generateSparkline('up')}
         />
         <StatCard
           title="Aktif Kullanıcı"
-          value={overviewStats.activeUsers.toLocaleString('tr-TR')}
+          value={isLoading ? '...' : (stats?.activeUsers || stats?.active_users_24h || 0).toLocaleString('tr-TR')}
           icon={Activity}
-          change={overviewStats.activeGrowth}
+          change={stats?.activeGrowth || 0}
           changeLabel="son 7 gün"
           variant="success"
           href="/analytics"
@@ -224,9 +229,9 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Toplam Gelir"
-          value={formatCurrency(overviewStats.totalRevenue, 'TRY')}
+          value={isLoading ? '...' : formatCurrency(stats?.totalRevenue || 0, 'TRY')}
           icon={DollarSign}
-          change={overviewStats.revenueGrowth}
+          change={stats?.revenueGrowth || 0}
           changeLabel="son 30 gün"
           variant="success"
           href="/revenue"
@@ -234,9 +239,9 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Toplam Moment"
-          value={overviewStats.totalMoments.toLocaleString('tr-TR')}
+          value={isLoading ? '...' : (stats?.totalMoments || stats?.total_moments || 0).toLocaleString('tr-TR')}
           icon={Camera}
-          change={overviewStats.momentGrowth}
+          change={stats?.momentGrowth || 0}
           changeLabel="son 30 gün"
           href="/moments"
           sparkline={generateSparkline('up')}
@@ -393,7 +398,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Revenue Summary Mini Card */}
+          {/* Today's Summary - Using real data */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
@@ -401,34 +406,40 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Yeni Kayıt
-                  </span>
-                  <span className="text-sm font-semibold">+248</span>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Aktif Oturum
-                  </span>
-                  <span className="text-sm font-semibold">3,892</span>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Yeni Kayıt
+                    </span>
+                    <span className="text-sm font-semibold">+{stats?.todayRegistrations || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Aktif Oturum
+                    </span>
+                    <span className="text-sm font-semibold">{(stats?.activeSessions || 0).toLocaleString('tr-TR')}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Günlük Gelir
+                    </span>
+                    <span className="text-sm font-semibold text-emerald-600">
+                      {formatCurrency(stats?.todayRevenue || stats?.today_revenue || 0, 'TRY')}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Yeni Moment
+                    </span>
+                    <span className="text-sm font-semibold">{stats?.todayMoments || 0}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Günlük Gelir
-                  </span>
-                  <span className="text-sm font-semibold text-emerald-600">
-                    ₺48,750
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Yeni Moment
-                  </span>
-                  <span className="text-sm font-semibold">1,234</span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>

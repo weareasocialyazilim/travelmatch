@@ -12,6 +12,8 @@ import {
   Download,
   CreditCard,
   Wallet,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,86 +28,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
 import { formatCurrency, formatRelativeDate, getInitials } from '@/lib/utils';
-
-// Mock data
-const mockTransactions = [
-  {
-    id: 't1',
-    type: 'payment',
-    amount: 1500,
-    currency: 'TRY',
-    status: 'completed',
-    user: { id: 'u1', full_name: 'Ali Veli', avatar_url: null },
-    description: 'Seyahat ödemesi',
-    created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-  {
-    id: 't2',
-    type: 'payout',
-    amount: 850,
-    currency: 'TRY',
-    status: 'pending',
-    user: { id: 'u2', full_name: 'Ayşe Yılmaz', avatar_url: null },
-    description: 'Kazanç çekimi',
-    created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-  },
-  {
-    id: 't3',
-    type: 'refund',
-    amount: 300,
-    currency: 'TRY',
-    status: 'completed',
-    user: { id: 'u3', full_name: 'Mehmet Demir', avatar_url: null },
-    description: 'İptal iadesi',
-    created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-  },
-  {
-    id: 't4',
-    type: 'payment',
-    amount: 2200,
-    currency: 'TRY',
-    status: 'failed',
-    user: { id: 'u4', full_name: 'Zeynep Kara', avatar_url: null },
-    description: 'Seyahat ödemesi',
-    created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-  },
-];
-
-const mockPayouts = [
-  {
-    id: 'p1',
-    amount: 2500,
-    currency: 'TRY',
-    status: 'pending',
-    user: { id: 'u1', full_name: 'Ali Veli', avatar_url: null },
-    bank_account: 'TR** **** **** **** **** 1234',
-    created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-  },
-  {
-    id: 'p2',
-    amount: 1800,
-    currency: 'TRY',
-    status: 'pending',
-    user: { id: 'u2', full_name: 'Ayşe Yılmaz', avatar_url: null },
-    bank_account: 'TR** **** **** **** **** 5678',
-    created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-  },
-  {
-    id: 'p3',
-    amount: 950,
-    currency: 'TRY',
-    status: 'approved',
-    user: { id: 'u3', full_name: 'Mehmet Demir', avatar_url: null },
-    bank_account: 'TR** **** **** **** **** 9012',
-    created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-  },
-];
+import { useFinance } from '@/hooks/use-finance';
 
 const transactionTypeConfig = {
   payment: { label: 'Ödeme', icon: ArrowUpRight, color: 'text-green-600' },
+  subscription: { label: 'Abonelik', icon: ArrowUpRight, color: 'text-green-600' },
+  boost: { label: 'Boost', icon: ArrowUpRight, color: 'text-blue-600' },
   payout: { label: 'Çekim', icon: ArrowDownRight, color: 'text-blue-600' },
   refund: { label: 'İade', icon: ArrowDownRight, color: 'text-orange-600' },
+  gift: { label: 'Hediye', icon: DollarSign, color: 'text-purple-600' },
   fee: { label: 'Komisyon', icon: DollarSign, color: 'text-purple-600' },
 };
 
@@ -121,11 +54,45 @@ const statusConfig = {
 export default function FinancePage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
-  const pendingPayoutsCount = mockPayouts.filter((p) => p.status === 'pending').length;
-  const pendingPayoutsTotal = mockPayouts
-    .filter((p) => p.status === 'pending')
-    .reduce((sum, p) => sum + p.amount, 0);
+  // Use real API data
+  const { data, isLoading, error } = useFinance({ period });
+
+  const transactions = data?.transactions || [];
+  const summary = data?.summary || {
+    totalRevenue: 0,
+    totalRefunds: 0,
+    subscriptionRevenue: 0,
+    boostRevenue: 0,
+    transactionCount: 0,
+  };
+
+  // Filter transactions
+  const filteredTransactions = transactions.filter((tx) => {
+    const matchesSearch =
+      search === '' ||
+      tx.id.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || tx.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  // Pending payouts (filter by type)
+  const pendingPayouts = transactions.filter((tx) => tx.status === 'pending');
+  const pendingPayoutsCount = pendingPayouts.length;
+  const pendingPayoutsTotal = pendingPayouts.reduce((sum, p) => sum + p.amount, 0);
+
+  if (error) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
+          <p className="text-muted-foreground">Finansal veriler yüklenemedi. Lütfen tekrar deneyin.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -137,46 +104,62 @@ export default function FinancePage() {
             Ödemeleri, çekimleri ve finansal işlemleri yönetin
           </p>
         </div>
-        <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" />
-          Rapor İndir
-        </Button>
+        <div className="flex items-center gap-2">
+          <Select value={period} onValueChange={(v) => setPeriod(v as '7d' | '30d' | '90d')}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">7 gün</SelectItem>
+              <SelectItem value="30d">30 gün</SelectItem>
+              <SelectItem value="90d">90 gün</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            Rapor İndir
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bugünkü Gelir</CardTitle>
+            <CardTitle className="text-sm font-medium">Toplam Gelir</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(12450)}</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatCurrency(summary.totalRevenue)}
+            </div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+12%</span> dünden
+              Son {period === '7d' ? '7 gün' : period === '30d' ? '30 gün' : '90 gün'}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aylık Gelir</CardTitle>
+            <CardTitle className="text-sm font-medium">Abonelik Geliri</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(324500)}</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatCurrency(summary.subscriptionRevenue)}
+            </div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+8%</span> geçen aydan
+              Toplam gelirin %{summary.totalRevenue > 0 ? Math.round((summary.subscriptionRevenue / summary.totalRevenue) * 100) : 0}'i
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bekleyen Ödemeler</CardTitle>
+            <CardTitle className="text-sm font-medium">Bekleyen İşlemler</CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {pendingPayoutsCount}
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : pendingPayoutsCount}
             </div>
             <p className="text-xs text-muted-foreground">
               Toplam {formatCurrency(pendingPayoutsTotal)}
@@ -185,96 +168,31 @@ export default function FinancePage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Platform Bakiyesi</CardTitle>
+            <CardTitle className="text-sm font-medium">Toplam İşlem</CardTitle>
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(89750)}</div>
-            <p className="text-xs text-muted-foreground">Kullanılabilir</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : summary.transactionCount}
+            </div>
+            <p className="text-xs text-muted-foreground">Bu dönem</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="payouts" className="space-y-4">
+      <Tabs defaultValue="transactions" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="transactions">İşlem Geçmişi</TabsTrigger>
           <TabsTrigger value="payouts">
-            Ödeme Onayları
+            Bekleyen Ödemeler
             {pendingPayoutsCount > 0 && (
               <Badge variant="warning" className="ml-2">
                 {pendingPayoutsCount}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="transactions">İşlem Geçmişi</TabsTrigger>
         </TabsList>
-
-        {/* Payouts Tab */}
-        <TabsContent value="payouts">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bekleyen Ödemeler</CardTitle>
-              <CardDescription>
-                Kullanıcı çekim taleplerini inceleyin ve onaylayın
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockPayouts.map((payout) => {
-                  const statusInfo = statusConfig[payout.status as keyof typeof statusConfig];
-
-                  return (
-                    <div
-                      key={payout.id}
-                      className="flex items-center justify-between rounded-lg border p-4"
-                    >
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={payout.user.avatar_url || undefined} />
-                          <AvatarFallback>
-                            {getInitials(payout.user.full_name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{payout.user.full_name}</span>
-                            <Badge variant={statusInfo.variant}>
-                              {statusInfo.label}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{payout.bank_account}</span>
-                            <span>•</span>
-                            <span>{formatRelativeDate(payout.created_at)}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <div className="text-lg font-bold">
-                            {formatCurrency(payout.amount)}
-                          </div>
-                        </div>
-                        {payout.status === 'pending' && (
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline">
-                              <XCircle className="mr-1 h-4 w-4" />
-                              Reddet
-                            </Button>
-                            <Button size="sm">
-                              <CheckCircle className="mr-1 h-4 w-4" />
-                              Onayla
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Transactions Tab */}
         <TabsContent value="transactions">
@@ -295,7 +213,7 @@ export default function FinancePage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    placeholder="Kullanıcı veya işlem ara..."
+                    placeholder="İşlem ID ara..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-10"
@@ -314,55 +232,158 @@ export default function FinancePage() {
                 </Select>
               </div>
 
-              {/* Transaction List */}
-              <div className="rounded-md border">
-                <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 border-b bg-muted/50 px-4 py-3 text-sm font-medium text-muted-foreground">
-                  <div>Kullanıcı</div>
-                  <div>Tür</div>
-                  <div>Tutar</div>
-                  <div>Durum</div>
-                  <div>Tarih</div>
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
-                {mockTransactions.map((tx) => {
-                  const typeInfo = transactionTypeConfig[tx.type as keyof typeof transactionTypeConfig];
-                  const statusInfo = statusConfig[tx.status as keyof typeof statusConfig];
-                  const TypeIcon = typeInfo.icon;
+              )}
 
-                  return (
-                    <div
-                      key={tx.id}
-                      className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 border-b px-4 py-3 last:border-0"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={tx.user.avatar_url || undefined} />
-                          <AvatarFallback className="text-xs">
-                            {getInitials(tx.user.full_name)}
-                          </AvatarFallback>
-                        </Avatar>
+              {/* Transaction List */}
+              {!isLoading && (
+                <div className="rounded-md border">
+                  <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 border-b bg-muted/50 px-4 py-3 text-sm font-medium text-muted-foreground">
+                    <div>İşlem ID</div>
+                    <div>Tür</div>
+                    <div>Tutar</div>
+                    <div>Durum</div>
+                    <div>Tarih</div>
+                  </div>
+                  {filteredTransactions.map((tx) => {
+                    const typeInfo = transactionTypeConfig[tx.type as keyof typeof transactionTypeConfig] ||
+                      { label: tx.type, icon: DollarSign, color: 'text-gray-600' };
+                    const statusInfo = statusConfig[tx.status as keyof typeof statusConfig] ||
+                      { label: tx.status, variant: 'secondary' as const };
+                    const TypeIcon = typeInfo.icon;
+
+                    return (
+                      <div
+                        key={tx.id}
+                        className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 border-b px-4 py-3 last:border-0"
+                      >
                         <div>
-                          <div className="font-medium">{tx.user.full_name}</div>
+                          <div className="font-medium font-mono text-sm">{tx.id}</div>
                           <div className="text-xs text-muted-foreground">
-                            {tx.description}
+                            User: {tx.user_id}
                           </div>
                         </div>
+                        <div className="flex items-center gap-1">
+                          <TypeIcon className={`h-4 w-4 ${typeInfo.color}`} />
+                          <span className={typeInfo.color}>{typeInfo.label}</span>
+                        </div>
+                        <div className="text-right font-medium">
+                          {tx.type === 'refund' ? '-' : '+'}
+                          {formatCurrency(tx.amount, tx.currency)}
+                        </div>
+                        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                        <div className="text-sm text-muted-foreground">
+                          {formatRelativeDate(tx.created_at)}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <TypeIcon className={`h-4 w-4 ${typeInfo.color}`} />
-                        <span className={typeInfo.color}>{typeInfo.label}</span>
+                    );
+                  })}
+                </div>
+              )}
+
+              {!isLoading && filteredTransactions.length === 0 && (
+                <div className="py-12 text-center">
+                  <DollarSign className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <h3 className="mt-4 text-lg font-semibold">İşlem bulunamadı</h3>
+                  <p className="text-muted-foreground">
+                    Arama kriterlerine uygun işlem yok
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Payouts Tab */}
+        <TabsContent value="payouts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Bekleyen Ödemeler</CardTitle>
+              <CardDescription>
+                Kullanıcı çekim taleplerini inceleyin ve onaylayın
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {pendingPayouts.map((payout) => {
+                    const statusInfo = statusConfig[payout.status as keyof typeof statusConfig] ||
+                      { label: payout.status, variant: 'secondary' as const };
+
+                    return (
+                      <div
+                        key={payout.id}
+                        className="flex items-center justify-between rounded-lg border p-4"
+                      >
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-10 w-10">
+                            <AvatarFallback>
+                              {getInitials(payout.user_id)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">{payout.id}</span>
+                              <Badge variant={statusInfo.variant}>
+                                {statusInfo.label}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span>User: {payout.user_id}</span>
+                              <span>•</span>
+                              <span>{formatRelativeDate(payout.created_at)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <div className="text-lg font-bold">
+                              {formatCurrency(payout.amount, payout.currency)}
+                            </div>
+                          </div>
+                          {payout.status === 'pending' && (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => toast.info('İade işlemi henüz bağlı değil')}
+                              >
+                                <XCircle className="mr-1 h-4 w-4" />
+                                Reddet
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => toast.info('Onay işlemi henüz bağlı değil')}
+                              >
+                                <CheckCircle className="mr-1 h-4 w-4" />
+                                Onayla
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-right font-medium">
-                        {tx.type === 'payment' ? '+' : '-'}
-                        {formatCurrency(tx.amount)}
-                      </div>
-                      <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
-                      <div className="text-sm text-muted-foreground">
-                        {formatRelativeDate(tx.created_at)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {!isLoading && pendingPayouts.length === 0 && (
+                <div className="py-12 text-center">
+                  <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+                  <h3 className="mt-4 text-lg font-semibold">Bekleyen ödeme yok</h3>
+                  <p className="text-muted-foreground">
+                    Tüm ödemeler işlenmiş durumda
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

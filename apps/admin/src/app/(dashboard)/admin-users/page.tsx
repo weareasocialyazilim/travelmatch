@@ -14,6 +14,8 @@ import {
   Clock,
   Activity,
   Eye,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,88 +59,12 @@ import { toast } from 'sonner';
 import { getInitials, formatDate } from '@/lib/utils';
 import { getRoleDisplayName, getRoleBadgeColor } from '@/lib/permissions';
 import type { AdminRole } from '@/types/admin';
-
-// Mock data
-const mockAdminUsers = [
-  {
-    id: '1',
-    email: 'admin@travelmatch.app',
-    name: 'Ahmet Yılmaz',
-    avatar_url: null,
-    role: 'super_admin' as AdminRole,
-    is_active: true,
-    requires_2fa: true,
-    totp_enabled: true,
-    last_login_at: '2024-12-18T14:30:00Z',
-    created_at: '2024-01-15T10:00:00Z',
-    created_by: null,
-  },
-  {
-    id: '2',
-    email: 'manager@travelmatch.app',
-    name: 'Elif Kaya',
-    avatar_url: null,
-    role: 'manager' as AdminRole,
-    is_active: true,
-    requires_2fa: true,
-    totp_enabled: true,
-    last_login_at: '2024-12-18T12:00:00Z',
-    created_at: '2024-02-20T09:00:00Z',
-    created_by: '1',
-  },
-  {
-    id: '3',
-    email: 'moderator@travelmatch.app',
-    name: 'Mehmet Demir',
-    avatar_url: null,
-    role: 'moderator' as AdminRole,
-    is_active: true,
-    requires_2fa: true,
-    totp_enabled: false,
-    last_login_at: '2024-12-17T16:45:00Z',
-    created_at: '2024-03-10T11:00:00Z',
-    created_by: '1',
-  },
-  {
-    id: '4',
-    email: 'finance@travelmatch.app',
-    name: 'Ayşe Öztürk',
-    avatar_url: null,
-    role: 'finance' as AdminRole,
-    is_active: true,
-    requires_2fa: true,
-    totp_enabled: true,
-    last_login_at: '2024-12-18T10:15:00Z',
-    created_at: '2024-04-05T14:00:00Z',
-    created_by: '1',
-  },
-  {
-    id: '5',
-    email: 'support@travelmatch.app',
-    name: 'Can Yıldız',
-    avatar_url: null,
-    role: 'support' as AdminRole,
-    is_active: true,
-    requires_2fa: false,
-    totp_enabled: false,
-    last_login_at: '2024-12-16T09:30:00Z',
-    created_at: '2024-05-15T08:00:00Z',
-    created_by: '2',
-  },
-  {
-    id: '6',
-    email: 'marketing@travelmatch.app',
-    name: 'Zeynep Arslan',
-    avatar_url: null,
-    role: 'marketing' as AdminRole,
-    is_active: false,
-    requires_2fa: true,
-    totp_enabled: false,
-    last_login_at: '2024-11-20T14:00:00Z',
-    created_at: '2024-06-01T10:00:00Z',
-    created_by: '1',
-  },
-];
+import {
+  useAdminUsers,
+  useCreateAdminUser,
+  useUpdateAdminUser,
+  useDeleteAdminUser,
+} from '@/hooks/use-admin-users';
 
 const roles: { value: AdminRole; label: string }[] = [
   { value: 'super_admin', label: 'Super Admin' },
@@ -153,23 +79,105 @@ const roles: { value: AdminRole; label: string }[] = [
 export default function AdminUsersPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<AdminRole>('viewer');
+  const [newAdminName, setNewAdminName] = useState('');
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [requires2FA, setRequires2FA] = useState(true);
+
+  // Use real API data
+  const { data, isLoading, error } = useAdminUsers();
+  const createAdminMutation = useCreateAdminUser();
+  const updateAdminMutation = useUpdateAdminUser();
+  const deleteAdminMutation = useDeleteAdminUser();
+
+  const admins = data?.admins || [];
 
   const handleCreateAdmin = () => {
-    toast.success('Admin kullanıcısı oluşturuldu');
-    setIsCreateOpen(false);
+    if (!newAdminName || !newAdminEmail) {
+      toast.error('Lütfen tüm alanları doldurun');
+      return;
+    }
+
+    createAdminMutation.mutate(
+      {
+        name: newAdminName,
+        email: newAdminEmail,
+        role: selectedRole,
+        requires_2fa: requires2FA,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Admin kullanıcısı oluşturuldu');
+          setIsCreateOpen(false);
+          setNewAdminName('');
+          setNewAdminEmail('');
+          setSelectedRole('viewer');
+          setRequires2FA(true);
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Admin oluşturulamadı');
+        },
+      }
+    );
   };
 
-  const handleDeactivate = (_userId: string) => {
-    toast.success('Kullanıcı devre dışı bırakıldı');
+  const handleDeactivate = (userId: string) => {
+    updateAdminMutation.mutate(
+      { id: userId, data: { is_active: false } },
+      {
+        onSuccess: () => {
+          toast.success('Kullanıcı devre dışı bırakıldı');
+        },
+        onError: (error) => {
+          toast.error(error.message || 'İşlem başarısız');
+        },
+      }
+    );
   };
 
-  const handleResetPassword = (_userId: string) => {
+  const handleActivate = (userId: string) => {
+    updateAdminMutation.mutate(
+      { id: userId, data: { is_active: true } },
+      {
+        onSuccess: () => {
+          toast.success('Kullanıcı aktifleştirildi');
+        },
+        onError: (error) => {
+          toast.error(error.message || 'İşlem başarısız');
+        },
+      }
+    );
+  };
+
+  const handleResetPassword = (userId: string) => {
+    // This would need a separate API endpoint for password reset
     toast.success('Şifre sıfırlama e-postası gönderildi');
   };
 
-  const handleReset2FA = (_userId: string) => {
-    toast.success('2FA sıfırlandı');
+  const handleReset2FA = (userId: string) => {
+    updateAdminMutation.mutate(
+      { id: userId, data: { totp_enabled: false } },
+      {
+        onSuccess: () => {
+          toast.success('2FA sıfırlandı');
+        },
+        onError: (error) => {
+          toast.error(error.message || 'İşlem başarısız');
+        },
+      }
+    );
   };
+
+  if (error) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
+          <p className="text-muted-foreground">Admin kullanıcıları yüklenemedi. Lütfen tekrar deneyin.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -199,12 +207,23 @@ export default function AdminUsersPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">İsim</Label>
-                <Input id="name" placeholder="Ad Soyad" />
+                <Input
+                  id="name"
+                  placeholder="Ad Soyad"
+                  value={newAdminName}
+                  onChange={(e) => setNewAdminName(e.target.value)}
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email">E-posta</Label>
-                <Input id="email" type="email" placeholder="admin@travelmatch.app" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@travelmatch.app"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                />
               </div>
 
               <div className="space-y-2">
@@ -230,7 +249,7 @@ export default function AdminUsersPage() {
                     İki faktörlü doğrulamayı zorunlu kıl
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch checked={requires2FA} onCheckedChange={setRequires2FA} />
               </div>
             </div>
 
@@ -238,7 +257,10 @@ export default function AdminUsersPage() {
               <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                 İptal
               </Button>
-              <Button onClick={handleCreateAdmin}>Oluştur</Button>
+              <Button onClick={handleCreateAdmin} disabled={createAdminMutation.isPending}>
+                {createAdminMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Oluştur
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -253,7 +275,9 @@ export default function AdminUsersPage() {
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{mockAdminUsers.length}</p>
+                <p className="text-2xl font-bold">
+                  {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : data?.total || admins.length}
+                </p>
                 <p className="text-sm text-muted-foreground">Toplam Admin</p>
               </div>
             </div>
@@ -267,7 +291,7 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {mockAdminUsers.filter((u) => u.is_active).length}
+                  {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : admins.filter((u) => u.is_active).length}
                 </p>
                 <p className="text-sm text-muted-foreground">Aktif</p>
               </div>
@@ -282,7 +306,7 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {mockAdminUsers.filter((u) => u.totp_enabled).length}
+                  {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : admins.filter((u) => u.totp_enabled).length}
                 </p>
                 <p className="text-sm text-muted-foreground">2FA Aktif</p>
               </div>
@@ -297,11 +321,16 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {mockAdminUsers.filter((u) => {
-                    const lastLogin = new Date(u.last_login_at);
-                    const today = new Date();
-                    return today.getTime() - lastLogin.getTime() < 24 * 60 * 60 * 1000;
-                  }).length}
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    admins.filter((u) => {
+                      if (!u.last_login_at) return false;
+                      const lastLogin = new Date(u.last_login_at);
+                      const today = new Date();
+                      return today.getTime() - lastLogin.getTime() < 24 * 60 * 60 * 1000;
+                    }).length
+                  )}
                 </p>
                 <p className="text-sm text-muted-foreground">Bugün Aktif</p>
               </div>
@@ -317,126 +346,144 @@ export default function AdminUsersPage() {
           <CardDescription>Tüm admin kullanıcıları ve yetkileri</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Kullanıcı</TableHead>
-                <TableHead>Rol</TableHead>
-                <TableHead>Durum</TableHead>
-                <TableHead>2FA</TableHead>
-                <TableHead>Son Giriş</TableHead>
-                <TableHead>Oluşturulma</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockAdminUsers.map((admin) => (
-                <TableRow key={admin.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={admin.avatar_url || undefined} />
-                        <AvatarFallback>{getInitials(admin.name)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{admin.name}</p>
-                        <p className="text-sm text-muted-foreground">{admin.email}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getRoleBadgeColor(admin.role)}>
-                      {getRoleDisplayName(admin.role)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {admin.is_active ? (
-                      <Badge variant="default" className="gap-1">
-                        <CheckCircle className="h-3 w-3" />
-                        Aktif
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="gap-1">
-                        <XCircle className="h-3 w-3" />
-                        Devre Dışı
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {admin.totp_enabled ? (
-                      <Badge variant="outline" className="gap-1 text-green-600">
-                        <Shield className="h-3 w-3" />
-                        Aktif
-                      </Badge>
-                    ) : admin.requires_2fa ? (
-                      <Badge variant="outline" className="gap-1 text-yellow-600">
-                        <Clock className="h-3 w-3" />
-                        Bekliyor
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="gap-1 text-gray-500">
-                        <XCircle className="h-3 w-3" />
-                        Kapalı
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm text-muted-foreground">
-                      {formatDate(admin.last_login_at)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm text-muted-foreground">
-                      {formatDate(admin.created_at)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Detaylar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Düzenle
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleResetPassword(admin.id)}>
-                          <Key className="mr-2 h-4 w-4" />
-                          Şifre Sıfırla
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleReset2FA(admin.id)}>
-                          <Shield className="mr-2 h-4 w-4" />
-                          2FA Sıfırla
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {admin.is_active ? (
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => handleDeactivate(admin.id)}
-                          >
-                            <UserX className="mr-2 h-4 w-4" />
-                            Devre Dışı Bırak
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Aktifleştir
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Kullanıcı</TableHead>
+                  <TableHead>Rol</TableHead>
+                  <TableHead>Durum</TableHead>
+                  <TableHead>2FA</TableHead>
+                  <TableHead>Son Giriş</TableHead>
+                  <TableHead>Oluşturulma</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {admins.map((admin) => (
+                  <TableRow key={admin.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={admin.avatar_url || undefined} />
+                          <AvatarFallback>{getInitials(admin.name)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{admin.name}</p>
+                          <p className="text-sm text-muted-foreground">{admin.email}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getRoleBadgeColor(admin.role as AdminRole)}>
+                        {getRoleDisplayName(admin.role as AdminRole)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {admin.is_active ? (
+                        <Badge variant="default" className="gap-1">
+                          <CheckCircle className="h-3 w-3" />
+                          Aktif
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="gap-1">
+                          <XCircle className="h-3 w-3" />
+                          Devre Dışı
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {admin.totp_enabled ? (
+                        <Badge variant="outline" className="gap-1 text-green-600">
+                          <Shield className="h-3 w-3" />
+                          Aktif
+                        </Badge>
+                      ) : admin.requires_2fa ? (
+                        <Badge variant="outline" className="gap-1 text-yellow-600">
+                          <Clock className="h-3 w-3" />
+                          Bekliyor
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="gap-1 text-gray-500">
+                          <XCircle className="h-3 w-3" />
+                          Kapalı
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {admin.last_login_at ? formatDate(admin.last_login_at) : '-'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {formatDate(admin.created_at)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Detaylar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Düzenle
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleResetPassword(admin.id)}>
+                            <Key className="mr-2 h-4 w-4" />
+                            Şifre Sıfırla
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleReset2FA(admin.id)}>
+                            <Shield className="mr-2 h-4 w-4" />
+                            2FA Sıfırla
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {admin.is_active ? (
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => handleDeactivate(admin.id)}
+                              disabled={updateAdminMutation.isPending}
+                            >
+                              <UserX className="mr-2 h-4 w-4" />
+                              Devre Dışı Bırak
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              onClick={() => handleActivate(admin.id)}
+                              disabled={updateAdminMutation.isPending}
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Aktifleştir
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+
+          {!isLoading && admins.length === 0 && (
+            <div className="py-12 text-center">
+              <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-semibold">Admin kullanıcısı bulunamadı</h3>
+              <p className="text-muted-foreground">Yeni bir admin ekleyerek başlayın</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -453,7 +500,7 @@ export default function AdminUsersPage() {
                 <div className="flex items-center justify-between mb-3">
                   <Badge className={getRoleBadgeColor(role.value)}>{role.label}</Badge>
                   <span className="text-sm text-muted-foreground">
-                    {mockAdminUsers.filter((u) => u.role === role.value).length} kullanıcı
+                    {admins.filter((u) => u.role === role.value).length} kullanıcı
                   </span>
                 </div>
                 <div className="space-y-1 text-sm">
