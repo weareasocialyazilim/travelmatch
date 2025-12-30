@@ -33,6 +33,7 @@ import Animated, {
 import { COLORS } from '../../constants/colors';
 import { STORY_DURATION } from './constants';
 import type { UserStory, Story } from './types';
+import { StoryActionBar } from './StoryActionBar';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -47,6 +48,12 @@ interface StoryViewerProps {
   onUserPress: (userId: string) => void;
   isPaused: boolean;
   setIsPaused: (paused: boolean) => void;
+  // Social interactions (Reels-style)
+  onLike?: (storyId: string) => void;
+  onComment?: (storyId: string) => void;
+  onShare?: (storyId: string) => void;
+  onSave?: (storyId: string) => void;
+  showActionBar?: boolean;
 }
 
 export const StoryViewer: React.FC<StoryViewerProps> = ({
@@ -60,6 +67,11 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
   onUserPress,
   isPaused,
   setIsPaused,
+  onLike,
+  onComment,
+  onShare,
+  onSave,
+  showActionBar = true,
 }) => {
   const insets = useSafeAreaInsets();
 
@@ -249,54 +261,74 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
 
           {/* Bottom Section: Info Card */}
           <View style={styles.bottomSection} pointerEvents="box-none">
-            <View style={styles.infoCard}>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoTitle} numberOfLines={1}>
-                  {currentStory?.title}
-                </Text>
-                <Text style={styles.infoDescription} numberOfLines={2}>
-                  {currentStory?.description}
-                </Text>
-                <View style={styles.infoMeta}>
-                  <View style={styles.infoMetaItem}>
-                    <MaterialCommunityIcons
-                      name="map-marker"
-                      size={14}
-                      color={COLORS.utility.white}
-                    />
-                    <Text style={styles.infoMetaText}>
-                      {currentStory?.distance}
-                    </Text>
-                  </View>
-                  <View style={styles.infoMetaItem}>
-                    <MaterialCommunityIcons
-                      name="currency-usd"
-                      size={14}
-                      color={COLORS.utility.white}
-                    />
-                    <Text style={styles.infoMetaText}>
-                      {currentStory?.price === 0
-                        ? 'Free'
-                        : `$${currentStory?.price}`}
-                    </Text>
+            <View style={styles.bottomContent}>
+              {/* Info Card */}
+              <View style={styles.infoCard}>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoTitle} numberOfLines={1}>
+                    {currentStory?.title}
+                  </Text>
+                  <Text style={styles.infoDescription} numberOfLines={2}>
+                    {currentStory?.description}
+                  </Text>
+                  <View style={styles.infoMeta}>
+                    <View style={styles.infoMetaItem}>
+                      <MaterialCommunityIcons
+                        name="map-marker"
+                        size={14}
+                        color={COLORS.utility.white}
+                      />
+                      <Text style={styles.infoMetaText}>
+                        {currentStory?.distance}
+                      </Text>
+                    </View>
+                    <View style={styles.infoMetaItem}>
+                      <MaterialCommunityIcons
+                        name="currency-usd"
+                        size={14}
+                        color={COLORS.utility.white}
+                      />
+                      <Text style={styles.infoMetaText}>
+                        {currentStory?.price === 0
+                          ? 'Ücretsiz'
+                          : `₺${currentStory?.price}`}
+                      </Text>
+                    </View>
                   </View>
                 </View>
+                <TouchableOpacity
+                  style={styles.viewMomentBtn}
+                  onPress={() => onViewMoment(currentStory)}
+                  activeOpacity={0.8}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={styles.viewMomentText}>Görüntüle</Text>
+                  <MaterialCommunityIcons
+                    name="arrow-right"
+                    size={18}
+                    color={COLORS.utility.white}
+                  />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.viewMomentBtn}
-                onPress={() => onViewMoment(currentStory)}
-                activeOpacity={0.8}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Text style={styles.viewMomentText}>View</Text>
-                <MaterialCommunityIcons
-                  name="arrow-right"
-                  size={18}
-                  color={COLORS.utility.white}
-                />
-              </TouchableOpacity>
             </View>
           </View>
+
+          {/* Right Side Action Bar (Reels-style) */}
+          {showActionBar && (
+            <View style={[styles.actionBarContainer, { bottom: insets.bottom + 100 }]}>
+              <StoryActionBar
+                likeCount={currentStory?.likeCount || 0}
+                commentCount={currentStory?.commentCount || 0}
+                shareCount={currentStory?.shareCount}
+                isLiked={currentStory?.isLiked}
+                isSaved={currentStory?.isSaved}
+                onLike={() => onLike?.(currentStory?.id || '')}
+                onComment={() => onComment?.(currentStory?.id || '')}
+                onShare={() => onShare?.(currentStory?.id || '')}
+                onSave={() => onSave?.(currentStory?.id || '')}
+              />
+            </View>
+          )}
         </View>
       </View>
     </Modal>
@@ -474,6 +506,14 @@ const styles = StyleSheet.create({
     color: COLORS.utility.white,
     fontWeight: '700',
     fontSize: 14,
+  },
+  bottomContent: {
+    flex: 1,
+  },
+  actionBarContainer: {
+    position: 'absolute',
+    right: 16,
+    alignItems: 'center',
   },
 });
 
