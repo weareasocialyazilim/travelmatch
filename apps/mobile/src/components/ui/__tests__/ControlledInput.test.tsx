@@ -33,7 +33,7 @@ const testSchema = z.object({
 type TestFormData = z.infer<typeof testSchema>;
 
 // Test wrapper component
-const TestForm = ({ onSubmit, defaultValues = {} }) => {
+const TestForm = ({ onSubmit, defaultValues = {} }: { onSubmit: () => void; defaultValues?: Partial<TestFormData> }) => {
   const { control, handleSubmit } = useForm<TestFormData>({
     resolver: zodResolver(testSchema),
     mode: 'onChange',
@@ -86,14 +86,14 @@ const TestForm = ({ onSubmit, defaultValues = {} }) => {
 describe('ControlledInput', () => {
   describe('Basic Rendering', () => {
     it('should render with label', () => {
-      const { getByText } = render(<TestForm onSubmit={() => {}} />);
+      const { getByText } = render(<TestForm onSubmit={jest.fn() as jest.Mock} />);
       expect(getByText('Email')).toBeTruthy();
       expect(getByText('Password')).toBeTruthy();
       expect(getByText('Username')).toBeTruthy();
     });
 
     it('should render with placeholder', () => {
-      const { getByTestId } = render(<TestForm onSubmit={() => {}} />);
+      const { getByTestId } = render(<TestForm onSubmit={jest.fn() as jest.Mock} />);
       expect(getByTestId('email-input').props.placeholder).toBe('Enter email');
       expect(getByTestId('password-input').props.placeholder).toBe(
         'Enter password',
@@ -106,7 +106,7 @@ describe('ControlledInput', () => {
     it('should render with default values', () => {
       const { getByTestId } = render(
         <TestForm
-          onSubmit={() => {}}
+          onSubmit={jest.fn() as jest.Mock}
           defaultValues={{
             email: 'test@example.com',
             username: 'testuser',
@@ -118,13 +118,13 @@ describe('ControlledInput', () => {
     });
 
     it('should render password field with secure text entry', () => {
-      const { getByTestId } = render(<TestForm onSubmit={() => {}} />);
+      const { getByTestId } = render(<TestForm onSubmit={jest.fn() as jest.Mock} />);
       const passwordInput = getByTestId('password-input');
       expect(passwordInput.props.secureTextEntry).toBe(true);
     });
 
     it('should render multiline field', () => {
-      const { getByTestId } = render(<TestForm onSubmit={() => {}} />);
+      const { getByTestId } = render(<TestForm onSubmit={jest.fn() as jest.Mock} />);
       const bioInput = getByTestId('bio-input');
       expect(bioInput.props.multiline).toBe(true);
       expect(bioInput.props.numberOfLines).toBe(4);
@@ -137,7 +137,7 @@ describe('ControlledInput', () => {
   describe.skip('Validation - Real-time', () => {
     it('should show validation error on blur with invalid email', async () => {
       const { getByTestId, findByText } = render(
-        <TestForm onSubmit={() => {}} />,
+        <TestForm onSubmit={jest.fn() as jest.Mock} />,
       );
       const emailInput = getByTestId('email-input');
 
@@ -150,7 +150,7 @@ describe('ControlledInput', () => {
 
     it('should show validation error for short password', async () => {
       const { getByTestId, findByText } = render(
-        <TestForm onSubmit={() => {}} />,
+        <TestForm onSubmit={jest.fn() as jest.Mock} />,
       );
       const passwordInput = getByTestId('password-input');
 
@@ -163,7 +163,7 @@ describe('ControlledInput', () => {
 
     it('should show validation error for short username', async () => {
       const { getByTestId, findByText } = render(
-        <TestForm onSubmit={() => {}} />,
+        <TestForm onSubmit={jest.fn() as jest.Mock} />,
       );
       const usernameInput = getByTestId('username-input');
 
@@ -176,7 +176,7 @@ describe('ControlledInput', () => {
 
     it('should clear error when valid input entered', async () => {
       const { getByTestId, findByText, queryByText } = render(
-        <TestForm onSubmit={() => {}} />,
+        <TestForm onSubmit={jest.fn() as jest.Mock} />,
       );
       const emailInput = getByTestId('email-input');
 
@@ -196,7 +196,7 @@ describe('ControlledInput', () => {
 
     it('should not show error until field is touched', () => {
       const { getByTestId, queryByText } = render(
-        <TestForm onSubmit={() => {}} />,
+        <TestForm onSubmit={jest.fn() as jest.Mock} />,
       );
       const emailInput = getByTestId('email-input');
 
@@ -210,7 +210,7 @@ describe('ControlledInput', () => {
 
   describe('User Interactions', () => {
     it('should update value on text change', async () => {
-      const { getByTestId } = render(<TestForm onSubmit={() => {}} />);
+      const { getByTestId } = render(<TestForm onSubmit={jest.fn() as jest.Mock} />);
       const emailInput = getByTestId('email-input');
 
       fireEvent.changeText(emailInput, 'test@example.com');
@@ -221,7 +221,7 @@ describe('ControlledInput', () => {
     });
 
     it('should handle focus event', () => {
-      const { getByTestId } = render(<TestForm onSubmit={() => {}} />);
+      const { getByTestId } = render(<TestForm onSubmit={jest.fn() as jest.Mock} />);
       const emailInput = getByTestId('email-input');
 
       fireEvent(emailInput, 'focus');

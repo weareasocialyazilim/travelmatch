@@ -4,7 +4,7 @@ import { LanguageSelectionBottomSheet } from '../LanguageSelectionBottomSheet';
 
 // Mock GenericBottomSheet
 jest.mock('../ui/GenericBottomSheet', () => ({
-  GenericBottomSheet: ({ children, visible, onClose, title }: any) => {
+  GenericBottomSheet: ({ children, visible, onClose, title }: { children: React.ReactNode; visible: boolean; onClose: () => void; title: string }) => {
     const { View, Text } = require('react-native');
     if (!visible) return null;
     return (

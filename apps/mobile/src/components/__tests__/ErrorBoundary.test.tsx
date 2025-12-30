@@ -224,7 +224,7 @@ describe('ErrorBoundary', () => {
     });
 
     it('should handle Sentry reporting failures gracefully', () => {
-      mockSentry.captureException.mockImplementationOnce(() => {
+      (mockSentry.captureException as jest.Mock).mockImplementationOnce(() => {
         throw new Error('Sentry unavailable');
       });
 
@@ -245,7 +245,7 @@ describe('ErrorBoundary', () => {
     });
 
     it('should call custom onError handler', () => {
-      const onError = jest.fn();
+      const onError = jest.fn() as jest.Mock;
 
       render(
         <ErrorBoundary onError={onError}>

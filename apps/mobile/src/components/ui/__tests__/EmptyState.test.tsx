@@ -26,7 +26,7 @@ jest.mock('../Button', () => {
   const React = require('react');
   const RN = require('react-native');
   return {
-    Button: ({ title, onPress, variant, testID }: any) =>
+    Button: ({ title, onPress, variant, testID }: { title?: string; onPress?: () => void; variant?: string; testID?: string }) =>
       React.createElement(
         RN.TouchableOpacity,
         { onPress, testID },
@@ -179,7 +179,7 @@ describe('EmptyState Component', () => {
 
   describe('Action Buttons', () => {
     it('renders primary action button', () => {
-      const onAction = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState title="Empty" actionLabel="Reload" onAction={onAction} />,
       );
@@ -187,7 +187,7 @@ describe('EmptyState Component', () => {
     });
 
     it('calls onAction when primary button pressed', () => {
-      const onAction = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState title="Empty" actionLabel="Reload" onAction={onAction} />,
       );
@@ -204,7 +204,7 @@ describe('EmptyState Component', () => {
     });
 
     it('does not render action button without actionLabel', () => {
-      const onAction = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
       const { UNSAFE_root } = render(
         <EmptyState title="Empty" onAction={onAction} />,
       );
@@ -212,7 +212,7 @@ describe('EmptyState Component', () => {
     });
 
     it('renders primary button with primary variant', () => {
-      const onAction = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <EmptyState title="Empty" actionLabel="Action" onAction={onAction} />,
       );
@@ -226,7 +226,7 @@ describe('EmptyState Component', () => {
 
   describe('Secondary Action Buttons', () => {
     it('renders secondary action button', () => {
-      const onSecondary = jest.fn();
+      const onSecondary = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState
           title="Empty"
@@ -238,7 +238,7 @@ describe('EmptyState Component', () => {
     });
 
     it('calls onSecondaryAction when secondary button pressed', () => {
-      const onSecondary = jest.fn();
+      const onSecondary = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState
           title="Empty"
@@ -259,7 +259,7 @@ describe('EmptyState Component', () => {
     });
 
     it('renders secondary button with secondary variant', () => {
-      const onSecondary = jest.fn();
+      const onSecondary = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <EmptyState
           title="Empty"
@@ -271,8 +271,8 @@ describe('EmptyState Component', () => {
     });
 
     it('renders both primary and secondary buttons', () => {
-      const onAction = jest.fn();
-      const onSecondary = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
+      const onSecondary = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState
           title="Empty"
@@ -288,8 +288,8 @@ describe('EmptyState Component', () => {
     });
 
     it('both buttons work independently', () => {
-      const onAction = jest.fn();
-      const onSecondary = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
+      const onSecondary = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState
           title="Empty"
@@ -498,7 +498,7 @@ describe('EmptyState Component', () => {
     });
 
     it('adds action button after initial render', () => {
-      const onAction = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
       const { rerender, getByText } = render(<EmptyState title="Title" />);
 
       rerender(
@@ -514,8 +514,8 @@ describe('EmptyState Component', () => {
 
   describe('Integration', () => {
     it('renders complete empty state with all features', () => {
-      const onAction = jest.fn();
-      const onSecondary = jest.fn();
+      const onAction = jest.fn() as jest.Mock;
+      const onSecondary = jest.fn() as jest.Mock;
       const { getByText, getByTestId } = render(
         <EmptyState
           title="No items found"
@@ -579,7 +579,7 @@ describe('EmptyState Component', () => {
 
   describe('Real-World Use Cases', () => {
     it('renders search results empty state', () => {
-      const handleClear = jest.fn();
+      const handleClear = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState
           title="No results found"
@@ -596,7 +596,7 @@ describe('EmptyState Component', () => {
     });
 
     it('renders messages empty state', () => {
-      const handleDiscover = jest.fn();
+      const handleDiscover = jest.fn() as jest.Mock;
       const { getByText } = render(
         <EmptyState
           title="No messages yet"

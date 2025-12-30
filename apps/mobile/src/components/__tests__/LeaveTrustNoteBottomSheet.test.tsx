@@ -71,7 +71,7 @@ describe('LeaveTrustNoteBottomSheet', () => {
   });
 
   describe('Text Input', () => {
-    const getTextInput = (component: any) => {
+    const getTextInput = (component: ReturnType<typeof render>) => {
       const { TextInput } = require('react-native');
       return component.UNSAFE_getByType(TextInput);
     };
@@ -106,7 +106,7 @@ describe('LeaveTrustNoteBottomSheet', () => {
   });
 
   describe('Submit Functionality', () => {
-    const getTextInput = (component: any) => {
+    const getTextInput = (component: ReturnType<typeof render>) => {
       const { TextInput } = require('react-native');
       return component.UNSAFE_getByType(TextInput);
     };
@@ -201,7 +201,7 @@ describe('LeaveTrustNoteBottomSheet', () => {
   });
 
   describe('Edge Cases', () => {
-    const getTextInput = (component: any) => {
+    const getTextInput = (component: ReturnType<typeof render>) => {
       const { TextInput } = require('react-native');
       return component.UNSAFE_getByType(TextInput);
     };

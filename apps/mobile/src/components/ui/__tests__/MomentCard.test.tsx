@@ -240,13 +240,13 @@ describe('MomentCard', () => {
     },
   };
 
-  const mockOnPress = jest.fn();
-  const mockOnGiftPress = jest.fn();
-  const mockOnSharePress = jest.fn();
+  const mockOnPress = jest.fn() as jest.Mock;
+  const mockOnGiftPress = jest.fn() as jest.Mock;
+  const mockOnSharePress = jest.fn() as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' });
+    jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never);
   });
 
   describe('Rendering', () => {

@@ -4,7 +4,7 @@ import { CurrencySelectionBottomSheet } from '../CurrencySelectionBottomSheet';
 
 // Mock GenericBottomSheet
 jest.mock('../ui/GenericBottomSheet', () => ({
-  GenericBottomSheet: ({ children, visible, onClose, renderFooter, title }: any) => {
+  GenericBottomSheet: ({ children, visible, onClose, renderFooter, title }: { children: React.ReactNode; visible: boolean; onClose: () => void; renderFooter?: () => React.ReactNode; title: string }) => {
     const { View, Text } = require('react-native');
     if (!visible) return null;
     return (
@@ -75,7 +75,7 @@ describe('CurrencySelectionBottomSheet', () => {
       const MaterialCommunityIcons = require('@expo/vector-icons').MaterialCommunityIcons;
       const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
       
-      const searchIcon = icons.find((icon: any) => icon.props.name === 'magnify');
+      const searchIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'magnify');
       expect(searchIcon).toBeTruthy();
     });
 

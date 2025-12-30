@@ -24,7 +24,7 @@ import { logger } from '@/utils/logger';
 // Mock logger
 jest.mock('@/utils/logger');
 
-const mockLogger = logger ;
+const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('usePagination', () => {
   interface TestItem {

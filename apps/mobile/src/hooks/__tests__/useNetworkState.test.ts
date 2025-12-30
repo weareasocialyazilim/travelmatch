@@ -28,8 +28,8 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockNetInfo = NetInfo ;
-const mockLogger = logger ;
+const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
+const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('Network State Detection', () => {
   beforeEach(() => {

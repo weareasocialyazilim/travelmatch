@@ -20,7 +20,15 @@ jest.mock('../Input', () => {
       autoCapitalize,
       autoCorrect,
       ...props
-    }: any) =>
+    }: {
+      leftIcon?: string;
+      rightIcon?: string;
+      onRightIconPress?: () => void;
+      secureTextEntry?: boolean;
+      autoCapitalize?: string;
+      autoCorrect?: boolean;
+      [key: string]: unknown;
+    }) =>
       React.createElement(
         RN.View,
         { testID: 'input-container' },

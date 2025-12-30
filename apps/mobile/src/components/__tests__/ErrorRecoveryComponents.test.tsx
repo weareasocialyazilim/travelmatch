@@ -14,7 +14,7 @@ jest.mock('../ui/Button', () => {
   const { TouchableOpacity, Text } = require('react-native');
   return {
     __esModule: true,
-    default: ({ title, onPress, variant, style }: any) => (
+    default: ({ title, onPress, variant, style }: { title: string; onPress: () => void; variant?: string; style?: unknown }) => (
       <TouchableOpacity onPress={onPress} style={style} testID={`button-${variant}`}>
         <Text>{title}</Text>
       </TouchableOpacity>
@@ -67,7 +67,7 @@ describe('ErrorRecoveryComponents', () => {
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
-        const errorIcon = icons.find((icon) => icon.props.name === 'alert-circle-outline');
+        const errorIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'alert-circle-outline');
         expect(errorIcon).toBeTruthy();
         expect(errorIcon?.props.size).toBe(64);
       });
@@ -194,7 +194,7 @@ describe('ErrorRecoveryComponents', () => {
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
-        const wifiIcon = icons.find((icon) => icon.props.name === 'wifi-off');
+        const wifiIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'wifi-off');
         expect(wifiIcon).toBeTruthy();
         expect(wifiIcon?.props.size).toBe(64);
       });
@@ -281,7 +281,7 @@ describe('ErrorRecoveryComponents', () => {
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
-        const wifiIcon = icons.find((icon) => icon.props.name === 'wifi-off');
+        const wifiIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'wifi-off');
         expect(wifiIcon).toBeTruthy();
         expect(wifiIcon?.props.size).toBe(20);
       });

@@ -8,11 +8,11 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { SortSelector } from '../SortSelector';
 
 // Mock Zustand store
-const mockSetSortBy = jest.fn();
+const mockSetSortBy = jest.fn() as jest.Mock;
 const mockUseSearchStore = jest.fn(() => ({
   sortBy: 'recent',
   setSortBy: mockSetSortBy,
-}));
+})) as jest.Mock;
 
 jest.mock('../../../stores/searchStore', () => ({
   useSearchStore: () => mockUseSearchStore(),
