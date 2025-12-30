@@ -124,24 +124,66 @@ describe('AddBankAccountBottomSheet', () => {
       expect(holderInput.props.value).toBe('John Smith');
     });
 
-    it.skip('Save button is disabled when IBAN is empty', () => {
-      // Testing disabled state of TouchableOpacity requires checking parent TouchableOpacity props
-      // which is not easily accessible with current testing library setup
+    it('Save button is disabled when IBAN is empty', () => {
+      const component = render(<AddBankAccountBottomSheet {...defaultProps} />);
+      const { holderInput } = getInputs(component);
+
+      fireEvent.changeText(holderInput, 'John Smith');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const saveButton = touchables.find((t: { props: { children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Save');
+      });
+
+      expect(saveButton?.props.disabled).toBe(true);
     });
 
-    it.skip('Save button is disabled when account holder is empty', () => {
-      // Testing disabled state of TouchableOpacity requires checking parent TouchableOpacity props
-      // which is not easily accessible with current testing library setup
+    it('Save button is disabled when account holder is empty', () => {
+      const component = render(<AddBankAccountBottomSheet {...defaultProps} />);
+      const { ibanInput } = getInputs(component);
+
+      fireEvent.changeText(ibanInput, 'DE89370400440532013000');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const saveButton = touchables.find((t: { props: { children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Save');
+      });
+
+      expect(saveButton?.props.disabled).toBe(true);
     });
 
-    it.skip('Save button is disabled when both fields are empty', () => {
-      // Testing disabled state of TouchableOpacity requires checking parent TouchableOpacity props
-      // which is not easily accessible with current testing library setup
+    it('Save button is disabled when both fields are empty', () => {
+      const component = render(<AddBankAccountBottomSheet {...defaultProps} />);
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const saveButton = touchables.find((t: { props: { children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Save');
+      });
+
+      expect(saveButton?.props.disabled).toBe(true);
     });
 
-    it.skip('Save button is enabled when both fields are filled', () => {
-      // Testing disabled state of TouchableOpacity requires checking parent TouchableOpacity props
-      // which is not easily accessible with current testing library setup
+    it('Save button is enabled when both fields are filled', () => {
+      const component = render(<AddBankAccountBottomSheet {...defaultProps} />);
+      const { ibanInput, holderInput } = getInputs(component);
+
+      fireEvent.changeText(ibanInput, 'DE89370400440532013000');
+      fireEvent.changeText(holderInput, 'John Smith');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const saveButton = touchables.find((t: { props: { children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Save');
+      });
+
+      expect(saveButton?.props.disabled).toBe(false);
     });
 
     it('calls onSave with correct data when Save is pressed', () => {
@@ -204,19 +246,51 @@ describe('AddBankAccountBottomSheet', () => {
   });
 
   describe('Form Validation', () => {
-    it.skip('trims whitespace from IBAN before validation', () => {
-      // Testing disabled state requires checking TouchableOpacity disabled prop
-      // which is not easily accessible with current testing library setup
+    it('trims whitespace from IBAN before validation', () => {
+      const component = render(<AddBankAccountBottomSheet {...defaultProps} />);
+      const { ibanInput, holderInput } = getInputs(component);
+
+      // Enter only whitespace in IBAN
+      fireEvent.changeText(ibanInput, '   ');
+      fireEvent.changeText(holderInput, 'John Smith');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const saveButton = touchables.find((t: { props: { children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Save');
+      });
+
+      expect(saveButton?.props.disabled).toBe(true);
     });
 
-    it.skip('trims whitespace from account holder before validation', () => {
-      // Testing disabled state requires checking TouchableOpacity disabled prop
-      // which is not easily accessible with current testing library setup
+    it('trims whitespace from account holder before validation', () => {
+      const component = render(<AddBankAccountBottomSheet {...defaultProps} />);
+      const { ibanInput, holderInput } = getInputs(component);
+
+      fireEvent.changeText(ibanInput, 'DE89370400440532013000');
+      // Enter only whitespace in account holder
+      fireEvent.changeText(holderInput, '   ');
+
+      const TouchableOpacity = require('react-native').TouchableOpacity;
+      const touchables = component.UNSAFE_getAllByType(TouchableOpacity);
+      const saveButton = touchables.find((t: { props: { children?: React.ReactNode } }) => {
+        const children = t.props.children;
+        return children && JSON.stringify(children).includes('Save');
+      });
+
+      expect(saveButton?.props.disabled).toBe(true);
     });
 
-    it.skip('does not call onSave when fields contain only whitespace', () => {
-      // Testing disabled state requires checking TouchableOpacity disabled prop
-      // which is not easily accessible with current testing library setup
+    it('does not call onSave when fields contain only whitespace', () => {
+      const component = render(<AddBankAccountBottomSheet {...defaultProps} />);
+      const { ibanInput, holderInput } = getInputs(component);
+
+      fireEvent.changeText(ibanInput, '   ');
+      fireEvent.changeText(holderInput, '   ');
+      fireEvent.press(component.getByText('Save'));
+
+      expect(mockOnSave).not.toHaveBeenCalled();
     });
   });
 

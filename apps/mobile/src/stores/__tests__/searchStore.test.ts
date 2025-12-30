@@ -561,8 +561,7 @@ describe('searchStore', () => {
   });
 
   describe('persistence', () => {
-    // Skip flaky persistence tests - AsyncStorage timing issues in test environment
-    it.skip('should persist search history to AsyncStorage', async () => {
+    it('should persist search history to AsyncStorage', async () => {
       const { result } = renderHook(() => useSearchStore());
 
       act(() => {
@@ -570,16 +569,15 @@ describe('searchStore', () => {
         result.current.addToHistory('restaurants');
       });
 
-      // Wait for zustand persist middleware to complete
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const stored = await AsyncStorage.getItem('search-storage');
-      expect(stored).toBeTruthy();
-
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        expect(parsed.state.searchHistory).toEqual(['restaurants', 'coffee']);
-      }
+      // Wait for zustand persist middleware to complete using waitFor
+      await waitFor(async () => {
+        const stored = await AsyncStorage.getItem('search-storage');
+        expect(stored).toBeTruthy();
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          expect(parsed.state.searchHistory).toEqual(['restaurants', 'coffee']);
+        }
+      }, { timeout: 500 });
     });
 
     it('should persist filters to AsyncStorage', async () => {

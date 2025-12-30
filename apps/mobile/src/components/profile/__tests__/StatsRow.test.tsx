@@ -147,10 +147,9 @@ describe('StatsRow Component', () => {
       expect(getByText('0%')).toBeTruthy();
     });
 
-    // TODO: Component doesn't convert decimal to percentage - expects integer
-    it.skip('rounds response rate to whole number', () => {
+    it('displays response rate as percentage', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={0}
           exchangesCount={0}
           responseRate={88}
