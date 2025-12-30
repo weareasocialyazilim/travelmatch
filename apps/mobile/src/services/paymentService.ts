@@ -189,19 +189,31 @@ export const paymentService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Fetch user balance from users table
+      // Fetch wallet balance from wallets table (not users table)
       const { data, error } = await supabase
-        .from('users')
-        .select('balance, currency')
-        .eq('id', user.id)
+        .from('wallets')
+        .select('balance, currency, status')
+        .eq('user_id', user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        logger.error('Get balance error:', { error, userId: user.id });
+        throw new Error('Failed to fetch wallet balance');
+      }
+
+      // Calculate pending from escrow transactions
+      const { data: pendingEscrow } = await supabase
+        .from('escrow_transactions')
+        .select('amount')
+        .eq('recipient_id', user.id)
+        .eq('status', 'pending');
+
+      const pendingAmount = pendingEscrow?.reduce((sum, e) => sum + e.amount, 0) || 0;
 
       return {
-        available: data.balance || 0,
-        pending: 0, // Logic for pending balance would go here
-        currency: data.currency || 'USD',
+        available: data?.balance || 0,
+        pending: pendingAmount,
+        currency: data?.currency || 'USD',
       };
     } catch (error) {
       logger.error('Get balance error:', error);
@@ -745,9 +757,42 @@ export const paymentService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Validate amount
+      if (data.amount <= 0) {
+        throw new Error('Withdrawal amount must be greater than zero');
+      }
+
+      // Check balance before withdrawal
+      const { available } = await paymentService.getBalance();
+      if (available < data.amount) {
+        logger.warn('[Payment] Insufficient funds for withdrawal', {
+          userId: user.id,
+          requested: data.amount,
+          available,
+        });
+        throw new Error(`Insufficient balance. Available: ${available} ${data.currency}`);
+      }
+
+      // Verify bank account belongs to user
+      const { data: bankAccount, error: bankError } = await supabase
+        .from('bank_accounts')
+        .select('id, is_verified')
+        .eq('id', data.bankAccountId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (bankError || !bankAccount) {
+        throw new Error('Bank account not found or does not belong to you');
+      }
+
+      if (!bankAccount.is_verified) {
+        throw new Error('Bank account must be verified before withdrawal');
+      }
+
+      // Amount is stored as positive, type indicates direction
       const { data: transaction, error } = await dbTransactionsService.create({
         user_id: user.id,
-        amount: -data.amount, // Negative for withdrawal? Or just track as withdrawal type
+        amount: data.amount, // Keep positive, type indicates withdrawal
         currency: data.currency,
         type: 'withdrawal',
         status: 'pending',
@@ -771,7 +816,13 @@ export const paymentService = {
       };
     } catch (error) {
       logger.error('Withdraw funds error:', error);
-      throw error;
+      // Re-throw with user-friendly message if not already
+      if (error instanceof Error && (error.message.includes('Insufficient') ||
+          error.message.includes('not found') ||
+          error.message.includes('must be'))) {
+        throw error;
+      }
+      throw new Error('Withdrawal failed. Please try again.');
     }
   },
 
@@ -821,11 +872,19 @@ export const paymentService = {
               p_message: message,
             });
 
-          if (directError) throw directError;
+          if (directError) {
+            logger.error('[Payment] Direct transfer failed', { directError, amount, recipientId });
+            throw new Error('Transfer failed. Please try again.');
+          }
+
+          if (!directData?.senderTxnId) {
+            logger.error('[Payment] Transfer completed but transaction ID missing', { amount, recipientId });
+            throw new Error('Transfer completed but transaction ID missing. Please contact support.');
+          }
 
           return {
             success: true,
-            transactionId: directData?.senderTxnId ?? '',
+            transactionId: directData.senderTxnId,
           };
         }
 
@@ -847,12 +906,20 @@ export const paymentService = {
                 p_release_condition: 'proof_verified',
               });
 
-            if (escrowError) throw escrowError;
+            if (escrowError) {
+              logger.error('[Payment] Escrow creation failed', { escrowError, amount, recipientId });
+              throw new Error('Failed to create escrow. Please try again.');
+            }
+
+            if (!escrowData?.escrowId) {
+              logger.error('[Payment] Escrow created but ID missing', { amount, recipientId });
+              throw new Error('Escrow created but ID missing. Please contact support.');
+            }
 
             return {
               success: true,
-              transactionId: escrowData?.transactionId ?? '',
-              escrowId: escrowData?.escrowId ?? '',
+              transactionId: escrowData.transactionId || escrowData.escrowId,
+              escrowId: escrowData.escrowId,
             };
           } else {
             // User chose direct payment
@@ -865,11 +932,19 @@ export const paymentService = {
                 p_message: message,
               });
 
-            if (directError2) throw directError2;
+            if (directError2) {
+              logger.error('[Payment] Direct transfer failed', { directError2, amount, recipientId });
+              throw new Error('Transfer failed. Please try again.');
+            }
+
+            if (!directData2?.senderTxnId) {
+              logger.error('[Payment] Transfer completed but transaction ID missing', { amount, recipientId });
+              throw new Error('Transfer completed but transaction ID missing. Please contact support.');
+            }
 
             return {
               success: true,
-              transactionId: directData2?.senderTxnId ?? '',
+              transactionId: directData2.senderTxnId,
             };
           }
         }
@@ -886,12 +961,20 @@ export const paymentService = {
               p_release_condition: 'proof_verified',
             });
 
-          if (mandatoryError) throw mandatoryError;
+          if (mandatoryError) {
+            logger.error('[Payment] Mandatory escrow creation failed', { mandatoryError, amount, recipientId });
+            throw new Error('Failed to create escrow. Please try again.');
+          }
+
+          if (!mandatoryData?.escrowId) {
+            logger.error('[Payment] Mandatory escrow created but ID missing', { amount, recipientId });
+            throw new Error('Escrow created but ID missing. Please contact support.');
+          }
 
           return {
             success: true,
-            transactionId: mandatoryData?.transactionId ?? '',
-            escrowId: mandatoryData?.escrowId ?? '',
+            transactionId: mandatoryData.transactionId || mandatoryData.escrowId,
+            escrowId: mandatoryData.escrowId,
           };
         }
 
@@ -900,7 +983,11 @@ export const paymentService = {
       }
     } catch (error) {
       logger.error('Transfer funds error:', error);
-      throw error;
+      // Re-throw with user-friendly message if it's not already a user-friendly error
+      if (error instanceof Error && error.message.includes('Please')) {
+        throw error;
+      }
+      throw new Error('Transfer failed. Please try again later.');
     }
   },
 
