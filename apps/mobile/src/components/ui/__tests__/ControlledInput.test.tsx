@@ -412,8 +412,6 @@ describe('ControlledInput', () => {
       });
     });
 
-    // Full validation flows covered in integration/E2E; jest timers are flaky here
-    it.skip('should trigger form validation', async () => {});
   });
 
   describe('Accessibility', () => {
@@ -538,8 +536,6 @@ describe('ControlledInput', () => {
       const { toJSON } = render(<TestForm onSubmit={() => {}} />);
       expect(toJSON()).toMatchSnapshot();
     });
-
-    it.skip('should match snapshot with errors', async () => {});
 
     it('should match snapshot with values', () => {
       const { toJSON } = render(

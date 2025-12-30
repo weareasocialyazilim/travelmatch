@@ -276,23 +276,6 @@ describe('Input Component', () => {
     });
   });
 
-  // TODO: Component doesn't support multiline prop - feature needs to be added
-  describe.skip('Multiline', () => {
-    it('renders multiline text area', () => {
-      const { getByTestId } = render(
-        <Input
-          placeholder="Description"
-          multiline
-          numberOfLines={4}
-          testID="multiline-input"
-        />,
-      );
-      const input = getByTestId('multiline-input');
-      expect(input.props.multiline).toBe(true);
-      expect(input.props.numberOfLines).toBe(4);
-    });
-  });
-
   describe('Snapshots', () => {
     it('matches snapshot for basic input', () => {
       const { toJSON } = render(
