@@ -10,7 +10,7 @@
  * Documentation: https://dev.paytr.com/
  */
 
-import { createHmac } from 'https://deno.land/std@0.177.0/node/crypto.ts';
+import { createHmac, timingSafeEqual } from 'https://deno.land/std@0.177.0/node/crypto.ts';
 
 // =============================================================================
 // TYPES
@@ -163,6 +163,7 @@ export function generateTokenHash(
 
 /**
  * Verify webhook hash from PayTR
+ * Uses timing-safe comparison to prevent timing attacks
  */
 export function verifyWebhookHash(
   config: PayTRConfig,
@@ -178,7 +179,17 @@ export function verifyWebhookHash(
   hmac.update(hashStr);
   const calculatedHash = hmac.digest('base64');
 
-  return calculatedHash === payload.hash;
+  // Use timing-safe comparison to prevent timing attacks
+  // Both strings must be same length for timingSafeEqual
+  if (calculatedHash.length !== payload.hash.length) {
+    return false;
+  }
+
+  const encoder = new TextEncoder();
+  const a = encoder.encode(calculatedHash);
+  const b = encoder.encode(payload.hash);
+
+  return timingSafeEqual(a, b);
 }
 
 /**
