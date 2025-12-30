@@ -36,6 +36,7 @@ import {
   MapPin,
   LogOut,
   Moon,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -80,6 +81,12 @@ const managementNavItems: NavItem[] = [
     resource: 'disputes',
   },
   { title: 'Creators', href: '/creators', icon: Star, resource: 'users' },
+  {
+    title: 'Ceremony',
+    href: '/ceremony-management',
+    icon: Sparkles,
+    resource: 'users',
+  },
 ];
 
 const operationsNavItems: NavItem[] = [
