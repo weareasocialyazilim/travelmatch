@@ -15,6 +15,8 @@ import {
 } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { DOCUMENT_OPTIONS } from './constants';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
@@ -75,6 +77,7 @@ const KYCReviewScreen: React.FC = () => {
     'Unknown';
 
   return (
+    <NetworkGuard offlineMessage="Kimlik doğrulama için internet bağlantısı gerekli.">
     <SafeAreaView style={kycStyles.container}>
       <View style={kycStyles.content}>
         <KYCHeader title="Review" />
@@ -205,7 +208,12 @@ const KYCReviewScreen: React.FC = () => {
         </View>
       </View>
     </SafeAreaView>
+    </NetworkGuard>
   );
 };
 
-export default KYCReviewScreen;
+// Wrap with ErrorBoundary for critical KYC functionality
+export default withErrorBoundary(KYCReviewScreen, {
+  fallbackType: 'generic',
+  displayName: 'KYCReviewScreen',
+});

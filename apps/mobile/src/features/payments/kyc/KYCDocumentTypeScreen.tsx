@@ -9,6 +9,7 @@ import {
 } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { DOCUMENT_OPTIONS } from './constants';
 import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
@@ -120,4 +121,8 @@ const KYCDocumentTypeScreen: React.FC = () => {
   );
 };
 
-export default KYCDocumentTypeScreen;
+// Wrap with ErrorBoundary for critical KYC functionality
+export default withErrorBoundary(KYCDocumentTypeScreen, {
+  fallbackType: 'generic',
+  displayName: 'KYCDocumentTypeScreen',
+});
