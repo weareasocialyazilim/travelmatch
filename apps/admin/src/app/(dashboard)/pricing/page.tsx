@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import {
   Table,
@@ -51,6 +52,11 @@ const subscriptionPlans = [
     subscribers: 45678,
     revenue: 0,
     features: ['5 günlük swipe limiti', 'Temel eşleşme', 'Reklam gösterimi'],
+    limits: {
+      giftsPerMonth: 1,
+      momentsPerMonth: 3,
+      messagesPerDay: 20,
+    },
   },
   {
     id: '2',
@@ -60,6 +66,11 @@ const subscriptionPlans = [
     subscribers: 12345,
     revenue: 617377,
     features: ['Sınırsız swipe', 'Super Like x5/gün', 'Reklamsız', 'Kimin beğendiğini gör'],
+    limits: {
+      giftsPerMonth: 10,
+      momentsPerMonth: 15,
+      messagesPerDay: -1, // unlimited
+    },
   },
   {
     id: '3',
@@ -69,6 +80,11 @@ const subscriptionPlans = [
     subscribers: 3456,
     revenue: 345543,
     features: ['Premium özellikleri', 'Öne çıkarılma', 'Mesaj önceliği', 'Profil boost'],
+    limits: {
+      giftsPerMonth: -1, // unlimited
+      momentsPerMonth: -1, // unlimited
+      messagesPerDay: -1, // unlimited
+    },
   },
 ];
 
@@ -253,6 +269,16 @@ export default function PricingPage() {
                         </p>
                       </div>
                     )}
+                    <div className="pt-4 border-t">
+                      <Label className="text-sm text-muted-foreground">Gifts/month</Label>
+                      <Input
+                        type="number"
+                        defaultValue={plan.limits.giftsPerMonth === -1 ? '' : plan.limits.giftsPerMonth}
+                        placeholder="Unlimited"
+                        className="mt-1"
+                      />
+                    </div>
+                    <Button className="w-full mt-4">Save Changes</Button>
                   </div>
                 </CardContent>
               </Card>
