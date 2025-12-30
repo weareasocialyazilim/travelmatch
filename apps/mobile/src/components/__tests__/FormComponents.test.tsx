@@ -163,11 +163,11 @@ describe('FormComponents', () => {
   });
 
   describe('FormInput', () => {
-    const mockOnChangeText = jest.fn();
-    const mockOnBlur = jest.fn();
-    const mockOnFocus = jest.fn();
-    const mockOnSubmitEditing = jest.fn();
-    const mockOnRightIconPress = jest.fn();
+    const mockOnChangeText = jest.fn() as jest.Mock;
+    const mockOnBlur = jest.fn() as jest.Mock;
+    const mockOnFocus = jest.fn() as jest.Mock;
+    const mockOnSubmitEditing = jest.fn() as jest.Mock;
+    const mockOnRightIconPress = jest.fn() as jest.Mock;
 
     beforeEach(() => {
       jest.clearAllMocks();

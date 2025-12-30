@@ -202,7 +202,7 @@ describe('OfflineState', () => {
     });
 
     it('should handle sync onRetry callback', async () => {
-      const mockOnRetry = jest.fn();
+      const mockOnRetry = jest.fn() as jest.Mock;
       const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {

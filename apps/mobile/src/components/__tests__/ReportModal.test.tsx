@@ -17,7 +17,7 @@ jest.mock('../../services/moderationService', () => ({
   ],
 }));
 
-const mockShowToast = jest.fn();
+const mockShowToast = jest.fn() as jest.Mock;
 jest.mock('../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: mockShowToast,
@@ -29,7 +29,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 describe('ReportModal', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

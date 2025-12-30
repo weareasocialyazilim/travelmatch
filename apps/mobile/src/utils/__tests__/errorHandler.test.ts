@@ -33,7 +33,7 @@ jest.mock('@/utils/logger', () => ({
 }));
 
 // Mock global Sentry
-const mockSentryCaptureException = jest.fn();
+const mockSentryCaptureException = jest.fn() as jest.Mock;
 (global as unknown as { Sentry: unknown }).Sentry = {
   captureException: mockSentryCaptureException,
 };
@@ -143,7 +143,7 @@ describe('errorHandler', () => {
     });
 
     it('should notify subscribers', () => {
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       const unsubscribe = ErrorHandler.subscribe(listener);
 
       const error = new ApiError('API failed');
@@ -175,7 +175,7 @@ describe('errorHandler', () => {
 
   describe('ErrorHandler.subscribe', () => {
     it('should unsubscribe from error events', () => {
-      const listener = jest.fn();
+      const listener = jest.fn() as jest.Mock;
       const unsubscribe = ErrorHandler.subscribe(listener);
 
       ErrorHandler.handle(new ApiError('First error'));
@@ -208,7 +208,7 @@ describe('errorHandler', () => {
 
   describe('ErrorHandler.createBoundaryHandler', () => {
     it('should create error boundary handler', () => {
-      const fallback = jest.fn();
+      const fallback = jest.fn() as jest.Mock;
       const handler = ErrorHandler.createBoundaryHandler(fallback);
 
       const error = new Error('Component error');

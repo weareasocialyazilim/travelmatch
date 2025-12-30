@@ -89,7 +89,7 @@ describe('Optimistic UI Updates', () => {
 
   describe('Optimistic State Updates', () => {
     it('should apply optimistic update before API response', async () => {
-      const onSuccess = jest.fn();
+      const onSuccess = jest.fn() as jest.Mock;
       const mutationFn = jest.fn().mockImplementation(async () => {
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -266,7 +266,7 @@ describe('Optimistic UI Updates', () => {
 
   describe('Rollback on Failure', () => {
     it('should rollback optimistic update when mutation fails', async () => {
-      const onError = jest.fn();
+      const onError = jest.fn() as jest.Mock;
       const mutationFn = jest.fn().mockRejectedValue(new Error('API Error'));
 
       offlineSyncQueue.registerHandler('LIKE_MOMENT', mutationFn);

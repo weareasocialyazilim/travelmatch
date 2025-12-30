@@ -83,7 +83,7 @@ describe.skip('Input Component - Enhanced Tests', () => {
     });
 
     it('should call onChangeText handler', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
         <Input placeholder="Type" onChangeText={onChangeText} />
       );
@@ -93,7 +93,7 @@ describe.skip('Input Component - Enhanced Tests', () => {
     });
 
     it('should call onChangeText multiple times', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
         <Input placeholder="Type" onChangeText={onChangeText} />
       );
@@ -109,7 +109,7 @@ describe.skip('Input Component - Enhanced Tests', () => {
 
   describe('Focus and Blur', () => {
     it('should handle focus event', () => {
-      const onFocus = jest.fn();
+      const onFocus = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
         <Input placeholder="Focus me" onFocus={onFocus} />
       );
@@ -119,7 +119,7 @@ describe.skip('Input Component - Enhanced Tests', () => {
     });
 
     it('should handle blur event', () => {
-      const onBlur = jest.fn();
+      const onBlur = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
         <Input placeholder="Blur me" onBlur={onBlur} />
       );
@@ -218,7 +218,7 @@ describe.skip('Input Component - Enhanced Tests', () => {
     });
 
     it('should call onRightIconPress when right icon pressed', () => {
-      const onRightIconPress = jest.fn();
+      const onRightIconPress = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
         <Input 
           placeholder="Clear" 

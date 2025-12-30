@@ -371,7 +371,7 @@ describe('logger.ts', () => {
     });
 
     it('should execute callback in group', () => {
-      const callback = jest.fn();
+      const callback = jest.fn() as jest.Mock;
       logger.group('Test', callback);
       expect(callback).toHaveBeenCalled();
     });

@@ -24,8 +24,8 @@ jest.mock('../ui/Button', () => {
 
 describe('ErrorRecoveryComponents', () => {
   describe('ErrorView', () => {
-    const mockOnRetry = jest.fn();
-    const mockOnUseCachedData = jest.fn();
+    const mockOnRetry = jest.fn() as jest.Mock;
+    const mockOnUseCachedData = jest.fn() as jest.Mock;
 
     beforeEach(() => {
       jest.clearAllMocks();
@@ -173,8 +173,8 @@ describe('ErrorRecoveryComponents', () => {
   });
 
   describe('NetworkErrorView', () => {
-    const mockOnRetry = jest.fn();
-    const mockOnGoOffline = jest.fn();
+    const mockOnRetry = jest.fn() as jest.Mock;
+    const mockOnGoOffline = jest.fn() as jest.Mock;
 
     beforeEach(() => {
       jest.clearAllMocks();
@@ -256,7 +256,7 @@ describe('ErrorRecoveryComponents', () => {
   });
 
   describe('OfflineBanner', () => {
-    const mockOnRetry = jest.fn();
+    const mockOnRetry = jest.fn() as jest.Mock;
 
     beforeEach(() => {
       jest.clearAllMocks();
@@ -377,7 +377,7 @@ describe('ErrorRecoveryComponents', () => {
   });
 
   describe('LoadingWithRetry', () => {
-    const mockOnCancel = jest.fn();
+    const mockOnCancel = jest.fn() as jest.Mock;
 
     beforeEach(() => {
       jest.clearAllMocks();

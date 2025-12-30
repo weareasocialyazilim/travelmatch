@@ -30,7 +30,7 @@ jest.mock('../../../services/analytics', () => ({
 }));
 
 // Mock ToastContext
-const mockShowToast = jest.fn();
+const mockShowToast = jest.fn() as jest.Mock;
 jest.mock('../../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: mockShowToast,

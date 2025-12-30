@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { RetakeProofBottomSheet } from '../RetakeProofBottomSheet';
 
 describe('RetakeProofBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnTakeNewPhoto = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnTakeNewPhoto = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

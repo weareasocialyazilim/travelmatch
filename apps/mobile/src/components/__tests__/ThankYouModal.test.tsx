@@ -39,7 +39,7 @@ jest.mock('@expo/vector-icons', () => {
 });
 
 describe('ThankYouModal', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
   const defaultProps = {
     visible: true,
     onClose: mockOnClose,

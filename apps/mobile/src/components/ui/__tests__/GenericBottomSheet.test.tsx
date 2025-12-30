@@ -210,7 +210,7 @@ describe('GenericBottomSheet', () => {
 
   describe('User Interactions', () => {
     it('should call onClose when backdrop pressed and dismissible', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <GenericBottomSheet visible={true} onClose={onClose} dismissible={true}>
           <Text>Content</Text>
@@ -224,7 +224,7 @@ describe('GenericBottomSheet', () => {
     });
 
     it('should not call onClose when backdrop pressed and not dismissible', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
@@ -242,7 +242,7 @@ describe('GenericBottomSheet', () => {
     });
 
     it('should call onClose when close button pressed', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
@@ -262,7 +262,7 @@ describe('GenericBottomSheet', () => {
 
     // Skip: PanResponder events not properly propagated in mocked environment
     it.skip('should handle swipe down to dismiss', async () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
@@ -290,7 +290,7 @@ describe('GenericBottomSheet', () => {
     });
 
     it('should not dismiss on small swipe', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <GenericBottomSheet
           visible={true}
@@ -681,7 +681,7 @@ describe('ConfirmationBottomSheet', () => {
 
   describe('User Interactions', () => {
     it('should call onConfirm when confirm button pressed', () => {
-      const onConfirm = jest.fn();
+      const onConfirm = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <ConfirmationBottomSheet
           visible={true}
@@ -698,7 +698,7 @@ describe('ConfirmationBottomSheet', () => {
     });
 
     it('should call onClose when cancel button pressed', () => {
-      const onClose = jest.fn();
+      const onClose = jest.fn() as jest.Mock;
       const { getByText } = render(
         <ConfirmationBottomSheet
           visible={true}
@@ -850,7 +850,7 @@ describe('SelectionBottomSheet', () => {
 
   describe('Selection', () => {
     it('should call onSelect with correct value', () => {
-      const onSelect = jest.fn();
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SelectionBottomSheet
           visible={true}
@@ -930,7 +930,7 @@ describe('SelectionBottomSheet', () => {
     });
 
     it('should not call onSelect for disabled options', () => {
-      const onSelect = jest.fn();
+      const onSelect = jest.fn() as jest.Mock;
       const optionsWithDisabled = [
         { value: 'disabled', label: 'Disabled Option', disabled: true },
       ];
@@ -952,7 +952,7 @@ describe('SelectionBottomSheet', () => {
 
   describe('Multiple Selection', () => {
     it('should allow multiple selections when multiple is true', () => {
-      const onSelect = jest.fn();
+      const onSelect = jest.fn() as jest.Mock;
       const { getByText } = render(
         <SelectionBottomSheet
           visible={true}

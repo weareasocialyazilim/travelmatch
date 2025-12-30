@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { RemoveCardModal } from '../RemoveCardModal';
 
 describe('RemoveCardModal', () => {
-  const mockOnCancel = jest.fn();
-  const mockOnRemove = jest.fn();
+  const mockOnCancel = jest.fn() as jest.Mock;
+  const mockOnRemove = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

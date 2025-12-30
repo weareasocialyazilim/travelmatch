@@ -35,8 +35,8 @@ jest.mock('react-native/Libraries/Vibration/Vibration', () => ({
 }));
 
 describe('GiftSuccessModal', () => {
-  const mockOnClose = jest.fn();
-  const mockOnViewApprovals = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnViewApprovals = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

@@ -181,7 +181,7 @@ describe('Network State Detection', () => {
         type: 'wifi',
       });
 
-      const onNetworkChange = jest.fn();
+      const onNetworkChange = jest.fn() as jest.Mock;
 
       const { result } = renderHook(() => useNetwork({ onNetworkChange }));
 
@@ -208,7 +208,7 @@ describe('Network State Detection', () => {
     });
 
     it('should cleanup listener on unmount', async () => {
-      const unsubscribe = jest.fn();
+      const unsubscribe = jest.fn() as jest.Mock;
 
       (mockNetInfo.addEventListener ).mockReturnValue(unsubscribe);
 
@@ -509,7 +509,7 @@ describe('Network State Detection', () => {
         type: 'none',
       });
 
-      const onReconnect = jest.fn();
+      const onReconnect = jest.fn() as jest.Mock;
 
       const { result } = renderHook(() => useNetwork({ onReconnect }));
 
@@ -594,7 +594,7 @@ describe('Network State Detection', () => {
         type: 'none',
       });
 
-      const onReconnect = jest.fn();
+      const onReconnect = jest.fn() as jest.Mock;
 
       renderHook(() => useNetwork({ onReconnect }));
 
@@ -629,7 +629,7 @@ describe('Network State Detection', () => {
         type: 'wifi',
       });
 
-      const onReconnect = jest.fn();
+      const onReconnect = jest.fn() as jest.Mock;
 
       renderHook(() => useNetwork({ onReconnect }));
 
@@ -713,7 +713,7 @@ describe('Network State Detection', () => {
         type: 'wifi',
       });
 
-      const onNetworkChange = jest.fn();
+      const onNetworkChange = jest.fn() as jest.Mock;
 
       renderHook(() => useNetwork({ onNetworkChange, debounceMs: 500 }));
 

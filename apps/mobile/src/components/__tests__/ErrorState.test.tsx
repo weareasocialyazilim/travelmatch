@@ -47,7 +47,7 @@ describe('ErrorState', () => {
 
   describe('Retry Functionality', () => {
     it('should call onRetry when retry button is pressed', () => {
-      const mockOnRetry = jest.fn();
+      const mockOnRetry = jest.fn() as jest.Mock;
       const { getByText } = render(<ErrorState onRetry={mockOnRetry} />);
       
       const retryButton = getByText('Try Again');
@@ -57,7 +57,7 @@ describe('ErrorState', () => {
     });
 
     it('should call onRetry multiple times when pressed multiple times', () => {
-      const mockOnRetry = jest.fn();
+      const mockOnRetry = jest.fn() as jest.Mock;
       const { getByText } = render(<ErrorState onRetry={mockOnRetry} />);
       
       const retryButton = getByText('Try Again');

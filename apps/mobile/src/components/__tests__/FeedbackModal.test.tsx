@@ -31,8 +31,8 @@ jest.mock('../../utils/forms', () => ({
 }));
 
 describe('FeedbackModal', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSubmit = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnSubmit = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

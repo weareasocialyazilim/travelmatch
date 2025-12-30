@@ -18,8 +18,8 @@ jest.mock('../ui/GenericBottomSheet', () => ({
 }));
 
 describe('CurrencySelectionBottomSheet', () => {
-  const mockOnClose = jest.fn();
-  const mockOnCurrencyChange = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnCurrencyChange = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,

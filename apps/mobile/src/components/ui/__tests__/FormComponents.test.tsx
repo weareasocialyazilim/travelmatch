@@ -149,7 +149,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - User Interactions', () => {
     it('should call onChangeText when text changes', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput value="" onChangeText={onChangeText} testID="email-input" />,
       );
@@ -159,7 +159,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onFocus when input receives focus', () => {
-      const onFocus = jest.fn();
+      const onFocus = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -174,7 +174,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onBlur when input loses focus', () => {
-      const onBlur = jest.fn();
+      const onBlur = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -189,7 +189,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onRightIconPress when right icon pressed', () => {
-      const onRightIconPress = jest.fn();
+      const onRightIconPress = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -206,7 +206,7 @@ describe('FormComponents', () => {
     });
 
     it('should call onSubmitEditing when return key pressed', () => {
-      const onSubmitEditing = jest.fn();
+      const onSubmitEditing = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value=""
@@ -365,7 +365,7 @@ describe('FormComponents', () => {
     });
 
     it('should set editable to false when disabled', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <FormInput
           value="Disabled"
@@ -657,7 +657,7 @@ describe('FormComponents', () => {
 
   describe('FormInput - Performance', () => {
     it('should not re-render when props dont change', () => {
-      const onChangeText = jest.fn();
+      const onChangeText = jest.fn() as jest.Mock;
       const { rerender } = render(
         <FormInput
           value="test"

@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { ClearCacheDialog } from '../ClearCacheDialog';
 
 describe('ClearCacheDialog', () => {
-  const mockOnClose = jest.fn();
-  const mockOnConfirm = jest.fn();
+  const mockOnClose = jest.fn() as jest.Mock;
+  const mockOnConfirm = jest.fn() as jest.Mock;
 
   const defaultProps = {
     visible: true,
