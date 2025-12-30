@@ -21,6 +21,8 @@ export { TMPill, TMCategoryChip } from './TMPill';
 export { PasswordInput } from './PasswordInput';
 export { ControlledInput } from './ControlledInput';
 export { PasswordStrengthMeter } from './PasswordStrengthMeter';
+export { FormStepIndicator } from './FormStepIndicator';
+export type { FormStep } from './FormStepIndicator';
 
 // Performance Optimized
 export { OptimizedImage } from './OptimizedImage';
