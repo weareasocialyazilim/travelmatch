@@ -94,3 +94,46 @@ export function useCreateDispute() {
     },
   });
 }
+
+async function updateDisputeStatus(
+  id: string,
+  status: 'resolved' | 'rejected',
+  resolution?: string
+): Promise<{ dispute: Dispute }> {
+  const response = await fetch(`/api/disputes/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status, resolution }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Anlaşmazlık güncellenemedi');
+  }
+  return response.json();
+}
+
+export function useResolveDispute() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, resolution }: { id: string; resolution?: string }) =>
+      updateDisputeStatus(id, 'resolved', resolution),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['disputes'] });
+    },
+  });
+}
+
+export function useRejectDispute() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, resolution }: { id: string; resolution?: string }) =>
+      updateDisputeStatus(id, 'rejected', resolution),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['disputes'] });
+    },
+  });
+}
+
+export type { Dispute, DisputesResponse, DisputeFilters };
