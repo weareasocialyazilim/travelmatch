@@ -24,16 +24,17 @@ const DARK_COLORS = {
  * Follows WCAG 2.1 Level AA accessibility guidelines
  */
 export const FONT_SIZES = {
-  xs: 12,
-  sm: 13,
-  base: 15,
-  md: 16,
-  lg: 17,
-  xl: 20,
-  '2xl': 24,
-  '3xl': 28,
-  '4xl': 32,
-  '5xl': 36,
+  xs: 12,      // Caption, small labels
+  sm: 13,      // Small body text
+  body: 14,    // Standard body text (from design reference)
+  base: 15,    // Base/default
+  md: 16,      // Subheadline, button text
+  lg: 17,      // h4 headers
+  xl: 20,      // h3 headers
+  '2xl': 24,   // Headline (h1/h2)
+  '3xl': 28,   // Display 3
+  '4xl': 32,   // Display 2
+  '5xl': 36,   // Display 1
 } as const;
 
 export const FONT_WEIGHTS = {
