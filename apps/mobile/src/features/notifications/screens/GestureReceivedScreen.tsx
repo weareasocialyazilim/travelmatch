@@ -171,7 +171,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
         otherUser: {
           id: senderId,
           name: senderName || 'Anonymous',
-          avatar: senderAvatar || 'https://via.placeholder.com/100',
+          avatar: senderAvatar || '',
           isVerified: true,
           type: 'traveler',
           role: 'Traveler',
@@ -250,7 +250,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
               <View style={styles.senderInfo}>
                 <Image
                   source={{
-                    uri: senderAvatar || 'https://via.placeholder.com/100',
+                    uri: senderAvatar || '',
                   }}
                   style={styles.senderAvatar}
                 />

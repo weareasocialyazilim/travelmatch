@@ -183,7 +183,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         user: {
           id: moment.creator?.id || 'unknown',
           name: moment.creator?.name || 'Anonymous',
-          avatar: moment.creator?.avatar || 'https://via.placeholder.com/150',
+          avatar: moment.creator?.avatar || '',
         },
         status:
           (moment.status as 'active' | 'pending' | 'completed') || 'active',
@@ -342,8 +342,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
                   <View style={styles.trustNoteHeader}>
                     <Image
                       source={{
-                        uri:
-                          note.writerAvatar || 'https://via.placeholder.com/32',
+                        uri: note.writerAvatar || '',
                       }}
                       style={styles.trustNoteAvatar}
                     />

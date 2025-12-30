@@ -168,13 +168,12 @@ const DiscoverScreen = () => {
       stories.push({
         id: host.hostId,
         name: host.hostName || 'Unknown',
-        avatar: host.hostAvatar || 'https://via.placeholder.com/60',
+        avatar: host.hostAvatar || '',
         hasStory: true,
         isNew: hoursAgo < 6, // Mark as new if less than 6 hours old
         stories: moments.map((m) => ({
           id: m.id,
-          imageUrl:
-            m.image || m.images?.[0] || 'https://via.placeholder.com/400',
+          imageUrl: m.image || m.images?.[0] || '',
           title: m.title,
           description: m.description || '',
           location:
