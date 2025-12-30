@@ -43,8 +43,6 @@ import { SPRINGS } from '../hooks/useAnimations';
 import { useToast } from '@/context/ToastContext';
 import type { Moment } from '../types';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
 // ============================================
 // TYPES
 // ============================================

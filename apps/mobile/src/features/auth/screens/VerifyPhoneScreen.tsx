@@ -20,7 +20,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, GRADIENTS, primitives } from '@/constants/colors';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 import { LoadingState } from '@/components/LoadingState';
 import { OTPInput } from '@/components/ui';

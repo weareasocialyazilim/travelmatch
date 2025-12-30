@@ -17,8 +17,6 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withSequence,
-  withTiming,
-  runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { COLORS, primitives } from '@/constants/colors';
@@ -209,10 +207,7 @@ interface FloatingHeartsProps {
   onComplete?: () => void;
 }
 
-export const FloatingHearts = memo<FloatingHeartsProps>(function FloatingHearts({
-  count,
-  onComplete,
-}) {
+export const FloatingHearts = memo<FloatingHeartsProps>(function FloatingHearts() {
   // For a full implementation, this would render multiple animated hearts
   // that float up and fade out. Simplified version here.
   return null; // Placeholder for now - would need more complex animation
