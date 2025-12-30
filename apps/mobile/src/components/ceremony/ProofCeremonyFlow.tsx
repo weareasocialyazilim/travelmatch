@@ -14,7 +14,7 @@
  * ```
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -22,11 +22,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  Image,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -103,7 +103,7 @@ interface ProofCeremonyFlowProps {
   testID?: string;
 }
 
-export const ProofCeremonyFlow: React.FC<ProofCeremonyFlowProps> = ({
+export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(({
   gift,
   onComplete,
   onCancel,
@@ -297,16 +297,18 @@ export const ProofCeremonyFlow: React.FC<ProofCeremonyFlowProps> = ({
       </Animated.View>
     </SafeAreaView>
   );
-};
+});
 
-// Intro Step Component
+ProofCeremonyFlow.displayName = 'ProofCeremonyFlow';
+
+// Intro Step Component - memoized for performance
 interface IntroStepProps {
   gift: Gift;
   onStart: () => void;
   onCancel: () => void;
 }
 
-const IntroStep: React.FC<IntroStepProps> = ({ gift, onStart, onCancel }) => (
+const IntroStep = memo<IntroStepProps>(({ gift, onStart, onCancel }) => (
   <ScrollView style={styles.introContainer} contentContainerStyle={styles.introContent}>
     {/* Big Sunset Clock */}
     <View style={styles.introClockContainer}>
@@ -373,9 +375,11 @@ const IntroStep: React.FC<IntroStepProps> = ({ gift, onStart, onCancel }) => (
       </TouchableOpacity>
     </Animated.View>
   </ScrollView>
-);
+));
 
-// Capture Step Component
+IntroStep.displayName = 'IntroStep';
+
+// Capture Step Component - memoized for performance
 interface CaptureStepProps {
   momentTitle: string;
   deadline: Date;
@@ -383,7 +387,7 @@ interface CaptureStepProps {
   onBack: () => void;
 }
 
-const CaptureStep: React.FC<CaptureStepProps> = ({
+const CaptureStep = memo<CaptureStepProps>(({
   momentTitle,
   deadline,
   onCapture,
@@ -407,7 +411,9 @@ const CaptureStep: React.FC<CaptureStepProps> = ({
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
     } catch (error) {
-      console.error('Camera error:', error);
+      if (__DEV__) {
+        console.error('Camera error:', error);
+      }
     } finally {
       setIsCapturing(false);
     }
@@ -440,7 +446,9 @@ const CaptureStep: React.FC<CaptureStepProps> = ({
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
-      console.error('Location error:', error);
+      if (__DEV__) {
+        console.error('Location error:', error);
+      }
       Alert.alert('Hata', 'Konum alınamadı');
     } finally {
       setIsGettingLocation(false);
@@ -480,7 +488,7 @@ const CaptureStep: React.FC<CaptureStepProps> = ({
       <View style={styles.photoGrid}>
         {photos.map((photo, index) => (
           <View key={index} style={styles.photoItem}>
-            <Image source={{ uri: photo }} style={styles.photoImage} />
+            <Image source={{ uri: photo }} style={styles.photoImage} contentFit="cover" transition={200} />
             <TouchableOpacity
               style={styles.removePhoto}
               onPress={() => removePhoto(index)}
@@ -556,9 +564,11 @@ const CaptureStep: React.FC<CaptureStepProps> = ({
       </TouchableOpacity>
     </ScrollView>
   );
-};
+});
 
-// Celebration Step Component
+CaptureStep.displayName = 'CaptureStep';
+
+// Celebration Step Component - memoized for performance
 interface CelebrationStepProps {
   gift: Gift;
   proofPhotos: string[];
@@ -567,7 +577,7 @@ interface CelebrationStepProps {
   onComplete: (memoryCardUrl?: string) => void;
 }
 
-const CelebrationStep: React.FC<CelebrationStepProps> = ({
+const CelebrationStep = memo<CelebrationStepProps>(({
   gift,
   proofPhotos,
   authResult,
@@ -588,7 +598,10 @@ const CelebrationStep: React.FC<CelebrationStepProps> = ({
 
     // Show card after confetti
     const timer = setTimeout(() => setShowCard(true), 1500);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      scaleAnim.value = 0;
+    };
   }, []);
 
   const iconAnimatedStyle = useAnimatedStyle(() => ({
@@ -678,7 +691,9 @@ const CelebrationStep: React.FC<CelebrationStepProps> = ({
       </TouchableOpacity>
     </ScrollView>
   );
-};
+});
+
+CelebrationStep.displayName = 'CelebrationStep';
 
 const styles = StyleSheet.create({
   container: {
