@@ -106,7 +106,7 @@ export const RegisterScreen: React.FC = () => {
       },
     });
 
-  const { errors, dirtyFields } = formState;
+  const { errors } = formState;
 
   // Watch all fields for real-time validation
   const watchedFields = watch();

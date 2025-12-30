@@ -15,9 +15,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   Pressable,
-  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,7 +26,6 @@ import Reanimated, {
   withTiming,
   withSequence,
   withDelay,
-  withSpring,
   Easing,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -36,9 +33,7 @@ import * as Haptics from 'expo-haptics';
 
 import { COLORS, GRADIENTS, PALETTE } from '../../../constants/colors';
 import { TYPE_SCALE } from '../../../theme/typography';
-import { SPRINGS, TIMINGS } from '../../../hooks/useAnimations';
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+import { useTranslation } from '@/hooks/useTranslation';
 
 // ============================================
 // TYPES
@@ -203,6 +198,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 // ============================================
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const titleOpacity = useSharedValue(0);
   const subtitleOpacity = useSharedValue(0);
@@ -271,11 +267,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
           <AnimatedLogo />
 
           <Reanimated.View style={titleStyle}>
-            <Text style={styles.appName}>TravelMatch</Text>
+            <Text style={styles.appName}>{t('common.appName')}</Text>
           </Reanimated.View>
 
           <Reanimated.View style={subtitleStyle}>
-            <Text style={styles.tagline}>Dilekler paylaş, anılar hediye et</Text>
+            <Text style={styles.tagline}>{t('tagline.main')}</Text>
           </Reanimated.View>
         </View>
 
@@ -284,18 +280,18 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
           {/* Social Logins */}
           <AnimatedButton variant="apple" onPress={handleAppleLogin} delay={600}>
             <MaterialCommunityIcons name="apple" size={22} color={PALETTE.white} />
-            <Text style={styles.socialButtonText}>Apple ile devam et</Text>
+            <Text style={styles.socialButtonText}>{t('welcome.continueWithApple')}</Text>
           </AnimatedButton>
 
           <AnimatedButton variant="google" onPress={handleGoogleLogin} delay={700}>
             <MaterialCommunityIcons name="google" size={22} color={PALETTE.white} />
-            <Text style={styles.socialButtonText}>Google ile devam et</Text>
+            <Text style={styles.socialButtonText}>{t('welcome.continueWithGoogle')}</Text>
           </AnimatedButton>
 
           {/* Divider */}
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>veya</Text>
+            <Text style={styles.dividerText}>{t('welcome.or')}</Text>
             <View style={styles.dividerLine} />
           </View>
 
@@ -307,21 +303,20 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
               end={{ x: 1, y: 0 }}
               style={styles.gradientFill}
             >
-              <Text style={styles.primaryButtonText}>Hesap oluştur</Text>
+              <Text style={styles.primaryButtonText}>{t('welcome.createAccount')}</Text>
             </LinearGradient>
           </AnimatedButton>
 
           <AnimatedButton variant="secondary" onPress={handleLogin} delay={900}>
-            <Text style={styles.secondaryButtonText}>Giriş yap</Text>
+            <Text style={styles.secondaryButtonText}>{t('welcome.login')}</Text>
           </AnimatedButton>
         </View>
 
         {/* Footer */}
         <Text style={styles.footer}>
-          Devam ederek{' '}
-          <Text style={styles.footerLink}>Kullanım Koşulları</Text> ve{' '}
-          <Text style={styles.footerLink}>Gizlilik Politikası</Text>'nı kabul
-          etmiş olursunuz.
+          {t('welcome.termsPrefix')}{' '}
+          <Text style={styles.footerLink}>{t('welcome.terms')}</Text> {t('welcome.and')}{' '}
+          <Text style={styles.footerLink}>{t('welcome.privacy')}</Text>
         </Text>
       </View>
     </View>

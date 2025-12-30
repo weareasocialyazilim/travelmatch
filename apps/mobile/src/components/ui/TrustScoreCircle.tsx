@@ -20,7 +20,6 @@ import Animated, {
   withTiming,
   withDelay,
   Easing,
-  interpolateColor,
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -154,7 +153,7 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
 
           {/* Factor segment indicators (outer ring) */}
           <G rotation={-90} origin={`${center}, ${center}`}>
-            {factorSegments.map((segment, index) => {
+            {factorSegments.map((segment) => {
               const segmentRadius = radius + strokeWidth / 2 + 4;
               const segmentCircumference = 2 * Math.PI * segmentRadius;
               const segmentLength = (segment.endAngle - segment.startAngle) / 360;

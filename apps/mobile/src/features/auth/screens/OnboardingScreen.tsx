@@ -48,20 +48,19 @@ import { TYPE_SCALE } from '../../../theme/typography';
 import { SPRINGS, TIMINGS } from '../../../hooks/useAnimations';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useTranslation } from '@/hooks/useTranslation';
 import { logger } from '../../../utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // ============================================
 // TYPES
 // ============================================
-interface OnboardingSlide {
+interface OnboardingSlideData {
   id: string;
   emoji: string;
   emojiSize: number;
-  headline: string;
-  subheadline: string;
   gradientColors: readonly [string, string, string];
   floatingElements: Array<{
     emoji: string;
@@ -74,15 +73,13 @@ interface OnboardingSlide {
 type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 
 // ============================================
-// SLIDE DATA
+// SLIDE DATA (text comes from translations)
 // ============================================
-const SLIDES: OnboardingSlide[] = [
+const SLIDES: OnboardingSlideData[] = [
   {
     id: '1',
     emoji: '\u2615', // Coffee emoji
     emojiSize: 120,
-    headline: 'Ya birisi sana\nbugün bir kahve\nısmarlasa?',
-    subheadline: 'Yabancılar arasında dostluk kurmanın yeni yolu',
     gradientColors: ['#F97316', '#FB923C', '#0C0A09'] as const,
     floatingElements: [
       { emoji: '\u2728', position: { top: 15, left: 10 }, scale: 1.2, rotation: -15 },
@@ -94,8 +91,6 @@ const SLIDES: OnboardingSlide[] = [
     id: '2',
     emoji: '\u{1F31F}', // Star emoji
     emojiSize: 100,
-    headline: 'Bir dilek tut',
-    subheadline: 'İstediğin deneyimi paylaş,\nbiri onu sana hediye etsin',
     gradientColors: ['#A855F7', '#C084FC', '#0C0A09'] as const,
     floatingElements: [
       { emoji: '\u{1F4AB}', position: { top: 20, left: 15 }, scale: 1, rotation: 20 },
@@ -107,8 +102,6 @@ const SLIDES: OnboardingSlide[] = [
     id: '3',
     emoji: '\u{1F381}', // Gift emoji
     emojiSize: 110,
-    headline: 'Birinin gününü\ngüzelleştir',
-    subheadline: 'Küçük bir hediye, büyük bir mutluluk',
     gradientColors: ['#F43F5E', '#FB7185', '#0C0A09'] as const,
     floatingElements: [
       { emoji: '\u{1F49D}', position: { top: 18, left: 20 }, scale: 0.9, rotation: -12 },
@@ -120,8 +113,6 @@ const SLIDES: OnboardingSlide[] = [
     id: '4',
     emoji: '\u{1F510}', // Lock emoji
     emojiSize: 100,
-    headline: 'Güvenli kasada,\nmerak etme',
-    subheadline: 'Paran deneyim gerçekleşene kadar koruma altında',
     gradientColors: ['#10B981', '#34D399', '#0C0A09'] as const,
     floatingElements: [
       { emoji: '\u{1F6E1}', position: { top: 22, left: 12 }, scale: 1.1, rotation: 8 },
@@ -133,8 +124,6 @@ const SLIDES: OnboardingSlide[] = [
     id: '5',
     emoji: '\u{1F680}', // Rocket emoji
     emojiSize: 120,
-    headline: 'Hazır mısın?',
-    subheadline: 'Dilekler seni bekliyor',
     gradientColors: ['#3B82F6', '#60A5FA', '#0C0A09'] as const,
     floatingElements: [
       { emoji: '\u{1F30D}', position: { top: 20, left: 15 }, scale: 1.2, rotation: -10 },
@@ -231,6 +220,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const insets = useSafeAreaInsets();
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
+  const { t } = useTranslation();
 
   const slideProgress = useSharedValue(0);
   const emojiScale = useSharedValue(1);
@@ -354,8 +344,8 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
       {/* Content */}
       <Reanimated.View style={[styles.contentContainer, contentAnimatedStyle]}>
-        <Text style={styles.headline}>{currentSlide.headline}</Text>
-        <Text style={styles.subheadline}>{currentSlide.subheadline}</Text>
+        <Text style={styles.headline}>{t(`onboarding.slides.${currentSlide.id}.headline`)}</Text>
+        <Text style={styles.subheadline}>{t(`onboarding.slides.${currentSlide.id}.subheadline`)}</Text>
       </Reanimated.View>
 
       {/* Bottom Controls */}
@@ -390,7 +380,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
               style={styles.ctaBlur}
             >
               <Text style={styles.ctaText}>
-                {currentIndex === SLIDES.length - 1 ? 'Başla' : 'Devam'}
+                {currentIndex === SLIDES.length - 1 ? t('onboarding.start') : t('onboarding.continue')}
               </Text>
               <MaterialCommunityIcons
                 name="arrow-right"
@@ -404,7 +394,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         {/* Skip Link */}
         {currentIndex < SLIDES.length - 1 && (
           <Pressable style={styles.skipLink} onPress={handleSkip}>
-            <Text style={styles.skipText}>Atla</Text>
+            <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
           </Pressable>
         )}
       </View>

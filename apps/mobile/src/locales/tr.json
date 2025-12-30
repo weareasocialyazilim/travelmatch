@@ -281,9 +281,33 @@
       "title": "Maceranıza Başlayın",
       "description": "Anlamlı hediyeler ve özgün deneyimlerle bağlantı kuran binlerce gezgine katılın."
     },
+    "slides": {
+      "1": {
+        "headline": "Ya birisi sana\nbugün bir kahve\nısmarlasa?",
+        "subheadline": "Yabancılar arasında dostluk kurmanın yeni yolu"
+      },
+      "2": {
+        "headline": "Bir dilek tut",
+        "subheadline": "İstediğin deneyimi paylaş,\nbiri onu sana hediye etsin"
+      },
+      "3": {
+        "headline": "Birinin gününü\ngüzelleştir",
+        "subheadline": "Küçük bir hediye, büyük bir mutluluk"
+      },
+      "4": {
+        "headline": "Güvenli kasada,\nmerak etme",
+        "subheadline": "Paran deneyim gerçekleşene kadar koruma altında"
+      },
+      "5": {
+        "headline": "Hazır mısın?",
+        "subheadline": "Anlar seni bekliyor"
+      }
+    },
     "next": "İleri",
     "skip": "Geç",
     "getStarted": "Başlayın",
+    "continue": "Devam",
+    "start": "Başla",
     "welcome": "TravelMatch'e Hoş Geldiniz",
     "welcomeMessage": "Gezginlerle bağlantı kurun ve unutulmaz deneyimler yaratın",
     "step1Title": "Anları Keşfedin",
@@ -458,5 +482,69 @@
     "sendReport": "Rapor Gönder",
     "reportSubmitted": "Rapor Gönderildi",
     "thankYou": "Bildirdiğiniz için teşekkür ederiz. İnceleyeceğiz."
+  },
+  "trust": {
+    "factors": {
+      "identity": "Kimlik",
+      "social": "Sosyal",
+      "experience": "Deneyim",
+      "response": "Yanıt",
+      "score": "Puan"
+    },
+    "stats": {
+      "moments": "Anlar",
+      "gifts": "Hediyeler",
+      "response": "Yanıt"
+    },
+    "garden": {
+      "title": "Güven Bahçesi",
+      "factorsTitle": "GÜVEN FAKTÖRLERİ",
+      "levelsTitle": "GÜVEN SEVİYELERİ",
+      "howToImprove": "Nasıl geliştirilir:",
+      "identityVerification": "Kimlik Doğrulama",
+      "identityDesc": "KYC doğrulama durumu",
+      "socialConnections": "Sosyal Bağlantılar",
+      "socialDesc": "Bağlı sosyal hesaplar",
+      "completedExperiences": "Tamamlanan Deneyimler",
+      "experienceDesc": "Başarılı moment sayısı",
+      "responseRate": "Yanıt Oranı",
+      "responseDesc": "Taleplere hızlı yanıt",
+      "receivedRatings": "Alınan Puanlar",
+      "ratingsDesc": "Ortalama değerlendirme puanı",
+      "tips": {
+        "verifyId": "Kimlik belgesi doğrulaması yap",
+        "addAddress": "Adres belgesi ekle",
+        "completeKyc": "Tam KYC tamamla",
+        "connectInstagram": "Instagram bağla (+5)",
+        "connectTwitter": "Twitter bağla (+5)",
+        "addWebsite": "Website ekle (+5)",
+        "completeMoments": "Daha fazla moment tamamla",
+        "getHighRatings": "Yüksek puan al",
+        "respondQuickly": "Hızlı yanıt ver",
+        "respondIn2h": "2 saat içinde yanıt ver",
+        "acceptQuickly": "Talepleri hızlıca kabul et",
+        "keepCalendarUpdated": "Takviminizi güncel tut",
+        "offerUnique": "Özgün deneyimler sun",
+        "clearCommunication": "Net iletişim kur",
+        "exceedExpectations": "Beklentilerin ötesine geç"
+      },
+      "levels": {
+        "sprout": "Filiz",
+        "developing": "Gelişen",
+        "growing": "Büyüyen",
+        "blooming": "Çiçek Açan"
+      },
+      "points": "puan"
+    }
+  },
+  "messages": {
+    "offline": "Mesajları görmek için internet bağlantısı gerekli",
+    "cached": "Son yüklenen mesajları gösteriyorsunuz"
+  },
+  "wishCard": {
+    "approximately": "yaklaşık"
+  },
+  "tagline": {
+    "main": "Anları paylaş, deneyimleri hediye et"
   }
 }

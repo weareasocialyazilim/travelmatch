@@ -281,9 +281,33 @@
       "title": "Start Your Adventure",
       "description": "Join thousands of travelers connecting through meaningful gifts and authentic experiences."
     },
+    "slides": {
+      "1": {
+        "headline": "What if someone\nbought you a coffee\ntoday?",
+        "subheadline": "A new way to make friends among strangers"
+      },
+      "2": {
+        "headline": "Make a wish",
+        "subheadline": "Share the experience you want,\nlet someone gift it to you"
+      },
+      "3": {
+        "headline": "Make someone's\nday special",
+        "subheadline": "A small gift, a big happiness"
+      },
+      "4": {
+        "headline": "Safe in the vault,\ndon't worry",
+        "subheadline": "Your money is protected until the experience happens"
+      },
+      "5": {
+        "headline": "Are you ready?",
+        "subheadline": "Moments are waiting for you"
+      }
+    },
     "next": "Next",
     "skip": "Skip",
     "getStarted": "Get Started",
+    "continue": "Continue",
+    "start": "Start",
     "welcome": "Welcome to TravelMatch",
     "welcomeMessage": "Connect with travelers and create unforgettable experiences",
     "step1Title": "Discover Moments",
@@ -458,5 +482,69 @@
     "sendReport": "Send Report",
     "reportSubmitted": "Report Submitted",
     "thankYou": "Thank you for reporting. We will review this."
+  },
+  "trust": {
+    "factors": {
+      "identity": "Identity",
+      "social": "Social",
+      "experience": "Experience",
+      "response": "Response",
+      "score": "Score"
+    },
+    "stats": {
+      "moments": "Moments",
+      "gifts": "Gifts",
+      "response": "Response"
+    },
+    "garden": {
+      "title": "Trust Garden",
+      "factorsTitle": "TRUST FACTORS",
+      "levelsTitle": "TRUST LEVELS",
+      "howToImprove": "How to improve:",
+      "identityVerification": "Identity Verification",
+      "identityDesc": "KYC verification status",
+      "socialConnections": "Social Connections",
+      "socialDesc": "Connected social accounts",
+      "completedExperiences": "Completed Experiences",
+      "experienceDesc": "Successful moment count",
+      "responseRate": "Response Rate",
+      "responseDesc": "Quick response to requests",
+      "receivedRatings": "Received Ratings",
+      "ratingsDesc": "Average rating score",
+      "tips": {
+        "verifyId": "Complete ID verification",
+        "addAddress": "Add address document",
+        "completeKyc": "Complete full KYC",
+        "connectInstagram": "Connect Instagram (+5)",
+        "connectTwitter": "Connect Twitter (+5)",
+        "addWebsite": "Add website (+5)",
+        "completeMoments": "Complete more moments",
+        "getHighRatings": "Get high ratings",
+        "respondQuickly": "Respond quickly",
+        "respondIn2h": "Respond within 2 hours",
+        "acceptQuickly": "Accept requests quickly",
+        "keepCalendarUpdated": "Keep your calendar updated",
+        "offerUnique": "Offer unique experiences",
+        "clearCommunication": "Clear communication",
+        "exceedExpectations": "Exceed expectations"
+      },
+      "levels": {
+        "sprout": "Sprout",
+        "developing": "Developing",
+        "growing": "Growing",
+        "blooming": "Blooming"
+      },
+      "points": "points"
+    }
+  },
+  "messages": {
+    "offline": "Internet connection required to view messages",
+    "cached": "Showing last loaded messages"
+  },
+  "wishCard": {
+    "approximately": "approximately"
+  },
+  "tagline": {
+    "main": "Share moments, gift experiences"
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, PALETTE } from '../../constants/colors';
+import { COLORS } from '../../constants/colors';
 
 export interface Contributor {
   userId: string;

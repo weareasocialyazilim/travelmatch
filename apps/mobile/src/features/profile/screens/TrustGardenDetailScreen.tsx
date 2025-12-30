@@ -24,6 +24,7 @@ import { TRUST_GARDEN_DEFAULTS } from '@/constants/defaultValues';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
+import { useTranslation } from '@/hooks/useTranslation';
 import { TrustScoreCircle, type TrustFactor } from '@/components/ui';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { UserProfile } from '@/services/userService';
@@ -32,6 +33,7 @@ import type { NavigationProp } from '@react-navigation/native';
 const TrustGardenDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
@@ -48,12 +50,12 @@ const TrustGardenDetailScreen: React.FC = () => {
 
   const trustScore = user?.trustScore || 0;
 
-  // Turkish level names
-  const getLevelTurkish = (score: number) => {
-    if (score >= 91) return 'Çiçek Açan';
-    if (score >= 71) return 'Büyüyen';
-    if (score >= 41) return 'Gelişen';
-    return 'Filiz';
+  // Translated level names
+  const getLevelName = (score: number) => {
+    if (score >= 91) return t('trust.garden.levels.blooming');
+    if (score >= 71) return t('trust.garden.levels.growing');
+    if (score >= 41) return t('trust.garden.levels.developing');
+    return t('trust.garden.levels.sprout');
   };
 
   const socialScore =
@@ -66,7 +68,7 @@ const TrustGardenDetailScreen: React.FC = () => {
     () => [
       {
         id: '1',
-        name: 'Kimlik',
+        name: t('trust.factors.identity'),
         value:
           user?.kyc === 'Verified' ? 30 : user?.kyc === 'Pending' ? 15 : 0,
         maxValue: 30,
@@ -75,7 +77,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       },
       {
         id: '2',
-        name: 'Sosyal',
+        name: t('trust.factors.social'),
         value: socialScore,
         maxValue: 15,
         color: primitives.blue[500],
@@ -83,7 +85,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       },
       {
         id: '3',
-        name: 'Deneyim',
+        name: t('trust.factors.experience'),
         value: Math.min(userProfile?.momentCount || 0, 30),
         maxValue: 30,
         color: primitives.magenta[500],
@@ -91,7 +93,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       },
       {
         id: '4',
-        name: 'Yanıt',
+        name: t('trust.factors.response'),
         value: Math.round(
           TRUST_GARDEN_DEFAULTS.RESPONSE_RATE_PERCENTAGE *
             (TRUST_GARDEN_DEFAULTS.MAX_SCORE / 100)
@@ -102,85 +104,85 @@ const TrustGardenDetailScreen: React.FC = () => {
       },
       {
         id: '5',
-        name: 'Puan',
+        name: t('trust.factors.score'),
         value: Math.round((userProfile?.rating || 0) * 2),
         maxValue: 10,
         color: primitives.purple[500],
         icon: 'star',
       },
     ],
-    [user, userProfile, socialScore]
+    [user, userProfile, socialScore, t]
   );
 
   // Detailed factors for the list below
   const detailedFactors = [
     {
       id: '1',
-      name: 'Kimlik Doğrulama',
-      description: 'KYC doğrulama durumu',
+      name: t('trust.garden.identityVerification'),
+      description: t('trust.garden.identityDesc'),
       icon: 'shield-check',
       value: user?.kyc === 'Verified' ? 100 : user?.kyc === 'Pending' ? 50 : 0,
       maxValue: 100,
       color: primitives.emerald[500],
       tips: [
-        'Kimlik belgesi doğrulaması yap',
-        'Adres belgesi ekle',
-        'Tam KYC tamamla',
+        t('trust.garden.tips.verifyId'),
+        t('trust.garden.tips.addAddress'),
+        t('trust.garden.tips.completeKyc'),
       ],
       onPress: () => navigation.navigate('Security'),
     },
     {
       id: '2',
-      name: 'Sosyal Bağlantılar',
-      description: 'Bağlı sosyal hesaplar',
+      name: t('trust.garden.socialConnections'),
+      description: t('trust.garden.socialDesc'),
       icon: 'link-variant',
       value: socialScore,
       maxValue: 15,
       color: primitives.blue[500],
-      tips: ['Instagram bağla (+5)', 'Twitter bağla (+5)', 'Website ekle (+5)'],
+      tips: [t('trust.garden.tips.connectInstagram'), t('trust.garden.tips.connectTwitter'), t('trust.garden.tips.addWebsite')],
       onPress: () => navigation.navigate('ConnectedAccounts'),
     },
     {
       id: '3',
-      name: 'Tamamlanan Deneyimler',
-      description: 'Başarılı moment sayısı',
+      name: t('trust.garden.completedExperiences'),
+      description: t('trust.garden.experienceDesc'),
       icon: 'check-circle',
       value: userProfile?.momentCount || 0,
       maxValue: 30,
       color: primitives.magenta[500],
       tips: [
-        'Daha fazla moment tamamla',
-        'Yüksek puan al',
-        'Hızlı yanıt ver',
+        t('trust.garden.tips.completeMoments'),
+        t('trust.garden.tips.getHighRatings'),
+        t('trust.garden.tips.respondQuickly'),
       ],
       onPress: () => navigation.navigate('MyMoments'),
     },
     {
       id: '4',
-      name: 'Yanıt Oranı',
-      description: 'Taleplere hızlı yanıt',
+      name: t('trust.garden.responseRate'),
+      description: t('trust.garden.responseDesc'),
       icon: 'message-reply',
       value: TRUST_GARDEN_DEFAULTS.RESPONSE_RATE_PERCENTAGE,
       maxValue: TRUST_GARDEN_DEFAULTS.MAX_SCORE,
       color: primitives.amber[500],
       tips: [
-        '2 saat içinde yanıt ver',
-        'Talepleri hızlıca kabul et',
-        'Takviminizi güncel tut',
+        t('trust.garden.tips.respondIn2h'),
+        t('trust.garden.tips.acceptQuickly'),
+        t('trust.garden.tips.keepCalendarUpdated'),
       ],
     },
     {
       id: '5',
-      name: 'Alınan Puanlar',
-      description: 'Ortalama değerlendirme puanı',
+      name: t('trust.garden.receivedRatings'),
+      description: t('trust.garden.ratingsDesc'),
       icon: 'star',
       value: userProfile?.rating || 0,
       maxValue: 5,
       color: primitives.purple[500],
       tips: [
-        'Özgün deneyimler sun',
-        'Net iletişim kur',
-        'Beklentilerin ötesine geç',
+        t('trust.garden.tips.offerUnique'),
+        t('trust.garden.tips.clearCommunication'),
+        t('trust.garden.tips.exceedExpectations'),
       ],
     },
   ];
@@ -199,7 +201,7 @@ const TrustGardenDetailScreen: React.FC = () => {
             color={COLORS.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Güven Bahçesi</Text>
+        <Text style={styles.headerTitle}>{t('trust.garden.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -211,14 +213,14 @@ const TrustGardenDetailScreen: React.FC = () => {
         {/* Premium Trust Score Circle */}
         <TrustScoreCircle
           score={trustScore}
-          level={getLevelTurkish(trustScore)}
+          level={getLevelName(trustScore)}
           factors={trustFactors}
           animated
         />
 
         {/* Trust Factors Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>GÜVEN FAKTÖRLERİ</Text>
+          <Text style={styles.sectionTitle}>{t('trust.garden.factorsTitle')}</Text>
 
           {detailedFactors.map((factor) => (
             <TouchableOpacity
@@ -287,7 +289,7 @@ const TrustGardenDetailScreen: React.FC = () => {
 
               {factor.value < factor.maxValue && (
                 <View style={styles.tipsContainer}>
-                  <Text style={styles.tipsTitle}>Nasıl geliştirilir:</Text>
+                  <Text style={styles.tipsTitle}>{t('trust.garden.howToImprove')}</Text>
                   {factor.tips.slice(0, 2).map((tip, index) => (
                     <View key={index} style={styles.tipItem}>
                       <MaterialCommunityIcons
@@ -306,28 +308,28 @@ const TrustGardenDetailScreen: React.FC = () => {
 
         {/* Trust Levels Guide */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>GÜVEN SEVİYELERİ</Text>
+          <Text style={styles.sectionTitle}>{t('trust.garden.levelsTitle')}</Text>
 
           <View style={styles.levelsCard}>
             {[
               {
-                name: 'Filiz',
-                range: '0-40 puan',
+                name: t('trust.garden.levels.sprout'),
+                range: `0-40 ${t('trust.garden.points')}`,
                 color: primitives.magenta[500],
               },
               {
-                name: 'Gelişen',
-                range: '41-70 puan',
+                name: t('trust.garden.levels.developing'),
+                range: `41-70 ${t('trust.garden.points')}`,
                 color: primitives.amber[500],
               },
               {
-                name: 'Büyüyen',
-                range: '71-90 puan',
+                name: t('trust.garden.levels.growing'),
+                range: `71-90 ${t('trust.garden.points')}`,
                 color: primitives.emerald[500],
               },
               {
-                name: 'Çiçek Açan',
-                range: '91-100 puan',
+                name: t('trust.garden.levels.blooming'),
+                range: `91-100 ${t('trust.garden.points')}`,
                 color: primitives.purple[500],
               },
             ].map((level, index) => (
