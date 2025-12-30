@@ -4,3 +4,4 @@ export * from './stat-card';
 export * from './status-badge';
 export * from './bulk-actions';
 export * from './kanban-board';
+export * from './dashboard-widgets';
