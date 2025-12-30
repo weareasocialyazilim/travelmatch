@@ -1,17 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
+/**
+ * VerifyPhoneScreen - Phone OTP Verification
+ *
+ * Implements UX best practices:
+ * - Smart Keyboard Behavior with auto-advance
+ * - SMS auto-fill support
+ * - Clear CTA with prominent button
+ * - Visual feedback during verification
+ */
+
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
-  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '@/constants/colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, GRADIENTS, primitives } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 import { LoadingState } from '@/components/LoadingState';
+import { OTPInput } from '@/components/ui';
 import { useToast } from '@/context/ToastContext';
 import { twilioClient } from '@/services/twilioService';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -31,10 +43,10 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
 }) => {
   const { email: _email, phone, fullName: _fullName } = route.params;
   const { showToast } = useToast();
-  const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
+  const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Send SMS on mount
@@ -46,7 +58,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
     if (resendCooldown > 0) {
       const timer = setTimeout(
         () => setResendCooldown(resendCooldown - 1),
-        1000,
+        1000
       );
       return () => clearTimeout(timer);
     }
@@ -55,66 +67,43 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
 
   const sendSmsCode = async () => {
     setLoading(true);
+    setError(null);
     try {
       const result = await twilioClient.sendPhoneOtp(phone);
 
       if (result.success) {
         setResendCooldown(RESEND_COOLDOWN);
-        showToast('Verification code sent to your phone', 'success');
-        // Focus first input after SMS sent
-        setTimeout(() => inputRefs.current[0]?.focus(), 500);
+        showToast('Doğrulama kodu gönderildi', 'success');
       } else {
-        showToast(result.error || 'Failed to send SMS', 'error');
+        showToast(result.error || 'SMS gönderilemedi', 'error');
       }
-    } catch (error) {
-      logger.error('Send SMS error:', error);
-      showToast('Failed to send SMS. Please try again.', 'error');
+    } catch (err) {
+      logger.error('Send SMS error:', err);
+      showToast('SMS gönderilemedi. Lütfen tekrar deneyin.', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCodeChange = (text: string, index: number) => {
-    // Only allow digits
-    const digit = text.replace(/[^0-9]/g, '').slice(-1);
-
-    const newCode = [...code];
-    newCode[index] = digit;
+  const handleCodeChange = (newCode: string) => {
     setCode(newCode);
-
-    // Auto-focus next input
-    if (digit && index < CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    // Auto-submit when all digits entered
-    if (digit && index === CODE_LENGTH - 1) {
-      const fullCode = newCode.join('');
-      if (fullCode.length === CODE_LENGTH) {
-        Keyboard.dismiss();
-        handleVerify(fullCode);
-      }
-    }
+    setError(null);
   };
 
-  const handleKeyPress = (
-    e: { nativeEvent: { key: string } },
-    index: number,
-  ) => {
-    if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
+  const handleCodeComplete = async (verificationCode: string) => {
+    await handleVerify(verificationCode);
   };
 
   const handleVerify = async (verificationCode?: string) => {
-    const codeToVerify = verificationCode || code.join('');
+    const codeToVerify = verificationCode || code;
 
     if (codeToVerify.length !== CODE_LENGTH) {
-      showToast('Please enter the complete 6-digit code', 'error');
+      setError('Lütfen 6 haneli kodu girin');
       return;
     }
 
     setLoading(true);
+    setError(null);
     try {
       const result = await twilioClient.verifyPhoneOtp(phone, codeToVerify);
 
@@ -126,14 +115,12 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
           routes: [{ name: 'Discover' }],
         });
       } else {
-        showToast(result.error || 'Invalid verification code', 'error');
-        // Clear the code
-        setCode(Array(CODE_LENGTH).fill(''));
-        inputRefs.current[0]?.focus();
+        setError('Geçersiz doğrulama kodu');
+        setCode('');
       }
-    } catch (error) {
-      logger.error('Phone verification error:', error);
-      showToast('Verification failed. Please try again.', 'error');
+    } catch (err) {
+      logger.error('Phone verification error:', err);
+      setError('Doğrulama başarısız. Lütfen tekrar deneyin.');
     } finally {
       setLoading(false);
     }
@@ -142,23 +129,24 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
   const handleResend = async () => {
     if (resendCooldown > 0) return;
 
-    setCode(Array(CODE_LENGTH).fill(''));
+    setCode('');
+    setError(null);
     await sendSmsCode();
   };
 
   const formatPhoneNumber = (phoneNumber: string) => {
     // Mask middle digits for privacy
     if (phoneNumber.length > 6) {
-      return phoneNumber.slice(0, 4) + '****' + phoneNumber.slice(-2);
+      return phoneNumber.slice(0, 4) + ' •••• ' + phoneNumber.slice(-2);
     }
     return phoneNumber;
   };
 
-  const isCodeComplete = code.every((digit) => digit !== '');
+  const isCodeComplete = code.length === CODE_LENGTH;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {loading && <LoadingState type="overlay" message="Verifying..." />}
+      {loading && <LoadingState type="overlay" message="Doğrulanıyor..." />}
 
       {/* Header */}
       <View style={styles.header}>
@@ -166,80 +154,116 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
           onPress={() => navigation.goBack()}
           style={styles.backButton}
           accessibilityRole="button"
-          accessibilityLabel="Go back"
+          accessibilityLabel="Geri dön"
         >
-          <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text.primary}
+          />
         </TouchableOpacity>
       </View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        {/* Icon */}
-        <View style={styles.iconContainer}>
-          <Icon name="phone-check-outline" size={64} color={COLORS.mint} />
-        </View>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        {/* Content */}
+        <View style={styles.content}>
+          {/* Icon */}
+          <View style={styles.iconContainer}>
+            <LinearGradient
+              colors={GRADIENTS.gift}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.iconGradient}
+            >
+              <MaterialCommunityIcons
+                name="cellphone-message"
+                size={48}
+                color={COLORS.white}
+              />
+            </LinearGradient>
+          </View>
 
-        {/* Title */}
-        <Text style={styles.title}>Verify Your Phone</Text>
-        <Text style={styles.subtitle}>
-          We've sent a 6-digit verification code to
-        </Text>
-        <Text style={styles.phoneText}>{formatPhoneNumber(phone)}</Text>
-
-        {/* Code Input */}
-        <View style={styles.codeContainer}>
-          {code.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => {
-                inputRefs.current[index] = ref;
-              }}
-              style={[styles.codeInput, digit && styles.codeInputFilled]}
-              value={digit}
-              onChangeText={(text) => handleCodeChange(text, index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              keyboardType="number-pad"
-              maxLength={1}
-              selectTextOnFocus
-              accessibilityLabel={`Digit ${index + 1}`}
-            />
-          ))}
-        </View>
-
-        {/* Resend */}
-        <View style={styles.resendContainer}>
-          <Text style={styles.resendText}>Didn't receive the code? </Text>
-          {resendCooldown > 0 ? (
-            <Text style={styles.cooldownText}>Resend in {resendCooldown}s</Text>
-          ) : (
-            <TouchableOpacity onPress={handleResend}>
-              <Text style={styles.resendLink}>Resend Code</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Verify Button */}
-        <TouchableOpacity
-          style={[
-            styles.verifyButton,
-            (!isCodeComplete || loading) && styles.verifyButtonDisabled,
-          ]}
-          onPress={() => handleVerify()}
-          disabled={!isCodeComplete || loading}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.verifyButtonText}>Verify Phone</Text>
-        </TouchableOpacity>
-
-        {/* Email verification info */}
-        <View style={styles.emailInfoContainer}>
-          <Icon name="email-check-outline" size={18} color={COLORS.mint} />
-          <Text style={styles.emailInfoText}>
-            We've also sent a verification link to your email. Please check your
-            inbox and click the link to verify your email address.
+          {/* Title */}
+          <Text style={styles.title}>Telefonu Doğrula</Text>
+          <Text style={styles.subtitle}>
+            6 haneli doğrulama kodunu gönderdik
           </Text>
+          <Text style={styles.phoneText}>{formatPhoneNumber(phone)}</Text>
+
+          {/* OTP Input */}
+          <View style={styles.otpContainer}>
+            <OTPInput
+              length={CODE_LENGTH}
+              value={code}
+              onChange={handleCodeChange}
+              onComplete={handleCodeComplete}
+              error={!!error}
+              errorMessage={error || undefined}
+              autoFocus
+              disabled={loading}
+            />
+          </View>
+
+          {/* Resend */}
+          <View style={styles.resendContainer}>
+            <Text style={styles.resendText}>Kod gelmedi mi? </Text>
+            {resendCooldown > 0 ? (
+              <Text style={styles.cooldownText}>
+                {resendCooldown} saniye bekleyin
+              </Text>
+            ) : (
+              <TouchableOpacity onPress={handleResend} disabled={loading}>
+                <Text style={styles.resendLink}>Tekrar Gönder</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Verify Button - Prominent CTA */}
+          <TouchableOpacity
+            style={[
+              styles.verifyButton,
+              (!isCodeComplete || loading) && styles.verifyButtonDisabled,
+            ]}
+            onPress={() => handleVerify()}
+            disabled={!isCodeComplete || loading}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={
+                isCodeComplete && !loading
+                  ? GRADIENTS.gift
+                  : GRADIENTS.disabled
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.gradientButton}
+            >
+              <MaterialCommunityIcons
+                name="check-circle"
+                size={20}
+                color={COLORS.white}
+              />
+              <Text style={styles.verifyButtonText}>Telefonu Doğrula</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Email verification info */}
+          <View style={styles.emailInfoContainer}>
+            <MaterialCommunityIcons
+              name="email-check-outline"
+              size={18}
+              color={COLORS.primary}
+            />
+            <Text style={styles.emailInfoText}>
+              E-postanıza da bir doğrulama linki gönderdik. Lütfen gelen
+              kutunuzu kontrol edin.
+            </Text>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -256,11 +280,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
+    borderRadius: 22,
+    backgroundColor: COLORS.surface,
+  },
+  keyboardView: {
+    flex: 1,
   },
   content: {
     flex: 1,
@@ -268,20 +296,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: `${COLORS.mint}15`,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 24,
     marginBottom: 32,
+  },
+  iconGradient: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
     color: COLORS.text.primary,
-    marginBottom: 12,
+    marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
@@ -291,33 +320,15 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   phoneText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: COLORS.text.primary,
-    marginTop: 4,
+    marginTop: 8,
     marginBottom: 32,
+    letterSpacing: 1,
   },
-  codeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    marginBottom: 32,
-  },
-  codeInput: {
-    width: 48,
-    height: 56,
-    borderWidth: 2,
-    borderColor: COLORS.border.default,
-    borderRadius: 12,
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    textAlign: 'center',
-    backgroundColor: COLORS.utility.white,
-  },
-  codeInputFilled: {
-    borderColor: COLORS.mint,
-    backgroundColor: `${COLORS.mint}10`,
+  otpContainer: {
+    marginBottom: 24,
   },
   resendContainer: {
     flexDirection: 'row',
@@ -331,42 +342,46 @@ const styles = StyleSheet.create({
   resendLink: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.mint,
+    color: COLORS.primary,
   },
   cooldownText: {
     fontSize: 14,
-    color: COLORS.text.secondary,
+    color: COLORS.text.tertiary,
     fontWeight: '500',
   },
   verifyButton: {
     width: '100%',
-    height: 52,
-    backgroundColor: COLORS.mint,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 14,
+    overflow: 'hidden',
     marginBottom: 24,
   },
   verifyButtonDisabled: {
-    backgroundColor: `${COLORS.mint}50`,
+    opacity: 0.7,
+  },
+  gradientButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 56,
+    gap: 8,
   },
   verifyButtonText: {
-    color: COLORS.utility.white,
-    fontSize: 16,
+    color: COLORS.white,
+    fontSize: 17,
     fontWeight: '700',
   },
   emailInfoContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 10,
+    gap: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: `${COLORS.mint}10`,
-    borderRadius: 12,
+    paddingVertical: 14,
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: 14,
     marginTop: 8,
   },
   emailInfoText: {
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.text.primary,
     flex: 1,
     lineHeight: 20,
