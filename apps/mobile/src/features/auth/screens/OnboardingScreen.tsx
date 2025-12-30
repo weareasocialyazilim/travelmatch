@@ -43,7 +43,7 @@ import type {
 } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
-import { COLORS, GRADIENTS, PALETTE } from '../../../constants/colors';
+import { PALETTE } from '../../../constants/colors';
 import { TYPE_SCALE } from '../../../theme/typography';
 import { SPRINGS, TIMINGS } from '../../../hooks/useAnimations';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -266,7 +266,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         analytics.trackEvent('onboarding_page_view', {
           screen: 'onboarding',
           page_number: currentIndex + 2,
-          page_title: SLIDES[currentIndex + 1].headline,
+          page_id: SLIDES[currentIndex + 1].id,
         });
       }, 150);
     } else {
